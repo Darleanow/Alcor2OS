@@ -26,17 +26,22 @@ ASFLAGS     := -f elf64
 LIMINE_URL  := https://github.com/limine-bootloader/limine.git
 LIMINE_REV  := v8.x-binary
 
+MUSL_URL    := https://git.musl-libc.org/cgit/musl/snapshot/musl-1.2.5.tar.gz
+MUSL_VER    := 1.2.5
+
 SRCS_C      := $(shell find $(SRC) -name '*.c')
 SRCS_ASM    := $(shell find $(SRC) -name '*.asm')
 OBJS        := $(patsubst $(SRC)/%.c,$(BUILD)/%.c.o,$(SRCS_C)) \
                $(patsubst $(SRC)/%.asm,$(BUILD)/%.asm.o,$(SRCS_ASM))
 DEPS        := $(OBJS:.o=.d)
 
-.PHONY: all iso run run-disk disk disk-mount disk-umount clean distclean user
+.PHONY: all iso run run-disk disk disk-mount disk-umount clean distclean user musl
 
 all: iso
 
-user:
+musl: thirdparty/musl/install/lib/libc.a
+
+user: thirdparty/musl/install/lib/libc.a
 	$(MAKE) -C user/crt
 	$(MAKE) -C user/init
 	$(MAKE) -C user/shell
@@ -57,6 +62,19 @@ $(BUILD)/$(KERNEL): $(OBJS)
 thirdparty/limine/limine:
 	git clone $(LIMINE_URL) --branch=$(LIMINE_REV) --depth=1 thirdparty/limine
 	$(MAKE) -C thirdparty/limine
+
+thirdparty/musl/install/lib/libc.a:
+	@echo "Downloading musl $(MUSL_VER)..."
+	@mkdir -p thirdparty
+	@curl -sL $(MUSL_URL) | tar xz -C thirdparty
+	@mv thirdparty/musl-$(MUSL_VER) thirdparty/musl
+	@echo "Configuring musl..."
+	@cd thirdparty/musl && ./configure --prefix=$$(pwd)/install \
+		--disable-shared CFLAGS='-Os -fno-stack-protector' >/dev/null
+	@echo "Building musl (this may take a minute)..."
+	@$(MAKE) -C thirdparty/musl -j$$(nproc) >/dev/null
+	@$(MAKE) -C thirdparty/musl install >/dev/null
+	@echo "musl $(MUSL_VER) installed"
 
 iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user
 	@rm -rf $(BUILD)/iso
