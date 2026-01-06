@@ -139,52 +139,24 @@ void kmain(void)
   keyboard_init();
   console_print("Keyboard initialized.\n");
 
-  vfs_init();
-
-  /* Load modules into ramfs (bin/ directory) */
-  if(module_request.response && module_request.response->module_count > 1) {
-    vfs_mkdir("/bin");
-    for(u64 i = 1; i < module_request.response->module_count; i++) {
-      struct limine_file *mod = module_request.response->modules[i];
-      /* Extract filename from path (e.g., "boot():/bin/ls.elf" -> "ls") */
-      const char *path = mod->path;
-      const char *name = path;
-      for(const char *p = path; *p; p++) {
-        if(*p == '/')
-          name = p + 1;
-      }
-      /* Remove .elf extension */
-      char binname[64] = "/bin/";
-      int  j           = 5;
-      for(const char *p = name; *p && *p != '.' && j < 62; p++) {
-        binname[j++] = *p;
-      }
-      binname[j] = '\0';
-
-      /* Create file and write module data */
-      i64 fd = vfs_open(binname, O_CREAT | O_WRONLY);
-      if(fd >= 0) {
-        vfs_write(fd, mod->address, mod->size);
-        vfs_close(fd);
-        console_printf(
-            "[KERNEL] Loaded %s (%d bytes)\n", binname, (int)mod->size
-        );
-      }
-    }
-  }
-
-  /* Initialize ATA drives */
+  /* Initialize ATA drives early (needed for root filesystem) */
   ata_init();
 
-  /* Auto-mount FAT32 on /mnt if drive 0 is present */
+  /* Initialize VFS with minimal ramfs */
+  vfs_init();
+
+  /* Mount FAT32 as root filesystem */
   ata_drive_t *hda = ata_get_drive(0);
   if(hda && hda->present) {
-    vfs_mkdir("/mnt");
-    if(vfs_mount("/dev/hda", "/mnt", "fat32") == 0) {
-      console_print("[VFS] Mounted /dev/hda (FAT32) on /mnt\n");
+    if(vfs_mount("/dev/hda", "/", "fat32") == 0) {
+      console_print("[VFS] Mounted /dev/hda (FAT32) on /\n");
+      /* Mount /dev as ramfs overlay (like Linux devtmpfs) */
+      vfs_mount(NULL, "/dev", "ramfs");
     } else {
-      console_print("[VFS] Failed to mount FAT32 on /mnt\n");
+      console_print("[VFS] Failed to mount FAT32 on / - falling back to ramfs\n");
     }
+  } else {
+    console_print("[VFS] No disk found - using ramfs only\n");
   }
 
   cpu_enable_interrupts();

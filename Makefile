@@ -96,7 +96,7 @@ $(DISK):
 	@echo "Created $(DISK)"
 
 # Run with disk attached (hda = /dev/hda in guest)
-run-disk: iso $(DISK)
+run-disk: iso disk-populate
 	qemu-system-x86_64 -cdrom $(BUILD)/$(ISO) -drive file=$(DISK),format=raw,if=ide,cache=writethrough -boot d -m 256M
 
 # Mount disk image to ./mnt for adding files (requires sudo)
@@ -110,6 +110,23 @@ disk-umount:
 	@sudo umount mnt 2>/dev/null || true
 	@rmdir mnt 2>/dev/null || true
 	@echo "Disk unmounted"
+
+# Populate disk with user binaries
+disk-populate: $(DISK) user
+	@mkdir -p mnt
+	@sudo mount -o loop $(DISK) mnt
+	@sudo mkdir -p mnt/bin mnt/etc mnt/tmp mnt/home
+	@sudo cp user/build/bin/*.elf mnt/bin/ 2>/dev/null || true
+	@for f in mnt/bin/*.elf; do \
+		if [ -f "$$f" ]; then \
+			newname=$$(echo "$$f" | sed 's/\.elf$$//'); \
+			sudo mv "$$f" "$$newname"; \
+		fi; \
+	done
+	@echo "Welcome to Alcor2!" | sudo tee mnt/etc/motd > /dev/null
+	@sudo umount mnt
+	@rmdir mnt
+	@echo "Disk populated with user binaries"
 
 # Quick helper: add a file to disk
 # Usage: make disk-add FILE=myfile.txt

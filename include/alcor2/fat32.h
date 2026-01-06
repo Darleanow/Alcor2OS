@@ -135,6 +135,7 @@ typedef struct
   u32             position;
   u8              attr;
   bool            is_dir;
+  bool            is_root;         /**< Is this the root directory */
   bool            in_use;
   bool            dirty;           /**< File has been modified */
   u32             parent_cluster;  /**< Parent directory cluster */
