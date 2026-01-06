@@ -4,3 +4,4 @@ thirdparty/
 *.d
 *.elf
 *.iso
+*.img
