@@ -1021,7 +1021,7 @@ i64 vfs_touch(const char *path)
 /**
  * @brief Remove/delete a file
  * @param path Path to file to remove
- * @return 0 on success, negative on error
+ * @return 0 on success, negative errno on error
  */
 i64 vfs_unlink(const char *path)
 {
@@ -1029,9 +1029,20 @@ i64 vfs_unlink(const char *path)
   char abs_path[VFS_PATH_MAX];
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
+  /* Check if path is on a mounted filesystem */
+  vfs_mount_t *mount = find_mount(abs_path);
+  if(mount && mount->type == FS_TYPE_FAT32) {
+    const char *rel_path = get_relative_path(abs_path, mount);
+    return fat32_unlink((fat32_volume_t *)mount->fs_data, rel_path);
+  }
+
+  /* Ramfs path */
   vfs_node_t *node = resolve_path(abs_path);
-  if(!node || node->type != VFS_FILE) {
-    return -1; /* Can't remove directories with unlink */
+  if(!node) {
+    return -ENOENT;
+  }
+  if(node->type != VFS_FILE) {
+    return -EISDIR; /* Can't remove directories with unlink */
   }
 
   /* Remove from parent's children list */
