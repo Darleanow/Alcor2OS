@@ -445,14 +445,7 @@ void vfs_init(void)
   }
   root_node->parent = root_node; /* Root is its own parent */
 
-  /* Create standard directories */
-  vfs_mkdir("/bin");
-  vfs_mkdir("/etc");
-  vfs_mkdir("/tmp");
-  vfs_mkdir("/home");
-  vfs_mkdir("/mnt");
-
-  /* Create /dev for device nodes (Linux-like) */
+  /* Create /dev for device nodes - kept in ramfs */
   vfs_mkdir("/dev");
 
   /* Create device nodes for ATA drives
@@ -466,15 +459,7 @@ void vfs_init(void)
   vfs_touch("/dev/hdc");
   vfs_touch("/dev/hdd");
 
-  /* Create a welcome file */
-  i64 fd = vfs_open("/etc/motd", O_CREAT | O_WRONLY);
-  if(fd >= 0) {
-    const char *msg = "Welcome to Alcor2!\n";
-    vfs_write(fd, msg, str_len(msg));
-    vfs_close(fd);
-  }
-
-  console_print("[VFS] Initialized (ramfs + /dev)\n");
+  console_print("[VFS] Initialized (minimal ramfs + /dev)\n");
 }
 
 /**
@@ -1257,6 +1242,11 @@ i64 vfs_chdir(const char *path)
  */
 static bool starts_with(const char *path, const char *prefix)
 {
+  /* Special case: root mount point "/" matches everything starting with "/" */
+  if(prefix[0] == '/' && prefix[1] == '\0') {
+    return path[0] == '/';
+  }
+
   while(*prefix) {
     if(*path != *prefix)
       return false;

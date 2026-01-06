@@ -627,6 +627,7 @@ fat32_file_t *fat32_open(fat32_volume_t *vol, const char *path)
   file->position        = 0;
   file->attr            = entry.attr;
   file->is_dir          = (entry.attr & FAT_ATTR_DIRECTORY) != 0;
+  file->is_root         = (file->start_cluster == vol->root_cluster);
   file->in_use          = true;
   file->dirty           = false;
   file->parent_cluster  = entry_cluster;
