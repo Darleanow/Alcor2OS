@@ -252,4 +252,12 @@ i64 fat32_truncate(fat32_file_t *file);
  */
 i64 fat32_flush(fat32_file_t *file);
 
+/**
+ * @brief Delete a file from the filesystem.
+ * @param vol Volume containing the file.
+ * @param path Path to the file to delete.
+ * @return 0 on success, negative on error.
+ */
+i64 fat32_unlink(fat32_volume_t *vol, const char *path);
+
 #endif

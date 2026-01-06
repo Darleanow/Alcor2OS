@@ -1310,3 +1310,59 @@ fat32_file_t *fat32_create(fat32_volume_t *vol, const char *path)
 
   return file;
 }
+
+/**
+ * @brief Delete a file from the filesystem
+ * @param vol Volume containing the file
+ * @param path Path to the file to delete
+ * @return 0 on success, negative errno on error
+ */
+i64 fat32_unlink(fat32_volume_t *vol, const char *path)
+{
+  if(!vol || !vol->mounted || !path)
+    return -EINVAL;
+
+  /* Resolve path to get entry info */
+  fat32_dirent_t entry;
+  u32            entry_cluster = 0;
+  u32            entry_offset  = 0;
+
+  if(resolve_path(vol, path, &entry, NULL, &entry_cluster, &entry_offset) < 0) {
+    return -ENOENT; /* File not found */
+  }
+
+  /* Can't delete directories with unlink */
+  if(entry.attr & FAT_ATTR_DIRECTORY) {
+    return -EISDIR;
+  }
+
+  /* Get the file's data cluster chain start */
+  u32 file_cluster = ((u32)entry.cluster_high << 16) | entry.cluster_low;
+
+  /* Mark directory entry as deleted (0xE5) */
+  u8 *cluster_buf = kmalloc(vol->bytes_per_cluster);
+  if(!cluster_buf)
+    return -ENOMEM;
+
+  if(vol_read_cluster(vol, entry_cluster, cluster_buf) < 0) {
+    kfree(cluster_buf);
+    return -EIO;
+  }
+
+  /* Set first byte of name to 0xE5 (deleted marker) */
+  cluster_buf[entry_offset] = 0xE5;
+
+  if(vol_write_cluster(vol, entry_cluster, cluster_buf) < 0) {
+    kfree(cluster_buf);
+    return -EIO;
+  }
+
+  kfree(cluster_buf);
+
+  /* Free the cluster chain if file had data */
+  if(file_cluster >= 2) {
+    fat_free_chain(vol, file_cluster);
+  }
+
+  return 0;
+}
