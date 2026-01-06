@@ -1,0 +1,6 @@
+build/
+thirdparty/
+*.o
+*.d
+*.elf
+*.iso

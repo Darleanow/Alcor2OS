@@ -1,0 +1,215 @@
+/**
+ * @file src/kernel/main.c
+ * @brief Kernel entry point and initialization.
+ */
+
+#include <alcor2/ata.h>
+#include <alcor2/console.h>
+#include <alcor2/cpu.h>
+#include <alcor2/elf.h>
+#include <alcor2/gdt.h>
+#include <alcor2/heap.h>
+#include <alcor2/idt.h>
+#include <alcor2/keyboard.h>
+#include <alcor2/limine.h>
+#include <alcor2/pic.h>
+#include <alcor2/pit.h>
+#include <alcor2/pmm.h>
+#include <alcor2/proc.h>
+#include <alcor2/sched.h>
+#include <alcor2/syscall.h>
+#include <alcor2/types.h>
+#include <alcor2/user.h>
+#include <alcor2/vfs.h>
+#include <alcor2/vmm.h>
+
+LIMINE_BASE_REVISION(3)
+LIMINE_REQUESTS_START
+
+USED SECTION(
+    ".limine_requests"
+) static volatile struct limine_framebuffer_request fb_request = {
+    .id = LIMINE_FRAMEBUFFER_REQUEST_ID, .revision = 0
+};
+
+USED SECTION(
+    ".limine_requests"
+) static volatile struct limine_memmap_request memmap_request = {
+    .id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0
+};
+
+USED SECTION(
+    ".limine_requests"
+) static volatile struct limine_hhdm_request hhdm_request = {
+    .id = LIMINE_HHDM_REQUEST_ID, .revision = 0
+};
+
+USED SECTION(
+    ".limine_requests"
+) static volatile struct limine_module_request module_request = {
+    .id = LIMINE_MODULE_REQUEST_ID, .revision = 0
+};
+
+LIMINE_REQUESTS_END
+
+/**
+ * @brief Kernel main entry point.
+ * 
+ * Initializes all kernel subsystems in order:
+ * - Framebuffer console
+ * - Physical memory manager (PMM)
+ * - Virtual memory manager (VMM)
+ * - Kernel heap
+ * - Task scheduler
+ * - Global Descriptor Table (GDT)
+ * - Interrupt Descriptor Table (IDT)
+ * - CPU features (SSE/FPU)
+ * - System call interface
+ * - PIC and PIT (interrupts and timer)
+ * - Keyboard driver
+ * - Virtual File System (VFS)
+ * - ATA disk driver
+ * - Process subsystem
+ * 
+ * Loads modules into ramfs, then starts the first user process (init/shell).
+ * Never returns - enters idle loop or starts first process.
+ */
+void kmain(void)
+{
+  if(!LIMINE_BASE_REVISION_OK)
+    cpu_halt();
+
+  if(!fb_request.response || fb_request.response->framebuffer_count < 1)
+    cpu_halt();
+
+  if(!memmap_request.response || !hhdm_request.response)
+    cpu_halt();
+
+  struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
+
+  console_init(fb->address, fb->width, fb->height, fb->pitch);
+  console_set_theme((console_theme_t) {.foreground = 0x00FF00,
+                                       .background = 0x000000});
+  console_clear();
+
+  console_print("\n");
+  console_print("    ___    __                ___\n");
+  console_print("   /   |  / /________  _____/__ \\\n");
+  console_print("  / /| | / / ___/ __ \\/ ___/_/ /\n");
+  console_print(" / ___ |/ / /__/ /_/ / /   / __/\n");
+  console_print("/_/  |_/_/\\___/\\____/_/   /____/\n");
+  console_print("\n");
+  console_print("Alcor2 OS v0.1.0\n");
+  console_print("----------------\n\n");
+  console_print("Kernel initialized successfully.\n");
+  console_print("Framebuffer: ");
+  console_printf(
+      "%dx%d @ %dbpp\n", (int)fb->width, (int)fb->height, (int)fb->bpp
+  );
+
+  pmm_init(memmap_request.response, hhdm_request.response->offset);
+  console_printf(
+      "PMM: %dMB total, %dMB free\n", (int)(pmm_get_total() / 1024 / 1024),
+      (int)(pmm_get_free() / 1024 / 1024)
+  );
+
+  vmm_init(hhdm_request.response->offset);
+  console_print("VMM initialized.\n");
+
+  heap_init();
+
+  sched_init();
+
+  gdt_init();
+  console_print("GDT loaded.\n");
+
+  idt_init();
+  console_print("IDT loaded.\n");
+
+  cpu_enable_sse();
+
+  syscall_init();
+
+  pic_init();
+  pit_init(100);
+  pic_unmask(IRQ_TIMER);
+  pit_enable_sched();
+  console_print("PIC/PIT initialized.\n");
+
+  keyboard_init();
+  console_print("Keyboard initialized.\n");
+
+  vfs_init();
+
+  /* Load modules into ramfs (bin/ directory) */
+  if(module_request.response && module_request.response->module_count > 1) {
+    vfs_mkdir("/bin");
+    for(u64 i = 1; i < module_request.response->module_count; i++) {
+      struct limine_file *mod = module_request.response->modules[i];
+      /* Extract filename from path (e.g., "boot():/bin/ls.elf" -> "ls") */
+      const char *path = mod->path;
+      const char *name = path;
+      for(const char *p = path; *p; p++) {
+        if(*p == '/')
+          name = p + 1;
+      }
+      /* Remove .elf extension */
+      char binname[64] = "/bin/";
+      int  j           = 5;
+      for(const char *p = name; *p && *p != '.' && j < 62; p++) {
+        binname[j++] = *p;
+      }
+      binname[j] = '\0';
+
+      /* Create file and write module data */
+      i64 fd = vfs_open(binname, O_CREAT | O_WRONLY);
+      if(fd >= 0) {
+        vfs_write(fd, mod->address, mod->size);
+        vfs_close(fd);
+        console_printf(
+            "[KERNEL] Loaded %s (%d bytes)\n", binname, (int)mod->size
+        );
+      }
+    }
+  }
+
+  /* Initialize ATA drives */
+  ata_init();
+
+  /* Auto-mount FAT32 on /mnt if drive 0 is present */
+  ata_drive_t *hda = ata_get_drive(0);
+  if(hda && hda->present) {
+    vfs_mkdir("/mnt");
+    if(vfs_mount("/dev/hda", "/mnt", "fat32") == 0) {
+      console_print("[VFS] Mounted /dev/hda (FAT32) on /mnt\n");
+    } else {
+      console_print("[VFS] Failed to mount FAT32 on /mnt\n");
+    }
+  }
+
+  cpu_enable_interrupts();
+  console_print("Interrupts enabled.\n\n");
+
+  /* Initialize process subsystem */
+  proc_init();
+
+  /* Launch user-mode program */
+  if(module_request.response && module_request.response->module_count > 0) {
+    /* Load first module as init program */
+    struct limine_file *mod = module_request.response->modules[0];
+    console_printf(
+        "[KERNEL] Loading module: %s (%d bytes)\n", mod->path, (int)mod->size
+    );
+
+    /* Start first process (never returns) */
+    proc_start_first(mod->address, mod->size, "shell");
+  }
+
+  console_print("[KERNEL] No modules found, halting.\n");
+
+  /* Kernel idle loop */
+  for(;;) {
+    cpu_enable_interrupts();
+    __asm__ volatile("hlt");
+  }
+}

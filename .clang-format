@@ -1,0 +1,39 @@
+---
+IndentPPDirectives: BeforeHash
+SortIncludes: CaseSensitive
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AlignCompound: true
+  PadOperators: true
+  AlignFunctionPointers: true
+AlignEscapedNewlines: LeftWithLastLine
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+  AlignCompound: true
+  AlignFunctionPointers: true
+  PadOperators: true
+BreakTemplateDeclarations: Yes
+AllowShortEnumsOnASingleLine: false
+SpaceBeforeInheritanceColon: true
+AlignArrayOfStructures: Left
+QualifierAlignment: Left
+AlignTrailingComments:
+  Kind: Always
+AllowShortFunctionsOnASingleLine: Empty
+IndentWrappedFunctionNames: true
+SpaceBeforeCtorInitializerColon: true
+PackConstructorInitializers: CurrentLine
+AllowShortIfStatementsOnASingleLine: Never
+SpaceBeforeParens: Never
+AlignAfterOpenBracket: BlockIndent
+SpaceBeforeSquareBrackets: false
+BreakBeforeBraces: Mozilla
+AlignConsecutiveAssignments:
+  Enabled: true
+SpaceBeforeCpp11BracedList: true
+AllowShortLoopsOnASingleLine: false
+AllowAllArgumentsOnNextLine: false
+SortUsingDeclarations: LexicographicNumeric
