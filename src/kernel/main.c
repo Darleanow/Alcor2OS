@@ -146,7 +146,7 @@ void kmain(void)
   vfs_init();
 
   /* Mount FAT32 as root filesystem */
-  ata_drive_t *hda = ata_get_drive(0);
+  const ata_drive_t *hda = ata_get_drive(0);
   if(hda && hda->present) {
     if(vfs_mount("/dev/hda", "/", "fat32") == 0) {
       console_print("[VFS] Mounted /dev/hda (FAT32) on /\n");

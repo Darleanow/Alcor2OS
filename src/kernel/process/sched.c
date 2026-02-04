@@ -17,7 +17,7 @@ static task_t   *current_task = NULL;
 static task_t   *idle_task    = NULL;
 
 static u64       next_tid         = 1;
-static u64       task_count       = 0;
+static u64       task_count_val       = 0;
 static u64       context_switches = 0;
 
 /** @brief Time slice in ticks (100ms at 100Hz). */
@@ -41,7 +41,7 @@ static void task_list_add(task_t *task)
     task_list->prev->next = task;
     task_list->prev       = task;
   }
-  task_count++;
+  task_count_val++;
 }
 
 /**
@@ -60,7 +60,7 @@ static void task_list_remove(task_t *task)
       task_list = task->next;
     }
   }
-  task_count--;
+  task_count_val--;
 }
 
 /**
@@ -313,10 +313,10 @@ task_t *sched_current(void)
  * @param count Output pointer for number of tasks (can be NULL).
  * @param switches Output pointer for number of context switches (can be NULL).
  */
-void sched_stats(u64 *count, u64 *switches)
+void sched_stats(u64 *task_count, u64 *switches)
 {
-  if(count)
-    *count = task_count;
+  if(task_count)
+    *task_count = task_count_val;
   if(switches)
     *switches = context_switches;
 }

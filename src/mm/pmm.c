@@ -50,7 +50,7 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
 
   u64 highest_addr = 0;
   for(u64 i = 0; i < memmap->entry_count; i++) {
-    struct limine_memmap_entry *e   = memmap->entries[i];
+    const struct limine_memmap_entry *e   = memmap->entries[i];
     u64                         top = e->base + e->length;
     if(e->type == LIMINE_MEMMAP_USABLE && top > highest_addr) {
       highest_addr = top;
@@ -77,7 +77,7 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
   free_pages = 0;
 
   for(u64 i = 0; i < memmap->entry_count; i++) {
-    struct limine_memmap_entry *e = memmap->entries[i];
+    const struct limine_memmap_entry *e = memmap->entries[i];
     if(e->type == LIMINE_MEMMAP_USABLE) {
       u64 start = (e->base + PAGE_SIZE - 1) / PAGE_SIZE;
       u64 end   = (e->base + e->length) / PAGE_SIZE;

@@ -70,7 +70,7 @@ void vmm_init(u64 hhdm_offset)
 
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
-  u64 *const old_pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
+  const u64 *const old_pml4 = (const u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   for(int i = 256; i < 512; i++) {
     kernel_pml4[i] = old_pml4[i];
@@ -184,7 +184,7 @@ u64 vmm_get_phys(u64 virt)
   if(!pd)
     return 0;
 
-  u64 *pt = get_next_level(pd, pd_idx, false, 0);
+  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
   if(!pt)
     return 0;
 
@@ -222,7 +222,7 @@ u64 vmm_get_pte(u64 virt)
   if(!pd)
     return 0;
 
-  u64 *pt = get_next_level(pd, pd_idx, false, 0);
+  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
   if(!pt)
     return 0;
 
@@ -355,7 +355,7 @@ u64 vmm_get_phys_in(u64 pml4_phys, u64 virt)
   if(!pd)
     return 0;
 
-  u64 *pt = get_next_level(pd, pd_idx, false, 0);
+  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
   if(!pt)
     return 0;
 
@@ -383,29 +383,29 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
   if(!dst_pml4_phys)
     return 0;
 
-  u64 *src_pml4 = (u64 *)phys_to_virt(src_pml4_phys);
+  const u64 *src_pml4 = (const u64 *)phys_to_virt(src_pml4_phys);
 
   /* Walk user-space entries (0-255) and copy mappings */
   for(int pml4_idx = 0; pml4_idx < 256; pml4_idx++) {
     if(!(src_pml4[pml4_idx] & VMM_PRESENT))
       continue;
 
-    u64 *src_pdpt =
-        (u64 *)phys_to_virt(src_pml4[pml4_idx] & PAGE_FRAME_MASK);
+    const u64 *src_pdpt =
+        (const u64 *)phys_to_virt(src_pml4[pml4_idx] & PAGE_FRAME_MASK);
 
     for(int pdpt_idx = 0; pdpt_idx < 512; pdpt_idx++) {
       if(!(src_pdpt[pdpt_idx] & VMM_PRESENT))
         continue;
 
-      u64 *src_pd =
-          (u64 *)phys_to_virt(src_pdpt[pdpt_idx] & PAGE_FRAME_MASK);
+      const u64 *src_pd =
+          (const u64 *)phys_to_virt(src_pdpt[pdpt_idx] & PAGE_FRAME_MASK);
 
       for(int pd_idx = 0; pd_idx < 512; pd_idx++) {
         if(!(src_pd[pd_idx] & VMM_PRESENT))
           continue;
 
-        u64 *src_pt =
-            (u64 *)phys_to_virt(src_pd[pd_idx] & PAGE_FRAME_MASK);
+        const u64 *src_pt =
+            (const u64 *)phys_to_virt(src_pd[pd_idx] & PAGE_FRAME_MASK);
 
         for(int pt_idx = 0; pt_idx < 512; pt_idx++) {
           if(!(src_pt[pt_idx] & VMM_PRESENT))
@@ -426,7 +426,7 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
           }
 
           /* Copy page contents */
-          void *src_data = (void *)phys_to_virt(src_phys);
+          const void *src_data = (const void *)phys_to_virt(src_phys);
           void *dst_data = (void *)phys_to_virt((u64)dst_page);
           kmemcpy(dst_data, src_data, PAGE_SIZE);
 
@@ -451,26 +451,26 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
  */
 void vmm_destroy_user_mappings(u64 pml4_phys)
 {
-  u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);
+  const u64 *pml4 = (const u64 *)phys_to_virt(pml4_phys);
 
   /* Iterate over user-space entries (0-255) */
   for(int pml4_idx = 0; pml4_idx < 256; pml4_idx++) {
     if(!(pml4[pml4_idx] & VMM_PRESENT))
       continue;
 
-    u64 *pdpt = (u64 *)phys_to_virt(pml4[pml4_idx] & PAGE_FRAME_MASK);
+    const u64 *pdpt = (const u64 *)phys_to_virt(pml4[pml4_idx] & PAGE_FRAME_MASK);
 
     for(int pdpt_idx = 0; pdpt_idx < 512; pdpt_idx++) {
       if(!(pdpt[pdpt_idx] & VMM_PRESENT))
         continue;
 
-      u64 *pd = (u64 *)phys_to_virt(pdpt[pdpt_idx] & PAGE_FRAME_MASK);
+      const u64 *pd = (const u64 *)phys_to_virt(pdpt[pdpt_idx] & PAGE_FRAME_MASK);
 
       for(int pd_idx = 0; pd_idx < 512; pd_idx++) {
         if(!(pd[pd_idx] & VMM_PRESENT))
           continue;
 
-        u64 *pt = (u64 *)phys_to_virt(pd[pd_idx] & PAGE_FRAME_MASK);
+        const u64 *pt = (const u64 *)phys_to_virt(pd[pd_idx] & PAGE_FRAME_MASK);
 
         for(int pt_idx = 0; pt_idx < 512; pt_idx++) {
           if(!(pt[pt_idx] & VMM_PRESENT))

@@ -442,12 +442,12 @@ i64 vfs_open(const char *path, u32 flags)
       return -1;
 
     /* Handle truncate flag */
-    if((flags & O_TRUNC) && file) {
+    if(flags & O_TRUNC) {
       fat32_truncate(file);
     }
 
     /* Handle append flag - seek to end */
-    if((flags & O_APPEND) && file) {
+    if(flags & O_APPEND) {
       fat32_seek(file, 0, 2); /* SEEK_END */
     }
 
@@ -582,7 +582,7 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
   }
 
   vfs_fd_t   *f    = &fd_table[fd];
-  vfs_node_t *node = f->node;
+  const vfs_node_t *node = f->node;
 
   if(f->offset >= node->size) {
     return 0; /* EOF */
@@ -722,7 +722,7 @@ i64 vfs_seek(i64 fd, i64 offset, i32 whence)
  * @param st Output buffer for stat structure.
  * @return 0 on success, negative on error.
  */
-i64 vfs_stat(const char *path, vfs_stat_t *st)
+i64 vfs_stat(const char *path, vfs_stat_t *stat)
 {
   /* Convert to absolute path for mount point detection */
   char abs_path[VFS_PATH_MAX];
@@ -739,22 +739,22 @@ i64 vfs_stat(const char *path, vfs_stat_t *st)
       return -1;
     }
 
-    st->size     = fatent.size;
-    st->type     = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
-    st->created  = 0;
-    st->modified = 0;
+    stat->size     = fatent.size;
+    stat->type     = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
+    stat->created  = 0;
+    stat->modified = 0;
     return 0;
   }
 
   /* Ramfs path - use abs_path for consistency */
-  vfs_node_t *node = resolve_path(abs_path);
+  const vfs_node_t *node = resolve_path(abs_path);
   if(!node)
     return -1;
 
-  st->size     = node->size;
-  st->type     = node->type;
-  st->created  = 0; /* TODO: timestamps */
-  st->modified = 0;
+  stat->size     = node->size;
+  stat->type     = node->type;
+  stat->created  = 0; /* TODO: timestamps */
+  stat->modified = 0;
 
   return 0;
 }
@@ -1179,7 +1179,7 @@ i64 vfs_chdir(const char *path)
   }
 
   /* Ramfs path - verify with resolve_path */
-  vfs_node_t *node = resolve_path(path);
+  const vfs_node_t *node = resolve_path(path);
   if(!node || node->type != VFS_DIRECTORY) {
     return -1;
   }
@@ -1242,7 +1242,7 @@ static vfs_mount_t *find_mount(const char *path)
  * @param mount Mount point
  * @return Relative path within mounted filesystem
  */
-static const char *get_relative_path(const char *path, vfs_mount_t *mount)
+static const char *get_relative_path(const char *path, const vfs_mount_t *mount)
 {
   const char *rel = path + kstrlen(mount->path);
   if(*rel == '\0')
@@ -1311,7 +1311,7 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
   }
 
   /* Create mount point directory in ramfs if needed */
-  vfs_node_t *mp = resolve_path(target);
+  const vfs_node_t *mp = resolve_path(target);
   if(!mp) {
     if(vfs_mkdir(target) < 0) {
       console_printf("[vfs] mount: failed to create mount point %s\n", target);
@@ -1586,8 +1586,7 @@ i64 vfs_opendir_fat32(const char *path)
 
   dir_table[dirfd].in_use  = true;
   dir_table[dirfd].node    = (vfs_node_t *)dir;
-  dir_table[dirfd].in_use   = true;
-  dir_table[dirfd].current  = NULL;
+  dir_table[dirfd].current = NULL;
   dir_table[dirfd].index    = 0;
   dir_table[dirfd].is_fat32 = true;
 

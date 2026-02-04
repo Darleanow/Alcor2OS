@@ -363,7 +363,7 @@ static u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   pipe_t *p = alloc_pipe();
   if(!p) return (u64)-ENOMEM;
 
-  proc_t *proc = proc_current();
+  const proc_t *proc = proc_current();
   if(!proc) return (u64)-EINVAL;
 
   int read_fd = -1, write_fd = -1;
@@ -417,6 +417,7 @@ static i64 pipe_write(int fd, const void *buf, u64 count)
   if(!p->write_open) return -EBADF;
   if(!p->read_open) return -EPIPE;
 
+  /* cppcheck-suppress knownConditionTrueFalse */
   while(p->count >= PIPE_BUF_SIZE && p->read_open) { __asm__ volatile("pause"); }
 
   u64 space = PIPE_BUF_SIZE - p->count;
@@ -551,7 +552,6 @@ static u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
   proc_exit((i64)status);
-  __builtin_unreachable();
 }
 
 static u64 sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
@@ -657,7 +657,7 @@ static u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4; (void)a5; (void)a6;
   if(!iov) return (u64)-EFAULT;
-  struct iovec *vec = (struct iovec *)iov;
+  const struct iovec *vec = (const struct iovec *)iov;
   u64 total = 0;
   for(u64 i = 0; i < iovcnt; i++) {
     if(vec[i].iov_base && vec[i].iov_len > 0) {

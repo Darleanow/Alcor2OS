@@ -110,7 +110,7 @@ static u64 push_string(u64 sp, const char *str)
 }
 
 u64 proc_create(
-    const char *name, void *elf_data, u64 elf_size, char *const argv[]
+    const char *name, const void *elf_data, u64 elf_size, char *const argv[]
 )
 {
   proc_t *p = proc_alloc();
@@ -526,7 +526,7 @@ void proc_switch(proc_t *next)
  * @param elf_size Size of the ELF file in bytes.
  * @param name Name for the process.
  */
-void proc_start_first(void *elf_data, u64 elf_size, const char *name)
+void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
 {
   u64 pid = proc_create(name, elf_data, elf_size, NULL);
   if(pid == 0) {
@@ -577,9 +577,9 @@ void proc_start_first(void *elf_data, u64 elf_size, const char *name)
  * registers.
  * @return Child PID to parent process, 0 to child process, negative on error.
  */
-i64 proc_fork(void *frame_ptr)
+i64 proc_fork(void *syscall_frame)
 {
-  syscall_frame_t *frame  = (syscall_frame_t *)frame_ptr;
+  const syscall_frame_t *frame  = (const syscall_frame_t *)syscall_frame;
   proc_t          *parent = current_proc;
   if(!parent) {
     return -1;

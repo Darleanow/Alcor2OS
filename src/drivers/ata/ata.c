@@ -227,12 +227,12 @@ ata_drive_t *ata_get_drive(u8 drive)
  * @param buffer Buffer to store read data (must hold count * 512 bytes)
  * @return 0 on success, -1 on error
  */
-i64 ata_read(u8 drive_idx, u64 lba, u32 count, void *buffer)
+i64 ata_read(u8 drive, u64 lba, u32 count, void *buffer)
 {
-  if(drive_idx >= 4)
+  if(drive >= 4)
     return -EINVAL;
 
-  ata_drive_t *drv = &drives[drive_idx];
+  const ata_drive_t *drv = &drives[drive];
   if(!drv->present || drv->is_atapi)
     return -ENODEV;
 
@@ -279,12 +279,12 @@ i64 ata_read(u8 drive_idx, u64 lba, u32 count, void *buffer)
  * @param buffer Buffer containing data to write (must hold count * 512 bytes)
  * @return 0 on success, -1 on error
  */
-i64 ata_write(u8 drive_idx, u64 lba, u32 count, const void *buffer)
+i64 ata_write(u8 drive, u64 lba, u32 count, const void *buffer)
 {
-  if(drive_idx >= 4)
+  if(drive >= 4)
     return -EINVAL;
 
-  ata_drive_t *drv = &drives[drive_idx];
+  const ata_drive_t *drv = &drives[drive];
   if(!drv->present || drv->is_atapi)
     return -ENODEV;
 

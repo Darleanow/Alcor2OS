@@ -325,7 +325,7 @@ void *krealloc(void *ptr, u64 new_size)
     return NULL;
   }
 
-  heap_block_t *block = (heap_block_t *)((u8 *)ptr - HEAP_HEADER_SIZE);
+  const heap_block_t *block = (const heap_block_t *)((u8 *)ptr - HEAP_HEADER_SIZE);
 
   if(block->magic != HEAP_BLOCK_MAGIC) {
     return NULL;
