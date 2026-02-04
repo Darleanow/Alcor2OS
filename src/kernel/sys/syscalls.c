@@ -52,12 +52,12 @@ static u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   /* Check if it's a pipe */
   i64 pipe_result = pipe_read((int)fd, (void *)buf, count);
   if(pipe_result != -ENOENT) {
-    return (pipe_result < 0) ? (u64)pipe_result : (u64)pipe_result;
+    return (u64)pipe_result;
   }
 
   /* Regular file descriptor */
   i64 result = vfs_read((i64)fd, (void *)buf, count);
-  return (result < 0) ? (u64)result : (u64)result;
+  return (u64)result;
 }
 
 /**
@@ -83,12 +83,12 @@ static u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   /* Check if it's a pipe */
   i64 pipe_result = pipe_write((int)fd, (const void *)buf, count);
   if(pipe_result != -ENOENT) {
-    return (pipe_result < 0) ? (u64)pipe_result : (u64)pipe_result;
+    return (u64)pipe_result;
   }
 
   /* Regular file descriptor */
   i64 result = vfs_write((i64)fd, (void *)buf, count);
-  return (result < 0) ? (u64)result : (u64)result;
+  return (u64)result;
 }
 
 /**
@@ -131,7 +131,7 @@ struct linux_stat
   u32 st_mode;
   u32 st_uid;
   u32 st_gid;
-  u32 __pad0;
+  u32 pad0;
   u64 st_rdev;
   i64 st_size;
   i64 st_blksize;
@@ -142,7 +142,7 @@ struct linux_stat
   u64 st_mtime_nsec;
   u64 st_ctime;
   u64 st_ctime_nsec;
-  i64 __unused[3];
+  i64 unused[3];
 };
 
 #define S_IFMT  0170000
@@ -292,6 +292,7 @@ static u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
       return 0;
     }
     case TCGETS: case TCSETS: return 0;
+    default: break;
     }
   }
   return 0;
