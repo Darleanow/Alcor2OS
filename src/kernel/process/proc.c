@@ -14,6 +14,8 @@
 #include <alcor2/proc.h>
 #include <alcor2/syscall.h>
 #include <alcor2/vmm.h>
+#include <alcor2/vfs.h>
+#include <alcor2/kstdlib.h>
 
 static proc_t  proc_table[PROC_MAX];
 static proc_t *current_proc = NULL;
@@ -23,21 +25,6 @@ static u64     next_pid     = 1;
 u64 current_kernel_rsp = 0;
 /** @brief Current process CR3 for address space switching. */
 u64 current_proc_cr3 = 0;
-
-/**
- * @brief Copy string with maximum length.
- * @param dst Destination buffer.
- * @param src Source string.
- * @param max Maximum bytes including null terminator.
- */
-static void proc_strcpy(char *dst, const char *src, u64 max)
-{
-  u64 i;
-  for(i = 0; i < max - 1 && src[i]; i++) {
-    dst[i] = src[i];
-  }
-  dst[i] = '\0';
-}
 
 /**
  * @brief Initialize the process subsystem.
@@ -153,6 +140,7 @@ u64 proc_create(
   void *user_stack_phys = pmm_alloc_pages(stack_pages);
   if(!user_stack_phys) {
     kfree(p->kernel_stack);
+    vmm_destroy_user_mappings(p->cr3);
     console_print("[PROC] Failed to allocate user stack\n");
     return 0;
   }
@@ -183,6 +171,7 @@ u64 proc_create(
   if(elf_result != 0) {
     vmm_switch(old_cr3);
     kfree(p->kernel_stack);
+    vmm_destroy_user_mappings(p->cr3);
     console_print("[PROC] Failed to load ELF\n");
     return 0;
   }
@@ -266,7 +255,7 @@ u64 proc_create(
   /* Initialize process */
   p->pid        = next_pid++;
   p->parent_pid = current_proc ? current_proc->pid : 0;
-  proc_strcpy(p->name, name, PROC_NAME_MAX);
+  kstrncpy(p->name, name, PROC_NAME_MAX);
   p->state           = PROC_STATE_READY;
   p->exit_code       = 0;
   p->waiting_for_pid = 0;
@@ -349,6 +338,9 @@ void proc_exit(i64 code)
 
   p->exit_code = code;
   p->state     = PROC_STATE_ZOMBIE;
+  
+  /* Clean up open file descriptors */
+  vfs_close_for_pid(p->pid);
 
   /* Wake up parent if it's waiting */
   proc_t *parent = proc_get(p->parent_pid);
@@ -387,6 +379,7 @@ i64 proc_wait(u64 pid)
   if(child->state == PROC_STATE_ZOMBIE) {
     i64 code     = child->exit_code;
     child->state = PROC_STATE_FREE;
+    vmm_destroy_user_mappings(child->cr3);
     kfree(child->kernel_stack);
     return code;
   }
@@ -402,6 +395,7 @@ i64 proc_wait(u64 pid)
   if(child && child->state == PROC_STATE_ZOMBIE) {
     i64 code     = child->exit_code;
     child->state = PROC_STATE_FREE;
+    vmm_destroy_user_mappings(child->cr3);
     kfree(child->kernel_stack);
     return code;
   }
@@ -625,7 +619,7 @@ i64 proc_fork(void *frame_ptr)
   /* Initialize child process */
   child->pid        = next_pid++;
   child->parent_pid = parent->pid;
-  proc_strcpy(child->name, parent->name, PROC_NAME_MAX);
+  kstrncpy(child->name, parent->name, PROC_NAME_MAX);
   child->state           = PROC_STATE_READY;
   child->exit_code       = 0;
   child->waiting_for_pid = 0;

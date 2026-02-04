@@ -6,6 +6,7 @@
 #include <alcor2/memory_layout.h>
 #include <alcor2/pmm.h>
 #include <alcor2/vmm.h>
+#include <alcor2/kstdlib.h>
 
 static u64 *kernel_pml4;
 static u64  kernel_pml4_phys;
@@ -37,9 +38,7 @@ static u64 *get_next_level(u64 *table, u64 index, bool create, u64 flags)
     return 0;
 
   u64 *new_table = (u64 *)phys_to_virt((u64)page);
-  for(int i = 0; i < 512; i++) {
-    new_table[i] = 0;
-  }
+  kzero(new_table, 512 * sizeof(u64));
 
   /* Propagate USER flag to intermediate page table levels */
   u64 entry_flags = VMM_PRESENT | VMM_WRITE;
@@ -66,9 +65,7 @@ void vmm_init(u64 hhdm_offset)
   kernel_pml4_phys = (u64)pml4_phys;
   kernel_pml4      = (u64 *)phys_to_virt((u64)pml4_phys);
 
-  for(int i = 0; i < 512; i++) {
-    kernel_pml4[i] = 0;
-  }
+  kzero(kernel_pml4, 512 * sizeof(u64));
 
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
@@ -273,9 +270,8 @@ u64 vmm_create_address_space(void)
   u64 *new_pml4 = (u64 *)phys_to_virt((u64)pml4_phys);
 
   /* Clear user-space entries (0-255) */
-  for(int i = 0; i < 256; i++) {
-    new_pml4[i] = 0;
-  }
+  /* Clear user-space entries (0-255) */
+  kzero(new_pml4, 256 * sizeof(u64));
 
   /* Share kernel-space entries (256-511) from kernel PML4 */
   for(int i = 256; i < 512; i++) {
@@ -429,11 +425,9 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
           }
 
           /* Copy page contents */
-          u8 *src_data = (u8 *)phys_to_virt(src_phys);
-          u8 *dst_data = (u8 *)phys_to_virt((u64)dst_page);
-          for(int i = 0; i < 4096; i++) {
-            dst_data[i] = src_data[i];
-          }
+          void *src_data = (void *)phys_to_virt(src_phys);
+          void *dst_data = (void *)phys_to_virt((u64)dst_page);
+          kmemcpy(dst_data, src_data, PAGE_SIZE);
 
           /* Map in destination address space */
           vmm_map_in(dst_pml4_phys, virt, (u64)dst_page, flags);
@@ -456,6 +450,72 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
  */
 void vmm_destroy_user_mappings(u64 pml4_phys)
 {
-  /* TODO: Walk and free page table pages and mapped physical pages */
-  (void)pml4_phys;
+  u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);
+
+  /* Iterate over user-space entries (0-255) */
+  for(int pml4_idx = 0; pml4_idx < 256; pml4_idx++) {
+    if(!(pml4[pml4_idx] & VMM_PRESENT))
+      continue;
+
+    u64 *pdpt = (u64 *)phys_to_virt(pml4[pml4_idx] & PAGE_FRAME_MASK);
+
+    for(int pdpt_idx = 0; pdpt_idx < 512; pdpt_idx++) {
+      if(!(pdpt[pdpt_idx] & VMM_PRESENT))
+        continue;
+
+      u64 *pd = (u64 *)phys_to_virt(pdpt[pdpt_idx] & PAGE_FRAME_MASK);
+
+      for(int pd_idx = 0; pd_idx < 512; pd_idx++) {
+        if(!(pd[pd_idx] & VMM_PRESENT))
+          continue;
+
+        u64 *pt = (u64 *)phys_to_virt(pd[pd_idx] & PAGE_FRAME_MASK);
+
+        for(int pt_idx = 0; pt_idx < 512; pt_idx++) {
+          if(!(pt[pt_idx] & VMM_PRESENT))
+            continue;
+
+          /* Free physical page */
+          u64 phys = pt[pt_idx] & PAGE_FRAME_MASK;
+          pmm_free((void *)phys);
+        }
+        /* Free Page Table */
+        pmm_free((void *)(pd[pd_idx] & PAGE_FRAME_MASK));
+      }
+      /* Free Page Directory */
+      pmm_free((void *)(pdpt[pdpt_idx] & PAGE_FRAME_MASK));
+    }
+    /* Free PDPT */
+    pmm_free((void *)(pml4[pml4_idx] & PAGE_FRAME_MASK));
+  }
+
+  /* Free PML4 itself */
+  pmm_free((void *)pml4_phys);
+}
+
+/**
+ * @brief Check if a pointer is in user space.
+ * @param ptr Pointer to check.
+ * @return true if address is in user space range.
+ */
+bool vmm_is_user_ptr(const void *ptr)
+{
+  return (u64)ptr < USER_SPACE_END;
+}
+
+/**
+ * @brief Check if a memory range is entirely in user space.
+ * @param ptr Start of range.
+ * @param size Size of range.
+ * @return true if range is valid and in user space.
+ */
+bool vmm_is_user_range(const void *ptr, u64 size)
+{
+  u64 start = (u64)ptr;
+  u64 end   = start + size;
+  
+  /* Check for overflow */
+  if(end < start) return false;
+  
+  return end <= USER_SPACE_END;
 }

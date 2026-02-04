@@ -10,6 +10,7 @@
 #include <alcor2/memory_layout.h>
 #include <alcor2/pmm.h>
 #include <alcor2/vmm.h>
+#include <alcor2/kstdlib.h>
 
 static heap_block_t *heap_start   = NULL;
 static heap_block_t *heap_end     = NULL;
@@ -231,10 +232,7 @@ void *kzalloc(u64 size)
 {
   void *ptr = kmalloc(size);
   if(ptr != NULL) {
-    u8 *p = (u8 *)ptr;
-    for(u64 i = 0; i < size; i++) {
-      p[i] = 0;
-    }
+    kzero(ptr, size);
   }
   return ptr;
 }
@@ -344,11 +342,7 @@ void *krealloc(void *ptr, u64 new_size)
     return NULL;
   }
 
-  u8 *src = (u8 *)ptr;
-  u8 *dst = (u8 *)new_ptr;
-  for(u64 i = 0; i < block->size; i++) {
-    dst[i] = src[i];
-  }
+  kmemcpy(new_ptr, ptr, block->size);
 
   kfree(ptr);
   return new_ptr;

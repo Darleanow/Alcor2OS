@@ -92,6 +92,7 @@ typedef struct
   u64         offset;
   u32         flags;
   bool        in_use;
+  u64         owner_pid;
 } vfs_fd_t;
 
 /**
@@ -254,5 +255,11 @@ i64 vfs_opendir_fat32(const char *path);
 i64 vfs_readdir_fat32(i64 dirfd, vfs_dirent_t *entry);
 i64 vfs_closedir_fat32(i64 dirfd);
 /** @} */
+
+/**
+ * @brief Close all FDs owned by a specific PID.
+ * @param pid Process ID.
+ */
+void vfs_close_for_pid(u64 pid);
 
 #endif

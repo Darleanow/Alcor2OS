@@ -129,4 +129,14 @@ static inline u64 virt_to_phys(void *virt)
   return (u64)virt - vmm_get_hhdm();
 }
 
+/**
+ * @brief Check if pointer is in user space.
+ */
+bool vmm_is_user_ptr(const void *ptr);
+
+/**
+ * @brief Check if range is in user space.
+ */
+bool vmm_is_user_range(const void *ptr, u64 size);
+
 #endif

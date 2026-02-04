@@ -7,6 +7,7 @@
 #include <alcor2/cpu.h>
 #include <alcor2/heap.h>
 #include <alcor2/sched.h>
+#include <alcor2/kstdlib.h>
 
 /** @brief Circular doubly-linked task list. */
 static task_t   *task_list    = NULL;
@@ -22,20 +23,7 @@ static u64       context_switches = 0;
 /** @brief Time slice in ticks (100ms at 100Hz). */
 static const u64 DEFAULT_TIME_SLICE = 10;
 
-/**
- * @brief Copy string with maximum length.
- * @param dst Destination buffer.
- * @param src Source string.
- * @param max Maximum bytes including null terminator.
- */
-static void str_copy(char *dst, const char *src, u64 max)
-{
-  u64 i;
-  for(i = 0; i < max - 1 && src[i] != '\0'; i++) {
-    dst[i] = src[i];
-  }
-  dst[i] = '\0';
-}
+
 
 /**
  * @brief Add task to circular list.
@@ -133,7 +121,7 @@ void sched_init(void)
   }
 
   idle_task->tid = next_tid++;
-  str_copy(idle_task->name, "idle", TASK_NAME_MAX);
+  kstrncpy(idle_task->name, "idle", TASK_NAME_MAX);
   idle_task->state           = TASK_STATE_RUNNING;
   idle_task->time_slice      = DEFAULT_TIME_SLICE;
   idle_task->ticks_remaining = DEFAULT_TIME_SLICE;
@@ -164,7 +152,7 @@ u64 task_create(const char *name, task_entry_t entry, void *arg)
 
   /* Initialize task */
   task->tid = next_tid++;
-  str_copy(task->name, name, TASK_NAME_MAX);
+  kstrncpy(task->name, name, TASK_NAME_MAX);
   task->state           = TASK_STATE_READY;
   task->time_slice      = DEFAULT_TIME_SLICE;
   task->ticks_remaining = DEFAULT_TIME_SLICE;

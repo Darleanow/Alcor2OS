@@ -8,6 +8,7 @@
 #include <alcor2/errno.h>
 #include <alcor2/fat32.h>
 #include <alcor2/heap.h>
+#include <alcor2/kstdlib.h>
 
 #define MAX_VOLUMES       4
 #define MAX_FILES         32
@@ -17,74 +18,7 @@ static fat32_volume_t volumes[MAX_VOLUMES];
 static fat32_file_t   files[MAX_FILES];
 static u8             sector_cache[SECTOR_CACHE_SIZE];
 
-/**
- * @brief Copy memory region.
- * @param dst Destination.
- * @param src Source.
- * @param n Byte count.
- */
-static void mem_copy(void *dst, const void *src, u64 n)
-{
-  u8       *d = dst;
-  const u8 *s = src;
-  for(u64 i = 0; i < n; i++)
-    d[i] = s[i];
-}
-
-/**
- * @brief Zero memory region.
- * @param dst Destination.
- * @param n Byte count.
- */
-static void mem_zero(void *dst, u64 n)
-{
-  u8 *d = dst;
-  for(u64 i = 0; i < n; i++)
-    d[i] = 0;
-}
-
-/**
- * @brief Compare two strings.
- * @param a First string.
- * @param b Second string.
- * @return true if equal.
- */
-static bool __attribute__((unused)) str_equal(const char *a, const char *b)
-{
-  while(*a && *b && *a == *b) {
-    a++;
-    b++;
-  }
-  return *a == *b;
-}
-
-/**
- * @brief Get string length.
- * @param s String.
- * @return Length.
- */
-static u64 __attribute__((unused)) str_len(const char *s)
-{
-  u64 len = 0;
-  while(s[len])
-    len++;
-  return len;
-}
-
-/**
- * @brief Convert string to uppercase.
- * @param s String to modify.
- */
-static void __attribute__((unused)) str_upper(char *s)
-{
-  while(*s) {
-    if(*s >= 'a' && *s <= 'z')
-      *s -= 32;
-    s++;
-  }
-}
-
-/**
+/*
  * @brief Write sector to volume.
  * @param vol Volume.
  * @param sector Sector number.
@@ -401,7 +335,7 @@ static i64 find_entry_in_dir(
       }
 
       if(match) {
-        mem_copy(out_entry, e, sizeof(fat32_dirent_t));
+        kmemcpy(out_entry, e, sizeof(fat32_dirent_t));
         if(out_cluster)
           *out_cluster = cluster;
         if(out_offset)
@@ -444,7 +378,7 @@ static i64 resolve_path(
   /* Root directory */
   if(path[i] == '\0') {
     /* Fake root entry */
-    mem_zero(out_entry, sizeof(fat32_dirent_t));
+    kzero(out_entry, sizeof(fat32_dirent_t));
     out_entry->attr         = FAT_ATTR_DIRECTORY;
     out_entry->cluster_high = (vol->root_cluster >> 16) & 0xFFFF;
     out_entry->cluster_low  = vol->root_cluster & 0xFFFF;
@@ -495,7 +429,7 @@ static i64 resolve_path(
     }
   }
 
-  mem_copy(out_entry, &entry, sizeof(fat32_dirent_t));
+  kmemcpy(out_entry, &entry, sizeof(fat32_dirent_t));
   if(out_entry_cluster)
     *out_entry_cluster = entry_cluster;
   if(out_entry_offset)
@@ -509,8 +443,8 @@ static i64 resolve_path(
  */
 void fat32_init(void)
 {
-  mem_zero(volumes, sizeof(volumes));
-  mem_zero(files, sizeof(files));
+  kzero(volumes, sizeof(volumes));
+  kzero(files, sizeof(files));
   console_print("[FAT32] Initialized\n");
 }
 
@@ -688,7 +622,7 @@ i64 fat32_read(fat32_file_t *file, void *buf, u64 count)
       to_read = cluster_remaining;
 
     /* Copy data */
-    mem_copy(dst + bytes_read, cluster_buf + file->cluster_offset, to_read);
+    kmemcpy(dst + bytes_read, cluster_buf + file->cluster_offset, to_read);
     bytes_read += to_read;
     file->position += to_read;
     file->cluster_offset += to_read;
@@ -928,7 +862,7 @@ i64 fat32_write(fat32_file_t *file, const void *buf, u64 count)
     file->dirty           = true;
 
     /* Zero out the new cluster */
-    mem_zero(cluster_buf, vol->bytes_per_cluster);
+    kzero(cluster_buf, vol->bytes_per_cluster);
     if(vol_write_cluster(vol, new_cluster, cluster_buf) < 0) {
       kfree(cluster_buf);
       return -1;
@@ -954,7 +888,7 @@ i64 fat32_write(fat32_file_t *file, const void *buf, u64 count)
         next = new_cluster;
 
         /* Zero out the new cluster */
-        mem_zero(cluster_buf, vol->bytes_per_cluster);
+        kzero(cluster_buf, vol->bytes_per_cluster);
         if(vol_write_cluster(vol, new_cluster, cluster_buf) < 0) {
           kfree(cluster_buf);
           return -1;
@@ -980,7 +914,7 @@ i64 fat32_write(fat32_file_t *file, const void *buf, u64 count)
       to_write = cluster_remaining;
 
     /* Copy data to cluster buffer */
-    mem_copy(cluster_buf + file->cluster_offset, src + bytes_written, to_write);
+    kmemcpy(cluster_buf + file->cluster_offset, src + bytes_written, to_write);
 
     /* Write cluster back to disk */
     if(vol_write_cluster(vol, file->current_cluster, cluster_buf) < 0) {
@@ -1019,7 +953,7 @@ i64 fat32_write(fat32_file_t *file, const void *buf, u64 count)
         next = new_cluster;
 
         /* Zero out the new cluster */
-        mem_zero(cluster_buf, vol->bytes_per_cluster);
+        kzero(cluster_buf, vol->bytes_per_cluster);
         if(vol_write_cluster(vol, new_cluster, cluster_buf) < 0) {
           kfree(cluster_buf);
           return (i64)bytes_written;
@@ -1140,7 +1074,7 @@ static i64 find_free_dirent(
       fat_write_entry(vol, cluster, new_cluster);
 
       /* Zero out the new cluster */
-      mem_zero(cluster_buf, vol->bytes_per_cluster);
+      kzero(cluster_buf, vol->bytes_per_cluster);
       if(vol_write_cluster(vol, new_cluster, cluster_buf) < 0) {
         kfree(cluster_buf);
         return -1;
@@ -1167,7 +1101,7 @@ static i64 find_free_dirent(
  */
 static void path_split(const char *path, char *name, char *parent_path)
 {
-  u64 len        = str_len(path);
+  u64 len        = kstrlen(path);
   i64 last_slash = -1;
 
   for(u64 i = 0; i < len; i++) {
@@ -1279,7 +1213,7 @@ fat32_file_t *fat32_create(fat32_volume_t *vol, const char *path)
   }
 
   fat32_dirent_t *new_entry = (fat32_dirent_t *)(cluster_buf + entry_offset);
-  mem_zero(new_entry, sizeof(fat32_dirent_t));
+  kzero(new_entry, sizeof(fat32_dirent_t));
   string_to_fat_name(filename, new_entry->name);
   new_entry->attr         = FAT_ATTR_ARCHIVE;
   new_entry->cluster_high = 0;
