@@ -3,6 +3,7 @@
  * @brief Framebuffer console with ANSI color support.
  */
 
+#include <stdarg.h>
 #include "font.h"
 #include <alcor2/console.h>
 
@@ -138,6 +139,7 @@ static void handle_ansi_sequence(void)
       }
     }
     break;
+  default: break;
   }
 }
 
@@ -234,13 +236,27 @@ void console_print(const char *s)
  */
 static void print_int(int n)
 {
+  char buf[32];
+  int  i = 0;
+
+  if(n == 0) {
+    console_putchar('0');
+    return;
+  }
+
   if(n < 0) {
     console_putchar('-');
     n = -n;
   }
-  if(n >= 10)
-    print_int(n / 10);
-  console_putchar('0' + (n % 10));
+
+  while(n > 0) {
+    buf[i++] = (char)('0' + (n % 10));
+    n /= 10;
+  }
+
+  while(--i >= 0) {
+    console_putchar(buf[i]);
+  }
 }
 
 /**
@@ -270,27 +286,31 @@ static void print_hex(u64 n)
  */
 void console_printf(const char *fmt, ...)
 {
-  __builtin_va_list args;
-  __builtin_va_start(args, fmt);
+  va_list args;
+  va_start(args, fmt);
 
   while(*fmt) {
     if(*fmt == '%' && *(fmt + 1)) {
       fmt++;
       switch(*fmt) {
       case 'd':
-        print_int(__builtin_va_arg(args, int));
+        print_int(va_arg(args, int)); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 'x':
-        print_hex(__builtin_va_arg(args, u64));
+        print_hex(va_arg(args, u64)); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 's':
-        console_print(__builtin_va_arg(args, const char *));
+        console_print(va_arg(args, const char *)); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 'c':
-        console_putchar((char)__builtin_va_arg(args, int));
+        console_putchar((char)va_arg(args, int)); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case '%':
         console_putchar('%');
+        break;
+      default:
+        console_putchar('%');
+        console_putchar(*fmt);
         break;
       }
     } else {
@@ -299,5 +319,5 @@ void console_printf(const char *fmt, ...)
     fmt++;
   }
 
-  __builtin_va_end(args);
+  va_end(args);
 }
