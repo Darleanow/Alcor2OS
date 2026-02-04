@@ -41,7 +41,7 @@ static void proc_strcpy(char *dst, const char *src, u64 max)
 
 /**
  * @brief Initialize the process subsystem.
- * 
+ *
  * Clears the process table and sets all process slots to FREE state.
  */
 void proc_init(void)
@@ -95,10 +95,11 @@ static proc_t *proc_alloc(void)
 
 /**
  * @brief Push a string onto user stack and return the new stack pointer.
- * 
+ *
  * Must be called while in the process's address space.
- * The string is copied with null terminator and the stack pointer is aligned to 8 bytes.
- * 
+ * The string is copied with null terminator and the stack pointer is aligned to
+ * 8 bytes.
+ *
  * @param sp Current stack pointer.
  * @param str String to push (null-terminated).
  * @return New stack pointer after pushing the string.
@@ -309,28 +310,28 @@ u64 proc_create(
 
   p->saved_rsp = (u64)ksp;
 
-  console_printf(
+  /*console_printf(
       "[PROC] Created process '%s' (pid=%d, entry=0x%x)\n", name, (int)p->pid,
       (int)elf_info.entry
-  );
+  );*/
 
   return p->pid;
 }
 
 /**
  * @brief External assembly entry point for new processes.
- * 
- * Defined in proc.asm. This function performs the initial iretq to enter user mode
- * for newly created processes.
+ *
+ * Defined in proc.asm. This function performs the initial iretq to enter user
+ * mode for newly created processes.
  */
 extern void proc_enter_first_time(void);
 
 /**
  * @brief Exit the current process with the given exit code.
- * 
+ *
  * Marks the process as PROC_STATE_ZOMBIE, wakes up the parent if waiting,
  * and schedules another process. Never returns.
- * 
+ *
  * @param code Exit code (typically 0 for success, non-zero for error).
  */
 void proc_exit(i64 code)
@@ -368,10 +369,10 @@ void proc_exit(i64 code)
 
 /**
  * @brief Wait for a specific child process to exit.
- * 
+ *
  * If the child is already a zombie, immediately returns its exit code.
  * Otherwise blocks the current process until the child exits.
- * 
+ *
  * @param pid Child process ID to wait for.
  * @return Child's exit code on success, -1 on error.
  */
@@ -410,9 +411,10 @@ i64 proc_wait(u64 pid)
 
 /**
  * @brief Schedule the next ready process to run.
- * 
- * Performs simple round-robin scheduling. Searches for the next PROC_STATE_READY
- * process starting from the current process. If no ready process is found, halts the CPU.
+ *
+ * Performs simple round-robin scheduling. Searches for the next
+ * PROC_STATE_READY process starting from the current process. If no ready
+ * process is found, halts the CPU.
  */
 void proc_schedule(void)
 {
@@ -446,10 +448,10 @@ void proc_schedule(void)
 
 /**
  * @brief Low-level context switch function.
- * 
+ *
  * Defined in context.asm. Saves the current stack pointer to *old_rsp,
  * loads new_rsp into RSP, and performs the context switch.
- * 
+ *
  * @param old_rsp Pointer to save current RSP (can be NULL for initial switch).
  * @param new_rsp New stack pointer to load.
  */
@@ -457,13 +459,13 @@ extern void context_switch(u64 *old_rsp, u64 new_rsp);
 
 /**
  * @brief Switch to a different process.
- * 
- * Updates process states, switches address spaces (CR3), updates TSS kernel stack,
- * restores TLS (FS base), and performs the context switch.
- * 
+ *
+ * Updates process states, switches address spaces (CR3), updates TSS kernel
+ * stack, restores TLS (FS base), and performs the context switch.
+ *
  * @param next Process to switch to.
  */
-void        proc_switch(proc_t *next)
+void proc_switch(proc_t *next)
 {
   if(next == current_proc) {
     cpu_enable_interrupts();
@@ -522,10 +524,10 @@ void        proc_switch(proc_t *next)
 
 /**
  * @brief Start the first user process from kernel initialization.
- * 
+ *
  * Creates a process from the given ELF data, switches to its address space,
  * and jumps to user mode. Never returns.
- * 
+ *
  * @param elf_data Pointer to ELF file data in memory.
  * @param elf_size Size of the ELF file in bytes.
  * @param name Name for the process.
@@ -572,12 +574,13 @@ void proc_start_first(void *elf_data, u64 elf_size, const char *name)
 
 /**
  * @brief Fork the current process (create a copy).
- * 
+ *
  * Creates a child process that is a copy of the current process with its own
  * address space (cloned page tables) and kernel stack. The child returns 0,
  * while the parent receives the child's PID.
- * 
- * @param frame_ptr Pointer to syscall_frame_t containing parent's saved registers.
+ *
+ * @param frame_ptr Pointer to syscall_frame_t containing parent's saved
+ * registers.
  * @return Child PID to parent process, 0 to child process, negative on error.
  */
 i64 proc_fork(void *frame_ptr)
@@ -662,26 +665,6 @@ i64 proc_fork(void *frame_ptr)
 
   child->saved_rsp = (u64)ksp;
 
-  /* Child will return 0 from fork - this is set via RAX in the child's iretq
-   * frame We need to modify RAX in child's user-space frame. Since the child
-   * will go through proc_enter_first_time which does iretq, we need to set the
-   * return value. The return value is in RAX, but iretq doesn't restore RAX. So
-   * we need a different approach: have child set RAX = 0 before sysret.
-   *
-   * Actually, for a proper fork, the child needs to return to the same place as
-   * parent but with RAX=0. The cleanest way is to:
-   * 1. Have child go through syscall return path (not proc_enter_first_time)
-   * 2. Or set up child's kernel stack to return through sysret with RAX=0
-   *
-   * For simplicity, we'll create a child-specific entry point that sets RAX=0
-   * before doing sysret. But that's complex.
-   *
-   * Simpler approach: child's saved frame will have RAX=0, and we make child
-   * return through the normal syscall return path.
-   */
-
-  /* Actually, let's store the frame on child's kernel stack so it can do sysret
-   */
   /* Reset ksp and build a different stack layout */
   ksp = (u64 *)child->kernel_stack_top;
 
@@ -736,7 +719,7 @@ i64 proc_fork(void *frame_ptr)
 
 /**
  * @brief Entry point for forked child processes.
- * 
+ *
  * Defined in proc.asm. This function pops the saved syscall frame from the
  * kernel stack and performs sysret to return to user mode with RAX=0.
  */
@@ -744,14 +727,16 @@ extern void proc_fork_child_entry(void);
 
 /**
  * @brief Wait for child process(es) to change state.
- * 
- * Implements waitpid syscall semantics. Can wait for a specific child (pid > 0),
- * any child (pid == -1), or return immediately if no child is ready (WNOHANG).
- * 
+ *
+ * Implements waitpid syscall semantics. Can wait for a specific child (pid >
+ * 0), any child (pid == -1), or return immediately if no child is ready
+ * (WNOHANG).
+ *
  * @param pid Process ID: -1 for any child, >0 for specific child.
  * @param status Pointer to store child's exit status (can be NULL).
  * @param options Wait options (e.g., WNOHANG for non-blocking).
- * @return Child PID on success, 0 if WNOHANG and no child ready, negative on error.
+ * @return Child PID on success, 0 if WNOHANG and no child ready, negative on
+ * error.
  */
 i64 proc_waitpid(i64 pid, i32 *status, i32 options)
 {

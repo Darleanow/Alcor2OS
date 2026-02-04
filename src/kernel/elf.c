@@ -5,9 +5,9 @@
 
 #include <alcor2/console.h>
 #include <alcor2/elf.h>
+#include <alcor2/memory_layout.h>
 #include <alcor2/pmm.h>
 #include <alcor2/vmm.h>
-#include <alcor2/memory_layout.h>
 
 /**
  * @brief Copy memory region.
@@ -40,10 +40,10 @@ static void memset(void *dst, u8 val, u64 size)
 
 /**
  * @brief Validate ELF64 header.
- * 
+ *
  * Checks ELF magic number, class (64-bit), endianness (little-endian),
  * file type (executable or dynamic), and machine architecture (x86_64).
- * 
+ *
  * @param ehdr Pointer to ELF header.
  * @return true if valid, false otherwise.
  */
@@ -85,13 +85,13 @@ bool elf_validate(const Elf64_Ehdr *ehdr)
 
 /**
  * @brief Load an ELF64 executable into memory.
- * 
+ *
  * Validates the ELF header, iterates through program headers, allocates
  * and maps physical pages for PT_LOAD segments, copies segment data,
  * and fills the elf_info_t structure with entry point and memory range.
- * 
+ *
  * Must be called while in the target address space.
- * 
+ *
  * @param data Pointer to ELF file data.
  * @param size Size of ELF file in bytes.
  * @param info Output structure for entry point and memory range.
@@ -200,18 +200,12 @@ int elf_load(const void *data, u64 size, elf_info_t *info)
         remaining -= to_copy;
       }
     }
-
-    console_printf(
-        "[ELF] Loaded segment at 0x%x (%d bytes)\n", (unsigned)vaddr, (int)memsz
-    );
   }
 
   if(info->base == ELF_BASE_SENTINEL) {
     console_print("[ELF] No loadable segments\n");
     return -1;
   }
-
-  console_printf("[ELF] Entry point: 0x%x\n", (unsigned)info->entry);
 
   return 0;
 }
