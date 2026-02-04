@@ -128,6 +128,8 @@ void irq_handler(u8 irq)
   case IRQ_KEYBOARD:
     keyboard_irq();
     break;
+  default:
+    break;
   }
   pic_eoi(irq);
 }
