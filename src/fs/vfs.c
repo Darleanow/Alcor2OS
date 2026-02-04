@@ -23,10 +23,10 @@ typedef enum
 /** @brief Mount point descriptor. */
 typedef struct
 {
-  char      path[VFS_PATH_MAX]; /**< Mount point path */
-  fs_type_t type;               /**< Filesystem type */
   void     *fs_data;            /**< FS-specific data */
+  fs_type_t type;               /**< Filesystem type */
   bool      active;             /**< Mount active */
+  char      path[VFS_PATH_MAX]; /**< Mount point path */
 } vfs_mount_t;
 
 static vfs_mount_t mounts[VFS_MAX_MOUNTS];
@@ -117,8 +117,10 @@ static void normalize_path(char *path)
  */
 static void make_absolute_path(const char *path, char *out, u64 out_size)
 {
-  if(!path || !out || out_size == 0)
+  if(!path || !out || out_size == 0) {
+    if(out && out_size > 0) out[0] = '\0';
     return;
+  }
 
   /* Build combined path first */
   if(path[0] == '/') {
