@@ -152,16 +152,16 @@ static void ata_identify(ata_drive_t *drv)
 
   /* Extract model string (words 27-46, byte-swapped) */
   for(int i = 0; i < 20; i++) {
-    drv->model[i * 2]     = (identify[27 + i] >> 8) & 0xFF;
-    drv->model[i * 2 + 1] = identify[27 + i] & 0xFF;
+    drv->model[(ptrdiff_t)i * 2]     = (char)((identify[27 + i] >> 8) & 0xFF);
+    drv->model[(ptrdiff_t)i * 2 + 1] = (char)(identify[27 + i] & 0xFF);
   }
   drv->model[40] = '\0';
   str_trim(drv->model);
 
   /* Extract serial (words 10-19, byte-swapped) */
   for(int i = 0; i < 10; i++) {
-    drv->serial[i * 2]     = (identify[10 + i] >> 8) & 0xFF;
-    drv->serial[i * 2 + 1] = identify[10 + i] & 0xFF;
+    drv->serial[(ptrdiff_t)i * 2]     = (char)((identify[10 + i] >> 8) & 0xFF);
+    drv->serial[(ptrdiff_t)i * 2 + 1] = (char)(identify[10 + i] & 0xFF);
   }
   drv->serial[20] = '\0';
   str_trim(drv->serial);

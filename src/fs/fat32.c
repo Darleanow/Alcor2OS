@@ -95,7 +95,7 @@ static i64 vol_read_cluster(fat32_volume_t *vol, u32 cluster, void *buf)
   u32 sector = cluster_to_sector(vol, cluster);
 
   for(u32 i = 0; i < vol->sectors_per_cluster; i++) {
-    if(vol_read_sector(vol, sector + i, (u8 *)buf + i * FAT32_SECTOR_SIZE) <
+    if(vol_read_sector(vol, sector + i, (u8 *)buf + (size_t)i * FAT32_SECTOR_SIZE) <
        0) {
       return -1;
     }
@@ -117,7 +117,7 @@ static i64 vol_write_cluster(fat32_volume_t *vol, u32 cluster, const void *buf)
 
   for(u32 i = 0; i < vol->sectors_per_cluster; i++) {
     if(vol_write_sector(
-           vol, sector + i, (const u8 *)buf + i * FAT32_SECTOR_SIZE
+           vol, sector + i, (const u8 *)buf + (size_t)i * FAT32_SECTOR_SIZE
        ) < 0) {
       return -1;
     }
@@ -211,7 +211,7 @@ static void fat_name_to_string(const u8 *fat_name, char *out)
 
   /* Copy name (up to 8 chars, trim spaces), convert to lowercase */
   for(i = 0; i < 8 && fat_name[i] != ' '; i++) {
-    char c = fat_name[i];
+    char c = (char)fat_name[i];
     if(c >= 'A' && c <= 'Z')
       c += 32;
     out[j++] = c;
@@ -221,7 +221,7 @@ static void fat_name_to_string(const u8 *fat_name, char *out)
   if(fat_name[8] != ' ') {
     out[j++] = '.';
     for(i = 8; i < 11 && fat_name[i] != ' '; i++) {
-      char c = fat_name[i];
+      char c = (char)fat_name[i];
       if(c >= 'A' && c <= 'Z')
         c += 32;
       out[j++] = c;

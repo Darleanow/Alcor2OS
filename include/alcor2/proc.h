@@ -18,7 +18,7 @@
 #define PROC_NAME_MAX 32
 
 /** @brief Kernel stack size per process. */
-#define PROC_KERNEL_STACK (8 * 1024)
+#define PROC_KERNEL_STACK (8ULL * 1024)
 
 /** @brief User stack size per process. */
 #define PROC_USER_STACK (64 * 1024)

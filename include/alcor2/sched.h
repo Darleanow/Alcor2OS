@@ -14,7 +14,7 @@
 #define TASK_NAME_MAX 32
 
 /** @brief Stack size per task. */
-#define TASK_STACK_SIZE (16 * 1024)
+#define TASK_STACK_SIZE (16ULL * 1024)
 
 /** @brief Maximum number of tasks. */
 #define TASK_MAX_COUNT 64

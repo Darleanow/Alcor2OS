@@ -99,8 +99,8 @@ char keyboard_scancode_to_char(u8 scancode, bool shift)
 {
   if(scancode >= 128)
     return 0;
-  return shift ? scancode_to_ascii_shift[scancode]
-               : scancode_to_ascii[scancode];
+  return (char)(shift ? scancode_to_ascii_shift[scancode]
+                      : scancode_to_ascii[scancode]);
 }
 
 /**

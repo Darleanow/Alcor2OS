@@ -13,7 +13,7 @@
 /** @brief User stack base address. */
 #define USER_STACK_ADDR 0x800000ULL
 /** @brief User stack size (16 KB). */
-#define USER_STACK_SIZE (16 * 1024)
+#define USER_STACK_SIZE (16ULL * 1024)
 
 extern void tss_set_rsp0(u64 rsp0);
 

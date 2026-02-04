@@ -40,7 +40,7 @@
 #define USER_STACK_TOP 0x00007FFF00000000ULL
 
 /** @brief User stack size (64KB per process) */
-#define USER_STACK_SIZE (64 * 1024)
+#define USER_STACK_SIZE (64ULL * 1024)
 
 /** @brief User stack base calculation */
 #define USER_STACK_BASE (USER_STACK_TOP - USER_STACK_SIZE)

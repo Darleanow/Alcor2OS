@@ -708,7 +708,7 @@ i64 proc_fork(void *frame_ptr)
   );
 
   /* Parent returns child PID */
-  return child->pid;
+  return (i64)child->pid;
 }
 
 /**
@@ -815,7 +815,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options)
   }
 
   /* Get exit status */
-  i64 child_pid = child->pid;
+  i64 child_pid = (i64)child->pid;
   if(status) {
     /* Linux status format: exit_code << 8 for normal exit */
     *status = (i32)((child->exit_code & 0xFF) << 8);
