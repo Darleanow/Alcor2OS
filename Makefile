@@ -166,3 +166,12 @@ distclean: clean
 	rm -rf thirdparty
 
 -include $(DEPS)
+
+# Static Analysis
+lint:
+	clang-tidy $(SRCS_C) -- -I$(INCLUDE) -std=gnu11
+
+check:
+	cppcheck --enable=all --suppress=missingIncludeSystem --inconclusive --quiet -I$(INCLUDE) $(SRC)
+
+analyze: lint check

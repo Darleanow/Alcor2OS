@@ -95,7 +95,7 @@ u64 vmm_get_phys_in(u64 pml4_phys, u64 virt);
  * @param src_pml4 Source PML4 physical address.
  * @return New PML4 physical address with cloned mappings.
  */
-u64 vmm_clone_address_space(u64 src_pml4);
+u64 vmm_clone_address_space(u64 src_pml4_phys);
 
 /**
  * @brief Destroy all user mappings in an address space.

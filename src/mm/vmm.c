@@ -7,6 +7,7 @@
 #include <alcor2/pmm.h>
 #include <alcor2/vmm.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/types.h>
 
 static u64 *kernel_pml4;
 static u64  kernel_pml4_phys;
@@ -69,7 +70,7 @@ void vmm_init(u64 hhdm_offset)
 
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
-  u64 *old_pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
+  u64 *const old_pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   for(int i = 256; i < 512; i++) {
     kernel_pml4[i] = old_pml4[i];

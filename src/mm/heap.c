@@ -358,12 +358,12 @@ void *krealloc(void *ptr, u64 new_size)
  * @param used Output pointer for used heap size in bytes (can be NULL).
  * @param free_mem Output pointer for free heap size in bytes (can be NULL).
  */
-void heap_stats(u64 *total, u64 *used, u64 *free_mem)
+void heap_stats(heap_stats_t *stats)
 {
-  if(total)
-    *total = heap_size;
-  if(used)
-    *used = heap_used;
-  if(free_mem)
-    *free_mem = heap_size - heap_used;
+  if(!stats)
+    return;
+
+  stats->total_bytes = heap_size;
+  stats->used_bytes  = heap_used;
+  stats->free_bytes  = heap_size - heap_used;
 }

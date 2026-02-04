@@ -5,6 +5,8 @@
 
 #include <alcor2/pmm.h>
 #include <alcor2/memory_layout.h>
+#include <alcor2/limine.h>
+#include <alcor2/types.h>
 
 #define BITS_PER_ENTRY 64
 

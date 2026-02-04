@@ -77,11 +77,19 @@ void kfree(void *ptr);
 void *krealloc(void *ptr, u64 new_size);
 
 /**
- * @brief Get heap statistics.
- * @param total Output: total heap size.
- * @param used Output: used heap size.
- * @param free_mem Output: free heap size.
+ * @brief Heap statistics.
  */
-void heap_stats(u64 *total, u64 *used, u64 *free_mem);
+typedef struct
+{
+  u64 total_bytes;
+  u64 used_bytes;
+  u64 free_bytes;
+} heap_stats_t;
+
+/**
+ * @brief Get heap statistics.
+ * @param stats Pointer to stats structure to fill.
+ */
+void heap_stats(heap_stats_t *stats);
 
 #endif
