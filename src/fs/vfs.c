@@ -41,7 +41,7 @@ static char        cwd[VFS_PATH_MAX] = "/";
 
 static bool         is_fat32_fd(i64 fd);
 static vfs_mount_t *find_mount(const char *path);
-static const char  *get_relative_path(const char *path, vfs_mount_t *mount);
+static const char  *get_relative_path(const char *path, const vfs_mount_t *mount);
 
 /*
  * @brief Normalize a path by resolving . and .. components.

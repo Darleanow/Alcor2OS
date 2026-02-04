@@ -83,7 +83,7 @@ proc_t *proc_current(void);
  * @return New process's PID, or 0 on failure.
  */
 u64 proc_create(
-    const char *name, void *elf_data, u64 elf_size, char *const argv[]
+    const char *name, const void *elf_data, u64 elf_size, char *const argv[]
 );
 
 /**
@@ -139,7 +139,7 @@ proc_t *proc_get(u64 pid);
  * @param elf_size Size of ELF data.
  * @param name Process name.
  */
-void proc_start_first(void *elf_data, u64 elf_size, const char *name);
+void proc_start_first(const void *elf_data, u64 elf_size, const char *name);
 
 /**
  * @brief Entry point for newly created processes (defined in proc.asm).
