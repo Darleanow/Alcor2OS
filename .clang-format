@@ -7,7 +7,6 @@ AlignConsecutiveMacros:
   AlignCompound: true
   PadOperators: true
   AlignFunctionPointers: true
-AlignEscapedNewlines: LeftWithLastLine
 AlignConsecutiveDeclarations:
   Enabled: true
   AcrossEmptyLines: true
@@ -15,7 +14,7 @@ AlignConsecutiveDeclarations:
   AlignCompound: true
   AlignFunctionPointers: true
   PadOperators: true
-BreakTemplateDeclarations: Yes
+
 AllowShortEnumsOnASingleLine: false
 SpaceBeforeInheritanceColon: true
 AlignArrayOfStructures: Left
