@@ -577,7 +577,7 @@ void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
  * registers.
  * @return Child PID to parent process, 0 to child process, negative on error.
  */
-i64 proc_fork(void *syscall_frame)
+i64 proc_fork(const void *syscall_frame)
 {
   const syscall_frame_t *frame  = (const syscall_frame_t *)syscall_frame;
   proc_t          *parent = current_proc;

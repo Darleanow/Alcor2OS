@@ -692,6 +692,7 @@ static syscall_fn_t syscall_table[SYS_MAX] = {
     [SYS_ARCH_PRCTL] = sys_arch_prctl
 };
 
+__attribute__((used))
 u64 syscall_dispatch(syscall_frame_t *frame)
 {
   u64 num = frame->rax;
