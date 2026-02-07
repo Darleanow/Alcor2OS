@@ -5,12 +5,12 @@
 
 #include <alcor2/console.h>
 #include <alcor2/cpu.h>
-#include <alcor2/syscall.h>
-#include <alcor2/proc.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/proc.h>
+#include <alcor2/syscall.h>
 
-// MSR Definitions (duplicated here or from header, better to rely on header if possible)
-// But syscall.h has them.
+// MSR Definitions (duplicated here or from header, better to rely on header if
+// possible) But syscall.h has them.
 
 /**
  * @brief Read Model Specific Register
@@ -43,14 +43,18 @@ static inline void wrmsr(u32 msr, u64 value)
  */
 u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
 
   proc_t *p = proc_current();
 
   switch(code) {
   case ARCH_SET_FS:
     wrmsr(MSR_FS_BASE, addr);
-    if(p) p->fs_base = addr;
+    if(p)
+      p->fs_base = addr;
     return 0;
 
   case ARCH_SET_GS:
@@ -58,12 +62,14 @@ u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
     return 0;
 
   case ARCH_GET_FS:
-    if(!addr) return (u64)-14; // -EFAULT
+    if(!addr)
+      return (u64)-14; // -EFAULT
     *(u64 *)addr = rdmsr(MSR_FS_BASE);
     return 0;
 
   case ARCH_GET_GS:
-    if(!addr) return (u64)-14; // -EFAULT
+    if(!addr)
+      return (u64)-14; // -EFAULT
     *(u64 *)addr = rdmsr(MSR_GS_BASE);
     return 0;
 

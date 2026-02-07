@@ -175,7 +175,7 @@ extern int execve(const char *path, char *const argv[], char *const envp[]);
  * @param argv Argument array (NULL-terminated)
  * @return Exit code of child process, or negative on error
  */
-int        sh_exec(const char *path, char *const argv[])
+int sh_exec(const char *path, char *const argv[])
 {
   /* For now, directly call execve syscall */
   /* Our kernel's execve creates a child process and waits */

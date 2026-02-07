@@ -24,8 +24,6 @@ u64 user_enter(void *entry, void *user_rsp);
  */
 NORETURN void user_return(u64 exit_code);
 
-
-
 /**
  * @brief Execute an ELF binary in userspace.
  * @param data Pointer to ELF file data.

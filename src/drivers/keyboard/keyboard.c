@@ -24,7 +24,7 @@ static volatile u32 kb_write_pos = 0;
  * @brief Push character to input buffer.
  * @param c Character to push.
  */
-static void         kb_buffer_push(char c)
+static void kb_buffer_push(char c)
 {
   u32 next = (kb_write_pos + 1) % KB_BUFFER_SIZE;
   if(next != kb_read_pos) { /* Buffer not full */
@@ -35,10 +35,10 @@ static void         kb_buffer_push(char c)
 
 /**
  * @brief Read buffered keyboard input.
- * 
+ *
  * Reads up to count characters from the keyboard input buffer.
  * Non-blocking - returns immediately with available data.
- * 
+ *
  * @param buf Destination buffer.
  * @param count Maximum number of bytes to read.
  * @return Number of bytes actually read.
@@ -105,7 +105,7 @@ char keyboard_scancode_to_char(u8 scancode, bool shift)
 
 /**
  * @brief IRQ handler for keyboard interrupts.
- * 
+ *
  * Reads scancodes from the keyboard, updates modifier state, converts
  * to ASCII, and pushes to the input buffer.
  */
@@ -151,7 +151,7 @@ void keyboard_irq(void)
 
 /**
  * @brief Initialize the PS/2 keyboard driver.
- * 
+ *
  * Flushes the keyboard buffer and unmasks the keyboard IRQ.
  */
 void keyboard_init(void)
@@ -164,10 +164,10 @@ void keyboard_init(void)
 
 /**
  * @brief Set a custom keyboard event handler.
- * 
+ *
  * Allows registering a callback function that will be called on each
  * key press event (in addition to buffering).
- * 
+ *
  * @param handler Callback function, or NULL to disable.
  */
 // cppcheck-suppress unusedFunction

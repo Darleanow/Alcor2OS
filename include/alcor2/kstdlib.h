@@ -5,7 +5,7 @@
  * Provides common utility functions for kernel code:
  * - Memory operations (copy, zero, set, compare)
  * - String operations (length, copy, compare, find)
- * 
+ *
  * These replace the duplicated static functions across FS drivers.
  */
 

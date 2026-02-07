@@ -100,10 +100,10 @@ typedef struct
  */
 typedef struct
 {
-  vfs_node_t *node;    /**< VFS node (ramfs) or FAT32 file handle */
-  vfs_node_t *current; /**< Current child for ramfs iteration */
-  u64         index;   /**< Entry index for iteration */
-  bool        in_use;  /**< Handle is active */
+  vfs_node_t *node;     /**< VFS node (ramfs) or FAT32 file handle */
+  vfs_node_t *current;  /**< Current child for ramfs iteration */
+  u64         index;    /**< Entry index for iteration */
+  bool        in_use;   /**< Handle is active */
   bool        is_fat32; /**< true if FAT32 directory, false if ramfs */
 } vfs_dir_t;
 

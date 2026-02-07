@@ -19,9 +19,9 @@
 
 /**
  * @brief Initialize and remap the 8259 PIC.
- * 
- * Remaps the PIC IRQs from 0-15 to 32-47 to avoid conflicts with CPU exceptions.
- * Initially masks all IRQs (they must be explicitly unmasked).
+ *
+ * Remaps the PIC IRQs from 0-15 to 32-47 to avoid conflicts with CPU
+ * exceptions. Initially masks all IRQs (they must be explicitly unmasked).
  */
 void pic_init(void)
 {
@@ -57,10 +57,10 @@ void pic_init(void)
 
 /**
  * @brief Send End-Of-Interrupt signal to the PIC.
- * 
+ *
  * Must be called at the end of an IRQ handler to acknowledge the interrupt.
  * Automatically handles both master and slave PIC if needed.
- * 
+ *
  * @param irq IRQ number (0-15).
  */
 void pic_eoi(u8 irq)
@@ -72,9 +72,9 @@ void pic_eoi(u8 irq)
 
 /**
  * @brief Mask (disable) an IRQ line.
- * 
+ *
  * Prevents the specified IRQ from triggering interrupts.
- * 
+ *
  * @param irq IRQ number (0-15).
  */
 // cppcheck-suppress unusedFunction
@@ -87,9 +87,9 @@ void pic_mask(u8 irq)
 
 /**
  * @brief Unmask (enable) an IRQ line.
- * 
+ *
  * Allows the specified IRQ to trigger interrupts.
- * 
+ *
  * @param irq IRQ number (0-15).
  */
 void pic_unmask(u8 irq)

@@ -19,17 +19,25 @@
 
 /** @name Request IDs
  * @{ */
-#define LIMINE_FRAMEBUFFER_REQUEST_ID                                      \
-  {LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x9d5827dcd881dd75, 0xa3148604f6fab11b}
+#define LIMINE_FRAMEBUFFER_REQUEST_ID                                          \
+  {                                                                            \
+    LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x9d5827dcd881dd75, 0xa3148604f6fab11b     \
+  }
 
-#define LIMINE_MEMMAP_REQUEST_ID                                           \
-  {LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x67cf3d9d378a806f, 0xe304acdfc50c3c62}
+#define LIMINE_MEMMAP_REQUEST_ID                                               \
+  {                                                                            \
+    LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x67cf3d9d378a806f, 0xe304acdfc50c3c62     \
+  }
 
-#define LIMINE_HHDM_REQUEST_ID                                             \
-  {LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x48dcf1cb8ad2b852, 0x63984e959a98244b}
+#define LIMINE_HHDM_REQUEST_ID                                                 \
+  {                                                                            \
+    LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x48dcf1cb8ad2b852, 0x63984e959a98244b     \
+  }
 
-#define LIMINE_MODULE_REQUEST_ID                                           \
-  {LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x3e7e279702be32af, 0xca1c4f3bd1280cee}
+#define LIMINE_MODULE_REQUEST_ID                                               \
+  {                                                                            \
+    LIMINE_MAGIC_0, LIMINE_MAGIC_1, 0x3e7e279702be32af, 0xca1c4f3bd1280cee     \
+  }
 /** @} */
 
 /** @name Memory map entry types
@@ -48,25 +56,23 @@
  * @brief Declare base revision for Limine protocol.
  * @param n Revision number.
  */
-#define LIMINE_BASE_REVISION(n)                                      \
-  USED                  SECTION(                                     \
-      ".limine_requests"                            \
-  ) static volatile u64 limine_base_revision[3] = { \
-      0xf9562b2d5c95a6c8, 0x6a7b384944536bdc, (n)   \
+#define LIMINE_BASE_REVISION(n)                                                \
+  USED SECTION(".limine_requests"                                              \
+  ) static volatile u64 limine_base_revision[3] = {                            \
+      0xf9562b2d5c95a6c8, 0x6a7b384944536bdc, (n)                              \
   };
 
 /** @brief Check if base revision was accepted. */
 #define LIMINE_BASE_REVISION_OK (limine_base_revision[2] == 0)
 
 /** @brief Start of request section. */
-#define LIMINE_REQUESTS_START                     \
-  USED                    SECTION(                \
-      ".limine_requests_start" \
+#define LIMINE_REQUESTS_START                                                  \
+  USED SECTION(".limine_requests_start"                                        \
   ) static volatile void *limine_req_start = (void *)0xf9562b2d5c95a6c8;
 
 /** @brief End of request section. */
-#define LIMINE_REQUESTS_END                                                   \
-  USED SECTION(".limine_requests_end") static volatile void *limine_req_end = \
+#define LIMINE_REQUESTS_END                                                    \
+  USED SECTION(".limine_requests_end") static volatile void *limine_req_end =  \
       (void *)0xadc0e0531bb10d03;
 
 /**

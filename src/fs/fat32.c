@@ -25,7 +25,8 @@ static u8             sector_cache[SECTOR_CACHE_SIZE];
  * @param buf Buffer.
  * @return 0 on success, negative on error.
  */
-static i64 vol_write_sector(const fat32_volume_t *vol, u32 sector, const void *buf)
+static i64
+    vol_write_sector(const fat32_volume_t *vol, u32 sector, const void *buf)
 {
   return ata_write(vol->drive, vol->partition_lba + sector, 1, buf);
 }
@@ -95,8 +96,9 @@ static i64 vol_read_cluster(const fat32_volume_t *vol, u32 cluster, void *buf)
   u32 sector = cluster_to_sector(vol, cluster);
 
   for(u32 i = 0; i < vol->sectors_per_cluster; i++) {
-    if(vol_read_sector(vol, sector + i, (u8 *)buf + (size_t)i * FAT32_SECTOR_SIZE) <
-       0) {
+    if(vol_read_sector(
+           vol, sector + i, (u8 *)buf + (size_t)i * FAT32_SECTOR_SIZE
+       ) < 0) {
       return -1;
     }
   }
@@ -111,7 +113,8 @@ static i64 vol_read_cluster(const fat32_volume_t *vol, u32 cluster, void *buf)
  * @param buf Buffer with cluster data (must be bytes_per_cluster size)
  * @return 0 on success, negative on error
  */
-static i64 vol_write_cluster(const fat32_volume_t *vol, u32 cluster, const void *buf)
+static i64
+    vol_write_cluster(const fat32_volume_t *vol, u32 cluster, const void *buf)
 {
   u32 sector = cluster_to_sector(vol, cluster);
 
@@ -188,8 +191,8 @@ static i64 fat_free_chain(const fat32_volume_t *vol, u32 start_cluster)
 {
   u32 cluster = start_cluster;
 
-  while(cluster >= 2 && !cluster_is_end(cluster) &&
-        cluster != FAT32_CLUSTER_BAD) {
+  while(cluster >= 2 && !cluster_is_end(cluster) && cluster != FAT32_CLUSTER_BAD
+  ) {
     u32 next = fat_read_entry(vol, cluster);
     if(fat_write_entry(vol, cluster, FAT32_CLUSTER_FREE) < 0) {
       return -1;
@@ -594,9 +597,9 @@ i64 fat32_read(fat32_file_t *file, void *buf, u64 count)
   if(!file || !file->in_use || file->is_dir)
     return -1;
 
-  const fat32_volume_t *vol = file->vol;
-  u8             *dst        = (u8 *)buf;
-  u64             bytes_read = 0;
+  const fat32_volume_t *vol        = file->vol;
+  u8                   *dst        = (u8 *)buf;
+  u64                   bytes_read = 0;
 
   /* Limit to file size */
   if(file->position >= file->file_size)
@@ -653,7 +656,7 @@ i64 fat32_readdir(fat32_file_t *dir, fat32_entry_t *entry)
 
   const fat32_volume_t *vol = dir->vol;
 
-  u8             *cluster_buf = kmalloc(vol->bytes_per_cluster);
+  u8                   *cluster_buf = kmalloc(vol->bytes_per_cluster);
   if(!cluster_buf)
     return -1;
 
@@ -712,7 +715,9 @@ i64 fat32_readdir(fat32_file_t *dir, fat32_entry_t *entry)
  * @param entry Output buffer for file information
  * @return 0 on success, -1 if not found
  */
-i64 fat32_stat(const fat32_volume_t *vol, const char *path, fat32_entry_t *entry)
+i64 fat32_stat(
+    const fat32_volume_t *vol, const char *path, fat32_entry_t *entry
+)
 {
   if(!vol || !vol->mounted)
     return -1;
@@ -814,7 +819,7 @@ i64 fat32_seek(fat32_file_t *file, i64 offset, i32 whence)
 
   /* Recalculate current_cluster and cluster_offset */
   const fat32_volume_t *vol         = file->vol;
-  u32             cluster_idx = file->position / vol->bytes_per_cluster;
+  u32                   cluster_idx = file->position / vol->bytes_per_cluster;
 
   file->current_cluster = file->start_cluster;
   for(u32 i = 0; i < cluster_idx && !cluster_is_end(file->current_cluster);
@@ -843,10 +848,10 @@ i64 fat32_write(fat32_file_t *file, const void *buf, u64 count)
     return 0;
 
   const fat32_volume_t *vol           = file->vol;
-  const u8       *src           = (const u8 *)buf;
-  u64             bytes_written = 0;
+  const u8             *src           = (const u8 *)buf;
+  u64                   bytes_written = 0;
 
-  u8             *cluster_buf = kmalloc(vol->bytes_per_cluster);
+  u8                   *cluster_buf = kmalloc(vol->bytes_per_cluster);
   if(!cluster_buf)
     return -1;
 
@@ -1036,7 +1041,8 @@ i64 fat32_flush(fat32_file_t *file)
  * @return 0 on success, negative on error
  */
 static i64 find_free_dirent(
-    const fat32_volume_t *vol, u32 dir_cluster, u32 *out_cluster, u32 *out_offset
+    const fat32_volume_t *vol, u32 dir_cluster, u32 *out_cluster,
+    u32 *out_offset
 )
 {
   u8 *cluster_buf = kmalloc(vol->bytes_per_cluster);

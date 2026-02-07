@@ -26,35 +26,25 @@
 LIMINE_BASE_REVISION(3)
 LIMINE_REQUESTS_START
 
-USED SECTION(
-    ".limine_requests"
+USED SECTION(".limine_requests"
 ) static volatile struct limine_framebuffer_request fb_request = {
     .id = LIMINE_FRAMEBUFFER_REQUEST_ID, .revision = 0
 };
 
-USED SECTION(
-    ".limine_requests"
-) static volatile struct limine_memmap_request memmap_request = {
-    .id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0
-};
+USED SECTION(".limine_requests") static volatile struct limine_memmap_request
+    memmap_request = {.id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0};
 
-USED SECTION(
-    ".limine_requests"
-) static volatile struct limine_hhdm_request hhdm_request = {
-    .id = LIMINE_HHDM_REQUEST_ID, .revision = 0
-};
+USED SECTION(".limine_requests") static volatile struct limine_hhdm_request
+    hhdm_request = {.id = LIMINE_HHDM_REQUEST_ID, .revision = 0};
 
-USED SECTION(
-    ".limine_requests"
-) static volatile struct limine_module_request module_request = {
-    .id = LIMINE_MODULE_REQUEST_ID, .revision = 0
-};
+USED SECTION(".limine_requests") static volatile struct limine_module_request
+    module_request = {.id = LIMINE_MODULE_REQUEST_ID, .revision = 0};
 
 LIMINE_REQUESTS_END
 
 /**
  * @brief Kernel main entry point.
- * 
+ *
  * Initializes all kernel subsystems in order:
  * - Framebuffer console
  * - Physical memory manager (PMM)
@@ -70,7 +60,7 @@ LIMINE_REQUESTS_END
  * - Virtual File System (VFS)
  * - ATA disk driver
  * - Process subsystem
- * 
+ *
  * Loads modules into ramfs, then starts the first user process (init/shell).
  * Never returns - enters idle loop or starts first process.
  */
@@ -89,8 +79,8 @@ void kmain(void)
   struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
 
   console_init(fb->address, fb->width, fb->height, fb->pitch);
-  console_set_theme((console_theme_t) {.foreground = 0x00FF00,
-                                       .background = 0x000000});
+  console_set_theme((console_theme_t
+  ) {.foreground = 0x00FF00, .background = 0x000000});
   console_clear();
 
   console_print("\n");
@@ -154,7 +144,8 @@ void kmain(void)
       /* Mount /dev as ramfs overlay (like Linux devtmpfs) */
       vfs_mount(NULL, "/dev", "ramfs");
     } else {
-      console_print("[VFS] Failed to mount FAT32 on / - falling back to ramfs\n");
+      console_print("[VFS] Failed to mount FAT32 on / - falling back to ramfs\n"
+      );
     }
   } else {
     console_print("[VFS] No disk found - using ramfs only\n");

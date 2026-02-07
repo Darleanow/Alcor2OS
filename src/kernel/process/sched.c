@@ -6,24 +6,22 @@
 #include <alcor2/console.h>
 #include <alcor2/cpu.h>
 #include <alcor2/heap.h>
-#include <alcor2/sched.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/sched.h>
 
 /** @brief Circular doubly-linked task list. */
-static task_t   *task_list    = NULL;
+static task_t *task_list = NULL;
 /** @brief Currently running task. */
-static task_t   *current_task = NULL;
+static task_t *current_task = NULL;
 /** @brief Idle task (never removed). */
-static task_t   *idle_task    = NULL;
+static task_t *idle_task = NULL;
 
-static u64       next_tid         = 1;
-static u64       task_count_val       = 0;
-static u64       context_switches = 0;
+static u64     next_tid         = 1;
+static u64     task_count_val   = 0;
+static u64     context_switches = 0;
 
 /** @brief Time slice in ticks (100ms at 100Hz). */
 static const u64 DEFAULT_TIME_SLICE = 10;
-
-
 
 /**
  * @brief Add task to circular list.
@@ -65,10 +63,10 @@ static void task_list_remove(task_t *task)
 
 /**
  * @brief Find the next ready task in round-robin order.
- * 
+ *
  * Searches the circular task list starting from current_task->next.
  * Returns the idle task if no ready task is found.
- * 
+ *
  * @return Pointer to next ready task or idle task.
  */
 static task_t *find_next_ready(void)
@@ -93,7 +91,7 @@ static task_t *find_next_ready(void)
 
 /**
  * @brief Task wrapper function.
- * 
+ *
  * This is the initial entry point for all tasks. It enables interrupts,
  * calls the task's entry function with its argument, then calls task_exit().
  */
@@ -222,7 +220,7 @@ void sched_yield(void)
 
 /**
  * @brief Flag indicating that a reschedule is needed.
- * 
+ *
  * Set by sched_tick() when time slice expires, checked at safe points.
  * Similar to Linux's TIF_NEED_RESCHED.
  */
@@ -230,11 +228,11 @@ static volatile bool need_resched = false;
 
 /**
  * @brief Timer tick handler for preemptive scheduling.
- * 
+ *
  * Called by the PIT IRQ handler. Decrements the current task's remaining
  * time slice and sets need_resched flag when it expires.
  */
-void                 sched_tick(void)
+void sched_tick(void)
 {
   if(current_task == NULL) {
     return;
@@ -252,7 +250,7 @@ void                 sched_tick(void)
 
 /**
  * @brief Check if reschedule is needed and perform it.
- * 
+ *
  * Called at safe points such as syscall return to ensure preemptive
  * scheduling happens outside interrupt context.
  */
@@ -267,7 +265,7 @@ void sched_check_resched(void)
 
 /**
  * @brief Terminate the current task.
- * 
+ *
  * Marks the task as TASK_STATE_ZOMBIE, removes it from the task list,
  * and switches to the next ready task. Never returns.
  */

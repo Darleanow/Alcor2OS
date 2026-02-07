@@ -11,7 +11,7 @@
 
 /**
  * @brief Halt the CPU indefinitely.
- * 
+ *
  * Disables interrupts and enters an infinite HLT loop. Used for
  * unrecoverable errors or system shutdown. Never returns.
  */
@@ -24,7 +24,7 @@ NORETURN void cpu_halt(void)
 
 /**
  * @brief CPU pause instruction for spinlock optimization.
- * 
+ *
  * Hints to the CPU that we're in a spinlock loop, improving performance
  * and reducing power consumption.
  */
@@ -36,7 +36,7 @@ void cpu_pause(void)
 
 /**
  * @brief Disable hardware interrupts (CLI instruction).
- * 
+ *
  * Prevents the CPU from handling external interrupts. Used for
  * critical sections that must be atomic.
  */
@@ -47,7 +47,7 @@ void cpu_disable_interrupts(void)
 
 /**
  * @brief Enable hardware interrupts (STI instruction).
- * 
+ *
  * Allows the CPU to handle external interrupts. Must be called after
  * cpu_disable_interrupts() to restore normal interrupt handling.
  */
@@ -58,10 +58,10 @@ void cpu_enable_interrupts(void)
 
 /**
  * @brief Set the FS base MSR for thread-local storage.
- * 
+ *
  * Sets the base address for the FS segment register, typically used
  * for thread-local storage in user applications.
- * 
+ *
  * @param addr Linear address for FS segment base.
  */
 void cpu_set_fs_base(u64 addr)
@@ -73,9 +73,9 @@ void cpu_set_fs_base(u64 addr)
 
 /**
  * @brief Get the current FS base MSR value.
- * 
+ *
  * Reads the base address of the FS segment register.
- * 
+ *
  * @return FS base address.
  */
 u64 cpu_get_fs_base(void)
@@ -87,9 +87,10 @@ u64 cpu_get_fs_base(void)
 
 /**
  * @brief Enable SSE and FPU instructions.
- * 
+ *
  * Configures CR0 and CR4 to enable SSE/SSE2 instructions and floating-point
- * operations. Initializes the FPU state. Must be called during kernel initialization.
+ * operations. Initializes the FPU state. Must be called during kernel
+ * initialization.
  */
 void cpu_enable_sse(void)
 {

@@ -16,13 +16,13 @@ static bool         sched_enabled = false;
 
 /**
  * @brief Initialize the PIT to generate timer interrupts.
- * 
+ *
  * Configures the PIT in mode 3 (square wave generator) to produce
  * periodic interrupts at the specified frequency.
- * 
+ *
  * @param frequency Desired tick frequency in Hz (typically 100Hz).
  */
-void                pit_init(u32 frequency)
+void pit_init(u32 frequency)
 {
   u16 divisor = PIT_FREQ / frequency;
 
@@ -33,7 +33,7 @@ void                pit_init(u32 frequency)
 
 /**
  * @brief Enable preemptive scheduling on timer ticks.
- * 
+ *
  * After calling this, the PIT will invoke the scheduler on each tick,
  * enabling preemptive multitasking.
  */
@@ -44,8 +44,9 @@ void pit_enable_sched(void)
 
 /**
  * @brief PIT interrupt handler (called by IRQ0 handler).
- * 
- * Increments the tick counter and invokes the scheduler if scheduling is enabled.
+ *
+ * Increments the tick counter and invokes the scheduler if scheduling is
+ * enabled.
  */
 void pit_tick(void)
 {

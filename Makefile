@@ -167,6 +167,10 @@ distclean: clean
 
 -include $(DEPS)
 
+# Code Formatting
+format:
+	@find src include user -name '*.c' -o -name '*.h' | xargs clang-format -i
+
 # Static Analysis
 lint:
 	clang-tidy $(SRCS_C) -- -I$(INCLUDE) -std=gnu11

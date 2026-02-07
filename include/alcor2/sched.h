@@ -49,18 +49,18 @@ typedef struct
  */
 typedef struct task
 {
-  u64          tid;
-  char         name[TASK_NAME_MAX];
-  task_state_t state;
-  u64          time_slice;
-  u64          ticks_remaining;
-  void       (*entry)(void *);
-  void        *arg;
-  void        *stack_base;
-  void        *stack_top;
+  u64            tid;
+  char           name[TASK_NAME_MAX];
+  task_state_t   state;
+  u64            time_slice;
+  u64            ticks_remaining;
+  void           (*entry)(void *);
+  void          *arg;
+  void          *stack_base;
+  void          *stack_top;
   cpu_context_t *context;
-  struct task *next;
-  struct task *prev;
+  struct task   *next;
+  struct task   *prev;
 } task_t;
 
 /**

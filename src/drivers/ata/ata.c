@@ -5,8 +5,8 @@
 
 #include <alcor2/ata.h>
 #include <alcor2/console.h>
-#include <alcor2/io.h>
 #include <alcor2/errno.h>
+#include <alcor2/io.h>
 
 /** @brief Drive state for up to 4 ATA devices. */
 static ata_drive_t drives[4];

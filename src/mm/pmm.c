@@ -3,18 +3,18 @@
  * @brief Physical memory manager using bitmap allocator.
  */
 
-#include <alcor2/pmm.h>
-#include <alcor2/memory_layout.h>
 #include <alcor2/limine.h>
+#include <alcor2/memory_layout.h>
+#include <alcor2/pmm.h>
 #include <alcor2/types.h>
 
 #define BITS_PER_ENTRY 64
 
-static u64        *bitmap;
-static u64         bitmap_size;
-static u64         total_pages;
-static u64         free_pages;
-static u64         hhdm;
+static u64 *bitmap;
+static u64  bitmap_size;
+static u64  total_pages;
+static u64  free_pages;
+static u64  hhdm;
 
 /**
  * @brief Mark page as allocated in bitmap.
@@ -51,7 +51,7 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
   u64 highest_addr = 0;
   for(u64 i = 0; i < memmap->entry_count; i++) {
     const struct limine_memmap_entry *e   = memmap->entries[i];
-    u64                         top = e->base + e->length;
+    u64                               top = e->base + e->length;
     if(e->type == LIMINE_MEMMAP_USABLE && top > highest_addr) {
       highest_addr = top;
     }
@@ -91,10 +91,10 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
 
 /**
  * @brief Allocate a single 4KB physical page.
- * 
+ *
  * Searches the bitmap for the first free page, marks it as allocated,
  * and returns its physical address.
- * 
+ *
  * @return Physical address of the allocated page, or NULL if out of memory.
  */
 void *pmm_alloc(void)
@@ -116,12 +116,13 @@ void *pmm_alloc(void)
 
 /**
  * @brief Allocate multiple contiguous physical pages.
- * 
+ *
  * Searches for a contiguous region of free pages, marks them as allocated,
  * and returns the physical address of the first page.
- * 
+ *
  * @param count Number of pages to allocate.
- * @return Physical address of the first page, or NULL if not enough contiguous memory.
+ * @return Physical address of the first page, or NULL if not enough contiguous
+ * memory.
  */
 void *pmm_alloc_pages(usize count)
 {
@@ -149,9 +150,9 @@ void *pmm_alloc_pages(usize count)
 
 /**
  * @brief Free a single physical page.
- * 
+ *
  * Marks the page as free in the bitmap, making it available for reallocation.
- * 
+ *
  * @param addr Physical address of the page to free.
  */
 void pmm_free(void *addr)
@@ -165,9 +166,9 @@ void pmm_free(void *addr)
 
 /**
  * @brief Free multiple contiguous physical pages.
- * 
+ *
  * Marks a range of pages as free in the bitmap.
- * 
+ *
  * @param addr Physical address of the first page.
  * @param count Number of pages to free.
  */

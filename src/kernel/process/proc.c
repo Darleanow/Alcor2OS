@@ -9,13 +9,13 @@
 #include <alcor2/errno.h>
 #include <alcor2/gdt.h>
 #include <alcor2/heap.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/memory_layout.h>
 #include <alcor2/pmm.h>
 #include <alcor2/proc.h>
 #include <alcor2/syscall.h>
-#include <alcor2/vmm.h>
 #include <alcor2/vfs.h>
-#include <alcor2/kstdlib.h>
+#include <alcor2/vmm.h>
 
 static proc_t  proc_table[PROC_MAX];
 static proc_t *current_proc = NULL;
@@ -338,7 +338,7 @@ void proc_exit(i64 code)
 
   p->exit_code = code;
   p->state     = PROC_STATE_ZOMBIE;
-  
+
   /* Clean up open file descriptors */
   vfs_close_for_pid(p->pid);
 
@@ -580,7 +580,7 @@ void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
 i64 proc_fork(const void *syscall_frame)
 {
   const syscall_frame_t *frame  = (const syscall_frame_t *)syscall_frame;
-  proc_t          *parent = current_proc;
+  proc_t                *parent = current_proc;
   if(!parent) {
     return -1;
   }

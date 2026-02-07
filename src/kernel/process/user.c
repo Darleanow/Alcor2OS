@@ -22,10 +22,10 @@ static u8 kernel_stack[8192] __attribute__((aligned(16)));
 
 /**
  * @brief Allocate and map user stack.
- * 
+ *
  * Allocates physical pages and maps them at USER_STACK_ADDR with user
  * permissions (ring 3 accessible).
- * 
+ *
  * @return Pointer to top of stack (ready to use), or NULL on failure.
  */
 static void *alloc_user_stack(void)
@@ -48,10 +48,10 @@ static void *alloc_user_stack(void)
 
 /**
  * @brief Execute an ELF binary in userspace (ring 3).
- * 
+ *
  * Loads the ELF file into user-accessible memory, allocates a user stack,
  * sets up the TSS kernel stack, and jumps to the ELF entry point.
- * 
+ *
  * @param data Pointer to ELF file data.
  * @param size Size of ELF file in bytes.
  * @return Exit code from user program, or (u64)-1 on load failure.
@@ -82,5 +82,3 @@ u64 user_exec_elf(const void *data, u64 size)
   /* Execute ELF entry point */
   return user_enter((void *)info.entry, user_rsp);
 }
-
-

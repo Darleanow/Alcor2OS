@@ -104,7 +104,8 @@ i64 proc_wait(u64 pid);
  * @param pid -1 = any child, >0 = specific child.
  * @param status Pointer to store exit status (can be NULL).
  * @param options WNOHANG etc (0 = block).
- * @return Child PID on success, 0 if WNOHANG and no child ready, negative on error.
+ * @return Child PID on success, 0 if WNOHANG and no child ready, negative on
+ * error.
  */
 i64 proc_waitpid(i64 pid, i32 *status, i32 options);
 

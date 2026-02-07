@@ -3,9 +3,9 @@
  * @brief Framebuffer console with ANSI color support.
  */
 
-#include <stdarg.h>
 #include "font.h"
 #include <alcor2/console.h>
+#include <stdarg.h>
 
 #define FONT_W 8
 #define FONT_H 16
@@ -21,9 +21,9 @@ static struct
   u32           cursor_y;    /**< Cursor Y (chars) */
   u32           fg;          /**< Foreground color */
   u32           bg;          /**< Background color */
-  int  esc_state;            /**< ANSI parser: 0=normal, 1=ESC, 2=[ */
-  char esc_buf[16];          /**< ANSI escape buffer */
-  int  esc_len;              /**< ANSI buffer length */
+  int           esc_state;   /**< ANSI parser: 0=normal, 1=ESC, 2=[ */
+  char          esc_buf[16]; /**< ANSI escape buffer */
+  int           esc_len;     /**< ANSI buffer length */
 } ctx;
 
 /**
@@ -140,7 +140,8 @@ static void handle_ansi_sequence(void)
       }
     }
     break;
-  default: break;
+  default:
+    break;
   }
 }
 
@@ -274,14 +275,14 @@ static void print_hex(u64 n)
 
 /**
  * @brief Formatted console output (printf-style).
- * 
+ *
  * Supports the following format specifiers:
  * - %d: signed integer
  * - %x: unsigned 64-bit hexadecimal (with 0x prefix)
  * - %s: null-terminated string
  * - %c: single character
  * - %%: literal percent sign
- * 
+ *
  * @param fmt Format string.
  * @param ... Variable arguments matching format specifiers.
  */
@@ -295,16 +296,20 @@ void console_printf(const char *fmt, ...)
       fmt++;
       switch(*fmt) {
       case 'd':
-        print_int(va_arg(args, int)); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_int(va_arg(args, int)
+        ); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 'x':
-        print_hex(va_arg(args, u64)); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_hex(va_arg(args, u64)
+        ); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 's':
-        console_print(va_arg(args, const char *)); // NOLINT(clang-analyzer-valist.Uninitialized)
+        console_print(va_arg(args, const char *)
+        ); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 'c':
-        console_putchar((char)va_arg(args, int)); // NOLINT(clang-analyzer-valist.Uninitialized)
+        console_putchar((char)va_arg(args, int)
+        ); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case '%':
         console_putchar('%');

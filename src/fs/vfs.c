@@ -40,7 +40,8 @@ static char        cwd[VFS_PATH_MAX] = "/";
 #define FAT32_FD_MAGIC 0x80000000
 
 static vfs_mount_t *find_mount(const char *path);
-static const char  *get_relative_path(const char *path, const vfs_mount_t *mount);
+static const char *
+    get_relative_path(const char *path, const vfs_mount_t *mount);
 
 /**
  * @brief Check if file descriptor is a FAT32 file
@@ -62,9 +63,9 @@ static void normalize_path(char *path)
     return;
 
   /* Work buffer to build normalized path */
-  char   result[VFS_PATH_MAX];
-  char  *out   = result;
-  char  *p     = path + 1; /* Skip initial '/' */
+  char  result[VFS_PATH_MAX];
+  char *out = result;
+  char *p   = path + 1; /* Skip initial '/' */
 
   *out++ = '/';
 
@@ -127,7 +128,8 @@ static void normalize_path(char *path)
 static void make_absolute_path(const char *path, char *out, u64 out_size)
 {
   if(!path || !out || out_size == 0) {
-    if(out && out_size > 0) out[0] = '\0';
+    if(out && out_size > 0)
+      out[0] = '\0';
     return;
   }
 
@@ -274,10 +276,10 @@ static vfs_node_t *resolve_path(const char *path)
 
 /**
  * @brief Resolve parent directory and extract filename from path.
- * 
- * Splits a path into its parent directory node and the final filename component.
- * Handles both absolute and relative paths.
- * 
+ *
+ * Splits a path into its parent directory node and the final filename
+ * component. Handles both absolute and relative paths.
+ *
  * @param path Path to resolve.
  * @param name_out Output buffer for filename (VFS_NAME_MAX bytes).
  * @return Parent directory node, or NULL on error.
@@ -326,9 +328,9 @@ static vfs_node_t *resolve_parent(const char *path, char *name_out)
 
 /**
  * @brief Create a new VFS node.
- * 
+ *
  * Allocates and initializes a new node with the given name and type.
- * 
+ *
  * @param name Node name (copied into node).
  * @param type Node type (VFS_FILE or VFS_DIRECTORY).
  * @return Pointer to new node, or NULL on allocation failure.
@@ -353,9 +355,10 @@ static vfs_node_t *create_node(const char *name, u8 type)
 
 /**
  * @brief Add a child node to a parent directory.
- * 
- * Links the child into the parent's children list and sets the child's parent pointer.
- * 
+ *
+ * Links the child into the parent's children list and sets the child's parent
+ * pointer.
+ *
  * @param parent Parent directory node.
  * @param child Child node to add.
  */
@@ -368,7 +371,7 @@ static void add_child(vfs_node_t *parent, vfs_node_t *child)
 
 /**
  * @brief Initialize the Virtual File System.
- * 
+ *
  * Creates the root directory, initializes file descriptor and directory tables,
  * and sets up the initial mount table. Also initializes FAT32 support.
  */
@@ -406,10 +409,11 @@ void vfs_init(void)
 
 /**
  * @brief Open a file.
- * 
- * Opens a file in ramfs or mounted FAT32 filesystem. Supports creation, truncation,
- * and various access modes. File descriptors 0-2 are reserved for stdin/stdout/stderr.
- * 
+ *
+ * Opens a file in ramfs or mounted FAT32 filesystem. Supports creation,
+ * truncation, and various access modes. File descriptors 0-2 are reserved for
+ * stdin/stdout/stderr.
+ *
  * @param path Path to file (absolute or relative).
  * @param flags Open flags (O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC, etc.).
  * @return File descriptor on success, negative on error.
@@ -464,9 +468,9 @@ i64 vfs_open(const char *path, u32 flags)
     fd_table[fd].node   = (vfs_node_t *)file;
     fd_table[fd].offset = file->position;
     fd_table[fd].flags  = flags | FAT32_FD_MAGIC;
-    
+
     /* Set owner PID */
-    proc_t *p = proc_current();
+    proc_t *p              = proc_current();
     fd_table[fd].owner_pid = p ? p->pid : 0;
 
     return fd;
@@ -500,11 +504,11 @@ i64 vfs_open(const char *path, u32 flags)
           fd_table[i].offset = 0;
           fd_table[i].flags  = flags;
           fd_table[i].in_use = true;
-          
+
           /* Set owner PID */
-          proc_t *p = proc_current();
+          proc_t *p             = proc_current();
           fd_table[i].owner_pid = p ? p->pid : 0;
-          
+
           return i;
         }
       }
@@ -519,9 +523,9 @@ i64 vfs_open(const char *path, u32 flags)
       fd_table[i].offset = (flags & O_APPEND) ? node->size : 0;
       fd_table[i].flags  = flags;
       fd_table[i].in_use = true;
-      
+
       /* Set owner PID */
-      proc_t *p = proc_current();
+      proc_t *p             = proc_current();
       fd_table[i].owner_pid = p ? p->pid : 0;
 
       /* Truncate if needed */
@@ -538,10 +542,10 @@ i64 vfs_open(const char *path, u32 flags)
 
 /**
  * @brief Close a file descriptor.
- * 
+ *
  * Closes an open file descriptor and marks it as available for reuse.
  * For FAT32 files, flushes changes and calls the FAT32 close handler.
- * 
+ *
  * @param fd File descriptor to close.
  * @return 0 on success, negative on error.
  */
@@ -565,10 +569,10 @@ i64 vfs_close(i64 fd)
 
 /**
  * @brief Read data from an open file.
- * 
+ *
  * Reads up to count bytes from the file at the current offset.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param fd File descriptor.
  * @param buf Destination buffer.
  * @param count Maximum bytes to read.
@@ -590,7 +594,7 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
     return bytes;
   }
 
-  vfs_fd_t   *f    = &fd_table[fd];
+  vfs_fd_t         *f    = &fd_table[fd];
   const vfs_node_t *node = f->node;
 
   if(f->offset >= node->size) {
@@ -608,11 +612,11 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
 
 /**
  * @brief Write data to an open file.
- * 
+ *
  * Writes up to count bytes to the file at the current offset.
  * Automatically expands the file buffer if necessary.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param fd File descriptor.
  * @param buf Source buffer.
  * @param count Number of bytes to write.
@@ -671,13 +675,14 @@ i64 vfs_write(i64 fd, const void *buf, u64 count)
 
 /**
  * @brief Seek to a position in an open file.
- * 
+ *
  * Changes the file offset according to whence parameter.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param fd File descriptor.
  * @param offset Offset to seek to (interpretation depends on whence).
- * @param whence Seek mode: SEEK_SET (absolute), SEEK_CUR (relative), SEEK_END (from end).
+ * @param whence Seek mode: SEEK_SET (absolute), SEEK_CUR (relative), SEEK_END
+ * (from end).
  * @return New file offset, negative on error.
  */
 i64 vfs_seek(i64 fd, i64 offset, i32 whence)
@@ -723,10 +728,10 @@ i64 vfs_seek(i64 fd, i64 offset, i32 whence)
 
 /**
  * @brief Get file status information.
- * 
+ *
  * Returns file metadata including size, type, and timestamps.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param path Path to file or directory.
  * @param st Output buffer for stat structure.
  * @return 0 on success, negative on error.
@@ -743,7 +748,7 @@ i64 vfs_stat(const char *path, vfs_stat_t *stat)
     const fat32_volume_t *vol      = mount->fs_data;
     const char           *rel_path = get_relative_path(abs_path, mount);
 
-    fat32_entry_t   fatent;
+    fat32_entry_t         fatent;
     if(fat32_stat(vol, rel_path, &fatent) < 0) {
       return -1;
     }
@@ -770,10 +775,10 @@ i64 vfs_stat(const char *path, vfs_stat_t *stat)
 
 /**
  * @brief Create a new directory.
- * 
+ *
  * Creates a directory in ramfs. Parent directory must exist.
  * Returns error if directory already exists.
- * 
+ *
  * @param path Path to new directory.
  * @return 0 on success, negative on error.
  */
@@ -805,10 +810,10 @@ i64 vfs_mkdir(const char *path)
 
 /**
  * @brief Open a directory for reading.
- * 
+ *
  * Opens a directory and returns a directory handle for use with vfs_readdir().
  * Handles both ramfs and FAT32 directories.
- * 
+ *
  * @param path Path to directory.
  * @return Directory handle on success, negative on error.
  */
@@ -836,7 +841,7 @@ i64 vfs_opendir(const char *path)
     fat32_volume_t *vol      = mount->fs_data;
     const char     *rel_path = get_relative_path(abs_path, mount);
 
-    fat32_file_t *fatdir = fat32_open(vol, rel_path);
+    fat32_file_t   *fatdir = fat32_open(vol, rel_path);
     if(!fatdir) {
       return -1;
     }
@@ -871,10 +876,10 @@ i64 vfs_opendir(const char *path)
 
 /**
  * @brief Read next directory entry.
- * 
+ *
  * Reads the next entry from an open directory. Returns 1 on success,
  * 0 when no more entries, negative on error.
- * 
+ *
  * @param dirfd Directory handle from vfs_opendir().
  * @param entry Output buffer for directory entry.
  * @return 1 on success, 0 at end, negative on error.
@@ -948,9 +953,9 @@ i64 vfs_closedir(i64 dirfd)
 
 /**
  * @brief Create an empty file (like Unix touch command).
- * 
+ *
  * Creates an empty file if it doesn't exist. Does nothing if file exists.
- * 
+ *
  * @param path Path to file.
  * @return 0 on success, negative on error.
  */
@@ -1086,19 +1091,19 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
       }
 
       u64 namelen = kstrlen(fatent.name);
-      u64 reclen = 8 + 8 + 2 + 1 + namelen + 1;
-      reclen     = (reclen + 7) & ~7; /* Align to 8 bytes */
+      u64 reclen  = 8 + 8 + 2 + 1 + namelen + 1;
+      reclen      = (reclen + 7) & ~7; /* Align to 8 bytes */
 
       if(written + reclen > count) {
         break; /* No more room */
       }
 
       u8 *p            = out + written;
-      *(u64 *)p        = fatent.cluster;                             /* d_ino */
-      *(i64 *)(p + 8)  = (i64)(fde->offset + 1);                     /* d_off */
-      *(u16 *)(p + 16) = (u16)reclen;                                /* d_reclen */
-      *(u8 *)(p + 18)  = (fatent.attr & 0x10) ? DT_DIR : DT_REG;     /* d_type */
-      kstrncpy((char *)(p + 19), fatent.name, namelen + 1);          /* d_name */
+      *(u64 *)p        = fatent.cluster;                         /* d_ino */
+      *(i64 *)(p + 8)  = (i64)(fde->offset + 1);                 /* d_off */
+      *(u16 *)(p + 16) = (u16)reclen;                            /* d_reclen */
+      *(u8 *)(p + 18)  = (fatent.attr & 0x10) ? DT_DIR : DT_REG; /* d_type */
+      kstrncpy((char *)(p + 19), fatent.name, namelen + 1);      /* d_name */
 
       written += reclen;
       fde->offset++;
@@ -1157,10 +1162,10 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
 
 /**
  * @brief Change current working directory.
- * 
+ *
  * Updates the process's current working directory to the specified path.
  * Handles both ramfs and FAT32 directories.
- * 
+ *
  * @param path Path to new directory (absolute or relative).
  * @return 0 on success, negative on error.
  */
@@ -1266,7 +1271,7 @@ static const char *get_relative_path(const char *path, const vfs_mount_t *mount)
  * @brief Parse device path to get drive number
  * @param source Device path (e.g., "/dev/hda")
  * @return Drive number (0-3), or 0 as default
- * 
+ *
  * Mappings:
  * - /dev/hda -> 0 (Primary Master)
  * - /dev/hdb -> 1 (Primary Slave)
@@ -1401,22 +1406,24 @@ i64 vfs_umount(const char *target)
 
 /**
  * @brief Close all FDs owned by a specific PID.
- * 
+ *
  * Called by proc_exit to clean up resources.
- * 
+ *
  * @param pid Process ID.
  */
 void vfs_close_for_pid(u64 pid)
 {
-  if(pid == 0) return;
+  if(pid == 0)
+    return;
 
   for(int i = 0; i < VFS_MAX_FD; i++) {
     if(fd_table[i].in_use && fd_table[i].owner_pid == pid) {
-      /* Skip standard streams if they are shared/system-wide? 
+      /* Skip standard streams if they are shared/system-wide?
        * Ideally stdin/out/err are per-process but here FDs are global.
        * Only close if actually owned by this PID.
        */
-      /* console_printf("[VFS] Closing leaked FD %d for PID %d\n", i, (int)pid); */
+      /* console_printf("[VFS] Closing leaked FD %d for PID %d\n", i, (int)pid);
+       */
       vfs_close(i);
     }
   }
