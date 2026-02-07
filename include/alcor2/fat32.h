@@ -135,11 +135,11 @@ typedef struct
   u32             position;
   u8              attr;
   bool            is_dir;
-  bool            is_root;         /**< Is this the root directory */
+  bool            is_root; /**< Is this the root directory */
   bool            in_use;
-  bool            dirty;           /**< File has been modified */
-  u32             parent_cluster;  /**< Parent directory cluster */
-  u32             dirent_offset;   /**< Offset of dirent in parent cluster */
+  bool            dirty;          /**< File has been modified */
+  u32             parent_cluster; /**< Parent directory cluster */
+  u32             dirent_offset;  /**< Offset of dirent in parent cluster */
 } fat32_file_t;
 
 /**
@@ -210,7 +210,9 @@ i64 fat32_readdir(fat32_file_t *dir, fat32_entry_t *entry);
  * @param entry Output entry.
  * @return 0 on success, negative on error.
  */
-i64 fat32_stat(fat32_volume_t *vol, const char *path, fat32_entry_t *entry);
+i64 fat32_stat(
+    const fat32_volume_t *vol, const char *path, fat32_entry_t *entry
+);
 
 /**
  * @brief Write data to a file.
@@ -258,6 +260,6 @@ i64 fat32_flush(fat32_file_t *file);
  * @param path Path to the file to delete.
  * @return 0 on success, negative on error.
  */
-i64 fat32_unlink(fat32_volume_t *vol, const char *path);
+i64 fat32_unlink(const fat32_volume_t *vol, const char *path);
 
 #endif

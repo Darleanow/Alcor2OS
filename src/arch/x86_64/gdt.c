@@ -18,8 +18,8 @@
 
 /** @name GDT Flags */
 /**@{*/
-#define GDT_FLAG_LONG      (1 << 1)
-#define GDT_FLAG_GRANULAR  (1 << 3)
+#define GDT_FLAG_LONG     (1 << 1)
+#define GDT_FLAG_GRANULAR (1 << 3)
 /**@}*/
 
 extern void gdt_load(gdt_ptr_t *gdtr);
@@ -31,9 +31,9 @@ static struct
   gdt_entry_t     reserved[4];
   gdt_entry_t     kernel_code; /**< 0x28 */
   gdt_entry_t     kernel_data; /**< 0x30 */
-  gdt_entry_t     user_data; /**< 0x38 - MUST precede user_code for SYSRET */
-  gdt_entry_t     user_code; /**< 0x40 */
-  gdt_tss_entry_t tss;       /**< 0x48 */
+  gdt_entry_t     user_data;   /**< 0x38 - MUST precede user_code for SYSRET */
+  gdt_entry_t     user_code;   /**< 0x40 */
+  gdt_tss_entry_t tss;         /**< 0x48 */
 } PACKED         gdt;
 
 static gdt_ptr_t gdtr;
@@ -45,7 +45,7 @@ static tss_t     tss;
  * @param access Access byte.
  * @param flags Flags nibble.
  */
-static void      gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
+static void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
 {
   entry->limit_low   = 0xFFFF;
   entry->base_low    = 0;
@@ -74,7 +74,7 @@ static void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
 
 /**
  * @brief Initialize the Global Descriptor Table and load the TSS.
- * 
+ *
  * Sets up kernel code/data segments, user code/data segments (with proper
  * ordering for SYSRET compatibility), and the Task State Segment. Loads
  * the GDT and switches to the new segments.
@@ -127,10 +127,11 @@ void gdt_init(void)
 
 /**
  * @brief Update the TSS ring-0 stack pointer.
- * 
+ *
  * Sets the kernel stack pointer used when transitioning from ring 3 to ring 0
- * (e.g., during system calls or interrupts). Each process has its own kernel stack.
- * 
+ * (e.g., during system calls or interrupts). Each process has its own kernel
+ * stack.
+ *
  * @param rsp0 New kernel stack pointer (top of kernel stack).
  */
 void tss_set_rsp0(u64 rsp0)

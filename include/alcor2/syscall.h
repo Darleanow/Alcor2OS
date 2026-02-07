@@ -2,8 +2,8 @@
  * @file include/alcor2/syscall.h
  * @brief x86_64 syscall interface and definitions.
  *
- * Syscalls use the SYSCALL/SYSRET instructions with System V AMD64 calling convention.
- * Syscall number in RAX, arguments in RDI, RSI, RDX, R10, R8, R9.
+ * Syscalls use the SYSCALL/SYSRET instructions with System V AMD64 calling
+ * convention. Syscall number in RAX, arguments in RDI, RSI, RDX, R10, R8, R9.
  * Return value in RAX. RCX and R11 are clobbered by SYSCALL.
  */
 
@@ -97,11 +97,13 @@ u64 syscall_dispatch(syscall_frame_t *frame);
 
 /** @name MSR definitions for SYSCALL/SYSRET
  * @{ */
-#define MSR_EFER   0xC0000080
-#define MSR_STAR   0xC0000081
-#define MSR_LSTAR  0xC0000082
-#define MSR_SFMASK 0xC0000084
-#define EFER_SCE   (1 << 0)
+#define MSR_EFER    0xC0000080
+#define MSR_STAR    0xC0000081
+#define MSR_LSTAR   0xC0000082
+#define MSR_SFMASK  0xC0000084
+#define MSR_FS_BASE 0xC0000100
+#define MSR_GS_BASE 0xC0000101
+#define EFER_SCE    (1 << 0)
 /** @} */
 
 #endif

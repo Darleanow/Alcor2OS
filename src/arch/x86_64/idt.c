@@ -55,10 +55,10 @@ static const char *exception_names[] = {
 
 /**
  * @brief Set an IDT entry to point to a handler.
- * 
+ *
  * Configures an interrupt gate with the specified handler address and flags.
  * Uses kernel code segment selector (0x28) and IST 0.
- * 
+ *
  * @param vector Interrupt vector number (0-255).
  * @param handler Address of the interrupt handler function.
  * @param flags Gate type and DPL (e.g., IDT_GATE_INT, IDT_GATE_TRAP).
@@ -78,12 +78,13 @@ void idt_set_gate(u8 vector, void *handler, u8 flags)
 
 /**
  * @brief Generic CPU exception handler.
- * 
+ *
  * Displays detailed exception information and halts the system.
  * Handles all CPU exceptions (vectors 0-31) including page faults.
- * 
+ *
  * @param frame Saved interrupt frame with CPU state and exception info.
  */
+// cppcheck-suppress unusedFunction
 void exception_handler(interrupt_frame_t *frame)
 {
   console_print("\n\n*** KERNEL PANIC ***\n\n");
@@ -113,12 +114,13 @@ void exception_handler(interrupt_frame_t *frame)
 
 /**
  * @brief Generic hardware IRQ handler.
- * 
+ *
  * Dispatches IRQs to their respective device handlers (timer, keyboard, etc.)
  * and sends EOI to the PIC.
- * 
+ *
  * @param irq IRQ number (0-15).
  */
+// cppcheck-suppress unusedFunction
 void irq_handler(u8 irq)
 {
   switch(irq) {
@@ -128,13 +130,15 @@ void irq_handler(u8 irq)
   case IRQ_KEYBOARD:
     keyboard_irq();
     break;
+  default:
+    break;
   }
   pic_eoi(irq);
 }
 
 /**
  * @brief Initialize the Interrupt Descriptor Table.
- * 
+ *
  * Installs exception handlers for vectors 0-31 and IRQ handlers for
  * vectors 32-47, then loads the IDT into the CPU.
  */

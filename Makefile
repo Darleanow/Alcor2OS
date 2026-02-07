@@ -31,6 +31,7 @@ MUSL_VER    := 1.2.5
 
 SRCS_C      := $(shell find $(SRC) -name '*.c')
 SRCS_ASM    := $(shell find $(SRC) -name '*.asm')
+USER_SRCS_C := $(shell find user -name '*.c')
 OBJS        := $(patsubst $(SRC)/%.c,$(BUILD)/%.c.o,$(SRCS_C)) \
                $(patsubst $(SRC)/%.asm,$(BUILD)/%.asm.o,$(SRCS_ASM))
 DEPS        := $(OBJS:.o=.d)
@@ -166,3 +167,16 @@ distclean: clean
 	rm -rf thirdparty
 
 -include $(DEPS)
+
+# Code Formatting
+format:
+	@find src include user -name '*.c' -o -name '*.h' | xargs clang-format -i
+
+# Static Analysis
+lint:
+	clang-tidy $(SRCS_C) $(USER_SRCS_C) -- -I$(INCLUDE) -Ithirdparty/musl/install/include -std=gnu11
+
+check:
+	cppcheck --enable=all --suppress=missingIncludeSystem --inline-suppr --inconclusive --quiet -I$(INCLUDE) $(SRC) user
+
+analyze: lint check

@@ -1,0 +1,9 @@
+---
+Checks:          'bugprone-*,cert-*,clang-analyzer-*,misc-*,performance-*,-llvmlibc-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-misc-include-cleaner*,-performance-no-int-to-ptr,-bugprone-easily-swappable-parameters'
+WarningsAsErrors: ''
+HeaderFilterRegex: 'src/.*|include/.*'
+FormatStyle:     none
+CheckOptions:
+  - key:             cert-dcl16-c.NewSuffixes
+    value:           'L;LL;LU;LLU'
+...

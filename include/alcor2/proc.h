@@ -18,7 +18,7 @@
 #define PROC_NAME_MAX 32
 
 /** @brief Kernel stack size per process. */
-#define PROC_KERNEL_STACK (8 * 1024)
+#define PROC_KERNEL_STACK (8ULL * 1024)
 
 /** @brief User stack size per process. */
 #define PROC_USER_STACK (64 * 1024)
@@ -83,7 +83,7 @@ proc_t *proc_current(void);
  * @return New process's PID, or 0 on failure.
  */
 u64 proc_create(
-    const char *name, void *elf_data, u64 elf_size, char *const argv[]
+    const char *name, const void *elf_data, u64 elf_size, char *const argv[]
 );
 
 /**
@@ -104,7 +104,8 @@ i64 proc_wait(u64 pid);
  * @param pid -1 = any child, >0 = specific child.
  * @param status Pointer to store exit status (can be NULL).
  * @param options WNOHANG etc (0 = block).
- * @return Child PID on success, 0 if WNOHANG and no child ready, negative on error.
+ * @return Child PID on success, 0 if WNOHANG and no child ready, negative on
+ * error.
  */
 i64 proc_waitpid(i64 pid, i32 *status, i32 options);
 
@@ -113,7 +114,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options);
  * @param syscall_frame Saved syscall frame.
  * @return Child PID in parent, 0 in child, negative on error.
  */
-i64 proc_fork(void *syscall_frame);
+i64 proc_fork(const void *syscall_frame);
 
 /**
  * @brief Switch to a process (called by scheduler or exec).
@@ -139,7 +140,7 @@ proc_t *proc_get(u64 pid);
  * @param elf_size Size of ELF data.
  * @param name Process name.
  */
-void proc_start_first(void *elf_data, u64 elf_size, const char *name);
+void proc_start_first(const void *elf_data, u64 elf_size, const char *name);
 
 /**
  * @brief Entry point for newly created processes (defined in proc.asm).

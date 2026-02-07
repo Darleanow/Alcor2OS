@@ -5,8 +5,8 @@
 
 #include <alcor2/ata.h>
 #include <alcor2/console.h>
-#include <alcor2/io.h>
 #include <alcor2/errno.h>
+#include <alcor2/io.h>
 
 /** @brief Drive state for up to 4 ATA devices. */
 static ata_drive_t drives[4];
@@ -30,16 +30,6 @@ static void ata_delay(u16 port)
 static void ata_wait_bsy(u16 port)
 {
   while(inb(port) & ATA_SR_BSY)
-    ;
-}
-
-/**
- * @brief Wait for DRQ flag to set.
- * @param port Status port.
- */
-static void __attribute__((unused)) ata_wait_drq(u16 port)
-{
-  while(!(inb(port) & ATA_SR_DRQ))
     ;
 }
 
@@ -152,16 +142,16 @@ static void ata_identify(ata_drive_t *drv)
 
   /* Extract model string (words 27-46, byte-swapped) */
   for(int i = 0; i < 20; i++) {
-    drv->model[i * 2]     = (identify[27 + i] >> 8) & 0xFF;
-    drv->model[i * 2 + 1] = identify[27 + i] & 0xFF;
+    drv->model[(ptrdiff_t)i * 2]     = (char)((identify[27 + i] >> 8) & 0xFF);
+    drv->model[(ptrdiff_t)i * 2 + 1] = (char)(identify[27 + i] & 0xFF);
   }
   drv->model[40] = '\0';
   str_trim(drv->model);
 
   /* Extract serial (words 10-19, byte-swapped) */
   for(int i = 0; i < 10; i++) {
-    drv->serial[i * 2]     = (identify[10 + i] >> 8) & 0xFF;
-    drv->serial[i * 2 + 1] = identify[10 + i] & 0xFF;
+    drv->serial[(ptrdiff_t)i * 2]     = (char)((identify[10 + i] >> 8) & 0xFF);
+    drv->serial[(ptrdiff_t)i * 2 + 1] = (char)(identify[10 + i] & 0xFF);
   }
   drv->serial[20] = '\0';
   str_trim(drv->serial);
@@ -227,12 +217,12 @@ ata_drive_t *ata_get_drive(u8 drive)
  * @param buffer Buffer to store read data (must hold count * 512 bytes)
  * @return 0 on success, -1 on error
  */
-i64 ata_read(u8 drive_idx, u64 lba, u32 count, void *buffer)
+i64 ata_read(u8 drive, u64 lba, u32 count, void *buffer)
 {
-  if(drive_idx >= 4)
+  if(drive >= 4)
     return -EINVAL;
 
-  ata_drive_t *drv = &drives[drive_idx];
+  const ata_drive_t *drv = &drives[drive];
   if(!drv->present || drv->is_atapi)
     return -ENODEV;
 
@@ -279,12 +269,12 @@ i64 ata_read(u8 drive_idx, u64 lba, u32 count, void *buffer)
  * @param buffer Buffer containing data to write (must hold count * 512 bytes)
  * @return 0 on success, -1 on error
  */
-i64 ata_write(u8 drive_idx, u64 lba, u32 count, const void *buffer)
+i64 ata_write(u8 drive, u64 lba, u32 count, const void *buffer)
 {
-  if(drive_idx >= 4)
+  if(drive >= 4)
     return -EINVAL;
 
-  ata_drive_t *drv = &drives[drive_idx];
+  const ata_drive_t *drv = &drives[drive];
   if(!drv->present || drv->is_atapi)
     return -ENODEV;
 

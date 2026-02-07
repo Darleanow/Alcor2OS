@@ -6,36 +6,22 @@
 #include <alcor2/console.h>
 #include <alcor2/cpu.h>
 #include <alcor2/heap.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/sched.h>
 
 /** @brief Circular doubly-linked task list. */
-static task_t   *task_list    = NULL;
+static task_t *task_list = NULL;
 /** @brief Currently running task. */
-static task_t   *current_task = NULL;
+static task_t *current_task = NULL;
 /** @brief Idle task (never removed). */
-static task_t   *idle_task    = NULL;
+static task_t *idle_task = NULL;
 
-static u64       next_tid         = 1;
-static u64       task_count       = 0;
-static u64       context_switches = 0;
+static u64     next_tid         = 1;
+static u64     task_count_val   = 0;
+static u64     context_switches = 0;
 
 /** @brief Time slice in ticks (100ms at 100Hz). */
 static const u64 DEFAULT_TIME_SLICE = 10;
-
-/**
- * @brief Copy string with maximum length.
- * @param dst Destination buffer.
- * @param src Source string.
- * @param max Maximum bytes including null terminator.
- */
-static void str_copy(char *dst, const char *src, u64 max)
-{
-  u64 i;
-  for(i = 0; i < max - 1 && src[i] != '\0'; i++) {
-    dst[i] = src[i];
-  }
-  dst[i] = '\0';
-}
 
 /**
  * @brief Add task to circular list.
@@ -53,7 +39,7 @@ static void task_list_add(task_t *task)
     task_list->prev->next = task;
     task_list->prev       = task;
   }
-  task_count++;
+  task_count_val++;
 }
 
 /**
@@ -72,15 +58,15 @@ static void task_list_remove(task_t *task)
       task_list = task->next;
     }
   }
-  task_count--;
+  task_count_val--;
 }
 
 /**
  * @brief Find the next ready task in round-robin order.
- * 
+ *
  * Searches the circular task list starting from current_task->next.
  * Returns the idle task if no ready task is found.
- * 
+ *
  * @return Pointer to next ready task or idle task.
  */
 static task_t *find_next_ready(void)
@@ -105,7 +91,7 @@ static task_t *find_next_ready(void)
 
 /**
  * @brief Task wrapper function.
- * 
+ *
  * This is the initial entry point for all tasks. It enables interrupts,
  * calls the task's entry function with its argument, then calls task_exit().
  */
@@ -133,7 +119,7 @@ void sched_init(void)
   }
 
   idle_task->tid = next_tid++;
-  str_copy(idle_task->name, "idle", TASK_NAME_MAX);
+  kstrncpy(idle_task->name, "idle", TASK_NAME_MAX);
   idle_task->state           = TASK_STATE_RUNNING;
   idle_task->time_slice      = DEFAULT_TIME_SLICE;
   idle_task->ticks_remaining = DEFAULT_TIME_SLICE;
@@ -147,6 +133,7 @@ void sched_init(void)
   console_print("[SCHED] Initialized\n");
 }
 
+// cppcheck-suppress unusedFunction
 u64 task_create(const char *name, task_entry_t entry, void *arg)
 {
   /* Allocate task structure */
@@ -164,7 +151,7 @@ u64 task_create(const char *name, task_entry_t entry, void *arg)
 
   /* Initialize task */
   task->tid = next_tid++;
-  str_copy(task->name, name, TASK_NAME_MAX);
+  kstrncpy(task->name, name, TASK_NAME_MAX);
   task->state           = TASK_STATE_READY;
   task->time_slice      = DEFAULT_TIME_SLICE;
   task->ticks_remaining = DEFAULT_TIME_SLICE;
@@ -233,7 +220,7 @@ void sched_yield(void)
 
 /**
  * @brief Flag indicating that a reschedule is needed.
- * 
+ *
  * Set by sched_tick() when time slice expires, checked at safe points.
  * Similar to Linux's TIF_NEED_RESCHED.
  */
@@ -241,11 +228,11 @@ static volatile bool need_resched = false;
 
 /**
  * @brief Timer tick handler for preemptive scheduling.
- * 
+ *
  * Called by the PIT IRQ handler. Decrements the current task's remaining
  * time slice and sets need_resched flag when it expires.
  */
-void                 sched_tick(void)
+void sched_tick(void)
 {
   if(current_task == NULL) {
     return;
@@ -263,10 +250,11 @@ void                 sched_tick(void)
 
 /**
  * @brief Check if reschedule is needed and perform it.
- * 
+ *
  * Called at safe points such as syscall return to ensure preemptive
  * scheduling happens outside interrupt context.
  */
+// cppcheck-suppress unusedFunction
 void sched_check_resched(void)
 {
   if(need_resched) {
@@ -277,7 +265,7 @@ void sched_check_resched(void)
 
 /**
  * @brief Terminate the current task.
- * 
+ *
  * Marks the task as TASK_STATE_ZOMBIE, removes it from the task list,
  * and switches to the next ready task. Never returns.
  */
@@ -325,10 +313,11 @@ task_t *sched_current(void)
  * @param count Output pointer for number of tasks (can be NULL).
  * @param switches Output pointer for number of context switches (can be NULL).
  */
-void sched_stats(u64 *count, u64 *switches)
+// cppcheck-suppress unusedFunction
+void sched_stats(u64 *task_count, u64 *switches)
 {
-  if(count)
-    *count = task_count;
+  if(task_count)
+    *task_count = task_count_val;
   if(switches)
     *switches = context_switches;
 }

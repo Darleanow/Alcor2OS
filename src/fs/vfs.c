@@ -7,6 +7,8 @@
 #include <alcor2/errno.h>
 #include <alcor2/fat32.h>
 #include <alcor2/heap.h>
+#include <alcor2/kstdlib.h>
+#include <alcor2/proc.h>
 #include <alcor2/vfs.h>
 
 #define VFS_MAX_MOUNTS 8
@@ -21,10 +23,10 @@ typedef enum
 /** @brief Mount point descriptor. */
 typedef struct
 {
-  char      path[VFS_PATH_MAX]; /**< Mount point path */
-  fs_type_t type;               /**< Filesystem type */
   void     *fs_data;            /**< FS-specific data */
+  fs_type_t type;               /**< Filesystem type */
   bool      active;             /**< Mount active */
+  char      path[VFS_PATH_MAX]; /**< Mount point path */
 } vfs_mount_t;
 
 static vfs_mount_t mounts[VFS_MAX_MOUNTS];
@@ -37,82 +39,21 @@ static char        cwd[VFS_PATH_MAX] = "/";
 /** @brief Magic value for FAT32 file descriptors (bit 31). */
 #define FAT32_FD_MAGIC 0x80000000
 
-static bool         is_fat32_fd(i64 fd);
 static vfs_mount_t *find_mount(const char *path);
-static const char  *get_relative_path(const char *path, vfs_mount_t *mount);
+static const char *
+    get_relative_path(const char *path, const vfs_mount_t *mount);
 
 /**
- * @brief Get string length.
- * @param s String.
- * @return Length.
+ * @brief Check if file descriptor is a FAT32 file
+ * @param fd File descriptor to check
+ * @return true if FAT32 file, false if ramfs file
  */
-static u64 str_len(const char *s)
+static bool is_fat32_fd(i64 fd)
 {
-  u64 len = 0;
-  while(s[len])
-    len++;
-  return len;
+  return (fd_table[fd].flags & FAT32_FD_MAGIC) != 0;
 }
 
-/**
- * @brief Copy string with maximum length.
- * @param dst Destination.
- * @param src Source.
- * @param max Maximum bytes including null terminator.
- */
-static void str_copy(char *dst, const char *src, u64 max)
-{
-  u64 i;
-  for(i = 0; i < max - 1 && src[i]; i++) {
-    dst[i] = src[i];
-  }
-  dst[i] = '\0';
-}
-
-/**
- * @brief Compare two strings.
- * @param a First string.
- * @param b Second string.
- * @return true if equal.
- */
-static bool str_equal(const char *a, const char *b)
-{
-  while(*a && *b && *a == *b) {
-    a++;
-    b++;
-  }
-  return *a == *b;
-}
-
-/**
- * @brief Copy memory region.
- * @param dst Destination.
- * @param src Source.
- * @param n Byte count.
- */
-static void mem_copy(void *dst, const void *src, u64 n)
-{
-  u8       *d = dst;
-  const u8 *s = src;
-  for(u64 i = 0; i < n; i++) {
-    d[i] = s[i];
-  }
-}
-
-/**
- * @brief Zero memory region.
- * @param dst Destination.
- * @param n Byte count.
- */
-static void mem_zero(void *dst, u64 n)
-{
-  u8 *d = dst;
-  for(u64 i = 0; i < n; i++) {
-    d[i] = 0;
-  }
-}
-
-/**
+/*
  * @brief Normalize a path by resolving . and .. components.
  * @param path Path to normalize (modified in place).
  */
@@ -122,9 +63,9 @@ static void normalize_path(char *path)
     return;
 
   /* Work buffer to build normalized path */
-  char   result[VFS_PATH_MAX];
-  char  *out   = result;
-  char  *p     = path + 1; /* Skip initial '/' */
+  char  result[VFS_PATH_MAX];
+  char *out = result;
+  char *p   = path + 1; /* Skip initial '/' */
 
   *out++ = '/';
 
@@ -175,7 +116,7 @@ static void normalize_path(char *path)
   *out = '\0';
 
   /* Copy back to original */
-  str_copy(path, result, VFS_PATH_MAX);
+  kstrncpy(path, result, VFS_PATH_MAX);
 }
 
 /**
@@ -186,22 +127,25 @@ static void normalize_path(char *path)
  */
 static void make_absolute_path(const char *path, char *out, u64 out_size)
 {
-  if(!path || !out || out_size == 0)
+  if(!path || !out || out_size == 0) {
+    if(out && out_size > 0)
+      out[0] = '\0';
     return;
+  }
 
   /* Build combined path first */
   if(path[0] == '/') {
     /* Already absolute */
-    str_copy(out, path, out_size);
+    kstrncpy(out, path, out_size);
   } else {
     /* Build absolute path from cwd + path */
-    u64 path_len = str_len(path);
+    u64 path_len = kstrlen(path);
 
     /* Copy cwd first */
-    str_copy(out, cwd, out_size);
+    kstrncpy(out, cwd, out_size);
 
     /* Add separator if needed */
-    u64 pos = str_len(out);
+    u64 pos = kstrlen(out);
     if(pos > 0 && out[pos - 1] != '/' && pos + 1 < out_size) {
       out[pos++] = '/';
       out[pos]   = '\0';
@@ -263,7 +207,7 @@ static vfs_node_t *resolve_path(const char *path)
 
       vfs_node_t *child = node->children;
       while(child) {
-        if(str_equal(child->name, comp)) {
+        if(kstreq(child->name, comp)) {
           node = child;
           break;
         }
@@ -297,10 +241,10 @@ static vfs_node_t *resolve_path(const char *path)
     component[j] = '\0';
 
     /* Handle . and .. */
-    if(str_equal(component, ".")) {
+    if(kstreq(component, ".")) {
       continue;
     }
-    if(str_equal(component, "..")) {
+    if(kstreq(component, "..")) {
       if(node->parent) {
         node = node->parent;
       }
@@ -314,7 +258,7 @@ static vfs_node_t *resolve_path(const char *path)
 
     vfs_node_t *child = node->children;
     while(child) {
-      if(str_equal(child->name, component)) {
+      if(kstreq(child->name, component)) {
         break;
       }
       child = child->next;
@@ -332,10 +276,10 @@ static vfs_node_t *resolve_path(const char *path)
 
 /**
  * @brief Resolve parent directory and extract filename from path.
- * 
- * Splits a path into its parent directory node and the final filename component.
- * Handles both absolute and relative paths.
- * 
+ *
+ * Splits a path into its parent directory node and the final filename
+ * component. Handles both absolute and relative paths.
+ *
  * @param path Path to resolve.
  * @param name_out Output buffer for filename (VFS_NAME_MAX bytes).
  * @return Parent directory node, or NULL on error.
@@ -347,7 +291,7 @@ static vfs_node_t *resolve_parent(const char *path, char *name_out)
   }
 
   /* Find last slash */
-  u64 len        = str_len(path);
+  u64 len        = kstrlen(path);
   i64 last_slash = -1;
 
   for(u64 i = 0; i < len; i++) {
@@ -358,14 +302,14 @@ static vfs_node_t *resolve_parent(const char *path, char *name_out)
 
   if(last_slash == -1) {
     /* No slash - parent is cwd */
-    str_copy(name_out, path, VFS_NAME_MAX);
+    kstrncpy(name_out, path, VFS_NAME_MAX);
     /* Resolve cwd to get the actual current directory node */
     return resolve_path(cwd);
   }
 
   if(last_slash == 0) {
     /* Root directory is parent */
-    str_copy(name_out, path + 1, VFS_NAME_MAX);
+    kstrncpy(name_out, path + 1, VFS_NAME_MAX);
     return root_node;
   }
 
@@ -377,16 +321,16 @@ static vfs_node_t *resolve_parent(const char *path, char *name_out)
   parent_path[last_slash] = '\0';
 
   /* Extract name */
-  str_copy(name_out, path + last_slash + 1, VFS_NAME_MAX);
+  kstrncpy(name_out, path + last_slash + 1, VFS_NAME_MAX);
 
   return resolve_path(parent_path);
 }
 
 /**
  * @brief Create a new VFS node.
- * 
+ *
  * Allocates and initializes a new node with the given name and type.
- * 
+ *
  * @param name Node name (copied into node).
  * @param type Node type (VFS_FILE or VFS_DIRECTORY).
  * @return Pointer to new node, or NULL on allocation failure.
@@ -397,7 +341,7 @@ static vfs_node_t *create_node(const char *name, u8 type)
   if(!node)
     return NULL;
 
-  str_copy(node->name, name, VFS_NAME_MAX);
+  kstrncpy(node->name, name, VFS_NAME_MAX);
   node->type     = type;
   node->size     = 0;
   node->data     = NULL;
@@ -411,9 +355,10 @@ static vfs_node_t *create_node(const char *name, u8 type)
 
 /**
  * @brief Add a child node to a parent directory.
- * 
- * Links the child into the parent's children list and sets the child's parent pointer.
- * 
+ *
+ * Links the child into the parent's children list and sets the child's parent
+ * pointer.
+ *
  * @param parent Parent directory node.
  * @param child Child node to add.
  */
@@ -426,16 +371,16 @@ static void add_child(vfs_node_t *parent, vfs_node_t *child)
 
 /**
  * @brief Initialize the Virtual File System.
- * 
+ *
  * Creates the root directory, initializes file descriptor and directory tables,
  * and sets up the initial mount table. Also initializes FAT32 support.
  */
 void vfs_init(void)
 {
   /* Initialize tables */
-  mem_zero(fd_table, sizeof(fd_table));
-  mem_zero(dir_table, sizeof(dir_table));
-  mem_zero(mounts, sizeof(mounts));
+  kzero(fd_table, sizeof(fd_table));
+  kzero(dir_table, sizeof(dir_table));
+  kzero(mounts, sizeof(mounts));
 
   /* Create root directory */
   root_node = create_node("/", VFS_DIRECTORY);
@@ -464,10 +409,11 @@ void vfs_init(void)
 
 /**
  * @brief Open a file.
- * 
- * Opens a file in ramfs or mounted FAT32 filesystem. Supports creation, truncation,
- * and various access modes. File descriptors 0-2 are reserved for stdin/stdout/stderr.
- * 
+ *
+ * Opens a file in ramfs or mounted FAT32 filesystem. Supports creation,
+ * truncation, and various access modes. File descriptors 0-2 are reserved for
+ * stdin/stdout/stderr.
+ *
  * @param path Path to file (absolute or relative).
  * @param flags Open flags (O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC, etc.).
  * @return File descriptor on success, negative on error.
@@ -509,12 +455,12 @@ i64 vfs_open(const char *path, u32 flags)
       return -1;
 
     /* Handle truncate flag */
-    if((flags & O_TRUNC) && file) {
+    if(flags & O_TRUNC) {
       fat32_truncate(file);
     }
 
     /* Handle append flag - seek to end */
-    if((flags & O_APPEND) && file) {
+    if(flags & O_APPEND) {
       fat32_seek(file, 0, 2); /* SEEK_END */
     }
 
@@ -522,6 +468,10 @@ i64 vfs_open(const char *path, u32 flags)
     fd_table[fd].node   = (vfs_node_t *)file;
     fd_table[fd].offset = file->position;
     fd_table[fd].flags  = flags | FAT32_FD_MAGIC;
+
+    /* Set owner PID */
+    proc_t *p              = proc_current();
+    fd_table[fd].owner_pid = p ? p->pid : 0;
 
     return fd;
   }
@@ -551,10 +501,14 @@ i64 vfs_open(const char *path, u32 flags)
       /* Open directory for reading (getdents) */
       for(i64 i = 3; i < VFS_MAX_FD; i++) {
         if(!fd_table[i].in_use) {
-          fd_table[i].node   = node;
           fd_table[i].offset = 0;
           fd_table[i].flags  = flags;
           fd_table[i].in_use = true;
+
+          /* Set owner PID */
+          proc_t *p             = proc_current();
+          fd_table[i].owner_pid = p ? p->pid : 0;
+
           return i;
         }
       }
@@ -566,10 +520,13 @@ i64 vfs_open(const char *path, u32 flags)
   /* Find free fd (skip 0,1,2 reserved for stdin/stdout/stderr) */
   for(i64 i = 3; i < VFS_MAX_FD; i++) {
     if(!fd_table[i].in_use) {
-      fd_table[i].node   = node;
       fd_table[i].offset = (flags & O_APPEND) ? node->size : 0;
       fd_table[i].flags  = flags;
       fd_table[i].in_use = true;
+
+      /* Set owner PID */
+      proc_t *p             = proc_current();
+      fd_table[i].owner_pid = p ? p->pid : 0;
 
       /* Truncate if needed */
       if(flags & O_TRUNC) {
@@ -585,10 +542,10 @@ i64 vfs_open(const char *path, u32 flags)
 
 /**
  * @brief Close a file descriptor.
- * 
+ *
  * Closes an open file descriptor and marks it as available for reuse.
  * For FAT32 files, flushes changes and calls the FAT32 close handler.
- * 
+ *
  * @param fd File descriptor to close.
  * @return 0 on success, negative on error.
  */
@@ -612,10 +569,10 @@ i64 vfs_close(i64 fd)
 
 /**
  * @brief Read data from an open file.
- * 
+ *
  * Reads up to count bytes from the file at the current offset.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param fd File descriptor.
  * @param buf Destination buffer.
  * @param count Maximum bytes to read.
@@ -637,8 +594,8 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
     return bytes;
   }
 
-  vfs_fd_t   *f    = &fd_table[fd];
-  vfs_node_t *node = f->node;
+  vfs_fd_t         *f    = &fd_table[fd];
+  const vfs_node_t *node = f->node;
 
   if(f->offset >= node->size) {
     return 0; /* EOF */
@@ -647,7 +604,7 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
   u64 available = node->size - f->offset;
   u64 to_read   = (count < available) ? count : available;
 
-  mem_copy(buf, node->data + f->offset, to_read);
+  kmemcpy(buf, node->data + f->offset, to_read);
   f->offset += to_read;
 
   return (i64)to_read;
@@ -655,11 +612,11 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
 
 /**
  * @brief Write data to an open file.
- * 
+ *
  * Writes up to count bytes to the file at the current offset.
  * Automatically expands the file buffer if necessary.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param fd File descriptor.
  * @param buf Source buffer.
  * @param count Number of bytes to write.
@@ -698,7 +655,7 @@ i64 vfs_write(i64 fd, const void *buf, u64 count)
       return -1;
 
     if(node->data) {
-      mem_copy(new_data, node->data, node->size);
+      kmemcpy(new_data, node->data, node->size);
       kfree(node->data);
     }
 
@@ -706,7 +663,7 @@ i64 vfs_write(i64 fd, const void *buf, u64 count)
     node->capacity = new_cap;
   }
 
-  mem_copy(node->data + f->offset, buf, count);
+  kmemcpy(node->data + f->offset, buf, count);
   f->offset += count;
 
   if(f->offset > node->size) {
@@ -718,13 +675,14 @@ i64 vfs_write(i64 fd, const void *buf, u64 count)
 
 /**
  * @brief Seek to a position in an open file.
- * 
+ *
  * Changes the file offset according to whence parameter.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param fd File descriptor.
  * @param offset Offset to seek to (interpretation depends on whence).
- * @param whence Seek mode: SEEK_SET (absolute), SEEK_CUR (relative), SEEK_END (from end).
+ * @param whence Seek mode: SEEK_SET (absolute), SEEK_CUR (relative), SEEK_END
+ * (from end).
  * @return New file offset, negative on error.
  */
 i64 vfs_seek(i64 fd, i64 offset, i32 whence)
@@ -770,57 +728,57 @@ i64 vfs_seek(i64 fd, i64 offset, i32 whence)
 
 /**
  * @brief Get file status information.
- * 
+ *
  * Returns file metadata including size, type, and timestamps.
  * Handles both ramfs and FAT32 files.
- * 
+ *
  * @param path Path to file or directory.
  * @param st Output buffer for stat structure.
  * @return 0 on success, negative on error.
  */
-i64 vfs_stat(const char *path, vfs_stat_t *st)
+i64 vfs_stat(const char *path, vfs_stat_t *stat)
 {
   /* Convert to absolute path for mount point detection */
   char abs_path[VFS_PATH_MAX];
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
   /* Check if path is on a mounted filesystem */
-  vfs_mount_t *mount = find_mount(abs_path);
+  const vfs_mount_t *mount = find_mount(abs_path);
   if(mount && mount->type == FS_TYPE_FAT32) {
-    fat32_volume_t *vol      = mount->fs_data;
-    const char     *rel_path = get_relative_path(abs_path, mount);
+    const fat32_volume_t *vol      = mount->fs_data;
+    const char           *rel_path = get_relative_path(abs_path, mount);
 
-    fat32_entry_t   fatent;
+    fat32_entry_t         fatent;
     if(fat32_stat(vol, rel_path, &fatent) < 0) {
       return -1;
     }
 
-    st->size     = fatent.size;
-    st->type     = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
-    st->created  = 0;
-    st->modified = 0;
+    stat->size     = fatent.size;
+    stat->type     = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
+    stat->created  = 0;
+    stat->modified = 0;
     return 0;
   }
 
   /* Ramfs path - use abs_path for consistency */
-  vfs_node_t *node = resolve_path(abs_path);
+  const vfs_node_t *node = resolve_path(abs_path);
   if(!node)
     return -1;
 
-  st->size     = node->size;
-  st->type     = node->type;
-  st->created  = 0; /* TODO: timestamps */
-  st->modified = 0;
+  stat->size     = node->size;
+  stat->type     = node->type;
+  stat->created  = 0; /* TODO: timestamps */
+  stat->modified = 0;
 
   return 0;
 }
 
 /**
  * @brief Create a new directory.
- * 
+ *
  * Creates a directory in ramfs. Parent directory must exist.
  * Returns error if directory already exists.
- * 
+ *
  * @param path Path to new directory.
  * @return 0 on success, negative on error.
  */
@@ -852,13 +810,14 @@ i64 vfs_mkdir(const char *path)
 
 /**
  * @brief Open a directory for reading.
- * 
+ *
  * Opens a directory and returns a directory handle for use with vfs_readdir().
  * Handles both ramfs and FAT32 directories.
- * 
+ *
  * @param path Path to directory.
  * @return Directory handle on success, negative on error.
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_opendir(const char *path)
 {
   /* Convert to absolute path for mount point detection */
@@ -882,7 +841,7 @@ i64 vfs_opendir(const char *path)
     fat32_volume_t *vol      = mount->fs_data;
     const char     *rel_path = get_relative_path(abs_path, mount);
 
-    fat32_file_t *fatdir = fat32_open(vol, rel_path);
+    fat32_file_t   *fatdir = fat32_open(vol, rel_path);
     if(!fatdir) {
       return -1;
     }
@@ -917,14 +876,15 @@ i64 vfs_opendir(const char *path)
 
 /**
  * @brief Read next directory entry.
- * 
+ *
  * Reads the next entry from an open directory. Returns 1 on success,
  * 0 when no more entries, negative on error.
- * 
+ *
  * @param dirfd Directory handle from vfs_opendir().
  * @param entry Output buffer for directory entry.
  * @return 1 on success, 0 at end, negative on error.
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
 {
   if(dirfd < 0 || dirfd >= VFS_MAX_FD || !dir_table[dirfd].in_use) {
@@ -942,7 +902,7 @@ i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
       return ret;
     }
 
-    str_copy(entry->name, fatent.name, VFS_NAME_MAX);
+    kstrncpy(entry->name, fatent.name, VFS_NAME_MAX);
     entry->type = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
     entry->size = fatent.size;
     return 1;
@@ -953,7 +913,7 @@ i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
     return 0; /* End of directory */
   }
 
-  str_copy(entry->name, d->current->name, VFS_NAME_MAX);
+  kstrncpy(entry->name, d->current->name, VFS_NAME_MAX);
   entry->type = d->current->type;
   entry->size = d->current->size;
 
@@ -966,6 +926,7 @@ i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
  * @param dirfd Directory handle from vfs_opendir()
  * @return 0 on success, negative on error
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_closedir(i64 dirfd)
 {
   if(dirfd < 0 || dirfd >= VFS_MAX_FD || !dir_table[dirfd].in_use) {
@@ -992,9 +953,9 @@ i64 vfs_closedir(i64 dirfd)
 
 /**
  * @brief Create an empty file (like Unix touch command).
- * 
+ *
  * Creates an empty file if it doesn't exist. Does nothing if file exists.
- * 
+ *
  * @param path Path to file.
  * @return 0 on success, negative on error.
  */
@@ -1030,7 +991,7 @@ i64 vfs_unlink(const char *path)
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
   /* Check if path is on a mounted filesystem */
-  vfs_mount_t *mount = find_mount(abs_path);
+  const vfs_mount_t *mount = find_mount(abs_path);
   if(mount && mount->type == FS_TYPE_FAT32) {
     const char *rel_path = get_relative_path(abs_path, mount);
     return fat32_unlink((fat32_volume_t *)mount->fs_data, rel_path);
@@ -1129,20 +1090,20 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
         break; /* End of directory or error */
       }
 
-      u64 namelen = str_len(fatent.name);
-      u64 reclen = 8 + 8 + 2 + 1 + namelen + 1;
-      reclen     = (reclen + 7) & ~7; /* Align to 8 bytes */
+      u64 namelen = kstrlen(fatent.name);
+      u64 reclen  = 8 + 8 + 2 + 1 + namelen + 1;
+      reclen      = (reclen + 7) & ~7; /* Align to 8 bytes */
 
       if(written + reclen > count) {
         break; /* No more room */
       }
 
       u8 *p            = out + written;
-      *(u64 *)p        = fatent.cluster;                             /* d_ino */
-      *(i64 *)(p + 8)  = (i64)(fde->offset + 1);                     /* d_off */
-      *(u16 *)(p + 16) = (u16)reclen;                                /* d_reclen */
-      *(u8 *)(p + 18)  = (fatent.attr & 0x10) ? DT_DIR : DT_REG;     /* d_type */
-      str_copy((char *)(p + 19), fatent.name, namelen + 1);          /* d_name */
+      *(u64 *)p        = fatent.cluster;                         /* d_ino */
+      *(i64 *)(p + 8)  = (i64)(fde->offset + 1);                 /* d_off */
+      *(u16 *)(p + 16) = (u16)reclen;                            /* d_reclen */
+      *(u8 *)(p + 18)  = (fatent.attr & 0x10) ? DT_DIR : DT_REG; /* d_type */
+      kstrncpy((char *)(p + 19), fatent.name, namelen + 1);      /* d_name */
 
       written += reclen;
       fde->offset++;
@@ -1172,7 +1133,7 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
 
   while(child && written < count) {
     /* Calculate record length (must be 8-byte aligned) */
-    u64 namelen = str_len(child->name);
+    u64 namelen = kstrlen(child->name);
     /* Size: d_ino(8) + d_off(8) + d_reclen(2) + d_type(1) + name + null */
     u64 reclen = 8 + 8 + 2 + 1 + namelen + 1;
     reclen     = (reclen + 7) & ~7; /* Align to 8 bytes */
@@ -1188,7 +1149,7 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
     *(u16 *)(p + 16) = (u16)reclen;           /* d_reclen */
     *(u8 *)(p + 18) =
         (child->type == VFS_DIRECTORY) ? DT_DIR : DT_REG; /* d_type */
-    str_copy((char *)(p + 19), child->name, namelen + 1); /* d_name */
+    kstrncpy((char *)(p + 19), child->name, namelen + 1); /* d_name */
 
     written += reclen;
     fde->offset++;
@@ -1201,10 +1162,10 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
 
 /**
  * @brief Change current working directory.
- * 
+ *
  * Updates the process's current working directory to the specified path.
  * Handles both ramfs and FAT32 directories.
- * 
+ *
  * @param path Path to new directory (absolute or relative).
  * @return 0 on success, negative on error.
  */
@@ -1230,18 +1191,18 @@ i64 vfs_chdir(const char *path)
     fat32_close(dir);
 
     /* Update cwd to normalized absolute path */
-    str_copy(cwd, abs_path, VFS_PATH_MAX);
+    kstrncpy(cwd, abs_path, VFS_PATH_MAX);
     return 0;
   }
 
   /* Ramfs path - verify with resolve_path */
-  vfs_node_t *node = resolve_path(path);
+  const vfs_node_t *node = resolve_path(path);
   if(!node || node->type != VFS_DIRECTORY) {
     return -1;
   }
 
   /* Update cwd to normalized absolute path */
-  str_copy(cwd, abs_path, VFS_PATH_MAX);
+  kstrncpy(cwd, abs_path, VFS_PATH_MAX);
   return 0;
 }
 
@@ -1282,7 +1243,7 @@ static vfs_mount_t *find_mount(const char *path)
     if(!mounts[i].active)
       continue;
 
-    u64 len = str_len(mounts[i].path);
+    u64 len = kstrlen(mounts[i].path);
     if(starts_with(path, mounts[i].path) && len > best_len) {
       best     = &mounts[i];
       best_len = len;
@@ -1298,9 +1259,9 @@ static vfs_mount_t *find_mount(const char *path)
  * @param mount Mount point
  * @return Relative path within mounted filesystem
  */
-static const char *get_relative_path(const char *path, vfs_mount_t *mount)
+static const char *get_relative_path(const char *path, const vfs_mount_t *mount)
 {
-  const char *rel = path + str_len(mount->path);
+  const char *rel = path + kstrlen(mount->path);
   if(*rel == '\0')
     return "/";
   return rel;
@@ -1310,7 +1271,7 @@ static const char *get_relative_path(const char *path, vfs_mount_t *mount)
  * @brief Parse device path to get drive number
  * @param source Device path (e.g., "/dev/hda")
  * @return Drive number (0-3), or 0 as default
- * 
+ *
  * Mappings:
  * - /dev/hda -> 0 (Primary Master)
  * - /dev/hdb -> 1 (Primary Slave)
@@ -1367,7 +1328,7 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
   }
 
   /* Create mount point directory in ramfs if needed */
-  vfs_node_t *mp = resolve_path(target);
+  const vfs_node_t *mp = resolve_path(target);
   if(!mp) {
     if(vfs_mkdir(target) < 0) {
       console_printf("[vfs] mount: failed to create mount point %s\n", target);
@@ -1375,7 +1336,7 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
     }
   }
 
-  if(str_equal(fstype, "fat32")) {
+  if(kstreq(fstype, "fat32")) {
     /* Parse device path (Linux-like) */
     i32 drive = parse_device_path(source);
     if(drive < 0) {
@@ -1394,7 +1355,7 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
 
     mounts[slot].type    = FS_TYPE_FAT32;
     mounts[slot].fs_data = vol;
-    str_copy(mounts[slot].path, target, VFS_PATH_MAX);
+    kstrncpy(mounts[slot].path, target, VFS_PATH_MAX);
     mounts[slot].active = true;
 
     console_printf(
@@ -1403,11 +1364,11 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
     return 0;
   }
 
-  if(str_equal(fstype, "ramfs")) {
+  if(kstreq(fstype, "ramfs")) {
     /* ramfs doesn't need special handling */
     mounts[slot].type    = FS_TYPE_RAMFS;
     mounts[slot].fs_data = NULL;
-    str_copy(mounts[slot].path, target, VFS_PATH_MAX);
+    kstrncpy(mounts[slot].path, target, VFS_PATH_MAX);
     mounts[slot].active = true;
 
     console_printf("[vfs] mounted ramfs at %s\n", target);
@@ -1423,13 +1384,14 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
  * @param target Mount point path to unmount
  * @return 0 on success, negative on error
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_umount(const char *target)
 {
   if(!target)
     return -1;
 
   for(int i = 0; i < VFS_MAX_MOUNTS; i++) {
-    if(mounts[i].active && str_equal(mounts[i].path, target)) {
+    if(mounts[i].active && kstreq(mounts[i].path, target)) {
       if(mounts[i].type == FS_TYPE_FAT32 && mounts[i].fs_data) {
         fat32_unmount(mounts[i].fs_data);
       }
@@ -1441,234 +1403,28 @@ i64 vfs_umount(const char *target)
 
   return -1;
 }
-/**
- * @brief Check if file descriptor is a FAT32 file
- * @param fd File descriptor to check
- * @return true if FAT32 file, false if ramfs file
- */
-static bool is_fat32_fd(i64 fd)
-{
-  return (fd_table[fd].flags & FAT32_FD_MAGIC) != 0;
-}
 
 /**
- * @brief Open file with FAT32 support
- * @param path File path
- * @param flags Open flags
- * @return File descriptor on success, negative on error
- * 
- * Note: FAT32 is read-only for now
+ * @brief Close all FDs owned by a specific PID.
+ *
+ * Called by proc_exit to clean up resources.
+ *
+ * @param pid Process ID.
  */
-i64 vfs_open_fat32(const char *path, i32 flags)
+void vfs_close_for_pid(u64 pid)
 {
-  vfs_mount_t *mount = find_mount(path);
+  if(pid == 0)
+    return;
 
-  if(!mount || mount->type != FS_TYPE_FAT32) {
-    /* Use ramfs */
-    return vfs_open(path, (u32)flags);
-  }
-
-  /* FAT32 path */
-  fat32_volume_t *vol      = mount->fs_data;
-  const char     *rel_path = get_relative_path(path, mount);
-
-  /* Find free fd */
-  i64 fd = -1;
-  for(i64 i = 0; i < VFS_MAX_FD; i++) {
-    if(!fd_table[i].in_use) {
-      fd = i;
-      break;
+  for(int i = 0; i < VFS_MAX_FD; i++) {
+    if(fd_table[i].in_use && fd_table[i].owner_pid == pid) {
+      /* Skip standard streams if they are shared/system-wide?
+       * Ideally stdin/out/err are per-process but here FDs are global.
+       * Only close if actually owned by this PID.
+       */
+      /* console_printf("[VFS] Closing leaked FD %d for PID %d\n", i, (int)pid);
+       */
+      vfs_close(i);
     }
   }
-  if(fd < 0)
-    return -1;
-
-  /* Open FAT32 file */
-  fat32_file_t *file = fat32_open(vol, rel_path);
-  if(!file)
-    return -1;
-
-  fd_table[fd].in_use = true;
-  fd_table[fd].node   = (vfs_node_t *)file; /* Store FAT32 file pointer */
-  fd_table[fd].offset = 0;
-  fd_table[fd].flags  = (u32)flags | FAT32_FD_MAGIC; /* Mark as FAT32 */
-
-  return fd;
-}
-
-/**
- * @brief Read from file with FAT32 support
- * @param fd File descriptor
- * @param buf Buffer to read into
- * @param count Number of bytes to read
- * @return Bytes read on success, negative on error
- */
-i64 vfs_read_fat32(i64 fd, void *buf, u64 count)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_fat32_fd(fd)) {
-    fat32_file_t *fatfile = (fat32_file_t *)fd_table[fd].node;
-    /* Seek to current offset first */
-    fatfile->position = (u32)fd_table[fd].offset;
-    i64 bytes         = fat32_read(fatfile, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
-    return bytes;
-  }
-
-  /* Use ramfs */
-  return vfs_read(fd, buf, count);
-}
-
-/**
- * @brief Write to file with FAT32 support
- * @param fd File descriptor
- * @param buf Buffer to write from
- * @param count Number of bytes to write
- * @return Bytes written on success, negative on error
- */
-i64 vfs_write_fat32(i64 fd, const void *buf, u64 count)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_fat32_fd(fd)) {
-    fat32_file_t *fatfile = (fat32_file_t *)fd_table[fd].node;
-    /* Seek to current offset first */
-    fat32_seek(fatfile, (i64)fd_table[fd].offset, 0); /* SEEK_SET */
-    i64 bytes = fat32_write(fatfile, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
-    return bytes;
-  }
-
-  /* Use ramfs */
-  return vfs_write(fd, buf, count);
-}
-
-/**
- * @brief Close file with FAT32 support
- * @param fd File descriptor to close
- * @return 0 on success, negative on error
- */
-i64 vfs_close_fat32(i64 fd)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_fat32_fd(fd)) {
-    fat32_file_t *fatfile = (fat32_file_t *)fd_table[fd].node;
-    fat32_flush(fatfile);
-    fat32_close(fatfile);
-    fd_table[fd].in_use = false;
-    return 0;
-  }
-
-  return vfs_close(fd);
-}
-
-/**
- * @brief Get file status with FAT32 support
- * @param path File path
- * @param st Output buffer for file statistics
- * @return 0 on success, negative on error
- */
-i64 vfs_stat_fat32(const char *path, vfs_stat_t *st)
-{
-  vfs_mount_t *mount = find_mount(path);
-
-  if(!mount || mount->type != FS_TYPE_FAT32) {
-    return vfs_stat(path, st);
-  }
-
-  fat32_volume_t *vol      = mount->fs_data;
-  const char     *rel_path = get_relative_path(path, mount);
-
-  fat32_entry_t   fatent;
-  if(fat32_stat(vol, rel_path, &fatent) < 0) {
-    return -1;
-  }
-
-  /* Convert FAT32 entry to VFS stat */
-  st->size     = fatent.size;
-  st->type     = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
-  st->created  = 0;
-  st->modified = 0;
-
-  return 0;
-}
-
-/**
- * @brief Open directory with FAT32 support
- * @param path Directory path
- * @return Directory handle on success, negative on error
- */
-i64 vfs_opendir_fat32(const char *path)
-{
-  vfs_mount_t *mount = find_mount(path);
-
-  if(!mount || mount->type != FS_TYPE_FAT32) {
-    return vfs_opendir(path);
-  }
-
-  fat32_volume_t *vol      = mount->fs_data;
-  const char     *rel_path = get_relative_path(path, mount);
-
-  /* Find free dirfd */
-  i64 dirfd = -1;
-  for(i64 i = 0; i < VFS_MAX_FD; i++) {
-    if(!dir_table[i].in_use) {
-      dirfd = i;
-      break;
-    }
-  }
-  if(dirfd < 0)
-    return -1;
-
-  /* Open FAT32 directory using fat32_open */
-  fat32_file_t *dir = fat32_open(vol, rel_path);
-  if(!dir || !dir->is_dir) {
-    if(dir)
-      fat32_close(dir);
-    return -1;
-  }
-
-  dir_table[dirfd].in_use  = true;
-  dir_table[dirfd].node    = (vfs_node_t *)dir;
-  dir_table[dirfd].in_use   = true;
-  dir_table[dirfd].current  = NULL;
-  dir_table[dirfd].index    = 0;
-  dir_table[dirfd].is_fat32 = true;
-
-  return dirfd;
-}
-
-/**
- * @brief Read directory entry with FAT32 support
- * @param dirfd Directory handle
- * @param entry Output buffer for directory entry
- * @return 1 if entry read, 0 at end, negative on error
- */
-i64 vfs_readdir_fat32(i64 dirfd, vfs_dirent_t *entry)
-{
-  /* Just use the unified vfs_readdir */
-  return vfs_readdir(dirfd, entry);
-}
-
-/**
- * @brief Close directory with FAT32 support
- * @param dirfd Directory handle to close
- * @return 0 on success, negative on error
- */
-i64 vfs_closedir_fat32(i64 dirfd)
-{
-  /* Just use the unified vfs_closedir */
-  return vfs_closedir(dirfd);
 }

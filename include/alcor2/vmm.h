@@ -95,7 +95,7 @@ u64 vmm_get_phys_in(u64 pml4_phys, u64 virt);
  * @param src_pml4 Source PML4 physical address.
  * @return New PML4 physical address with cloned mappings.
  */
-u64 vmm_clone_address_space(u64 src_pml4);
+u64 vmm_clone_address_space(u64 src_pml4_phys);
 
 /**
  * @brief Destroy all user mappings in an address space.
@@ -124,9 +124,20 @@ static inline void *phys_to_virt(u64 phys)
  * @param virt Virtual address in HHDM region.
  * @return Physical address.
  */
+// cppcheck-suppress unusedFunction
 static inline u64 virt_to_phys(void *virt)
 {
   return (u64)virt - vmm_get_hhdm();
 }
+
+/**
+ * @brief Check if pointer is in user space.
+ */
+bool vmm_is_user_ptr(const void *ptr);
+
+/**
+ * @brief Check if range is in user space.
+ */
+bool vmm_is_user_range(const void *ptr, u64 size);
 
 #endif

@@ -7,6 +7,7 @@
 
 #include <alcor2/console.h>
 #include <alcor2/heap.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/memory_layout.h>
 #include <alcor2/pmm.h>
 #include <alcor2/vmm.h>
@@ -170,11 +171,11 @@ void heap_init(void)
 
 /**
  * @brief Allocate memory from kernel heap.
- * 
+ *
  * Uses first-fit algorithm to find a suitable free block. If no block is large
- * enough, expands the heap by allocating more physical pages. Blocks are automatically
- * split if significantly larger than needed.
- * 
+ * enough, expands the heap by allocating more physical pages. Blocks are
+ * automatically split if significantly larger than needed.
+ *
  * @param size Number of bytes to allocate (automatically aligned to 16 bytes).
  * @return Pointer to allocated memory, or NULL on failure.
  */
@@ -221,9 +222,9 @@ void *kmalloc(u64 size)
 
 /**
  * @brief Allocate zeroed memory from kernel heap.
- * 
+ *
  * Same as kmalloc() but clears the allocated memory to zero.
- * 
+ *
  * @param size Number of bytes to allocate.
  * @return Pointer to zeroed memory, or NULL on failure.
  */
@@ -231,24 +232,23 @@ void *kzalloc(u64 size)
 {
   void *ptr = kmalloc(size);
   if(ptr != NULL) {
-    u8 *p = (u8 *)ptr;
-    for(u64 i = 0; i < size; i++) {
-      p[i] = 0;
-    }
+    kzero(ptr, size);
   }
   return ptr;
 }
 
 /**
  * @brief Allocate aligned memory from kernel heap.
- * 
- * Allocates memory with the specified alignment. The alignment must be a power of 2.
- * Stores the original pointer before the aligned address for proper freeing.
- * 
+ *
+ * Allocates memory with the specified alignment. The alignment must be a power
+ * of 2. Stores the original pointer before the aligned address for proper
+ * freeing.
+ *
  * @param size Number of bytes to allocate.
  * @param alignment Alignment in bytes (minimum 16, rounded up if smaller).
  * @return Pointer to aligned memory, or NULL on failure.
  */
+// cppcheck-suppress unusedFunction
 void *kmalloc_aligned(u64 size, u64 alignment)
 {
   if(alignment < 16) {
@@ -273,10 +273,10 @@ void *kmalloc_aligned(u64 size, u64 alignment)
 
 /**
  * @brief Free previously allocated memory.
- * 
- * Returns memory to the free list and attempts to coalesce with adjacent free blocks.
- * Performs validation checks for double-free and corruption.
- * 
+ *
+ * Returns memory to the free list and attempts to coalesce with adjacent free
+ * blocks. Performs validation checks for double-free and corruption.
+ *
  * @param ptr Pointer previously returned by kmalloc/kzalloc, or NULL (ignored).
  */
 void kfree(void *ptr)
@@ -306,16 +306,17 @@ void kfree(void *ptr)
 
 /**
  * @brief Reallocate memory to a new size.
- * 
+ *
  * If ptr is NULL, equivalent to kmalloc(new_size).
  * If new_size is 0, equivalent to kfree(ptr) and returns NULL.
  * If current block is large enough, returns the same pointer.
  * Otherwise, allocates new block, copies data, and frees old block.
- * 
+ *
  * @param ptr Pointer to previously allocated memory, or NULL.
  * @param new_size New size in bytes.
  * @return Pointer to reallocated memory, or NULL on failure.
  */
+// cppcheck-suppress unusedFunction
 void *krealloc(void *ptr, u64 new_size)
 {
   if(ptr == NULL) {
@@ -327,7 +328,8 @@ void *krealloc(void *ptr, u64 new_size)
     return NULL;
   }
 
-  heap_block_t *block = (heap_block_t *)((u8 *)ptr - HEAP_HEADER_SIZE);
+  const heap_block_t *block =
+      (const heap_block_t *)((u8 *)ptr - HEAP_HEADER_SIZE);
 
   if(block->magic != HEAP_BLOCK_MAGIC) {
     return NULL;
@@ -344,11 +346,7 @@ void *krealloc(void *ptr, u64 new_size)
     return NULL;
   }
 
-  u8 *src = (u8 *)ptr;
-  u8 *dst = (u8 *)new_ptr;
-  for(u64 i = 0; i < block->size; i++) {
-    dst[i] = src[i];
-  }
+  kmemcpy(new_ptr, ptr, block->size);
 
   kfree(ptr);
   return new_ptr;
@@ -356,20 +354,21 @@ void *krealloc(void *ptr, u64 new_size)
 
 /**
  * @brief Get heap statistics.
- * 
+ *
  * Returns total heap size, used memory, and free memory.
  * Any parameter can be NULL if that statistic is not needed.
- * 
+ *
  * @param total Output pointer for total heap size in bytes (can be NULL).
  * @param used Output pointer for used heap size in bytes (can be NULL).
  * @param free_mem Output pointer for free heap size in bytes (can be NULL).
  */
-void heap_stats(u64 *total, u64 *used, u64 *free_mem)
+// cppcheck-suppress unusedFunction
+void heap_stats(heap_stats_t *stats)
 {
-  if(total)
-    *total = heap_size;
-  if(used)
-    *used = heap_used;
-  if(free_mem)
-    *free_mem = heap_size - heap_used;
+  if(!stats)
+    return;
+
+  stats->total_bytes = heap_size;
+  stats->used_bytes  = heap_used;
+  stats->free_bytes  = heap_size - heap_used;
 }

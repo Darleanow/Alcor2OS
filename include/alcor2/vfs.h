@@ -92,6 +92,7 @@ typedef struct
   u64         offset;
   u32         flags;
   bool        in_use;
+  u64         owner_pid;
 } vfs_fd_t;
 
 /**
@@ -99,10 +100,10 @@ typedef struct
  */
 typedef struct
 {
-  vfs_node_t *node;    /**< VFS node (ramfs) or FAT32 file handle */
-  vfs_node_t *current; /**< Current child for ramfs iteration */
-  u64         index;   /**< Entry index for iteration */
-  bool        in_use;  /**< Handle is active */
+  vfs_node_t *node;     /**< VFS node (ramfs) or FAT32 file handle */
+  vfs_node_t *current;  /**< Current child for ramfs iteration */
+  u64         index;    /**< Entry index for iteration */
+  bool        in_use;   /**< Handle is active */
   bool        is_fat32; /**< true if FAT32 directory, false if ramfs */
 } vfs_dir_t;
 
@@ -242,17 +243,10 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype);
  */
 i64 vfs_umount(const char *target);
 
-/** @name FAT32-aware VFS operations
- * Transparently handle both ramfs and mounted FAT32 volumes.
- * @{ */
-i64 vfs_open_fat32(const char *path, i32 flags);
-i64 vfs_read_fat32(i64 fd, void *buf, u64 count);
-i64 vfs_write_fat32(i64 fd, const void *buf, u64 count);
-i64 vfs_close_fat32(i64 fd);
-i64 vfs_stat_fat32(const char *path, vfs_stat_t *st);
-i64 vfs_opendir_fat32(const char *path);
-i64 vfs_readdir_fat32(i64 dirfd, vfs_dirent_t *entry);
-i64 vfs_closedir_fat32(i64 dirfd);
-/** @} */
+/**
+ * @brief Close all FDs owned by a specific PID.
+ * @param pid Process ID.
+ */
+void vfs_close_for_pid(u64 pid);
 
 #endif

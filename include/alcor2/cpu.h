@@ -2,7 +2,8 @@
  * @file include/alcor2/cpu.h
  * @brief x86_64 CPU control and state management.
  *
- * Low-level operations: halting, interrupts, MSR access for thread-local storage.
+ * Low-level operations: halting, interrupts, MSR access for thread-local
+ * storage.
  */
 
 #ifndef ALCOR2_CPU_H

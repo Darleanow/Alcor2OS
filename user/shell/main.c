@@ -133,9 +133,9 @@ static void print_prompt(void)
 
 /**
  * @brief Shell main entry point.
- * 
+ *
  * Displays welcome message and enters the main read-eval-print loop.
- * 
+ *
  * @param argc Argument count.
  * @param argv Argument vector.
  * @return Exit code (0 on normal exit).

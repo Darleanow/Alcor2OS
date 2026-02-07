@@ -11,7 +11,7 @@
  * @brief Table of builtin command names.
  */
 static const char *builtins[] = {"help", "version", "clear", "exit",
-                                 "echo", "cd",      "pwd",   NULL};
+                                 "cd",   "pwd",     NULL};
 
 /**
  * @name Builtin command implementations
@@ -72,20 +72,6 @@ static void cmd_exit(void)
 {
   sh_puts("Goodbye!\n");
   exit(0);
-}
-
-/**
- * @brief Print arguments to standard output.
- * @param cmd Command structure containing arguments to echo.
- */
-static void cmd_echo(command_t *cmd)
-{
-  for(int i = 0; i < cmd->argc; i++) {
-    if(i > 0)
-      sh_putchar(' ');
-    sh_puts(cmd->args[i]);
-  }
-  sh_putchar('\n');
 }
 
 /**
@@ -153,8 +139,6 @@ int run_builtin(command_t *cmd)
     cmd_clear();
   } else if(sh_strcmp(cmd->cmd, "exit") == 0) {
     cmd_exit();
-  } else if(sh_strcmp(cmd->cmd, "echo") == 0) {
-    cmd_echo(cmd);
   } else if(sh_strcmp(cmd->cmd, "cd") == 0) {
     cmd_cd(cmd);
   } else if(sh_strcmp(cmd->cmd, "pwd") == 0) {
