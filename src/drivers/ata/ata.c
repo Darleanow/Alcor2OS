@@ -34,16 +34,6 @@ static void ata_wait_bsy(u16 port)
 }
 
 /**
- * @brief Wait for DRQ flag to set.
- * @param port Status port.
- */
-static void __attribute__((unused)) ata_wait_drq(u16 port)
-{
-  while(!(inb(port) & ATA_SR_DRQ))
-    ;
-}
-
-/**
  * @brief Wait for drive to be ready for data transfer.
  * @param status_port Status port.
  * @return true if ready, false on error/timeout.

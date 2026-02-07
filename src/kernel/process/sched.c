@@ -135,6 +135,7 @@ void sched_init(void)
   console_print("[SCHED] Initialized\n");
 }
 
+// cppcheck-suppress unusedFunction
 u64 task_create(const char *name, task_entry_t entry, void *arg)
 {
   /* Allocate task structure */
@@ -255,6 +256,7 @@ void                 sched_tick(void)
  * Called at safe points such as syscall return to ensure preemptive
  * scheduling happens outside interrupt context.
  */
+// cppcheck-suppress unusedFunction
 void sched_check_resched(void)
 {
   if(need_resched) {
@@ -313,6 +315,7 @@ task_t *sched_current(void)
  * @param count Output pointer for number of tasks (can be NULL).
  * @param switches Output pointer for number of context switches (can be NULL).
  */
+// cppcheck-suppress unusedFunction
 void sched_stats(u64 *task_count, u64 *switches)
 {
   if(task_count)

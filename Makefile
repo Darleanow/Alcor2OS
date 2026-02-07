@@ -172,6 +172,6 @@ lint:
 	clang-tidy $(SRCS_C) -- -I$(INCLUDE) -std=gnu11
 
 check:
-	cppcheck --enable=all --suppress=missingIncludeSystem --inconclusive --quiet -I$(INCLUDE) $(SRC)
+	cppcheck --enable=all --suppress=missingIncludeSystem --inline-suppr --inconclusive --quiet -I$(INCLUDE) $(SRC)
 
 analyze: lint check

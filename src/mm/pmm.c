@@ -171,6 +171,7 @@ void pmm_free(void *addr)
  * @param addr Physical address of the first page.
  * @param count Number of pages to free.
  */
+// cppcheck-suppress unusedFunction
 void pmm_free_pages(void *addr, usize count)
 {
   u64 page = (u64)addr / PAGE_SIZE;

@@ -49,6 +49,7 @@ void console_init(void *fb, u64 width, u64 height, u64 pitch)
  * @brief Set console color theme
  * @param theme Theme with foreground and background colors (RGB)
  */
+// cppcheck-suppress unusedFunction
 void console_set_theme(console_theme_t theme)
 {
   ctx.fg = theme.foreground;

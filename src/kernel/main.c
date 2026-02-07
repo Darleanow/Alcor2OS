@@ -74,7 +74,7 @@ LIMINE_REQUESTS_END
  * Loads modules into ramfs, then starts the first user process (init/shell).
  * Never returns - enters idle loop or starts first process.
  */
-__attribute__((used))
+// cppcheck-suppress unusedFunction
 void kmain(void)
 {
   if(!LIMINE_BASE_REVISION_OK)

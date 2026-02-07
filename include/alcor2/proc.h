@@ -113,7 +113,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options);
  * @param syscall_frame Saved syscall frame.
  * @return Child PID in parent, 0 in child, negative on error.
  */
-i64 proc_fork(void *syscall_frame);
+i64 proc_fork(const void *syscall_frame);
 
 /**
  * @brief Switch to a process (called by scheduler or exec).

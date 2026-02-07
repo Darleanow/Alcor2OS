@@ -441,6 +441,7 @@ static i64 resolve_path(
  *
  * Zeros out volume and file structures. Must be called before mounting.
  */
+// cppcheck-suppress unusedFunction
 void fat32_init(void)
 {
   kzero(volumes, sizeof(volumes));

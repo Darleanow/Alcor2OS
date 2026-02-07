@@ -170,6 +170,7 @@ void keyboard_init(void)
  * 
  * @param handler Callback function, or NULL to disable.
  */
+// cppcheck-suppress unusedFunction
 void keyboard_set_handler(keyboard_handler_t handler)
 {
   user_handler = handler;

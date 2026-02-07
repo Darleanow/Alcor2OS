@@ -124,6 +124,7 @@ static inline void *phys_to_virt(u64 phys)
  * @param virt Virtual address in HHDM region.
  * @return Physical address.
  */
+// cppcheck-suppress unusedFunction
 static inline u64 virt_to_phys(void *virt)
 {
   return (u64)virt - vmm_get_hhdm();

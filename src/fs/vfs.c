@@ -39,9 +39,18 @@ static char        cwd[VFS_PATH_MAX] = "/";
 /** @brief Magic value for FAT32 file descriptors (bit 31). */
 #define FAT32_FD_MAGIC 0x80000000
 
-static bool         is_fat32_fd(i64 fd);
 static vfs_mount_t *find_mount(const char *path);
 static const char  *get_relative_path(const char *path, const vfs_mount_t *mount);
+
+/**
+ * @brief Check if file descriptor is a FAT32 file
+ * @param fd File descriptor to check
+ * @return true if FAT32 file, false if ramfs file
+ */
+static bool is_fat32_fd(i64 fd)
+{
+  return (fd_table[fd].flags & FAT32_FD_MAGIC) != 0;
+}
 
 /*
  * @brief Normalize a path by resolving . and .. components.
@@ -729,10 +738,10 @@ i64 vfs_stat(const char *path, vfs_stat_t *stat)
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
   /* Check if path is on a mounted filesystem */
-  vfs_mount_t *mount = find_mount(abs_path);
+  const vfs_mount_t *mount = find_mount(abs_path);
   if(mount && mount->type == FS_TYPE_FAT32) {
-    fat32_volume_t *vol      = mount->fs_data;
-    const char     *rel_path = get_relative_path(abs_path, mount);
+    const fat32_volume_t *vol      = mount->fs_data;
+    const char           *rel_path = get_relative_path(abs_path, mount);
 
     fat32_entry_t   fatent;
     if(fat32_stat(vol, rel_path, &fatent) < 0) {
@@ -803,6 +812,7 @@ i64 vfs_mkdir(const char *path)
  * @param path Path to directory.
  * @return Directory handle on success, negative on error.
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_opendir(const char *path)
 {
   /* Convert to absolute path for mount point detection */
@@ -869,6 +879,7 @@ i64 vfs_opendir(const char *path)
  * @param entry Output buffer for directory entry.
  * @return 1 on success, 0 at end, negative on error.
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
 {
   if(dirfd < 0 || dirfd >= VFS_MAX_FD || !dir_table[dirfd].in_use) {
@@ -910,6 +921,7 @@ i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
  * @param dirfd Directory handle from vfs_opendir()
  * @return 0 on success, negative on error
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_closedir(i64 dirfd)
 {
   if(dirfd < 0 || dirfd >= VFS_MAX_FD || !dir_table[dirfd].in_use) {
@@ -974,7 +986,7 @@ i64 vfs_unlink(const char *path)
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
   /* Check if path is on a mounted filesystem */
-  vfs_mount_t *mount = find_mount(abs_path);
+  const vfs_mount_t *mount = find_mount(abs_path);
   if(mount && mount->type == FS_TYPE_FAT32) {
     const char *rel_path = get_relative_path(abs_path, mount);
     return fat32_unlink((fat32_volume_t *)mount->fs_data, rel_path);
@@ -1367,6 +1379,7 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype)
  * @param target Mount point path to unmount
  * @return 0 on success, negative on error
  */
+// cppcheck-suppress unusedFunction
 i64 vfs_umount(const char *target)
 {
   if(!target)
@@ -1384,236 +1397,6 @@ i64 vfs_umount(const char *target)
   }
 
   return -1;
-}
-/**
- * @brief Check if file descriptor is a FAT32 file
- * @param fd File descriptor to check
- * @return true if FAT32 file, false if ramfs file
- */
-static bool is_fat32_fd(i64 fd)
-{
-  return (fd_table[fd].flags & FAT32_FD_MAGIC) != 0;
-}
-
-/**
- * @brief Open file with FAT32 support
- * @param path File path
- * @param flags Open flags
- * @return File descriptor on success, negative on error
- * 
- * Note: FAT32 is read-only for now
- */
-i64 vfs_open_fat32(const char *path, i32 flags)
-{
-  vfs_mount_t *mount = find_mount(path);
-
-  if(!mount || mount->type != FS_TYPE_FAT32) {
-    /* Use ramfs */
-    return vfs_open(path, (u32)flags);
-  }
-
-  /* FAT32 path */
-  fat32_volume_t *vol      = mount->fs_data;
-  const char     *rel_path = get_relative_path(path, mount);
-
-  /* Find free fd */
-  i64 fd = -1;
-  for(i64 i = 0; i < VFS_MAX_FD; i++) {
-    if(!fd_table[i].in_use) {
-      fd = i;
-      break;
-    }
-  }
-  if(fd < 0)
-    return -1;
-
-  /* Open FAT32 file */
-  fat32_file_t *file = fat32_open(vol, rel_path);
-  if(!file)
-    return -1;
-
-  fd_table[fd].in_use = true;
-  fd_table[fd].node   = (vfs_node_t *)file; /* Store FAT32 file pointer */
-  fd_table[fd].offset = 0;
-  fd_table[fd].flags  = (u32)flags | FAT32_FD_MAGIC; /* Mark as FAT32 */
-
-  return fd;
-}
-
-/**
- * @brief Read from file with FAT32 support
- * @param fd File descriptor
- * @param buf Buffer to read into
- * @param count Number of bytes to read
- * @return Bytes read on success, negative on error
- */
-i64 vfs_read_fat32(i64 fd, void *buf, u64 count)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_fat32_fd(fd)) {
-    fat32_file_t *fatfile = (fat32_file_t *)fd_table[fd].node;
-    /* Seek to current offset first */
-    fatfile->position = (u32)fd_table[fd].offset;
-    i64 bytes         = fat32_read(fatfile, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
-    return bytes;
-  }
-
-  /* Use ramfs */
-  return vfs_read(fd, buf, count);
-}
-
-/**
- * @brief Write to file with FAT32 support
- * @param fd File descriptor
- * @param buf Buffer to write from
- * @param count Number of bytes to write
- * @return Bytes written on success, negative on error
- */
-i64 vfs_write_fat32(i64 fd, const void *buf, u64 count)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_fat32_fd(fd)) {
-    fat32_file_t *fatfile = (fat32_file_t *)fd_table[fd].node;
-    /* Seek to current offset first */
-    fat32_seek(fatfile, (i64)fd_table[fd].offset, 0); /* SEEK_SET */
-    i64 bytes = fat32_write(fatfile, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
-    return bytes;
-  }
-
-  /* Use ramfs */
-  return vfs_write(fd, buf, count);
-}
-
-/**
- * @brief Close file with FAT32 support
- * @param fd File descriptor to close
- * @return 0 on success, negative on error
- */
-i64 vfs_close_fat32(i64 fd)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_fat32_fd(fd)) {
-    fat32_file_t *fatfile = (fat32_file_t *)fd_table[fd].node;
-    fat32_flush(fatfile);
-    fat32_close(fatfile);
-    fd_table[fd].in_use = false;
-    return 0;
-  }
-
-  return vfs_close(fd);
-}
-
-/**
- * @brief Get file status with FAT32 support
- * @param path File path
- * @param st Output buffer for file statistics
- * @return 0 on success, negative on error
- */
-i64 vfs_stat_fat32(const char *path, vfs_stat_t *st)
-{
-  vfs_mount_t *mount = find_mount(path);
-
-  if(!mount || mount->type != FS_TYPE_FAT32) {
-    return vfs_stat(path, st);
-  }
-
-  fat32_volume_t *vol      = mount->fs_data;
-  const char     *rel_path = get_relative_path(path, mount);
-
-  fat32_entry_t   fatent;
-  if(fat32_stat(vol, rel_path, &fatent) < 0) {
-    return -1;
-  }
-
-  /* Convert FAT32 entry to VFS stat */
-  st->size     = fatent.size;
-  st->type     = (fatent.attr & 0x10) ? VFS_DIRECTORY : VFS_FILE;
-  st->created  = 0;
-  st->modified = 0;
-
-  return 0;
-}
-
-/**
- * @brief Open directory with FAT32 support
- * @param path Directory path
- * @return Directory handle on success, negative on error
- */
-i64 vfs_opendir_fat32(const char *path)
-{
-  vfs_mount_t *mount = find_mount(path);
-
-  if(!mount || mount->type != FS_TYPE_FAT32) {
-    return vfs_opendir(path);
-  }
-
-  fat32_volume_t *vol      = mount->fs_data;
-  const char     *rel_path = get_relative_path(path, mount);
-
-  /* Find free dirfd */
-  i64 dirfd = -1;
-  for(i64 i = 0; i < VFS_MAX_FD; i++) {
-    if(!dir_table[i].in_use) {
-      dirfd = i;
-      break;
-    }
-  }
-  if(dirfd < 0)
-    return -1;
-
-  /* Open FAT32 directory using fat32_open */
-  fat32_file_t *dir = fat32_open(vol, rel_path);
-  if(!dir || !dir->is_dir) {
-    if(dir)
-      fat32_close(dir);
-    return -1;
-  }
-
-  dir_table[dirfd].in_use  = true;
-  dir_table[dirfd].node    = (vfs_node_t *)dir;
-  dir_table[dirfd].current = NULL;
-  dir_table[dirfd].index    = 0;
-  dir_table[dirfd].is_fat32 = true;
-
-  return dirfd;
-}
-
-/**
- * @brief Read directory entry with FAT32 support
- * @param dirfd Directory handle
- * @param entry Output buffer for directory entry
- * @return 1 if entry read, 0 at end, negative on error
- */
-i64 vfs_readdir_fat32(i64 dirfd, vfs_dirent_t *entry)
-{
-  /* Just use the unified vfs_readdir */
-  return vfs_readdir(dirfd, entry);
-}
-
-/**
- * @brief Close directory with FAT32 support
- * @param dirfd Directory handle to close
- * @return 0 on success, negative on error
- */
-i64 vfs_closedir_fat32(i64 dirfd)
-{
-  /* Just use the unified vfs_closedir */
-  return vfs_closedir(dirfd);
 }
 
 /**

@@ -247,6 +247,7 @@ void *kzalloc(u64 size)
  * @param alignment Alignment in bytes (minimum 16, rounded up if smaller).
  * @return Pointer to aligned memory, or NULL on failure.
  */
+// cppcheck-suppress unusedFunction
 void *kmalloc_aligned(u64 size, u64 alignment)
 {
   if(alignment < 16) {
@@ -314,6 +315,7 @@ void kfree(void *ptr)
  * @param new_size New size in bytes.
  * @return Pointer to reallocated memory, or NULL on failure.
  */
+// cppcheck-suppress unusedFunction
 void *krealloc(void *ptr, u64 new_size)
 {
   if(ptr == NULL) {
@@ -358,6 +360,7 @@ void *krealloc(void *ptr, u64 new_size)
  * @param used Output pointer for used heap size in bytes (can be NULL).
  * @param free_mem Output pointer for free heap size in bytes (can be NULL).
  */
+// cppcheck-suppress unusedFunction
 void heap_stats(heap_stats_t *stats)
 {
   if(!stats)

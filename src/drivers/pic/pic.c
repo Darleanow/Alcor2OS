@@ -77,6 +77,7 @@ void pic_eoi(u8 irq)
  * 
  * @param irq IRQ number (0-15).
  */
+// cppcheck-suppress unusedFunction
 void pic_mask(u8 irq)
 {
   u16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;

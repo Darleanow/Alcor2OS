@@ -60,6 +60,7 @@ void pit_tick(void)
  * @brief Get the number of PIT ticks since initialization.
  * @return Tick count.
  */
+// cppcheck-suppress unusedFunction
 u64 pit_get_ticks(void)
 {
   return ticks;

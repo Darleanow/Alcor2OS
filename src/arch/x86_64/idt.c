@@ -84,7 +84,7 @@ void idt_set_gate(u8 vector, void *handler, u8 flags)
  * 
  * @param frame Saved interrupt frame with CPU state and exception info.
  */
-__attribute__((used))
+// cppcheck-suppress unusedFunction
 void exception_handler(interrupt_frame_t *frame)
 {
   console_print("\n\n*** KERNEL PANIC ***\n\n");
@@ -120,7 +120,7 @@ void exception_handler(interrupt_frame_t *frame)
  * 
  * @param irq IRQ number (0-15).
  */
-__attribute__((used))
+// cppcheck-suppress unusedFunction
 void irq_handler(u8 irq)
 {
   switch(irq) {

@@ -126,6 +126,7 @@ void vmm_map(u64 virt, u64 phys, u64 flags)
  * 
  * @param virt Virtual address to unmap.
  */
+// cppcheck-suppress unusedFunction
 void vmm_unmap(u64 virt)
 {
   /* Get current PML4 (could be kernel or process PML4) */
@@ -203,6 +204,7 @@ u64 vmm_get_phys(u64 virt)
  * @param virt Virtual address.
  * @return Complete PTE value, or 0 if page tables don't exist.
  */
+// cppcheck-suppress unusedFunction
 u64 vmm_get_pte(u64 virt)
 {
   u64 cr3;
@@ -338,6 +340,7 @@ u64 vmm_get_current_pml4(void)
  * @param virt Virtual address to resolve.
  * @return Physical address, or 0 if not mapped or not present.
  */
+// cppcheck-suppress unusedFunction
 u64 vmm_get_phys_in(u64 pml4_phys, u64 virt)
 {
   u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);

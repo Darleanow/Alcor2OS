@@ -28,6 +28,7 @@ NORETURN void cpu_halt(void)
  * Hints to the CPU that we're in a spinlock loop, improving performance
  * and reducing power consumption.
  */
+// cppcheck-suppress unusedFunction
 void cpu_pause(void)
 {
   __asm__ volatile("pause");

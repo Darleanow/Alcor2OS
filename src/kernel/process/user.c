@@ -56,6 +56,7 @@ static void *alloc_user_stack(void)
  * @param size Size of ELF file in bytes.
  * @return Exit code from user program, or (u64)-1 on load failure.
  */
+// cppcheck-suppress unusedFunction
 u64 user_exec_elf(const void *data, u64 size)
 {
   elf_info_t info;

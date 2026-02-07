@@ -28,6 +28,7 @@ void kzero(void *dst, u64 n)
   kmemset(dst, 0, n);
 }
 
+// cppcheck-suppress unusedFunction
 int kmemcmp(const void *s1, const void *s2, u64 n)
 {
   const u8 *p1 = (const u8 *)s1;
@@ -67,6 +68,7 @@ int kstrcmp(const char *a, const char *b)
   return (u8)*a - (u8)*b;
 }
 
+// cppcheck-suppress unusedFunction
 int kstricmp(const char *a, const char *b)
 {
   while(*a && *b) {
@@ -85,6 +87,7 @@ bool kstreq(const char *a, const char *b)
   return kstrcmp(a, b) == 0;
 }
 
+// cppcheck-suppress unusedFunction
 char *kstrchr(const char *s, int c)
 {
   while(*s) {
@@ -95,6 +98,7 @@ char *kstrchr(const char *s, int c)
   return (c == '\0') ? (char *)s : NULL;
 }
 
+// cppcheck-suppress unusedFunction
 char *kstrrchr(const char *s, int c)
 {
   const char *last = NULL;
@@ -106,6 +110,7 @@ char *kstrrchr(const char *s, int c)
   return (c == '\0') ? (char *)s : (char *)last;
 }
 
+// cppcheck-suppress unusedFunction
 bool kstarts_with(const char *str, const char *prefix)
 {
   while(*prefix) {
@@ -117,6 +122,7 @@ bool kstarts_with(const char *str, const char *prefix)
   return true;
 }
 
+// cppcheck-suppress unusedFunction
 int ktoupper(int c)
 {
   if(c >= 'a' && c <= 'z')

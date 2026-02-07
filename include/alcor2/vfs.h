@@ -243,19 +243,6 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype);
  */
 i64 vfs_umount(const char *target);
 
-/** @name FAT32-aware VFS operations
- * Transparently handle both ramfs and mounted FAT32 volumes.
- * @{ */
-i64 vfs_open_fat32(const char *path, i32 flags);
-i64 vfs_read_fat32(i64 fd, void *buf, u64 count);
-i64 vfs_write_fat32(i64 fd, const void *buf, u64 count);
-i64 vfs_close_fat32(i64 fd);
-i64 vfs_stat_fat32(const char *path, vfs_stat_t *st);
-i64 vfs_opendir_fat32(const char *path);
-i64 vfs_readdir_fat32(i64 dirfd, vfs_dirent_t *entry);
-i64 vfs_closedir_fat32(i64 dirfd);
-/** @} */
-
 /**
  * @brief Close all FDs owned by a specific PID.
  * @param pid Process ID.
