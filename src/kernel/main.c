@@ -7,6 +7,7 @@
 #include <alcor2/console.h>
 #include <alcor2/cpu.h>
 #include <alcor2/elf.h>
+#include <alcor2/ext2.h>
 #include <alcor2/gdt.h>
 #include <alcor2/heap.h>
 #include <alcor2/idt.h>
@@ -28,61 +29,33 @@ LIMINE_REQUESTS_START
 
 USED SECTION(".limine_requests"
 ) static volatile struct limine_framebuffer_request fb_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST_ID, .revision = 0
+    .id       = LIMINE_FRAMEBUFFER_REQUEST_ID,
+    .revision = 0,
 };
 
-USED SECTION(".limine_requests") static volatile struct limine_memmap_request
-    memmap_request = {.id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0};
+USED SECTION(".limine_requests"
+) static volatile struct limine_memmap_request memmap_request = {
+    .id       = LIMINE_MEMMAP_REQUEST_ID,
+    .revision = 0,
+};
 
-USED SECTION(".limine_requests") static volatile struct limine_hhdm_request
-    hhdm_request = {.id = LIMINE_HHDM_REQUEST_ID, .revision = 0};
+USED SECTION(".limine_requests"
+) static volatile struct limine_hhdm_request hhdm_request = {
+    .id       = LIMINE_HHDM_REQUEST_ID,
+    .revision = 0,
+};
 
-USED SECTION(".limine_requests") static volatile struct limine_module_request
-    module_request = {.id = LIMINE_MODULE_REQUEST_ID, .revision = 0};
+USED SECTION(".limine_requests"
+) static volatile struct limine_module_request module_request = {
+    .id       = LIMINE_MODULE_REQUEST_ID,
+    .revision = 0,
+};
 
 LIMINE_REQUESTS_END
 
-/**
- * @brief Kernel main entry point.
- *
- * Initializes all kernel subsystems in order:
- * - Framebuffer console
- * - Physical memory manager (PMM)
- * - Virtual memory manager (VMM)
- * - Kernel heap
- * - Task scheduler
- * - Global Descriptor Table (GDT)
- * - Interrupt Descriptor Table (IDT)
- * - CPU features (SSE/FPU)
- * - System call interface
- * - PIC and PIT (interrupts and timer)
- * - Keyboard driver
- * - Virtual File System (VFS)
- * - ATA disk driver
- * - Process subsystem
- *
- * Loads modules into ramfs, then starts the first user process (init/shell).
- * Never returns - enters idle loop or starts first process.
- */
-// cppcheck-suppress unusedFunction
-void kmain(void)
+/** @brief Print boot banner. */
+static void print_banner(void)
 {
-  if(!LIMINE_BASE_REVISION_OK)
-    cpu_halt();
-
-  if(!fb_request.response || fb_request.response->framebuffer_count < 1)
-    cpu_halt();
-
-  if(!memmap_request.response || !hhdm_request.response)
-    cpu_halt();
-
-  struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
-
-  console_init(fb->address, fb->width, fb->height, fb->pitch);
-  console_set_theme((console_theme_t
-  ) {.foreground = 0x00FF00, .background = 0x000000});
-  console_clear();
-
   console_print("\n");
   console_print("    ___    __                ___\n");
   console_print("   /   |  / /________  _____/__ \\\n");
@@ -92,12 +65,30 @@ void kmain(void)
   console_print("\n");
   console_print("Alcor2 OS v0.1.0\n");
   console_print("----------------\n\n");
-  console_print("Kernel initialized successfully.\n");
-  console_print("Framebuffer: ");
+}
+
+/**
+ * @brief Initialize early boot subsystems.
+ *
+ * Sets up console, memory managers, and heap.
+ */
+static void init_early(struct limine_framebuffer *fb)
+{
+  /* Console */
+  console_init(fb->address, fb->width, fb->height, fb->pitch);
+  console_set_theme((console_theme_t) {
+      .foreground = 0xA6A6A6,
+      .background = 0x000000,
+  });
+  console_clear();
+  print_banner();
+
   console_printf(
-      "%dx%d @ %dbpp\n", (int)fb->width, (int)fb->height, (int)fb->bpp
+      "Framebuffer: %dx%d @ %dbpp\n", (int)fb->width, (int)fb->height,
+      (int)fb->bpp
   );
 
+  /* Memory management */
   pmm_init(memmap_request.response, hhdm_request.response->offset);
   console_printf(
       "PMM: %dMB total, %dMB free\n", (int)(pmm_get_total() / 1024 / 1024),
@@ -108,7 +99,15 @@ void kmain(void)
   console_print("VMM initialized.\n");
 
   heap_init();
+}
 
+/**
+ * @brief Initialize CPU and core kernel structures.
+ *
+ * Sets up GDT, IDT, scheduler, SSE, and syscall interface.
+ */
+static void init_core(void)
+{
   sched_init();
 
   gdt_init();
@@ -118,60 +117,112 @@ void kmain(void)
   console_print("IDT loaded.\n");
 
   cpu_enable_sse();
-
   syscall_init();
+}
 
+/**
+ * @brief Initialize interrupt controllers and drivers.
+ *
+ * Sets up PIC, PIT timer, and keyboard.
+ */
+static void init_interrupts(void)
+{
   pic_init();
   pit_init(100);
   pic_unmask(IRQ_TIMER);
   pit_enable_sched();
-  console_print("PIC/PIT initialized.\n");
+  console_print("PIC/PIT initialized (100Hz).\n");
 
   keyboard_init();
   console_print("Keyboard initialized.\n");
+}
 
-  /* Initialize ATA drives early (needed for root filesystem) */
+/**
+ * @brief Initialize storage and filesystems.
+ *
+ * Sets up ATA driver, VFS, ext2, and mounts root filesystem.
+ */
+static void init_storage(void)
+{
   ata_init();
-
-  /* Initialize VFS with minimal ramfs */
   vfs_init();
+  ext2_init();
 
-  /* Mount FAT32 as root filesystem */
+  /* Mount root filesystem */
   const ata_drive_t *hda = ata_get_drive(0);
   if(hda && hda->present) {
-    if(vfs_mount("/dev/hda", "/", "fat32") == 0) {
-      console_print("[VFS] Mounted /dev/hda (FAT32) on /\n");
-      /* Mount /dev as ramfs overlay (like Linux devtmpfs) */
+    if(vfs_mount("/dev/hda", "/", "ext2") == 0) {
+      console_print("Mounted /dev/hda (ext2) on /\n");
       vfs_mount(NULL, "/dev", "ramfs");
     } else {
-      console_print("[VFS] Failed to mount FAT32 on / - falling back to ramfs\n"
-      );
+      console_print("Failed to mount ext2 - falling back to ramfs\n");
     }
   } else {
-    console_print("[VFS] No disk found - using ramfs only\n");
+    console_print("No disk found - using ramfs only\n");
+  }
+}
+
+/**
+ * @brief Launch first user process from boot modules.
+ *
+ * Loads the first Limine module as the init/shell process.
+ * Never returns on success.
+ */
+static void launch_init(void)
+{
+  proc_init();
+
+  if(!module_request.response || module_request.response->module_count == 0) {
+    console_print("[KERNEL] No modules found, halting.\n");
+    return;
   }
 
+  struct limine_file *mod = module_request.response->modules[0];
+  console_printf(
+      "[KERNEL] Loading: %s (%d bytes)\n", mod->path, (int)mod->size
+  );
+
+  /* Start first process - never returns */
+  proc_start_first(mod->address, mod->size, "shell");
+}
+
+/**
+ * @brief Kernel main entry point.
+ *
+ * Initializes all kernel subsystems in order, then starts the first
+ * user process. Never returns
+ */
+// cppcheck-suppress unusedFunction
+void kmain(void)
+{
+  /* Validate bootloader response */
+  if(!LIMINE_BASE_REVISION_OK)
+    cpu_halt();
+  if(!fb_request.response || fb_request.response->framebuffer_count < 1)
+    cpu_halt();
+  if(!memmap_request.response || !hhdm_request.response)
+    cpu_halt();
+
+  /* Early init (console, memory) */
+  init_early(fb_request.response->framebuffers[0]);
+
+  /* Core kernel (GDT, IDT, scheduler) */
+  init_core();
+
+  /* Interrupts and drivers */
+  init_interrupts();
+
+  /* Storage and filesystems */
+  init_storage();
+
+  /* Enable interrupts */
   cpu_enable_interrupts();
   console_print("Interrupts enabled.\n\n");
 
-  /* Initialize process subsystem */
-  proc_init();
+  /* Stage 5: Launch init process */
+  launch_init();
 
-  /* Launch user-mode program */
-  if(module_request.response && module_request.response->module_count > 0) {
-    /* Load first module as init program */
-    struct limine_file *mod = module_request.response->modules[0];
-    console_printf(
-        "[KERNEL] Loading module: %s (%d bytes)\n", mod->path, (int)mod->size
-    );
-
-    /* Start first process (never returns) */
-    proc_start_first(mod->address, mod->size, "shell");
-  }
-
-  console_print("[KERNEL] No modules found, halting.\n");
-
-  /* Kernel idle loop */
+  /* Idle loop (fallback if no init) */
   for(;;) {
     cpu_enable_interrupts();
     __asm__ volatile("hlt");
