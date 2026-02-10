@@ -101,24 +101,24 @@ run: iso
 	qemu-system-x86_64 -cdrom $(BUILD)/$(ISO) -m 256M
 
 # ============================================================================
-# Disk Image Management (FAT32)
+# Disk Image Management
 # ============================================================================
 
-# Create a FAT32 disk image
+# Create a disk image
 disk: $(DISK)
 
 $(DISK):
 	@mkdir -p $(BUILD)
-	@echo "Creating $(DISK_SIZE) FAT32 disk image..."
+	@echo "Creating $(DISK_SIZE) ext2 disk image..."
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
-	@mkfs.fat -F 32 -n "ALCOR2" $(DISK) >/dev/null
+	@mke2fs -t ext2 -L "ALCOR2" -q $(DISK)
 	@echo "Created $(DISK)"
 
-# Run with disk attached (hda = /dev/hda in guest)
+# Run with disk attached
 run-disk: iso disk-populate
 	qemu-system-x86_64 -cdrom $(BUILD)/$(ISO) -drive file=$(DISK),format=raw,if=ide,cache=writethrough -boot d -m 256M
 
-# Mount disk image to ./mnt for adding files (requires sudo)
+# Mount disk image to ./mnt for adding files
 disk-mount: $(DISK)
 	@mkdir -p mnt
 	@sudo mount -o loop $(DISK) mnt
@@ -146,17 +146,6 @@ disk-populate: $(DISK) user
 	@sudo umount mnt
 	@rmdir mnt
 	@echo "Disk populated with user binaries"
-
-# Quick helper: add a file to disk
-# Usage: make disk-add FILE=myfile.txt
-disk-add: $(DISK)
-	@if [ -z "$(FILE)" ]; then echo "Usage: make disk-add FILE=<path>"; exit 1; fi
-	@mkdir -p mnt
-	@sudo mount -o loop $(DISK) mnt
-	@sudo cp "$(FILE)" mnt/
-	@sudo umount mnt
-	@rmdir mnt
-	@echo "Added $(FILE) to disk"
 
 clean:
 	rm -rf $(BUILD)
