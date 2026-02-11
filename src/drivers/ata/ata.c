@@ -60,7 +60,7 @@ static inline void delay_400ns(ata_channel_t *ch)
  */
 static u8 poll_bsy(ata_channel_t *ch, u32 iters)
 {
-  u8 s;
+  u8 s = 0xFF;
   for(u32 i = 0; i < iters; i++) {
     s = reg_read(ch, ATA_REG_STATUS);
     if(!(s & ATA_SR_BSY))
@@ -183,15 +183,15 @@ static void identify(ata_drive_t *d)
 
   /* Model (words 27-46) and serial (words 10-19), byte-swapped */
   for(int i = 0; i < 20; i++) {
-    d->model[i * 2]     = (char)(id[27 + i] >> 8);
-    d->model[i * 2 + 1] = (char)(id[27 + i] & 0xFF);
+    d->model[(u32)i * 2]     = (char)(id[27 + i] >> 8);
+    d->model[(u32)i * 2 + 1] = (char)(id[27 + i] & 0xFF);
   }
   d->model[40] = '\0';
   trim_string(d->model, 40);
 
   for(int i = 0; i < 10; i++) {
-    d->serial[i * 2]     = (char)(id[10 + i] >> 8);
-    d->serial[i * 2 + 1] = (char)(id[10 + i] & 0xFF);
+    d->serial[(u32)i * 2]     = (char)(id[10 + i] >> 8);
+    d->serial[(u32)i * 2 + 1] = (char)(id[10 + i] & 0xFF);
   }
   d->serial[20] = '\0';
   trim_string(d->serial, 20);
@@ -462,19 +462,19 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
 
 /**
  * @brief Read sectors from an ATA drive (DMA if available, else PIO).
- * @param idx   Drive index (0-3).
+ * @param drive Drive index (0-3).
  * @param lba   Starting sector.
  * @param count Number of sectors.
  * @param buf   Output buffer.
  * @return 0 on success, negative errno on failure.
  */
 // cppcheck-suppress unusedFunction
-i64 ata_read(u8 idx, u64 lba, u32 count, void *buf)
+i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
 {
-  if(idx >= 4 || !buf || count == 0)
+  if(drive >= 4 || !buf || count == 0)
     return -EINVAL;
 
-  ata_drive_t *d = &drives[idx];
+  ata_drive_t *d = &drives[drive];
   if(!d->present || d->atapi)
     return -ENODEV;
   if(lba + count > d->sectors)
@@ -489,19 +489,19 @@ i64 ata_read(u8 idx, u64 lba, u32 count, void *buf)
 
 /**
  * @brief Write sectors to an ATA drive (DMA if available, else PIO).
- * @param idx   Drive index (0-3).
+ * @param drive Drive index (0-3).
  * @param lba   Starting sector.
  * @param count Number of sectors.
  * @param buf   Input buffer.
  * @return 0 on success, negative errno on failure.
  */
 // cppcheck-suppress unusedFunction
-i64 ata_write(u8 idx, u64 lba, u32 count, const void *buf)
+i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
 {
-  if(idx >= 4 || !buf || count == 0)
+  if(drive >= 4 || !buf || count == 0)
     return -EINVAL;
 
-  ata_drive_t *d = &drives[idx];
+  ata_drive_t *d = &drives[drive];
   if(!d->present || d->atapi)
     return -ENODEV;
   if(lba + count > d->sectors)
@@ -516,14 +516,14 @@ i64 ata_write(u8 idx, u64 lba, u32 count, const void *buf)
 
 /**
  * @brief ATA IRQ handler — reading status clears the device's IRQ line.
- * @param idx Channel index (0 = primary, 1 = secondary).
+ * @param channel Channel index (0 = primary, 1 = secondary).
  */
-void ata_irq(u8 idx)
+void ata_irq(u8 channel)
 {
-  if(idx >= 2)
+  if(channel >= 2)
     return;
 
-  ata_channel_t *ch = &channels[idx];
+  ata_channel_t *ch = &channels[channel];
 
   ch->status = reg_read(ch, ATA_REG_STATUS);
   ch->error  = (ch->status & ATA_SR_ERR) ? reg_read(ch, ATA_REG_ERROR) : 0;
