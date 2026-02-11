@@ -5,6 +5,7 @@
 
 #include "font.h"
 #include <alcor2/console.h>
+#include <alcor2/kstdlib.h>
 #include <stdarg.h>
 
 #define FONT_W 8
@@ -61,9 +62,15 @@ void console_set_theme(console_theme_t theme)
  */
 void console_clear(void)
 {
-  for(u64 y = 0; y < ctx.height; y++)
-    for(u64 x = 0; x < ctx.width; x++)
-      ctx.buffer[y * ctx.pitch + x] = ctx.bg;
+  u64 bg64 = (u64)ctx.bg | ((u64)ctx.bg << 32);
+  for(u64 y = 0; y < ctx.height; y++) {
+    u64 *row = (u64 *)&ctx.buffer[y * ctx.pitch];
+    u64  w   = ctx.width / 2;
+    for(u64 i = 0; i < w; i++)
+      row[i] = bg64;
+    if(ctx.width & 1)
+      ctx.buffer[y * ctx.pitch + ctx.width - 1] = ctx.bg;
+  }
   ctx.cursor_x = 0;
   ctx.cursor_y = 0;
 }
@@ -93,17 +100,31 @@ static void draw_glyph(char c, u32 px, u32 py)
 }
 
 /**
- * @brief Scroll framebuffer up by one line.
+ * @brief Scroll framebuffer up by one text line.
+ *
+ * Uses row-based kmemcpy for bulk copies instead of pixel-by-pixel,
+ * and 64-bit stores for the bottom clear.
  */
 static void scroll(void)
 {
-  for(u64 y = 0; y < ctx.height - FONT_H; y++)
-    for(u64 x = 0; x < ctx.width; x++)
-      ctx.buffer[y * ctx.pitch + x] = ctx.buffer[(y + FONT_H) * ctx.pitch + x];
+  u64 row_bytes = ctx.width * sizeof(u32);
 
-  for(u64 y = ctx.height - FONT_H; y < ctx.height; y++)
-    for(u64 x = 0; x < ctx.width; x++)
-      ctx.buffer[y * ctx.pitch + x] = ctx.bg;
+  /* Shift the visible area up by FONT_H pixel rows */
+  for(u64 y = 0; y < ctx.height - FONT_H; y++)
+    kmemcpy((void *)&ctx.buffer[y * ctx.pitch],
+           (const void *)&ctx.buffer[(y + FONT_H) * ctx.pitch],
+           row_bytes);
+
+  /* Clear the bottom FONT_H rows with background color */
+  u64 bg64 = (u64)ctx.bg | ((u64)ctx.bg << 32);
+  for(u64 y = ctx.height - FONT_H; y < ctx.height; y++) {
+    u64 *row = (u64 *)&ctx.buffer[y * ctx.pitch];
+    u64  w   = ctx.width / 2;
+    for(u64 i = 0; i < w; i++)
+      row[i] = bg64;
+    if(ctx.width & 1)
+      ctx.buffer[y * ctx.pitch + ctx.width - 1] = ctx.bg;
+  }
 }
 
 /**
