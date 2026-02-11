@@ -1595,7 +1595,7 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
     return NULL;
   }
 
-  u8 *gdt_buf = kmalloc(gdt_blocks * vol->block_size);
+  u8 *gdt_buf = kmalloc((u64)gdt_blocks * vol->block_size);
   if(!gdt_buf) {
     kfree(vol->groups);
     console_print("[EXT2] Failed to allocate GDT buffer\n");

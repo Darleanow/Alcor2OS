@@ -183,15 +183,15 @@ static void identify(ata_drive_t *d)
 
   /* Model (words 27-46) and serial (words 10-19), byte-swapped */
   for(int i = 0; i < 20; i++) {
-    d->model[(u32)i * 2]     = (char)(id[27 + i] >> 8);
-    d->model[(u32)i * 2 + 1] = (char)(id[27 + i] & 0xFF);
+    d->model[(size_t)i * 2]     = (char)(id[27 + i] >> 8);
+    d->model[(size_t)i * 2 + 1] = (char)(id[27 + i] & 0xFF);
   }
   d->model[40] = '\0';
   trim_string(d->model, 40);
 
   for(int i = 0; i < 10; i++) {
-    d->serial[(u32)i * 2]     = (char)(id[10 + i] >> 8);
-    d->serial[(u32)i * 2 + 1] = (char)(id[10 + i] & 0xFF);
+    d->serial[(size_t)i * 2]     = (char)(id[10 + i] >> 8);
+    d->serial[(size_t)i * 2 + 1] = (char)(id[10 + i] & 0xFF);
   }
   d->serial[20] = '\0';
   trim_string(d->serial, 20);
