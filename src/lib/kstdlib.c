@@ -17,8 +17,27 @@ void *kmemcpy(void *dst, const void *src, u64 n)
 {
   u8       *d = (u8 *)dst;
   const u8 *s = (const u8 *)src;
+
+  /* Byte-copy until destination is 8-byte aligned */
+  while(n && ((u64)d & 7)) {
+    *d++ = *s++;
+    n--;
+  }
+
+  /* Bulk copy 8 bytes at a time */
+  u64       *d64 = (u64 *)d;
+  const u64 *s64 = (const u64 *)s;
+  while(n >= 8) {
+    *d64++ = *s64++;
+    n -= 8;
+  }
+
+  /* Copy remaining bytes */
+  d = (u8 *)d64;
+  s = (const u8 *)s64;
   while(n--)
     *d++ = *s++;
+
   return dst;
 }
 
@@ -34,8 +53,29 @@ void *kmemset(void *dst, int val, u64 n)
 {
   u8 *d = (u8 *)dst;
   u8  v = (u8)val;
+
+  /* Byte-fill until 8-byte aligned */
+  while(n && ((u64)d & 7)) {
+    *d++ = v;
+    n--;
+  }
+
+  /* Build 8-byte fill pattern and bulk fill */
+  u64 v64 = v;
+  v64 |= v64 << 8;
+  v64 |= v64 << 16;
+  v64 |= v64 << 32;
+  u64 *d64 = (u64 *)d;
+  while(n >= 8) {
+    *d64++ = v64;
+    n -= 8;
+  }
+
+  /* Fill remaining bytes */
+  d = (u8 *)d64;
   while(n--)
     *d++ = v;
+
   return dst;
 }
 
