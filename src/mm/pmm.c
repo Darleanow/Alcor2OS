@@ -44,6 +44,15 @@ static inline bool bitmap_test(u64 page)
   return bitmap[page / BITS_PER_ENTRY] & (1ULL << (page % BITS_PER_ENTRY));
 }
 
+/**
+ * @brief Initialize the physical memory manager.
+ *
+ * Parses the memory map to build a bitmap of free/used pages
+ * and reserves kernel memory regions.
+ *
+ * @param memmap Limine memory map response.
+ * @param hhdm_offset Higher-half direct map offset.
+ */
 void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
 {
   hhdm = hhdm_offset;

@@ -28,7 +28,12 @@ static int pipe_close(int fd);
 extern u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6);
 
 /**
- * @brief Read data from a file descriptor
+ * @brief Read data from a file descriptor.
+ *
+ * @param fd    File descriptor.
+ * @param buf   User buffer to read into.
+ * @param count Maximum bytes to read.
+ * @return Bytes read, or negative errno.
  */
 static u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
@@ -66,7 +71,12 @@ static u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 }
 
 /**
- * @brief Write data to a file descriptor
+ * @brief Write data to a file descriptor.
+ *
+ * @param fd    File descriptor.
+ * @param buf   User buffer to write from.
+ * @param count Number of bytes to write.
+ * @return Bytes written, or negative errno.
  */
 static u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
@@ -102,7 +112,12 @@ static u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 }
 
 /**
- * @brief Open a file or directory
+ * @brief Open a file or directory.
+ *
+ * @param path  User pointer to pathname.
+ * @param flags Open flags (O_RDONLY, O_CREAT, etc.).
+ * @param mode  File mode (unused).
+ * @return File descriptor, or negative errno.
  */
 static u64 sys_open(u64 path, u64 flags, u64 mode, u64 a4, u64 a5, u64 a6)
 {
@@ -123,7 +138,10 @@ static u64 sys_open(u64 path, u64 flags, u64 mode, u64 a4, u64 a5, u64 a6)
 }
 
 /**
- * @brief Close a file descriptor
+ * @brief Close a file descriptor.
+ *
+ * @param fd File descriptor to close.
+ * @return 0 on success, negative errno on error.
  */
 static u64 sys_close(u64 fd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
@@ -171,7 +189,11 @@ struct linux_stat
 #define S_IFREG 0100000
 
 /**
- * @brief Get file status by path
+ * @brief Get file status by path.
+ *
+ * @param path    User pointer to pathname.
+ * @param statbuf User pointer to stat structure.
+ * @return 0 on success, negative errno on error.
  */
 static u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
 {
@@ -202,6 +224,11 @@ static u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/** @brief Get file status by fd.
+ * @param fd      File descriptor.
+ * @param statbuf User pointer to stat structure.
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
@@ -226,11 +253,20 @@ static u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/** @brief Get file status (no symlink follow, delegates to sys_stat). */
 static u64 sys_lstat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_stat(path, statbuf, a3, a4, a5, a6);
 }
 
+/**
+ * @brief Reposition file read/write offset.
+ *
+ * @param fd     File descriptor.
+ * @param offset Seek offset.
+ * @param whence Seek mode (SEEK_SET, SEEK_CUR, SEEK_END).
+ * @return New offset, or negative errno.
+ */
 static u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -242,6 +278,17 @@ static u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 
 #define MAP_ANONYMOUS 0x20
 
+/**
+ * @brief Map anonymous memory into the process address space.
+ *
+ * @param addr   Requested address (hint, ignored).
+ * @param length Size in bytes.
+ * @param prot   Protection flags (ignored).
+ * @param flags  Mapping flags (MAP_ANONYMOUS required).
+ * @param fd     File descriptor (must be -1 for anon).
+ * @param offset File offset (ignored).
+ * @return Mapped address, or negative errno.
+ */
 static u64
     sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
 {
@@ -276,6 +323,7 @@ static u64
   return result;
 }
 
+/** @brief Change memory protection (stub, always succeeds). */
 static u64 sys_mprotect(u64 addr, u64 len, u64 prot, u64 a4, u64 a5, u64 a6)
 {
   (void)addr;
@@ -287,6 +335,7 @@ static u64 sys_mprotect(u64 addr, u64 len, u64 prot, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/** @brief Unmap memory (stub, always succeeds). */
 static u64 sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)addr;
@@ -298,6 +347,12 @@ static u64 sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/**
+ * @brief Adjust the program break.
+ *
+ * @param addr New break address, or 0 to query current break.
+ * @return Current or new break address.
+ */
 static u64 sys_brk(u64 addr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -335,6 +390,14 @@ static u64 sys_brk(u64 addr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 #define TCSETS     0x5402
 #define TIOCGWINSZ 0x5413
 
+/**
+ * @brief Handle terminal ioctl requests.
+ *
+ * @param fd      File descriptor.
+ * @param request Ioctl request code.
+ * @param arg     Request argument.
+ * @return 0 on success.
+ */
 static u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -366,6 +429,13 @@ static u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/**
+ * @brief Check file accessibility.
+ *
+ * @param path Path to check.
+ * @param mode Access mode (ignored).
+ * @return 0 if accessible, negative errno otherwise.
+ */
 static u64 sys_access(u64 path, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)mode;
@@ -399,6 +469,13 @@ typedef struct pipe
 static pipe_t  pipes[MAX_PIPES];
 static int     pipes_initialized = 0;
 
+/**
+ * @brief Find a pipe associated with a file descriptor.
+ *
+ * @param fd      File descriptor to look up.
+ * @param is_read Output: 1 if read end, 0 if write end.
+ * @return Pipe pointer, or NULL if not found.
+ */
 static pipe_t *find_pipe_by_fd(int fd, int *is_read)
 {
   for(int i = 0; i < MAX_PIPES; i++) {
@@ -414,6 +491,10 @@ static pipe_t *find_pipe_by_fd(int fd, int *is_read)
   return NULL;
 }
 
+/**
+ * @brief Allocate a free pipe from the pool.
+ * @return Pipe pointer, or NULL if none available.
+ */
 static pipe_t *alloc_pipe(void)
 {
   if(!pipes_initialized) {
@@ -429,6 +510,12 @@ static pipe_t *alloc_pipe(void)
   return NULL;
 }
 
+/**
+ * @brief Create a unidirectional pipe.
+ *
+ * @param pipefd User pointer to int[2] for read/write fds.
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -532,6 +619,12 @@ static i64 pipe_write(int fd, const void *buf, u64 count)
   return (i64)to_write;
 }
 
+/**
+ * @brief Close one end of a pipe.
+ *
+ * @param fd File descriptor to close.
+ * @return 0 on success, -ENOENT if not a pipe fd.
+ */
 static int pipe_close(int fd)
 {
   int     is_read;
@@ -545,6 +638,7 @@ static int pipe_close(int fd)
   return 0;
 }
 
+/** @brief Duplicate a file descriptor (stub, returns oldfd). */
 static u64 sys_dup(u64 oldfd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -555,6 +649,7 @@ static u64 sys_dup(u64 oldfd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return oldfd;
 }
 
+/** @brief Duplicate fd to a specific number (stub, returns newfd). */
 static u64 sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)oldfd;
@@ -565,6 +660,13 @@ static u64 sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
   return newfd;
 }
 
+/**
+ * @brief Sleep for the specified duration.
+ *
+ * @param req User pointer to timespec (seconds + nanoseconds).
+ * @param rem User pointer for remaining time (unused).
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)rem;
@@ -591,6 +693,7 @@ static u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/** @brief Get current process ID. */
 static u64 sys_getpid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -603,11 +706,13 @@ static u64 sys_getpid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return p ? p->pid : 1;
 }
 
+/** @brief Get thread ID (same as PID, no threading). */
 static u64 sys_gettid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_getpid(a1, a2, a3, a4, a5, a6);
 }
 
+/** @brief Get parent process ID. */
 static u64 sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -622,6 +727,9 @@ static u64 sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
 static syscall_frame_t *current_syscall_frame = NULL;
 
+/** @brief Fork the current process.
+ * @return Child PID in parent, 0 in child, negative errno on error.
+ */
 static u64              sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -638,6 +746,14 @@ static u64              sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 #define MAX_EXEC_ARGS 32
 #define MAX_ARG_LEN   256
 
+/**
+ * @brief Execute a program, replacing the current process image.
+ *
+ * @param pathname User pointer to executable path.
+ * @param argv     User pointer to argument array.
+ * @param envp     User pointer to environment (ignored).
+ * @return Does not return on success; negative errno on error.
+ */
 static u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 {
   (void)envp;
@@ -704,6 +820,11 @@ static u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   return (u64)exit_code;
 }
 
+/**
+ * @brief Terminate the current process.
+ *
+ * @param status Exit status code.
+ */
 static u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -714,6 +835,15 @@ static u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   proc_exit((i64)status);
 }
 
+/**
+ * @brief Wait for a child process to change state.
+ *
+ * @param pid     Child PID to wait for.
+ * @param wstatus User pointer for exit status.
+ * @param options Wait options.
+ * @param rusage  Resource usage (ignored).
+ * @return Child PID, or negative errno.
+ */
 static u64
     sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
 {
@@ -723,6 +853,12 @@ static u64
   return (u64)proc_waitpid((i64)pid, (i32 *)wstatus, (i32)options);
 }
 
+/**
+ * @brief Get system identification.
+ *
+ * @param buf User pointer to utsname structure.
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -751,6 +887,7 @@ static u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/** @brief File control operations (stub, always returns 0). */
 static u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
 {
   (void)fd;
@@ -762,6 +899,14 @@ static u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/**
+ * @brief Read directory entries.
+ *
+ * @param fd    Directory file descriptor.
+ * @param dirp  User buffer for dirent structures.
+ * @param count Buffer size in bytes.
+ * @return Bytes written to buffer, or negative errno.
+ */
 static u64 sys_getdents(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -777,11 +922,19 @@ static u64 sys_getdents(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
   return (result < 0) ? (u64)-EBADF : (u64)result;
 }
 
+/** @brief Read directory entries (64-bit, delegates to sys_getdents). */
 static u64 sys_getdents64(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
 {
   return sys_getdents(fd, dirp, count, a4, a5, a6);
 }
 
+/**
+ * @brief Get current working directory.
+ *
+ * @param buf  User buffer for path.
+ * @param size Buffer size.
+ * @return Length including null, or negative errno.
+ */
 static u64 sys_getcwd(u64 buf, u64 size, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
@@ -802,6 +955,12 @@ static u64 sys_getcwd(u64 buf, u64 size, u64 a3, u64 a4, u64 a5, u64 a6)
   return len + 1;
 }
 
+/**
+ * @brief Change current working directory.
+ *
+ * @param path User pointer to directory path.
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_chdir(u64 path, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -815,6 +974,13 @@ static u64 sys_chdir(u64 path, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return (result < 0) ? (u64)-ENOENT : 0;
 }
 
+/**
+ * @brief Create a directory.
+ *
+ * @param pathname User pointer to directory path.
+ * @param mode     Directory permissions (ignored).
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_mkdir(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)mode;
@@ -828,6 +994,12 @@ static u64 sys_mkdir(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
   return (result < 0) ? (u64)-ENOENT : 0;
 }
 
+/**
+ * @brief Remove a file or directory.
+ *
+ * @param pathname User pointer to path.
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_unlink(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
@@ -841,6 +1013,7 @@ static u64 sys_unlink(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return (result < 0) ? (u64)-ENOENT : 0;
 }
 
+/** @brief Read symbolic link (stub, returns -EINVAL). */
 static u64 sys_readlink(u64 path, u64 buf, u64 bufsiz, u64 a4, u64 a5, u64 a6)
 {
   (void)path;
@@ -852,6 +1025,7 @@ static u64 sys_readlink(u64 path, u64 buf, u64 bufsiz, u64 a4, u64 a5, u64 a6)
   return (u64)-EINVAL;
 }
 
+/** @brief Get user ID (always 0). */
 static u64 sys_getuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -862,6 +1036,7 @@ static u64 sys_getuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
   return 0;
 }
+/** @brief Get group ID (always 0). */
 static u64 sys_getgid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -872,6 +1047,7 @@ static u64 sys_getgid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
   return 0;
 }
+/** @brief Get effective user ID (always 0). */
 static u64 sys_geteuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -882,6 +1058,7 @@ static u64 sys_geteuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
   return 0;
 }
+/** @brief Get effective group ID (always 0). */
 static u64 sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -892,6 +1069,7 @@ static u64 sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
   return 0;
 }
+/** @brief Futex operation (stub, always returns 0). */
 static u64
     sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
 {
@@ -903,6 +1081,7 @@ static u64
   (void)val3;
   return 0;
 }
+/** @brief Set thread ID address (stub, returns current PID). */
 static u64
     sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
@@ -915,6 +1094,13 @@ static u64
   proc_t *p = proc_current();
   return p ? p->pid : 1;
 }
+/**
+ * @brief Get clock time (stub, returns zero time).
+ *
+ * @param clk Clock ID (ignored).
+ * @param tp  User pointer to timespec output.
+ * @return 0 on success, negative errno on error.
+ */
 static u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)clk;
@@ -933,6 +1119,7 @@ static u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
   ts->ns = 0;
   return 0;
 }
+/** @brief Yield the CPU voluntarily. */
 static u64 sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
@@ -950,6 +1137,14 @@ struct iovec
   void *iov_base;
   u64   iov_len;
 };
+/**
+ * @brief Write from scatter/gather vectors.
+ *
+ * @param fd     File descriptor.
+ * @param iov    User pointer to iovec array.
+ * @param iovcnt Number of iovec elements.
+ * @return Total bytes written, or negative errno.
+ */
 static u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -1020,6 +1215,12 @@ static syscall_fn_t syscall_table[SYS_MAX] = {
     [SYS_ARCH_PRCTL]      = sys_arch_prctl
 };
 
+/**
+ * @brief Dispatch a syscall from the saved register frame.
+ *
+ * @param frame Pointer to saved syscall registers.
+ * @return Syscall return value.
+ */
 // cppcheck-suppress unusedFunction
 u64 syscall_dispatch(syscall_frame_t *frame)
 {

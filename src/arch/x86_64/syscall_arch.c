@@ -13,7 +13,9 @@
 // possible) But syscall.h has them.
 
 /**
- * @brief Read Model Specific Register
+ * @brief Read Model Specific Register.
+ * @param msr MSR index.
+ * @return 64-bit MSR value.
  */
 static inline u64 rdmsr(u32 msr)
 {
@@ -23,7 +25,9 @@ static inline u64 rdmsr(u32 msr)
 }
 
 /**
- * @brief Write Model Specific Register
+ * @brief Write Model Specific Register.
+ * @param msr   MSR index.
+ * @param value 64-bit value to write.
  */
 static inline void wrmsr(u32 msr, u64 value)
 {
@@ -39,7 +43,10 @@ static inline void wrmsr(u32 msr, u64 value)
 #define ARCH_GET_GS 0x1004
 
 /**
- * @brief Set architecture-specific thread state
+ * @brief Set architecture-specific thread state.
+ * @param code Operation (ARCH_SET_FS, ARCH_GET_FS, etc.).
+ * @param addr Address or buffer pointer.
+ * @return 0 on success, negative errno on error.
  */
 u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
 {
@@ -81,7 +88,7 @@ u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
 extern void syscall_entry(void);
 
 /**
- * @brief Initialize syscall mechanism
+ * @brief Initialize syscall mechanism (MSRs + LSTAR entry).
  */
 void syscall_init(void)
 {

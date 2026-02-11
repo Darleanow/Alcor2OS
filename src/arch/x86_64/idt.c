@@ -113,7 +113,7 @@ void exception_handler(interrupt_frame_t *frame)
 }
 
 /**
- * @brief Generic hardware IRQ handler.
+ * @brief Hardware IRQ handler.
  *
  * Dispatches IRQs to their respective device handlers (timer, keyboard, etc.)
  * and sends EOI to the PIC.

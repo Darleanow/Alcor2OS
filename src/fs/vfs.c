@@ -48,7 +48,7 @@ static inline bool is_mounted_fd(i64 fd)
   return fd_table[fd].ops != NULL;
 }
 
-/*
+/**
  * @brief Normalize a path by resolving . and .. components.
  * @param path Path to normalize (modified in place).
  */

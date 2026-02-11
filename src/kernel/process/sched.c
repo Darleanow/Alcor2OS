@@ -109,6 +109,11 @@ static void task_wrapper(void)
   task_exit();
 }
 
+/**
+ * @brief Initialize the scheduler.
+ *
+ * Creates the idle task from the current boot context.
+ */
 void sched_init(void)
 {
   /* Create idle task from current context */
@@ -133,6 +138,14 @@ void sched_init(void)
   console_print("[SCHED] Initialized\n");
 }
 
+/**
+ * @brief Create a new kernel task.
+ *
+ * @param name  Task name.
+ * @param entry Task entry function.
+ * @param arg   Argument passed to entry function.
+ * @return Task ID, or 0 on failure.
+ */
 // cppcheck-suppress unusedFunction
 u64 task_create(const char *name, task_entry_t entry, void *arg)
 {
@@ -183,6 +196,9 @@ u64 task_create(const char *name, task_entry_t entry, void *arg)
   return task->tid;
 }
 
+/**
+ * @brief Voluntarily yield the CPU to the next ready task.
+ */
 void sched_yield(void)
 {
   cpu_disable_interrupts();
