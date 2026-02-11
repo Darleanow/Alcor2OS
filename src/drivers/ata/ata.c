@@ -468,7 +468,6 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
  * @param buf   Output buffer.
  * @return 0 on success, negative errno on failure.
  */
-// cppcheck-suppress unusedFunction
 i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
 {
   if(drive >= 4 || !buf || count == 0)
@@ -495,7 +494,6 @@ i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
  * @param buf   Input buffer.
  * @return 0 on success, negative errno on failure.
  */
-// cppcheck-suppress unusedFunction
 i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
 {
   if(drive >= 4 || !buf || count == 0)
