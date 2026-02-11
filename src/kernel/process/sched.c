@@ -337,3 +337,52 @@ void sched_stats(u64 *task_count, u64 *switches)
   if(switches)
     *switches = context_switches;
 }
+
+/**
+ * @brief Block the current task until unblocked.
+ *
+ * Switches to the next ready task. The blocked task will not be
+ * scheduled until sched_unblock() is called on it.
+ */
+void sched_block(void)
+{
+  cpu_disable_interrupts();
+
+  if(current_task == NULL || current_task == idle_task) {
+    cpu_enable_interrupts();
+    return;
+  }
+
+  /* Mark as blocked */
+  current_task->state = TASK_STATE_BLOCKED;
+
+  /* Find next ready task */
+  task_t *next = find_next_ready();
+
+  /* Switch to it */
+  task_t *prev                  = current_task;
+  current_task                  = next;
+  current_task->state           = TASK_STATE_RUNNING;
+  current_task->ticks_remaining = current_task->time_slice;
+  context_switches++;
+
+  context_switch(&prev->context, current_task->context);
+
+  cpu_enable_interrupts();
+}
+
+/**
+ * @brief Unblock a previously blocked task.
+ *
+ * @param task Task to unblock.
+ */
+void sched_unblock(task_t *task)
+{
+  if(task == NULL)
+    return;
+
+  /* Safe to call from IRQ context - just set state */
+  if(task->state == TASK_STATE_BLOCKED) {
+    task->state = TASK_STATE_READY;
+  }
+}
