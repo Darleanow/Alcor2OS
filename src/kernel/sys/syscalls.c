@@ -466,8 +466,8 @@ typedef struct pipe
 } pipe_t;
 
 #define MAX_PIPES 16
-static pipe_t  pipes[MAX_PIPES];
-static int     pipes_initialized = 0;
+static pipe_t pipes[MAX_PIPES];
+static int    pipes_initialized = 0;
 
 /**
  * @brief Find a pipe associated with a file descriptor.
@@ -730,7 +730,7 @@ static syscall_frame_t *current_syscall_frame = NULL;
 /** @brief Fork the current process.
  * @return Child PID in parent, 0 in child, negative errno on error.
  */
-static u64              sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+static u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;

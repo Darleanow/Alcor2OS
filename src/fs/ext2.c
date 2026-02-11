@@ -1603,7 +1603,8 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   }
 
   for(u32 b = 0; b < gdt_blocks; b++) {
-    if(vol_read_block(vol, gdt_block + b, gdt_buf + (u64)b * vol->block_size) < 0) {
+    if(vol_read_block(vol, gdt_block + b, gdt_buf + (u64)b * vol->block_size) <
+       0) {
       kfree(gdt_buf);
       kfree(vol->groups);
       console_print("[EXT2] Failed to read group descriptors\n");
