@@ -5,9 +5,9 @@ A minimal x86_64 operating system kernel.
 ## Build
 
 ```sh
-make        # Build ISO
-make run    # Run in QEMU
-make clean  # Clean build artifacts
+make           # Build ISO
+make run-disk  # Run in QEMU (auto creates a disk (ext2) and uses it)
+make clean     # Clean build artifacts
 ```
 
 ## Requirements
