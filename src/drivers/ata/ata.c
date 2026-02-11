@@ -1,318 +1,637 @@
 /**
  * @file src/drivers/ata/ata.c
- * @brief ATA/IDE PIO-mode driver implementation.
+ * @brief ATA/IDE disk driver (DMA + PIO fallback, LBA28/48).
+ *
+ * DMA via PCI Bus Master with per-channel bounce buffer.
+ * Falls back to PIO when no scheduler context or DMA unsupported.
  */
 
 #include <alcor2/ata.h>
 #include <alcor2/console.h>
+#include <alcor2/cpu.h>
 #include <alcor2/errno.h>
 #include <alcor2/io.h>
+#include <alcor2/kstdlib.h>
+#include <alcor2/pci.h>
+#include <alcor2/pic.h>
+#include <alcor2/pit.h>
+#include <alcor2/pmm.h>
+#include <alcor2/sched.h>
+#include <alcor2/vmm.h>
 
-/** @brief Drive state for up to 4 ATA devices. */
-static ata_drive_t drives[4];
+#define TIMEOUT_TICKS 500 /* 5 s at 100 Hz */
+#define LBA28_LIMIT   0x10000000ULL
+#define MAX_RETRIES   3
+#define POLL_ITERS    500000
+#define PRD_EOT       0x8000
 
-/**
- * @brief Short delay for ATA operations (~400ns).
- * @param port Status port to read.
- */
-static void ata_delay(u16 port)
+static ata_channel_t channels[2];
+static ata_drive_t   drives[4];
+static void         *bounce_virt[2]; /* DMA bounce buffer (virtual) */
+static u64           bounce_phys[2]; /* DMA bounce buffer (physical) */
+
+static inline u8     reg_read(ata_channel_t *ch, u8 reg)
 {
-  inb(port);
-  inb(port);
-  inb(port);
-  inb(port);
+  return inb(ch->base + reg);
+}
+static inline void reg_write(ata_channel_t *ch, u8 reg, u8 v)
+{
+  outb(ch->base + reg, v);
+}
+static inline u8 alt_status(ata_channel_t *ch)
+{
+  return inb(ch->ctrl);
+}
+
+/* ~400 ns delay (ATA spec after drive select / command issue). */
+static inline void delay_400ns(ata_channel_t *ch)
+{
+  alt_status(ch);
+  alt_status(ch);
+  alt_status(ch);
+  alt_status(ch);
 }
 
 /**
- * @brief Wait for BSY flag to clear.
- * @param port Status port.
+ * @brief Poll until BSY clears.
+ * @param ch    Channel to poll.
+ * @param iters Maximum iterations.
+ * @return Last status byte.
  */
-static void ata_wait_bsy(u16 port)
+static u8 poll_bsy(ata_channel_t *ch, u32 iters)
 {
-  while(inb(port) & ATA_SR_BSY)
-    ;
+  u8 s;
+  for(u32 i = 0; i < iters; i++) {
+    s = reg_read(ch, ATA_REG_STATUS);
+    if(!(s & ATA_SR_BSY))
+      return s;
+  }
+  return s;
 }
 
 /**
- * @brief Wait for drive to be ready for data transfer.
- * @param status_port Status port.
- * @return true if ready, false on error/timeout.
+ * @brief Poll until DRQ asserted (BSY clear).
+ * @param ch    Channel to poll.
+ * @param iters Maximum iterations.
+ * @return true if DRQ set, false on error/timeout.
  */
-static bool ata_wait_ready(u16 status_port)
+static bool poll_drq(ata_channel_t *ch, u32 iters)
 {
-  u32 timeout = 100000;
-  while(timeout--) {
-    u8 status = inb(status_port);
-    if(status & ATA_SR_ERR)
+  for(u32 i = 0; i < iters; i++) {
+    u8 s = reg_read(ch, ATA_REG_STATUS);
+    if(s & (ATA_SR_ERR | ATA_SR_DF))
       return false;
-    if(status & ATA_SR_DF)
-      return false;
-    if(!(status & ATA_SR_BSY) && (status & ATA_SR_DRQ))
+    if(!(s & ATA_SR_BSY) && (s & ATA_SR_DRQ))
       return true;
   }
   return false;
 }
 
 /**
- * @brief Trim trailing spaces from ATA string.
- * @param s String buffer (40 chars).
+ * @brief Select a drive on its channel (master or slave).
+ * @param d Drive to select.
  */
-static void str_trim(char *s)
+static void select_drive(ata_drive_t *d)
 {
-  char *end = s + 40;
-  while(end > s && (*(end - 1) == ' ' || *(end - 1) == '\0')) {
+  reg_write(d->channel, ATA_REG_HDDEVSEL, 0xA0 | (d->slave << 4));
+  delay_400ns(d->channel);
+}
+
+/**
+ * @brief Right-trim spaces and NULs from an ATA identify string.
+ * @param s   String buffer (modified in place).
+ * @param len Maximum length.
+ */
+static void trim_string(char *s, size_t len)
+{
+  char *end = s + len;
+  while(end > s && (end[-1] == ' ' || end[-1] == '\0'))
     end--;
-  }
   *end = '\0';
 }
 
 /**
- * @brief Identify an ATA drive and read its geometry.
- * @param drv Drive structure to populate.
+ * @brief Check whether a device is present (0xFF = floating bus).
+ * @param ch Channel to probe.
+ * @return true if device present.
  */
-static void ata_identify(ata_drive_t *drv)
+static bool channel_exists(ata_channel_t *ch)
 {
-  u16 base = drv->base;
-  u16 ctrl = drv->ctrl;
-
-  /* Select drive */
-  outb(base + 6, drv->drive ? ATA_DRIVE_SLAVE : ATA_DRIVE_MASTER);
-  ata_delay(ctrl);
-
-  /* Clear sector count and LBA registers */
-  outb(base + 2, 0);
-  outb(base + 3, 0);
-  outb(base + 4, 0);
-  outb(base + 5, 0);
-
-  /* Send IDENTIFY command */
-  outb(base + 7, ATA_CMD_IDENTIFY);
-  ata_delay(ctrl);
-
-  /* Check if drive exists */
-  u8 status = inb(base + 7);
-  if(status == 0) {
-    drv->present = false;
-    return;
-  }
-
-  /* Wait for BSY to clear */
-  ata_wait_bsy(base + 7);
-
-  /* Check for ATAPI */
-  u8 lba_mid = inb(base + 4);
-  u8 lba_hi  = inb(base + 5);
-
-  if(lba_mid == 0x14 && lba_hi == 0xEB) {
-    drv->is_atapi = true;
-    drv->present  = true;
-    return; /* ATAPI not fully supported yet */
-  }
-
-  if(lba_mid == 0x3C && lba_hi == 0xC3) {
-    drv->is_atapi = true;
-    drv->present  = true;
-    return;
-  }
-
-  /* Wait for DRQ or error */
-  if(!ata_wait_ready(base + 7)) {
-    drv->present = false;
-    return;
-  }
-
-  /* Read identify data */
-  u16 identify[256];
-  for(int i = 0; i < 256; i++) {
-    identify[i] = inw(base);
-  }
-
-  drv->present  = true;
-  drv->is_atapi = false;
-
-  /* Parse identify data */
-  /* Words 60-61: Total addressable sectors (LBA28) */
-  u32 lba28_sectors = identify[60] | ((u32)identify[61] << 16);
-
-  /* Words 100-103: Total addressable sectors (LBA48) */
-  u64 lba48_sectors = identify[100] | ((u64)identify[101] << 16) |
-                      ((u64)identify[102] << 32) | ((u64)identify[103] << 48);
-
-  drv->sectors = lba48_sectors ? lba48_sectors : lba28_sectors;
-
-  /* Extract model string (words 27-46, byte-swapped) */
-  for(int i = 0; i < 20; i++) {
-    drv->model[(ptrdiff_t)i * 2]     = (char)((identify[27 + i] >> 8) & 0xFF);
-    drv->model[(ptrdiff_t)i * 2 + 1] = (char)(identify[27 + i] & 0xFF);
-  }
-  drv->model[40] = '\0';
-  str_trim(drv->model);
-
-  /* Extract serial (words 10-19, byte-swapped) */
-  for(int i = 0; i < 10; i++) {
-    drv->serial[(ptrdiff_t)i * 2]     = (char)((identify[10 + i] >> 8) & 0xFF);
-    drv->serial[(ptrdiff_t)i * 2 + 1] = (char)(identify[10 + i] & 0xFF);
-  }
-  drv->serial[20] = '\0';
-  str_trim(drv->serial);
+  return reg_read(ch, ATA_REG_STATUS) != 0xFF;
 }
 
 /**
- * @brief Initialize ATA driver and detect all drives
- *
- * Sets up drive structures for primary and secondary channels (master/slave).
- * Identifies each drive and prints detected drives with model and size.
+ * @brief Run IDENTIFY and populate drive descriptor.
+ * @param d Drive descriptor to fill.
  */
+static void identify(ata_drive_t *d)
+{
+  ata_channel_t *ch = d->channel;
+
+  d->present = false;
+  d->atapi   = false;
+  d->lba48   = false;
+  d->dma     = false;
+  d->sectors = 0;
+
+  if(!channel_exists(ch))
+    return;
+
+  select_drive(d);
+
+  reg_write(ch, ATA_REG_SECCOUNT, 0);
+  reg_write(ch, ATA_REG_LBA0, 0);
+  reg_write(ch, ATA_REG_LBA1, 0);
+  reg_write(ch, ATA_REG_LBA2, 0);
+  reg_write(ch, ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
+  delay_400ns(ch);
+
+  u8 status = reg_read(ch, ATA_REG_STATUS);
+  if(status == 0)
+    return;
+
+  status = poll_bsy(ch, 100000);
+  if(status & ATA_SR_BSY)
+    return;
+
+  /* ATAPI signature check */
+  u8 mid = reg_read(ch, ATA_REG_LBA1);
+  u8 hi  = reg_read(ch, ATA_REG_LBA2);
+  if((mid == 0x14 && hi == 0xEB) || (mid == 0x69 && hi == 0x96)) {
+    d->present = true;
+    d->atapi   = true;
+    return;
+  }
+
+  if(!poll_drq(ch, 100000))
+    return;
+
+  u16 id[256];
+  for(int i = 0; i < 256; i++)
+    id[i] = inw(ch->base);
+
+  d->present = true;
+  d->lba48   = !!(id[83] & (1 << 10));
+  d->dma     = !!(id[49] & (1 << 8));
+
+  if(d->lba48) {
+    d->sectors = (u64)id[100] | ((u64)id[101] << 16) | ((u64)id[102] << 32) |
+                 ((u64)id[103] << 48);
+  }
+  if(d->sectors == 0)
+    d->sectors = (u32)id[60] | ((u32)id[61] << 16);
+
+  /* Model (words 27-46) and serial (words 10-19), byte-swapped */
+  for(int i = 0; i < 20; i++) {
+    d->model[i * 2]     = (char)(id[27 + i] >> 8);
+    d->model[i * 2 + 1] = (char)(id[27 + i] & 0xFF);
+  }
+  d->model[40] = '\0';
+  trim_string(d->model, 40);
+
+  for(int i = 0; i < 10; i++) {
+    d->serial[i * 2]     = (char)(id[10 + i] >> 8);
+    d->serial[i * 2 + 1] = (char)(id[10 + i] & 0xFF);
+  }
+  d->serial[20] = '\0';
+  trim_string(d->serial, 20);
+}
+
+/**
+ * @brief Wait for ATA command completion.
+ *
+ * With scheduler: block + wake from IRQ. Early boot: busy-poll.
+ *
+ * @param ch Channel with a pending command.
+ * @return 0 on success, -EIO on error, -ETIMEDOUT on timeout.
+ */
+static i64 wait_irq(ata_channel_t *ch)
+{
+  task_t *me = (task_t *)ch->waiter;
+
+  if(!me) {
+    cpu_enable_interrupts();
+    for(int i = 0; i < POLL_ITERS; i++) {
+      u8 s = alt_status(ch);
+      if(s & (ATA_SR_ERR | ATA_SR_DF))
+        return -EIO;
+      if(!(s & ATA_SR_BSY))
+        return 0;
+    }
+    return -ETIMEDOUT;
+  }
+
+  u64 deadline = pit_get_ticks() + TIMEOUT_TICKS;
+  while(ch->state == ATA_STATE_PENDING) {
+    if(pit_get_ticks() >= deadline) {
+      if(ch->dma_ok)
+        outb(ch->bmi + BMI_CMD, 0);
+      ch->state  = ATA_STATE_IDLE;
+      ch->waiter = NULL;
+      cpu_enable_interrupts();
+      return -ETIMEDOUT;
+    }
+    sched_block();
+    cpu_disable_interrupts();
+  }
+
+  ch->waiter = NULL;
+  cpu_enable_interrupts();
+  return (ch->status & (ATA_SR_ERR | ATA_SR_DF)) ? -EIO : 0;
+}
+
+/**
+ * @brief Prepare a channel for IRQ-driven command completion.
+ * @param ch Channel to prepare.
+ */
+static void prepare_irq_wait(ata_channel_t *ch)
+{
+  cpu_disable_interrupts();
+  ch->state  = ATA_STATE_PENDING;
+  ch->waiter = sched_current();
+}
+
+/**
+ * @brief Program task-file registers for LBA28.
+ * @param d     Target drive.
+ * @param lba   Starting LBA.
+ * @param count Sector count (0 = 256).
+ */
+static void setup_lba28(ata_drive_t *d, u64 lba, u8 count)
+{
+  ata_channel_t *ch = d->channel;
+  reg_write(
+      ch, ATA_REG_HDDEVSEL, 0xE0 | (d->slave << 4) | ((lba >> 24) & 0x0F)
+  );
+  delay_400ns(ch);
+  reg_write(ch, ATA_REG_SECCOUNT, count);
+  reg_write(ch, ATA_REG_LBA0, (u8)(lba));
+  reg_write(ch, ATA_REG_LBA1, (u8)(lba >> 8));
+  reg_write(ch, ATA_REG_LBA2, (u8)(lba >> 16));
+}
+
+/**
+ * @brief Program task-file registers for LBA48 (HOB first).
+ * @param d     Target drive.
+ * @param lba   Starting LBA.
+ * @param count Sector count (0 = 65536).
+ */
+static void setup_lba48(ata_drive_t *d, u64 lba, u16 count)
+{
+  ata_channel_t *ch = d->channel;
+  reg_write(ch, ATA_REG_HDDEVSEL, 0x40 | (d->slave << 4));
+  delay_400ns(ch);
+  reg_write(ch, ATA_REG_SECCOUNT, (u8)(count >> 8));
+  reg_write(ch, ATA_REG_LBA0, (u8)(lba >> 24));
+  reg_write(ch, ATA_REG_LBA1, (u8)(lba >> 32));
+  reg_write(ch, ATA_REG_LBA2, (u8)(lba >> 40));
+  reg_write(ch, ATA_REG_SECCOUNT, (u8)(count));
+  reg_write(ch, ATA_REG_LBA0, (u8)(lba));
+  reg_write(ch, ATA_REG_LBA1, (u8)(lba >> 8));
+  reg_write(ch, ATA_REG_LBA2, (u8)(lba >> 16));
+}
+
+/**
+ * @brief Load PRDT with a single bounce-buffer entry.
+ * @param ch    Channel whose PRDT to program.
+ * @param phys  Physical address of data buffer.
+ * @param bytes Transfer size in bytes.
+ */
+static void setup_prdt(ata_channel_t *ch, u64 phys, u32 bytes)
+{
+  ch->prdt[0].phys_addr  = (u32)phys;
+  ch->prdt[0].byte_count = (u16)(bytes & 0xFFFF);
+  ch->prdt[0].flags      = PRD_EOT;
+  outl(ch->bmi + BMI_PRDT, (u32)ch->prdt_phys);
+}
+
+/**
+ * @brief DMA read/write through bounce buffer with retries.
+ * @param d     Target drive.
+ * @param lba   Starting sector.
+ * @param count Sector count (must fit in one page).
+ * @param buf   Caller's buffer.
+ * @param write true = write, false = read.
+ * @return 0 on success, negative errno on failure.
+ */
+static i64
+    dma_transfer(ata_drive_t *d, u64 lba, u32 count, void *buf, bool write)
+{
+  ata_channel_t *ch    = d->channel;
+  int            cidx  = (ch == &channels[0]) ? 0 : 1;
+  bool           ext   = d->lba48 && (lba + count) >= LBA28_LIMIT;
+  u32            bytes = count * ATA_SECTOR_SIZE;
+
+  if(bytes > PAGE_SIZE)
+    return -EINVAL;
+
+  void *bounce = bounce_virt[cidx];
+  u64   bphys  = bounce_phys[cidx];
+  if(!bounce)
+    return -ENOMEM;
+
+  if(write)
+    kmemcpy(bounce, buf, bytes);
+
+  for(int retry = 0; retry < MAX_RETRIES; retry++) {
+    outb(ch->bmi + BMI_CMD, 0);
+    outb(ch->bmi + BMI_STATUS, BMI_STATUS_IRQ | BMI_STATUS_ERR);
+
+    setup_prdt(ch, bphys, bytes);
+    prepare_irq_wait(ch);
+
+    if(ext) {
+      setup_lba48(d, lba, (u16)count);
+      reg_write(
+          ch, ATA_REG_COMMAND,
+          write ? ATA_CMD_WRITE_DMA_EXT : ATA_CMD_READ_DMA_EXT
+      );
+    } else {
+      setup_lba28(d, lba, (u8)count);
+      reg_write(
+          ch, ATA_REG_COMMAND, write ? ATA_CMD_WRITE_DMA : ATA_CMD_READ_DMA
+      );
+    }
+
+    outb(ch->bmi + BMI_CMD, BMI_CMD_START | (write ? 0 : BMI_CMD_READ));
+    i64 r = wait_irq(ch);
+    outb(ch->bmi + BMI_CMD, 0);
+
+    if(r == 0 && !(ch->bmi_status & BMI_STATUS_ERR)) {
+      if(!write)
+        kmemcpy(buf, bounce, bytes);
+      return 0;
+    }
+  }
+
+  return -EIO;
+}
+
+/**
+ * @brief Read sectors using PIO.
+ * @param d     Target drive.
+ * @param lba   Starting sector.
+ * @param count Number of sectors.
+ * @param buf   Output buffer.
+ * @return 0 on success, negative errno on failure.
+ */
+static i64 pio_read(ata_drive_t *d, u64 lba, u32 count, void *buf)
+{
+  ata_channel_t *ch  = d->channel;
+  u16           *out = (u16 *)buf;
+
+  for(u32 s = 0; s < count; s++) {
+    u64  cur = lba + s;
+    bool ext = d->lba48 && cur >= LBA28_LIMIT;
+    i64  r   = -EIO;
+
+    for(int retry = 0; retry < MAX_RETRIES && r < 0; retry++) {
+      prepare_irq_wait(ch);
+      if(ext) {
+        setup_lba48(d, cur, 1);
+        reg_write(ch, ATA_REG_COMMAND, ATA_CMD_READ_PIO_EXT);
+      } else {
+        setup_lba28(d, cur, 1);
+        reg_write(ch, ATA_REG_COMMAND, ATA_CMD_READ_PIO);
+      }
+      r = wait_irq(ch);
+    }
+
+    if(r < 0)
+      return r;
+
+    for(int i = 0; i < 256; i++)
+      out[s * 256 + i] = inw(ch->base);
+  }
+
+  return 0;
+}
+
+/**
+ * @brief Write sectors using PIO with cache flush.
+ * @param d     Target drive.
+ * @param lba   Starting sector.
+ * @param count Number of sectors.
+ * @param buf   Input buffer.
+ * @return 0 on success, negative errno on failure.
+ */
+static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
+{
+  ata_channel_t *ch  = d->channel;
+  const u16     *src = (const u16 *)buf;
+
+  for(u32 s = 0; s < count; s++) {
+    u64  cur = lba + s;
+    bool ext = d->lba48 && cur >= LBA28_LIMIT;
+    i64  r   = -EIO;
+
+    for(int retry = 0; retry < MAX_RETRIES && r < 0; retry++) {
+      if(ext) {
+        setup_lba48(d, cur, 1);
+        reg_write(ch, ATA_REG_COMMAND, ATA_CMD_WRITE_PIO_EXT);
+      } else {
+        setup_lba28(d, cur, 1);
+        reg_write(ch, ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
+      }
+
+      delay_400ns(ch);
+      delay_400ns(ch);
+
+      if(!(reg_read(ch, ATA_REG_STATUS) & ATA_SR_DRQ)) {
+        r = -EIO;
+        continue;
+      }
+
+      for(int i = 0; i < 256; i++)
+        outw(ch->base, src[s * 256 + i]);
+
+      prepare_irq_wait(ch);
+      reg_write(
+          ch, ATA_REG_COMMAND,
+          ext ? ATA_CMD_CACHE_FLUSH_EXT : ATA_CMD_CACHE_FLUSH
+      );
+      r = wait_irq(ch);
+    }
+
+    if(r < 0)
+      return r;
+  }
+
+  return 0;
+}
+
+/**
+ * @brief Read sectors from an ATA drive (DMA if available, else PIO).
+ * @param idx   Drive index (0-3).
+ * @param lba   Starting sector.
+ * @param count Number of sectors.
+ * @param buf   Output buffer.
+ * @return 0 on success, negative errno on failure.
+ */
+// cppcheck-suppress unusedFunction
+i64 ata_read(u8 idx, u64 lba, u32 count, void *buf)
+{
+  if(idx >= 4 || !buf || count == 0)
+    return -EINVAL;
+
+  ata_drive_t *d = &drives[idx];
+  if(!d->present || d->atapi)
+    return -ENODEV;
+  if(lba + count > d->sectors)
+    return -EINVAL;
+
+  if(d->dma && d->channel->dma_ok && sched_current() &&
+     count <= (PAGE_SIZE / ATA_SECTOR_SIZE))
+    return dma_transfer(d, lba, count, buf, false);
+
+  return pio_read(d, lba, count, buf);
+}
+
+/**
+ * @brief Write sectors to an ATA drive (DMA if available, else PIO).
+ * @param idx   Drive index (0-3).
+ * @param lba   Starting sector.
+ * @param count Number of sectors.
+ * @param buf   Input buffer.
+ * @return 0 on success, negative errno on failure.
+ */
+// cppcheck-suppress unusedFunction
+i64 ata_write(u8 idx, u64 lba, u32 count, const void *buf)
+{
+  if(idx >= 4 || !buf || count == 0)
+    return -EINVAL;
+
+  ata_drive_t *d = &drives[idx];
+  if(!d->present || d->atapi)
+    return -ENODEV;
+  if(lba + count > d->sectors)
+    return -EINVAL;
+
+  if(d->dma && d->channel->dma_ok && sched_current() &&
+     count <= (PAGE_SIZE / ATA_SECTOR_SIZE))
+    return dma_transfer(d, lba, count, (void *)buf, true);
+
+  return pio_write(d, lba, count, buf);
+}
+
+/**
+ * @brief ATA IRQ handler — reading status clears the device's IRQ line.
+ * @param idx Channel index (0 = primary, 1 = secondary).
+ */
+void ata_irq(u8 idx)
+{
+  if(idx >= 2)
+    return;
+
+  ata_channel_t *ch = &channels[idx];
+
+  ch->status = reg_read(ch, ATA_REG_STATUS);
+  ch->error  = (ch->status & ATA_SR_ERR) ? reg_read(ch, ATA_REG_ERROR) : 0;
+
+  if(ch->dma_ok) {
+    ch->bmi_status = inb(ch->bmi + BMI_STATUS);
+    outb(ch->bmi + BMI_STATUS, BMI_STATUS_IRQ | BMI_STATUS_ERR);
+  }
+
+  ch->state = ATA_STATE_IDLE;
+
+  if(ch->waiter)
+    sched_unblock((task_t *)ch->waiter);
+}
+
+/** @brief Detect and configure PCI IDE Bus Master for DMA. */
+static void init_dma(void)
+{
+  pci_device_t ide;
+  if(!pci_find_device(PCI_CLASS_STORAGE, PCI_SUBCLASS_IDE, &ide)) {
+    console_print("[ATA] No IDE controller found, DMA disabled\n");
+    return;
+  }
+
+  pci_enable_bus_master(&ide);
+
+  u16 bar4 = ide.bar[4] & 0xFFFC;
+  if(bar4 == 0) {
+    console_print("[ATA] BAR4 invalid, DMA disabled\n");
+    return;
+  }
+
+  for(int i = 0; i < 2; i++) {
+    channels[i].bmi = bar4 + (i * 8);
+
+    void *prdt_page   = pmm_alloc();
+    void *bounce_page = pmm_alloc();
+    if(!prdt_page || !bounce_page) {
+      console_print("[ATA] Failed to allocate DMA buffers\n");
+      if(prdt_page)
+        pmm_free(prdt_page);
+      if(bounce_page)
+        pmm_free(bounce_page);
+      continue;
+    }
+
+    channels[i].prdt_phys = (u64)prdt_page;
+    channels[i].prdt      = phys_to_virt((u64)prdt_page);
+    channels[i].dma_ok    = true;
+
+    bounce_phys[i] = (u64)bounce_page;
+    bounce_virt[i] = phys_to_virt((u64)bounce_page);
+  }
+
+  console_print("[ATA] DMA enabled\n");
+}
+
+/** @brief Initialize the ATA subsystem (channels, drives, IRQs, DMA). */
 void ata_init(void)
 {
-  /* Initialize drive structures */
-  drives[0].base  = ATA_PRIMARY_DATA;
-  drives[0].ctrl  = ATA_PRIMARY_CTRL;
-  drives[0].drive = 0;
+  channels[0] = (ata_channel_t
+  ) {.base  = ATA_PRIMARY_DATA,
+     .ctrl  = ATA_PRIMARY_CTRL,
+     .irq   = IRQ_ATA_PRIMARY,
+     .state = ATA_STATE_IDLE};
+  channels[1] = (ata_channel_t
+  ) {.base  = ATA_SECONDARY_DATA,
+     .ctrl  = ATA_SECONDARY_CTRL,
+     .irq   = IRQ_ATA_SECONDARY,
+     .state = ATA_STATE_IDLE};
 
-  drives[1].base  = ATA_PRIMARY_DATA;
-  drives[1].ctrl  = ATA_PRIMARY_CTRL;
-  drives[1].drive = 1;
-
-  drives[2].base  = ATA_SECONDARY_DATA;
-  drives[2].ctrl  = ATA_SECONDARY_CTRL;
-  drives[2].drive = 0;
-
-  drives[3].base  = ATA_SECONDARY_DATA;
-  drives[3].ctrl  = ATA_SECONDARY_CTRL;
-  drives[3].drive = 1;
-
-  /* Detect drives */
   for(int i = 0; i < 4; i++) {
-    ata_identify(&drives[i]);
+    drives[i].channel = &channels[i / 2];
+    drives[i].slave   = i % 2;
+  }
 
-    if(drives[i].present && !drives[i].is_atapi) {
+  for(int i = 0; i < 4; i++) {
+    identify(&drives[i]);
+    if(drives[i].present && !drives[i].atapi) {
+      u32 mb = (u32)(drives[i].sectors / 2048);
       console_printf(
-          "[ATA] Drive %d: %s (%d MB)\n", i, drives[i].model,
-          (int)(drives[i].sectors / 2048)
+          "[ATA] Drive %d: %s (%d MB, %s%s)\n", i, drives[i].model, mb,
+          drives[i].lba48 ? "LBA48" : "LBA28", drives[i].dma ? ", DMA" : ""
       );
     }
   }
 
-  console_print("[ATA] Initialized\n");
+  /* Enable device interrupts (nIEN = 0) and drain stale IRQs from IDENTIFY */
+  outb(ATA_PRIMARY_CTRL, 0x00);
+  outb(ATA_SECONDARY_CTRL, 0x00);
+  (void)reg_read(&channels[0], ATA_REG_STATUS);
+  (void)reg_read(&channels[1], ATA_REG_STATUS);
+
+  pic_unmask(IRQ_ATA_PRIMARY);
+  pic_unmask(IRQ_ATA_SECONDARY);
+
+  init_dma();
+  console_print("[ATA] Ready\n");
 }
 
 /**
- * @brief Get drive structure by index
- * @param drive Drive index (0-3)
- * @return Pointer to drive structure, or NULL if invalid
+ * @brief Get drive descriptor by index.
+ * @param idx Drive index (0-3).
+ * @return Drive pointer, or NULL if not present.
  */
-ata_drive_t *ata_get_drive(u8 drive)
+ata_drive_t *ata_get_drive(u8 idx)
 {
-  if(drive >= 4)
+  if(idx >= 4 || !drives[idx].present)
     return NULL;
-  return &drives[drive];
-}
-
-/**
- * @brief Read sectors from ATA drive
- * @param drive_idx Drive index (0-3)
- * @param lba Starting logical block address
- * @param count Number of sectors to read
- * @param buffer Buffer to store read data (must hold count * 512 bytes)
- * @return 0 on success, -1 on error
- */
-i64 ata_read(u8 drive, u64 lba, u32 count, void *buffer)
-{
-  if(drive >= 4)
-    return -EINVAL;
-
-  const ata_drive_t *drv = &drives[drive];
-  if(!drv->present || drv->is_atapi)
-    return -ENODEV;
-
-  u16  base = drv->base;
-  u16 *buf  = (u16 *)buffer;
-
-  for(u32 sector = 0; sector < count; sector++) {
-    u64 current_lba = lba + sector;
-
-    /* Wait for drive to be ready */
-    ata_wait_bsy(base + 7);
-
-    /* Select drive with LBA mode */
-    outb(base + 6, 0xE0 | (drv->drive << 4) | ((current_lba >> 24) & 0x0F));
-
-    /* Send sector count and LBA */
-    outb(base + 2, 1); /* Read 1 sector */
-    outb(base + 3, (u8)(current_lba));
-    outb(base + 4, (u8)(current_lba >> 8));
-    outb(base + 5, (u8)(current_lba >> 16));
-
-    /* Send read command */
-    outb(base + 7, ATA_CMD_READ_PIO);
-
-    /* Wait for data */
-    if(!ata_wait_ready(base + 7)) {
-      return -EIO;
-    }
-
-    /* Read data (256 words = 512 bytes) */
-    for(int i = 0; i < 256; i++) {
-      buf[sector * 256 + i] = inw(base);
-    }
-  }
-
-  return 0;
-}
-
-/**
- * @brief Write sectors to ATA drive
- * @param drive_idx Drive index (0-3)
- * @param lba Starting logical block address
- * @param count Number of sectors to write
- * @param buffer Buffer containing data to write (must hold count * 512 bytes)
- * @return 0 on success, -1 on error
- */
-i64 ata_write(u8 drive, u64 lba, u32 count, const void *buffer)
-{
-  if(drive >= 4)
-    return -EINVAL;
-
-  const ata_drive_t *drv = &drives[drive];
-  if(!drv->present || drv->is_atapi)
-    return -ENODEV;
-
-  u16        base = drv->base;
-  const u16 *buf  = (const u16 *)buffer;
-
-  for(u32 sector = 0; sector < count; sector++) {
-    u64 current_lba = lba + sector;
-
-    /* Wait for drive to be ready */
-    ata_wait_bsy(base + 7);
-
-    /* Select drive with LBA mode */
-    outb(base + 6, 0xE0 | (drv->drive << 4) | ((current_lba >> 24) & 0x0F));
-
-    /* Send sector count and LBA */
-    outb(base + 2, 1);
-    outb(base + 3, (u8)(current_lba));
-    outb(base + 4, (u8)(current_lba >> 8));
-    outb(base + 5, (u8)(current_lba >> 16));
-
-    /* Send write command */
-    outb(base + 7, ATA_CMD_WRITE_PIO);
-
-    /* Wait for DRQ */
-    if(!ata_wait_ready(base + 7)) {
-      return -EIO;
-    }
-
-    /* Write data */
-    for(int i = 0; i < 256; i++) {
-      outw(base, buf[sector * 256 + i]);
-    }
-
-    /* Flush cache */
-    outb(base + 7, ATA_CMD_CACHE_FLUSH);
-    ata_wait_bsy(base + 7);
-  }
-
-  return 0;
+  return &drives[idx];
 }
