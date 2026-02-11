@@ -71,6 +71,8 @@ static void print_banner(void)
  * @brief Initialize early boot subsystems.
  *
  * Sets up console, memory managers, and heap.
+ *
+ * @param fb Limine framebuffer for console output.
  */
 static void init_early(struct limine_framebuffer *fb)
 {

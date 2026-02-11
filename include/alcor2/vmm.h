@@ -132,11 +132,16 @@ static inline u64 virt_to_phys(void *virt)
 
 /**
  * @brief Check if pointer is in user space.
+ * @param ptr Pointer to check.
+ * @return true if in user address range.
  */
 bool vmm_is_user_ptr(const void *ptr);
 
 /**
  * @brief Check if range is in user space.
+ * @param ptr  Start of range.
+ * @param size Size in bytes.
+ * @return true if entire range is in user address space.
  */
 bool vmm_is_user_range(const void *ptr, u64 size);
 

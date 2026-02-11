@@ -110,6 +110,24 @@ void task_exit(void);
 task_t *sched_current(void);
 
 /**
+ * @brief Block the current task and yield to another.
+ *
+ * Sets current task state to BLOCKED and switches to next ready task.
+ * Task will not run until unblocked with sched_unblock().
+ */
+void sched_block(void);
+
+/**
+ * @brief Unblock a blocked task.
+ *
+ * Sets task state to READY so it can be scheduled again.
+ * Safe to call from interrupt context.
+ *
+ * @param task Task to unblock.
+ */
+void sched_unblock(task_t *task);
+
+/**
  * @brief Get scheduler statistics.
  * @param task_count Output: number of tasks.
  * @param switches Output: number of context switches.

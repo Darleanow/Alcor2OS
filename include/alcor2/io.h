@@ -55,6 +55,28 @@ static inline u16 inw(u16 port)
 }
 
 /**
+ * @brief Write a dword to an I/O port.
+ * @param port I/O port number.
+ * @param val Value to write.
+ */
+static inline void outl(u16 port, u32 val)
+{
+  __asm__ volatile("outl %0, %1" : : "a"(val), "Nd"(port));
+}
+
+/**
+ * @brief Read a dword from an I/O port.
+ * @param port I/O port number.
+ * @return Value read from port.
+ */
+static inline u32 inl(u16 port)
+{
+  u32 val;
+  __asm__ volatile("inl %1, %0" : "=a"(val) : "Nd"(port));
+  return val;
+}
+
+/**
  * @brief Short I/O delay (write to port 0x80).
  */
 static inline void io_wait(void)

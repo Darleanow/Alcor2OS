@@ -156,6 +156,12 @@ static void coalesce(heap_block_t *block)
   }
 }
 
+/**
+ * @brief Initialize the kernel heap allocator.
+ *
+ * Expands the heap by the initial page count and sets up
+ * the first free block.
+ */
 void heap_init(void)
 {
   if(heap_expand(HEAP_INITIAL_PAGES) != 0) {
@@ -355,12 +361,9 @@ void *krealloc(void *ptr, u64 new_size)
 /**
  * @brief Get heap statistics.
  *
- * Returns total heap size, used memory, and free memory.
- * Any parameter can be NULL if that statistic is not needed.
+ * Fills the stats structure with total, used, and free heap sizes.
  *
- * @param total Output pointer for total heap size in bytes (can be NULL).
- * @param used Output pointer for used heap size in bytes (can be NULL).
- * @param free_mem Output pointer for free heap size in bytes (can be NULL).
+ * @param stats Output structure for heap statistics (can be NULL).
  */
 // cppcheck-suppress unusedFunction
 void heap_stats(heap_stats_t *stats)

@@ -3,6 +3,7 @@
  * @brief Interrupt Descriptor Table and exception handlers.
  */
 
+#include <alcor2/ata.h>
 #include <alcor2/console.h>
 #include <alcor2/cpu.h>
 #include <alcor2/idt.h>
@@ -113,7 +114,7 @@ void exception_handler(interrupt_frame_t *frame)
 }
 
 /**
- * @brief Generic hardware IRQ handler.
+ * @brief Hardware IRQ handler.
  *
  * Dispatches IRQs to their respective device handlers (timer, keyboard, etc.)
  * and sends EOI to the PIC.
@@ -129,6 +130,12 @@ void irq_handler(u8 irq)
     break;
   case IRQ_KEYBOARD:
     keyboard_irq();
+    break;
+  case IRQ_ATA_PRIMARY:
+    ata_irq(0);
+    break;
+  case IRQ_ATA_SECONDARY:
+    ata_irq(1);
     break;
   default:
     break;

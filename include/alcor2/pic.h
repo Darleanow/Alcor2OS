@@ -16,6 +16,12 @@
 /** @brief IRQ number for PS/2 keyboard. */
 #define IRQ_KEYBOARD 1
 
+/** @brief IRQ number for ATA primary channel. */
+#define IRQ_ATA_PRIMARY 14
+
+/** @brief IRQ number for ATA secondary channel. */
+#define IRQ_ATA_SECONDARY 15
+
 /**
  * @brief Initialize and remap the PIC.
  */

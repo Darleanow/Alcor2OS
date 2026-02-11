@@ -1517,6 +1517,11 @@ static void path_split(const char *path, char *parent, char *name)
   }
 }
 
+/**
+ * @brief Initialize the ext2 filesystem driver.
+ *
+ * Clears volume/file pools and registers ext2 with the VFS.
+ */
 void ext2_init(void)
 {
   kzero(g_volumes, sizeof(g_volumes));
@@ -1524,6 +1529,15 @@ void ext2_init(void)
   vfs_register_fs(&g_ext2_fstype);
 }
 
+/**
+ * @brief Mount an ext2 partition.
+ *
+ * Reads the superblock and group descriptors from disk.
+ *
+ * @param drive ATA drive number.
+ * @param partition_lba LBA offset of the partition.
+ * @return Volume handle, or NULL on failure.
+ */
 ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
 {
   /* Find free volume slot */
@@ -1575,13 +1589,13 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   u32 gdt_size   = vol->groups_count * sizeof(ext2_group_desc_t);
   u32 gdt_blocks = (gdt_size + vol->block_size - 1) / vol->block_size;
 
-  vol->groups = kmalloc(vol->groups_count * sizeof(ext2_group_desc_t));
+  vol->groups = kmalloc((u64)vol->groups_count * sizeof(ext2_group_desc_t));
   if(!vol->groups) {
     console_print("[EXT2] Failed to allocate group descriptors\n");
     return NULL;
   }
 
-  u8 *gdt_buf = kmalloc(gdt_blocks * vol->block_size);
+  u8 *gdt_buf = kmalloc((u64)gdt_blocks * vol->block_size);
   if(!gdt_buf) {
     kfree(vol->groups);
     console_print("[EXT2] Failed to allocate GDT buffer\n");
@@ -1589,7 +1603,8 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   }
 
   for(u32 b = 0; b < gdt_blocks; b++) {
-    if(vol_read_block(vol, gdt_block + b, gdt_buf + b * vol->block_size) < 0) {
+    if(vol_read_block(vol, gdt_block + b, gdt_buf + (u64)b * vol->block_size) <
+       0) {
       kfree(gdt_buf);
       kfree(vol->groups);
       console_print("[EXT2] Failed to read group descriptors\n");
@@ -1610,6 +1625,13 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   return vol;
 }
 
+/**
+ * @brief Unmount an ext2 volume.
+ *
+ * Flushes metadata and frees group descriptor memory.
+ *
+ * @param vol Volume to unmount.
+ */
 void ext2_unmount(ext2_volume_t *vol)
 {
   if(!vol || !vol->mounted)
@@ -1627,6 +1649,13 @@ void ext2_unmount(ext2_volume_t *vol)
   vol->mounted = false;
 }
 
+/**
+ * @brief Open a file or directory on an ext2 volume.
+ *
+ * @param vol  Volume handle.
+ * @param path Path to open.
+ * @return File handle, or NULL on failure.
+ */
 ext2_file_t *ext2_open(ext2_volume_t *vol, const char *path)
 {
   if(!vol || !vol->mounted || !path)
@@ -1663,6 +1692,13 @@ ext2_file_t *ext2_open(ext2_volume_t *vol, const char *path)
   return file;
 }
 
+/**
+ * @brief Close an ext2 file handle.
+ *
+ * Writes back dirty inode data before releasing the handle.
+ *
+ * @param file File handle to close.
+ */
 void ext2_close(ext2_file_t *file)
 {
   if(!file || !file->in_use)
@@ -1676,6 +1712,14 @@ void ext2_close(ext2_file_t *file)
   file->in_use = false;
 }
 
+/**
+ * @brief Read data from an ext2 file.
+ *
+ * @param file  Open file handle.
+ * @param buf   Destination buffer.
+ * @param count Maximum bytes to read.
+ * @return Bytes read, or negative errno on error.
+ */
 i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
 {
   if(!file || !file->in_use || file->is_dir)
@@ -1730,6 +1774,16 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
   return (i64)bytes_read;
 }
 
+/**
+ * @brief Write data to an ext2 file.
+ *
+ * Allocates new blocks as needed and extends the file.
+ *
+ * @param file  Open file handle.
+ * @param buf   Source buffer.
+ * @param count Number of bytes to write.
+ * @return Bytes written, or negative errno on error.
+ */
 i64 ext2_write(ext2_file_t *file, const void *buf, u64 count)
 {
   if(!file || !file->in_use || file->is_dir)
@@ -1801,6 +1855,13 @@ i64 ext2_write(ext2_file_t *file, const void *buf, u64 count)
   return (i64)bytes_written;
 }
 
+/**
+ * @brief Read the next directory entry.
+ *
+ * @param dir   Open directory handle.
+ * @param entry Output entry structure.
+ * @return 1 if an entry was read, 0 at end, or negative errno on error.
+ */
 i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry)
 {
   if(!dir || !dir->in_use || !dir->is_dir)
@@ -1868,6 +1929,14 @@ i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry)
   return 0;
 }
 
+/**
+ * @brief Get file status information.
+ *
+ * @param vol   Volume handle.
+ * @param path  Path to the file or directory.
+ * @param entry Output entry with inode, size, and type.
+ * @return 0 on success, negative errno on error.
+ */
 i64 ext2_stat(const ext2_volume_t *vol, const char *path, ext2_entry_t *entry)
 {
   if(!vol || !vol->mounted || !path || !entry)
@@ -1925,6 +1994,14 @@ i64 ext2_stat(const ext2_volume_t *vol, const char *path, ext2_entry_t *entry)
   return 0;
 }
 
+/**
+ * @brief Seek to a position in an ext2 file.
+ *
+ * @param file   Open file handle.
+ * @param offset Seek offset.
+ * @param whence Seek mode (0=SET, 1=CUR, 2=END).
+ * @return New position, or negative errno on error.
+ */
 i64 ext2_seek(ext2_file_t *file, i64 offset, i32 whence)
 {
   if(!file || !file->in_use)
@@ -1952,6 +2029,15 @@ i64 ext2_seek(ext2_file_t *file, i64 offset, i32 whence)
   return (i64)file->position;
 }
 
+/**
+ * @brief Create a new file on an ext2 volume.
+ *
+ * If the file already exists, opens it instead.
+ *
+ * @param vol  Volume handle.
+ * @param path Path for the new file.
+ * @return File handle, or NULL on failure.
+ */
 ext2_file_t *ext2_create(ext2_volume_t *vol, const char *path)
 {
   if(!vol || !vol->mounted || !path)
@@ -2038,6 +2124,13 @@ ext2_file_t *ext2_create(ext2_volume_t *vol, const char *path)
   return file;
 }
 
+/**
+ * @brief Create a directory on an ext2 volume.
+ *
+ * @param vol  Volume handle.
+ * @param path Path for the new directory.
+ * @return 0 on success, negative errno on error.
+ */
 i64 ext2_mkdir(ext2_volume_t *vol, const char *path)
 {
   if(!vol || !vol->mounted || !path)
@@ -2150,6 +2243,14 @@ i64 ext2_mkdir(ext2_volume_t *vol, const char *path)
   return 0;
 }
 
+/**
+ * @brief Truncate an ext2 file to zero length.
+ *
+ * Frees all data blocks and resets the file position.
+ *
+ * @param file Open file handle.
+ * @return 0 on success, negative errno on error.
+ */
 i64 ext2_truncate(ext2_file_t *file)
 {
   if(!file || !file->in_use || file->is_dir)
@@ -2170,6 +2271,12 @@ i64 ext2_truncate(ext2_file_t *file)
   return flush_metadata(vol);
 }
 
+/**
+ * @brief Flush a file's dirty inode and metadata to disk.
+ *
+ * @param file Open file handle.
+ * @return 0 on success, negative errno on error.
+ */
 i64 ext2_flush(ext2_file_t *file)
 {
   if(!file || !file->in_use)
@@ -2188,6 +2295,15 @@ i64 ext2_flush(ext2_file_t *file)
   return 0;
 }
 
+/**
+ * @brief Remove a file from an ext2 volume.
+ *
+ * Decrements the link count; frees blocks/inode when it reaches zero.
+ *
+ * @param vol  Volume handle.
+ * @param path Path to the file.
+ * @return 0 on success, negative errno on error.
+ */
 i64 ext2_unlink(ext2_volume_t *vol, const char *path)
 {
   if(!vol || !vol->mounted || !path)
@@ -2232,6 +2348,13 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
   return 0;
 }
 
+/**
+ * @brief Remove an empty directory from an ext2 volume.
+ *
+ * @param vol  Volume handle.
+ * @param path Path to the directory.
+ * @return 0 on success, negative errno on error.
+ */
 i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
 {
   if(!vol || !vol->mounted || !path)
@@ -2431,6 +2554,11 @@ static const fs_type_t g_ext2_fstype = {
 };
 /** @} */
 
+/**
+ * @brief Get ext2 VFS operations table.
+ * @return Pointer to ext2 fs_ops_t structure.
+ */
+// cppcheck-suppress unusedFunction
 const fs_ops_t *ext2_get_ops(void)
 {
   return &g_ext2_vfs_ops;

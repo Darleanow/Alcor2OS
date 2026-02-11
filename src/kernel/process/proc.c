@@ -109,6 +109,18 @@ static u64 push_string(u64 sp, const char *str)
   return sp;
 }
 
+/**
+ * @brief Create a new process from an ELF binary.
+ *
+ * Allocates a process slot, sets up the address space, loads the ELF,
+ * and prepares it for scheduling.
+ *
+ * @param name     Process name.
+ * @param elf_data Pointer to ELF file data.
+ * @param elf_size Size of the ELF data in bytes.
+ * @param argv     Null-terminated argument array.
+ * @return PID of the new process, or 0 on failure.
+ */
 u64 proc_create(
     const char *name, const void *elf_data, u64 elf_size, char *const argv[]
 )
