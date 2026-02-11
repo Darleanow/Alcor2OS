@@ -135,9 +135,6 @@ bool pci_find_device(u8 class_code, u8 subclass, pci_device_t *dev);
  * @brief Enable bus mastering for a PCI device.
  * @param dev Device to configure.
  */
-void pci_enable_bus_master(pci_device_t *dev);
-
-/** @brief Initialize PCI subsystem. */
-void pci_init(void);
+void pci_enable_bus_master(const pci_device_t *dev);
 
 #endif
