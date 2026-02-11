@@ -1589,7 +1589,7 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   u32 gdt_size   = vol->groups_count * sizeof(ext2_group_desc_t);
   u32 gdt_blocks = (gdt_size + vol->block_size - 1) / vol->block_size;
 
-  vol->groups = kmalloc(vol->groups_count * sizeof(ext2_group_desc_t));
+  vol->groups = kmalloc((u64)vol->groups_count * sizeof(ext2_group_desc_t));
   if(!vol->groups) {
     console_print("[EXT2] Failed to allocate group descriptors\n");
     return NULL;
@@ -1603,7 +1603,7 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   }
 
   for(u32 b = 0; b < gdt_blocks; b++) {
-    if(vol_read_block(vol, gdt_block + b, gdt_buf + b * vol->block_size) < 0) {
+    if(vol_read_block(vol, gdt_block + b, gdt_buf + (u64)b * vol->block_size) < 0) {
       kfree(gdt_buf);
       kfree(vol->groups);
       console_print("[EXT2] Failed to read group descriptors\n");
@@ -2553,6 +2553,11 @@ static const fs_type_t g_ext2_fstype = {
 };
 /** @} */
 
+/**
+ * @brief Get ext2 VFS operations table.
+ * @return Pointer to ext2 fs_ops_t structure.
+ */
+// cppcheck-suppress unusedFunction
 const fs_ops_t *ext2_get_ops(void)
 {
   return &g_ext2_vfs_ops;
