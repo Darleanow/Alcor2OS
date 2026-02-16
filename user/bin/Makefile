@@ -5,7 +5,7 @@
 include ../common.mk
 
 OUT_DIR := $(BUILD_DIR)/bin
-BINS    := ls cat echo pwd mkdir touch rm
+BINS    := ls cat echo pwd mkdir touch rm wc
 TARGETS := $(patsubst %,$(OUT_DIR)/%.elf,$(BINS))
 
 .PHONY: all clean
