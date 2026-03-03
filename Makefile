@@ -8,8 +8,14 @@ INCLUDE     := include
 DISK        := disk.img
 DISK_SIZE   := 32M
 
-CC          := gcc
-LD          := ld
+UNAME       := $(shell uname -s)
+ifeq ($(UNAME), Darwin)
+    CC      := x86_64-elf-gcc
+    LD      := x86_64-elf-ld
+else
+    CC      := gcc
+    LD      := ld
+endif
 AS          := nasm
 
 CFLAGS      := -std=gnu11 -Wall -Wextra -Werror \
