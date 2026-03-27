@@ -11,6 +11,18 @@
 #define FONT_W 8
 #define FONT_H 16
 
+/** @brief Standard ANSI 8-color palette (RGB). Index matches ANSI color code - 30/40. */
+static const u32 ansi_colors[8] = {
+  0x000000, /* 0: black   */
+  0xAA0000, /* 1: red     */
+  0x00AA00, /* 2: green   */
+  0xAA5500, /* 3: yellow  */
+  0x0000AA, /* 4: blue    */
+  0xAA00AA, /* 5: magenta */
+  0x00AAAA, /* 6: cyan    */
+  0xAAAAAA, /* 7: white   */
+};
+
 /** @brief Console state and framebuffer context. */
 static struct
 {
@@ -22,6 +34,8 @@ static struct
   u32           cursor_y;    /**< Cursor Y (chars) */
   u32           fg;          /**< Foreground color */
   u32           bg;          /**< Background color */
+  u32           default_fg;  /**< Default foreground (reset target) */
+  u32           default_bg;  /**< Default background (reset target) */
   int           esc_state;   /**< ANSI parser: 0=normal, 1=ESC, 2=[ */
   char          esc_buf[16]; /**< ANSI escape buffer */
   int           esc_len;     /**< ANSI buffer length */
@@ -42,8 +56,10 @@ void console_init(void *fb, u64 width, u64 height, u64 pitch)
   ctx.pitch    = pitch / sizeof(u32);
   ctx.cursor_x = 0;
   ctx.cursor_y = 0;
-  ctx.fg       = 0xFFFFFF;
-  ctx.bg       = 0x000000;
+  ctx.fg         = 0xFFFFFF;
+  ctx.bg         = 0x000000;
+  ctx.default_fg = ctx.fg;
+  ctx.default_bg = ctx.bg;
 }
 
 /**
@@ -53,8 +69,10 @@ void console_init(void *fb, u64 width, u64 height, u64 pitch)
 // cppcheck-suppress unusedFunction
 void console_set_theme(console_theme_t theme)
 {
-  ctx.fg = theme.foreground;
-  ctx.bg = theme.background;
+  ctx.fg         = theme.foreground;
+  ctx.bg         = theme.background;
+  ctx.default_fg = ctx.fg;
+  ctx.default_bg = ctx.bg;
 }
 
 /**
@@ -161,6 +179,43 @@ static void handle_ansi_sequence(void)
       }
     }
     break;
+  case 'm': /* SGR – Select Graphic Rendition */
+  {
+    int params[8];
+    int nparams = 0;
+    int val     = 0;
+    int has_val = 0;
+
+    for(int i = 0; i < ctx.esc_len - 1 && nparams < 8; i++) {
+      char ch = ctx.esc_buf[i];
+      if(ch >= '0' && ch <= '9') {
+        val     = val * 10 + (ch - '0');
+        has_val = 1;
+      } else if(ch == ';') {
+        params[nparams++] = has_val ? val : 0;
+        val               = 0;
+        has_val           = 0;
+      }
+    }
+    params[nparams++] = has_val ? val : 0; /* last / only param */
+
+    for(int i = 0; i < nparams; i++) {
+      int p = params[i];
+      if(p == 0) {
+        ctx.fg = ctx.default_fg;
+        ctx.bg = ctx.default_bg;
+      } else if(p >= 30 && p <= 37) {
+        ctx.fg = ansi_colors[p - 30];
+      } else if(p == 39) {
+        ctx.fg = ctx.default_fg;
+      } else if(p >= 40 && p <= 47) {
+        ctx.bg = ansi_colors[p - 40];
+      } else if(p == 49) {
+        ctx.bg = ctx.default_bg;
+      }
+    }
+    break;
+  }
   default:
     break;
   }
