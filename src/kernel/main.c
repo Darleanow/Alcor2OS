@@ -1,6 +1,10 @@
 /**
  * @file src/kernel/main.c
- * @brief Kernel entry point and initialization.
+ * @brief Kernel entry point and bring-up sequence.
+ *
+ * Typical order: console → PMM (Limine map) → VMM (HHDM) → GDT/IDT → PIC/PIT → kernel heap →
+ * ATA disk → ext2 volume on `/` → VFS → keyboard → syscall MSRs → scheduler → first user
+ * program (shell or binary from module).
  */
 
 #include <alcor2/drivers/ata.h>

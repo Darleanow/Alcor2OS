@@ -1,16 +1,16 @@
 /**
  * @file src/arch/x86_64/syscall_arch.c
- * @brief Architecture-specific syscall setup (MSRs, etc).
+ * @brief Syscall hardware setup (STAR/LSTAR/SFMASK MSRs, `syscall_init`).
+ *
+ * Shared MSR constants live in `syscall.h`; this file only provides local `rdmsr` / `wrmsr` and
+ * programs the MSRs for 64-bit SYSRET.
  */
 
-#include <alcor2/console.h>
-#include <alcor2/cpu.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/arch/cpu.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/proc.h>
-#include <alcor2/syscall.h>
-
-// MSR Definitions (duplicated here or from header, better to rely on header if
-// possible) But syscall.h has them.
+#include <alcor2/proc/proc.h>
+#include <alcor2/sys/syscall.h>
 
 /**
  * @brief Read Model Specific Register.
