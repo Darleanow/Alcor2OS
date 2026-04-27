@@ -1,5 +1,6 @@
 /**
- * Alcor2 Shell - String Utilities
+ * @file user/shell/str.c
+ * @brief Small string helpers for the shell
  */
 
 #include "shell.h"

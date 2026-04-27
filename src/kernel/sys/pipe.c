@@ -1,6 +1,9 @@
 /**
  * @file src/kernel/sys/pipe.c
- * @brief Minimal anonymous pipe implementation for syscall layer.
+ * @brief Anonymous pipes (ring buffer) for `pipe`, `read`, `write`, and `close`.
+ *
+ * Read/write FDs are allocated in a dedicated range (`PIPE_FD_MIN`…`PIPE_FD_MAX`) so they do
+ * not collide with normal VFS FDs. `sys_read` and `sys_write` delegate here when the FD is a pipe.
  */
 
 #include <alcor2/errno.h>

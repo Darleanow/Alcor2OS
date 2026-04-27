@@ -1,6 +1,9 @@
 /**
  * @file src/mm/vmm.c
- * @brief Virtual memory manager (x86_64 paging).
+ * @brief x86_64 virtual memory manager (PML4 → PT, address-space clone, tear down user maps).
+ *
+ * Provides `vmm_map` / `vmm_unmap`, fork-time clone, and `vmm_map_range_alloc` to map a run of
+ * pages while reusing page-table levels already walked.
  */
 
 #include <alcor2/kstdlib.h>

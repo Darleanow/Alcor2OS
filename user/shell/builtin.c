@@ -1,7 +1,6 @@
 /**
- * Alcor2 Shell - Builtin Commands
- *
- * Commands that run in the shell process itself.
+ * @file user/shell/builtin.c
+ * @brief Built-in commands (`cd`, `exit`, `help`, …) run in-process without `execve`.
  */
 
 #include "shell.h"

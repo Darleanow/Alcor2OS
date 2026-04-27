@@ -1,7 +1,6 @@
 /**
- * Alcor2 Shell - Main Entry Point
- *
- * A clean, modular shell for Alcor2 OS.
+ * @file user/shell/main.c
+ * @brief Shell main loop: read line, parse, builtins or `execve` of `/bin` programs.
  */
 
 #include "shell.h"

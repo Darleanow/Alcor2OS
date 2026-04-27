@@ -1,6 +1,6 @@
 /**
- * @file src/kernel/kstdlib.c
- * @brief Kernel micro standard library implementation.
+ * @file src/lib/kstdlib.c
+ * @brief Kernel micro-library implementation (strings, memory).
  */
 
 #include <alcor2/kstdlib.h>
@@ -44,7 +44,7 @@ void *kmemset(void *dst, int val, u64 n)
 /**
  * @brief Zero-fill a memory region.
  *
- * Thin wrapper over kmemset for the common val=0 case.
+ * Same @c rep stosb sequence as @c kmemset(..., 0, n) without an extra function call.
  *
  * @param dst Destination buffer.
  * @param n   Number of bytes to zero.
