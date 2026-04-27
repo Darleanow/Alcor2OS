@@ -1,0 +1,92 @@
+/**
+ * @file src/kernel/sys/sys_dispatch.c
+ * @brief Syscall dispatcher and syscall table.
+ */
+
+#include <alcor2/errno.h>
+#include <alcor2/proc/sched.h>
+#include <alcor2/sys/internal.h>
+
+static syscall_frame_t *g_current_syscall_frame = NULL;
+
+syscall_frame_t *syscall_get_current_frame(void)
+{
+  return g_current_syscall_frame;
+}
+
+static const syscall_fn_t g_syscall_table[SYS_MAX] = {
+    [SYS_READ]            = sys_read,
+    [SYS_WRITE]           = sys_write,
+    [SYS_OPEN]            = sys_open,
+    [SYS_CLOSE]           = sys_close,
+    [SYS_STAT]            = sys_stat,
+    [SYS_FSTAT]           = sys_fstat,
+    [SYS_LSTAT]           = sys_lstat,
+    [SYS_LSEEK]           = sys_lseek,
+    [SYS_MMAP]            = sys_mmap,
+    [SYS_MPROTECT]        = sys_mprotect,
+    [SYS_MUNMAP]          = sys_munmap,
+    [SYS_BRK]             = sys_brk,
+    [SYS_RT_SIGACTION]    = sys_rt_sigaction,
+    [SYS_RT_SIGPROCMASK]  = sys_rt_sigprocmask,
+    [SYS_RT_SIGRETURN]    = sys_rt_sigreturn,
+    [SYS_IOCTL]           = sys_ioctl,
+    [SYS_PREAD64]         = sys_pread64,
+    [SYS_PWRITE64]        = sys_pwrite64,
+    [SYS_WRITEV]          = sys_writev,
+    [SYS_ACCESS]          = sys_access,
+    [SYS_PIPE]            = sys_pipe,
+    [SYS_SCHED_YIELD]     = sys_sched_yield,
+    [SYS_DUP]             = sys_dup,
+    [SYS_DUP2]            = sys_dup2,
+    [SYS_NANOSLEEP]       = sys_nanosleep,
+    [SYS_GETPID]          = sys_getpid,
+    [SYS_CLONE]           = sys_clone,
+    [SYS_FORK]            = sys_fork,
+    [SYS_EXECVE]          = sys_execve,
+    [SYS_EXIT]            = sys_exit,
+    [SYS_WAIT4]           = sys_wait4,
+    [SYS_KILL]            = sys_kill,
+    [SYS_UNAME]           = sys_uname,
+    [SYS_FCNTL]           = sys_fcntl,
+    [SYS_FTRUNCATE]       = sys_ftruncate,
+    [SYS_GETDENTS]        = sys_getdents,
+    [SYS_GETCWD]          = sys_getcwd,
+    [SYS_CHDIR]           = sys_chdir,
+    [SYS_RENAME]          = sys_rename,
+    [SYS_MKDIR]           = sys_mkdir,
+    [SYS_RMDIR]           = sys_rmdir,
+    [SYS_CREAT]           = sys_creat,
+    [SYS_SYMLINK]         = sys_symlink,
+    [SYS_UNLINK]          = sys_unlink,
+    [SYS_READLINK]        = sys_readlink,
+    [SYS_GETTIMEOFDAY]    = sys_gettimeofday,
+    [SYS_GETUID]          = sys_getuid,
+    [SYS_GETGID]          = sys_getgid,
+    [SYS_GETEUID]         = sys_geteuid,
+    [SYS_GETEGID]         = sys_getegid,
+    [SYS_GETPPID]         = sys_getppid,
+    [SYS_ARCH_PRCTL]      = sys_arch_prctl,
+    [SYS_GETTID]          = sys_gettid,
+    [SYS_FUTEX]           = sys_futex,
+    [SYS_SET_TID_ADDRESS] = sys_set_tid_address,
+    [SYS_CLOCK_GETTIME]   = sys_clock_gettime,
+    [SYS_EXIT_GROUP]      = sys_exit,
+    [SYS_GETDENTS64]      = sys_getdents64,
+    [SYS_OPENAT]          = sys_openat,
+};
+
+u64 syscall_dispatch(syscall_frame_t *frame)
+{
+  u64 num = frame->rax;
+  if(num >= SYS_MAX || g_syscall_table[num] == NULL)
+    return (u64)-ENOSYS;
+
+  g_current_syscall_frame = frame;
+  u64 result = g_syscall_table[num](
+      frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
+  );
+  g_current_syscall_frame = NULL;
+  sched_check_resched();
+  return result;
+}
