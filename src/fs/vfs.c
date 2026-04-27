@@ -3,12 +3,12 @@
  * @brief Virtual File System (ramfs + mountable filesystems).
  */
 
-#include <alcor2/console.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
-#include <alcor2/heap.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/proc.h>
-#include <alcor2/vfs.h>
+#include <alcor2/proc/proc.h>
+#include <alcor2/fs/vfs.h>
 
 #define VFS_MAX_MOUNTS  8
 #define VFS_MAX_FSTYPES 8
@@ -1088,6 +1088,163 @@ i64 vfs_rmdir(const char *path)
 
   kfree(node);
   return 0;
+}
+
+/**
+ * @brief Duplicate a file descriptor to the lowest free slot (>= 3).
+ *
+ * Both the old and the new descriptor share the same node pointer and
+ * start with the same offset (POSIX: they share the open file description).
+ *
+ * @param oldfd Source file descriptor.
+ * @return New fd on success, -EBADF / -EMFILE on error.
+ */
+i64 vfs_dup(i64 oldfd)
+{
+  if(oldfd < 0 || oldfd >= VFS_MAX_FD || !fd_table[oldfd].in_use)
+    return -EBADF;
+
+  for(i64 i = 3; i < VFS_MAX_FD; i++) {
+    if(!fd_table[i].in_use) {
+      fd_table[i] = fd_table[oldfd];
+      return i;
+    }
+  }
+  return -EMFILE;
+}
+
+/**
+ * @brief Duplicate a file descriptor to a specific slot.
+ *
+ * Closes newfd first if it is already open. If oldfd == newfd, returns
+ * immediately without any side-effects.
+ *
+ * @param oldfd Source file descriptor.
+ * @param newfd Target file descriptor.
+ * @return newfd on success, -EBADF on error.
+ */
+i64 vfs_dup2(i64 oldfd, i64 newfd)
+{
+  if(oldfd < 0 || oldfd >= VFS_MAX_FD || !fd_table[oldfd].in_use)
+    return -EBADF;
+  if(newfd < 0 || newfd >= VFS_MAX_FD)
+    return -EBADF;
+  if(oldfd == newfd)
+    return newfd;
+
+  if(fd_table[newfd].in_use)
+    vfs_close(newfd);
+
+  fd_table[newfd] = fd_table[oldfd];
+  return newfd;
+}
+
+/**
+ * @brief Get file statistics from an open file descriptor.
+ *
+ * For ramfs files the node size and type are returned directly.
+ * For mounted-filesystem files the file size is obtained by seeking to
+ * the end and back.
+ *
+ * @param fd   Open file descriptor.
+ * @param st   Output stat buffer.
+ * @return 0 on success, -EBADF on error.
+ */
+i64 vfs_fstat_fd(i64 fd, vfs_stat_t *st)
+{
+  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+    return -EBADF;
+
+  if(is_mounted_fd(fd)) {
+    fs_file_t fh      = (fs_file_t)fd_table[fd].node;
+    u64       saved   = fd_table[fd].offset;
+    i64       end_pos = 0;
+
+    if(fd_table[fd].ops->seek) {
+      end_pos = fd_table[fd].ops->seek(fh, 0, SEEK_END);
+      fd_table[fd].ops->seek(fh, (i64)saved, SEEK_SET);
+    }
+
+    st->size = (end_pos >= 0) ? (u64)end_pos : 0;
+    st->type = VFS_FILE;
+    return 0;
+  }
+
+  const vfs_node_t *node = fd_table[fd].node;
+  st->size = node->size;
+  st->type = node->type;
+  return 0;
+}
+
+/**
+ * @brief Return the open flags of a file descriptor.
+ * @param fd File descriptor.
+ * @return Flags on success, -EBADF on error.
+ */
+i64 vfs_get_flags(i64 fd)
+{
+  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+    return -EBADF;
+  return (i64)fd_table[fd].flags;
+}
+
+/**
+ * @brief Set the open flags of a file descriptor (O_APPEND, O_NONBLOCK…).
+ *
+ * Only flags that make sense to change after open are updated;
+ * O_RDONLY / O_WRONLY / O_RDWR bits are preserved from the original.
+ *
+ * @param fd    File descriptor.
+ * @param flags Replacement flags.
+ * @return 0 on success, -EBADF on error.
+ */
+i64 vfs_set_flags(i64 fd, u32 flags)
+{
+  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+    return -EBADF;
+
+  /* Keep the access-mode bits, replace the rest */
+  u32 access = fd_table[fd].flags & O_RDWR;
+  fd_table[fd].flags = access | (flags & ~(u32)O_RDWR);
+  return 0;
+}
+
+/**
+ * @brief Truncate an open file to the given length.
+ *
+ * For ramfs files: sets node->size.  Extension with zero-fill is not
+ * yet supported (returns -ENOSYS when length > current size).
+ * For mounted-FS files: only length == 0 is supported via ops->truncate.
+ *
+ * @param fd     Open, writable file descriptor.
+ * @param length Target length.
+ * @return 0 on success, negative errno on error.
+ */
+i64 vfs_ftruncate(i64 fd, i64 length)
+{
+  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+    return -EBADF;
+  if(length < 0)
+    return -EINVAL;
+
+  if(is_mounted_fd(fd)) {
+    if(length == 0 && fd_table[fd].ops->truncate)
+      return fd_table[fd].ops->truncate((fs_file_t)fd_table[fd].node);
+    return (length == 0) ? 0 : -ENOSYS;
+  }
+
+  vfs_node_t *node = fd_table[fd].node;
+  if(!node || node->type != VFS_FILE)
+    return -EINVAL;
+
+  if((u64)length <= node->size) {
+    node->size = (u64)length;
+    if(fd_table[fd].offset > node->size)
+      fd_table[fd].offset = node->size;
+    return 0;
+  }
+
+  return -ENOSYS;
 }
 
 /**

@@ -1,13 +1,16 @@
 /**
  * @file src/mm/vmm.c
- * @brief Virtual memory manager (x86_64 paging).
+ * @brief x86_64 virtual memory manager (PML4 → PT, address-space clone, tear down user maps).
+ *
+ * Provides `vmm_map` / `vmm_unmap`, fork-time clone, and `vmm_map_range_alloc` to map a run of
+ * pages while reusing page-table levels already walked.
  */
 
 #include <alcor2/kstdlib.h>
-#include <alcor2/memory_layout.h>
-#include <alcor2/pmm.h>
+#include <alcor2/mm/memory_layout.h>
+#include <alcor2/mm/pmm.h>
 #include <alcor2/types.h>
-#include <alcor2/vmm.h>
+#include <alcor2/mm/vmm.h>
 
 static u64 *kernel_pml4;
 static u64  kernel_pml4_phys;
@@ -91,31 +94,84 @@ void vmm_init(u64 hhdm_offset)
  */
 void vmm_map(u64 virt, u64 phys, u64 flags)
 {
-  /* Get current PML4 (could be kernel or process PML4) */
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
-  u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
-  u64  pdpt_idx = (virt >> 30) & PAGE_TABLE_INDEX_MASK;
-  u64  pd_idx   = (virt >> 21) & PAGE_TABLE_INDEX_MASK;
-  u64  pt_idx   = (virt >> 12) & PAGE_TABLE_INDEX_MASK;
+  u64 *pdpt = get_next_level(pml4, (virt >> 39) & PAGE_TABLE_INDEX_MASK, true, flags);
+  if(!pdpt) return;
+  u64 *pd = get_next_level(pdpt, (virt >> 30) & PAGE_TABLE_INDEX_MASK, true, flags);
+  if(!pd) return;
+  u64 *pt = get_next_level(pd, (virt >> 21) & PAGE_TABLE_INDEX_MASK, true, flags);
+  if(!pt) return;
 
-  u64 *pdpt = get_next_level(pml4, pml4_idx, true, flags);
-  if(!pdpt)
-    return;
+  pt[(virt >> 12) & PAGE_TABLE_INDEX_MASK] = (phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
+  __asm__ volatile("invlpg (%0)" :: "r"(virt) : "memory");
+}
 
-  u64 *pd = get_next_level(pdpt, pdpt_idx, true, flags);
-  if(!pd)
-    return;
+/**
+ * @brief Allocate and map a range of consecutive virtual pages.
+ *
+ * Reads CR3 once and caches intermediate page table levels across pages.
+ * Within the same 2 MB region (same PT), only a single PT lookup is needed
+ * for up to 512 consecutive pages — greatly reducing the per-page walk cost
+ * compared to calling vmm_map() in a loop.
+ *
+ * Skips pages that are already mapped (safe for overlapping ELF segments).
+ * Returns false and stops if physical memory is exhausted.
+ *
+ * @param virt_start First virtual address to map (page-aligned).
+ * @param count      Number of 4 KiB pages to map.
+ * @param flags      Page flags (VMM_WRITE, VMM_USER, …); VMM_PRESENT is added.
+ * @return true on full success, false if pmm_alloc() failed.
+ */
+bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
+{
+  u64 cr3;
+  __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+  u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
-  u64 *pt = get_next_level(pd, pd_idx, true, flags);
-  if(!pt)
-    return;
+  /* Cached pointers — invalidated when the corresponding index changes */
+  u64  c_pml4_idx = ~0ULL, c_pdpt_idx = ~0ULL, c_pd_idx = ~0ULL;
+  u64 *pdpt = NULL, *pd = NULL, *pt = NULL;
 
-  pt[pt_idx] = (phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
+  for(u64 i = 0; i < count; i++) {
+    u64 virt     = virt_start + (i << 12);
+    u64 pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
+    u64 pdpt_idx = (virt >> 30) & PAGE_TABLE_INDEX_MASK;
+    u64 pd_idx   = (virt >> 21) & PAGE_TABLE_INDEX_MASK;
+    u64 pt_idx   = (virt >> 12) & PAGE_TABLE_INDEX_MASK;
 
-  __asm__ volatile("invlpg (%0)" : : "r"(virt) : "memory");
+    /* Only re-walk levels that changed */
+    if(pml4_idx != c_pml4_idx) {
+      pdpt = get_next_level(pml4, pml4_idx, true, flags);
+      if(!pdpt) return false;
+      c_pml4_idx = pml4_idx;
+      c_pdpt_idx = ~0ULL;
+    }
+    if(pdpt_idx != c_pdpt_idx) {
+      pd = get_next_level(pdpt, pdpt_idx, true, flags);
+      if(!pd) return false;
+      c_pdpt_idx = pdpt_idx;
+      c_pd_idx   = ~0ULL;
+    }
+    if(pd_idx != c_pd_idx) {
+      pt = get_next_level(pd, pd_idx, true, flags);
+      if(!pt) return false;
+      c_pd_idx = pd_idx;
+    }
+
+    /* Skip pages already mapped (handles overlapping ELF segments) */
+    if(pt[pt_idx] & VMM_PRESENT) continue;
+
+    void *phys = pmm_alloc();
+    if(!phys) return false;
+
+    kzero(phys_to_virt((u64)phys), PAGE_SIZE);
+    pt[pt_idx] = ((u64)phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
+    __asm__ volatile("invlpg (%0)" :: "r"(virt) : "memory");
+  }
+  return true;
 }
 
 /**

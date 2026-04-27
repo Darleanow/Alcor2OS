@@ -4,7 +4,7 @@
  */
 
 #include "font.h"
-#include <alcor2/console.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/kstdlib.h>
 #include <stdarg.h>
 

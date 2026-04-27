@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/memory_layout.h
+ * @file include/alcor2/mm/memory_layout.h
  * @brief Virtual memory layout constants for x86_64.
  *
  * Defines the memory map for both kernel and user space.
@@ -39,14 +39,17 @@
 /** @brief User stack top (grows downward) */
 #define USER_STACK_TOP 0x00007FFF00000000ULL
 
-/** @brief User stack size (64KB per process) */
-#define USER_STACK_SIZE (64ULL * 1024)
+/** @brief User stack size (8MB per process — matches Linux default) */
+#define USER_STACK_SIZE (8ULL * 1024 * 1024)
 
 /** @brief User stack base calculation */
 #define USER_STACK_BASE (USER_STACK_TOP - USER_STACK_SIZE)
 
-/** @brief User heap start for mmap (1GB) */
+/** @brief User heap start for brk() allocations (1GB) */
 #define USER_HEAP_START 0x0000000040000000ULL
+
+/** @brief Dedicated mmap region base (256GB — well above brk, below stack) */
+#define USER_MMAP_BASE  0x0000100000000000ULL
 
 /** @} */
 

@@ -1,7 +1,6 @@
 /**
- * Alcor2 Shell - Main Entry Point
- *
- * A clean, modular shell for Alcor2 OS.
+ * @file user/shell/main.c
+ * @brief Shell main loop: read line, parse, builtins or `execve` of `/bin` programs.
  */
 
 #include "shell.h"
@@ -16,21 +15,29 @@
 static int run_external(command_t *cmd)
 {
   char        path[MAX_PATH];
-  char       *p      = path;
-  const char *prefix = "/bin/";
+  char       *p = path;
 
-  while(*prefix) {
-    *p++ = *prefix++;
+  if(cmd->cmd[0] == '/') {
+    const char *c = cmd->cmd;
+    while(*c && p < path + MAX_PATH - 1)
+      *p++ = *c++;
+    *p = '\0';
+    int ret = sh_exec(path, cmd->args);
+    return (ret < 0) ? -1 : 0;
   }
 
-  const char *c = cmd->cmd;
-  while(*c && p < path + MAX_PATH - 1) {
-    *p++ = *c++;
+  static const char *const dirs[] = { "/bin/", "/usr/bin/", NULL };
+  for(int i = 0; dirs[i]; i++) {
+    p = path;
+    const char *prefix = dirs[i];
+    while(*prefix) *p++ = *prefix++;
+    const char *c = cmd->cmd;
+    while(*c && p < path + MAX_PATH - 1) *p++ = *c++;
+    *p = '\0';
+    int ret = sh_exec(path, cmd->args);
+    if(ret >= 0) return 0;
   }
-  *p = '\0';
-
-  int ret = sh_exec(path, cmd->args);
-  return (ret < 0) ? -1 : 0;
+  return -1;
 }
 
 /**

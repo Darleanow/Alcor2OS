@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/idt.h
+ * @file include/alcor2/arch/idt.h
  * @brief Interrupt Descriptor Table setup.
  *
  * Structures and functions for managing the x86_64 IDT and interrupt handling.

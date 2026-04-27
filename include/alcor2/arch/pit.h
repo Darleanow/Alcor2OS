@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/pit.h
+ * @file include/alcor2/arch/pit.h
  * @brief 8253/8254 PIT (Programmable Interval Timer) driver.
  *
  * Configures the PIT for periodic timer interrupts and tracks system ticks.

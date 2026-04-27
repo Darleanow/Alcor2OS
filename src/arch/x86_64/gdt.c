@@ -3,7 +3,7 @@
  * @brief Global Descriptor Table and TSS setup.
  */
 
-#include <alcor2/gdt.h>
+#include <alcor2/arch/gdt.h>
 
 /** @name GDT Access Flags */
 /**@{*/

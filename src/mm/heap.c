@@ -5,12 +5,12 @@
  * First-fit allocator with block coalescing, backed by PMM pages.
  */
 
-#include <alcor2/console.h>
-#include <alcor2/heap.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/memory_layout.h>
-#include <alcor2/pmm.h>
-#include <alcor2/vmm.h>
+#include <alcor2/mm/memory_layout.h>
+#include <alcor2/mm/pmm.h>
+#include <alcor2/mm/vmm.h>
 
 static heap_block_t *heap_start   = NULL;
 static heap_block_t *heap_end     = NULL;

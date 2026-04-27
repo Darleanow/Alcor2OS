@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/pmm.h
+ * @file include/alcor2/mm/pmm.h
  * @brief Physical memory manager (page allocator).
  *
  * Bitmap-based allocator for 4K physical pages.

@@ -1,12 +1,15 @@
 /**
- * @file src/kernel/kstdlib.c
- * @brief Kernel micro standard library implementation.
+ * @file src/lib/kstdlib.c
+ * @brief Kernel micro-library implementation (strings, memory).
  */
 
 #include <alcor2/kstdlib.h>
 
 /**
  * @brief Copy memory from src to dst.
+ *
+ * Uses REP MOVSB which on modern x86-64 CPUs (ERMSB) runs at full memory
+ * bandwidth via microcode — equivalent to a tuned libc memcpy.
  *
  * @param dst Destination buffer.
  * @param src Source buffer.
@@ -15,34 +18,16 @@
  */
 void *kmemcpy(void *dst, const void *src, u64 n)
 {
-  u8       *d = (u8 *)dst;
-  const u8 *s = (const u8 *)src;
-
-  /* Byte-copy until destination is 8-byte aligned */
-  while(n && ((u64)d & 7)) {
-    *d++ = *s++;
-    n--;
-  }
-
-  /* Bulk copy 8 bytes at a time */
-  u64       *d64 = (u64 *)d;
-  const u64 *s64 = (const u64 *)s;
-  while(n >= 8) {
-    *d64++ = *s64++;
-    n -= 8;
-  }
-
-  /* Copy remaining bytes */
-  d = (u8 *)d64;
-  s = (const u8 *)s64;
-  while(n--)
-    *d++ = *s++;
-
+  void       *d = dst;
+  const void *s = src;
+  __asm__ volatile("rep movsb" : "+D"(d), "+S"(s), "+c"(n) :: "memory");
   return dst;
 }
 
 /**
  * @brief Fill memory with a byte value.
+ *
+ * Uses REP STOSB which on modern x86-64 CPUs runs at full memory bandwidth.
  *
  * @param dst Destination buffer.
  * @param val Byte value to fill with.
@@ -51,43 +36,23 @@ void *kmemcpy(void *dst, const void *src, u64 n)
  */
 void *kmemset(void *dst, int val, u64 n)
 {
-  u8 *d = (u8 *)dst;
-  u8  v = (u8)val;
-
-  /* Byte-fill until 8-byte aligned */
-  while(n && ((u64)d & 7)) {
-    *d++ = v;
-    n--;
-  }
-
-  /* Build 8-byte fill pattern and bulk fill */
-  u64 v64 = v;
-  v64 |= v64 << 8;
-  v64 |= v64 << 16;
-  v64 |= v64 << 32;
-  u64 *d64 = (u64 *)d;
-  while(n >= 8) {
-    *d64++ = v64;
-    n -= 8;
-  }
-
-  /* Fill remaining bytes */
-  d = (u8 *)d64;
-  while(n--)
-    *d++ = v;
-
+  void *d = dst;
+  __asm__ volatile("rep stosb" : "+D"(d), "+c"(n) : "a"((u8)val) : "memory");
   return dst;
 }
 
 /**
  * @brief Zero-fill a memory region.
  *
+ * Same @c rep stosb sequence as @c kmemset(..., 0, n) without an extra function call.
+ *
  * @param dst Destination buffer.
  * @param n   Number of bytes to zero.
  */
 void kzero(void *dst, u64 n)
 {
-  kmemset(dst, 0, n);
+  void *d = dst;
+  __asm__ volatile("rep stosb" : "+D"(d), "+c"(n) : "a"((u8)0) : "memory");
 }
 
 /**

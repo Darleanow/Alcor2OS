@@ -1,7 +1,6 @@
 /**
- * Alcor2 Init Program
- *
- * First user-space program loaded by the kernel.
+ * @file user/init/main.c
+ * @brief Minimal init process (demo message); the kernel starts the shell separately.
  */
 
 #include <stdio.h>

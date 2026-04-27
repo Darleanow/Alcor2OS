@@ -3,32 +3,37 @@
  * @brief ATA/IDE disk driver (DMA + PIO fallback, LBA28/48).
  *
  * DMA via PCI Bus Master with per-channel bounce buffer.
+ * The bounce buffer is 64 KB (16 contiguous pages) per channel, allowing
+ * up to 128 sectors (64 KB) per single DMA command instead of 8 (4 KB).
  * Falls back to PIO when no scheduler context or DMA unsupported.
  */
 
-#include <alcor2/ata.h>
-#include <alcor2/console.h>
-#include <alcor2/cpu.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/arch/cpu.h>
 #include <alcor2/errno.h>
-#include <alcor2/io.h>
+#include <alcor2/arch/io.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/pci.h>
-#include <alcor2/pic.h>
-#include <alcor2/pit.h>
-#include <alcor2/pmm.h>
-#include <alcor2/sched.h>
-#include <alcor2/vmm.h>
+#include <alcor2/drivers/pci.h>
+#include <alcor2/arch/pic.h>
+#include <alcor2/arch/pit.h>
+#include <alcor2/mm/pmm.h>
+#include <alcor2/proc/sched.h>
+#include <alcor2/mm/vmm.h>
 
-#define TIMEOUT_TICKS 500 /* 5 s at 100 Hz */
-#define LBA28_LIMIT   0x10000000ULL
-#define MAX_RETRIES   3
-#define POLL_ITERS    500000
-#define PRD_EOT       0x8000
+#define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
+#define LBA28_LIMIT      0x10000000ULL
+#define MAX_RETRIES      3
+#define POLL_ITERS       500000
+#define PRD_EOT          0x8000
+#define DMA_BOUNCE_PAGES 16                          /* 64 KB per channel  */
+#define DMA_BOUNCE_BYTES (DMA_BOUNCE_PAGES * 0x1000) /* 65536 bytes        */
+#define DMA_MAX_SECTORS  (DMA_BOUNCE_BYTES / 512)    /* 128 sectors        */
 
 static ata_channel_t channels[2];
 static ata_drive_t   drives[4];
-static void         *bounce_virt[2]; /* DMA bounce buffer (virtual) */
-static u64           bounce_phys[2]; /* DMA bounce buffer (physical) */
+static void         *bounce_virt[2]; /* DMA bounce buffer (virtual, 64 KB) */
+static u64           bounce_phys[2]; /* DMA bounce buffer (physical)        */
 
 static inline u8     reg_read(ata_channel_t *ch, u8 reg)
 {
@@ -65,6 +70,7 @@ static u8 poll_bsy(ata_channel_t *ch, u32 iters)
     s = reg_read(ch, ATA_REG_STATUS);
     if(!(s & ATA_SR_BSY))
       return s;
+    cpu_pause();
   }
   return s;
 }
@@ -83,6 +89,7 @@ static bool poll_drq(ata_channel_t *ch, u32 iters)
       return false;
     if(!(s & ATA_SR_BSY) && (s & ATA_SR_DRQ))
       return true;
+    cpu_pause();
   }
   return false;
 }
@@ -322,7 +329,7 @@ static i64
   bool           ext   = d->lba48 && (lba + count) >= LBA28_LIMIT;
   u32            bytes = count * ATA_SECTOR_SIZE;
 
-  if(bytes > PAGE_SIZE)
+  if(bytes > DMA_BOUNCE_BYTES)
     return -EINVAL;
 
   void *bounce = bounce_virt[cidx];
@@ -480,7 +487,7 @@ i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
     return -EINVAL;
 
   if(d->dma && d->channel->dma_ok && sched_current() &&
-     count <= (PAGE_SIZE / ATA_SECTOR_SIZE))
+     count <= DMA_MAX_SECTORS)
     return dma_transfer(d, lba, count, buf, false);
 
   return pio_read(d, lba, count, buf);
@@ -506,7 +513,7 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
     return -EINVAL;
 
   if(d->dma && d->channel->dma_ok && sched_current() &&
-     count <= (PAGE_SIZE / ATA_SECTOR_SIZE))
+     count <= DMA_MAX_SECTORS)
     return dma_transfer(d, lba, count, (void *)buf, true);
 
   return pio_write(d, lba, count, buf);
@@ -558,13 +565,13 @@ static void init_dma(void)
     channels[i].bmi = bar4 + (i * 8);
 
     void *prdt_page   = pmm_alloc();
-    void *bounce_page = pmm_alloc();
+    void *bounce_page = pmm_alloc_pages(DMA_BOUNCE_PAGES);
     if(!prdt_page || !bounce_page) {
       console_print("[ATA] Failed to allocate DMA buffers\n");
       if(prdt_page)
         pmm_free(prdt_page);
       if(bounce_page)
-        pmm_free(bounce_page);
+        pmm_free_pages(bounce_page, DMA_BOUNCE_PAGES);
       continue;
     }
 

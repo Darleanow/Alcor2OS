@@ -3,8 +3,8 @@
  * @brief CPU control and management implementation.
  */
 
-#include <alcor2/console.h>
-#include <alcor2/cpu.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/arch/cpu.h>
 
 /** @brief MSR register for FS base (thread-local storage). */
 #define MSR_FS_BASE 0xC0000100

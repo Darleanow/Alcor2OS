@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/ext2.h
+ * @file include/alcor2/fs/ext2.h
  * @brief ext2 filesystem driver.
  *
  * Read/write support for ext2 volumes on ATA devices.

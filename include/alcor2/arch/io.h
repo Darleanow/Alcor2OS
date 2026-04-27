@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/io.h
+ * @file include/alcor2/arch/io.h
  * @brief x86 I/O port access functions.
  *
  * Inline wrappers for `in`/`out` instructions.

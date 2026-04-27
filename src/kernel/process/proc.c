@@ -3,19 +3,20 @@
  * @brief Process management with per-process kernel stacks.
  */
 
-#include <alcor2/console.h>
-#include <alcor2/cpu.h>
-#include <alcor2/elf.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/arch/cpu.h>
+#include <alcor2/proc/elf.h>
 #include <alcor2/errno.h>
-#include <alcor2/gdt.h>
-#include <alcor2/heap.h>
+#include <alcor2/arch/gdt.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/memory_layout.h>
-#include <alcor2/pmm.h>
-#include <alcor2/proc.h>
-#include <alcor2/syscall.h>
-#include <alcor2/vfs.h>
-#include <alcor2/vmm.h>
+#include <alcor2/mm/memory_layout.h>
+#include <alcor2/mm/pmm.h>
+#include <alcor2/proc/proc.h>
+#include <alcor2/proc/signal.h>
+#include <alcor2/sys/syscall.h>
+#include <alcor2/fs/vfs.h>
+#include <alcor2/mm/vmm.h>
 
 static proc_t  proc_table[PROC_MAX];
 static proc_t *current_proc = NULL;
@@ -122,7 +123,11 @@ static u64 push_string(u64 sp, const char *str)
  * @return PID of the new process, or 0 on failure.
  */
 u64 proc_create(
-    const char *name, const void *elf_data, u64 elf_size, char *const argv[]
+    const char  *name,
+    const void  *elf_data,
+    u64          elf_size,
+    i64          elf_fd,
+    char *const  argv[]
 )
 {
   proc_t *p = proc_alloc();
@@ -178,7 +183,11 @@ u64 proc_create(
   vmm_switch(p->cr3);
 
   elf_info_t elf_info;
-  int        elf_result = elf_load(elf_data, elf_size, &elf_info);
+  int        elf_result;
+  if(elf_fd >= 0)
+    elf_result = elf_load_fd(elf_fd, &elf_info);
+  else
+    elf_result = elf_load(elf_data, elf_size, &elf_info);
 
   if(elf_result != 0) {
     vmm_switch(old_cr3);
@@ -201,6 +210,48 @@ u64 proc_create(
    * - argc
    */
 
+  /*
+   * Build initial user stack per the System V AMD64 ABI.
+   *
+   * Layout in memory (low address → high address, stack grows downward):
+   *
+   *   sp → [argc]
+   *         [argv[0]] ... [argv[argc-1]] [NULL]   ← argv array
+   *         [NULL]                                ← envp array (empty)
+   *         [AT_type0][AT_val0] ...               ← auxv pairs
+   *         [AT_NULL=0][0]                        ← auxv terminator
+   *         <string data>                         ← argument strings
+   *         stack_top (highest address)
+   *
+   * We push from stack_top downward, so the LAST push ends up at the
+   * LOWEST address (= sp).  Order of pushes:
+   *   1. argv strings  (highest)
+   *   2. auxv terminator AT_NULL (val then type — struct layout: type@low, val@high)
+   *   3. other auxv entries (AT_PHDR last pushed = lowest among auxv)
+   *   4. envp NULL
+   *   5. argv NULL terminator
+   *   6. argv pointers  (argv[0] last pushed = just above argc)
+   *   7. argc           (lowest address = final sp)
+   */
+
+#define AT_NULL_V 0
+#define AT_PHDR   3
+#define AT_PHENT  4
+#define AT_PHNUM  5
+#define AT_PAGESZ 6
+#define AT_ENTRY  9
+#define AT_UID    11
+#define AT_EUID   12
+#define AT_GID    13
+#define AT_EGID   14
+
+  /* Each PUSH_AUX stores: val at higher address, type at lower address,
+   * so reading as Elf64_auxv_t {u64 type; u64 val} gives the right layout. */
+#define PUSH_AUX(type, val) do { \
+    sp -= 8; *(u64 *)sp = (u64)(val);  \
+    sp -= 8; *(u64 *)sp = (u64)(type); \
+  } while(0)
+
   u64 sp = stack_top;
 
   /* Count arguments */
@@ -209,57 +260,69 @@ u64 proc_create(
     while(argv[argc])
       argc++;
   }
+  if(argc == 0)
+    argc = 1; /* will synthesise argv[0] = name below */
 
-  /* If no argv provided, create one with just the program name */
-  if(argc == 0) {
-    /* Push program name string */
-    sp            = push_string(sp, name);
-    u64 argv0_ptr = sp;
-
-    /* Align to 16 bytes */
-    sp &= ~0xFULL;
-
-    /* Push NULL terminator */
-    sp -= 8;
-    *(u64 *)sp = 0;
-
-    /* Push argv[0] pointer */
-    sp -= 8;
-    *(u64 *)sp = argv0_ptr;
-
-    /* Push argc */
-    sp -= 8;
-    *(u64 *)sp = 1;
-  } else {
-    /* Push all argument strings and save their addresses */
-    u64 arg_ptrs[32]; /* Max 32 args */
+  /* 1. Push argv strings (highest addresses) */
+  u64 arg_ptrs[32];
+  if(argv && argv[0]) {
     for(int i = argc - 1; i >= 0; i--) {
       sp          = push_string(sp, argv[i]);
       arg_ptrs[i] = sp;
     }
-
-    /* Align to 16 bytes for the pointer array */
-    sp &= ALIGN_16_MASK;
-
-    /* Adjust for even/odd argc to maintain 16-byte alignment after argc push */
-    if((argc + 1) % 2 != 0) {
-      sp -= 8; /* Padding */
-    }
-
-    /* Push NULL terminator for argv */
-    sp -= 8;
-    *(u64 *)sp = 0;
-
-    /* Push argv pointers in reverse order */
-    for(int i = argc - 1; i >= 0; i--) {
-      sp -= 8;
-      *(u64 *)sp = arg_ptrs[i];
-    }
-
-    /* Push argc */
-    sp -= 8;
-    *(u64 *)sp = (u64)argc;
+  } else {
+    sp          = push_string(sp, name);
+    arg_ptrs[0] = sp;
   }
+
+  /* Align to 16 bytes before the pointer/auxv area */
+  sp &= ALIGN_16_MASK;
+
+  /* 2. auxv terminator AT_NULL (pushed first = highest auxv address) */
+  PUSH_AUX(AT_NULL_V, 0);
+
+  /* 3. auxv entries (last pushed = lowest auxv address, first read by musl) */
+  PUSH_AUX(AT_EGID,   0);
+  PUSH_AUX(AT_GID,    0);
+  PUSH_AUX(AT_EUID,   0);
+  PUSH_AUX(AT_UID,    0);
+  PUSH_AUX(AT_ENTRY,  elf_info.entry);
+  PUSH_AUX(AT_PAGESZ, 4096);
+  if(elf_info.phdr) {
+    PUSH_AUX(AT_PHNUM, elf_info.phnum);
+    PUSH_AUX(AT_PHENT, elf_info.phent);
+    PUSH_AUX(AT_PHDR,  elf_info.phdr);
+  }
+
+  /* 4. envp NULL terminator (no environment variables) */
+  sp -= 8;
+  *(u64 *)sp = 0;
+
+  /* 5. argv NULL terminator */
+  sp -= 8;
+  *(u64 *)sp = 0;
+
+  /* 6. argv pointers (argv[0] pushed last = just above argc) */
+  for(int i = argc - 1; i >= 0; i--) {
+    sp -= 8;
+    *(u64 *)sp = arg_ptrs[i];
+  }
+
+  /* 7. argc (last push = lowest address = final sp) */
+  sp -= 8;
+  *(u64 *)sp = (u64)argc;
+
+#undef PUSH_AUX
+#undef AT_NULL_V
+#undef AT_PHDR
+#undef AT_PHENT
+#undef AT_PHNUM
+#undef AT_PAGESZ
+#undef AT_ENTRY
+#undef AT_UID
+#undef AT_EUID
+#undef AT_GID
+#undef AT_EGID
 
   /* Switch back to kernel/current address space */
   vmm_switch(old_cr3);
@@ -279,6 +342,7 @@ u64 proc_create(
   u64 elf_end_aligned = (elf_info.end + 0xFFF) & ALIGN_16_MASK;
   p->program_break    = elf_end_aligned;
   p->heap_break       = USER_HEAP_START;
+  p->mmap_base        = USER_MMAP_BASE;
 
   /* Set user context - stack now contains argc/argv */
   p->user_rip    = elf_info.entry;
@@ -354,11 +418,12 @@ void proc_exit(i64 code)
   /* Clean up open file descriptors */
   vfs_close_for_pid(p->pid);
 
-  /* Wake up parent if it's waiting */
+  /* Notify parent via SIGCHLD and wake it if blocked in waitpid */
   proc_t *parent = proc_get(p->parent_pid);
-  if(parent && parent->state == PROC_STATE_BLOCKED) {
-    /* Parent is waiting for this specific child OR any child */
-    if(parent->waiting_for_pid == p->pid || parent->waiting_for_pid == 0) {
+  if(parent) {
+    proc_signal(p->parent_pid, SIGCHLD);
+    if(parent->state == PROC_STATE_BLOCKED &&
+       (parent->waiting_for_pid == p->pid || parent->waiting_for_pid == 0)) {
       parent->state = PROC_STATE_READY;
     }
   }
@@ -540,7 +605,7 @@ void proc_switch(proc_t *next)
  */
 void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
 {
-  u64 pid = proc_create(name, elf_data, elf_size, NULL);
+  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL);
   if(pid == 0) {
     console_print("[PROC] Failed to create first process\n");
     return;
@@ -640,6 +705,7 @@ i64 proc_fork(const void *syscall_frame)
   /* Copy per-process memory state */
   child->program_break = parent->program_break;
   child->heap_break    = parent->heap_break;
+  child->mmap_base     = parent->mmap_base;
 
   /* Copy user context from syscall frame */
   child->user_rip    = frame->rip;

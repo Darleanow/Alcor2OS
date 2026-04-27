@@ -1,5 +1,6 @@
 /**
- * Alcor2 Shell - I/O Utilities
+ * @file user/shell/io.c
+ * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
 #include "shell.h"

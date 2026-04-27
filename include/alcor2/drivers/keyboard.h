@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/keyboard.h
+ * @file include/alcor2/drivers/keyboard.h
  * @brief PS/2 keyboard driver.
  *
  * Scancode-to-ASCII translation and input buffering for user programs.

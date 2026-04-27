@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/user.h
+ * @file include/alcor2/proc/user.h
  * @brief User-mode (ring-3) support functions.
  *
  * Functions to create processes, switch to user mode, and return from it.

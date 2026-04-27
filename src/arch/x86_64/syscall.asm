@@ -28,6 +28,7 @@ extern tss_get_rsp0
 section .text
 global syscall_entry
 extern syscall_dispatch
+extern proc_check_signals
 
 ;;
 ;; syscall_entry - Entry point for SYSCALL instruction
@@ -96,6 +97,10 @@ syscall_entry:
     
     ;; Store return value in frame's rax slot
     mov [rsp + 14*8], rax
+
+    ;; Check for pending signals — may redirect frame to a signal handler
+    mov rdi, rsp
+    call proc_check_signals
     
     ;; CRITICAL: Disable interrupts before restoring registers
     ;; sys_read may have enabled them while waiting for keyboard

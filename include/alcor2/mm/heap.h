@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/heap.h
+ * @file include/alcor2/mm/heap.h
  * @brief Kernel heap allocator.
  *
  * Simple free-list based dynamic memory allocator for the kernel.

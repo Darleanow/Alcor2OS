@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/elf.h
+ * @file include/alcor2/proc/elf.h
  * @brief ELF64 format definitions and loader.
  *
  * Structures and constants for parsing/loading ELF64 executables.
@@ -135,6 +135,9 @@ typedef struct
   u64 entry; /**< Entry point address. */
   u64 base;  /**< Load base address. */
   u64 end;   /**< End of loaded segments. */
+  u64 phdr;  /**< Virtual address of program header table (for AT_PHDR). */
+  u16 phent; /**< Size of one program header entry (for AT_PHENT). */
+  u16 phnum; /**< Number of program header entries (for AT_PHNUM). */
 } elf_info_t;
 
 /**
@@ -145,6 +148,20 @@ typedef struct
  * @return 0 on success, negative on error.
  */
 int elf_load(const void *data, u64 size, elf_info_t *info);
+
+/**
+ * @brief Load an ELF64 executable streaming directly from a file descriptor.
+ *
+ * Reads the ELF header and program headers with small stack/heap allocations,
+ * then reads each PT_LOAD segment directly into HHDM-mapped physical pages.
+ * No intermediate 87MB kernel buffer is needed — O(1) kernel memory overhead.
+ *
+ * @param fd   Open file descriptor positioned anywhere (position is saved and
+ *             restored on return).
+ * @param info Output: loaded ELF information.
+ * @return 0 on success, -1 on error.
+ */
+int elf_load_fd(i64 fd, elf_info_t *info);
 
 /**
  * @brief Validate an ELF64 header.

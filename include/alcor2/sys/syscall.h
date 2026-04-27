@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/syscall.h
+ * @file include/alcor2/sys/syscall.h
  * @brief x86_64 syscall interface and definitions.
  *
  * Syscalls use the SYSCALL/SYSRET instructions with System V AMD64 calling
@@ -27,6 +27,12 @@
 #define SYS_MPROTECT        10
 #define SYS_MUNMAP          11
 #define SYS_BRK             12
+#define SYS_RT_SIGACTION    13
+#define SYS_RT_SIGPROCMASK  14
+#define SYS_RT_SIGRETURN    15
+#define SYS_WRITEV          20
+#define SYS_PREAD64         17
+#define SYS_PWRITE64        18
 #define SYS_IOCTL           16
 #define SYS_ACCESS          21
 #define SYS_PIPE            22
@@ -43,13 +49,16 @@
 #define SYS_KILL            62
 #define SYS_UNAME           63
 #define SYS_FCNTL           72
+#define SYS_FTRUNCATE       77
 #define SYS_GETDENTS        78
 #define SYS_GETCWD          79
 #define SYS_CHDIR           80
+#define SYS_RENAME          82
 #define SYS_MKDIR           83
 #define SYS_RMDIR           84
 #define SYS_CREAT           85
 #define SYS_UNLINK          87
+#define SYS_SYMLINK         88
 #define SYS_READLINK        89
 #define SYS_GETTIMEOFDAY    96
 #define SYS_GETUID          102
@@ -68,6 +77,7 @@
 #define SYS_GETDENTS64      217
 #define SYS_OPENAT          257
 #define SYS_MAX             512
+/* Unmapped syscall numbers in dispatcher intentionally return -ENOSYS. */
 /** @} */
 
 /**
@@ -94,6 +104,14 @@ void syscall_init(void);
  * @return Syscall return value.
  */
 u64 syscall_dispatch(syscall_frame_t *frame);
+
+/**
+ * @brief Return the syscall_frame_t for the currently executing syscall.
+ *
+ * Valid only during a syscall handler invocation. Returns NULL otherwise.
+ * Used by signal.c's rt_sigreturn implementation.
+ */
+syscall_frame_t *syscall_get_current_frame(void);
 
 /** @name MSR definitions for SYSCALL/SYSRET
  * @{ */

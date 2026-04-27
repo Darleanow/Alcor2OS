@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/cpu.h
+ * @file include/alcor2/arch/cpu.h
  * @brief x86_64 CPU control and state management.
  *
  * Low-level operations: halting, interrupts, MSR access for thread-local

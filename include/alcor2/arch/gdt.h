@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/gdt.h
+ * @file include/alcor2/arch/gdt.h
  * @brief Global Descriptor Table and Task State Segment setup.
  *
  * Defines segment selectors for kernel and userspace code/data,

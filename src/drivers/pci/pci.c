@@ -6,9 +6,9 @@
  * Enumerates devices on buses 0-255, slots 0-31, functions 0-7.
  */
 
-#include <alcor2/console.h>
-#include <alcor2/io.h>
-#include <alcor2/pci.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/arch/io.h>
+#include <alcor2/drivers/pci.h>
 
 /* Build PCI config address dword. */
 static inline u32 pci_addr(u8 bus, u8 slot, u8 func, u8 offset)

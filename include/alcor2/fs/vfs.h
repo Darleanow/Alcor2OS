@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/vfs.h
+ * @file include/alcor2/fs/vfs.h
  * @brief Virtual File System layer.
  *
  * Simple VFS with ramfs backend and ext2 mounting support.
@@ -391,6 +391,66 @@ i64 vfs_touch(const char *path);
  * @return 0 on success, negative on error.
  */
 i64 vfs_unlink(const char *path);
+
+/**
+ * @brief Remove an empty directory.
+ * @param path Directory path.
+ * @return 0 on success, negative on error.
+ */
+i64 vfs_rmdir(const char *path);
+
+/**
+ * @brief Duplicate a file descriptor to the lowest available slot.
+ * @param oldfd Source file descriptor.
+ * @return New file descriptor, or negative on error.
+ */
+i64 vfs_dup(i64 oldfd);
+
+/**
+ * @brief Duplicate a file descriptor to a specific slot.
+ *
+ * If newfd is already open, it is closed first.
+ * If oldfd == newfd, returns newfd without doing anything.
+ *
+ * @param oldfd Source file descriptor.
+ * @param newfd Target file descriptor.
+ * @return newfd on success, or negative on error.
+ */
+i64 vfs_dup2(i64 oldfd, i64 newfd);
+
+/**
+ * @brief Get file statistics from an open file descriptor.
+ * @param fd   File descriptor.
+ * @param stat Output stat structure.
+ * @return 0 on success, negative on error.
+ */
+i64 vfs_fstat_fd(i64 fd, vfs_stat_t *stat);
+
+/**
+ * @brief Get the open flags of a file descriptor.
+ * @param fd File descriptor.
+ * @return Flags, or negative on error.
+ */
+i64 vfs_get_flags(i64 fd);
+
+/**
+ * @brief Set the open flags of a file descriptor (settable bits only).
+ * @param fd    File descriptor.
+ * @param flags New flags.
+ * @return 0 on success, negative on error.
+ */
+i64 vfs_set_flags(i64 fd, u32 flags);
+
+/**
+ * @brief Truncate an open file to the specified length.
+ *
+ * Currently supports truncation to zero or shorter lengths.
+ *
+ * @param fd     File descriptor.
+ * @param length Target length in bytes.
+ * @return 0 on success, negative on error.
+ */
+i64 vfs_ftruncate(i64 fd, i64 length);
 
 /**
  * @brief Get current working directory.

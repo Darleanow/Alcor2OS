@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/proc.h
+ * @file include/alcor2/proc/proc.h
  * @brief Process management and scheduling.
  *
  * Each process has its own address space, kernel stack, and user context.
@@ -9,6 +9,7 @@
 #ifndef ALCOR2_PROC_H
 #define ALCOR2_PROC_H
 
+#include <alcor2/proc/signal.h>
 #include <alcor2/types.h>
 
 /** @brief Maximum number of processes. */
@@ -21,7 +22,7 @@
 #define PROC_KERNEL_STACK (8ULL * 1024)
 
 /** @brief User stack size per process. */
-#define PROC_USER_STACK (64 * 1024)
+#define PROC_USER_STACK (8ULL * 1024 * 1024)
 
 /** @brief waitpid option: return immediately if no child has exited. */
 #define WNOHANG 1
@@ -61,6 +62,12 @@ typedef struct proc
   u64          waiting_for_pid;
   u64          program_break;
   u64          heap_break;
+  u64          mmap_base;
+
+  /** @name Signal state */
+  u64          sig_pending;               /**< Bitmask of pending signals */
+  u64          sig_mask;                  /**< Bitmask of blocked signals */
+  k_sigaction_t sig_actions[NSIG];        /**< Per-signal action table */
 } proc_t;
 
 /**
@@ -82,8 +89,18 @@ proc_t *proc_current(void);
  * @param argv NULL-terminated array of arguments (argv[0] = program name).
  * @return New process's PID, or 0 on failure.
  */
+/**
+ * Pass ELF_FD_NONE as elf_fd to use an in-memory buffer instead of a
+ * file descriptor.
+ */
+#define ELF_FD_NONE ((i64)-1)
+
 u64 proc_create(
-    const char *name, const void *elf_data, u64 elf_size, char *const argv[]
+    const char  *name,
+    const void  *elf_data,
+    u64          elf_size,
+    i64          elf_fd,
+    char *const  argv[]
 );
 
 /**

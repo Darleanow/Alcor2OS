@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/pic.h
+ * @file include/alcor2/arch/pic.h
  * @brief 8259 PIC (Programmable Interrupt Controller) driver.
  *
  * Functions to initialize, mask/unmask, and acknowledge IRQs.

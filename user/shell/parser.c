@@ -1,5 +1,6 @@
 /**
- * Alcor2 Shell - Command Parser
+ * @file user/shell/parser.c
+ * @brief Split an input line into command and arguments (mutates the line in place).
  */
 
 #include "shell.h"

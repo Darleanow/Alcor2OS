@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/sched.h
+ * @file include/alcor2/proc/sched.h
  * @brief Kernel task scheduler (round-robin).
  *
  * Simple preemptive scheduler for kernel-mode tasks with cooperative yielding.

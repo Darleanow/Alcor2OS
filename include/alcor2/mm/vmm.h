@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/vmm.h
+ * @file include/alcor2/mm/vmm.h
  * @brief Virtual memory manager (paging).
  *
  * x86_64 page table management for kernel and per-process address spaces.
@@ -34,6 +34,21 @@ void vmm_init(u64 hhdm_offset);
  * @param flags Page flags (VMM_PRESENT, VMM_WRITE, etc.).
  */
 void vmm_map(u64 virt, u64 phys, u64 flags);
+
+/**
+ * @brief Allocate and map a range of consecutive virtual pages.
+ *
+ * More efficient than calling vmm_map() in a loop: reads CR3 once and caches
+ * intermediate page table levels across pages. Within the same 2 MB region
+ * only one PT lookup is needed for up to 512 pages.
+ * Skips already-mapped pages (safe for overlapping ELF segments).
+ *
+ * @param virt_start First virtual address (page-aligned).
+ * @param count      Number of 4 KiB pages.
+ * @param flags      Page flags (VMM_WRITE, VMM_USER, …); VMM_PRESENT is added.
+ * @return true on success, false if physical memory is exhausted.
+ */
+bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags);
 
 /**
  * @brief Unmap a virtual page.

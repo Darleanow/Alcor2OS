@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/console.h
+ * @file include/alcor2/drivers/console.h
  * @brief Framebuffer-based console output.
  *
  * Provides a simple text console using a linear framebuffer with a
