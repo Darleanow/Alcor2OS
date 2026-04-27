@@ -16,13 +16,13 @@
  * - No journal support
  */
 
-#include <alcor2/ata.h>
-#include <alcor2/console.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
-#include <alcor2/ext2.h>
-#include <alcor2/heap.h>
+#include <alcor2/fs/ext2.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/vfs.h>
+#include <alcor2/fs/vfs.h>
 
 /** @brief Maximum mounted ext2 volumes. */
 #define EXT2_MAX_VOLUMES 4
@@ -30,11 +30,52 @@
 /** @brief Maximum concurrent open files. */
 #define EXT2_MAX_FILES 32
 
-/** @brief Block buffer cache size. */
+/** @brief Block buffer cache size (pool for single-block I/O). */
 #define EXT2_BLOCK_CACHE_SIZE 8
 
 /** @brief Maximum supported block size (for cache). */
 #define EXT2_MAX_BLOCK_SIZE 4096
+
+/** @brief Direct-mapped disk block cache (512 x 4 KB = 2 MB). */
+#define EXT2_DSK_CACHE_SLOTS 512
+
+typedef struct
+{
+  const ext2_volume_t *vol;      /**< NULL = slot unused */
+  u32                  block_num;
+  u8                   data[EXT2_MAX_BLOCK_SIZE];
+} dsk_cache_slot_t;
+
+static dsk_cache_slot_t g_dsk_cache[EXT2_DSK_CACHE_SLOTS];
+
+static inline u32 dsk_cache_idx(const ext2_volume_t *vol, u32 bn)
+{
+  return (u32)(((uintptr_t)vol >> 4) ^ (u64)bn * 2654435761ULL) &
+         (EXT2_DSK_CACHE_SLOTS - 1);
+}
+
+static void dsk_cache_insert(
+    const ext2_volume_t *vol, u32 bn, const void *data, u32 size
+)
+{
+  u32 idx                    = dsk_cache_idx(vol, bn);
+  g_dsk_cache[idx].vol       = vol;
+  g_dsk_cache[idx].block_num = bn;
+  if(size > EXT2_MAX_BLOCK_SIZE)
+    size = EXT2_MAX_BLOCK_SIZE;
+  kmemcpy(g_dsk_cache[idx].data, data, size);
+}
+
+static const u8 *dsk_cache_lookup(const ext2_volume_t *vol, u32 bn)
+{
+  u32 idx = dsk_cache_idx(vol, bn);
+  if(g_dsk_cache[idx].vol == vol && g_dsk_cache[idx].block_num == bn)
+    return g_dsk_cache[idx].data;
+  return NULL;
+}
+
+/** @brief Max contiguous blocks coalesced in a single read (16 x 4 KB). */
+#define EXT2_READ_RUN_MAX 16
 
 /** @brief Pool of mounted volumes. */
 static ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
@@ -138,10 +179,19 @@ static inline i64 vol_write_sectors(
  */
 static i64 vol_read_block(const ext2_volume_t *vol, u32 block, void *buf)
 {
+  const u8 *cached = dsk_cache_lookup(vol, block);
+  if(cached) {
+    kmemcpy(buf, cached, vol->block_size);
+    return 0;
+  }
+
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
 
-  return vol_read_sectors(vol, sector, sectors_per_block, buf);
+  i64 ret = vol_read_sectors(vol, sector, sectors_per_block, buf);
+  if(ret >= 0)
+    dsk_cache_insert(vol, block, buf, vol->block_size);
+  return ret;
 }
 
 /**
@@ -1740,6 +1790,9 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
   if(!block_buf)
     return -ENOMEM;
 
+  /* Multi-block read buffer (allocated once, optional fallback). */
+  u8 *run_buf = kmalloc((u64)EXT2_READ_RUN_MAX * block_size);
+
   while(bytes_read < count) {
     u32 file_block   = file->position / block_size;
     u32 block_offset = file->position % block_size;
@@ -1756,20 +1809,75 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
       continue;
     }
 
-    if(vol_read_block(vol, block_num, block_buf) < 0) {
-      cache_put_block(block_buf);
-      return bytes_read > 0 ? (i64)bytes_read : -EIO;
+    u64 remaining = count - bytes_read;
+
+    if(run_buf) {
+      /* Multi-block fast path. */
+      u32 max_run =
+          (u32)((remaining + block_offset + block_size - 1) / block_size);
+      if(max_run > EXT2_READ_RUN_MAX)
+        max_run = EXT2_READ_RUN_MAX;
+
+      /* Detect how many consecutive disk blocks follow block_num. */
+      u32 run = 1;
+      while(run < max_run) {
+        u32 nxt = get_block_num(vol, &file->inode, file_block + run);
+        if(nxt != block_num + run)
+          break;
+        run++;
+      }
+
+      if(run == 1) {
+        /* Only one block (or fragmented): use cached single-block read. */
+        if(vol_read_block(vol, block_num, block_buf) < 0) {
+          kfree(run_buf);
+          cache_put_block(block_buf);
+          return bytes_read > 0 ? (i64)bytes_read : -EIO;
+        }
+        u64 to_read = block_size - block_offset;
+        if(to_read > remaining)
+          to_read = remaining;
+        kmemcpy(dst + bytes_read, block_buf + block_offset, to_read);
+        bytes_read += to_read;
+        file->position += to_read;
+      } else {
+        /* Multi-block DMA: read `run` consecutive disk blocks at once. */
+        u32 sectors  = run * (block_size / EXT2_SECTOR_SIZE);
+        u32 base_sec = block_num * (block_size / EXT2_SECTOR_SIZE);
+        if(vol_read_sectors(vol, base_sec, sectors, run_buf) < 0) {
+          kfree(run_buf);
+          cache_put_block(block_buf);
+          return bytes_read > 0 ? (i64)bytes_read : -EIO;
+        }
+      /* Populate cache with freshly read blocks. */
+        for(u32 i = 0; i < run; i++)
+          dsk_cache_insert(
+              vol, block_num + i, run_buf + (u64)i * block_size, block_size
+          );
+
+        u64 avail   = (u64)run * block_size - block_offset;
+        u64 to_read = remaining < avail ? remaining : avail;
+        kmemcpy(dst + bytes_read, run_buf + block_offset, to_read);
+        bytes_read += to_read;
+        file->position += to_read;
+      }
+    } else {
+      /* run_buf unavailable: fall back to single-block reads. */
+      if(vol_read_block(vol, block_num, block_buf) < 0) {
+        cache_put_block(block_buf);
+        return bytes_read > 0 ? (i64)bytes_read : -EIO;
+      }
+      u64 to_read = block_size - block_offset;
+      if(to_read > remaining)
+        to_read = remaining;
+      kmemcpy(dst + bytes_read, block_buf + block_offset, to_read);
+      bytes_read += to_read;
+      file->position += to_read;
     }
-
-    u64 to_read = block_size - block_offset;
-    if(to_read > count - bytes_read)
-      to_read = count - bytes_read;
-
-    kmemcpy(dst + bytes_read, block_buf + block_offset, to_read);
-    bytes_read += to_read;
-    file->position += to_read;
   }
 
+  if(run_buf)
+    kfree(run_buf);
   cache_put_block(block_buf);
   return (i64)bytes_read;
 }
@@ -2404,9 +2512,7 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
   return 0;
 }
 
-/* ========================================================================== */
-/*                          VFS Operations Wrappers                           */
-/* ========================================================================== */
+/* VFS operation wrappers */
 
 /**
  * @name VFS filesystem operations
