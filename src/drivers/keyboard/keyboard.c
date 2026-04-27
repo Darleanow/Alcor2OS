@@ -3,9 +3,9 @@
  * @brief PS/2 keyboard driver with scancode translation.
  */
 
-#include <alcor2/io.h>
-#include <alcor2/keyboard.h>
-#include <alcor2/pic.h>
+#include <alcor2/arch/io.h>
+#include <alcor2/drivers/keyboard.h>
+#include <alcor2/arch/pic.h>
 
 #define KB_DATA_PORT 0x60
 #define KB_CMD_PORT  0x64

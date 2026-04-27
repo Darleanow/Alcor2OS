@@ -3,8 +3,8 @@
  * @brief 8259 PIC driver for IRQ management.
  */
 
-#include <alcor2/io.h>
-#include <alcor2/pic.h>
+#include <alcor2/arch/io.h>
+#include <alcor2/arch/pic.h>
 
 #define PIC1_CMD  0x20
 #define PIC1_DATA 0x21

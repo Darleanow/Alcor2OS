@@ -3,9 +3,9 @@
  * @brief 8253/8254 PIT timer driver.
  */
 
-#include <alcor2/io.h>
-#include <alcor2/pit.h>
-#include <alcor2/sched.h>
+#include <alcor2/arch/io.h>
+#include <alcor2/arch/pit.h>
+#include <alcor2/proc/sched.h>
 
 #define PIT_CHANNEL0 0x40
 #define PIT_CMD      0x43

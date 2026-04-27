@@ -3,26 +3,26 @@
  * @brief Kernel entry point and initialization.
  */
 
-#include <alcor2/ata.h>
-#include <alcor2/console.h>
-#include <alcor2/cpu.h>
-#include <alcor2/elf.h>
-#include <alcor2/ext2.h>
-#include <alcor2/gdt.h>
-#include <alcor2/heap.h>
-#include <alcor2/idt.h>
-#include <alcor2/keyboard.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/arch/cpu.h>
+#include <alcor2/proc/elf.h>
+#include <alcor2/fs/ext2.h>
+#include <alcor2/arch/gdt.h>
+#include <alcor2/mm/heap.h>
+#include <alcor2/arch/idt.h>
+#include <alcor2/drivers/keyboard.h>
 #include <alcor2/limine.h>
-#include <alcor2/pic.h>
-#include <alcor2/pit.h>
-#include <alcor2/pmm.h>
-#include <alcor2/proc.h>
-#include <alcor2/sched.h>
-#include <alcor2/syscall.h>
+#include <alcor2/arch/pic.h>
+#include <alcor2/arch/pit.h>
+#include <alcor2/mm/pmm.h>
+#include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
+#include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
-#include <alcor2/user.h>
-#include <alcor2/vfs.h>
-#include <alcor2/vmm.h>
+#include <alcor2/proc/user.h>
+#include <alcor2/fs/vfs.h>
+#include <alcor2/mm/vmm.h>
 
 LIMINE_BASE_REVISION(3)
 LIMINE_REQUESTS_START
@@ -64,7 +64,6 @@ static void print_banner(void)
   console_print("/_/  |_/_/\\___/\\____/_/   /____/\n");
   console_print("\n");
   console_print("Alcor2 OS v0.1.0\n");
-  console_print("----------------\n\n");
 }
 
 /**
