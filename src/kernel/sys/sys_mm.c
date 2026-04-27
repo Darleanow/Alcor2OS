@@ -1,6 +1,9 @@
 /**
  * @file src/kernel/sys/sys_mm.c
- * @brief Memory-management syscall implementations.
+ * @brief Memory syscalls: `mmap`, `mprotect`, `munmap`, `brk`.
+ *
+ * Page alignment, prot → PTE flags, filling file-backed pages through the VFS, and anonymous
+ * ranges via `vmm_map_range_alloc` where applicable.
  */
 
 #include <alcor2/errno.h>

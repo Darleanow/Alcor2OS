@@ -1,6 +1,13 @@
 /**
  * @file src/kernel/sys/sys_dispatch.c
- * @brief Syscall dispatcher and syscall table.
+ * @brief Syscall table and dispatch from the ASM entry stub.
+ *
+ * @par Behaviour
+ * Sets `g_current_syscall_frame` for the duration of the handler (signals / rt_sigreturn),
+ * invokes the handler with RDI…R9 per Linux x86_64 ABI, then calls `sched_check_resched()`
+ * before returning the value in RAX.
+ *
+ * Unknown syscall number or NULL table slot: return `(u64)-ENOSYS`.
  */
 
 #include <alcor2/errno.h>

@@ -1,6 +1,8 @@
 /**
  * @file src/kernel/sys/sys_io.c
- * @brief I/O-oriented syscall implementations.
+ * @brief I/O syscalls: `read`, `write`, `lseek`, `ioctl`, `nanosleep`, `writev`.
+ *
+ * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending on descriptor.
  */
 
 #include <alcor2/drivers/console.h>

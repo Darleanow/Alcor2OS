@@ -1,6 +1,8 @@
 /**
  * @file src/kernel/sys/sys_proc.c
- * @brief Process-oriented syscall implementations.
+ * @brief Process syscalls: PID, fork/exec/wait, identities, `clone` (stub).
+ *
+ * Validates user pointers (strings, `argv`, `wait4` buffers) via the VMM before access.
  */
 
 #include <alcor2/errno.h>

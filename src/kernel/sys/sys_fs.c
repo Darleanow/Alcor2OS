@@ -1,6 +1,9 @@
 /**
  * @file src/kernel/sys/sys_fs.c
- * @brief Filesystem and path syscall implementations.
+ * @brief Path and file syscalls: open/stat/chdir/… into the VFS layer.
+ *
+ * `linux_stat` layout matches what musl/Linux binaries expect for `stat` / `fstat` / `lstat`.
+ * User pointers are checked before copying into user space.
  */
 
 #include <alcor2/errno.h>

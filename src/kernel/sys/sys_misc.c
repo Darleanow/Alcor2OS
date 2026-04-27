@@ -1,6 +1,6 @@
 /**
  * @file src/kernel/sys/sys_misc.c
- * @brief Miscellaneous syscall implementations.
+ * @brief Misc syscalls: `uname`, time, minimal `futex`, `sched_yield`.
  */
 
 #include <alcor2/errno.h>
