@@ -25,7 +25,7 @@ static void cmd_help(void)
 {
   sh_puts("\n");
   sh_puts("  Alcor2 Shell - Command Reference\n");
-  sh_puts("  ================================\n\n");
+  sh_puts("\n");
 
   sh_puts("  Builtin Commands:\n");
   sh_puts("    help              Show this help message\n");
