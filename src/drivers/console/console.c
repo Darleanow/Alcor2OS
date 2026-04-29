@@ -1,178 +1,330 @@
 /**
  * @file src/drivers/console/console.c
- * @brief Framebuffer console with ANSI color support.
+ * @brief Framebuffer console.
+ *
+ * Limine @a pitch is bytes per scanline. Pixel offset is
+ * y * pitch_bytes + x * bytes_pp — do not assume 32 bpp.
  */
 
 #include "font.h"
 #include <alcor2/drivers/console.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/types.h>
 #include <stdarg.h>
 
 #define FONT_W 8
 #define FONT_H 16
 
-/** @brief Console state and framebuffer context. */
+#define ESC_BUF_MAX 64
+
 static struct
 {
-  volatile u32 *buffer;      /**< Framebuffer pointer */
-  u64           width;       /**< Width in pixels */
-  u64           height;      /**< Height in pixels */
-  u64           pitch;       /**< Pitch in pixels */
-  u32           cursor_x;    /**< Cursor X (chars) */
-  u32           cursor_y;    /**< Cursor Y (chars) */
-  u32           fg;          /**< Foreground color */
-  u32           bg;          /**< Background color */
-  int           esc_state;   /**< ANSI parser: 0=normal, 1=ESC, 2=[ */
-  char          esc_buf[16]; /**< ANSI escape buffer */
-  int           esc_len;     /**< ANSI buffer length */
+  volatile u8 *base;
+  u64           width;
+  u64           height;
+  u64           pitch_bytes;
+  u8            bytes_pp;
+  u32           fg;
+  u32           bg;
+  u32           cursor_x;
+  u32           cursor_y;
+  int           esc_state;
+  char          esc_buf[ESC_BUF_MAX];
+  int           esc_len;
+  int           cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
 } ctx;
 
-/**
- * @brief Initialize the framebuffer console
- * @param fb Framebuffer address
- * @param width Width in pixels
- * @param height Height in pixels
- * @param pitch Pitch in bytes (bytes per row)
- */
-void console_init(void *fb, u64 width, u64 height, u64 pitch)
+/** Match first three bytes of a little-endian u32 color (same as old u32 store on 32 bpp). */
+static void fb_store24(volatile u8 *p, u32 c)
 {
-  ctx.buffer   = (volatile u32 *)fb;
-  ctx.width    = width;
-  ctx.height   = height;
-  ctx.pitch    = pitch / sizeof(u32);
-  ctx.cursor_x = 0;
-  ctx.cursor_y = 0;
-  ctx.fg       = 0xFFFFFF;
-  ctx.bg       = 0x000000;
+  p[0] = (u8)(c & 0xffu);
+  p[1] = (u8)((c >> 8) & 0xffu);
+  p[2] = (u8)((c >> 16) & 0xffu);
 }
 
-/**
- * @brief Set console color theme
- * @param theme Theme with foreground and background colors (RGB)
- */
-// cppcheck-suppress unusedFunction
+static void fb_store16(volatile u8 *p, u32 c)
+{
+  u32 r         = (c >> 16) & 0xffu;
+  u32 g         = (c >> 8) & 0xffu;
+  u32 bo        = c & 0xffu;
+  u16 rgb565 =
+    (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (bo >> 3));
+  p[0]          = (u8)(rgb565 & 0xffu);
+  p[1]          = (u8)(rgb565 >> 8);
+}
+
+static void fb_put_pixel(u32 x, u32 y, u32 color)
+{
+  if(x >= ctx.width || y >= ctx.height)
+    return;
+  volatile u8 *p =
+    ctx.base + (u64)y * ctx.pitch_bytes + (u64)x * ctx.bytes_pp;
+
+  switch(ctx.bytes_pp) {
+  case 4:
+    *(volatile u32 *)p = color;
+    return;
+  case 3:
+    fb_store24(p, color);
+    return;
+  case 2:
+    fb_store16(p, color);
+    return;
+  default:
+    return;
+  }
+}
+
+/** Bytes per pixel from bpp; Limine QEMU is usually 32. */
+static u8 bytes_pp_from_bpp(u16 bpp)
+{
+  switch(bpp) {
+  case 32:
+    return 4;
+  case 24:
+    return 3;
+  case 16:
+    return 2;
+  default: {
+    u8 guess = (u8)(((unsigned)bpp + 7u) / 8u);
+    if(guess >= 2u && guess <= 4u)
+      return guess;
+    return 4;
+  }
+  }
+}
+
+void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
+{
+  ctx.base        = (volatile u8 *)fb;
+  ctx.width       = width;
+  ctx.height      = height;
+  ctx.pitch_bytes = pitch_bytes;
+  ctx.bytes_pp    = bytes_pp_from_bpp(bpp);
+  ctx.cursor_x    = 0;
+  ctx.cursor_y    = 0;
+  ctx.fg          = 0xFFFFFF;
+  ctx.bg          = 0x000000;
+  ctx.esc_state   = 0;
+  ctx.esc_len     = 0;
+  ctx.cp437_mode  = 0;
+}
+
 void console_set_theme(console_theme_t theme)
 {
   ctx.fg = theme.foreground;
   ctx.bg = theme.background;
 }
 
-/**
- * @brief Clear the entire screen and reset cursor
- */
+static void fb_clear_rectangle(u64 y0, u64 y1)
+{
+  if(ctx.bytes_pp == 4) {
+    volatile u32 *row32 = (volatile u32 *)ctx.base;
+    u64           pu     = ctx.pitch_bytes / 4ull;
+    u64           pairs  = ctx.width / 2;
+    u64           bgpair = ((u64)ctx.bg << 32) | ctx.bg;
+
+    for(u64 y = y0; y < y1; y++) {
+      volatile u64 *r = (volatile u64 *)(row32 + y * pu);
+      for(u64 i = 0; i < pairs; i++)
+        r[i] = bgpair;
+      if(ctx.width & 1u)
+        row32[y * pu + ctx.width - 1] = ctx.bg;
+    }
+    return;
+  }
+  for(u64 y = y0; y < y1; y++)
+    for(u32 x = 0; x < (u32)ctx.width; x++)
+      fb_put_pixel(x, (u32)y, ctx.bg);
+}
+
 void console_clear(void)
 {
-  u64 bg64 = (u64)ctx.bg | ((u64)ctx.bg << 32);
-  for(u64 y = 0; y < ctx.height; y++) {
-    u64 *row = (u64 *)&ctx.buffer[y * ctx.pitch];
-    u64  w   = ctx.width / 2;
-    for(u64 i = 0; i < w; i++)
-      row[i] = bg64;
-    if(ctx.width & 1)
-      ctx.buffer[y * ctx.pitch + ctx.width - 1] = ctx.bg;
-  }
+  fb_clear_rectangle(0, ctx.height);
   ctx.cursor_x = 0;
   ctx.cursor_y = 0;
 }
 
-/**
- * @brief Draw 8x16 glyph at pixel position.
- * @param c Character to draw.
- * @param px Pixel X.
- * @param py Pixel Y.
- */
+/** MSB is left pixel (classic PC font / font_bitmap.h). */
 static void draw_glyph(char c, u32 px, u32 py)
 {
-  if(c < 32 || c > 126)
+  u8 uc = (u8)c;
+  int gi = font_glyph_index(uc);
+  if(gi < 0)
+    gi = font_glyph_index((unsigned char)'?');
+  if(gi < 0)
     return;
-  const u8 *glyph = font_data[c - 32];
+
+  const u8 *glyph = ctx.cp437_mode ? font_cp437[gi] : font_latin1[gi];
 
   for(int row = 0; row < FONT_H; row++) {
+    u8 b = glyph[row];
     for(int col = 0; col < FONT_W; col++) {
-      u32 x = px + col;
-      u32 y = py + row;
-      if(x < ctx.width && y < ctx.height) {
-        u32 color = (glyph[row] & (0x80 >> col)) ? ctx.fg : ctx.bg;
-        ctx.buffer[y * ctx.pitch + x] = color;
-      }
+      u32 x = px + (u32)col;
+      u32 y = py + (u32)row;
+      fb_put_pixel(x, y, ((b & (0x80u >> col)) != 0) ? ctx.fg : ctx.bg);
     }
   }
 }
 
-/**
- * @brief Scroll framebuffer up by one text line.
- *
- * Uses row-based kmemcpy for bulk copies instead of pixel-by-pixel,
- * and 64-bit stores for the bottom clear.
- */
 static void scroll(void)
 {
-  u64 row_bytes = ctx.width * sizeof(u32);
+  u64 span = ctx.height - (u64)FONT_H;
 
-  /* Shift the visible area up by FONT_H pixel rows */
-  for(u64 y = 0; y < ctx.height - FONT_H; y++)
-    kmemcpy((void *)&ctx.buffer[y * ctx.pitch],
-           (const void *)&ctx.buffer[(y + FONT_H) * ctx.pitch],
-           row_bytes);
+  if(ctx.bytes_pp == 4) {
+    volatile u32 *buf = (volatile u32 *)ctx.base;
+    u64             pu = ctx.pitch_bytes / 4ull;
+    u64             rowcopy = ctx.width * sizeof(u32);
 
-  /* Clear the bottom FONT_H rows with background color */
-  u64 bg64 = (u64)ctx.bg | ((u64)ctx.bg << 32);
-  for(u64 y = ctx.height - FONT_H; y < ctx.height; y++) {
-    u64 *row = (u64 *)&ctx.buffer[y * ctx.pitch];
-    u64  w   = ctx.width / 2;
-    for(u64 i = 0; i < w; i++)
-      row[i] = bg64;
-    if(ctx.width & 1)
-      ctx.buffer[y * ctx.pitch + ctx.width - 1] = ctx.bg;
+    for(u64 y = 0; y < span; y++)
+      kmemcpy((void *)&buf[y * pu], (void const *)&buf[(y + (u64)FONT_H) * pu],
+             rowcopy);
+    fb_clear_rectangle(span, ctx.height);
+    return;
+  }
+
+  u64 row_px = ctx.width * ctx.bytes_pp;
+  for(u64 y = 0; y < span; y++) {
+    volatile u8       *dst = ctx.base + y * ctx.pitch_bytes;
+    const volatile u8 *src =
+      ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
+    kmemcpy((void *)dst, (void const *)src, row_px);
+  }
+  fb_clear_rectangle(span, ctx.height);
+}
+
+/** xterm-like 256-color palette (ANSI 38/48;5). */
+static u32 ansi256_to_rgb(unsigned idx)
+{
+  static const u32 ansi16_col[16] = {
+    0x000000ul, 0xAA0000ul, 0x00AA00ul, 0xAA5500ul, 0x0000AAul, 0xAA00AAul,
+    0x00AAAAul, 0xAAAAAAul, 0x555555ul, 0xFF5555ul, 0x55FF55ul, 0xFFFF55ul,
+    0x5555FFul, 0xFF55FFul, 0x55FFFFul, 0xFFFFFFul,
+  };
+
+  if(idx < 16u)
+    return ansi16_col[idx];
+  if(idx < 232u) {
+    unsigned i   = idx - 16u;
+    unsigned r6  = i / 36u;
+    unsigned rem = i % 36u;
+    unsigned g6  = rem / 6u;
+    unsigned b6  = rem % 6u;
+    u32      rchan = (r6 == 0u) ? 0u : (55u + 40u * (r6 - 1u));
+    u32      gchan = (g6 == 0u) ? 0u : (55u + 40u * (g6 - 1u));
+    u32      bchan = (b6 == 0u) ? 0u : (55u + 40u * (b6 - 1u));
+    return (rchan << 16) | (gchan << 8u) | bchan;
+  }
+  {
+    unsigned k = idx - 232u;
+    u32      v = 8u + 10u * k;
+    return (v << 16) | (v << 8) | v;
   }
 }
 
-/**
- * @brief Process ANSI escape sequence.
- */
+static void handle_sgr(void)
+{
+  if(ctx.esc_len < 1 || ctx.esc_buf[ctx.esc_len - 1] != 'm')
+    return;
+
+  int pn = ctx.esc_len - 1; /* excludes trailing ASCII 'm'. */
+  if(pn <= 0) {
+    ctx.fg         = 0xFFFFFFu;
+    ctx.bg         = 0x000000u;
+    ctx.cp437_mode = 0;
+    return;
+  }
+
+  int pv[32];
+  int np = 0;
+
+  /* Parse ';'-separated unsigned numbers (missing numbers become 0). */
+  int i = 0;
+  while(i < pn && np < (int)(sizeof(pv) / sizeof(pv[0]))) {
+    unsigned acc = 0u;
+    int      dig = 0;
+    while(i < pn && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
+      acc = acc * 10u + (unsigned)(ctx.esc_buf[i] - '0');
+      i++;
+      dig++;
+    }
+    pv[np++] = (int)((dig != 0) ? acc % 256u : 0u);
+    if(i < pn && ctx.esc_buf[i] == ';')
+      i++;
+  }
+
+  for(int pi = 0; pi < np; pi++) {
+    int p = pv[pi];
+
+    switch(p) {
+    case 0:
+      ctx.fg         = 0xFFFFFFu;
+      ctx.bg         = 0x000000u;
+      ctx.cp437_mode = 0;
+      break;
+    case 39:
+      ctx.fg = 0xFFFFFFu;
+      break;
+    case 49:
+      ctx.bg = 0x000000u;
+      break;
+    case 38:
+      if(pi + 2 < np && pv[pi + 1] == 5) {
+        ctx.fg = ansi256_to_rgb((unsigned)pv[pi + 2]);
+        pi += 2;
+      }
+      break;
+    case 48:
+      if(pi + 2 < np && pv[pi + 1] == 5) {
+        ctx.bg = ansi256_to_rgb((unsigned)pv[pi + 2]);
+        pi += 2;
+      }
+      break;
+    /* Private: atlas select (outside standard 30–37/90–97 foreground set). */
+    case 50:
+      ctx.cp437_mode = 0;
+      break;
+    case 51:
+      ctx.cp437_mode = 1;
+      break;
+    default:
+      break;
+    }
+  }
+}
+
 static void handle_ansi_sequence(void)
 {
-  /* Parse the escape sequence in esc_buf */
-  /* Common sequences:
-   * [2J  - clear screen
-   * [H   - cursor home
-   * [nA  - cursor up n
-   * [nB  - cursor down n
-   * [nC  - cursor forward n
-   * [nD  - cursor back n
-   */
+  if(ctx.esc_len < 1)
+    return;
+
   char cmd = ctx.esc_buf[ctx.esc_len - 1];
 
   switch(cmd) {
-  case 'J': /* Erase display */
-    if(ctx.esc_len >= 2 && ctx.esc_buf[0] == '2') {
+  case 'J':
+    if(ctx.esc_len >= 2 && ctx.esc_buf[0] == '2')
       console_clear();
-    }
     break;
-  case 'H': /* Cursor home */
+  case 'H':
     ctx.cursor_x = 0;
     ctx.cursor_y = 0;
     break;
-  case 'K': /* Erase line */
-    /* Clear from cursor to end of line */
+  case 'K':
     for(u32 x = ctx.cursor_x; x < ctx.width; x++) {
-      for(int row = 0; row < FONT_H; row++) {
-        ctx.buffer[(ctx.cursor_y + row) * ctx.pitch + x] = ctx.bg;
-      }
+      for(int row = 0; row < FONT_H; row++)
+        fb_put_pixel(x, ctx.cursor_y + (u32)row, ctx.bg);
     }
+    break;
+  case 'm':
+    handle_sgr();
     break;
   default:
     break;
   }
 }
 
-/**
- * @brief Write a single character to the console
- * @param c Character to write (supports \n, \r, \t, \b, and ANSI escapes)
- */
 void console_putchar(char c)
 {
-  /* ANSI escape sequence parser */
   if(ctx.esc_state == 1) {
     if(c == '[') {
       ctx.esc_state = 2;
@@ -180,22 +332,19 @@ void console_putchar(char c)
       return;
     }
     ctx.esc_state = 0;
-    /* Fall through to print the character */
   } else if(ctx.esc_state == 2) {
     if((c >= '0' && c <= '9') || c == ';') {
-      if(ctx.esc_len < 15) {
+      if(ctx.esc_len < ESC_BUF_MAX - 1)
         ctx.esc_buf[ctx.esc_len++] = c;
-      }
       return;
     }
-    /* End of sequence */
     ctx.esc_buf[ctx.esc_len++] = c;
     handle_ansi_sequence();
     ctx.esc_state = 0;
     return;
   }
 
-  if(c == '\033') { /* ESC */
+  if(c == '\033') {
     ctx.esc_state = 1;
     return;
   }
@@ -209,22 +358,15 @@ void console_putchar(char c)
     ctx.cursor_x = 0;
     break;
   case '\t':
-    ctx.cursor_x = (ctx.cursor_x + 32) & ~31;
+    ctx.cursor_x = (ctx.cursor_x + 32u) & ~31u;
     break;
   case '\b':
-    /* Backspace: move cursor back and erase character */
     if(ctx.cursor_x >= FONT_W) {
       ctx.cursor_x -= FONT_W;
-      /* Erase the character by drawing background */
-      for(int row = 0; row < FONT_H; row++) {
-        for(int col = 0; col < FONT_W; col++) {
-          u32 x = ctx.cursor_x + col;
-          u32 y = ctx.cursor_y + row;
-          if(x < ctx.width && y < ctx.height) {
-            ctx.buffer[y * ctx.pitch + x] = ctx.bg;
-          }
-        }
-      }
+      for(int row = 0; row < FONT_H; row++)
+        for(int col = 0; col < FONT_W; col++)
+          fb_put_pixel(ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row,
+                       ctx.bg);
     }
     break;
   default:
@@ -243,20 +385,12 @@ void console_putchar(char c)
   }
 }
 
-/**
- * @brief Write a null-terminated string to the console.
- * @param s String to display.
- */
 void console_print(const char *s)
 {
   while(*s)
     console_putchar(*s++);
 }
 
-/**
- * @brief Print a signed integer to the console.
- * @param n Integer to print.
- */
 static void print_int(int n)
 {
   char buf[32];
@@ -282,31 +416,14 @@ static void print_int(int n)
   }
 }
 
-/**
- * @brief Print an unsigned 64-bit integer in hexadecimal format.
- * @param n Integer to print (prefixed with "0x").
- */
 static void print_hex(u64 n)
 {
-  const char hex[] = "0123456789abcdef";
+  static const char hex[] = "0123456789abcdef";
   console_print("0x");
-  for(int i = 60; i >= 0; i -= 4)
-    console_putchar(hex[(n >> i) & 0xF]);
+  for(int s = 60; s >= 0; s -= 4)
+    console_putchar(hex[(int)((n >> s) & 0xFULL)]);
 }
 
-/**
- * @brief Formatted console output (printf-style).
- *
- * Supports the following format specifiers:
- * - %d: signed integer
- * - %x: unsigned 64-bit hexadecimal (with 0x prefix)
- * - %s: null-terminated string
- * - %c: single character
- * - %%: literal percent sign
- *
- * @param fmt Format string.
- * @param ... Variable arguments matching format specifiers.
- */
 void console_printf(const char *fmt, ...)
 {
   va_list args;
@@ -340,9 +457,8 @@ void console_printf(const char *fmt, ...)
         console_putchar(*fmt);
         break;
       }
-    } else {
+    } else
       console_putchar(*fmt);
-    }
     fmt++;
   }
 

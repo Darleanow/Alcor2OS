@@ -2,8 +2,10 @@
  * @file include/alcor2/drivers/console.h
  * @brief Framebuffer-based console output.
  *
- * Provides a simple text console using a linear framebuffer with a
- * built-in font. Supports scrolling, theming, and printf-style formatting.
+ * Framebuffer bpp is taken into account (@a bpp / bytes per pixel). Latin-1 and
+ * CP437 atlases disagree on octets ≥0x80; select with @c ESC [ 50 m (ISO Latin-1,
+ * default) vs @c ESC [ 51 m (CP437 / box drawing). Xterm 256-colour SGR @c ESC [ 38 ; 5 ; n m
+ * and @c ESC [ 48 ; 5 ; n m set foreground/background from the fixed palette.
  */
 
 #ifndef ALCOR2_CONSOLE_H
@@ -25,9 +27,10 @@ typedef struct
  * @param fb Pointer to the linear framebuffer.
  * @param width Width in pixels.
  * @param height Height in pixels.
- * @param pitch Bytes per scanline.
+ * @param pitch_bytes Bytes per scanline (Limine @c pitch field).
+ * @param bpp Bits per pixel (typically 24 or 32).
  */
-void console_init(void *fb, u64 width, u64 height, u64 pitch);
+void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp);
 
 /**
  * @brief Set the console color theme.
