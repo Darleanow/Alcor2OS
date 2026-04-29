@@ -10,7 +10,7 @@
  * @brief Table of builtin command names.
  */
 static const char *builtins[] = {"help", "version", "clear", "exit",
-                                 "cd",   "pwd",     NULL};
+                                 "cd",   "pwd",     "kbd",   NULL};
 
 /**
  * @name Builtin command implementations
@@ -34,6 +34,7 @@ static void cmd_help(void)
   sh_puts("    echo [text...]    Display text\n");
   sh_puts("    cd <dir>          Change directory\n");
   sh_puts("    pwd               Print working directory\n");
+  sh_puts("    kbd us|fr         Set PS/2 keymap layout (US QWERTY or FR AZERTY-ish)\n");
   sh_puts("\n");
 
   sh_puts("  External Commands (/bin):\n");
@@ -106,6 +107,23 @@ static void cmd_pwd(void)
     sh_puts("pwd: error\n");
   }
 }
+
+/**
+ * @brief Set keyboard layout (`us` | `fr`); semantics match kernel tty layer, not firmware.
+ */
+static void cmd_kbd(command_t *cmd)
+{
+  const char *what = cmd->args[0];
+  if(!what || sh_strcmp(what, "us") == 0) {
+    sh_kbd_layout(KBD_LAYOUT_US);
+    sh_puts("keyboard: layout us\n");
+  } else if(sh_strcmp(what, "fr") == 0) {
+    sh_kbd_layout(KBD_LAYOUT_FR);
+    sh_puts("keyboard: layout fr\n");
+  } else {
+    sh_puts("usage: kbd [us|fr]\n");
+  }
+}
 /** @} */
 
 /**
@@ -142,6 +160,8 @@ int run_builtin(command_t *cmd)
     cmd_cd(cmd);
   } else if(sh_strcmp(cmd->cmd, "pwd") == 0) {
     cmd_pwd();
+  } else if(sh_strcmp(cmd->cmd, "kbd") == 0) {
+    cmd_kbd(cmd);
   } else {
     return -1;
   }

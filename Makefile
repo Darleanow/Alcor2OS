@@ -219,8 +219,12 @@ $(DISK):
 
 disk-mount: $(DISK)
 	@mkdir -p mnt
-	@sudo mount -o loop $(DISK) mnt
-	@echo "Mounted at ./mnt  —  run 'make disk-umount' when done"
+	@if mountpoint -q mnt 2>/dev/null; then \
+	  echo >&2 "$(DISK) already mounted at ./mnt (run 'make disk-umount' when done)"; \
+	else \
+	  sudo mount -o loop $(DISK) mnt && \
+	  echo "Mounted at ./mnt  —  run 'make disk-umount' when done"; \
+	fi
 
 disk-umount:
 	@sudo umount mnt 2>/dev/null || true
@@ -228,7 +232,11 @@ disk-umount:
 
 disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	@mkdir -p mnt
-	@sudo mount -o loop $(DISK) mnt
+	@if mountpoint -q mnt 2>/dev/null; then \
+	  : reused mount at ./mnt; \
+	else \
+	  sudo mount -o loop $(DISK) mnt; \
+	fi
 	@sudo mkdir -p mnt/bin mnt/etc mnt/tmp mnt/home \
 		mnt/usr/bin mnt/usr/lib/tcc mnt/usr/include mnt/usr/lib
 	@sudo cp user/build/bin/*.elf mnt/bin/ 2>/dev/null || true

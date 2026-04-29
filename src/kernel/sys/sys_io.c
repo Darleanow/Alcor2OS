@@ -9,6 +9,8 @@
 #include <alcor2/arch/cpu.h>
 #include <alcor2/errno.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/kbd.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/sys/internal.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/mm/vmm.h>
@@ -31,12 +33,7 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 
   if(fd == 0) {
     char *user_buf = (char *)buf;
-    while(!keyboard_has_data()) {
-      cpu_enable_interrupts();
-      __asm__ volatile("hlt");
-      cpu_disable_interrupts();
-    }
-    return keyboard_read(user_buf, count);
+    return kbd_read_translated(user_buf, count);
   }
 
   i64 pipe_result = pipe_read((int)fd, (void *)buf, count);
@@ -111,6 +108,18 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
       break;
     }
   }
+
+  if(fd == 0 && request == ALCOR2_IOC_KBD_SET_LAYOUT) {
+    u32 lid;
+    if(!user_rw_ok(arg, sizeof(lid)))
+      return (u64)-EFAULT;
+    kmemcpy(&lid, (void *)arg, sizeof(lid));
+    if(lid >= KBD_LAYOUT_COUNT)
+      return (u64)-EINVAL;
+    kbd_set_layout((kbd_layout_t)lid);
+    return 0;
+  }
+
   return 0;
 }
 

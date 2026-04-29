@@ -115,7 +115,9 @@ static int read_line(char *buf, size_t size)
       return 0;
     }
 
-    if(c >= 32 && c < 127 && pos < size - 1) {
+    /* ISO 8859-1 (same bytes as Unicode U+0080-U+00FF): allow printable high bytes after user sets `kbd fr`. */
+    unsigned char uc = (unsigned char)c;
+    if(((uc >= 32u && uc < 127u) || uc >= 160u) && pos < size - 1) {
       buf[pos++] = (char)c;
       sh_putchar((char)c);
     }

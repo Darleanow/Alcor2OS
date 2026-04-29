@@ -80,7 +80,7 @@ static void print_banner(void)
 static void init_early(struct limine_framebuffer *fb)
 {
   /* Console */
-  console_init(fb->address, fb->width, fb->height, fb->pitch);
+  console_init(fb->address, fb->width, fb->height, fb->pitch, fb->bpp);
   console_set_theme((console_theme_t) {
       .foreground = 0xA6A6A6,
       .background = 0x000000,
