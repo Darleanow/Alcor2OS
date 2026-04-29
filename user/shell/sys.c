@@ -49,6 +49,22 @@ long sh_write(int fd, const void *buf, size_t len)
   return write(fd, buf, len);
 }
 
+int sh_ioctl(int fd, unsigned long request, void *arg)
+{
+  return ioctl(fd, request, arg);
+}
+
+/**
+ * @brief Apply keyboard layout (same tables as kernel `kbd_layout.c`).
+ *
+ * Usage: ioctl with `ALCOR2_IOC_KBD_SET_LAYOUT` — see `<alcor2/kbd.h>`.
+ */
+void sh_kbd_layout(kbd_layout_t layout)
+{
+  uint32_t v = (uint32_t)layout;
+  (void)sh_ioctl(0, (unsigned long)ALCOR2_IOC_KBD_SET_LAYOUT, &v);
+}
+
 /**
  * @brief Clear the terminal screen
  */

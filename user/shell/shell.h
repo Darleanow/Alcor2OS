@@ -10,7 +10,10 @@
 #include <dirent.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
+
+#include <alcor2/kbd.h>
 
 /** @file Configuration constants */
 
@@ -47,6 +50,8 @@ int  sh_getchar(void);
 void           sh_exit(int code);
 long           sh_read(int fd, void *buf, size_t len);
 long           sh_write(int fd, const void *buf, size_t len);
+int            sh_ioctl(int fd, unsigned long request, void *arg);
+void           sh_kbd_layout(kbd_layout_t layout);
 void           sh_clear(void);
 int            sh_open(const char *path, int flags);
 int            sh_close(int fd);
