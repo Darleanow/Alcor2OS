@@ -51,9 +51,32 @@ OBJS     := $(patsubst $(SRC)/%.c,$(BUILD)/%.c.o,$(SRCS_C)) \
 DEPS     := $(OBJS:.o=.d)
 
 .PHONY: all iso run run-disk disk disk-mount disk-umount disk-populate \
-        clean distclean user musl tcc clang format lint check analyze
+        compile_commands clean distclean user musl tcc clang format lint check analyze
 
-all: iso
+all: $(BUILD)/$(KERNEL) compile_commands
+
+# Accurate flags for clangd/IDE. Auto-generated after builds.
+compile_commands: $(BUILD)/$(KERNEL)
+	@echo '[' > compile_commands.json
+	@for src in $(SRCS_C); do \
+		echo '  {' >> compile_commands.json; \
+		echo '    "directory": "$(shell pwd)",' >> compile_commands.json; \
+		echo '    "arguments": [' >> compile_commands.json; \
+		echo '      "$(CC)",' >> compile_commands.json; \
+		for flag in $(CFLAGS); do \
+			echo '      "'"$$flag"'",' >> compile_commands.json; \
+		done; \
+		echo '      "-c",' >> compile_commands.json; \
+		echo '      "'"$$src"'",' >> compile_commands.json; \
+		echo '      "-o",' >> compile_commands.json; \
+		obj=$$(echo $$src | sed 's|$(SRC)|$(BUILD)|; s|\.c$$|\.c\.o|'); \
+		echo '      "'"$$obj"'"' >> compile_commands.json; \
+		echo '    ],' >> compile_commands.json; \
+		echo '    "file": "'"$$src"'"' >> compile_commands.json; \
+		echo '  },' >> compile_commands.json; \
+	done
+	@sed -i '$$ s/,$$//' compile_commands.json  # Remove last comma
+	@echo ']' >> compile_commands.json
 
 musl:  thirdparty/musl/install/lib/libc.a
 tcc:   thirdparty/tcc-install/usr/bin/tcc
@@ -175,7 +198,7 @@ thirdparty/clang-install/usr/bin/clang: thirdparty/musl-cross/bin/x86_64-linux-m
 	  --component lld 2>&1 | tail -3
 	@echo "Clang $(LLVM_VER) built for Alcor2"
 
-iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user
+iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user compile_commands
 	@rm -rf $(BUILD)/iso
 	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT $(BUILD)/iso/bin
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/

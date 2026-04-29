@@ -1,0 +1,10 @@
+CompileFlags:
+  CompilationDatabase: .
+
+Index:
+  Background: Build
+  StandardLibrary: false
+
+Diagnostics:
+  ClangTidy:
+    Checks: "-*"

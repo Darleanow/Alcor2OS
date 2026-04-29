@@ -2,54 +2,58 @@
  * @file src/kernel/main.c
  * @brief Kernel entry point and bring-up sequence.
  *
- * Typical order: console → PMM (Limine map) → VMM (HHDM) → GDT/IDT → PIC/PIT → kernel heap →
- * ATA disk → ext2 volume on `/` → VFS → keyboard → syscall MSRs → scheduler → first user
- * program (shell or binary from module).
+ * Typical order: console → PMM (Limine map) → VMM (HHDM) → GDT/IDT → PIC/PIT →
+ * kernel heap → ATA disk → ext2 volume on `/` → VFS → keyboard → syscall MSRs →
+ * scheduler → first user program (shell or binary from module).
  */
 
-#include <alcor2/drivers/ata.h>
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
-#include <alcor2/proc/elf.h>
-#include <alcor2/fs/ext2.h>
 #include <alcor2/arch/gdt.h>
-#include <alcor2/mm/heap.h>
 #include <alcor2/arch/idt.h>
-#include <alcor2/drivers/keyboard.h>
-#include <alcor2/limine.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/arch/pit.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/drivers/keyboard.h>
+#include <alcor2/fs/ext2.h>
+#include <alcor2/fs/vfs.h>
+#include <alcor2/limine.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/mm/pmm.h>
+#include <alcor2/mm/vmm.h>
+#include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/sched.h>
+#include <alcor2/proc/user.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
-#include <alcor2/proc/user.h>
-#include <alcor2/fs/vfs.h>
-#include <alcor2/mm/vmm.h>
 
 LIMINE_BASE_REVISION(3)
 LIMINE_REQUESTS_START
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_framebuffer_request fb_request = {
     .id       = LIMINE_FRAMEBUFFER_REQUEST_ID,
     .revision = 0,
 };
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_memmap_request memmap_request = {
     .id       = LIMINE_MEMMAP_REQUEST_ID,
     .revision = 0,
 };
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_hhdm_request hhdm_request = {
     .id       = LIMINE_HHDM_REQUEST_ID,
     .revision = 0,
 };
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_module_request module_request = {
     .id       = LIMINE_MODULE_REQUEST_ID,
     .revision = 0,

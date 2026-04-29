@@ -1,0 +1,5 @@
+-Iinclude
+-std=gnu11
+-ffreestanding
+-fno-stack-protector
+-m64
