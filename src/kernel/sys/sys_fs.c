@@ -80,11 +80,6 @@ u64 sys_close(u64 fd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  if(fd <= 2)
-    return 0;
-  if(pipe_close((int)fd) == 0)
-    return 0;
-
   i64 result = vfs_close((i64)fd);
   return (result < 0) ? (u64)-EBADF : 0;
 }

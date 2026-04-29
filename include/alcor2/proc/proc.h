@@ -9,6 +9,7 @@
 #ifndef ALCOR2_PROC_H
 #define ALCOR2_PROC_H
 
+#include <alcor2/fs/vfs.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/types.h>
 
@@ -68,6 +69,11 @@ typedef struct proc
   u64          sig_pending;               /**< Bitmask of pending signals */
   u64          sig_mask;                  /**< Bitmask of blocked signals */
   k_sigaction_t sig_actions[NSIG];        /**< Per-signal action table */
+
+  /** @brief Per-process fd table; each entry is an index into the global
+   * open file table, or -1 for closed. Inherited on fork, preserved across
+   * exec, released on exit. */
+  i32          fds[VFS_MAX_FD];
 } proc_t;
 
 /**

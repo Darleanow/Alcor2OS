@@ -8,6 +8,7 @@
 #include <alcor2/mm/heap.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/proc/proc.h>
+#include <alcor2/sys/internal.h>
 #include <alcor2/fs/vfs.h>
 
 #define VFS_MAX_MOUNTS  8
@@ -39,13 +40,154 @@ static const char *
     get_relative_path(const char *path, const vfs_mount_t *mount);
 
 /**
- * @brief Check if file descriptor is on a mounted filesystem (not ramfs)
- * @param fd File descriptor to check
- * @return true if mounted fs, false if ramfs
+ * @brief True if the OFT entry refers to a mounted filesystem (vs ramfs).
  */
-static inline bool is_mounted_fd(i64 fd)
+static inline bool is_mounted_oft(i32 oft_idx)
 {
-  return fd_table[fd].ops != NULL;
+  return fd_table[oft_idx].ops != NULL;
+}
+
+/* ====================================================================== */
+/*  Open file table + per-process fd table                                */
+/* ====================================================================== */
+
+/**
+ * @brief Allocate a free slot in the open file table, refcount=1, kind=FILE.
+ * @return Index, or -ENFILE.
+ */
+static i32 oft_alloc_file(void)
+{
+  for(i32 i = 0; i < VFS_MAX_FD; i++) {
+    if(!fd_table[i].in_use) {
+      fd_table[i].in_use   = true;
+      fd_table[i].kind     = VFS_FD_FILE;
+      fd_table[i].refcount = 1;
+      fd_table[i].node     = NULL;
+      fd_table[i].ops      = NULL;
+      fd_table[i].pipe     = NULL;
+      fd_table[i].offset   = 0;
+      fd_table[i].flags    = 0;
+      return i;
+    }
+  }
+  return -ENFILE;
+}
+
+i32 vfs_oft_alloc_pipe(i32 kind, void *pipe)
+{
+  for(i32 i = 0; i < VFS_MAX_FD; i++) {
+    if(!fd_table[i].in_use) {
+      fd_table[i].in_use   = true;
+      fd_table[i].kind     = kind;
+      fd_table[i].refcount = 1;
+      fd_table[i].node     = NULL;
+      fd_table[i].ops      = NULL;
+      fd_table[i].pipe     = pipe;
+      fd_table[i].offset   = 0;
+      fd_table[i].flags    = 0;
+      return i;
+    }
+  }
+  return -ENFILE;
+}
+
+void vfs_oft_retain(i32 oft_idx)
+{
+  if(oft_idx < 0 || oft_idx >= VFS_MAX_FD || !fd_table[oft_idx].in_use)
+    return;
+  fd_table[oft_idx].refcount++;
+}
+
+void vfs_oft_release(i32 oft_idx)
+{
+  if(oft_idx < 0 || oft_idx >= VFS_MAX_FD || !fd_table[oft_idx].in_use)
+    return;
+  if(--fd_table[oft_idx].refcount > 0)
+    return;
+
+  switch(fd_table[oft_idx].kind) {
+    case VFS_FD_FILE:
+      if(fd_table[oft_idx].ops) {
+        fs_file_t fh = (fs_file_t)fd_table[oft_idx].node;
+        if(fd_table[oft_idx].ops->flush)
+          fd_table[oft_idx].ops->flush(fh);
+        fd_table[oft_idx].ops->close(fh);
+      }
+      break;
+    case VFS_FD_PIPE_READ:
+    case VFS_FD_PIPE_WRITE:
+      if(fd_table[oft_idx].pipe)
+        pipe_oft_release(fd_table[oft_idx].kind, fd_table[oft_idx].pipe);
+      break;
+  }
+  fd_table[oft_idx].in_use = false;
+  fd_table[oft_idx].ops    = NULL;
+  fd_table[oft_idx].node   = NULL;
+  fd_table[oft_idx].pipe   = NULL;
+}
+
+/**
+ * @brief Translate a per-process fd to an OFT index.
+ * @return OFT index, or -1 if @p fd is closed or invalid.
+ */
+static i32 fd_to_oft(i64 fd)
+{
+  proc_t *p = proc_current();
+  if(!p || fd < 0 || fd >= VFS_MAX_FD)
+    return -1;
+  i32 idx = p->fds[fd];
+  if(idx < 0 || idx >= VFS_MAX_FD || !fd_table[idx].in_use)
+    return -1;
+  return idx;
+}
+
+/**
+ * @brief Install @p oft_idx at the lowest free fd >= 3 in the current
+ * process's fd table.
+ * @return The fd, or -EMFILE.
+ */
+static i64 proc_install_fd_from(int start, i32 oft_idx)
+{
+  proc_t *p = proc_current();
+  if(!p)
+    return -EINVAL;
+  for(i64 i = start; i < VFS_MAX_FD; i++) {
+    if(p->fds[i] < 0) {
+      p->fds[i] = oft_idx;
+      return i;
+    }
+  }
+  return -EMFILE;
+}
+
+i64 vfs_install_fd(i32 oft_idx)
+{
+  return proc_install_fd_from(0, oft_idx);
+}
+
+void vfs_proc_init_fds(i32 *fds)
+{
+  for(int i = 0; i < VFS_MAX_FD; i++)
+    fds[i] = -1;
+}
+
+void vfs_proc_inherit_fds(i32 *child_fds, const i32 *parent_fds)
+{
+  for(int i = 0; i < VFS_MAX_FD; i++) {
+    child_fds[i] = parent_fds[i];
+    if(child_fds[i] >= 0)
+      vfs_oft_retain(child_fds[i]);
+  }
+}
+
+void vfs_proc_release_fds(i32 *fds)
+{
+  for(int i = 0; i < VFS_MAX_FD; i++) {
+    if(fds[i] >= 0) {
+      vfs_oft_release(fds[i]);
+      fds[i] = -1;
+    }
+  }
 }
 
 /**
@@ -413,135 +555,86 @@ void vfs_init(void)
  * @param flags Open flags (O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC, etc.).
  * @return File descriptor on success, negative on error.
  */
+/* Helper: install an opened file/dir in a freshly allocated OFT slot, then
+ * publish at the lowest free fd >= 3 in the current process's fd table. */
+static i64 publish_open(
+    vfs_node_t     *node,
+    fs_file_t       fh,
+    const fs_ops_t *ops,
+    u64             offset,
+    u32             flags
+)
+{
+  i32 oft = oft_alloc_file();
+  if(oft < 0)
+    return -ENFILE;
+  fd_table[oft].node   = ops ? (vfs_node_t *)fh : node;
+  fd_table[oft].ops    = ops;
+  fd_table[oft].offset = offset;
+  fd_table[oft].flags  = flags;
+
+  i64 fd = proc_install_fd_from(3, oft);
+  if(fd < 0) {
+    vfs_oft_release(oft);
+    return fd;
+  }
+  return fd;
+}
+
 i64 vfs_open(const char *path, u32 flags)
 {
-  /* Convert to absolute path for mount point detection */
   char abs_path[VFS_PATH_MAX];
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
-  /* Check if path is on a mounted filesystem with ops */
   vfs_mount_t *mount = find_mount(abs_path);
   if(mount && mount->ops) {
-    /* Route to mounted filesystem via ops */
     const char *rel_path = get_relative_path(abs_path, mount);
-
-    /* Find free fd (skip 0,1,2 reserved for stdin/stdout/stderr) */
-    i64 fd = -1;
-    for(i64 i = 3; i < VFS_MAX_FD; i++) {
-      if(!fd_table[i].in_use) {
-        fd = i;
-        break;
-      }
-    }
-    if(fd < 0)
-      return -1;
 
     fs_file_t fh     = NULL;
     bool      is_dir = false;
 
-    /* Handle create flag */
     if(flags & O_CREAT) {
       fh = mount->ops->create(mount->fs_data, rel_path);
-      if(fh && mount->ops->is_dir) {
+      if(fh && mount->ops->is_dir)
         is_dir = mount->ops->is_dir(fh);
-      }
     } else {
       fh = mount->ops->open(mount->fs_data, rel_path, flags, &is_dir);
     }
-
     if(!fh)
       return -1;
 
-    /* Handle truncate flag */
-    if((flags & O_TRUNC) && mount->ops->truncate) {
+    if((flags & O_TRUNC) && mount->ops->truncate)
       mount->ops->truncate(fh);
-    }
-
-    /* Handle append flag - seek to end */
-    if((flags & O_APPEND) && mount->ops->seek) {
+    if((flags & O_APPEND) && mount->ops->seek)
       mount->ops->seek(fh, 0, SEEK_END);
-    }
 
-    fd_table[fd].in_use = true;
-    fd_table[fd].node   = (vfs_node_t *)fh;
-    fd_table[fd].ops    = mount->ops;
-    fd_table[fd].offset =
-        mount->ops->get_position ? mount->ops->get_position(fh) : 0;
-    fd_table[fd].flags = flags;
-
-    /* Set owner PID */
-    proc_t *p              = proc_current();
-    fd_table[fd].owner_pid = p ? p->pid : 0;
-
-    return fd;
+    u64 off = mount->ops->get_position ? mount->ops->get_position(fh) : 0;
+    return publish_open(NULL, fh, mount->ops, off, flags);
   }
 
-  /* Ramfs path - use abs_path for consistency */
   vfs_node_t *node = resolve_path(abs_path);
 
-  /* Create if needed */
   if(!node && (flags & O_CREAT)) {
     char        name[VFS_NAME_MAX];
     vfs_node_t *parent = resolve_parent(abs_path, name);
-
-    if(!parent || parent->type != VFS_DIRECTORY) {
+    if(!parent || parent->type != VFS_DIRECTORY)
       return -1;
-    }
-
     node = create_node(name, VFS_FILE);
     if(!node)
       return -1;
-
     add_child(parent, node);
   }
 
   if(!node || node->type != VFS_FILE) {
-    /* Allow opening directories if O_DIRECTORY is set */
-    if(node && node->type == VFS_DIRECTORY && (flags & O_DIRECTORY)) {
-      /* Open directory for reading (getdents) */
-      for(i64 i = 3; i < VFS_MAX_FD; i++) {
-        if(!fd_table[i].in_use) {
-          fd_table[i].node   = node;
-          fd_table[i].ops    = NULL;
-          fd_table[i].offset = 0;
-          fd_table[i].flags  = flags;
-          fd_table[i].in_use = true;
-
-          /* Set owner PID */
-          proc_t *p             = proc_current();
-          fd_table[i].owner_pid = p ? p->pid : 0;
-
-          return i;
-        }
-      }
-      return -1;
-    }
+    if(node && node->type == VFS_DIRECTORY && (flags & O_DIRECTORY))
+      return publish_open(node, NULL, NULL, 0, flags);
     return -1;
   }
 
-  /* Find free fd (skip 0,1,2 reserved for stdin/stdout/stderr) */
-  for(i64 i = 3; i < VFS_MAX_FD; i++) {
-    if(!fd_table[i].in_use) {
-      fd_table[i].node   = node;
-      fd_table[i].ops    = NULL;
-      fd_table[i].offset = (flags & O_APPEND) ? node->size : 0;
-      fd_table[i].flags  = flags;
-      fd_table[i].in_use = true;
-
-      /* Set owner PID */
-      proc_t *p             = proc_current();
-      fd_table[i].owner_pid = p ? p->pid : 0;
-
-      /* Truncate if needed */
-      if(flags & O_TRUNC) {
-        node->size = 0;
-      }
-
-      return i;
-    }
-  }
-
-  return -1; /* No free fd */
+  u64 off = (flags & O_APPEND) ? node->size : 0;
+  if(flags & O_TRUNC)
+    node->size = 0;
+  return publish_open(node, NULL, NULL, off, flags);
 }
 
 /**
@@ -555,22 +648,14 @@ i64 vfs_open(const char *path, u32 flags)
  */
 i64 vfs_close(i64 fd)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fd_table[fd].node;
-    if(fd_table[fd].ops->flush) {
-      fd_table[fd].ops->flush(fh);
-    }
-    fd_table[fd].ops->close(fh);
-    fd_table[fd].in_use = false;
-    fd_table[fd].ops    = NULL;
-    return 0;
-  }
-
-  fd_table[fd].in_use = false;
+  proc_t *p = proc_current();
+  if(!p || fd < 0 || fd >= VFS_MAX_FD)
+    return -EBADF;
+  i32 oft = p->fds[fd];
+  if(oft < 0)
+    return -EBADF;
+  vfs_oft_release(oft);
+  p->fds[fd] = -1;
   return 0;
 }
 
@@ -587,36 +672,35 @@ i64 vfs_close(i64 fd)
  */
 i64 vfs_read(i64 fd, void *buf, u64 count)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
+    return -EBADF;
 
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fd_table[fd].node;
-    /* Sync position from fd table to file handle */
-    if(fd_table[fd].ops->seek) {
-      fd_table[fd].ops->seek(fh, (i64)fd_table[fd].offset, SEEK_SET);
-    }
-    i64 bytes = fd_table[fd].ops->read(fh, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
+  vfs_fd_t *f = &fd_table[oft];
+
+  if(f->kind == VFS_FD_PIPE_READ)
+    return pipe_read_obj(f->pipe, buf, count);
+  if(f->kind == VFS_FD_PIPE_WRITE)
+    return -EBADF;
+
+  if(is_mounted_oft(oft)) {
+    fs_file_t fh = (fs_file_t)f->node;
+    if(f->ops->seek)
+      f->ops->seek(fh, (i64)f->offset, SEEK_SET);
+    i64 bytes = f->ops->read(fh, buf, count);
+    if(bytes > 0)
+      f->offset += (u64)bytes;
     return bytes;
   }
 
-  vfs_fd_t         *f    = &fd_table[fd];
   const vfs_node_t *node = f->node;
-
-  if(f->offset >= node->size) {
-    return 0; /* EOF */
-  }
+  if(f->offset >= node->size)
+    return 0;
 
   u64 available = node->size - f->offset;
   u64 to_read   = (count < available) ? count : available;
-
   kmemcpy(buf, node->data + f->offset, to_read);
   f->offset += to_read;
-
   return (i64)to_read;
 }
 
@@ -634,29 +718,28 @@ i64 vfs_read(i64 fd, void *buf, u64 count)
  */
 i64 vfs_write(i64 fd, const void *buf, u64 count)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
+    return -EBADF;
 
-  /* Handle mounted filesystem files */
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fd_table[fd].node;
+  vfs_fd_t *f = &fd_table[oft];
 
-    /* Sync position from fd table to file */
-    if(fd_table[fd].ops->seek) {
-      fd_table[fd].ops->seek(fh, (i64)fd_table[fd].offset, SEEK_SET);
-    }
+  if(f->kind == VFS_FD_PIPE_WRITE)
+    return pipe_write_obj(f->pipe, buf, count);
+  if(f->kind == VFS_FD_PIPE_READ)
+    return -EBADF;
 
-    i64 bytes = fd_table[fd].ops->write(fh, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
+  if(is_mounted_oft(oft)) {
+    fs_file_t fh = (fs_file_t)f->node;
+    if(f->ops->seek)
+      f->ops->seek(fh, (i64)f->offset, SEEK_SET);
+    i64 bytes = f->ops->write(fh, buf, count);
+    if(bytes > 0)
+      f->offset += (u64)bytes;
     return bytes;
   }
 
-  vfs_fd_t   *f    = &fd_table[fd];
-  vfs_node_t *node = f->node;
-
+  vfs_node_t *node    = f->node;
   u64         end_pos = f->offset + count;
 
   /* Grow buffer if needed */
@@ -699,21 +782,22 @@ i64 vfs_write(i64 fd, const void *buf, u64 count)
  */
 i64 vfs_seek(i64 fd, i64 offset, i32 whence)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
+    return -EBADF;
 
-  /* Handle mounted filesystem files */
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh      = (fs_file_t)fd_table[fd].node;
-    i64       new_pos = fd_table[fd].ops->seek(fh, offset, whence);
-    if(new_pos >= 0) {
-      fd_table[fd].offset = (u64)new_pos;
-    }
+  if(fd_table[oft].kind != VFS_FD_FILE)
+    return -ESPIPE;
+
+  if(is_mounted_oft(oft)) {
+    fs_file_t fh      = (fs_file_t)fd_table[oft].node;
+    i64       new_pos = fd_table[oft].ops->seek(fh, offset, whence);
+    if(new_pos >= 0)
+      fd_table[oft].offset = (u64)new_pos;
     return new_pos;
   }
 
-  vfs_fd_t *f = &fd_table[fd];
+  vfs_fd_t *f = &fd_table[oft];
   i64       new_offset;
 
   switch(whence) {
@@ -1101,16 +1185,17 @@ i64 vfs_rmdir(const char *path)
  */
 i64 vfs_dup(i64 oldfd)
 {
-  if(oldfd < 0 || oldfd >= VFS_MAX_FD || !fd_table[oldfd].in_use)
+  i32 oft = fd_to_oft(oldfd);
+  if(oft < 0)
     return -EBADF;
 
-  for(i64 i = 3; i < VFS_MAX_FD; i++) {
-    if(!fd_table[i].in_use) {
-      fd_table[i] = fd_table[oldfd];
-      return i;
-    }
+  vfs_oft_retain(oft);
+  i64 new_fd = proc_install_fd_from(0, oft);
+  if(new_fd < 0) {
+    vfs_oft_release(oft);
+    return new_fd;
   }
-  return -EMFILE;
+  return new_fd;
 }
 
 /**
@@ -1125,17 +1210,23 @@ i64 vfs_dup(i64 oldfd)
  */
 i64 vfs_dup2(i64 oldfd, i64 newfd)
 {
-  if(oldfd < 0 || oldfd >= VFS_MAX_FD || !fd_table[oldfd].in_use)
+  i32 oft = fd_to_oft(oldfd);
+  if(oft < 0)
     return -EBADF;
   if(newfd < 0 || newfd >= VFS_MAX_FD)
     return -EBADF;
   if(oldfd == newfd)
     return newfd;
 
-  if(fd_table[newfd].in_use)
-    vfs_close(newfd);
+  proc_t *p = proc_current();
+  if(!p)
+    return -EINVAL;
 
-  fd_table[newfd] = fd_table[oldfd];
+  if(p->fds[newfd] >= 0)
+    vfs_oft_release(p->fds[newfd]);
+
+  vfs_oft_retain(oft);
+  p->fds[newfd] = oft;
   return newfd;
 }
 
@@ -1152,17 +1243,18 @@ i64 vfs_dup2(i64 oldfd, i64 newfd)
  */
 i64 vfs_fstat_fd(i64 fd, vfs_stat_t *st)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
     return -EBADF;
 
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh      = (fs_file_t)fd_table[fd].node;
-    u64       saved   = fd_table[fd].offset;
+  if(is_mounted_oft(oft)) {
+    fs_file_t fh      = (fs_file_t)fd_table[oft].node;
+    u64       saved   = fd_table[oft].offset;
     i64       end_pos = 0;
 
-    if(fd_table[fd].ops->seek) {
-      end_pos = fd_table[fd].ops->seek(fh, 0, SEEK_END);
-      fd_table[fd].ops->seek(fh, (i64)saved, SEEK_SET);
+    if(fd_table[oft].ops->seek) {
+      end_pos = fd_table[oft].ops->seek(fh, 0, SEEK_END);
+      fd_table[oft].ops->seek(fh, (i64)saved, SEEK_SET);
     }
 
     st->size = (end_pos >= 0) ? (u64)end_pos : 0;
@@ -1170,7 +1262,7 @@ i64 vfs_fstat_fd(i64 fd, vfs_stat_t *st)
     return 0;
   }
 
-  const vfs_node_t *node = fd_table[fd].node;
+  const vfs_node_t *node = fd_table[oft].node;
   st->size = node->size;
   st->type = node->type;
   return 0;
@@ -1183,9 +1275,10 @@ i64 vfs_fstat_fd(i64 fd, vfs_stat_t *st)
  */
 i64 vfs_get_flags(i64 fd)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
     return -EBADF;
-  return (i64)fd_table[fd].flags;
+  return (i64)fd_table[oft].flags;
 }
 
 /**
@@ -1200,12 +1293,11 @@ i64 vfs_get_flags(i64 fd)
  */
 i64 vfs_set_flags(i64 fd, u32 flags)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
     return -EBADF;
-
-  /* Keep the access-mode bits, replace the rest */
-  u32 access = fd_table[fd].flags & O_RDWR;
-  fd_table[fd].flags = access | (flags & ~(u32)O_RDWR);
+  u32 access          = fd_table[oft].flags & O_RDWR;
+  fd_table[oft].flags = access | (flags & ~(u32)O_RDWR);
   return 0;
 }
 
@@ -1222,25 +1314,26 @@ i64 vfs_set_flags(i64 fd, u32 flags)
  */
 i64 vfs_ftruncate(i64 fd, i64 length)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
     return -EBADF;
   if(length < 0)
     return -EINVAL;
 
-  if(is_mounted_fd(fd)) {
-    if(length == 0 && fd_table[fd].ops->truncate)
-      return fd_table[fd].ops->truncate((fs_file_t)fd_table[fd].node);
+  if(is_mounted_oft(oft)) {
+    if(length == 0 && fd_table[oft].ops->truncate)
+      return fd_table[oft].ops->truncate((fs_file_t)fd_table[oft].node);
     return (length == 0) ? 0 : -ENOSYS;
   }
 
-  vfs_node_t *node = fd_table[fd].node;
+  vfs_node_t *node = fd_table[oft].node;
   if(!node || node->type != VFS_FILE)
     return -EINVAL;
 
   if((u64)length <= node->size) {
     node->size = (u64)length;
-    if(fd_table[fd].offset > node->size)
-      fd_table[fd].offset = node->size;
+    if(fd_table[oft].offset > node->size)
+      fd_table[oft].offset = node->size;
     return 0;
   }
 
@@ -1265,11 +1358,11 @@ const char *vfs_getcwd(void)
  */
 i64 vfs_getdents(i64 fd, void *buf, u64 count)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
     return -1;
-  }
 
-  vfs_fd_t *fde = &fd_table[fd];
+  vfs_fd_t *fde = &fd_table[oft];
 
   /* Must be opened with O_DIRECTORY */
   if(!(fde->flags & O_DIRECTORY)) {
@@ -1280,7 +1373,7 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
   u64 written = 0;
 
   /* Handle mounted filesystem directories */
-  if(is_mounted_fd(fd)) {
+  if(is_mounted_oft(oft)) {
     fs_file_t fh = (fs_file_t)fde->node;
 
     /* Check if it's a directory */
@@ -1628,25 +1721,6 @@ i64 vfs_umount(const char *target)
   }
 
   return -1;
-}
-
-/**
- * @brief Close all FDs owned by a specific PID.
- *
- * Called by proc_exit to clean up resources.
- *
- * @param pid Process ID.
- */
-void vfs_close_for_pid(u64 pid)
-{
-  if(pid == 0)
-    return;
-
-  for(int i = 0; i < VFS_MAX_FD; i++) {
-    if(fd_table[i].in_use && fd_table[i].owner_pid == pid) {
-      vfs_close(i);
-    }
-  }
 }
 
 /**

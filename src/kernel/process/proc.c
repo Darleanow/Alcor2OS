@@ -75,6 +75,7 @@ static proc_t *proc_alloc(void)
 {
   for(int i = 0; i < PROC_MAX; i++) {
     if(proc_table[i].state == PROC_STATE_FREE) {
+      vfs_proc_init_fds(proc_table[i].fds);
       return &proc_table[i];
     }
   }
@@ -415,8 +416,8 @@ void proc_exit(i64 code)
   p->exit_code = code;
   p->state     = PROC_STATE_ZOMBIE;
 
-  /* Clean up open file descriptors */
-  vfs_close_for_pid(p->pid);
+  /* Release per-process fd table; OFT entries close when refcount hits 0 */
+  vfs_proc_release_fds(p->fds);
 
   /* Notify parent via SIGCHLD and wake it if blocked in waitpid */
   proc_t *parent = proc_get(p->parent_pid);
@@ -706,6 +707,9 @@ i64 proc_fork(const void *syscall_frame)
   child->program_break = parent->program_break;
   child->heap_break    = parent->heap_break;
   child->mmap_base     = parent->mmap_base;
+
+  /* Inherit parent's open file descriptors (POSIX fork semantics). */
+  vfs_proc_inherit_fds(child->fds, parent->fds);
 
   /* Copy user context from syscall frame */
   child->user_rip    = frame->rip;
