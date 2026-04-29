@@ -21,6 +21,6 @@
  *
  * @param line Null-terminated input line (modified during parsing).
  */
-void vega_run(char *line);
+void vega_run(const char *line);
 
 #endif /* VEGA_H */

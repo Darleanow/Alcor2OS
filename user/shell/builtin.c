@@ -1,26 +1,16 @@
 /**
  * @file user/shell/builtin.c
- * @brief Built-in commands (`cd`, `exit`, `help`, …) run in-process without `execve`.
+ * @brief vega built-in commands. Receive POSIX-style argv (argv[0] is the
+ * command name).
  */
 
 #include "shell.h"
 #include "vega.h"
 #include <stdlib.h>
 
-/**
- * @brief Table of builtin command names.
- */
-static const char *builtins[] = {"help", "version", "clear", "exit",
-                                 "cd",   "pwd",     "kbd",   NULL};
+static const char *builtins[] = { "help",  "version", "clear", "exit",
+                                  "cd",    "pwd",     "kbd",   NULL };
 
-/**
- * @name Builtin command implementations
- * @{
- */
-
-/**
- * @brief Display shell help message with builtin and external commands.
- */
 static void cmd_help(void)
 {
   sh_puts("\n");
@@ -32,7 +22,6 @@ static void cmd_help(void)
   sh_puts("    version           Show OS version\n");
   sh_puts("    clear             Clear the screen\n");
   sh_puts("    exit              Exit the shell\n");
-  sh_puts("    echo [text...]    Display text\n");
   sh_puts("    cd <dir>          Change directory\n");
   sh_puts("    pwd               Print working directory\n");
   sh_puts("    kbd us|fr         Set PS/2 keymap layout (US QWERTY or FR AZERTY-ish)\n");
@@ -48,9 +37,6 @@ static void cmd_help(void)
   sh_puts("\n");
 }
 
-/**
- * @brief Display OS and shell version information.
- */
 static void cmd_version(void)
 {
   sh_puts("Alcor2 Operating System v0.1.0\n");
@@ -59,114 +45,96 @@ static void cmd_version(void)
   sh_puts("\n");
 }
 
-/**
- * @brief Clear the terminal screen.
- */
 static void cmd_clear(void)
 {
   sh_clear();
 }
 
-/**
- * @brief Exit the shell and return to init process.
- */
 static void cmd_exit(void)
 {
   sh_puts("Goodbye!\n");
   exit(0);
 }
 
-/**
- * @brief Change current working directory.
- * @param cmd Command structure with directory path as first argument.
- */
-static void cmd_cd(command_t *cmd)
+static int cmd_cd(int argc, char *const argv[])
 {
-  const char *path = cmd->args[0];
-
-  if(!path) {
-    path = "/";
-  }
+  const char *path = (argc > 1) ? argv[1] : "/";
 
   if(sh_chdir(path) < 0) {
     sh_puts("cd: ");
     sh_puts(path);
     sh_puts(": No such directory\n");
+    return 1;
   }
+  return 0;
 }
 
-/**
- * @brief Print current working directory.
- */
-static void cmd_pwd(void)
+static int cmd_pwd(void)
 {
   char cwd[MAX_PATH];
 
   if(sh_getcwd(cwd, sizeof(cwd)) != NULL) {
     sh_puts(cwd);
     sh_putchar('\n');
-  } else {
-    sh_puts("pwd: error\n");
+    return 0;
   }
+  sh_puts("pwd: error\n");
+  return 1;
 }
 
-/**
- * @brief Set keyboard layout (`us` | `fr`); semantics match kernel tty layer, not firmware.
- */
-static void cmd_kbd(command_t *cmd)
+/* Set keyboard layout (`us` | `fr`); semantics match kernel tty layer. */
+static int cmd_kbd(int argc, char *const argv[])
 {
-  const char *what = cmd->args[0];
-  if(!what || sh_strcmp(what, "us") == 0) {
+  const char *what = (argc > 1) ? argv[1] : "us";
+  if(sh_strcmp(what, "us") == 0) {
     sh_kbd_layout(KBD_LAYOUT_US);
     sh_puts("keyboard: layout us\n");
-  } else if(sh_strcmp(what, "fr") == 0) {
+    return 0;
+  }
+  if(sh_strcmp(what, "fr") == 0) {
     sh_kbd_layout(KBD_LAYOUT_FR);
     sh_puts("keyboard: layout fr\n");
-  } else {
-    sh_puts("usage: kbd [us|fr]\n");
+    return 0;
   }
+  sh_puts("usage: kbd [us|fr]\n");
+  return 1;
 }
-/** @} */
 
-/**
- * @brief Check if a command name is a builtin.
- * @param cmd Command name to check.
- * @return 1 if builtin, 0 otherwise.
- */
 int is_builtin(const char *cmd)
 {
   for(int i = 0; builtins[i]; i++) {
-    if(sh_strcmp(cmd, builtins[i]) == 0) {
+    if(sh_strcmp(cmd, builtins[i]) == 0)
       return 1;
-    }
   }
   return 0;
 }
 
-/**
- * @brief Execute a builtin command.
- * @param cmd Command structure with command name and arguments.
- * @return 0 on success, -1 if command not found.
- */
-int run_builtin(command_t *cmd)
+int run_builtin(int argc, char *const argv[])
 {
-  if(sh_strcmp(cmd->cmd, "help") == 0) {
-    cmd_help();
-  } else if(sh_strcmp(cmd->cmd, "version") == 0) {
-    cmd_version();
-  } else if(sh_strcmp(cmd->cmd, "clear") == 0) {
-    cmd_clear();
-  } else if(sh_strcmp(cmd->cmd, "exit") == 0) {
-    cmd_exit();
-  } else if(sh_strcmp(cmd->cmd, "cd") == 0) {
-    cmd_cd(cmd);
-  } else if(sh_strcmp(cmd->cmd, "pwd") == 0) {
-    cmd_pwd();
-  } else if(sh_strcmp(cmd->cmd, "kbd") == 0) {
-    cmd_kbd(cmd);
-  } else {
-    return -1;
-  }
+  const char *name = argv[0];
 
-  return 0;
+  if(sh_strcmp(name, "help") == 0) {
+    cmd_help();
+    return 0;
+  }
+  if(sh_strcmp(name, "version") == 0) {
+    cmd_version();
+    return 0;
+  }
+  if(sh_strcmp(name, "clear") == 0) {
+    cmd_clear();
+    return 0;
+  }
+  if(sh_strcmp(name, "exit") == 0) {
+    cmd_exit();
+    return 0;
+  }
+  if(sh_strcmp(name, "cd") == 0)
+    return cmd_cd(argc, argv);
+  if(sh_strcmp(name, "pwd") == 0)
+    return cmd_pwd();
+  if(sh_strcmp(name, "kbd") == 0)
+    return cmd_kbd(argc, argv);
+
+  return -1;
 }
