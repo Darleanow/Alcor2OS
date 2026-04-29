@@ -1,71 +1,12 @@
 /**
  * @file user/shell/main.c
- * @brief Shell main loop: read line, parse, builtins or `execve` of `/bin` programs.
+ * @brief vega REPL: read a line, hand it to vega_run().
  */
 
 #include "shell.h"
+#include "vega.h"
 #include <stddef.h>
 #include <stdlib.h>
-
-/**
- * @brief Run an external command from /bin directory.
- * @param cmd Command structure with command name and arguments.
- * @return 0 on success, -1 on failure.
- */
-static int run_external(command_t *cmd)
-{
-  char        path[MAX_PATH];
-  char       *p = path;
-
-  if(cmd->cmd[0] == '/') {
-    const char *c = cmd->cmd;
-    while(*c && p < path + MAX_PATH - 1)
-      *p++ = *c++;
-    *p = '\0';
-    int ret = sh_exec(path, cmd->args);
-    return (ret < 0) ? -1 : 0;
-  }
-
-  static const char *const dirs[] = { "/bin/", "/usr/bin/", NULL };
-  for(int i = 0; dirs[i]; i++) {
-    p = path;
-    const char *prefix = dirs[i];
-    while(*prefix) *p++ = *prefix++;
-    const char *c = cmd->cmd;
-    while(*c && p < path + MAX_PATH - 1) *p++ = *c++;
-    *p = '\0';
-    int ret = sh_exec(path, cmd->args);
-    if(ret >= 0) return 0;
-  }
-  return -1;
-}
-
-/**
- * @brief Parse and execute a command line.
- * @param line Command line to execute.
- */
-static void execute(char *line)
-{
-  command_t cmd;
-
-  if(parse_command(line, &cmd) < 0) {
-    return;
-  }
-
-  if(!cmd.cmd) {
-    return;
-  }
-
-  if(is_builtin(cmd.cmd)) {
-    run_builtin(&cmd);
-    return;
-  }
-
-  if(run_external(&cmd) < 0) {
-    sh_puts(cmd.cmd);
-    sh_puts(": command not found\n");
-  }
-}
 
 /**
  * @brief Read a line of input from the user with basic line editing.
@@ -157,7 +98,7 @@ int main(int argc, char *argv[])
   char line[MAX_CMD_LEN];
 
   sh_puts("\n");
-  sh_puts("  Welcome to Alcor2 Shell!\n");
+  sh_puts("  vega " VEGA_VERSION " - Alcor2 shell\n");
   sh_puts("  Type 'help' for available commands.\n");
   sh_puts("\n");
 
@@ -172,7 +113,7 @@ int main(int argc, char *argv[])
     }
 
     if(len > 0) {
-      execute(line);
+      vega_run(line);
     }
   }
 

@@ -4,6 +4,7 @@
  */
 
 #include "shell.h"
+#include "vega.h"
 #include <stdlib.h>
 
 /**
@@ -23,7 +24,7 @@ static const char *builtins[] = {"help", "version", "clear", "exit",
 static void cmd_help(void)
 {
   sh_puts("\n");
-  sh_puts("  Alcor2 Shell - Command Reference\n");
+  sh_puts("  vega - Command Reference\n");
   sh_puts("\n");
 
   sh_puts("  Builtin Commands:\n");
@@ -53,8 +54,8 @@ static void cmd_help(void)
 static void cmd_version(void)
 {
   sh_puts("Alcor2 Operating System v0.1.0\n");
-  sh_puts("Shell version ");
-  sh_puts(SHELL_VERSION);
+  sh_puts("vega ");
+  sh_puts(VEGA_VERSION);
   sh_puts("\n");
 }
 

@@ -2,7 +2,7 @@ include ../common.mk
 
 OUT_DIR := $(BUILD_DIR)/shell
 TARGET  := $(OUT_DIR)/shell.elf
-SRCS    := main.c sys.c str.c io.c parser.c builtin.c
+SRCS    := main.c sys.c str.c io.c parser.c builtin.c vega.c
 OBJS    := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
 
 .PHONY: all clean
@@ -12,7 +12,7 @@ all: $(TARGET)
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
 
-$(OUT_DIR)/%.o: %.c shell.h | $(OUT_DIR)
+$(OUT_DIR)/%.o: %.c shell.h vega.h | $(OUT_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJS) $(CRT0)
