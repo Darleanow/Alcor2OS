@@ -140,6 +140,23 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options);
 i64 proc_fork(const void *syscall_frame);
 
 /**
+ * @brief POSIX-style exec: replace @p p's user image with the ELF read from
+ * @p elf_fd. Tears down the current user mappings, loads the new ELF, and
+ * builds a fresh user stack with @p argv.
+ *
+ * On success @p p->user_rip / @p p->user_rsp point at the new entry; the
+ * caller is responsible for updating its in-flight syscall frame so the
+ * sysret return path lands in the new image. On catastrophic failure the
+ * old image has already been destroyed and the process can no longer
+ * continue — the caller should @c proc_exit.
+ *
+ * @return 0 on success, negative -errno on failure.
+ */
+i64 proc_exec_replace_image(
+    proc_t *p, const char *name, i64 elf_fd, char *const argv[]
+);
+
+/**
  * @brief Switch to a process (called by scheduler or exec).
  * @param next Process to switch to.
  */

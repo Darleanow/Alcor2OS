@@ -182,18 +182,32 @@ int sh_unlink(const char *path)
 
 /** Process Execution */
 
-/* Simple exec wrapper using fork/exec pattern */
-extern int execve(const char *path, char *const argv[], char *const envp[]);
+extern int   execve(const char *path, char *const argv[], char *const envp[]);
+extern int   fork(void);
+extern void  _exit(int status) __attribute__((noreturn));
+extern int   waitpid(int pid, int *status, int options);
 
 /**
- * @brief Execute a program
- * @param path Path to executable
- * @param argv Argument array (NULL-terminated)
- * @return Exit code of child process, or negative on error
+ * @brief Run @p path as a child process and wait for it.
+ *
+ * Standard POSIX fork + execve + waitpid pattern: the parent forks, the child
+ * exec's the binary at @p path with @p argv (POSIX-style — argv[0] should be
+ * the program name), the parent waits and returns the child's exit status.
+ *
+ * @return Child's exit status on success, or -1 on fork/exec failure.
  */
 int sh_exec(const char *path, char *const argv[])
 {
-  /* For now, directly call execve syscall */
-  /* Our kernel's execve creates a child process and waits */
-  return execve(path, argv, NULL);
+  int pid = fork();
+  if(pid < 0)
+    return -1;
+  if(pid == 0) {
+    execve(path, argv, NULL);
+    /* execve only returns on failure; the parent will see exit status 127. */
+    _exit(127);
+  }
+  int status = 0;
+  if(waitpid(pid, &status, 0) < 0)
+    return -1;
+  return (status >> 8) & 0xff;
 }

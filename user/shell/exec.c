@@ -11,14 +11,12 @@
 
 #define MAX_EXEC_PATH 256
 
-/* Until the kernel split (Phase 4) sys_execve prepends the program path to
- * argv internally, so userland must pass argv with argv[0] stripped. */
+/* sh_exec performs fork+execve+waitpid; argv is full POSIX (argv[0] is the
+ * program name as the user typed it). */
 static int run_external(char *const argv[])
 {
-  if(argv[0][0] == '/') {
-    int ret = sh_exec(argv[0], &argv[1]);
-    return (ret < 0) ? -1 : ret;
-  }
+  if(argv[0][0] == '/')
+    return sh_exec(argv[0], argv);
 
   static const char *const dirs[] = { "/bin/", "/usr/bin/", NULL };
   char                     path[MAX_EXEC_PATH];
@@ -31,10 +29,12 @@ static int run_external(char *const argv[])
     const char *c = argv[0];
     while(*c && p < path + MAX_EXEC_PATH - 1)
       *p++ = *c++;
-    *p      = '\0';
-    int ret = sh_exec(path, &argv[1]);
-    if(ret >= 0)
-      return ret;
+    *p = '\0';
+
+    /* Probe with stat first so we don't pay a fork() per missing path. */
+    struct stat st;
+    if(sh_stat(path, &st) == 0)
+      return sh_exec(path, argv);
   }
   return -1;
 }

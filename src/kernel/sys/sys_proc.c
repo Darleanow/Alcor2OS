@@ -102,35 +102,60 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   if(st.type != VFS_FILE)
     return (u64)-EACCES;
 
-  i64 fd = vfs_open(path, 0);
-  if(fd < 0)
-    return (u64)-ENOENT;
-
+  /* Snapshot argv into kernel storage now — once we tear down user mappings
+   * the user-space argv buffers will be gone. */
   static char  arg_storage[MAX_EXEC_ARGS][MAX_ARG_LEN];
-  static char *child_argv[MAX_EXEC_ARGS + 1];
+  static char *new_argv[MAX_EXEC_ARGS + 1];
+  static char  name_storage[MAX_ARG_LEN];
 
-  int argc = 0;
-  kstrncpy(arg_storage[argc], path, MAX_ARG_LEN);
-  child_argv[argc++] = arg_storage[0];
-
+  int    argc      = 0;
   char **user_argv = (char **)argv;
-  if(user_argv) {
+  if(user_argv && user_argv[0]) {
     for(int i = 0; user_argv[i] && argc < MAX_EXEC_ARGS; i++) {
       if(!user_cstr_ok((u64)user_argv[i]))
         return (u64)-EFAULT;
       kstrncpy(arg_storage[argc], user_argv[i], MAX_ARG_LEN);
-      child_argv[argc] = arg_storage[argc];
+      new_argv[argc] = arg_storage[argc];
       argc++;
     }
+  } else {
+    /* No argv supplied: synthesise argv[0] from path. */
+    kstrncpy(arg_storage[0], path, MAX_ARG_LEN);
+    new_argv[0] = arg_storage[0];
+    argc        = 1;
   }
-  child_argv[argc] = NULL;
+  new_argv[argc] = NULL;
 
-  u64 child_pid = proc_create(path, NULL, 0, fd, child_argv);
+  /* Snapshot the basename for the proc's name field — argv[0] may be relative
+   * (e.g. "ls"), but we want a stable kernel-side string. */
+  kstrncpy(name_storage, path, MAX_ARG_LEN);
+
+  i64 fd = vfs_open(path, 0);
+  if(fd < 0)
+    return (u64)-ENOENT;
+
+  proc_t *p = proc_current();
+  if(!p) {
+    vfs_close(fd);
+    return (u64)-EINVAL;
+  }
+
+  i64 rc = proc_exec_replace_image(p, name_storage, fd, new_argv);
   vfs_close(fd);
-  if(child_pid == 0)
-    return (u64)-ENOMEM;
+  if(rc < 0) {
+    /* Old image is gone but a new one couldn't be set up — terminate. */
+    proc_exit(127);
+  }
 
-  return (u64)proc_wait(child_pid);
+  /* Redirect the in-flight syscall return path to the new entry. The asm
+   * stub pops rip / rflags / rsp from the frame and SYSRETs. */
+  syscall_frame_t *frame = syscall_get_current_frame();
+  if(frame) {
+    frame->rip    = p->user_rip;
+    frame->rsp    = p->user_rsp;
+    frame->rflags = p->user_rflags;
+  }
+  return 0;
 }
 
 u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)

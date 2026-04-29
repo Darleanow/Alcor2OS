@@ -123,7 +123,18 @@ static u64 push_string(u64 sp, const char *str)
  * @param argv     Null-terminated argument array.
  * @return PID of the new process, or 0 on failure.
  */
-u64 proc_create(
+/* Allocate a user stack and load an ELF into @p p's address space, then
+ * build the System V AMD64 startup stack (argc / argv / envp / auxv) and
+ * populate p->user_*, p->program_break, p->heap_break, p->mmap_base.
+ *
+ * Caller invariant: @p p->cr3 is allocated and (for execve) the user-space
+ * portion has already been cleared.
+ *
+ * Returns 0 on success, -errno on failure with no partial state left in @p p
+ * other than possibly-mapped stack pages (the caller decides how to recover).
+ */
+static int proc_setup_image(
+    proc_t      *p,
     const char  *name,
     const void  *elf_data,
     u64          elf_size,
@@ -131,44 +142,14 @@ u64 proc_create(
     char *const  argv[]
 )
 {
-  proc_t *p = proc_alloc();
-  if(!p) {
-    console_print("[PROC] No free process slots\n");
-    return 0;
-  }
-
-  /* Create new address space for this process */
-  p->cr3 = vmm_create_address_space();
-  if(!p->cr3) {
-    console_print("[PROC] Failed to create address space\n");
-    return 0;
-  }
-
-  /* Allocate kernel stack */
-  p->kernel_stack = kmalloc(PROC_KERNEL_STACK);
-  if(!p->kernel_stack) {
-    console_print("[PROC] Failed to allocate kernel stack\n");
-    return 0;
-  }
-  p->kernel_stack_top = (void *)((u64)p->kernel_stack + PROC_KERNEL_STACK);
-
-  /* Allocate user stack */
-  /* Allocate one extra page to cover the stack_top address itself */
   u64   stack_pages     = (PROC_USER_STACK / 4096) + 1;
   void *user_stack_phys = pmm_alloc_pages(stack_pages);
-  if(!user_stack_phys) {
-    kfree(p->kernel_stack);
-    vmm_destroy_user_mappings(p->cr3);
-    console_print("[PROC] Failed to allocate user stack\n");
-    return 0;
-  }
+  if(!user_stack_phys)
+    return -ENOMEM;
 
-  /* User stack at fixed address (each process has own address space now) */
   u64 user_stack_base = USER_STACK_BASE;
   u64 stack_top       = USER_STACK_TOP;
 
-  /* Map user stack in process's address space (including the page at stack_top)
-   */
   for(u64 off = 0; off < stack_pages * 4096; off += 4096) {
     vmm_map_in(
         p->cr3, user_stack_base + off, (u64)user_stack_phys + off,
@@ -178,24 +159,15 @@ u64 proc_create(
   p->user_stack     = (void *)user_stack_base;
   p->user_stack_top = (void *)stack_top;
 
-  /* Load ELF into process's address space */
-  /* Temporarily switch to process's address space to load ELF */
   u64 old_cr3 = vmm_get_current_pml4();
   vmm_switch(p->cr3);
 
   elf_info_t elf_info;
-  int        elf_result;
-  if(elf_fd >= 0)
-    elf_result = elf_load_fd(elf_fd, &elf_info);
-  else
-    elf_result = elf_load(elf_data, elf_size, &elf_info);
-
+  int elf_result = (elf_fd >= 0) ? elf_load_fd(elf_fd, &elf_info)
+                                 : elf_load(elf_data, elf_size, &elf_info);
   if(elf_result != 0) {
     vmm_switch(old_cr3);
-    kfree(p->kernel_stack);
-    vmm_destroy_user_mappings(p->cr3);
-    console_print("[PROC] Failed to load ELF\n");
-    return 0;
+    return -ENOEXEC;
   }
 
   /**
@@ -325,33 +297,63 @@ u64 proc_create(
 #undef AT_GID
 #undef AT_EGID
 
-  /* Switch back to kernel/current address space */
   vmm_switch(old_cr3);
 
-  /* Initialize process */
-  p->pid        = next_pid++;
-  p->parent_pid = current_proc ? current_proc->pid : 0;
+  u64 elf_end_aligned = (elf_info.end + 0xFFF) & ALIGN_16_MASK;
+  p->program_break    = elf_end_aligned;
+  p->heap_break       = USER_HEAP_START;
+  p->mmap_base        = USER_MMAP_BASE;
+
+  p->user_rip    = elf_info.entry;
+  p->user_rsp    = sp;
+  p->user_rflags = 0x202; /* IF enabled */
+
+  return 0;
+}
+
+u64 proc_create(
+    const char  *name,
+    const void  *elf_data,
+    u64          elf_size,
+    i64          elf_fd,
+    char *const  argv[]
+)
+{
+  proc_t *p = proc_alloc();
+  if(!p) {
+    console_print("[PROC] No free process slots\n");
+    return 0;
+  }
+
+  p->cr3 = vmm_create_address_space();
+  if(!p->cr3) {
+    console_print("[PROC] Failed to create address space\n");
+    return 0;
+  }
+
+  p->kernel_stack = kmalloc(PROC_KERNEL_STACK);
+  if(!p->kernel_stack) {
+    vmm_destroy_user_mappings(p->cr3);
+    console_print("[PROC] Failed to allocate kernel stack\n");
+    return 0;
+  }
+  p->kernel_stack_top = (void *)((u64)p->kernel_stack + PROC_KERNEL_STACK);
+
+  if(proc_setup_image(p, name, elf_data, elf_size, elf_fd, argv) < 0) {
+    kfree(p->kernel_stack);
+    vmm_destroy_user_mappings(p->cr3);
+    console_print("[PROC] Failed to load image\n");
+    return 0;
+  }
+
+  p->pid             = next_pid++;
+  p->parent_pid      = current_proc ? current_proc->pid : 0;
   kstrncpy(p->name, name, PROC_NAME_MAX);
   p->state           = PROC_STATE_READY;
   p->exit_code       = 0;
   p->waiting_for_pid = 0;
   p->fs_base         = 0;
 
-  /* Initialize per-process memory regions based on ELF layout
-   * program_break starts at end of loaded ELF segments (page-aligned)
-   * heap_break (for mmap) starts higher to avoid conflicts */
-  u64 elf_end_aligned = (elf_info.end + 0xFFF) & ALIGN_16_MASK;
-  p->program_break    = elf_end_aligned;
-  p->heap_break       = USER_HEAP_START;
-  p->mmap_base        = USER_MMAP_BASE;
-
-  /* Set user context - stack now contains argc/argv */
-  p->user_rip    = elf_info.entry;
-  p->user_rsp    = sp;
-  p->user_rflags = 0x202; /* IF enabled */
-
-  /* Setup initial kernel stack for first switch */
-  /* When we switch to this process, we'll iret to userspace */
   u64 *ksp = (u64 *)p->kernel_stack_top;
 
   /* Build iretq frame on kernel stack */
@@ -391,6 +393,22 @@ u64 proc_create(
  * mode for newly created processes.
  */
 extern void proc_enter_first_time(void);
+
+i64 proc_exec_replace_image(
+    proc_t *p, const char *name, i64 elf_fd, char *const argv[]
+)
+{
+  /* We are running on @p p (this is its syscall handler), so p->cr3 IS the
+   * current cr3. Wipe the user-space portion before loading the new image. */
+  vmm_clear_user_mappings(p->cr3);
+
+  int rc = proc_setup_image(p, name, NULL, 0, elf_fd, argv);
+  if(rc < 0)
+    return rc;
+
+  kstrncpy(p->name, name, PROC_NAME_MAX);
+  return 0;
+}
 
 /**
  * @brief Exit the current process with the given exit code.
