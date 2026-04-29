@@ -66,6 +66,21 @@ int vega_exec(ast_t *node)
   switch(node->kind) {
     case AST_CMD:
       return exec_cmd(node);
+    case AST_AND: {
+      int s = vega_exec(node->u.binop.left);
+      if(s == 0)
+        return vega_exec(node->u.binop.right);
+      return s;
+    }
+    case AST_OR: {
+      int s = vega_exec(node->u.binop.left);
+      if(s != 0)
+        return vega_exec(node->u.binop.right);
+      return s;
+    }
+    case AST_SEQ:
+      vega_exec(node->u.binop.left);
+      return vega_exec(node->u.binop.right);
   }
   return 0;
 }

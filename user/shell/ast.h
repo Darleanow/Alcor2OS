@@ -11,11 +11,15 @@
 
 typedef enum {
   AST_CMD,
+  AST_AND, /* left && right, short-circuit on non-zero status */
+  AST_OR,  /* left || right, short-circuit on zero status */
+  AST_SEQ, /* left ; right, status is right's */
 } ast_kind_t;
 
 /**
- * @brief Simple command node: argv[0..argc-1] with a NULL terminator at
- * argv[argc]. Each string is heap-allocated and owned by the node.
+ * @brief AST node. CMD nodes own a heap argv; binary nodes own their two
+ * children. The union is grown by later phases (pipes, redirections, control
+ * flow).
  */
 typedef struct ast_node
 {
@@ -26,6 +30,10 @@ typedef struct ast_node
       int    argc;
       int    cap;
     } cmd;
+    struct {
+      struct ast_node *left;
+      struct ast_node *right;
+    } binop;
   } u;
 } ast_t;
 
@@ -40,6 +48,13 @@ ast_t *ast_new_cmd(void);
  *         must free @p arg).
  */
 int ast_cmd_push_arg(ast_t *n, char *arg);
+
+/**
+ * @brief Allocate a binary operator node (AND, OR or SEQ) taking ownership of
+ * @p left and @p right. On allocation failure both children are freed and
+ * NULL is returned.
+ */
+ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right);
 
 /** @brief Free an AST node and everything it owns. NULL-safe. */
 void ast_free(ast_t *n);

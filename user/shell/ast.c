@@ -40,6 +40,20 @@ int ast_cmd_push_arg(ast_t *n, char *arg)
   return 0;
 }
 
+ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n) {
+    ast_free(left);
+    ast_free(right);
+    return NULL;
+  }
+  n->kind          = kind;
+  n->u.binop.left  = left;
+  n->u.binop.right = right;
+  return n;
+}
+
 void ast_free(ast_t *n)
 {
   if(!n)
@@ -49,6 +63,12 @@ void ast_free(ast_t *n)
       for(int i = 0; i < n->u.cmd.argc; i++)
         free(n->u.cmd.argv[i]);
       free(n->u.cmd.argv);
+      break;
+    case AST_AND:
+    case AST_OR:
+    case AST_SEQ:
+      ast_free(n->u.binop.left);
+      ast_free(n->u.binop.right);
       break;
   }
   free(n);
