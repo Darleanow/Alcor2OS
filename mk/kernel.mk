@@ -44,7 +44,7 @@ compile_commands: $(OBJS)
 		echo '    "file": "'"$$src"'"' >> compile_commands.json; \
 		echo '  },' >> compile_commands.json; \
 	done
-	@if [ -n "$(strip $(USER_APPS_CPPS))" ] && [ -n "$(strip $(LIBCXX_HDR))" ] && [ -d "$(LIBCXX_HDR)" ]; then \
+	@if [ -n "$(strip $(USER_APPS_CPPS))" ]; then \
 		for cpp in $(USER_APPS_CPPS); do \
 			echo '  {' >> compile_commands.json; \
 			echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \
@@ -53,14 +53,20 @@ compile_commands: $(OBJS)
 			echo '      "-std=gnu++17",' >> compile_commands.json; \
 			echo '      "--target=x86_64-linux-musl",' >> compile_commands.json; \
 			echo '      "-nostdlibinc",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(LIBCXX_HDR)"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(LIBCXX_HDR)/x86_64-linux-musl"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(MUSL_CROSS_SYS)/include"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"thirdparty/musl/install/include"'",' >> compile_commands.json; \
+			if [ -n "$(strip $(LIBCXX_HDR))" ] && [ -d "$(LIBCXX_HDR)" ]; then \
+				echo '      "-isystem",' >> compile_commands.json; \
+				echo '      "'"$(LIBCXX_HDR)"'",' >> compile_commands.json; \
+				echo '      "-isystem",' >> compile_commands.json; \
+				echo '      "'"$(LIBCXX_HDR)/x86_64-linux-musl"'",' >> compile_commands.json; \
+			fi; \
+			if [ -d "$(MUSL_CROSS_SYS)/include" ]; then \
+				echo '      "-isystem",' >> compile_commands.json; \
+				echo '      "'"$(MUSL_CROSS_SYS)/include"'",' >> compile_commands.json; \
+			fi; \
+			if [ -d thirdparty/musl/install/include ]; then \
+				echo '      "-isystem",' >> compile_commands.json; \
+				echo '      "'"thirdparty/musl/install/include"'",' >> compile_commands.json; \
+			fi; \
 			echo '      "-isystem",' >> compile_commands.json; \
 			echo '      "'"$(INCLUDE)"'",' >> compile_commands.json; \
 			echo '      "-Wall",' >> compile_commands.json; \

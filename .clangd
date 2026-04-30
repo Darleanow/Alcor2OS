@@ -8,3 +8,14 @@ Index:
 Diagnostics:
   ClangTidy:
     Checks: "-*"
+---
+# Without per-file entries (e.g. musl/libstdc++ paths missing), clangd can fall
+# back to a kernel command and apply -std=gnu11 to C++ — invalid for C++.
+If:
+  PathMatch: (^|.*/)user/.*\.cpp$
+CompileFlags:
+  Remove:
+    - -std=gnu11
+    - -ffreestanding
+  Add:
+    - -std=gnu++17
