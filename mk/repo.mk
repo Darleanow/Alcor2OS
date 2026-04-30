@@ -136,7 +136,8 @@ disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	fi; \
 	$$S mkdir -p mnt/bin mnt/etc mnt/tmp mnt/home \
 		mnt/usr/bin mnt/usr/lib/tcc mnt/usr/include mnt/usr/lib; \
-	rm -rf mnt/bin/*; \
+	[ -d mnt/bin ] && find mnt/bin -mindepth 1 -maxdepth 1 \
+		! -name clang ! -name lld -exec rm -f {} +; \
 	cp user/build/bin/*.elf mnt/bin/ 2>/dev/null || true; \
 	cp user/build/apps/*.elf mnt/bin/ 2>/dev/null || true; \
 	for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; \
@@ -148,20 +149,27 @@ disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crti.o      mnt/usr/lib/crti.o; \
 	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crtn.o      mnt/usr/lib/crtn.o; \
 	if [ -n "$(strip $(CLANG_BIN))" ] && [ -f "$(CLANG_BIN)" ]; then \
-		echo "installing Clang from $(CLANG_BIN)"; \
-		MUSL_SYSROOT=$(CURDIR)/thirdparty/musl-cross/x86_64-linux-musl; \
-		$$S mkdir -p mnt/usr/bin mnt/usr/lib/clang; \
-		$$S cp "$(CLANG_BIN)" mnt/bin/clang; \
-		$$S strip mnt/bin/clang 2>/dev/null || true; \
-		$$S cp thirdparty/clang-install/usr/bin/lld mnt/bin/lld 2>/dev/null || true; \
-		$$S strip mnt/bin/lld 2>/dev/null || true; \
-		$$S cp -r thirdparty/clang-install/usr/lib/clang/. mnt/usr/lib/clang/ 2>/dev/null || true; \
-		if [ -d "$$MUSL_SYSROOT" ]; then \
-			$$S mkdir -p mnt/usr/include/c++ mnt/usr/lib; \
-			$$S cp -r $$MUSL_SYSROOT/include/c++/. mnt/usr/include/c++/ 2>/dev/null || true; \
-			$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++.a'   -exec $$S cp {} mnt/usr/lib/libstdc++.a \;   2>/dev/null || true; \
-			$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++fs.a' -exec $$S cp {} mnt/usr/lib/libstdc++fs.a \; 2>/dev/null || true; \
-			$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libsupc++.a'   -exec $$S cp {} mnt/usr/lib/libsupc++.a \;   2>/dev/null || true; \
+		CLB="$(CURDIR)/$(CLANG_BIN)"; \
+		MUSL_SYSROOT="$(CURDIR)/thirdparty/musl-cross/x86_64-linux-musl"; \
+		LLD="$(CURDIR)/thirdparty/clang-install/usr/bin/lld"; \
+		if [ ! -x mnt/bin/clang ] || [ "$$CLB" -nt mnt/bin/clang ] \
+			|| { [ -f "$$LLD" ] && { [ ! -x mnt/bin/lld ] || [ "$$LLD" -nt mnt/bin/lld ]; }; }; then \
+			echo "installing Clang from $$CLB"; \
+			$$S mkdir -p mnt/usr/bin mnt/usr/lib/clang; \
+			$$S cp "$$CLB" mnt/bin/clang; \
+			$$S strip mnt/bin/clang 2>/dev/null || true; \
+			$$S cp thirdparty/clang-install/usr/bin/lld mnt/bin/lld 2>/dev/null || true; \
+			$$S strip mnt/bin/lld 2>/dev/null || true; \
+			$$S cp -r thirdparty/clang-install/usr/lib/clang/. mnt/usr/lib/clang/ 2>/dev/null || true; \
+			if [ -d "$$MUSL_SYSROOT" ]; then \
+				$$S mkdir -p mnt/usr/include/c++ mnt/usr/lib; \
+				$$S cp -r $$MUSL_SYSROOT/include/c++/. mnt/usr/include/c++/ 2>/dev/null || true; \
+				$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++.a'   -exec $$S cp {} mnt/usr/lib/libstdc++.a \;   2>/dev/null || true; \
+				$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++fs.a' -exec $$S cp {} mnt/usr/lib/libstdc++fs.a \; 2>/dev/null || true; \
+				$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libsupc++.a'   -exec $$S cp {} mnt/usr/lib/libsupc++.a \;   2>/dev/null || true; \
+			fi; \
+		else \
+			echo "[disk] clang/lld on image up to date, skip toolchain copy"; \
 		fi; \
 	else \
 		echo "[disk] no static clang (optional: make clang)"; \
