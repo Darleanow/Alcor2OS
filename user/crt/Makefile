@@ -1,14 +1,19 @@
-BUILD_DIR := ../build/crt
+include ../common.mk
+
+CRT_BUILD := $(BUILD_DIR)/crt
 
 .PHONY: all clean
 
-all: $(BUILD_DIR)/crt0.o
+all: $(CRT_BUILD)/crt0.o $(CRT_BUILD)/alcor2_stdio_tty.o
 
-$(BUILD_DIR)/crt0.o: crt0.asm | $(BUILD_DIR)
-	nasm -f elf64 $< -o $@
+$(CRT_BUILD)/crt0.o: crt0.asm | $(CRT_BUILD)
+	$(AS) $(ASFLAGS) $< -o $@
 
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+$(CRT_BUILD)/alcor2_stdio_tty.o: alcor2_stdio_tty.c | $(CRT_BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(CRT_BUILD):
+	mkdir -p $@
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(CRT_BUILD)

@@ -43,6 +43,7 @@ static void cmd_help(void)
   sh_puts("    mkdir <dir>       Create directory\n");
   sh_puts("    touch <file>      Create empty file\n");
   sh_puts("    rm <file>         Remove file\n");
+  sh_puts("    edi <file>        Tiny line editor (. alone = save)\n");
   sh_puts("\n");
 }
 

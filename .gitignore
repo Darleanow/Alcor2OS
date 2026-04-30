@@ -5,3 +5,6 @@ thirdparty/
 *.elf
 *.iso
 *.img
+user/apps/**/compile_commands.json
+user/apps/**/.cache/
+
