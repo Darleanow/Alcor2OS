@@ -159,9 +159,6 @@ u64 sys_dup(u64 oldfd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  if(oldfd <= 2)
-    return oldfd;
-
   i64 result = vfs_dup((i64)oldfd);
   return (result < 0) ? (u64)-EBADF : (u64)result;
 }
@@ -174,8 +171,6 @@ u64 sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(oldfd == newfd)
-    return newfd;
-  if(oldfd <= 2 || newfd <= 2)
     return newfd;
 
   i64 result = vfs_dup2((i64)oldfd, (i64)newfd);
