@@ -37,9 +37,10 @@ static void diag_expected_after(tok_kind_t after)
 static int redir_kind_from_token(tok_kind_t k, redir_kind_t *out)
 {
   switch(k) {
-    case TOK_REDIR_OUT:    *out = REDIR_OUT;    return 1;
-    case TOK_REDIR_APPEND: *out = REDIR_APPEND; return 1;
-    case TOK_REDIR_IN:     *out = REDIR_IN;     return 1;
+    case TOK_REDIR_OUT:    *out = REDIR_OUT;        return 1;
+    case TOK_REDIR_APPEND: *out = REDIR_APPEND;     return 1;
+    case TOK_REDIR_IN:     *out = REDIR_IN;         return 1;
+    case TOK_HERESTRING:   *out = REDIR_HERESTRING; return 1;
     default:               return 0;
   }
 }

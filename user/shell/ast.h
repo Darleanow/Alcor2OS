@@ -18,9 +18,11 @@ typedef enum {
 } ast_kind_t;
 
 typedef enum {
-  REDIR_OUT,    /* >  file — truncate */
-  REDIR_APPEND, /* >> file — append */
-  REDIR_IN,     /* <  file */
+  REDIR_OUT,        /* >   file — truncate */
+  REDIR_APPEND,     /* >>  file — append */
+  REDIR_IN,         /* <   file */
+  REDIR_HERESTRING, /* <<< text — feed text on stdin (target is the content,
+                                  not a path) */
 } redir_kind_t;
 
 /**

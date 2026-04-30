@@ -20,11 +20,37 @@
 #define MAX_EXEC_PATH    256
 #define MAX_PIPE_STAGES  16
 
+/* Set up a here-string: pipe, write @p text + trailing newline into it, close
+ * the write end, dup2 the read end onto fd 0. Caps at the pipe buffer size
+ * (~4KB on this kernel); larger here-strings would need a temp-file path. */
+static int apply_herestring(const char *text)
+{
+  int pipefd[2];
+  if(pipe(pipefd) < 0)
+    return -1;
+
+  size_t len = sh_strlen(text);
+  if(len > 0)
+    write(pipefd[1], text, len);
+  write(pipefd[1], "\n", 1);
+  close(pipefd[1]);
+
+  if(dup2(pipefd[0], 0) < 0) {
+    close(pipefd[0]);
+    return -1;
+  }
+  close(pipefd[0]);
+  return 0;
+}
+
 /* Open @p target with flags appropriate for the redir kind, then dup2 onto the
  * canonical fd (0 for IN, 1 for OUT/APPEND). Returns 0 on success, -1 on any
  * error — caller is expected to bail out. */
 static int apply_one_redir(const redir_t *r)
 {
+  if(r->kind == REDIR_HERESTRING)
+    return apply_herestring(r->target);
+
   int flags = 0;
   int dest_fd;
   switch(r->kind) {
