@@ -15,6 +15,53 @@
 #include <alcor2/fs/vfs.h>
 #include <alcor2/mm/vmm.h>
 
+/* musl: isatty(3) probes TIOCGWINSZ; tcgetattr uses TCGETS (x86_64 termios is 60 bytes). */
+#define MUSL_NCCS         32
+#define MUSL_TERMIOS_SIZE 60
+
+typedef struct {
+  u32 c_iflag;
+  u32 c_oflag;
+  u32 c_cflag;
+  u32 c_lflag;
+  u8  c_line;
+  u8  pad[3];
+  u8  c_cc[MUSL_NCCS];
+  u32 __c_ispeed;
+  u32 __c_ospeed;
+} musl_termios_t;
+
+_Static_assert(sizeof(musl_termios_t) == MUSL_TERMIOS_SIZE, "musl_termios mismatch");
+
+/* Values from musl arch/generic/bits/termios.h (octal literals). */
+
+#define TG_ICRNL  0000400u
+#define TG_ONLCR  0000004u
+#define TG_CS8    0000060u
+#define TG_CREAD  0000200u
+#define TG_CLOCAL 0004000u
+#define TG_ISIG   0000001u
+#define TG_ICANON 0000002u
+#define TG_ECHO   0000010u
+#define TG_IEXTEN 0100000u
+#define TG_B38400 0000017u
+
+static void tty_fill_default_termios(musl_termios_t *t)
+{
+  kzero(t, sizeof(*t));
+  t->c_iflag     = TG_ICRNL;
+  t->c_oflag     = TG_ONLCR;
+  t->c_cflag     = TG_CS8 | TG_CREAD | TG_CLOCAL;
+  t->c_lflag     = TG_ISIG | TG_ICANON | TG_ECHO | TG_IEXTEN;
+  t->__c_ispeed  = TG_B38400;
+  t->__c_ospeed  = TG_B38400;
+  t->c_cc[0]     = '\x03'; /* VINTR Ctrl+C */
+  t->c_cc[1]     = 0x1c; /* VQUIT */
+  t->c_cc[2]     = 0x7f; /* VERASE */
+  t->c_cc[3]     = 0x15; /* VKILL */
+  t->c_cc[4]     = '\x04'; /* VEOF */
+}
+
 static inline bool user_rw_ok(u64 ptr, u64 size)
 {
   return ptr && vmm_is_user_range((void *)ptr, size);
@@ -86,29 +133,6 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  if(fd <= 2) {
-    switch(request) {
-    case TIOCGWINSZ: {
-      struct
-      {
-        u16 row, col, x, y;
-      } *ws = (void *)arg;
-      if(ws) {
-        ws->row = 25;
-        ws->col = 80;
-        ws->x   = 0;
-        ws->y   = 0;
-      }
-      return 0;
-    }
-    case TCGETS:
-    case TCSETS:
-      return 0;
-    default:
-      break;
-    }
-  }
-
   if(fd == 0 && request == ALCOR2_IOC_KBD_SET_LAYOUT) {
     u32 lid;
     if(!user_rw_ok(arg, sizeof(lid)))
@@ -118,6 +142,36 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
       return (u64)-EINVAL;
     kbd_set_layout((kbd_layout_t)lid);
     return 0;
+  }
+
+  if(fd <= 2) {
+    switch(request) {
+    case TIOCGWINSZ: {
+      if(!user_rw_ok(arg, 8))
+        return (u64)-EFAULT;
+      struct
+      {
+        u16 row, col, xpixel, ypixel;
+      } ws = {25, 80, 0, 0};
+      kmemcpy((void *)arg, &ws, sizeof(ws));
+      return 0;
+    }
+    case TCGETS:
+      if(!user_rw_ok(arg, sizeof(musl_termios_t)))
+        return (u64)-EFAULT;
+      {
+        musl_termios_t t;
+        tty_fill_default_termios(&t);
+        kmemcpy((void *)arg, &t, sizeof(t));
+      }
+      return 0;
+    case TCSETS:
+      if(!user_rw_ok(arg, sizeof(musl_termios_t)))
+        return (u64)-EFAULT;
+      return 0;
+    default:
+      return (u64)-ENOTTY;
+    }
   }
 
   return 0;
