@@ -2,9 +2,9 @@ include ../common.mk
 
 OUT_DIR := $(BUILD_DIR)/shell
 TARGET  := $(OUT_DIR)/shell.elf
-SRCS    := main.c sys.c str.c io.c builtin.c vega.c lexer.c ast.c parse.c exec.c
+SRCS    := main.c sys.c str.c io.c builtin.c vega.c lexer.c ast.c parse.c exec.c expand.c
 OBJS    := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
-HEADERS := shell.h vega.h lexer.h ast.h parse.h exec.h
+HEADERS := shell.h vega.h lexer.h ast.h parse.h exec.h expand.h
 
 .PHONY: all clean
 

@@ -4,12 +4,14 @@
  * command name).
  */
 
+#include "expand.h"
 #include "shell.h"
 #include "vega.h"
 #include <stdlib.h>
 
 static const char *builtins[] = { "help",  "version", "clear", "exit",
-                                  "cd",    "pwd",     "kbd",   NULL };
+                                  "cd",    "pwd",     "kbd",   "let",
+                                  NULL };
 
 static void cmd_help(void)
 {
@@ -25,6 +27,7 @@ static void cmd_help(void)
   sh_puts("    cd <dir>          Change directory\n");
   sh_puts("    pwd               Print working directory\n");
   sh_puts("    kbd us|fr         Set PS/2 keymap layout (US QWERTY or FR AZERTY-ish)\n");
+  sh_puts("    let NAME VALUE    Set a vega variable (read with $NAME)\n");
   sh_puts("\n");
 
   sh_puts("  External Commands (/bin):\n");
@@ -82,6 +85,21 @@ static int cmd_pwd(void)
   return 1;
 }
 
+/* Set a vega variable: `let NAME VALUE`. The value is a single arg, so use
+ * quoting if it contains spaces: `let greeting "hello world"`. */
+static int cmd_let(int argc, char *const argv[])
+{
+  if(argc < 3) {
+    sh_puts("usage: let NAME VALUE\n");
+    return 1;
+  }
+  if(expand_setvar(argv[1], argv[2]) < 0) {
+    sh_puts("let: failed to set variable\n");
+    return 1;
+  }
+  return 0;
+}
+
 /* Set keyboard layout (`us` | `fr`); semantics match kernel tty layer. */
 static int cmd_kbd(int argc, char *const argv[])
 {
@@ -135,6 +153,8 @@ int run_builtin(int argc, char *const argv[])
     return cmd_pwd();
   if(sh_strcmp(name, "kbd") == 0)
     return cmd_kbd(argc, argv);
+  if(sh_strcmp(name, "let") == 0)
+    return cmd_let(argc, argv);
 
   return -1;
 }

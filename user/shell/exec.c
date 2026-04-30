@@ -10,8 +10,10 @@
  */
 
 #include "exec.h"
+#include "expand.h"
 #include "shell.h"
 #include <fcntl.h>
+#include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -54,6 +56,29 @@ static int apply_redirs(const redir_t *list)
   for(const redir_t *r = list; r; r = r->next) {
     if(apply_one_redir(r) < 0)
       return -1;
+  }
+  return 0;
+}
+
+/* Expand $-syntax in @p cmd's argv and redir targets in place. Existing heap
+ * strings are freed and replaced with the expansion. Returns 0 on success,
+ * -1 on allocation failure (the cmd is left in a usable but partially
+ * expanded state). */
+static int expand_cmd(ast_t *cmd)
+{
+  for(int i = 0; i < cmd->u.cmd.argc; i++) {
+    char *expanded = expand_word(cmd->u.cmd.argv[i]);
+    if(!expanded)
+      return -1;
+    free(cmd->u.cmd.argv[i]);
+    cmd->u.cmd.argv[i] = expanded;
+  }
+  for(redir_t *r = cmd->u.cmd.redirs; r; r = r->next) {
+    char *expanded = expand_word(r->target);
+    if(!expanded)
+      return -1;
+    free(r->target);
+    r->target = expanded;
   }
   return 0;
 }
@@ -144,12 +169,18 @@ static int run_builtin_redirected(int argc, char *const argv[],
 
 static int exec_cmd(ast_t *n)
 {
+  if(n->u.cmd.argc == 0)
+    return 0;
+
+  if(expand_cmd(n) < 0)
+    return 1;
+
   int      argc   = n->u.cmd.argc;
   char   **argv   = n->u.cmd.argv;
   redir_t *redirs = n->u.cmd.redirs;
 
-  if(argc == 0)
-    return 0;
+  if(argv[0][0] == '\0')
+    return 0; /* expansion produced empty command name */
 
   if(is_builtin(argv[0]))
     return run_builtin_redirected(argc, argv, redirs);
@@ -201,6 +232,13 @@ static int exec_pipeline(ast_t *n)
   if(N > MAX_PIPE_STAGES) {
     sh_puts("vega: pipeline too long\n");
     return 1;
+  }
+
+  /* Expand each stage's argv/redirs in the parent so children fork with the
+   * fully-resolved command. */
+  for(int i = 0; i < N; i++) {
+    if(expand_cmd(stages[i]) < 0)
+      return 1;
   }
 
   int pipes[MAX_PIPE_STAGES - 1][2];
@@ -258,26 +296,32 @@ int vega_exec(ast_t *node)
 {
   if(!node)
     return 0;
+
+  int status;
   switch(node->kind) {
     case AST_CMD:
-      return exec_cmd(node);
+      status = exec_cmd(node);
+      break;
     case AST_AND: {
       int s = vega_exec(node->u.binop.left);
-      if(s == 0)
-        return vega_exec(node->u.binop.right);
-      return s;
+      status = (s == 0) ? vega_exec(node->u.binop.right) : s;
+      break;
     }
     case AST_OR: {
       int s = vega_exec(node->u.binop.left);
-      if(s != 0)
-        return vega_exec(node->u.binop.right);
-      return s;
+      status = (s != 0) ? vega_exec(node->u.binop.right) : s;
+      break;
     }
     case AST_SEQ:
       vega_exec(node->u.binop.left);
-      return vega_exec(node->u.binop.right);
+      status = vega_exec(node->u.binop.right);
+      break;
     case AST_PIPE:
-      return exec_pipeline(node);
+      status = exec_pipeline(node);
+      break;
+    default:
+      status = 0;
   }
-  return 0;
+  expand_set_status(status);
+  return status;
 }

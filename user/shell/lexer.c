@@ -105,7 +105,8 @@ static tok_t read_dquote(lexer_t *L)
   return t;
 }
 
-/* Read an unquoted bareword. Handles \<char> escapes. */
+/* Read an unquoted bareword. Handles \<char> escapes and ${...} (which would
+ * otherwise be split by the lexer because '{' is a structural token). */
 static tok_t read_word(lexer_t *L)
 {
   tok_t       t     = { TOK_WORD, NULL };
@@ -116,6 +117,20 @@ static tok_t read_word(lexer_t *L)
   while(!is_word_delim(*scan)) {
     if(*scan == '\\' && scan[1]) {
       scan++;
+      scan++;
+      n++;
+      continue;
+    }
+    if(*scan == '$' && scan[1] == '{') {
+      while(*scan && *scan != '}') {
+        scan++;
+        n++;
+      }
+      if(*scan == '}') {
+        scan++;
+        n++;
+      }
+      continue;
     }
     scan++;
     n++;
@@ -131,6 +146,15 @@ static tok_t read_word(lexer_t *L)
   while(!is_word_delim(*p)) {
     if(*p == '\\' && p[1]) {
       p++;
+      out[i++] = *p++;
+      continue;
+    }
+    if(*p == '$' && p[1] == '{') {
+      while(*p && *p != '}')
+        out[i++] = *p++;
+      if(*p == '}')
+        out[i++] = *p++;
+      continue;
     }
     out[i++] = *p++;
   }
