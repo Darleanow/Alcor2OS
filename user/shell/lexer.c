@@ -7,14 +7,14 @@
 #include "shell.h"
 #include <stdlib.h>
 
-static int is_space(char c)
+static int is_hspace(char c)
 {
   return c == ' ' || c == '\t';
 }
 
 static int is_word_delim(char c)
 {
-  if(c == '\0' || is_space(c) || c == '\n')
+  if(c == '\0' || is_hspace(c) || c == '\n')
     return 1;
   switch(c) {
     case '|':
@@ -150,7 +150,7 @@ void lex_init(lexer_t *L, const char *src)
 static tok_t scan_one(lexer_t *L)
 {
   /* skip horizontal whitespace */
-  while(is_space(*L->cur))
+  while(is_hspace(*L->cur))
     L->cur++;
 
   tok_t t = { TOK_EOF, NULL };
