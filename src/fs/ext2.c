@@ -206,7 +206,13 @@ static i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf)
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
 
-  return vol_write_sectors(vol, sector, sectors_per_block, buf);
+  i64 ret = vol_write_sectors(vol, sector, sectors_per_block, buf);
+  if(ret >= 0) {
+    /* Invalidate cache for this block */
+    u32 idx = dsk_cache_idx(vol, block);
+    g_dsk_cache[idx].vol = NULL;
+  }
+  return ret;
 }
 
 /**
