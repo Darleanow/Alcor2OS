@@ -15,6 +15,8 @@
 #include <alcor2/sys/internal.h>
 #include <alcor2/mm/vmm.h>
 
+extern void proc_schedule(void);
+
 #define PIPE_BUF_SIZE 4096
 #define MAX_PIPES     16
 
@@ -76,8 +78,10 @@ i64 pipe_read_obj(void *pipe_ptr, void *buf, u64 count)
   if(p->count == 0 && !p->write_open)
     return 0;
 
+  /* Yield to other procs while the buffer is empty. Without this we'd spin
+   * with interrupts masked (syscall context) and starve the writer. */
   while(p->count == 0 && p->write_open)
-    __asm__ volatile("pause");
+    proc_schedule();
 
   if(p->count == 0)
     return 0; /* write end closed mid-wait */
@@ -102,8 +106,9 @@ i64 pipe_write_obj(void *pipe_ptr, const void *buf, u64 count)
   if(!p->read_open)
     return -EPIPE;
 
+  /* Yield while the buffer is full so the reader can drain it. */
   while(p->count >= PIPE_BUF_SIZE && p->read_open)
-    __asm__ volatile("pause");
+    proc_schedule();
 
   u64       space    = PIPE_BUF_SIZE - p->count;
   u64       to_write = count > space ? space : count;
