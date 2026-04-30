@@ -8,11 +8,12 @@
 #include "exec.h"
 #include "parse.h"
 
-void vega_run(const char *line)
+int vega_run(const char *line)
 {
   ast_t *ast = vega_parse(line);
   if(!ast)
-    return;
-  vega_exec(ast);
+    return 0;
+  int status = vega_exec(ast);
   ast_free(ast);
+  return status;
 }

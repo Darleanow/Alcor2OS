@@ -16,11 +16,10 @@
 /**
  * @brief Parse and execute one line of input.
  *
- * The line buffer is mutated in place. Output, exit-status tracking and
- * builtin dispatch are handled internally.
- *
- * @param line Null-terminated input line (modified during parsing).
+ * @param line Null-terminated input line.
+ * @return The exit status of the last executed command, or 0 if the line
+ *         parsed empty.
  */
-void vega_run(const char *line);
+int vega_run(const char *line);
 
 #endif /* VEGA_H */

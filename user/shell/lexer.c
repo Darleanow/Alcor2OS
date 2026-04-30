@@ -132,6 +132,28 @@ static tok_t read_word(lexer_t *L)
       }
       continue;
     }
+    if(*scan == '$' && scan[1] == '(') {
+      scan++;
+      n++; /* $ */
+      scan++;
+      n++; /* ( */
+      int depth = 1;
+      while(*scan && depth > 0) {
+        if(*scan == '(')
+          depth++;
+        else if(*scan == ')') {
+          if(--depth == 0)
+            break;
+        }
+        scan++;
+        n++;
+      }
+      if(*scan == ')') {
+        scan++;
+        n++;
+      }
+      continue;
+    }
     scan++;
     n++;
   }
@@ -153,6 +175,23 @@ static tok_t read_word(lexer_t *L)
       while(*p && *p != '}')
         out[i++] = *p++;
       if(*p == '}')
+        out[i++] = *p++;
+      continue;
+    }
+    if(*p == '$' && p[1] == '(') {
+      out[i++] = *p++; /* $ */
+      out[i++] = *p++; /* ( */
+      int depth = 1;
+      while(*p && depth > 0) {
+        if(*p == '(')
+          depth++;
+        else if(*p == ')') {
+          if(--depth == 0)
+            break;
+        }
+        out[i++] = *p++;
+      }
+      if(*p == ')')
         out[i++] = *p++;
       continue;
     }

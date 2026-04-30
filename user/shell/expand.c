@@ -9,7 +9,9 @@
 
 #include "expand.h"
 #include "shell.h"
+#include "vega.h"
 #include <stdlib.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define MAX_VARS    32
@@ -150,6 +152,67 @@ static int is_name_cont(char c)
   return is_name_start(c) || (c >= '0' && c <= '9');
 }
 
+/* Run @p cmd_str through vega_run in a forked child with stdout redirected
+ * to a pipe; capture stdout into a heap-allocated string. Trailing newlines
+ * are stripped (matches bash $(...)). Returns NULL on any failure. */
+static char *run_substitution(const char *cmd_str)
+{
+  int pipefd[2];
+  if(pipe(pipefd) < 0)
+    return NULL;
+
+  int pid = fork();
+  if(pid < 0) {
+    close(pipefd[0]);
+    close(pipefd[1]);
+    return NULL;
+  }
+  if(pid == 0) {
+    close(pipefd[0]);
+    dup2(pipefd[1], 1);
+    close(pipefd[1]);
+    int rc = vega_run(cmd_str);
+    _exit(rc);
+  }
+
+  close(pipefd[1]);
+
+  size_t cap = 256;
+  size_t len = 0;
+  char  *buf = (char *)malloc(cap);
+  if(!buf) {
+    close(pipefd[0]);
+    waitpid(pid, NULL, 0);
+    return NULL;
+  }
+
+  while(1) {
+    if(len + 256 + 1 > cap) {
+      size_t new_cap = cap * 2;
+      char  *new_buf = (char *)realloc(buf, new_cap);
+      if(!new_buf) {
+        free(buf);
+        close(pipefd[0]);
+        waitpid(pid, NULL, 0);
+        return NULL;
+      }
+      buf = new_buf;
+      cap = new_cap;
+    }
+    long n = read(pipefd[0], buf + len, 256);
+    if(n <= 0)
+      break;
+    len += (size_t)n;
+  }
+  close(pipefd[0]);
+  waitpid(pid, NULL, 0);
+
+  while(len > 0 && buf[len - 1] == '\n')
+    len--;
+  buf[len] = '\0';
+  return buf;
+}
+
 /* Substitute one $-expression starting at *cur (which points just past '$').
  * Returns the number of source bytes consumed past the '$' (so caller can
  * advance src + 1 + returned). On allocation failure returns -1. */
@@ -171,6 +234,44 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
     if(buf_append(buf, cap, len, pid_buf, sh_strlen(pid_buf)) < 0)
       return -1;
     return 1;
+  }
+
+  /* $(cmd) — command substitution */
+  if(*cur == '(') {
+    const char *body_start = cur + 1;
+    const char *p          = body_start;
+    int         depth      = 1;
+    while(*p && depth > 0) {
+      if(*p == '(')
+        depth++;
+      else if(*p == ')') {
+        if(--depth == 0)
+          break;
+      }
+      p++;
+    }
+    if(*p != ')') {
+      if(buf_append(buf, cap, len, "$(", 2) < 0)
+        return -1;
+      return 1; /* unterminated; let caller continue past '(' */
+    }
+    size_t body_len = (size_t)(p - body_start);
+    char  *body     = (char *)malloc(body_len + 1);
+    if(!body)
+      return -1;
+    for(size_t i = 0; i < body_len; i++)
+      body[i] = body_start[i];
+    body[body_len] = '\0';
+
+    char *captured = run_substitution(body);
+    free(body);
+    if(!captured)
+      return -1;
+    int rc = buf_append(buf, cap, len, captured, sh_strlen(captured));
+    free(captured);
+    if(rc < 0)
+      return -1;
+    return (int)(p - cur) + 1; /* consumed ( ... ) */
   }
 
   /* ${NAME} */
