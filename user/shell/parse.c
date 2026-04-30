@@ -7,10 +7,11 @@
  *   script  := list EOF
  *   list    := and_or (SEMI and_or)*       -- empty separators ignored
  *   and_or  := command ((AND | OR) command)*
- *   command := (WORD | STRING)+
+ *   command := (word_or_redir)+
+ *   word_or_redir := WORD | STRING | (REDIR_OUT | REDIR_APPEND | REDIR_IN) WORD
  *
- * Pipes, redirections and control-flow tokens are recognised by the lexer but
- * still rejected here; later phases lift those restrictions.
+ * Pipes and control-flow tokens are recognised by the lexer but still rejected
+ * here; later phases lift those restrictions.
  */
 
 #include "parse.h"
@@ -32,6 +33,16 @@ static void diag_expected_after(tok_kind_t after)
   sh_puts("\n");
 }
 
+static int redir_kind_from_token(tok_kind_t k, redir_kind_t *out)
+{
+  switch(k) {
+    case TOK_REDIR_OUT:    *out = REDIR_OUT;    return 1;
+    case TOK_REDIR_APPEND: *out = REDIR_APPEND; return 1;
+    case TOK_REDIR_IN:     *out = REDIR_IN;     return 1;
+    default:               return 0;
+  }
+}
+
 static ast_t *parse_command(lexer_t *L)
 {
   ast_t *n = ast_new_cmd();
@@ -40,14 +51,39 @@ static ast_t *parse_command(lexer_t *L)
 
   while(1) {
     tok_t t = lex_peek(L);
-    if(t.kind != TOK_WORD && t.kind != TOK_STRING)
-      break;
-    lex_next(L);
-    if(ast_cmd_push_arg(n, t.text) < 0) {
-      free(t.text);
-      ast_free(n);
-      return NULL;
+    redir_kind_t rk;
+
+    if(t.kind == TOK_WORD || t.kind == TOK_STRING) {
+      lex_next(L);
+      if(ast_cmd_push_arg(n, t.text) < 0) {
+        free(t.text);
+        ast_free(n);
+        return NULL;
+      }
+      continue;
     }
+
+    if(redir_kind_from_token(t.kind, &rk)) {
+      tok_kind_t op_kind = t.kind;
+      lex_next(L); /* consume the redir operator */
+
+      tok_t target = lex_next(L);
+      if(target.kind != TOK_WORD && target.kind != TOK_STRING) {
+        diag_expected_after(op_kind);
+        lex_token_free(&target);
+        L->error = 1;
+        ast_free(n);
+        return NULL;
+      }
+      if(ast_cmd_add_redir(n, rk, target.text) < 0) {
+        free(target.text);
+        ast_free(n);
+        return NULL;
+      }
+      continue;
+    }
+
+    break;
   }
 
   if(n->u.cmd.argc == 0) {

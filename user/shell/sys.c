@@ -180,34 +180,3 @@ int sh_unlink(const char *path)
   return unlink(path);
 }
 
-/** Process Execution */
-
-extern int   execve(const char *path, char *const argv[], char *const envp[]);
-extern int   fork(void);
-extern void  _exit(int status) __attribute__((noreturn));
-extern int   waitpid(int pid, int *status, int options);
-
-/**
- * @brief Run @p path as a child process and wait for it.
- *
- * Standard POSIX fork + execve + waitpid pattern: the parent forks, the child
- * exec's the binary at @p path with @p argv (POSIX-style — argv[0] should be
- * the program name), the parent waits and returns the child's exit status.
- *
- * @return Child's exit status on success, or -1 on fork/exec failure.
- */
-int sh_exec(const char *path, char *const argv[])
-{
-  int pid = fork();
-  if(pid < 0)
-    return -1;
-  if(pid == 0) {
-    execve(path, argv, NULL);
-    /* execve only returns on failure; the parent will see exit status 127. */
-    _exit(127);
-  }
-  int status = 0;
-  if(waitpid(pid, &status, 0) < 0)
-    return -1;
-  return (status >> 8) & 0xff;
-}

@@ -47,7 +47,6 @@ int            sh_mkdir(const char *path);
 int            sh_chdir(const char *path);
 char          *sh_getcwd(char *buf, size_t size);
 int            sh_unlink(const char *path);
-int            sh_exec(const char *path, char *const argv[]);
 
 /* Builtin commands (builtin.c). argv is POSIX-style: argv[0] is the command
  * name, argv[argc] is NULL. */

@@ -16,19 +16,38 @@ typedef enum {
   AST_SEQ, /* left ; right, status is right's */
 } ast_kind_t;
 
+typedef enum {
+  REDIR_OUT,    /* >  file — truncate */
+  REDIR_APPEND, /* >> file — append */
+  REDIR_IN,     /* <  file */
+} redir_kind_t;
+
 /**
- * @brief AST node. CMD nodes own a heap argv; binary nodes own their two
- * children. The union is grown by later phases (pipes, redirections, control
- * flow).
+ * @brief Linked list of file redirections attached to an AST_CMD. The target
+ * string is heap-owned. Multiple redirs targeting the same fd apply in order
+ * (last one wins, matching bash).
+ */
+typedef struct redir
+{
+  redir_kind_t  kind;
+  char         *target;
+  struct redir *next;
+} redir_t;
+
+/**
+ * @brief AST node. CMD nodes own a heap argv and an optional redir list;
+ * binary nodes own their two children. The union is grown by later phases
+ * (pipes, control flow).
  */
 typedef struct ast_node
 {
   ast_kind_t kind;
   union {
     struct {
-      char **argv;
-      int    argc;
-      int    cap;
+      char    **argv;
+      int       argc;
+      int       cap;
+      redir_t  *redirs;
     } cmd;
     struct {
       struct ast_node *left;
@@ -48,6 +67,13 @@ ast_t *ast_new_cmd(void);
  *         must free @p arg).
  */
 int ast_cmd_push_arg(ast_t *n, char *arg);
+
+/**
+ * @brief Append a redirection to a CMD node. @p target is taken by ownership.
+ *
+ * @return 0 on success, -1 on allocation failure (caller must free @p target).
+ */
+int ast_cmd_add_redir(ast_t *n, redir_kind_t kind, char *target);
 
 /**
  * @brief Allocate a binary operator node (AND, OR or SEQ) taking ownership of

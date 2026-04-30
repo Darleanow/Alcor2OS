@@ -22,7 +22,25 @@ ast_t *ast_new_cmd(void)
   n->u.cmd.argv[0] = NULL;
   n->u.cmd.argc    = 0;
   n->u.cmd.cap     = INITIAL_ARGV_CAP;
+  n->u.cmd.redirs  = NULL;
   return n;
+}
+
+int ast_cmd_add_redir(ast_t *n, redir_kind_t kind, char *target)
+{
+  redir_t *r = (redir_t *)malloc(sizeof(*r));
+  if(!r)
+    return -1;
+  r->kind   = kind;
+  r->target = target;
+  r->next   = NULL;
+
+  /* append to keep apply order matching source order (last-wins per fd) */
+  redir_t **tail = &n->u.cmd.redirs;
+  while(*tail)
+    tail = &(*tail)->next;
+  *tail = r;
+  return 0;
 }
 
 int ast_cmd_push_arg(ast_t *n, char *arg)
@@ -63,6 +81,12 @@ void ast_free(ast_t *n)
       for(int i = 0; i < n->u.cmd.argc; i++)
         free(n->u.cmd.argv[i]);
       free(n->u.cmd.argv);
+      for(redir_t *r = n->u.cmd.redirs; r;) {
+        redir_t *next = r->next;
+        free(r->target);
+        free(r);
+        r = next;
+      }
       break;
     case AST_AND:
     case AST_OR:
