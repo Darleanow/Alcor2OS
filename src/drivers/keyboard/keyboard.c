@@ -5,8 +5,8 @@
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/arch/io.h>
-#include <alcor2/drivers/keyboard.h>
 #include <alcor2/arch/pic.h>
+#include <alcor2/drivers/keyboard.h>
 
 #define KB_DATA_PORT 0x60
 #define KB_CMD_PORT  0x64
