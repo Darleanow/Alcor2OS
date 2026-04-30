@@ -12,7 +12,7 @@ help:
 	@echo "  user              userland (crt, init, shell, bin, apps if g++ exists)"
 	@echo "  iso               Limine bootable CD image (+ kernel, shell on ISO)"
 	@echo "  run               QEMU: Limine ISO + $(DISK) (IDE)"
-	@echo "  disk-populate     fill $(DISK) (fuse2fs on Linux if available → no sudo)"
+	@echo "  disk-populate     fill $(DISK) (fuse2fs on Linux → no sudo when available); clang copy if built"
 	@echo "  disk-mount / disk-umount   manual inspect of $(DISK)"
 	@echo "  disk-resync       user + disk-populate"
 	@echo "  make run USE_KVM=0   slower CPU emu (TCG); KVM itself does not use sudo"
@@ -180,7 +180,7 @@ run: iso disk-populate
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM)
 
 clean:
-	rm -rf $(BUILD) compile_commands.json
+	rm -rf $(BUILD)
 	-$(MAKE) -C user/init clean
 	-$(MAKE) -C user/shell clean
 	-$(MAKE) -C user/bin clean
