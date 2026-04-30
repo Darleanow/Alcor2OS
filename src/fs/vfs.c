@@ -162,7 +162,12 @@ static i64 proc_install_fd_from(int start, i32 oft_idx)
 
 i64 vfs_install_fd(i32 oft_idx)
 {
-  return proc_install_fd_from(0, oft_idx);
+  /* Start at 3 so newly opened resources (pipes, etc.) never shadow stdio
+   * slots. Without this, in a shell that hasn't explicitly opened fds 0/1/2
+   * (relies on the kernel's stdio fallback), pipe() returns fds 0 and 1 —
+   * then `dup2(pipe_write, 1)` is a no-op and the subsequent close(1) drops
+   * the pipe end. */
+  return proc_install_fd_from(3, oft_idx);
 }
 
 void vfs_proc_init_fds(i32 *fds)
