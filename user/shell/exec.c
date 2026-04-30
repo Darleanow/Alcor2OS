@@ -4,8 +4,9 @@
  *
  * AST_CMD: resolve via /bin or /usr/bin (or absolute path), fork+execve+wait,
  * applying redirections in the child. AST_AND/OR/SEQ short-circuit the obvious
- * way. Builtins run in the shell process — for builtins with redirs, we save
- * fd 0/1 with dup, apply, run, then restore.
+ * way. AST_PIPE forks N children plumbed by N-1 pipes; pipeline status is the
+ * last stage's. Builtins run in the shell process when standalone (so cd
+ * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
 #include "exec.h"
@@ -14,7 +15,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define MAX_EXEC_PATH 256
+#define MAX_EXEC_PATH    256
+#define MAX_PIPE_STAGES  16
 
 /* Open @p target with flags appropriate for the redir kind, then dup2 onto the
  * canonical fd (0 for IN, 1 for OUT/APPEND). Returns 0 on success, -1 on any
@@ -161,6 +163,97 @@ static int exec_cmd(ast_t *n)
   return ret;
 }
 
+/* Run @p stage (an AST_CMD) in the current child after the pipeline plumbing
+ * has set up stdin/stdout. Applies the stage's own redirs (which override the
+ * pipeline plumbing per-fd, matching bash), then either runs a builtin and
+ * exits, or execve's. Never returns. */
+static void exec_stage_in_child(ast_t *stage) __attribute__((noreturn));
+static void exec_stage_in_child(ast_t *stage)
+{
+  int    argc = stage->u.cmd.argc;
+  char **argv = stage->u.cmd.argv;
+  if(argc == 0)
+    _exit(0);
+
+  if(apply_redirs(stage->u.cmd.redirs) < 0)
+    _exit(1);
+
+  if(is_builtin(argv[0])) {
+    int rc = run_builtin(argc, argv);
+    _exit(rc);
+  }
+
+  char path[MAX_EXEC_PATH];
+  if(!resolve_path(argv[0], path)) {
+    sh_puts(argv[0]);
+    sh_puts(": command not found\n");
+    _exit(127);
+  }
+  execve(path, argv, NULL);
+  _exit(127);
+}
+
+static int exec_pipeline(ast_t *n)
+{
+  int     N      = n->u.pipeline.n;
+  ast_t **stages = n->u.pipeline.stages;
+
+  if(N > MAX_PIPE_STAGES) {
+    sh_puts("vega: pipeline too long\n");
+    return 1;
+  }
+
+  int pipes[MAX_PIPE_STAGES - 1][2];
+  for(int i = 0; i < N - 1; i++) {
+    if(pipe(pipes[i]) < 0) {
+      for(int j = 0; j < i; j++) {
+        close(pipes[j][0]);
+        close(pipes[j][1]);
+      }
+      sh_puts("vega: pipe failed\n");
+      return 1;
+    }
+  }
+
+  int pids[MAX_PIPE_STAGES];
+  for(int i = 0; i < N; i++) {
+    pids[i] = fork();
+    if(pids[i] < 0) {
+      for(int j = 0; j < N - 1; j++) {
+        close(pipes[j][0]);
+        close(pipes[j][1]);
+      }
+      sh_puts("vega: fork failed\n");
+      return 1;
+    }
+    if(pids[i] == 0) {
+      if(i > 0)
+        dup2(pipes[i - 1][0], 0);
+      if(i < N - 1)
+        dup2(pipes[i][1], 1);
+      for(int j = 0; j < N - 1; j++) {
+        close(pipes[j][0]);
+        close(pipes[j][1]);
+      }
+      exec_stage_in_child(stages[i]);
+    }
+  }
+
+  for(int i = 0; i < N - 1; i++) {
+    close(pipes[i][0]);
+    close(pipes[i][1]);
+  }
+
+  int last_status = 0;
+  for(int i = 0; i < N; i++) {
+    int status = 0;
+    waitpid(pids[i], &status, 0);
+    if(i == N - 1)
+      last_status = (status >> 8) & 0xff;
+  }
+  return last_status;
+}
+
 int vega_exec(ast_t *node)
 {
   if(!node)
@@ -183,6 +276,8 @@ int vega_exec(ast_t *node)
     case AST_SEQ:
       vega_exec(node->u.binop.left);
       return vega_exec(node->u.binop.right);
+    case AST_PIPE:
+      return exec_pipeline(node);
   }
   return 0;
 }

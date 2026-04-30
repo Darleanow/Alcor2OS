@@ -72,6 +72,40 @@ ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right)
   return n;
 }
 
+#define INITIAL_PIPELINE_CAP 2
+
+ast_t *ast_new_pipeline(void)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n)
+    return NULL;
+  n->kind = AST_PIPE;
+  n->u.pipeline.stages =
+      (ast_t **)malloc(sizeof(ast_t *) * INITIAL_PIPELINE_CAP);
+  if(!n->u.pipeline.stages) {
+    free(n);
+    return NULL;
+  }
+  n->u.pipeline.n   = 0;
+  n->u.pipeline.cap = INITIAL_PIPELINE_CAP;
+  return n;
+}
+
+int ast_pipeline_push(ast_t *n, ast_t *stage)
+{
+  if(n->u.pipeline.n >= n->u.pipeline.cap) {
+    int     new_cap = n->u.pipeline.cap * 2;
+    ast_t **new_arr =
+        (ast_t **)realloc(n->u.pipeline.stages, sizeof(ast_t *) * new_cap);
+    if(!new_arr)
+      return -1;
+    n->u.pipeline.stages = new_arr;
+    n->u.pipeline.cap    = new_cap;
+  }
+  n->u.pipeline.stages[n->u.pipeline.n++] = stage;
+  return 0;
+}
+
 void ast_free(ast_t *n)
 {
   if(!n)
@@ -93,6 +127,11 @@ void ast_free(ast_t *n)
     case AST_SEQ:
       ast_free(n->u.binop.left);
       ast_free(n->u.binop.right);
+      break;
+    case AST_PIPE:
+      for(int i = 0; i < n->u.pipeline.n; i++)
+        ast_free(n->u.pipeline.stages[i]);
+      free(n->u.pipeline.stages);
       break;
   }
   free(n);

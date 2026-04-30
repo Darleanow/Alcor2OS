@@ -11,9 +11,10 @@
 
 typedef enum {
   AST_CMD,
-  AST_AND, /* left && right, short-circuit on non-zero status */
-  AST_OR,  /* left || right, short-circuit on zero status */
-  AST_SEQ, /* left ; right, status is right's */
+  AST_AND,  /* left && right, short-circuit on non-zero status */
+  AST_OR,   /* left || right, short-circuit on zero status */
+  AST_SEQ,  /* left ; right, status is right's */
+  AST_PIPE, /* a | b | ... ; status is last stage's */
 } ast_kind_t;
 
 typedef enum {
@@ -53,6 +54,11 @@ typedef struct ast_node
       struct ast_node *left;
       struct ast_node *right;
     } binop;
+    struct {
+      struct ast_node **stages; /* each stage owns its node */
+      int               n;
+      int               cap;
+    } pipeline;
   } u;
 } ast_t;
 
@@ -81,6 +87,16 @@ int ast_cmd_add_redir(ast_t *n, redir_kind_t kind, char *target);
  * NULL is returned.
  */
 ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right);
+
+/** @brief Allocate an empty AST_PIPE node. */
+ast_t *ast_new_pipeline(void);
+
+/**
+ * @brief Append @p stage to a pipeline (taking ownership). Grows as needed.
+ *
+ * @return 0 on success, -1 on allocation failure (caller must free @p stage).
+ */
+int ast_pipeline_push(ast_t *n, ast_t *stage);
 
 /** @brief Free an AST node and everything it owns. NULL-safe. */
 void ast_free(ast_t *n);

@@ -4,14 +4,15 @@
  *
  * Grammar:
  *
- *   script  := list EOF
- *   list    := and_or (SEMI and_or)*       -- empty separators ignored
- *   and_or  := command ((AND | OR) command)*
- *   command := (word_or_redir)+
+ *   script   := list EOF
+ *   list     := and_or (SEMI and_or)*      -- empty separators ignored
+ *   and_or   := pipeline ((AND | OR) pipeline)*
+ *   pipeline := command (PIPE command)*
+ *   command  := (word_or_redir)+
  *   word_or_redir := WORD | STRING | (REDIR_OUT | REDIR_APPEND | REDIR_IN) WORD
  *
- * Pipes and control-flow tokens are recognised by the lexer but still rejected
- * here; later phases lift those restrictions.
+ * Control-flow tokens are recognised by the lexer but still rejected here;
+ * later phases lift those restrictions.
  */
 
 #include "parse.h"
@@ -93,9 +94,46 @@ static ast_t *parse_command(lexer_t *L)
   return n;
 }
 
+static ast_t *parse_pipeline(lexer_t *L)
+{
+  ast_t *first = parse_command(L);
+  if(!first)
+    return NULL;
+
+  if(lex_peek(L).kind != TOK_PIPE)
+    return first; /* single command, no pipeline wrapper */
+
+  ast_t *pipe_node = ast_new_pipeline();
+  if(!pipe_node) {
+    ast_free(first);
+    return NULL;
+  }
+  if(ast_pipeline_push(pipe_node, first) < 0) {
+    ast_free(first);
+    ast_free(pipe_node);
+    return NULL;
+  }
+
+  while(lex_peek(L).kind == TOK_PIPE) {
+    lex_next(L); /* consume '|' */
+    ast_t *next = parse_command(L);
+    if(!next) {
+      diag_expected_after(TOK_PIPE);
+      ast_free(pipe_node);
+      return NULL;
+    }
+    if(ast_pipeline_push(pipe_node, next) < 0) {
+      ast_free(next);
+      ast_free(pipe_node);
+      return NULL;
+    }
+  }
+  return pipe_node;
+}
+
 static ast_t *parse_and_or(lexer_t *L)
 {
-  ast_t *left = parse_command(L);
+  ast_t *left = parse_pipeline(L);
   if(!left)
     return NULL;
 
@@ -105,7 +143,7 @@ static ast_t *parse_and_or(lexer_t *L)
       break;
     lex_next(L);
 
-    ast_t *right = parse_command(L);
+    ast_t *right = parse_pipeline(L);
     if(!right) {
       diag_expected_after(t.kind);
       ast_free(left);
