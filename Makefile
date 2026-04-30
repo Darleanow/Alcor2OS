@@ -50,7 +50,7 @@ OBJS     := $(patsubst $(SRC)/%.c,$(BUILD)/%.c.o,$(SRCS_C)) \
             $(patsubst $(SRC)/%.asm,$(BUILD)/%.asm.o,$(SRCS_ASM))
 DEPS     := $(OBJS:.o=.d)
 
-.PHONY: all iso run run-disk disk disk-mount disk-umount disk-populate \
+.PHONY: all iso run run-disk disk disk-mount disk-umount disk-populate rebuild-disk \
         compile_commands clean distclean user musl tcc clang format lint check analyze
 
 all: $(BUILD)/$(KERNEL) compile_commands
@@ -87,6 +87,11 @@ user: thirdparty/musl/install/lib/libc.a
 	$(MAKE) -C user/init
 	$(MAKE) -C user/shell
 	$(MAKE) -C user/bin
+	@if [ -f thirdparty/musl-cross/bin/x86_64-linux-musl-g++ ]; then \
+		$(MAKE) -C user/apps; \
+	else \
+		echo "[user] user/apps skipped (install musl-cross g++ for C++ programs)"; \
+	fi
 
 $(BUILD)/%.c.o: $(SRC)/%.c
 	@mkdir -p $(@D)
@@ -204,6 +209,7 @@ iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user compile_commands
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
 	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/
 	@cp user/build/bin/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
+	@cp user/build/apps/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
 	@cp thirdparty/limine/limine-bios.sys      $(BUILD)/iso/boot/limine/
 	@cp thirdparty/limine/limine-bios-cd.bin   $(BUILD)/iso/boot/limine/
@@ -262,7 +268,10 @@ disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	fi
 	@sudo mkdir -p mnt/bin mnt/etc mnt/tmp mnt/home \
 		mnt/usr/bin mnt/usr/lib/tcc mnt/usr/include mnt/usr/lib
+	@sudo rm -f mnt/bin/*.elf mnt/bin/cat mnt/bin/echo mnt/bin/ls mnt/bin/mkdir \
+	                mnt/bin/pwd mnt/bin/rm mnt/bin/touch mnt/bin/edi mnt/bin/hello-cpp
 	@sudo cp user/build/bin/*.elf mnt/bin/ 2>/dev/null || true
+	@sudo cp user/build/apps/*.elf mnt/bin/ 2>/dev/null || true
 	@for f in mnt/bin/*.elf; do \
 		[ -f "$$f" ] && sudo mv "$$f" "$${f%.elf}"; \
 	done
@@ -295,14 +304,19 @@ disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 		echo "Clang not built — run 'make clang' first"; \
 	fi
 	@echo "Welcome to Alcor2!" | sudo tee mnt/etc/motd > /dev/null
+	@sudo sync
 	@sudo umount mnt
 	@rmdir mnt
 	@echo "Disk populated"
+
+rebuild-disk: user disk-populate
 
 clean:
 	rm -rf $(BUILD)
 	$(MAKE) -C user/init clean
 	$(MAKE) -C user/shell clean
+	$(MAKE) -C user/bin clean
+	$(MAKE) -C user/apps clean
 
 distclean: clean
 	rm -rf thirdparty disk.img
