@@ -213,6 +213,51 @@ static char *run_substitution(const char *cmd_str)
   return buf;
 }
 
+/* Substitute a {NAME}-style brace expression starting at *cur (which points
+ * just past '{'). Returns bytes consumed past '{' on success (so caller can
+ * advance src + 1 + returned), or -1 on allocation failure. If the construct
+ * is malformed (no closing '}'), emits the literal '{' and returns 0 so the
+ * caller continues past it.
+ *
+ * Used only inside double-quoted strings to interpolate variables — vega's
+ * cleaner alternative to ${NAME} (which still works via the $-prefix path). */
+static int expand_brace(const char *cur, char **buf, size_t *cap, size_t *len)
+{
+  const char *name_start = cur;
+  const char *p          = name_start;
+  while(*p && *p != '}')
+    p++;
+  if(*p != '}') {
+    if(buf_append(buf, cap, len, "{", 1) < 0)
+      return -1;
+    return 0;
+  }
+  size_t nlen = (size_t)(p - name_start);
+  if(nlen >= NAME_MAX)
+    nlen = NAME_MAX - 1;
+  char name[NAME_MAX];
+  for(size_t i = 0; i < nlen; i++)
+    name[i] = name_start[i];
+  name[nlen] = '\0';
+
+  /* Special vars get the same treatment they do under $-syntax. */
+  const char *val;
+  char        special[16];
+  if(sh_strcmp(name, "?") == 0) {
+    render_int(last_status, special);
+    val = special;
+  } else if(sh_strcmp(name, "$") == 0) {
+    if(pid_buf[0] == '\0')
+      render_uint((unsigned long)getpid(), pid_buf);
+    val = pid_buf;
+  } else {
+    val = expand_getvar(name);
+  }
+  if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+    return -1;
+  return (int)(p - cur) + 1; /* consumed NAME } */
+}
+
 /* Substitute one $-expression starting at *cur (which points just past '$').
  * Returns the number of source bytes consumed past the '$' (so caller can
  * advance src + 1 + returned). On allocation failure returns -1. */
@@ -339,6 +384,21 @@ char *expand_word(const char *src)
     if(*p == '$') {
       p++; /* skip '$' */
       int consumed = expand_one(p, &buf, &cap, &len);
+      if(consumed < 0) {
+        free(buf);
+        return NULL;
+      }
+      p += consumed;
+      continue;
+    }
+    /* {name} interpolation — only kicks in when '{' is followed by a name
+     * character, $, or ?, so stray literal braces stay literal. Inside
+     * unquoted barewords '{' is a structural token (lexer-split), so this
+     * effectively only matters for double-quoted strings. */
+    if(*p == '{' &&
+       (is_name_start(p[1]) || p[1] == '?' || p[1] == '$')) {
+      p++; /* skip '{' */
+      int consumed = expand_brace(p, &buf, &cap, &len);
       if(consumed < 0) {
         free(buf);
         return NULL;
