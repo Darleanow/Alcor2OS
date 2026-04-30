@@ -38,7 +38,7 @@ static ast_t *parse_command(lexer_t *L)
   if(!n)
     return NULL;
 
-  for(;;) {
+  while(1) {
     tok_t t = lex_peek(L);
     if(t.kind != TOK_WORD && t.kind != TOK_STRING)
       break;
@@ -63,7 +63,7 @@ static ast_t *parse_and_or(lexer_t *L)
   if(!left)
     return NULL;
 
-  for(;;) {
+  while(1) {
     tok_t t = lex_peek(L);
     if(t.kind != TOK_AND && t.kind != TOK_OR)
       break;
@@ -90,7 +90,7 @@ static ast_t *parse_list(lexer_t *L)
   if(L->error)
     return NULL;
 
-  for(;;) {
+  while(1) {
     tok_t t = lex_peek(L);
     if(t.kind != TOK_SEMI)
       break;
