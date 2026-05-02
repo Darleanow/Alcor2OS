@@ -8,17 +8,18 @@
  *   list     := and_or (SEMI and_or)*      -- empty separators ignored
  *   and_or   := pipeline ((AND | OR) pipeline)*
  *   pipeline := unit (PIPE unit)*
- *   unit     := if_stmt | while_stmt | simple_command
+ *   unit     := if_stmt | while_stmt | for_stmt | simple_command
  *   if_stmt  := 'if' and_or '{' list '}' ('else' (if_stmt | '{' list '}'))?
  *   while_stmt := 'while' and_or '{' list '}'
+ *   for_stmt := 'for' WORD 'in' (WORD | STRING)* '{' list '}'
  *   simple_command := (word_or_redir)+
  *   word_or_redir  := WORD | STRING
  *                   | (REDIR_OUT | REDIR_APPEND | REDIR_IN | HERESTRING) WORD
  *
- * `if`/`else`/`while` are recognised as reserved words only when they appear
- * in the command position (first token of a unit / right after the closing
- * brace of an if branch); elsewhere they are ordinary identifiers and can be
- * passed as arguments. for/heredocs land in later phases.
+ * `if`/`else`/`while`/`for`/`in` are recognised as reserved words only when
+ * they appear in the command position (first token of a unit / right after
+ * the closing brace of an if branch); elsewhere they are ordinary
+ * identifiers and can be passed as arguments. heredocs land in a later phase.
  */
 
 #include "parse.h"
@@ -200,8 +201,53 @@ static ast_t *parse_while(lexer_t *L)
   return ast_new_while(cond, body);
 }
 
+static ast_t *parse_for(lexer_t *L)
+{
+  /* The opening `for` keyword has already been consumed by parse_unit. */
+  tok_t name_tok = lex_next(L);
+  if(name_tok.kind != TOK_WORD) {
+    diag_unexpected(name_tok.kind);
+    lex_token_free(&name_tok);
+    L->error = 1;
+    return NULL;
+  }
+
+  if(!match_keyword(L, "in")) {
+    sh_puts("vega: expected 'in' after for variable\n");
+    free(name_tok.text);
+    L->error = 1;
+    return NULL;
+  }
+
+  ast_t *n = ast_new_for(name_tok.text);
+  if(!n) {
+    L->error = 1;
+    return NULL;
+  }
+
+  while(1) {
+    tok_t t = lex_peek(L);
+    if(t.kind != TOK_WORD && t.kind != TOK_STRING)
+      break;
+    lex_next(L);
+    if(ast_for_push_word(n, t.text) < 0) {
+      free(t.text);
+      ast_free(n);
+      return NULL;
+    }
+  }
+
+  ast_t *body = parse_brace_body(L);
+  if(L->error) {
+    ast_free(n);
+    return NULL;
+  }
+  ast_for_set_body(n, body);
+  return n;
+}
+
 /* A "unit" is a single command in the pipeline grammar — either a compound
- * statement (`if`, `while`) or a simple command. */
+ * statement (`if`, `while`, `for`) or a simple command. */
 static ast_t *parse_unit(lexer_t *L)
 {
   tok_t t = lex_peek(L);
@@ -214,6 +260,11 @@ static ast_t *parse_unit(lexer_t *L)
     lex_next(L);
     lex_token_free(&t);
     return parse_while(L);
+  }
+  if(t.kind == TOK_WORD && sh_strcmp(t.text, "for") == 0) {
+    lex_next(L);
+    lex_token_free(&t);
+    return parse_for(L);
   }
   return parse_command(L);
 }

@@ -102,6 +102,49 @@ ast_t *ast_new_while(ast_t *cond, ast_t *body)
   return n;
 }
 
+#define INITIAL_FOR_CAP 4
+
+ast_t *ast_new_for(char *name)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n) {
+    free(name);
+    return NULL;
+  }
+  n->kind          = AST_FOR;
+  n->u.for_.name   = name;
+  n->u.for_.words  = (char **)malloc(sizeof(char *) * INITIAL_FOR_CAP);
+  if(!n->u.for_.words) {
+    free(name);
+    free(n);
+    return NULL;
+  }
+  n->u.for_.nwords = 0;
+  n->u.for_.cap    = INITIAL_FOR_CAP;
+  n->u.for_.body   = NULL;
+  return n;
+}
+
+int ast_for_push_word(ast_t *n, char *word)
+{
+  if(n->u.for_.nwords >= n->u.for_.cap) {
+    int    new_cap = n->u.for_.cap * 2;
+    char **new_arr =
+        (char **)realloc(n->u.for_.words, sizeof(char *) * new_cap);
+    if(!new_arr)
+      return -1;
+    n->u.for_.words = new_arr;
+    n->u.for_.cap   = new_cap;
+  }
+  n->u.for_.words[n->u.for_.nwords++] = word;
+  return 0;
+}
+
+void ast_for_set_body(ast_t *n, ast_t *body)
+{
+  n->u.for_.body = body;
+}
+
 #define INITIAL_PIPELINE_CAP 2
 
 ast_t *ast_new_pipeline(void)
@@ -171,6 +214,13 @@ void ast_free(ast_t *n)
     case AST_WHILE:
       ast_free(n->u.while_.cond);
       ast_free(n->u.while_.body);
+      break;
+    case AST_FOR:
+      free(n->u.for_.name);
+      for(int i = 0; i < n->u.for_.nwords; i++)
+        free(n->u.for_.words[i]);
+      free(n->u.for_.words);
+      ast_free(n->u.for_.body);
       break;
   }
   free(n);

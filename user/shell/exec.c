@@ -46,7 +46,7 @@ static int apply_herestring(const char *text)
 /* Open @p target with flags appropriate for the redir kind, then dup2 onto the
  * canonical fd (0 for IN, 1 for OUT/APPEND). Returns 0 on success, -1 on any
  * error — caller is expected to bail out. The redir's target is expanded here
- * (rather than once up-front) so that loop bodies see fresh values per
+ * (rather than once up-front) so that loop-bodies see fresh values per
  * iteration. */
 static int apply_one_redir(const redir_t *r)
 {
@@ -103,7 +103,7 @@ static int apply_redirs(const redir_t *list)
  * so loop bodies (re-executed AST nodes) see fresh expansions each call. */
 static char **build_expanded_argv(const ast_t *cmd)
 {
-  int    argc = cmd->u.cmd.argc;
+  int     argc = cmd->u.cmd.argc;
   char **out  = (char **)malloc(sizeof(char *) * (argc + 1));
   if(!out)
     return NULL;
@@ -382,6 +382,21 @@ int vega_exec(ast_t *node)
       status = 0;
       while(vega_exec(node->u.while_.cond) == 0)
         status = vega_exec(node->u.while_.body);
+      break;
+    }
+    case AST_FOR: {
+      status = 0;
+      for(int i = 0; i < node->u.for_.nwords; i++) {
+        char *expanded = expand_word(node->u.for_.words[i]);
+        if(!expanded) {
+          status = 1;
+          break;
+        }
+        expand_setvar(node->u.for_.name, expanded);
+        free(expanded);
+        if(node->u.for_.body)
+          status = vega_exec(node->u.for_.body);
+      }
       break;
     }
     default:

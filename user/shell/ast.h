@@ -17,6 +17,7 @@ typedef enum {
   AST_PIPE,  /* a | b | ... ; status is last stage's */
   AST_IF,    /* if cond { then } [else { else_branch }] */
   AST_WHILE, /* while cond { body } — loops while cond exits 0 */
+  AST_FOR,   /* for var in words... { body } */
 } ast_kind_t;
 
 typedef enum {
@@ -73,6 +74,13 @@ typedef struct ast_node
       struct ast_node *cond;
       struct ast_node *body;
     } while_;
+    struct {
+      char             *name;   /* loop variable */
+      char            **words;  /* heap array of heap strings */
+      int               nwords;
+      int               cap;
+      struct ast_node  *body;
+    } for_;
   } u;
 } ast_t;
 
@@ -113,6 +121,22 @@ ast_t *ast_new_if(ast_t *cond, ast_t *then_branch, ast_t *else_branch);
  * @p body may be NULL for an empty `{ }`.
  */
 ast_t *ast_new_while(ast_t *cond, ast_t *body);
+
+/**
+ * @brief Allocate an AST_FOR node with the given loop variable name (taken by
+ * ownership). The words list is empty and the body is NULL; populate via
+ * ast_for_push_word and ast_for_set_body.
+ */
+ast_t *ast_new_for(char *name);
+
+/**
+ * @brief Append a word (taken by ownership) to a FOR node's iteration list.
+ * @return 0 on success, -1 on allocation failure (caller must free @p word).
+ */
+int ast_for_push_word(ast_t *n, char *word);
+
+/** @brief Attach @p body (taken by ownership; may be NULL) to a FOR node. */
+void ast_for_set_body(ast_t *n, ast_t *body);
 
 /** @brief Allocate an empty AST_PIPE node. */
 ast_t *ast_new_pipeline(void);
