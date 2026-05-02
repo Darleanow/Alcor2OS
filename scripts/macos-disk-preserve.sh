@@ -26,14 +26,25 @@ walk() {
     dst=$2
     e2ls "$IMAGE:$src" >/dev/null 2>&1 || return 0
     mkdir -p "$dst" 2>/dev/null
-    e2ls "$IMAGE:$src" 2>/dev/null | tr ' ' '\n' | while IFS= read -r entry; do
-        [ -z "$entry" ] && continue
-        case "$entry" in '.'|'..') continue ;; esac
-        if e2cp "$IMAGE:$src/$entry" "$dst/$entry" 2>/dev/null; then
-            :
-        else
-            walk "$src/$entry" "$dst/$entry"
-        fi
+    # `e2ls -l` lines look like: "<inode> <perms> <uid> <gid> <size> <date> <name>".
+    # Find the 10-char perms field by pattern (first column position varies by version),
+    # then the leading 'd' tells us it's a directory.
+    e2ls -l "$IMAGE:$src" 2>/dev/null | awk '
+    {
+        perms = ""
+        for (i = 1; i <= NF; i++) {
+            if (length($i) == 10 && match($i, /^[-dlcbps]/)) { perms = $i; break }
+        }
+        if (perms == "") next
+        name = $NF
+        if (name == "." || name == "..") next
+        type = (substr(perms, 1, 1) == "d") ? "D" : "F"
+        print type, name
+    }' | while read -r type name; do
+        case "$type" in
+            D) walk "$src/$name" "$dst/$name" ;;
+            F) e2cp "$IMAGE:$src/$name" "$dst/$name" 2>/dev/null || true ;;
+        esac
     done
 }
 
