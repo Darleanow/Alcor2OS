@@ -6,4 +6,4 @@ thirdparty/
 *.iso
 *.img
 user/apps/**/.cache/
-
+.vscode
