@@ -219,8 +219,17 @@ static tok_t scan_one(lexer_t *L)
   tok_t t = { TOK_EOF, NULL };
   char  c = *L->cur;
 
-  if(c == '\0' || c == '\n')
+  if(c == '\0')
     return t;
+  if(c == '\n') {
+    /* Newlines act as statement separators (equivalent to ';'). The
+     * multi-line REPL stitches input lines with '\n' into one buffer; this
+     * lets a brace body like `if pwd {\n echo hi\n}` parse as
+     * `if pwd { echo hi ; }`. */
+    L->cur++;
+    t.kind = TOK_SEMI;
+    return t;
+  }
 
   switch(c) {
     case '|':

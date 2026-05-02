@@ -6,6 +6,8 @@
  *
  *   script   := list EOF
  *   list     := and_or (SEMI and_or)*      -- empty separators ignored
+ *                                          -- newlines lex as SEMI too,
+ *                                          -- so multi-line `{ ... }` works
  *   and_or   := pipeline ((AND | OR) pipeline)*
  *   pipeline := unit (PIPE unit)*
  *   unit     := if_stmt | while_stmt | for_stmt | simple_command

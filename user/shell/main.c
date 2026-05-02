@@ -81,6 +81,77 @@ static void print_prompt(void)
   }
 }
 
+/* True if @p buf parses as a complete statement: no open quote, balanced
+ * braces. Mirrors the lexer's quoting rules — single quotes are literal,
+ * double quotes recognise \" \\ \$ as escapes. Brace counting is suppressed
+ * inside either quote. A negative depth (`}` without `{`) is treated as
+ * complete: let the parser surface the error rather than wedge the REPL. */
+static int is_input_complete(const char *buf)
+{
+  int in_squote   = 0;
+  int in_dquote   = 0;
+  int brace_depth = 0;
+
+  for(const char *p = buf; *p; p++) {
+    char c = *p;
+    if(in_squote) {
+      if(c == '\'')
+        in_squote = 0;
+      continue;
+    }
+    if(in_dquote) {
+      if(c == '\\' && p[1] && (p[1] == '"' || p[1] == '\\' || p[1] == '$')) {
+        p++;
+        continue;
+      }
+      if(c == '"')
+        in_dquote = 0;
+      continue;
+    }
+    if(c == '\'') {
+      in_squote = 1;
+      continue;
+    }
+    if(c == '"') {
+      in_dquote = 1;
+      continue;
+    }
+    if(c == '{')
+      brace_depth++;
+    else if(c == '}' && brace_depth > 0)
+      brace_depth--;
+  }
+  return !in_squote && !in_dquote && brace_depth == 0;
+}
+
+/* Read input lines into @p buf until they form a complete statement. After
+ * each newline we append '\n' so the lexer (which treats '\n' as SEMI) sees
+ * a separator between stitched lines. PS2 ('> ') is shown for continuation
+ * prompts. Returns total bytes accumulated, or -1 on EOF. */
+static int read_complete_statement(char *buf, size_t size)
+{
+  size_t pos = 0;
+  buf[0]     = '\0';
+
+  while(1) {
+    int len = read_line(buf + pos, size - pos);
+    if(len < 0)
+      return -1;
+
+    pos += (size_t)len;
+    if(pos >= size - 2) /* leave room for '\n' and '\0' */
+      return (int)pos;
+
+    buf[pos++] = '\n';
+    buf[pos]   = '\0';
+
+    if(is_input_complete(buf))
+      return (int)pos;
+
+    sh_puts("> ");
+  }
+}
+
 /**
  * @brief Shell main entry point.
  *
@@ -105,7 +176,7 @@ int main(int argc, char *argv[])
   while(1) {
     print_prompt();
 
-    int len = read_line(line, sizeof(line));
+    int len = read_complete_statement(line, sizeof(line));
 
     if(len < 0) {
       sh_puts("exit\n");
