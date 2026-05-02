@@ -4,7 +4,7 @@
  * Thin wrappers around standard libc functions.
  */
 
-#include "shell.h"
+#include <vega/shell.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -180,20 +180,3 @@ int sh_unlink(const char *path)
   return unlink(path);
 }
 
-/** Process Execution */
-
-/* Simple exec wrapper using fork/exec pattern */
-extern int execve(const char *path, char *const argv[], char *const envp[]);
-
-/**
- * @brief Execute a program
- * @param path Path to executable
- * @param argv Argument array (NULL-terminated)
- * @return Exit code of child process, or negative on error
- */
-int sh_exec(const char *path, char *const argv[])
-{
-  /* For now, directly call execve syscall */
-  /* Our kernel's execve creates a child process and waits */
-  return execve(path, argv, NULL);
-}

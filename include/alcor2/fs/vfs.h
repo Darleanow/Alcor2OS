@@ -269,17 +269,32 @@ typedef struct vfs_node
   struct vfs_node *next;
 } vfs_node_t;
 
+/** @name Open file table entry kind
+ * @{ */
+#define VFS_FD_FILE       0 /**< Regular file (ramfs or mounted) */
+#define VFS_FD_PIPE_READ  1 /**< Read end of an anonymous pipe */
+#define VFS_FD_PIPE_WRITE 2 /**< Write end of an anonymous pipe */
+/** @} */
+
 /**
- * @brief File descriptor.
+ * @brief Open file table entry.
+ *
+ * One entry per open file description. Multiple per-process file descriptors
+ * (in @c proc_t::fds) can point at the same OFT entry — for example after
+ * @c dup/@c dup2 or after @c fork inherits its parent's open files. The
+ * entry's @c refcount tracks how many fds (across all processes) reference
+ * it; the entry is released when the count reaches zero.
  */
 typedef struct
 {
-  vfs_node_t     *node;      /**< VFS node (ramfs) or opaque FS file handle */
-  const fs_ops_t *ops;       /**< FS operations (NULL for ramfs) */
-  u64             offset;    /**< Current file offset */
-  u32             flags;     /**< Open flags */
-  bool            in_use;    /**< Descriptor is active */
-  u64             owner_pid; /**< Owner process ID */
+  vfs_node_t     *node;     /**< VFS node (ramfs) or opaque FS file handle */
+  const fs_ops_t *ops;      /**< FS operations (NULL for ramfs) */
+  void           *pipe;     /**< pipe_t* when @c kind is a pipe end */
+  u64             offset;   /**< Current file offset */
+  u32             flags;    /**< Open flags */
+  i32             kind;     /**< VFS_FD_FILE / VFS_FD_PIPE_* */
+  i32             refcount; /**< Number of fds referencing this entry */
+  bool            in_use;   /**< Entry is active */
 } vfs_fd_t;
 
 /**
@@ -491,10 +506,46 @@ i64 vfs_mount(const char *source, const char *target, const char *fstype);
 i64 vfs_umount(const char *target);
 
 /**
- * @brief Close all FDs owned by a specific PID.
- * @param pid Process ID.
+ * @brief Initialise a process's per-process fd table to all-closed.
+ * @param fds Pointer to the @c proc_t::fds[] array.
  */
-void vfs_close_for_pid(u64 pid);
+void vfs_proc_init_fds(i32 *fds);
+
+/**
+ * @brief Copy parent's fd table into child and bump OFT refcounts.
+ * Called from @c proc_fork after the child is allocated.
+ */
+void vfs_proc_inherit_fds(i32 *child_fds, const i32 *parent_fds);
+
+/**
+ * @brief Release every fd held by @p fds and zero the table. Called from
+ * @c proc_exit so the OFT entries' refcounts drop and underlying resources
+ * (files, pipe ends) close when nobody else holds them.
+ */
+void vfs_proc_release_fds(i32 *fds);
+
+/**
+ * @brief Install an OFT slot at the lowest free fd of the current process.
+ * Used by @c sys_pipe to publish freshly allocated pipe ends.
+ *
+ * @param oft_idx Index of an OFT entry that has just been allocated.
+ * @return The user-visible fd number, or -EMFILE if the proc fd table is full.
+ */
+i64 vfs_install_fd(i32 oft_idx);
+
+/**
+ * @brief Allocate an OFT entry of @p kind and return its index. Used by
+ * @c sys_pipe when adding pipe-read/pipe-write entries to the table.
+ *
+ * @return OFT index with refcount=1, or -ENFILE if the OFT is full.
+ */
+i32 vfs_oft_alloc_pipe(i32 kind, void *pipe);
+
+/** @brief Increment an OFT entry's refcount. */
+void vfs_oft_retain(i32 oft_idx);
+
+/** @brief Decrement an OFT entry's refcount; close underlying when zero. */
+void vfs_oft_release(i32 oft_idx);
 
 /**
  * @brief Register a filesystem type.

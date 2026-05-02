@@ -98,22 +98,35 @@ SYSCALL_DECL(sys_arch_prctl);
 SYSCALL_DECL(sys_pipe);
 
 /**
- * @brief Read from a pipe FD (called from sys_read when the FD is a pipe).
- * @return Bytes read, 0 if write end closed with no data, or negative `-errno`.
+ * @brief Read up to @p count bytes from the read end of a pipe object.
+ * @return Bytes read (0 on EOF when write end is closed), or negative -errno.
  */
-i64 pipe_read(int fd, void *buf, u64 count);
+i64 pipe_read_obj(void *pipe, void *buf, u64 count);
 
 /**
- * @brief Write to a pipe FD (called from sys_write).
- * @return Bytes written or negative `-errno`.
+ * @brief Write up to @p count bytes to the write end of a pipe object.
+ * @return Bytes written, or negative -errno.
  */
-i64 pipe_write(int fd, const void *buf, u64 count);
+i64 pipe_write_obj(void *pipe, const void *buf, u64 count);
 
 /**
- * @brief Close one end of a pipe; frees the pipe object when both ends are closed.
- * @return 0 or negative error code.
+ * @brief Allocate a fresh pipe object. Both ends start refcount=1; the caller
+ * is expected to wrap it in two OFT entries via @c vfs_oft_alloc_pipe and
+ * release one of them if any setup step fails.
+ *
+ * @return Opaque pipe pointer, or NULL on exhaustion.
  */
-int pipe_close(int fd);
+void *pipe_alloc_obj(void);
+
+/**
+ * @brief Called from the OFT release path when a pipe-end refcount hits zero.
+ * Closes the corresponding end and frees the pipe object once both ends are
+ * closed.
+ *
+ * @param kind  VFS_FD_PIPE_READ or VFS_FD_PIPE_WRITE.
+ * @param pipe  Pipe pointer.
+ */
+void pipe_oft_release(i32 kind, void *pipe);
 
 #undef SYSCALL_DECL
 

@@ -3,7 +3,7 @@
  * @brief Small string helpers for the shell
  */
 
-#include "shell.h"
+#include <vega/shell.h>
 #include <stddef.h>
 
 /**

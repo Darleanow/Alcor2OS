@@ -510,11 +510,13 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
  * @param pml4_phys Physical address of PML4 to clean up.
  * @todo Implement full cleanup including mapped physical pages.
  */
-void vmm_destroy_user_mappings(u64 pml4_phys)
+/* Walk and free everything below the PML4 in user space (entries 0-255).
+ * Optionally also zero the PML4 entries — required for clear; for destroy the
+ * PML4 page itself is freed afterwards so its contents do not matter. */
+static void user_mappings_walk_and_free(u64 pml4_phys, bool zero_entries)
 {
-  const u64 *pml4 = (const u64 *)phys_to_virt(pml4_phys);
+  u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);
 
-  /* Iterate over user-space entries (0-255) */
   for(int pml4_idx = 0; pml4_idx < 256; pml4_idx++) {
     if(!(pml4[pml4_idx] & VMM_PRESENT))
       continue;
@@ -538,23 +540,30 @@ void vmm_destroy_user_mappings(u64 pml4_phys)
         for(int pt_idx = 0; pt_idx < 512; pt_idx++) {
           if(!(pt[pt_idx] & VMM_PRESENT))
             continue;
-
-          /* Free physical page */
-          u64 phys = pt[pt_idx] & PAGE_FRAME_MASK;
-          pmm_free((void *)phys);
+          pmm_free((void *)(pt[pt_idx] & PAGE_FRAME_MASK));
         }
-        /* Free Page Table */
         pmm_free((void *)(pd[pd_idx] & PAGE_FRAME_MASK));
       }
-      /* Free Page Directory */
       pmm_free((void *)(pdpt[pdpt_idx] & PAGE_FRAME_MASK));
     }
-    /* Free PDPT */
     pmm_free((void *)(pml4[pml4_idx] & PAGE_FRAME_MASK));
-  }
 
-  /* Free PML4 itself */
+    if(zero_entries)
+      pml4[pml4_idx] = 0;
+  }
+}
+
+void vmm_destroy_user_mappings(u64 pml4_phys)
+{
+  user_mappings_walk_and_free(pml4_phys, false);
   pmm_free((void *)pml4_phys);
+}
+
+void vmm_clear_user_mappings(u64 pml4_phys)
+{
+  user_mappings_walk_and_free(pml4_phys, true);
+  /* Flush TLB so the now-cleared user mappings don't linger in cache. */
+  __asm__ volatile("mov %0, %%cr3" : : "r"(pml4_phys) : "memory");
 }
 
 /**

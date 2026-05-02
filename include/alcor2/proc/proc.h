@@ -9,6 +9,7 @@
 #ifndef ALCOR2_PROC_H
 #define ALCOR2_PROC_H
 
+#include <alcor2/fs/vfs.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/types.h>
 
@@ -68,6 +69,11 @@ typedef struct proc
   u64          sig_pending;               /**< Bitmask of pending signals */
   u64          sig_mask;                  /**< Bitmask of blocked signals */
   k_sigaction_t sig_actions[NSIG];        /**< Per-signal action table */
+
+  /** @brief Per-process fd table; each entry is an index into the global
+   * open file table, or -1 for closed. Inherited on fork, preserved across
+   * exec, released on exit. */
+  i32          fds[VFS_MAX_FD];
 } proc_t;
 
 /**
@@ -132,6 +138,23 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options);
  * @return Child PID in parent, 0 in child, negative on error.
  */
 i64 proc_fork(const void *syscall_frame);
+
+/**
+ * @brief POSIX-style exec: replace @p p's user image with the ELF read from
+ * @p elf_fd. Tears down the current user mappings, loads the new ELF, and
+ * builds a fresh user stack with @p argv.
+ *
+ * On success @p p->user_rip / @p p->user_rsp point at the new entry; the
+ * caller is responsible for updating its in-flight syscall frame so the
+ * sysret return path lands in the new image. On catastrophic failure the
+ * old image has already been destroyed and the process can no longer
+ * continue — the caller should @c proc_exit.
+ *
+ * @return 0 on success, negative -errno on failure.
+ */
+i64 proc_exec_replace_image(
+    proc_t *p, const char *name, i64 elf_fd, char *const argv[]
+);
 
 /**
  * @brief Switch to a process (called by scheduler or exec).

@@ -14,15 +14,17 @@ global proc_fork_child_entry
 ;; CR3 has already been switched by proc_switch before context_switch.
 ;;
 proc_enter_first_time:
-    ;; Set user data segments
+    ;; Set user data segments. Skip FS/GS: in long mode, loading a segment
+    ;; selector into FS/GS overwrites the FS_BASE/GS_BASE MSR with the GDT
+    ;; entry's base (0 for user data), wiping the TLS pointer set via
+    ;; arch_prctl(ARCH_SET_FS, ...). We deliberately leave FS/GS alone so
+    ;; the MSRs survive the transition.
     mov ax, 0x3B            ; User Data Segment | RPL 3
     mov ds, ax
     mov es, ax
-    mov fs, ax
-    mov gs, ax
-    
+
     ;; Enable interrupts will happen via iretq (RFLAGS has IF)
-    
+
     ;; iretq frame is already on stack from proc_create
     iretq
 
@@ -38,13 +40,13 @@ proc_enter_first_time:
 ;;
 proc_fork_child_entry:
     ;; CR3 has been switched by proc_switch
-    
-    ;; Set user data segments (like proc_enter_first_time)
+
+    ;; Set user data segments. Skip FS/GS — loading a selector clobbers
+    ;; FS_BASE / GS_BASE MSRs (descriptor base = 0 for user data), which
+    ;; would wipe the TLS pointer that proc_switch just restored.
     mov ax, 0x3B            ; User Data Segment | RPL 3
     mov ds, ax
     mov es, ax
-    mov fs, ax
-    mov gs, ax
     
     ;; Disable interrupts before restoring (will be re-enabled by sysret)
     cli
