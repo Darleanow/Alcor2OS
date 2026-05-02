@@ -5,17 +5,13 @@
       "includePath": [
         "${workspaceFolder}/**"
       ],
-      "defines": [
-        "_DEBUG",
-        "UNICODE",
-        "_UNICODE"
-      ],
-      "windowsSdkVersion": "10.0.19041.0",
       "compilerPath": "/usr/bin/clang",
       "cStandard": "${default}",
       "cppStandard": "${default}",
       "intelliSenseMode": "macos-clang-arm64",
-      "configurationProvider": "ms-vscode.makefile-tools"
+      "compilerArgs": [
+        ""
+      ]
     }
   ],
   "version": 4
