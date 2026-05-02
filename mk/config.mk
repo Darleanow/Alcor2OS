@@ -10,7 +10,6 @@ DISK      := disk.img
 DISK_SIZE := 1024M
 
 UNAME := $(shell uname -s)
-# musl ships an INSTALL file; APFS (case-insensitive) collides with prefix=install.
 # mke2fs is keg-only in Homebrew so PATH may not have it; fall back to the standard install dir.
 ifeq ($(UNAME), Darwin)
   CC          := x86_64-elf-gcc
