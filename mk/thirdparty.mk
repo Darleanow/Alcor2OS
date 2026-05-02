@@ -2,8 +2,11 @@
 
 # On macOS, host clang/cctools can't build musl: configure auto-detects
 # aarch64-darwin and Mach-O rejects weak_alias. Force the x86_64 cross.
+# CROSS_COMPILE is set so AR/RANLIB resolve to x86_64-elf-{ar,ranlib}
+# (Homebrew binutils) instead of musl's default x86_64-linux-musl-ar.
 ifeq ($(UNAME), Darwin)
-  MUSL_CONFIGURE_EXTRA := --target=x86_64-linux-musl CC=$(CC)
+  MUSL_CONFIGURE_EXTRA := --target=x86_64-linux-musl \
+                          CC=$(CC) CROSS_COMPILE=x86_64-elf-
 else
   MUSL_CONFIGURE_EXTRA :=
 endif
