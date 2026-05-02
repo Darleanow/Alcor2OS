@@ -11,11 +11,13 @@ DISK_SIZE := 1024M
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME), Darwin)
-  CC := x86_64-elf-gcc
-  LD := x86_64-elf-ld
+  CC   := x86_64-elf-gcc
+  LD   := x86_64-elf-ld
+  JOBS := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 1)
 else
-  CC := gcc
-  LD := ld
+  CC   := gcc
+  LD   := ld
+  JOBS := $(shell nproc 2>/dev/null || echo 1)
 endif
 AS := nasm
 

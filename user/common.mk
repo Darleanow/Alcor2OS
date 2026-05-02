@@ -7,8 +7,14 @@ MUSL_INC     := $(MUSL_INSTALL)/include
 MUSL_LIB     := $(MUSL_INSTALL)/lib
 USER_LD      := $(USER_BASE)/user.ld
 
-CC  := gcc
-LD  := ld
+UNAME := $(shell uname -s)
+ifeq ($(UNAME), Darwin)
+  CC := x86_64-elf-gcc
+  LD := x86_64-elf-ld
+else
+  CC := gcc
+  LD := ld
+endif
 AS  := nasm
 
 ASFLAGS := -f elf64

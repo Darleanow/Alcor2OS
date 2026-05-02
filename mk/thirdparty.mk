@@ -1,5 +1,13 @@
 # Bootstrap third-party toolchains (under thirdparty/, gitignored)
 
+# On macOS, host clang/cctools can't build musl: configure auto-detects
+# aarch64-darwin and Mach-O rejects weak_alias. Force the x86_64 cross.
+ifeq ($(UNAME), Darwin)
+  MUSL_CONFIGURE_EXTRA := --target=x86_64-linux-musl CC=$(CC)
+else
+  MUSL_CONFIGURE_EXTRA :=
+endif
+
 .PHONY: musl tcc clang musl-cross
 
 musl:  thirdparty/musl/install/lib/libc.a
@@ -17,8 +25,9 @@ thirdparty/musl/install/lib/libc.a:
 	@curl -sL $(MUSL_URL) | tar xz -C thirdparty
 	@mv thirdparty/musl-$(MUSL_VER) thirdparty/musl
 	@cd thirdparty/musl && ./configure --prefix=$$(pwd)/install \
-		--disable-shared CFLAGS='-Os -fno-stack-protector' >/dev/null
-	@$(MAKE) -C thirdparty/musl -j$$(nproc) >/dev/null
+		--disable-shared $(MUSL_CONFIGURE_EXTRA) \
+		CFLAGS='-Os -fno-stack-protector' >/dev/null
+	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
 
 thirdparty/tcc-install/usr/bin/tcc: thirdparty/musl/install/lib/libc.a
@@ -36,7 +45,7 @@ thirdparty/tcc-install/usr/bin/tcc: thirdparty/musl/install/lib/libc.a
 			--config-musl \
 			--sysincludepaths=$(CURDIR)/thirdparty/musl/install/include \
 			>/dev/null 2>&1 && \
-		make -j$$(nproc) 2>&1 | tail -5 && \
+		make -j$(JOBS) 2>&1 | tail -5 && \
 		make install DESTDIR=$(CURDIR)/thirdparty/tcc-install >/dev/null 2>&1
 
 thirdparty/musl-cross/bin/x86_64-linux-musl-gcc:
@@ -49,7 +58,7 @@ thirdparty/musl-cross/bin/x86_64-linux-musl-gcc:
 	@echo 'OUTPUT = $(CURDIR)/thirdparty/musl-cross'                     >> thirdparty/musl-cross-src/config.mak
 	@echo 'COMMON_CONFIG += --disable-nls'                               >> thirdparty/musl-cross-src/config.mak
 	@echo 'GCC_CONFIG += --enable-languages=c,c++ --disable-multilib'    >> thirdparty/musl-cross-src/config.mak
-	@$(MAKE) -C thirdparty/musl-cross-src -j$$(nproc) install \
+	@$(MAKE) -C thirdparty/musl-cross-src -j$(JOBS) install \
 	  2>&1 | tee thirdparty/musl-cross-build.log | tail -10
 	@test -f thirdparty/musl-cross/bin/x86_64-linux-musl-gcc || \
 	  { echo >&2 "musl-cross failed — see thirdparty/musl-cross-build.log"; exit 1; }
@@ -94,7 +103,7 @@ thirdparty/clang-install/usr/bin/clang: thirdparty/musl-cross/bin/x86_64-linux-m
 	  -DCLANG_ENABLE_ARCMT=OFF \
 	  -DCLANG_ENABLE_STATIC_ANALYZER=OFF \
 	  2>&1 | tail -10
-	@cmake --build thirdparty/llvm-build --target clang lld -j$$(nproc) 2>&1 | tail -20
+	@cmake --build thirdparty/llvm-build --target clang lld -j$(JOBS) 2>&1 | tail -20
 	@DESTDIR=$(CURDIR)/thirdparty/clang-install cmake --install thirdparty/llvm-build \
 	  --component clang 2>&1 | tail -3
 	@DESTDIR=$(CURDIR)/thirdparty/clang-install cmake --install thirdparty/llvm-build \
