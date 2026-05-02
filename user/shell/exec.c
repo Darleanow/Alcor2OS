@@ -11,6 +11,7 @@
 
 #include "exec.h"
 #include "expand.h"
+#include "fntab.h"
 #include "shell.h"
 #include <fcntl.h>
 #include <stdlib.h>
@@ -216,6 +217,48 @@ static int run_builtin_redirected(int argc, char *const argv[],
   return rc;
 }
 
+/* Bind positional args (argv[1..]) into the function's named parameters,
+ * then exec the body. Missing args bind to "". Variables are global today,
+ * so this clobbers any like-named outer var (no local scope). */
+static int call_function(const fn_entry_t *fn, int argc, char *const argv[])
+{
+  for(int i = 0; i < fn->n_args; i++) {
+    const char *val = (i + 1 < argc) ? argv[i + 1] : "";
+    expand_setvar(fn->arg_names[i], val);
+  }
+  return vega_exec(fn->body);
+}
+
+/* Run a function under @p redirs. Mirrors run_builtin_redirected: dup-save
+ * fds 0/1, apply redirs, run body, restore. */
+static int call_function_redirected(const fn_entry_t *fn, int argc,
+                                    char *const argv[], const redir_t *redirs)
+{
+  if(!redirs)
+    return call_function(fn, argc, argv);
+
+  int saved_in  = dup(0);
+  int saved_out = dup(1);
+
+  int rc = apply_redirs(redirs);
+  if(rc == 0)
+    rc = call_function(fn, argc, argv);
+
+  if(saved_in >= 0) {
+    dup2(saved_in, 0);
+    close(saved_in);
+  } else {
+    close(0);
+  }
+  if(saved_out >= 0) {
+    dup2(saved_out, 1);
+    close(saved_out);
+  } else {
+    close(1);
+  }
+  return rc;
+}
+
 static int exec_cmd(ast_t *n)
 {
   if(n->u.cmd.argc == 0)
@@ -230,29 +273,42 @@ static int exec_cmd(ast_t *n)
   int ret;
   if(argv[0][0] == '\0') {
     ret = 0; /* expansion produced empty command name */
-  } else if(is_builtin(argv[0])) {
-    ret = run_builtin_redirected(argc, argv, redirs);
   } else {
-    ret = run_external(argv, redirs);
-    if(ret < 0) {
-      sh_puts(argv[0]);
-      sh_puts(": command not found\n");
-      ret = 127;
+    const fn_entry_t *fn = fntab_get(argv[0]);
+    if(fn) {
+      ret = call_function_redirected(fn, argc, argv, redirs);
+    } else if(is_builtin(argv[0])) {
+      ret = run_builtin_redirected(argc, argv, redirs);
+    } else {
+      ret = run_external(argv, redirs);
+      if(ret < 0) {
+        sh_puts(argv[0]);
+        sh_puts(": command not found\n");
+        ret = 127;
+      }
     }
   }
   free_expanded_argv(argv, argc);
   return ret;
 }
 
-/* Run @p stage (an AST_CMD) in the current child after the pipeline plumbing
- * has set up stdin/stdout. Expands the stage's argv inside the child (so the
- * AST is never mutated and parent-side variable changes between stages would
- * be visible — though pipelines are forked simultaneously today). Applies
- * stage redirs (which override the pipeline plumbing per-fd, matching bash),
- * then either runs a builtin and exits, or execve's. Never returns. */
+/* Run @p stage in the current child after the pipeline plumbing has set up
+ * stdin/stdout. Compound nodes (if/while/for/fn) are exec'd via vega_exec
+ * and the child exits with their status — the registration/state changes
+ * stay confined to the child, but most pipeline stages are simple commands
+ * anyway. AST_CMD: expand argv inside the child (so the AST is never mutated
+ * and parent-side var changes between stages would be visible — though
+ * pipelines are forked simultaneously today), apply stage redirs (which
+ * override the pipeline plumbing per-fd, matching bash), then either run a
+ * function/builtin and exit, or execve. Never returns. */
 static void exec_stage_in_child(ast_t *stage) __attribute__((noreturn));
 static void exec_stage_in_child(ast_t *stage)
 {
+  if(stage->kind != AST_CMD) {
+    int rc = vega_exec(stage);
+    _exit(rc);
+  }
+
   int argc = stage->u.cmd.argc;
   if(argc == 0)
     _exit(0);
@@ -263,6 +319,12 @@ static void exec_stage_in_child(ast_t *stage)
 
   if(apply_redirs(stage->u.cmd.redirs) < 0)
     _exit(1);
+
+  const fn_entry_t *fn = fntab_get(argv[0]);
+  if(fn) {
+    int rc = call_function(fn, argc, argv);
+    _exit(rc);
+  }
 
   if(is_builtin(argv[0])) {
     int rc = run_builtin(argc, argv);
@@ -399,6 +461,30 @@ int vega_exec(ast_t *node)
         free(expanded);
         if(node->u.for_.body)
           status = vega_exec(node->u.for_.body);
+      }
+      break;
+    }
+    case AST_FN: {
+      /* Register, transferring ownership to the table. After the steal,
+       * ast_free finds NULL pointers and does nothing. If body is already
+       * NULL (e.g. an AST_FN nested inside another fn body that has been
+       * called once already), this is a no-op — the function stays
+       * registered from the first call. */
+      if(node->u.fn.body) {
+        if(fntab_set(node->u.fn.name, node->u.fn.arg_names, node->u.fn.n_args,
+                     node->u.fn.body)
+           == 0) {
+          node->u.fn.name      = NULL;
+          node->u.fn.arg_names = NULL;
+          node->u.fn.n_args    = 0;
+          node->u.fn.body      = NULL;
+          status               = 0;
+        } else {
+          sh_puts("vega: function table full\n");
+          status = 1;
+        }
+      } else {
+        status = 0;
       }
       break;
     }

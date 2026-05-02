@@ -145,6 +145,27 @@ void ast_for_set_body(ast_t *n, ast_t *body)
   n->u.for_.body = body;
 }
 
+ast_t *ast_new_fn(char *name, char **arg_names, int n_args, ast_t *body)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n) {
+    free(name);
+    if(arg_names) {
+      for(int i = 0; i < n_args; i++)
+        free(arg_names[i]);
+      free(arg_names);
+    }
+    ast_free(body);
+    return NULL;
+  }
+  n->kind           = AST_FN;
+  n->u.fn.name      = name;
+  n->u.fn.arg_names = arg_names;
+  n->u.fn.n_args    = n_args;
+  n->u.fn.body      = body;
+  return n;
+}
+
 #define INITIAL_PIPELINE_CAP 2
 
 ast_t *ast_new_pipeline(void)
@@ -221,6 +242,17 @@ void ast_free(ast_t *n)
         free(n->u.for_.words[i]);
       free(n->u.for_.words);
       ast_free(n->u.for_.body);
+      break;
+    case AST_FN:
+      /* Fields may have been NULL'd out when the function was registered
+       * (the table steals ownership). Each free() is NULL-safe. */
+      free(n->u.fn.name);
+      if(n->u.fn.arg_names) {
+        for(int i = 0; i < n->u.fn.n_args; i++)
+          free(n->u.fn.arg_names[i]);
+        free(n->u.fn.arg_names);
+      }
+      ast_free(n->u.fn.body);
       break;
   }
   free(n);

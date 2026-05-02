@@ -18,6 +18,7 @@ typedef enum {
   AST_IF,    /* if cond { then } [else { else_branch }] */
   AST_WHILE, /* while cond { body } — loops while cond exits 0 */
   AST_FOR,   /* for var in words... { body } */
+  AST_FN,    /* fn name(args) { body } — registers a function on exec */
 } ast_kind_t;
 
 typedef enum {
@@ -84,6 +85,12 @@ typedef struct ast_node
       int               cap;
       struct ast_node  *body;
     } for_;
+    struct {
+      char             *name;       /* function name */
+      char            **arg_names;  /* heap array of heap strings */
+      int               n_args;
+      struct ast_node  *body;
+    } fn;
   } u;
 } ast_t;
 
@@ -140,6 +147,14 @@ int ast_for_push_word(ast_t *n, char *word);
 
 /** @brief Attach @p body (taken by ownership; may be NULL) to a FOR node. */
 void ast_for_set_body(ast_t *n, ast_t *body);
+
+/**
+ * @brief Allocate an AST_FN node, taking ownership of @p name, @p arg_names
+ * (heap array of @p n_args heap strings; may be NULL when n_args == 0), and
+ * @p body. Executing this node registers the function (the table steals
+ * the body and arg_names).
+ */
+ast_t *ast_new_fn(char *name, char **arg_names, int n_args, ast_t *body);
 
 /** @brief Allocate an empty AST_PIPE node. */
 ast_t *ast_new_pipeline(void);

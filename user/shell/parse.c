@@ -10,10 +10,11 @@
  *                                          -- so multi-line `{ ... }` works
  *   and_or   := pipeline ((AND | OR) pipeline)*
  *   pipeline := unit (PIPE unit)*
- *   unit     := if_stmt | while_stmt | for_stmt | simple_command
+ *   unit     := if_stmt | while_stmt | for_stmt | fn_stmt | simple_command
  *   if_stmt  := 'if' and_or '{' list '}' ('else' (if_stmt | '{' list '}'))?
  *   while_stmt := 'while' and_or '{' list '}'
  *   for_stmt := 'for' WORD 'in' (WORD | STRING)* '{' list '}'
+ *   fn_stmt  := 'fn' WORD '(' WORD* ')' '{' list '}'
  *   simple_command := (word_or_redir)+
  *   word_or_redir  := WORD | STRING
  *                   | (REDIR_OUT | REDIR_APPEND | REDIR_IN | HERESTRING) WORD
@@ -279,8 +280,75 @@ static ast_t *parse_for(lexer_t *L)
   return n;
 }
 
+static ast_t *parse_fn(lexer_t *L)
+{
+  /* The opening `fn` keyword has already been consumed by parse_unit. */
+  tok_t name_tok = lex_next(L);
+  if(name_tok.kind != TOK_WORD) {
+    diag_unexpected(name_tok.kind);
+    lex_token_free(&name_tok);
+    L->error = 1;
+    return NULL;
+  }
+
+  if(lex_peek(L).kind != TOK_LPAREN) {
+    sh_puts("vega: expected '(' after fn name\n");
+    free(name_tok.text);
+    L->error = 1;
+    return NULL;
+  }
+  lex_next(L); /* consume '(' */
+
+  /* Args are space-separated WORDs; commas aren't word-delimiters in the
+   * lexer so we'd parse them as part of names. Keep the syntax simple. */
+  char **arg_names = NULL;
+  int    n_args    = 0;
+  int    cap       = 0;
+  while(lex_peek(L).kind == TOK_WORD) {
+    tok_t t = lex_next(L);
+    if(n_args >= cap) {
+      int    new_cap = (cap == 0) ? 4 : cap * 2;
+      char **new_arr = (char **)realloc(arg_names, sizeof(char *) * new_cap);
+      if(!new_arr) {
+        free(t.text);
+        for(int i = 0; i < n_args; i++)
+          free(arg_names[i]);
+        free(arg_names);
+        free(name_tok.text);
+        L->error = 1;
+        return NULL;
+      }
+      arg_names = new_arr;
+      cap       = new_cap;
+    }
+    arg_names[n_args++] = t.text;
+  }
+
+  if(lex_peek(L).kind != TOK_RPAREN) {
+    diag_unexpected(lex_peek(L).kind);
+    L->error = 1;
+    for(int i = 0; i < n_args; i++)
+      free(arg_names[i]);
+    free(arg_names);
+    free(name_tok.text);
+    return NULL;
+  }
+  lex_next(L); /* consume ')' */
+
+  ast_t *body = parse_brace_body(L);
+  if(L->error) {
+    for(int i = 0; i < n_args; i++)
+      free(arg_names[i]);
+    free(arg_names);
+    free(name_tok.text);
+    return NULL;
+  }
+
+  return ast_new_fn(name_tok.text, arg_names, n_args, body);
+}
+
 /* A "unit" is a single command in the pipeline grammar — either a compound
- * statement (`if`, `while`, `for`) or a simple command. */
+ * statement (`if`, `while`, `for`, `fn`) or a simple command. */
 static ast_t *parse_unit(lexer_t *L)
 {
   tok_t t = lex_peek(L);
@@ -298,6 +366,11 @@ static ast_t *parse_unit(lexer_t *L)
     lex_next(L);
     lex_token_free(&t);
     return parse_for(L);
+  }
+  if(t.kind == TOK_WORD && sh_strcmp(t.text, "fn") == 0) {
+    lex_next(L);
+    lex_token_free(&t);
+    return parse_fn(L);
   }
   return parse_command(L);
 }
