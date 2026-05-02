@@ -45,8 +45,9 @@ ASFLAGS := -f elf64
 # Lint: userland .c handled here (KERNEL_SRCS_* live in mk/kernel.mk)
 USER_SRCS_C := $(shell find user \( -path '*/.cache/*' \) -prune -o -name '*.c' -print 2>/dev/null | LC_ALL=C sort)
 
-# QEMU — KVM is optional acceleration
-# USE_KVM: empty/auto = enable if /dev/kvm is readable, 1 = force, 0 = TCG only (slower).
+# QEMU — hardware acceleration is optional (KVM on Linux, HVF on Intel Mac).
+# Apple Silicon hosts can't accelerate an x86_64 guest, so they stay on TCG.
+# USE_KVM: empty/auto = enable if available, 1 = force, 0 = TCG only (slower).
 QEMU       ?= qemu-system-x86_64
 QEMU_RAM   ?= 512M
 USE_KVM    ?=
@@ -59,5 +60,11 @@ ifeq ($(UNAME),Linux)
     QEMU_KVM := -enable-kvm -cpu host
   else
     QEMU_KVM := $(shell test -r /dev/kvm && printf '%s' '-enable-kvm -cpu host')
+  endif
+else ifeq ($(UNAME),Darwin)
+  ifneq ($(USE_KVM),0)
+    ifeq ($(shell uname -m),x86_64)
+      QEMU_KVM := -accel hvf -cpu host
+    endif
   endif
 endif
