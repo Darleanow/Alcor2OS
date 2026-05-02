@@ -21,7 +21,7 @@ help:
 
 kernel: $(BUILD)/$(KERNEL)
 
-user: thirdparty/musl/install/lib/libc.a
+user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/crt
 	$(MAKE) -C user/init
 	$(MAKE) -C user/shell
@@ -92,11 +92,11 @@ disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; \
 	$$S cp thirdparty/tcc-install/usr/bin/tcc mnt/bin/tcc; \
 	$$S cp -r thirdparty/tcc-install/usr/lib/tcc/. mnt/usr/lib/tcc/; \
-	$$S cp -r thirdparty/musl/install/include/. mnt/usr/include/; \
-	$$S cp thirdparty/musl/install/lib/libc.a      mnt/usr/lib/libc.a; \
-	$$S cp thirdparty/musl/install/lib/crt1.o      mnt/usr/lib/crt1.o; \
-	$$S cp thirdparty/musl/install/lib/crti.o      mnt/usr/lib/crti.o; \
-	$$S cp thirdparty/musl/install/lib/crtn.o      mnt/usr/lib/crtn.o; \
+	$$S cp -r thirdparty/musl/$(MUSL_PREFIX)/include/. mnt/usr/include/; \
+	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a      mnt/usr/lib/libc.a; \
+	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crt1.o      mnt/usr/lib/crt1.o; \
+	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crti.o      mnt/usr/lib/crti.o; \
+	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crtn.o      mnt/usr/lib/crtn.o; \
 	if [ -n "$(strip $(CLANG_BIN))" ] && [ -f "$(CLANG_BIN)" ]; then \
 		echo "installing Clang from $(CLANG_BIN)"; \
 		MUSL_SYSROOT=$(CURDIR)/thirdparty/musl-cross/x86_64-linux-musl; \
@@ -142,7 +142,7 @@ format:
 	@find src include user \( -name '*.c' -o -name '*.h' \) ! -path '*/.cache/*' -print0 | xargs -0 clang-format -i
 
 lint:
-	clang-tidy $(KERNEL_SRCS_C) $(USER_SRCS_C) -- -I$(INCLUDE) -Ithirdparty/musl/install/include -std=gnu11
+	clang-tidy $(KERNEL_SRCS_C) $(USER_SRCS_C) -- -I$(INCLUDE) -Ithirdparty/musl/$(MUSL_PREFIX)/include -std=gnu11
 
 check:
 	cppcheck --enable=all --suppress=missingIncludeSystem --inline-suppr --inconclusive --quiet \

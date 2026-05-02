@@ -60,7 +60,7 @@ compile_commands: $(OBJS)
 			echo '      "-isystem",' >> compile_commands.json; \
 			echo '      "'"$(MUSL_CROSS_SYS)/include"'",' >> compile_commands.json; \
 			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"thirdparty/musl/install/include"'",' >> compile_commands.json; \
+			echo '      "'"thirdparty/musl/$(MUSL_PREFIX)/include"'",' >> compile_commands.json; \
 			echo '      "-isystem",' >> compile_commands.json; \
 			echo '      "'"$(INCLUDE)"'",' >> compile_commands.json; \
 			echo '      "-Wall",' >> compile_commands.json; \

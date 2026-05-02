@@ -42,11 +42,11 @@ thirdparty/tcc-install/usr/bin/tcc: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	@cd thirdparty/tcc-src && \
 		./configure \
 			--prefix=/usr \
-			--cc=$(CURDIR)/thirdparty/musl/install/bin/musl-gcc \
+			--cc=$(CURDIR)/thirdparty/musl/$(MUSL_PREFIX)/bin/musl-gcc \
 			--extra-ldflags="-static" \
 			--cpu=x86_64 \
 			--config-musl \
-			--sysincludepaths=$(CURDIR)/thirdparty/musl/install/include \
+			--sysincludepaths=$(CURDIR)/thirdparty/musl/$(MUSL_PREFIX)/include \
 			>/dev/null 2>&1 && \
 		make -j$(JOBS) 2>&1 | tail -5 && \
 		make install DESTDIR=$(CURDIR)/thirdparty/tcc-install >/dev/null 2>&1
