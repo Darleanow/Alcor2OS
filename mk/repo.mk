@@ -59,7 +59,7 @@ $(DISK):
 	@mkdir -p $(BUILD)
 	@echo "ext2 $(DISK_SIZE) → $(DISK)"
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
-	@mke2fs -t ext2 -L ALCOR2 -q $(DISK)
+	@$(MKE2FS) -t ext2 -L ALCOR2 -q $(DISK)
 
 disk-mount: $(DISK)
 	@mkdir -p mnt
@@ -77,6 +77,55 @@ disk-umount:
 	@-fusermount -u mnt 2>/dev/null || sudo umount mnt 2>/dev/null || true
 	@-rmdir mnt 2>/dev/null || true
 
+ifeq ($(UNAME), Darwin)
+# Darwin: no loop-mount, no FUSE. Stage files in build/disk-root then
+# format-and-populate the image in one mke2fs -d call. tcc & clang optional.
+DISK_ROOT := $(BUILD)/disk-root
+
+disk-populate: user
+	@echo "stage → $(DISK_ROOT)"
+	@rm -rf $(DISK_ROOT)
+	@mkdir -p $(DISK_ROOT)/bin $(DISK_ROOT)/etc $(DISK_ROOT)/tmp $(DISK_ROOT)/home \
+		$(DISK_ROOT)/usr/bin $(DISK_ROOT)/usr/lib/tcc \
+		$(DISK_ROOT)/usr/include $(DISK_ROOT)/usr/lib
+	@cp user/build/bin/*.elf  $(DISK_ROOT)/bin/ 2>/dev/null || true
+	@cp user/build/apps/*.elf $(DISK_ROOT)/bin/ 2>/dev/null || true
+	@for f in $(DISK_ROOT)/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done
+	@if [ -f thirdparty/tcc-install/usr/bin/tcc ]; then \
+		cp thirdparty/tcc-install/usr/bin/tcc $(DISK_ROOT)/bin/tcc; \
+		cp -r thirdparty/tcc-install/usr/lib/tcc/. $(DISK_ROOT)/usr/lib/tcc/; \
+	else \
+		echo "[disk] no tcc on disk (optional: make tcc)"; \
+	fi
+	@cp -r thirdparty/musl/$(MUSL_PREFIX)/include/. $(DISK_ROOT)/usr/include/
+	@cp thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a $(DISK_ROOT)/usr/lib/libc.a
+	@cp thirdparty/musl/$(MUSL_PREFIX)/lib/crt1.o $(DISK_ROOT)/usr/lib/crt1.o
+	@cp thirdparty/musl/$(MUSL_PREFIX)/lib/crti.o $(DISK_ROOT)/usr/lib/crti.o
+	@cp thirdparty/musl/$(MUSL_PREFIX)/lib/crtn.o $(DISK_ROOT)/usr/lib/crtn.o
+	@if [ -n "$(strip $(CLANG_BIN))" ] && [ -f "$(CLANG_BIN)" ]; then \
+		echo "installing Clang from $(CLANG_BIN)"; \
+		MUSL_SYSROOT=$(CURDIR)/thirdparty/musl-cross/x86_64-linux-musl; \
+		mkdir -p $(DISK_ROOT)/usr/lib/clang; \
+		cp "$(CLANG_BIN)" $(DISK_ROOT)/bin/clang; \
+		cp thirdparty/clang-install/usr/bin/lld $(DISK_ROOT)/bin/lld 2>/dev/null || true; \
+		cp -r thirdparty/clang-install/usr/lib/clang/. $(DISK_ROOT)/usr/lib/clang/ 2>/dev/null || true; \
+		if [ -d "$$MUSL_SYSROOT" ]; then \
+			mkdir -p $(DISK_ROOT)/usr/include/c++; \
+			cp -r $$MUSL_SYSROOT/include/c++/. $(DISK_ROOT)/usr/include/c++/ 2>/dev/null || true; \
+			find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++.a'   -exec cp {} $(DISK_ROOT)/usr/lib/libstdc++.a \;   2>/dev/null || true; \
+			find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++fs.a' -exec cp {} $(DISK_ROOT)/usr/lib/libstdc++fs.a \; 2>/dev/null || true; \
+			find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libsupc++.a'   -exec cp {} $(DISK_ROOT)/usr/lib/libsupc++.a \;   2>/dev/null || true; \
+		fi; \
+	else \
+		echo "[disk] no static clang (optional: make clang)"; \
+	fi
+	@echo "Welcome to Alcor2!" > $(DISK_ROOT)/etc/motd
+	@mkdir -p $(BUILD)
+	@echo "ext2 $(DISK_SIZE) → $(DISK) (populated)"
+	@rm -f $(DISK)
+	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
+	@$(MKE2FS) -t ext2 -L ALCOR2 -d $(DISK_ROOT) -q $(DISK)
+else
 disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	@disk="$(CURDIR)/$(DISK)"; set -e; mkdir -p mnt; \
 	if command -v fuse2fs >/dev/null 2>&1 && [ "$$(uname -s)" = Linux ]; then \
@@ -120,6 +169,7 @@ disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
 	$$S sync; \
 	fusermount -u mnt 2>/dev/null || sudo umount mnt; \
 	rmdir mnt
+endif
 
 disk-resync: user disk-populate
 

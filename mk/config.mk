@@ -11,16 +11,22 @@ DISK_SIZE := 1024M
 
 UNAME := $(shell uname -s)
 # musl ships an INSTALL file; APFS (case-insensitive) collides with prefix=install.
+# mke2fs is keg-only in Homebrew so PATH may not have it; fall back to the standard install dir.
 ifeq ($(UNAME), Darwin)
   CC          := x86_64-elf-gcc
   LD          := x86_64-elf-ld
   JOBS        := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 1)
   MUSL_PREFIX := _install
+  MKE2FS      := $(shell command -v mke2fs 2>/dev/null \
+                 || ls /opt/homebrew/opt/e2fsprogs/sbin/mke2fs 2>/dev/null \
+                 || ls /usr/local/opt/e2fsprogs/sbin/mke2fs 2>/dev/null \
+                 || echo mke2fs)
 else
   CC          := gcc
   LD          := ld
   JOBS        := $(shell nproc 2>/dev/null || echo 1)
   MUSL_PREFIX := install
+  MKE2FS      := mke2fs
 endif
 AS := nasm
 
