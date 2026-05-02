@@ -7,12 +7,17 @@
  *   script   := list EOF
  *   list     := and_or (SEMI and_or)*      -- empty separators ignored
  *   and_or   := pipeline ((AND | OR) pipeline)*
- *   pipeline := command (PIPE command)*
- *   command  := (word_or_redir)+
- *   word_or_redir := WORD | STRING | (REDIR_OUT | REDIR_APPEND | REDIR_IN) WORD
+ *   pipeline := unit (PIPE unit)*
+ *   unit     := if_stmt | simple_command
+ *   if_stmt  := 'if' and_or '{' list '}' ('else' (if_stmt | '{' list '}'))?
+ *   simple_command := (word_or_redir)+
+ *   word_or_redir  := WORD | STRING
+ *                   | (REDIR_OUT | REDIR_APPEND | REDIR_IN | HERESTRING) WORD
  *
- * Control-flow tokens are recognised by the lexer but still rejected here;
- * later phases lift those restrictions.
+ * `if`/`else` are recognised as reserved words only when they appear in the
+ * command position (first token of a unit / right after the closing brace of
+ * an if branch); elsewhere they are ordinary identifiers and can be passed as
+ * arguments. while/for/heredocs land in later phases.
  */
 
 #include "parse.h"
@@ -95,14 +100,106 @@ static ast_t *parse_command(lexer_t *L)
   return n;
 }
 
+static ast_t *parse_list(lexer_t *L);
+static ast_t *parse_and_or(lexer_t *L);
+static ast_t *parse_unit(lexer_t *L);
+
+/* Returns 1 and consumes the token if the next token is a word matching
+ * @p keyword. Otherwise leaves the lexer untouched and returns 0. */
+static int match_keyword(lexer_t *L, const char *keyword)
+{
+  tok_t t = lex_peek(L);
+  if(t.kind != TOK_WORD || sh_strcmp(t.text, keyword) != 0)
+    return 0;
+  lex_next(L);
+  lex_token_free(&t);
+  return 1;
+}
+
+/* Parses `{ list }`. Caller has already verified the leading `{`. Returns
+ * the body's AST (possibly NULL for empty `{ }`); on error returns NULL with
+ * L->error set. */
+static ast_t *parse_brace_body(lexer_t *L)
+{
+  if(lex_peek(L).kind != TOK_LBRACE) {
+    diag_unexpected(lex_peek(L).kind);
+    L->error = 1;
+    return NULL;
+  }
+  lex_next(L); /* consume '{' */
+
+  ast_t *body = parse_list(L);
+  if(L->error) {
+    ast_free(body);
+    return NULL;
+  }
+
+  if(lex_peek(L).kind != TOK_RBRACE) {
+    diag_unexpected(lex_peek(L).kind);
+    L->error = 1;
+    ast_free(body);
+    return NULL;
+  }
+  lex_next(L); /* consume '}' */
+  return body;
+}
+
+static ast_t *parse_if(lexer_t *L)
+{
+  /* The opening `if` keyword has already been consumed by parse_unit. */
+  ast_t *cond = parse_and_or(L);
+  if(!cond || L->error) {
+    diag_expected_after(TOK_WORD);
+    ast_free(cond);
+    L->error = 1;
+    return NULL;
+  }
+
+  ast_t *then_branch = parse_brace_body(L);
+  if(L->error) {
+    ast_free(cond);
+    return NULL;
+  }
+
+  ast_t *else_branch = NULL;
+  if(match_keyword(L, "else")) {
+    if(match_keyword(L, "if")) {
+      else_branch = parse_if(L);
+    } else {
+      else_branch = parse_brace_body(L);
+    }
+    if(L->error) {
+      ast_free(cond);
+      ast_free(then_branch);
+      ast_free(else_branch);
+      return NULL;
+    }
+  }
+
+  return ast_new_if(cond, then_branch, else_branch);
+}
+
+/* A "unit" is a single command in the pipeline grammar — either a compound
+ * statement (currently just `if`) or a simple command. */
+static ast_t *parse_unit(lexer_t *L)
+{
+  tok_t t = lex_peek(L);
+  if(t.kind == TOK_WORD && sh_strcmp(t.text, "if") == 0) {
+    lex_next(L);
+    lex_token_free(&t);
+    return parse_if(L);
+  }
+  return parse_command(L);
+}
+
 static ast_t *parse_pipeline(lexer_t *L)
 {
-  ast_t *first = parse_command(L);
+  ast_t *first = parse_unit(L);
   if(!first)
     return NULL;
 
   if(lex_peek(L).kind != TOK_PIPE)
-    return first; /* single command, no pipeline wrapper */
+    return first; /* single unit, no pipeline wrapper */
 
   ast_t *pipe_node = ast_new_pipeline();
   if(!pipe_node) {
@@ -117,7 +214,7 @@ static ast_t *parse_pipeline(lexer_t *L)
 
   while(lex_peek(L).kind == TOK_PIPE) {
     lex_next(L); /* consume '|' */
-    ast_t *next = parse_command(L);
+    ast_t *next = parse_unit(L);
     if(!next) {
       diag_expected_after(TOK_PIPE);
       ast_free(pipe_node);

@@ -345,6 +345,17 @@ int vega_exec(ast_t *node)
     case AST_PIPE:
       status = exec_pipeline(node);
       break;
+    case AST_IF: {
+      int cond = vega_exec(node->u.if_.cond);
+      if(cond == 0) {
+        status = vega_exec(node->u.if_.then_branch);
+      } else if(node->u.if_.else_branch) {
+        status = vega_exec(node->u.if_.else_branch);
+      } else {
+        status = 0;
+      }
+      break;
+    }
     default:
       status = 0;
   }

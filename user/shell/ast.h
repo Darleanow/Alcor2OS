@@ -15,6 +15,7 @@ typedef enum {
   AST_OR,   /* left || right, short-circuit on zero status */
   AST_SEQ,  /* left ; right, status is right's */
   AST_PIPE, /* a | b | ... ; status is last stage's */
+  AST_IF,   /* if cond { then } [else { else_branch }] */
 } ast_kind_t;
 
 typedef enum {
@@ -61,6 +62,12 @@ typedef struct ast_node
       int               n;
       int               cap;
     } pipeline;
+    struct {
+      struct ast_node *cond;
+      struct ast_node *then_branch;
+      struct ast_node *else_branch; /* may be NULL; for `else if`, this is
+                                       another AST_IF */
+    } if_;
   } u;
 } ast_t;
 
@@ -89,6 +96,12 @@ int ast_cmd_add_redir(ast_t *n, redir_kind_t kind, char *target);
  * NULL is returned.
  */
 ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right);
+
+/**
+ * @brief Allocate an AST_IF node, taking ownership of @p cond, @p then_branch,
+ * and (optionally NULL) @p else_branch.
+ */
+ast_t *ast_new_if(ast_t *cond, ast_t *then_branch, ast_t *else_branch);
 
 /** @brief Allocate an empty AST_PIPE node. */
 ast_t *ast_new_pipeline(void);

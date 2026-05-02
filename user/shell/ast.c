@@ -72,6 +72,22 @@ ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right)
   return n;
 }
 
+ast_t *ast_new_if(ast_t *cond, ast_t *then_branch, ast_t *else_branch)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n) {
+    ast_free(cond);
+    ast_free(then_branch);
+    ast_free(else_branch);
+    return NULL;
+  }
+  n->kind             = AST_IF;
+  n->u.if_.cond        = cond;
+  n->u.if_.then_branch = then_branch;
+  n->u.if_.else_branch = else_branch;
+  return n;
+}
+
 #define INITIAL_PIPELINE_CAP 2
 
 ast_t *ast_new_pipeline(void)
@@ -132,6 +148,11 @@ void ast_free(ast_t *n)
       for(int i = 0; i < n->u.pipeline.n; i++)
         ast_free(n->u.pipeline.stages[i]);
       free(n->u.pipeline.stages);
+      break;
+    case AST_IF:
+      ast_free(n->u.if_.cond);
+      ast_free(n->u.if_.then_branch);
+      ast_free(n->u.if_.else_branch);
       break;
   }
   free(n);
