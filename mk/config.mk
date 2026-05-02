@@ -10,14 +10,17 @@ DISK      := disk.img
 DISK_SIZE := 1024M
 
 UNAME := $(shell uname -s)
+# musl ships an INSTALL file; APFS (case-insensitive) collides with prefix=install.
 ifeq ($(UNAME), Darwin)
-  CC   := x86_64-elf-gcc
-  LD   := x86_64-elf-ld
-  JOBS := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 1)
+  CC          := x86_64-elf-gcc
+  LD          := x86_64-elf-ld
+  JOBS        := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 1)
+  MUSL_PREFIX := _install
 else
-  CC   := gcc
-  LD   := ld
-  JOBS := $(shell nproc 2>/dev/null || echo 1)
+  CC          := gcc
+  LD          := ld
+  JOBS        := $(shell nproc 2>/dev/null || echo 1)
+  MUSL_PREFIX := install
 endif
 AS := nasm
 

@@ -13,7 +13,7 @@ endif
 
 .PHONY: musl tcc clang musl-cross
 
-musl:  thirdparty/musl/install/lib/libc.a
+musl:  thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 tcc:   thirdparty/tcc-install/usr/bin/tcc
 clang: thirdparty/clang-install/usr/bin/clang
 musl-cross: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
@@ -22,18 +22,18 @@ thirdparty/limine/limine:
 	git clone $(LIMINE_URL) --branch=$(LIMINE_REV) --depth=1 thirdparty/limine
 	$(MAKE) -C thirdparty/limine
 
-thirdparty/musl/install/lib/libc.a:
+thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a:
 	@echo "musl $(MUSL_VER) — download & build"
 	@mkdir -p thirdparty
 	@curl -sL $(MUSL_URL) | tar xz -C thirdparty
 	@mv thirdparty/musl-$(MUSL_VER) thirdparty/musl
-	@cd thirdparty/musl && ./configure --prefix=$$(pwd)/install \
+	@cd thirdparty/musl && ./configure --prefix=$$(pwd)/$(MUSL_PREFIX) \
 		--disable-shared $(MUSL_CONFIGURE_EXTRA) \
 		CFLAGS='-Os -fno-stack-protector' >/dev/null
 	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
 
-thirdparty/tcc-install/usr/bin/tcc: thirdparty/musl/install/lib/libc.a
+thirdparty/tcc-install/usr/bin/tcc: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	@echo "TCC $(TCC_VER) — download & build"
 	@mkdir -p thirdparty
 	@rm -rf thirdparty/tcc-src
