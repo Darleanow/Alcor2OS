@@ -356,6 +356,12 @@ int vega_exec(ast_t *node)
       }
       break;
     }
+    case AST_WHILE: {
+      status = 0;
+      while(vega_exec(node->u.while_.cond) == 0)
+        status = vega_exec(node->u.while_.body);
+      break;
+    }
     default:
       status = 0;
   }

@@ -88,6 +88,20 @@ ast_t *ast_new_if(ast_t *cond, ast_t *then_branch, ast_t *else_branch)
   return n;
 }
 
+ast_t *ast_new_while(ast_t *cond, ast_t *body)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n) {
+    ast_free(cond);
+    ast_free(body);
+    return NULL;
+  }
+  n->kind          = AST_WHILE;
+  n->u.while_.cond = cond;
+  n->u.while_.body = body;
+  return n;
+}
+
 #define INITIAL_PIPELINE_CAP 2
 
 ast_t *ast_new_pipeline(void)
@@ -153,6 +167,10 @@ void ast_free(ast_t *n)
       ast_free(n->u.if_.cond);
       ast_free(n->u.if_.then_branch);
       ast_free(n->u.if_.else_branch);
+      break;
+    case AST_WHILE:
+      ast_free(n->u.while_.cond);
+      ast_free(n->u.while_.body);
       break;
   }
   free(n);

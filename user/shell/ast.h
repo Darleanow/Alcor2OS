@@ -14,8 +14,9 @@ typedef enum {
   AST_AND,  /* left && right, short-circuit on non-zero status */
   AST_OR,   /* left || right, short-circuit on zero status */
   AST_SEQ,  /* left ; right, status is right's */
-  AST_PIPE, /* a | b | ... ; status is last stage's */
-  AST_IF,   /* if cond { then } [else { else_branch }] */
+  AST_PIPE,  /* a | b | ... ; status is last stage's */
+  AST_IF,    /* if cond { then } [else { else_branch }] */
+  AST_WHILE, /* while cond { body } — loops while cond exits 0 */
 } ast_kind_t;
 
 typedef enum {
@@ -68,6 +69,10 @@ typedef struct ast_node
       struct ast_node *else_branch; /* may be NULL; for `else if`, this is
                                        another AST_IF */
     } if_;
+    struct {
+      struct ast_node *cond;
+      struct ast_node *body;
+    } while_;
   } u;
 } ast_t;
 
@@ -102,6 +107,12 @@ ast_t *ast_new_binop(ast_kind_t kind, ast_t *left, ast_t *right);
  * and (optionally NULL) @p else_branch.
  */
 ast_t *ast_new_if(ast_t *cond, ast_t *then_branch, ast_t *else_branch);
+
+/**
+ * @brief Allocate an AST_WHILE node, taking ownership of @p cond and @p body.
+ * @p body may be NULL for an empty `{ }`.
+ */
+ast_t *ast_new_while(ast_t *cond, ast_t *body);
 
 /** @brief Allocate an empty AST_PIPE node. */
 ast_t *ast_new_pipeline(void);

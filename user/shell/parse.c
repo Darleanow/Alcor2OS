@@ -8,16 +8,17 @@
  *   list     := and_or (SEMI and_or)*      -- empty separators ignored
  *   and_or   := pipeline ((AND | OR) pipeline)*
  *   pipeline := unit (PIPE unit)*
- *   unit     := if_stmt | simple_command
+ *   unit     := if_stmt | while_stmt | simple_command
  *   if_stmt  := 'if' and_or '{' list '}' ('else' (if_stmt | '{' list '}'))?
+ *   while_stmt := 'while' and_or '{' list '}'
  *   simple_command := (word_or_redir)+
  *   word_or_redir  := WORD | STRING
  *                   | (REDIR_OUT | REDIR_APPEND | REDIR_IN | HERESTRING) WORD
  *
- * `if`/`else` are recognised as reserved words only when they appear in the
- * command position (first token of a unit / right after the closing brace of
- * an if branch); elsewhere they are ordinary identifiers and can be passed as
- * arguments. while/for/heredocs land in later phases.
+ * `if`/`else`/`while` are recognised as reserved words only when they appear
+ * in the command position (first token of a unit / right after the closing
+ * brace of an if branch); elsewhere they are ordinary identifiers and can be
+ * passed as arguments. for/heredocs land in later phases.
  */
 
 #include "parse.h"
@@ -179,8 +180,28 @@ static ast_t *parse_if(lexer_t *L)
   return ast_new_if(cond, then_branch, else_branch);
 }
 
+static ast_t *parse_while(lexer_t *L)
+{
+  /* The opening `while` keyword has already been consumed by parse_unit. */
+  ast_t *cond = parse_and_or(L);
+  if(!cond || L->error) {
+    diag_expected_after(TOK_WORD);
+    ast_free(cond);
+    L->error = 1;
+    return NULL;
+  }
+
+  ast_t *body = parse_brace_body(L);
+  if(L->error) {
+    ast_free(cond);
+    return NULL;
+  }
+
+  return ast_new_while(cond, body);
+}
+
 /* A "unit" is a single command in the pipeline grammar — either a compound
- * statement (currently just `if`) or a simple command. */
+ * statement (`if`, `while`) or a simple command. */
 static ast_t *parse_unit(lexer_t *L)
 {
   tok_t t = lex_peek(L);
@@ -188,6 +209,11 @@ static ast_t *parse_unit(lexer_t *L)
     lex_next(L);
     lex_token_free(&t);
     return parse_if(L);
+  }
+  if(t.kind == TOK_WORD && sh_strcmp(t.text, "while") == 0) {
+    lex_next(L);
+    lex_token_free(&t);
+    return parse_while(L);
   }
   return parse_command(L);
 }
