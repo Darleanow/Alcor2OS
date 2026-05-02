@@ -26,6 +26,9 @@ typedef enum {
   REDIR_IN,         /* <   file */
   REDIR_HERESTRING, /* <<< text — feed text on stdin (target is the content,
                                   not a path) */
+  REDIR_HEREDOC,    /* <<  DELIM ... DELIM — target is the collected body
+                                  (without the closing delim line); already
+                                  ends in '\n' if non-empty */
 } redir_kind_t;
 
 /**

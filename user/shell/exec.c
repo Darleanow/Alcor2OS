@@ -20,10 +20,12 @@
 #define MAX_EXEC_PATH    256
 #define MAX_PIPE_STAGES  16
 
-/* Set up a here-string: pipe, write @p text + trailing newline into it, close
- * the write end, dup2 the read end onto fd 0. Caps at the pipe buffer size
- * (~4KB on this kernel); larger here-strings would need a temp-file path. */
-static int apply_herestring(const char *text)
+/* Set up a here-string / heredoc: pipe, write @p text into it, close the
+ * write end, dup2 the read end onto fd 0. Caps at the pipe buffer size
+ * (~4KB on this kernel); larger payloads would need a temp-file path.
+ * For here-strings (`<<<`) bash adds an implicit trailing newline; heredocs
+ * already include the newline of their last body line. */
+static int apply_pipe_input(const char *text, int append_newline)
 {
   int pipefd[2];
   if(pipe(pipefd) < 0)
@@ -32,7 +34,8 @@ static int apply_herestring(const char *text)
   size_t len = sh_strlen(text);
   if(len > 0)
     write(pipefd[1], text, len);
-  write(pipefd[1], "\n", 1);
+  if(append_newline)
+    write(pipefd[1], "\n", 1);
   close(pipefd[1]);
 
   if(dup2(pipefd[0], 0) < 0) {
@@ -54,8 +57,8 @@ static int apply_one_redir(const redir_t *r)
   if(!target)
     return -1;
 
-  if(r->kind == REDIR_HERESTRING) {
-    int rc = apply_herestring(target);
+  if(r->kind == REDIR_HERESTRING || r->kind == REDIR_HEREDOC) {
+    int rc = apply_pipe_input(target, r->kind == REDIR_HERESTRING);
     free(target);
     return rc;
   }

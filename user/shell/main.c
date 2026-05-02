@@ -81,19 +81,81 @@ static void print_prompt(void)
   }
 }
 
+#define MAX_HEREDOC_DELIM 64
+
 /* True if @p buf parses as a complete statement: no open quote, balanced
- * braces. Mirrors the lexer's quoting rules — single quotes are literal,
- * double quotes recognise \" \\ \$ as escapes. Brace counting is suppressed
- * inside either quote. A negative depth (`}` without `{`) is treated as
- * complete: let the parser surface the error rather than wedge the REPL. */
+ * braces, no pending heredoc body. Mirrors the lexer's quoting rules —
+ * single quotes are literal, double quotes recognise \" \\ \$ as escapes.
+ * Brace counting is suppressed inside either quote.
+ *
+ * Heredoc tracking: when `<<` (not `<<<`) appears outside quotes, the next
+ * word is captured as the delimiter; from the following newline onward the
+ * walker watches each line for an exact match against the delimiter, and
+ * stays incomplete until found. We support one heredoc per command for now.
+ * A negative brace depth (`}` without `{`) is treated as complete: let the
+ * parser surface the error rather than wedge the REPL. */
 static int is_input_complete(const char *buf)
 {
-  int in_squote   = 0;
-  int in_dquote   = 0;
-  int brace_depth = 0;
+  int  in_squote   = 0;
+  int  in_dquote   = 0;
+  int  brace_depth = 0;
+  int  want_delim  = 0; /* saw `<<`, scanning for delim word */
+  int  in_hd_body  = 0; /* between `<<DELIM\n` and the closing line */
+  char delim[MAX_HEREDOC_DELIM];
+  int  dn = 0;
+  char line_buf[MAX_HEREDOC_DELIM];
+  int  ln = 0;
 
   for(const char *p = buf; *p; p++) {
     char c = *p;
+
+    if(in_hd_body) {
+      if(c == '\n') {
+        line_buf[ln] = '\0';
+        if(ln == dn) {
+          int eq = 1;
+          for(int i = 0; i < dn; i++)
+            if(line_buf[i] != delim[i]) { eq = 0; break; }
+          if(eq) {
+            in_hd_body = 0;
+            dn = 0;
+            ln = 0;
+            continue;
+          }
+        }
+        ln = 0;
+      } else if(ln < MAX_HEREDOC_DELIM - 1) {
+        line_buf[ln++] = c;
+      } else {
+        /* line longer than max delim — can't match */
+        ln = MAX_HEREDOC_DELIM - 1;
+      }
+      continue;
+    }
+
+    if(want_delim) {
+      if(c == ' ' || c == '\t') {
+        if(dn > 0) {
+          /* delim ended */
+          want_delim = 0;
+        }
+        continue;
+      }
+      if(c == '\n') {
+        if(dn > 0) {
+          want_delim = 0;
+          in_hd_body = 1;
+          ln = 0;
+        }
+        /* if dn == 0, no delim yet — stay in want_delim, more input needed */
+        continue;
+      }
+      if(dn < MAX_HEREDOC_DELIM - 1) {
+        delim[dn++] = c;
+      }
+      continue;
+    }
+
     if(in_squote) {
       if(c == '\'')
         in_squote = 0;
@@ -116,12 +178,33 @@ static int is_input_complete(const char *buf)
       in_dquote = 1;
       continue;
     }
+    if(c == '<' && p[1] == '<') {
+      if(p[2] == '<') {
+        /* `<<<` — herestring, not a heredoc. Skip all three so we don't
+         * re-detect `<<` on the next iteration. */
+        p += 2;
+        continue;
+      }
+      want_delim = 1;
+      dn         = 0;
+      p++; /* skip the second '<' */
+      continue;
+    }
+    if(c == '\n') {
+      if(dn > 0) {
+        /* a delim was captured earlier on this line; switch to body now */
+        in_hd_body = 1;
+        ln = 0;
+      }
+      continue;
+    }
     if(c == '{')
       brace_depth++;
     else if(c == '}' && brace_depth > 0)
       brace_depth--;
   }
-  return !in_squote && !in_dquote && brace_depth == 0;
+  return !in_squote && !in_dquote && brace_depth == 0
+         && !want_delim && !in_hd_body;
 }
 
 /* Read input lines into @p buf until they form a complete statement. After

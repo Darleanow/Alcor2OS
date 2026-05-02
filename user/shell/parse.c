@@ -17,11 +17,15 @@
  *   simple_command := (word_or_redir)+
  *   word_or_redir  := WORD | STRING
  *                   | (REDIR_OUT | REDIR_APPEND | REDIR_IN | HERESTRING) WORD
+ *                   | HEREDOC WORD                  -- consumes lines after the
+ *                                                   -- current one as the body,
+ *                                                   -- terminated by a line of
+ *                                                   -- the delimiter
  *
  * `if`/`else`/`while`/`for`/`in` are recognised as reserved words only when
  * they appear in the command position (first token of a unit / right after
  * the closing brace of an if branch); elsewhere they are ordinary
- * identifiers and can be passed as arguments. heredocs land in a later phase.
+ * identifiers and can be passed as arguments.
  */
 
 #include "parse.h"
@@ -68,6 +72,33 @@ static ast_t *parse_command(lexer_t *L)
       lex_next(L);
       if(ast_cmd_push_arg(n, t.text) < 0) {
         free(t.text);
+        ast_free(n);
+        return NULL;
+      }
+      continue;
+    }
+
+    if(t.kind == TOK_HEREDOC) {
+      lex_next(L); /* consume `<<` */
+
+      tok_t delim_tok = lex_next(L);
+      if(delim_tok.kind != TOK_WORD && delim_tok.kind != TOK_STRING) {
+        diag_expected_after(TOK_HEREDOC);
+        lex_token_free(&delim_tok);
+        L->error = 1;
+        ast_free(n);
+        return NULL;
+      }
+
+      char *body = lex_read_heredoc_body(L, delim_tok.text);
+      free(delim_tok.text);
+      if(!body) {
+        ast_free(n);
+        return NULL;
+      }
+
+      if(ast_cmd_add_redir(n, REDIR_HEREDOC, body) < 0) {
+        free(body);
         ast_free(n);
         return NULL;
       }

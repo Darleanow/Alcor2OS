@@ -64,4 +64,17 @@ void lex_token_free(tok_t *t);
 /** @brief Human-readable name for a token kind (for error messages). */
 const char *tok_name(tok_kind_t k);
 
+/**
+ * @brief Consume a heredoc body from the lexer's stream. Skips the rest of the
+ * current line (up to and including the next '\n'), then collects subsequent
+ * lines as the body until a line whose content equals @p delim (with no
+ * surrounding whitespace) is encountered. The lexer cursor is advanced past
+ * the closing delimiter line.
+ *
+ * @return Heap-allocated body string (NUL-terminated). Empty body returns "".
+ *         NULL on allocation failure or if EOF is reached before the
+ *         delimiter (in which case L->error is set).
+ */
+char *lex_read_heredoc_body(lexer_t *L, const char *delim);
+
 #endif /* VEGA_LEXER_H */

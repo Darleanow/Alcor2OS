@@ -329,6 +329,65 @@ void lex_token_free(tok_t *t)
   }
 }
 
+/* Compare a buffer slice (start..end exclusive) to a NUL-terminated string. */
+static int slice_eq(const char *start, const char *end, const char *s)
+{
+  while(start < end && *s) {
+    if(*start != *s)
+      return 0;
+    start++;
+    s++;
+  }
+  return start == end && *s == '\0';
+}
+
+char *lex_read_heredoc_body(lexer_t *L, const char *delim)
+{
+  /* Skip the rest of the current line. */
+  while(*L->cur && *L->cur != '\n')
+    L->cur++;
+  if(*L->cur == '\n')
+    L->cur++;
+
+  /* Collect lines until one equals @p delim. */
+  const char *body_start = L->cur;
+  const char *body_end   = body_start;
+  while(*L->cur) {
+    const char *line_start = L->cur;
+    while(*L->cur && *L->cur != '\n')
+      L->cur++;
+    const char *line_end = L->cur;
+    if(slice_eq(line_start, line_end, delim)) {
+      if(*L->cur == '\n')
+        L->cur++;
+      body_end = line_start;
+      goto done;
+    }
+    if(*L->cur == '\n')
+      L->cur++;
+    body_end = L->cur;
+  }
+  /* Reached EOF without seeing the delimiter. */
+  sh_puts("vega: unterminated heredoc (missing '");
+  sh_puts(delim);
+  sh_puts("')\n");
+  L->error = 1;
+  return NULL;
+
+done: {
+  size_t len = (size_t)(body_end - body_start);
+  char  *out = (char *)malloc(len + 1);
+  if(!out) {
+    L->error = 1;
+    return NULL;
+  }
+  for(size_t i = 0; i < len; i++)
+    out[i] = body_start[i];
+  out[len] = '\0';
+  return out;
+}
+}
+
 const char *tok_name(tok_kind_t k)
 {
   switch(k) {
