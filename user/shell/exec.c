@@ -288,7 +288,34 @@ static int exec_cmd(ast_t *n)
       }
     }
   }
+
+  /* Postfix `!` sugar: if this cmd was marked fail-fast and exited non-zero,
+   * tear down the shell with that status. Pipelines aren't covered: the
+   * stage runs in a forked child and can only _exit itself, not the
+   * parent. */
+  int fail_fast = n->u.cmd.fail_fast;
+  char *name_for_msg = NULL;
+  if(fail_fast && ret != 0) {
+    /* Copy name out before freeing argv so the message survives. */
+    int len = 0;
+    while(argv[0][len])
+      len++;
+    name_for_msg = (char *)malloc((size_t)len + 1);
+    if(name_for_msg) {
+      for(int i = 0; i <= len; i++)
+        name_for_msg[i] = argv[0][i];
+    }
+  }
+
   free_expanded_argv(argv, argc);
+
+  if(fail_fast && ret != 0) {
+    sh_puts("vega: '");
+    sh_puts(name_for_msg ? name_for_msg : "?");
+    sh_puts("!' failed\n");
+    free(name_for_msg);
+    exit(ret);
+  }
   return ret;
 }
 

@@ -58,6 +58,8 @@ typedef struct ast_node
       int       argc;
       int       cap;
       redir_t  *redirs;
+      int       fail_fast; /* set by parser when argv[0] ended with `!`;
+                              shell exits with the cmd's status if non-zero */
     } cmd;
     struct {
       struct ast_node *left;

@@ -133,6 +133,19 @@ static ast_t *parse_command(lexer_t *L)
     ast_free(n);
     return NULL;
   }
+
+  /* `cmd!` postfix sugar: strip a trailing `!` from the command name and
+   * mark the cmd as fail-fast. A bare `!` is left alone (would otherwise
+   * become an empty argv[0]). */
+  char *first = n->u.cmd.argv[0];
+  int   flen  = 0;
+  while(first[flen])
+    flen++;
+  if(flen > 1 && first[flen - 1] == '!') {
+    first[flen - 1]    = '\0';
+    n->u.cmd.fail_fast = 1;
+  }
+
   return n;
 }
 

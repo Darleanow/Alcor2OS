@@ -19,10 +19,11 @@ ast_t *ast_new_cmd(void)
     free(n);
     return NULL;
   }
-  n->u.cmd.argv[0] = NULL;
-  n->u.cmd.argc    = 0;
-  n->u.cmd.cap     = INITIAL_ARGV_CAP;
-  n->u.cmd.redirs  = NULL;
+  n->u.cmd.argv[0]    = NULL;
+  n->u.cmd.argc       = 0;
+  n->u.cmd.cap        = INITIAL_ARGV_CAP;
+  n->u.cmd.redirs     = NULL;
+  n->u.cmd.fail_fast  = 0;
   return n;
 }
 
