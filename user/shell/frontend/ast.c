@@ -3,7 +3,7 @@
  * @brief AST node allocation and teardown.
  */
 
-#include "ast.h"
+#include <vega/frontend/ast.h>
 #include <stdlib.h>
 
 #define INITIAL_ARGV_CAP 4

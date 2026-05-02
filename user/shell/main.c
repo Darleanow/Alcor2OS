@@ -3,8 +3,8 @@
  * @brief vega REPL: read a line, hand it to vega_run().
  */
 
-#include "shell.h"
-#include "vega.h"
+#include <vega/shell.h>
+#include <vega/vega.h>
 #include <stddef.h>
 #include <stdlib.h>
 

@@ -6,7 +6,7 @@
 #ifndef VEGA_EXEC_H
 #define VEGA_EXEC_H
 
-#include "ast.h"
+#include <vega/frontend/ast.h>
 
 /**
  * @brief Execute @p node and return its exit status (0 on success,

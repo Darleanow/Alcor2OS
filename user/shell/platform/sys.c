@@ -4,7 +4,7 @@
  * Thin wrappers around standard libc functions.
  */
 
-#include "shell.h"
+#include <vega/shell.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>

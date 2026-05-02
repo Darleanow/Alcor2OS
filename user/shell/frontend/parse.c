@@ -29,9 +29,9 @@
  * identifiers and can be passed as arguments.
  */
 
-#include "parse.h"
-#include "lexer.h"
-#include "shell.h"
+#include <vega/frontend/parse.h>
+#include <vega/frontend/lexer.h>
+#include <vega/shell.h>
 #include <stdlib.h>
 
 static void diag_unexpected(tok_kind_t k)

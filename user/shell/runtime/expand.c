@@ -7,9 +7,9 @@
  * MVP; will be revisited if/when scoping gets richer.
  */
 
-#include "expand.h"
-#include "shell.h"
-#include "vega.h"
+#include <vega/runtime/expand.h>
+#include <vega/shell.h>
+#include <vega/vega.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>

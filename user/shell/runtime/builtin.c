@@ -4,9 +4,9 @@
  * command name).
  */
 
-#include "expand.h"
-#include "shell.h"
-#include "vega.h"
+#include <vega/runtime/expand.h>
+#include <vega/shell.h>
+#include <vega/vega.h>
 #include <stdlib.h>
 
 static const char *builtins[] = { "help",  "version", "clear", "exit",

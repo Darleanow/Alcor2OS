@@ -12,7 +12,7 @@
 #ifndef VEGA_FNTAB_H
 #define VEGA_FNTAB_H
 
-#include "ast.h"
+#include <vega/frontend/ast.h>
 
 typedef struct
 {

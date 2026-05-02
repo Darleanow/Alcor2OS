@@ -9,10 +9,10 @@
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
-#include "exec.h"
-#include "expand.h"
-#include "fntab.h"
-#include "shell.h"
+#include <vega/runtime/exec.h>
+#include <vega/runtime/expand.h>
+#include <vega/runtime/fntab.h>
+#include <vega/shell.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/wait.h>
