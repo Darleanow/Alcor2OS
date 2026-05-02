@@ -45,11 +45,20 @@ static int apply_herestring(const char *text)
 
 /* Open @p target with flags appropriate for the redir kind, then dup2 onto the
  * canonical fd (0 for IN, 1 for OUT/APPEND). Returns 0 on success, -1 on any
- * error — caller is expected to bail out. */
+ * error — caller is expected to bail out. The redir's target is expanded here
+ * (rather than once up-front) so that loop bodies see fresh values per
+ * iteration. */
 static int apply_one_redir(const redir_t *r)
 {
-  if(r->kind == REDIR_HERESTRING)
-    return apply_herestring(r->target);
+  char *target = expand_word(r->target);
+  if(!target)
+    return -1;
+
+  if(r->kind == REDIR_HERESTRING) {
+    int rc = apply_herestring(target);
+    free(target);
+    return rc;
+  }
 
   int flags = 0;
   int dest_fd;
@@ -57,16 +66,18 @@ static int apply_one_redir(const redir_t *r)
     case REDIR_OUT:    flags = O_WRONLY | O_CREAT | O_TRUNC;  dest_fd = 1; break;
     case REDIR_APPEND: flags = O_WRONLY | O_CREAT | O_APPEND; dest_fd = 1; break;
     case REDIR_IN:     flags = O_RDONLY;                      dest_fd = 0; break;
-    default:           return -1;
+    default:           free(target); return -1;
   }
 
-  int fd = open(r->target, flags, 0644);
+  int fd = open(target, flags, 0644);
   if(fd < 0) {
     sh_puts("vega: cannot open ");
-    sh_puts(r->target);
+    sh_puts(target);
     sh_puts("\n");
+    free(target);
     return -1;
   }
+  free(target);
   if(fd != dest_fd) {
     if(dup2(fd, dest_fd) < 0) {
       close(fd);
@@ -86,27 +97,36 @@ static int apply_redirs(const redir_t *list)
   return 0;
 }
 
-/* Expand $-syntax in @p cmd's argv and redir targets in place. Existing heap
- * strings are freed and replaced with the expansion. Returns 0 on success,
- * -1 on allocation failure (the cmd is left in a usable but partially
- * expanded state). */
-static int expand_cmd(ast_t *cmd)
+/* Build a fresh, NULL-terminated argv with each word expanded. Returns a
+ * heap-allocated array of heap-allocated strings; caller frees via
+ * free_expanded_argv. NULL on allocation failure. The AST is left untouched
+ * so loop bodies (re-executed AST nodes) see fresh expansions each call. */
+static char **build_expanded_argv(const ast_t *cmd)
 {
-  for(int i = 0; i < cmd->u.cmd.argc; i++) {
-    char *expanded = expand_word(cmd->u.cmd.argv[i]);
-    if(!expanded)
-      return -1;
-    free(cmd->u.cmd.argv[i]);
-    cmd->u.cmd.argv[i] = expanded;
+  int    argc = cmd->u.cmd.argc;
+  char **out  = (char **)malloc(sizeof(char *) * (argc + 1));
+  if(!out)
+    return NULL;
+  for(int i = 0; i < argc; i++) {
+    out[i] = expand_word(cmd->u.cmd.argv[i]);
+    if(!out[i]) {
+      for(int j = 0; j < i; j++)
+        free(out[j]);
+      free(out);
+      return NULL;
+    }
   }
-  for(redir_t *r = cmd->u.cmd.redirs; r; r = r->next) {
-    char *expanded = expand_word(r->target);
-    if(!expanded)
-      return -1;
-    free(r->target);
-    r->target = expanded;
-  }
-  return 0;
+  out[argc] = NULL;
+  return out;
+}
+
+static void free_expanded_argv(char **argv, int argc)
+{
+  if(!argv)
+    return;
+  for(int i = 0; i < argc; i++)
+    free(argv[i]);
+  free(argv);
 }
 
 /* Look up @p name in the search path, copying the result into @p out_path
@@ -198,39 +218,45 @@ static int exec_cmd(ast_t *n)
   if(n->u.cmd.argc == 0)
     return 0;
 
-  if(expand_cmd(n) < 0)
+  int      argc   = n->u.cmd.argc;
+  char   **argv   = build_expanded_argv(n);
+  redir_t *redirs = n->u.cmd.redirs;
+  if(!argv)
     return 1;
 
-  int      argc   = n->u.cmd.argc;
-  char   **argv   = n->u.cmd.argv;
-  redir_t *redirs = n->u.cmd.redirs;
-
-  if(argv[0][0] == '\0')
-    return 0; /* expansion produced empty command name */
-
-  if(is_builtin(argv[0]))
-    return run_builtin_redirected(argc, argv, redirs);
-
-  int ret = run_external(argv, redirs);
-  if(ret < 0) {
-    sh_puts(argv[0]);
-    sh_puts(": command not found\n");
-    return 127;
+  int ret;
+  if(argv[0][0] == '\0') {
+    ret = 0; /* expansion produced empty command name */
+  } else if(is_builtin(argv[0])) {
+    ret = run_builtin_redirected(argc, argv, redirs);
+  } else {
+    ret = run_external(argv, redirs);
+    if(ret < 0) {
+      sh_puts(argv[0]);
+      sh_puts(": command not found\n");
+      ret = 127;
+    }
   }
+  free_expanded_argv(argv, argc);
   return ret;
 }
 
 /* Run @p stage (an AST_CMD) in the current child after the pipeline plumbing
- * has set up stdin/stdout. Applies the stage's own redirs (which override the
- * pipeline plumbing per-fd, matching bash), then either runs a builtin and
- * exits, or execve's. Never returns. */
+ * has set up stdin/stdout. Expands the stage's argv inside the child (so the
+ * AST is never mutated and parent-side variable changes between stages would
+ * be visible — though pipelines are forked simultaneously today). Applies
+ * stage redirs (which override the pipeline plumbing per-fd, matching bash),
+ * then either runs a builtin and exits, or execve's. Never returns. */
 static void exec_stage_in_child(ast_t *stage) __attribute__((noreturn));
 static void exec_stage_in_child(ast_t *stage)
 {
-  int    argc = stage->u.cmd.argc;
-  char **argv = stage->u.cmd.argv;
+  int argc = stage->u.cmd.argc;
   if(argc == 0)
     _exit(0);
+
+  char **argv = build_expanded_argv(stage);
+  if(!argv)
+    _exit(1);
 
   if(apply_redirs(stage->u.cmd.redirs) < 0)
     _exit(1);
@@ -260,12 +286,8 @@ static int exec_pipeline(ast_t *n)
     return 1;
   }
 
-  /* Expand each stage's argv/redirs in the parent so children fork with the
-   * fully-resolved command. */
-  for(int i = 0; i < N; i++) {
-    if(expand_cmd(stages[i]) < 0)
-      return 1;
-  }
+  /* Expansion happens inside each child via exec_stage_in_child to avoid
+   * mutating the shared AST (loop bodies re-execute the same nodes). */
 
   int pipes[MAX_PIPE_STAGES - 1][2];
   for(int i = 0; i < N - 1; i++) {
