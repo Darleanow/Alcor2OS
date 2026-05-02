@@ -88,6 +88,7 @@ disk-populate: user
 	@mkdir -p $(DISK_ROOT)/bin $(DISK_ROOT)/etc $(DISK_ROOT)/tmp $(DISK_ROOT)/home \
 		$(DISK_ROOT)/usr/bin $(DISK_ROOT)/usr/lib/tcc \
 		$(DISK_ROOT)/usr/include $(DISK_ROOT)/usr/lib
+	@sh scripts/macos-disk-preserve.sh $(DISK) $(DISK_ROOT) || true
 	@cp user/build/bin/*.elf  $(DISK_ROOT)/bin/ 2>/dev/null || true
 	@cp user/build/apps/*.elf $(DISK_ROOT)/bin/ 2>/dev/null || true
 	@for f in $(DISK_ROOT)/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done
