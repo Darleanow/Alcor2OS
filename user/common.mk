@@ -1,14 +1,22 @@
 # Alcor2 userland — shared by init, shell, bin, apps
 
+UNAME := $(shell uname -s)
+ifeq ($(UNAME), Darwin)
+  CC          := x86_64-elf-gcc
+  LD          := x86_64-elf-ld
+  MUSL_PREFIX := _install
+else
+  CC          := gcc
+  LD          := ld
+  MUSL_PREFIX := install
+endif
+
 USER_BASE    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 BUILD_DIR    := $(USER_BASE)/build
-MUSL_INSTALL := $(USER_BASE)/../thirdparty/musl/install
+MUSL_INSTALL := $(USER_BASE)/../thirdparty/musl/$(MUSL_PREFIX)
 MUSL_INC     := $(MUSL_INSTALL)/include
 MUSL_LIB     := $(MUSL_INSTALL)/lib
 USER_LD      := $(USER_BASE)/user.ld
-
-CC  := gcc
-LD  := ld
 AS  := nasm
 
 ASFLAGS := -f elf64
