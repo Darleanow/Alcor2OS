@@ -11,6 +11,7 @@
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/mm/vmm.h>
@@ -67,6 +68,23 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
   return ptr && vmm_is_user_range((void *)ptr, size);
 }
 
+/* Stdout fallback for fd 1/2 when the per-process fd table has no OFT entry
+ * mapped — keeps the console wired up for unredirected programs. (Stdin uses
+ * kbd_read_translated directly via the layout-aware path.) */
+static u64 stdout_fallback(u64 buf, u64 count)
+{
+  const char *str = (const char *)buf;
+  for(u64 i = 0; i < count; i++)
+    console_putchar(str[i]);
+  return count;
+}
+
+static bool fd_has_oft(u64 fd)
+{
+  proc_t *p = proc_current();
+  return p && fd < (u64)VFS_MAX_FD && p->fds[fd] >= 0;
+}
+
 u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -78,14 +96,8 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   if(count == 0)
     return 0;
 
-  if(fd == 0) {
-    char *user_buf = (char *)buf;
-    return kbd_read_translated(user_buf, count);
-  }
-
-  i64 pipe_result = pipe_read((int)fd, (void *)buf, count);
-  if(pipe_result != -ENOENT)
-    return (u64)pipe_result;
+  if(fd == 0 && !fd_has_oft(fd))
+    return kbd_read_translated((char *)buf, count);
 
   return (u64)vfs_read((i64)fd, (void *)buf, count);
 }
@@ -101,16 +113,8 @@ u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   if(count == 0)
     return 0;
 
-  if(fd == 1 || fd == 2) {
-    const char *str = (const char *)buf;
-    for(u64 i = 0; i < count; i++)
-      console_putchar(str[i]);
-    return count;
-  }
-
-  i64 pipe_result = pipe_write((int)fd, (const void *)buf, count);
-  if(pipe_result != -ENOENT)
-    return (u64)pipe_result;
+  if((fd == 1 || fd == 2) && !fd_has_oft(fd))
+    return stdout_fallback(buf, count);
 
   return (u64)vfs_write((i64)fd, (void *)buf, count);
 }

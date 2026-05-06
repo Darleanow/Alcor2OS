@@ -119,6 +119,18 @@ u64 vmm_clone_address_space(u64 src_pml4_phys);
 void vmm_destroy_user_mappings(u64 pml4_phys);
 
 /**
+ * @brief Free every user-space mapping in an address space (pages, PT, PD,
+ * PDPT) and zero the user-space PML4 entries, but keep the PML4 page itself
+ * intact.
+ *
+ * Used by @c execve to wipe the calling process's old image while preserving
+ * the address space so the new image can be loaded into the same @c cr3.
+ *
+ * @param pml4_phys Physical address of PML4.
+ */
+void vmm_clear_user_mappings(u64 pml4_phys);
+
+/**
  * @brief Get the current CR3 (PML4) value.
  * @return Current PML4 physical address.
  */

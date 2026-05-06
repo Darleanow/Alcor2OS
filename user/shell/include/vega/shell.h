@@ -1,7 +1,6 @@
 /**
- * Alcor2 Shell - Header
- *
- * Main definitions and configuration for the shell.
+ * @file user/shell/shell.h
+ * @brief Low-level helpers used across vega: string, I/O and syscall wrappers.
  */
 
 #ifndef SHELL_H
@@ -15,23 +14,8 @@
 
 #include <alcor2/kbd.h>
 
-/** @file Configuration constants */
-
-#define SHELL_VERSION "1.0.0"
-#define MAX_CMD_LEN   256
-#define MAX_ARGS      16
-#define MAX_PATH      256
-
-/** @brief Parsed command structure */
-
-typedef struct
-{
-  char *cmd;            /* Command name */
-  char *args[MAX_ARGS]; /* Arguments (NULL terminated) */
-  int   argc;           /* Argument count */
-} command_t;
-
-/** @brief Function prototypes */
+#define MAX_CMD_LEN 256
+#define MAX_PATH    256
 
 /* String utilities (str.c) */
 size_t sh_strlen(const char *s);
@@ -63,13 +47,10 @@ int            sh_mkdir(const char *path);
 int            sh_chdir(const char *path);
 char          *sh_getcwd(char *buf, size_t size);
 int            sh_unlink(const char *path);
-int            sh_exec(const char *path, char *const argv[]);
 
-/* Command parser (parser.c) */
-int parse_command(char *line, command_t *cmd);
-
-/* Builtin commands (builtin.c) */
+/* Builtin commands (builtin.c). argv is POSIX-style: argv[0] is the command
+ * name, argv[argc] is NULL. */
 int is_builtin(const char *cmd);
-int run_builtin(command_t *cmd);
+int run_builtin(int argc, char *const argv[]);
 
 #endif /* SHELL_H */

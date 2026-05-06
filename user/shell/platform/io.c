@@ -3,7 +3,7 @@
  * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
-#include "shell.h"
+#include <vega/shell.h>
 #include <unistd.h>
 
 /**
