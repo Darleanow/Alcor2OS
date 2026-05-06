@@ -467,8 +467,95 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
   return 0;
 }
 
+/* 
+ * Block cache (read-side, write-through-with-invalidate).
+ *
+ * 4 KB blocks (8 sectors), 1024 entries = 4 MB total. LRU eviction by
+ * monotonic counter. Hits (the common case after warm-up) skip DMA/PIO
+ * entirely — clang's repeated ELF page reads now cost a memcpy. Misses
+ * fetch a full 4 KB block so adjacent reads land hot.
+ */
+
+#define CACHE_BLOCK_SECTORS 8
+#define CACHE_BLOCK_BYTES   (CACHE_BLOCK_SECTORS * 512)
+#define CACHE_NUM_ENTRIES   1024
+#define CACHE_INVALID_LBA   ((u64)-1)
+
+typedef struct
+{
+  u64 block_lba;          /* aligned, CACHE_INVALID_LBA = free slot */
+  u64 last_used;
+  u8  drive;
+  u8  pad[7];
+  u8  data[CACHE_BLOCK_BYTES];
+} ata_cache_entry_t;
+
+static ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];
+static u64               g_cache_counter   = 0;
+static int               g_cache_inited    = 0;
+
+static void cache_init_once(void)
+{
+  if(g_cache_inited)
+    return;
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++)
+    g_ata_cache[i].block_lba = CACHE_INVALID_LBA;
+  g_cache_inited = 1;
+}
+
+static ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
+{
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    if(g_ata_cache[i].block_lba == block_lba &&
+       g_ata_cache[i].drive == drive) {
+      g_ata_cache[i].last_used = ++g_cache_counter;
+      return &g_ata_cache[i];
+    }
+  }
+  return NULL;
+}
+
+static ata_cache_entry_t *cache_alloc(void)
+{
+  /* Prefer free slot; else evict LRU. */
+  int idx       = 0;
+  u64 oldest    = (u64)-1;
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)
+      return &g_ata_cache[i];
+    if(g_ata_cache[i].last_used < oldest) {
+      oldest = g_ata_cache[i].last_used;
+      idx    = i;
+    }
+  }
+  return &g_ata_cache[idx];
+}
+
+static void cache_invalidate_range(u8 drive, u64 lba, u32 count)
+{
+  u64 end = lba + count;
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)
+      continue;
+    if(g_ata_cache[i].drive != drive)
+      continue;
+    u64 b_start = g_ata_cache[i].block_lba;
+    u64 b_end   = b_start + CACHE_BLOCK_SECTORS;
+    if(b_start < end && b_end > lba)
+      g_ata_cache[i].block_lba = CACHE_INVALID_LBA;
+  }
+}
+
+static i64 ata_read_raw(ata_drive_t *d, u64 lba, u32 count, void *buf)
+{
+  if(d->dma && d->channel->dma_ok && sched_current() &&
+     count <= DMA_MAX_SECTORS)
+    return dma_transfer(d, lba, count, buf, false);
+  return pio_read(d, lba, count, buf);
+}
+
 /**
- * @brief Read sectors from an ATA drive (DMA if available, else PIO).
+ * @brief Read sectors from an ATA drive (cache + DMA/PIO fallback).
  * @param drive Drive index (0-3).
  * @param lba   Starting sector.
  * @param count Number of sectors.
@@ -486,11 +573,46 @@ i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
   if(lba + count > d->sectors)
     return -EINVAL;
 
-  if(d->dma && d->channel->dma_ok && sched_current() &&
-     count <= DMA_MAX_SECTORS)
-    return dma_transfer(d, lba, count, buf, false);
+  cache_init_once();
 
-  return pio_read(d, lba, count, buf);
+  u64 cur = lba;
+  u64 end = lba + count;
+  u8 *out = (u8 *)buf;
+
+  while(cur < end) {
+    u64 block_lba     = cur & ~(u64)(CACHE_BLOCK_SECTORS - 1);
+    u64 in_block      = cur - block_lba;
+    u64 left_in_block = CACHE_BLOCK_SECTORS - in_block;
+    u64 left_total    = end - cur;
+    u64 take          = left_in_block < left_total ? left_in_block : left_total;
+
+    ata_cache_entry_t *e = cache_lookup(drive, block_lba);
+    if(!e) {
+      e               = cache_alloc();
+      u64 block_size  = CACHE_BLOCK_SECTORS;
+      if(block_lba + block_size > d->sectors)
+        block_size = d->sectors - block_lba;
+
+      i64 r = ata_read_raw(d, block_lba, (u32)block_size, e->data);
+      if(r < 0) {
+        e->block_lba = CACHE_INVALID_LBA;
+        return r;
+      }
+      /* Zero unread tail (partial block at disk end). */
+      for(u64 i = block_size * 512; i < CACHE_BLOCK_BYTES; i++)
+        e->data[i] = 0;
+
+      e->block_lba = block_lba;
+      e->drive     = drive;
+      e->last_used = ++g_cache_counter;
+    }
+
+    kmemcpy(out, &e->data[in_block * 512], take * 512);
+    out += take * 512;
+    cur += take;
+  }
+
+  return 0;
 }
 
 /**
@@ -511,6 +633,12 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
     return -ENODEV;
   if(lba + count > d->sectors)
     return -EINVAL;
+
+  /* Write-through: invalidate any cached blocks overlapping this range so
+   * the next read sees fresh data. Simpler and safer than mutating cache
+   * entries in place (handles unaligned writes too). */
+  cache_init_once();
+  cache_invalidate_range(drive, lba, count);
 
   if(d->dma && d->channel->dma_ok && sched_current() &&
      count <= DMA_MAX_SECTORS)

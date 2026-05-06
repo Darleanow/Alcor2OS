@@ -367,22 +367,34 @@ static bool process_raw(u8 raw, unsigned char *out)
 u64 kbd_read_translated(char *buf, u64 count)
 {
   u64 filled = 0;
+
   while(filled < count) {
     unsigned char pb;
     if(out_pend_take(&pb)) {
       buf[filled++] = (char)pb;
       continue;
     }
+
     while(!keyboard_raw_available()) {
       cpu_enable_interrupts();
       __asm__ volatile("hlt");
       cpu_disable_interrupts();
     }
+
     u8            raw = keyboard_raw_pop();
     unsigned char oc;
-    if(process_raw(raw, &oc))
+
+    if(process_raw(raw, &oc)) {
       buf[filled++] = (char)oc;
+      /*
+       * Short reads are required for TTY/input: libc often calls read(..., BUFSIZ).
+       * Returning as soon as we have at least one byte matches POSIX-style partial
+       * reads; otherwise getchar/cat would stall until BUFSIZ keys.
+       */
+      break;
+    }
   }
+
   return filled;
 }
 
