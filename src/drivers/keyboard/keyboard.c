@@ -1,6 +1,6 @@
 /**
  * @file src/drivers/keyboard/keyboard.c
- * @brief PS/2 keyboard: raw scancode ring; translation in kbd_layout.c.
+ * @brief PS/2 keyboard driver with scancode translation.
  */
 
 #include <alcor2/arch/cpu.h>
