@@ -8,6 +8,7 @@
 #include <alcor2/arch/cpu.h>
 #include <alcor2/arch/idt.h>
 #include <alcor2/arch/pic.h>
+#include <alcor2/proc/proc.h>
 
 extern void        pit_tick(void);
 extern void        keyboard_irq(void);
@@ -88,7 +89,12 @@ void idt_set_gate(u8 vector, void *handler, u8 flags)
 // cppcheck-suppress unusedFunction
 void exception_handler(interrupt_frame_t *frame)
 {
-  console_print("\n\n*** KERNEL PANIC ***\n\n");
+  /* CS RPL 3 = fault occurred in user mode (any exception, not just #PF). */
+  int user_fault = (frame->cs & 3) == 3;
+
+  if(!user_fault) {
+    console_print("\n\n*** KERNEL PANIC ***\n\n");
+  }
 
   if(frame->vector < 32) {
     console_print("Exception: ");
@@ -98,16 +104,27 @@ void exception_handler(interrupt_frame_t *frame)
     console_printf("%d", (int)frame->vector);
   }
 
-  console_print("\n\n");
+  proc_t *p = proc_current();
+  if(p) {
+    console_print(" [");
+    console_print(p->name);
+    console_print("]");
+  }
+  console_print("\n");
+
   console_printf("RIP: 0x%x\n", frame->rip);
   console_printf("RSP: 0x%x\n", frame->rsp);
   console_printf("ERR: 0x%x\n", frame->error_code);
 
-  /* For Page Fault, show CR2 (faulting address) */
   if(frame->vector == 14) {
     u64 cr2;
     __asm__ volatile("mov %%cr2, %0" : "=r"(cr2));
-    console_printf("CR2: 0x%x (faulting address)\n", cr2);
+    console_printf("CR2: 0x%x\n", cr2);
+  }
+
+  if(user_fault) {
+    console_print("Killing faulting process.\n");
+    proc_exit(-11);
   }
 
   cpu_halt();
