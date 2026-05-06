@@ -31,6 +31,7 @@ SYSCALL_DECL(sys_write);
 SYSCALL_DECL(sys_lseek);
 SYSCALL_DECL(sys_ioctl);
 SYSCALL_DECL(sys_nanosleep);
+SYSCALL_DECL(sys_readv);
 SYSCALL_DECL(sys_writev);
 
 /* Memory */
@@ -86,16 +87,23 @@ SYSCALL_DECL(sys_gettimeofday);
 SYSCALL_DECL(sys_futex);
 SYSCALL_DECL(sys_clock_gettime);
 SYSCALL_DECL(sys_sched_yield);
+SYSCALL_DECL(sys_sched_getaffinity);
+SYSCALL_DECL(sys_getrlimit);
+SYSCALL_DECL(sys_prlimit64);
 
 /* Signals and arch (Linux ABI) */
 SYSCALL_DECL(sys_rt_sigaction);
 SYSCALL_DECL(sys_rt_sigprocmask);
 SYSCALL_DECL(sys_rt_sigreturn);
+SYSCALL_DECL(sys_sigaltstack);
 SYSCALL_DECL(sys_kill);
+SYSCALL_DECL(sys_tkill);
+SYSCALL_DECL(sys_tgkill);
 SYSCALL_DECL(sys_arch_prctl);
 
 /* Pipe */
 SYSCALL_DECL(sys_pipe);
+SYSCALL_DECL(sys_pipe2);
 
 /**
  * @brief Read up to @p count bytes from the read end of a pipe object.
@@ -127,6 +135,18 @@ void *pipe_alloc_obj(void);
  * @param pipe  Pipe pointer.
  */
 void pipe_oft_release(i32 kind, void *pipe);
+
+/**
+ * @brief Bump refcounts on every open pipe end. Called by proc_fork so the
+ * child can close its inherited fds without affecting the parent.
+ */
+void pipe_dup_for_fork(void);
+
+/** @brief Mark a forked child as a holder of every pipe end the parent has open. */
+void pipe_assign_to_proc(u64 child_pid, u64 parent_pid);
+
+/** @brief Release every pipe end held by an exiting process; wakes blocked peers. */
+void pipe_close_for_exit(u64 pid);
 
 #undef SYSCALL_DECL
 

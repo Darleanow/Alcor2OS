@@ -33,6 +33,7 @@
 #define SYS_WRITEV          20
 #define SYS_PREAD64         17
 #define SYS_PWRITE64        18
+#define SYS_READV           19
 #define SYS_IOCTL           16
 #define SYS_ACCESS          21
 #define SYS_PIPE            22
@@ -66,16 +67,23 @@
 #define SYS_GETEUID         107
 #define SYS_GETEGID         108
 #define SYS_GETPPID         110
+#define SYS_GETRLIMIT       97
+#define SYS_PRLIMIT64       302
 #define SYS_ARCH_PRCTL      158
 #define SYS_MOUNT           165
 #define SYS_UMOUNT2         166
 #define SYS_GETTID          186
-#define SYS_FUTEX           202
-#define SYS_SET_TID_ADDRESS 218
+#define SYS_TKILL             200
+#define SYS_FUTEX             202
+#define SYS_SCHED_GETAFFINITY 204
+#define SYS_SET_TID_ADDRESS   218
+#define SYS_TGKILL            234
 #define SYS_CLOCK_GETTIME   228
 #define SYS_EXIT_GROUP      231
 #define SYS_GETDENTS64      217
 #define SYS_OPENAT          257
+#define SYS_PIPE2           293
+#define SYS_SIGALTSTACK     131
 #define SYS_MAX             512
 /* Unmapped syscall numbers in dispatcher intentionally return -ENOSYS. */
 /** @} */

@@ -8,6 +8,7 @@
 
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
@@ -84,6 +85,8 @@ static void fill_file_backed_pages(u64 base, u64 length, i64 fd, u64 offset)
   for(u64 map_off = 0; map_off < length;) {
     u64 page_virt  = base + map_off;
     u64 phys       = vmm_get_phys(page_virt);
+    if(!phys)
+      break;
     u8 *dst        = (u8 *)(phys + vmm_get_hhdm());
     u64 page_local = map_off & PAGE_MASK_LOCAL;
     u64 chunk      = PAGE_SIZE - page_local;
@@ -108,17 +111,40 @@ u64 sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
   if(!p)
     return (u64)-ENOMEM;
 
+  const bool fixed = (flags & MAP_FIXED) != 0;
+  if(fixed && addr == 0)
+    return (u64)-EINVAL;
+
   u64 aligned_len = page_align_up(length);
-  u64 base = ((flags & MAP_FIXED) && addr != 0) ? page_align_down(addr) : p->mmap_base;
-  if(!(flags & MAP_FIXED) || addr == 0)
-    p->mmap_base += aligned_len;
+  if(aligned_len < length)
+    return (u64)-ENOMEM;
+
+  u64 base = (fixed && addr != 0) ? page_align_down(addr) : page_align_down(p->mmap_base);
+  u64 end  = base + aligned_len;
+  if(end < base || end > USER_SPACE_END)
+    return (u64)-ENOMEM;
+
+  bool is_anon = (flags & MAP_ANONYMOUS) != 0 || fd == (u64)-1;
+  if(!is_anon && (offset & PAGE_MASK_LOCAL))
+    return (u64)-EINVAL;
 
   u64 map_flags = build_vmm_flags(prot);
+
+  /* MAP_FIXED requires "replace any existing mapping at this range with a
+   * fresh zero-filled mapping" semantics. vmm_map_range_alloc skips pages
+   * already PRESENT, so the new contents would be stale parent/peer data —
+   * which is what causes mallocng's a_crash() (heap metadata mismatch).
+   * Unmap the range first so the subsequent alloc sees only fresh pages. */
+  if(fixed)
+    unmap_and_free_range(base, aligned_len);
+
   i64 map_ret   = map_zeroed_user_range(base, aligned_len, map_flags);
   if(map_ret < 0)
     return (u64)map_ret;
 
-  bool is_anon = (flags & MAP_ANONYMOUS) || (fd == (u64)-1);
+  if(!fixed)
+    p->mmap_base = end;
+
   if(!is_anon)
     fill_file_backed_pages(base, length, (i64)fd, offset);
 

@@ -241,6 +241,39 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/* tkill(tid, sig) — single-threaded kernel: tid maps to pid. */
+u64 sys_tkill(u64 tid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  return sys_kill(tid, sig, a3, a4, a5, a6);
+}
+
+/* tgkill(tgid, tid, sig) — same: route to sys_kill on the tgid. */
+u64 sys_tgkill(u64 tgid, u64 tid, u64 sig, u64 a4, u64 a5, u64 a6)
+{
+  (void)tid;
+  return sys_kill(tgid, sig, 0, a4, a5, a6);
+}
+
+/* sigaltstack(const stack_t *ss, stack_t *old_ss) — alternate signal stack.
+ * No real altstack support: zero out old_ss if requested, ignore ss. */
+u64 sys_sigaltstack(u64 ss, u64 old_ss, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  (void)ss;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
+  if(old_ss) {
+    /* stack_t = { void *ss_sp; int ss_flags; size_t ss_size; } = 24 bytes */
+    u8 *p = (u8 *)old_ss;
+    for(unsigned i = 0; i < 24; i++)
+      p[i] = 0;
+    /* mark SS_DISABLE = 2 in ss_flags */
+    *(int *)(p + 8) = 2;
+  }
+  return 0;
+}
+
 /* Signal delivery helpers. */
 
 /**

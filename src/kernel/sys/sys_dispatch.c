@@ -10,7 +10,9 @@
  * Unknown syscall number or NULL table slot: return `(u64)-ENOSYS`.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
+#include <alcor2/proc/proc.h>
 #include <alcor2/proc/sched.h>
 #include <alcor2/sys/internal.h>
 
@@ -40,10 +42,14 @@ static const syscall_fn_t g_syscall_table[SYS_MAX] = {
     [SYS_IOCTL]           = sys_ioctl,
     [SYS_PREAD64]         = sys_pread64,
     [SYS_PWRITE64]        = sys_pwrite64,
+    [SYS_READV]           = sys_readv,
     [SYS_WRITEV]          = sys_writev,
     [SYS_ACCESS]          = sys_access,
     [SYS_PIPE]            = sys_pipe,
+    [SYS_PIPE2]           = sys_pipe2,
+    [SYS_SIGALTSTACK]     = sys_sigaltstack,
     [SYS_SCHED_YIELD]     = sys_sched_yield,
+    [SYS_SCHED_GETAFFINITY] = sys_sched_getaffinity,
     [SYS_DUP]             = sys_dup,
     [SYS_DUP2]            = sys_dup2,
     [SYS_NANOSLEEP]       = sys_nanosleep,
@@ -54,6 +60,8 @@ static const syscall_fn_t g_syscall_table[SYS_MAX] = {
     [SYS_EXIT]            = sys_exit,
     [SYS_WAIT4]           = sys_wait4,
     [SYS_KILL]            = sys_kill,
+    [SYS_TKILL]           = sys_tkill,
+    [SYS_TGKILL]          = sys_tgkill,
     [SYS_UNAME]           = sys_uname,
     [SYS_FCNTL]           = sys_fcntl,
     [SYS_FTRUNCATE]       = sys_ftruncate,
@@ -81,13 +89,21 @@ static const syscall_fn_t g_syscall_table[SYS_MAX] = {
     [SYS_EXIT_GROUP]      = sys_exit,
     [SYS_GETDENTS64]      = sys_getdents64,
     [SYS_OPENAT]          = sys_openat,
+    [SYS_GETRLIMIT]       = sys_getrlimit,
+    [SYS_PRLIMIT64]       = sys_prlimit64,
 };
 
 u64 syscall_dispatch(syscall_frame_t *frame)
 {
   u64 num = frame->rax;
-  if(num >= SYS_MAX || g_syscall_table[num] == NULL)
+  if(num >= SYS_MAX || g_syscall_table[num] == NULL) {
+    console_printf("[SYS?%d pid=%d]\n", (int)num,
+                   proc_current() ? (int)proc_current()->pid : -1);
     return (u64)-ENOSYS;
+  }
+
+  proc_t *cur = proc_current();
+  int     si  = proc_table_index(cur);
 
   g_current_syscall_frame = frame;
   u64 result = g_syscall_table[num](
@@ -95,5 +111,15 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   );
   g_current_syscall_frame = NULL;
   sched_check_resched();
+
+  /* Cooperative user-process preemption: yield every Nth syscall per slot. */
+  if(si >= 0 && cur && cur->state == PROC_STATE_RUNNING) {
+    static u64 g_yield_counter[PROC_MAX] = {0};
+    if(++g_yield_counter[si] >= 64) {
+      g_yield_counter[si] = 0;
+      cur->state            = PROC_STATE_READY;
+      proc_schedule();
+    }
+  }
   return result;
 }

@@ -1,6 +1,7 @@
 /**
  * @file src/kernel/sys/sys_io.c
- * @brief I/O syscalls: `read`, `write`, `lseek`, `ioctl`, `nanosleep`, `writev`.
+ * @brief I/O syscalls: `read`, `readv`, `write`, `lseek`, `ioctl`, `nanosleep`,
+ * `writev`.
  *
  * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending on descriptor.
  */
@@ -216,6 +217,39 @@ struct iovec
   void *iov_base;
   u64   iov_len;
 };
+
+#define SYS_READV_IOV_MAX 1024
+
+u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
+{
+  (void)a4;
+  (void)a5;
+  (void)a6;
+
+  if(iovcnt == 0 || iovcnt > SYS_READV_IOV_MAX)
+    return (u64)-EINVAL;
+  if(!iov_ptr || !user_rw_ok(iov_ptr, iovcnt * sizeof(struct iovec)))
+    return (u64)-EFAULT;
+
+  const struct iovec *vec = (const struct iovec *)iov_ptr;
+  u64                 total = 0;
+
+  for(u64 i = 0; i < iovcnt; i++) {
+    if(!vec[i].iov_base || vec[i].iov_len == 0)
+      continue;
+    if(!user_rw_ok((u64)vec[i].iov_base, vec[i].iov_len))
+      return (u64)-EFAULT;
+
+    u64 chunk = sys_read(fd, (u64)vec[i].iov_base, vec[i].iov_len, 0, 0, 0);
+    if((i64)chunk < 0)
+      return chunk;
+    total += chunk;
+    if(chunk < vec[i].iov_len)
+      break;
+  }
+
+  return total;
+}
 
 u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {

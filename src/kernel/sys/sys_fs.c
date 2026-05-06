@@ -47,10 +47,11 @@ static inline bool user_buf_ok(u64 ptr, u64 size)
   return ptr && vmm_is_user_range((void *)ptr, size);
 }
 
-static void fill_linux_stat(struct linux_stat *st, const vfs_stat_t *vst, u64 ino)
+static void fill_linux_stat(struct linux_stat *st, const vfs_stat_t *vst)
 {
   kzero(st, sizeof(*st));
-  st->st_ino = ino;
+  st->st_dev   = vst->dev;
+  st->st_ino   = vst->ino;
   st->st_nlink = 1;
   st->st_mode = (vst->type == VFS_DIRECTORY) ? (S_IFDIR | 0755) : (S_IFREG | 0644);
   st->st_size = (i64)vst->size;
@@ -98,7 +99,7 @@ u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   if(vfs_stat((const char *)path, &vst) < 0)
     return (u64)-ENOENT;
 
-  fill_linux_stat((struct linux_stat *)statbuf, &vst, 1);
+  fill_linux_stat((struct linux_stat *)statbuf, &vst);
   return 0;
 }
 
@@ -115,6 +116,8 @@ u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   struct linux_stat *st = (struct linux_stat *)statbuf;
   if(fd <= 2) {
     kzero(st, sizeof(*st));
+    st->st_dev     = 0x1000000000000000ULL | (u64)fd;
+    st->st_ino     = (u64)fd;
     st->st_mode    = 0020000 | 0666;
     st->st_blksize = 4096;
     st->st_nlink   = 1;
@@ -125,7 +128,7 @@ u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   if(vfs_fstat_fd((i64)fd, &vst) < 0)
     return (u64)-EBADF;
 
-  fill_linux_stat(st, &vst, fd);
+  fill_linux_stat(st, &vst);
   return 0;
 }
 
