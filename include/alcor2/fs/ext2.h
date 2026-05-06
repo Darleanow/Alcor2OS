@@ -347,7 +347,7 @@ i64 ext2_mkdir(ext2_volume_t *vol, const char *path);
  * @param file File handle.
  * @return 0 on success, negative on error.
  */
-i64 ext2_truncate(ext2_file_t *file);
+i64 ext2_truncate(ext2_file_t *file, u64 length);
 
 /**
  * @brief Flush file changes to disk.
