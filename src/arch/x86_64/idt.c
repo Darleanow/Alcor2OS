@@ -3,11 +3,11 @@
  * @brief Interrupt Descriptor Table and exception handlers.
  */
 
-#include <alcor2/drivers/ata.h>
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
 #include <alcor2/arch/idt.h>
 #include <alcor2/arch/pic.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/proc/proc.h>
 
 extern void        pit_tick(void);

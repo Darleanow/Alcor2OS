@@ -1,31 +1,32 @@
 /**
  * @file src/kernel/input/kbd_layout.c
- * @brief PS/2 set 1 scancodes to bytes: US or FR AZERTY (+ AltGr) and CSI arrow keys.
+ * @brief PS/2 set 1 scancodes to bytes: US or FR AZERTY (+ AltGr) and CSI arrow
+ * keys.
  */
 
 #include <alcor2/arch/cpu.h>
+#include <alcor2/drivers/keyboard.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/drivers/keyboard.h>
 
-#define LAT_mu   '\xb5'
-#define LAT_deg  '\xb0'
-#define LAT_sect '\xa7'
-#define LAT_ucce '\xe7'
-#define LAT_ucee '\xe8'
-#define LAT_uca0 '\xe0'
-#define LAT_uce9 '\xe9'
-#define LAT_ucf9 '\xf9'
-#define LAT_diae '\xa8'
-#define LAT_poun '\xa3'
-#define LAT_curr '\xa4'
+#define LAT_mu      '\xb5'
+#define LAT_deg     '\xb0'
+#define LAT_sect    '\xa7'
+#define LAT_ucce    '\xe7'
+#define LAT_ucee    '\xe8'
+#define LAT_uca0    '\xe0'
+#define LAT_uce9    '\xe9'
+#define LAT_ucf9    '\xf9'
+#define LAT_diae    '\xa8'
+#define LAT_poun    '\xa3'
+#define LAT_curr    '\xa4'
 
 #define OUT_PEND_SZ 256
 static unsigned char out_pend_buf[OUT_PEND_SZ];
 static u32           out_pend_w;
 static u32           out_pend_r;
 
-static bool out_pend_take(unsigned char *c)
+static bool          out_pend_take(unsigned char *c)
 {
   if(out_pend_r == out_pend_w)
     return false;
@@ -40,7 +41,7 @@ static bool out_pend_push(unsigned char b)
   if(next == out_pend_r)
     return false;
   out_pend_buf[out_pend_w] = b;
-  out_pend_w                = next;
+  out_pend_w               = next;
   return true;
 }
 
@@ -61,7 +62,8 @@ static const unsigned char us_pl[128] = {
     '+', '1',  '2',  '3', '0',  '.', 0,   0,   0,   0,   0,   0,   0,
     0,   0,    0,    0,   0,    0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,    0,    0,   0,    0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,    0,    0,   0,    0,   0,   0,   0,   0,   0};
+    0,   0,    0,    0,   0,    0,   0,   0,   0,   0,   0
+};
 
 static const unsigned char us_sh[128] = {
     0,   0,    '!',  '@', '#', '$', '%', '^', '&', '*', '(', ')', '_',
@@ -73,25 +75,17 @@ static const unsigned char us_sh[128] = {
     '+', '1',  '2',  '3', '0', '.', 0,   0,   0,   0,   0,   0,   0,
     0,   0,    0,    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,    0,    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,    0,    0,   0,   0,   0,   0,   0,   0,   0};
+    0,   0,    0,    0,   0,   0,   0,   0,   0,   0,   0
+};
 
-static unsigned char fr_pl[128];
-static unsigned char fr_sh[128];
-static bool          fr_ready;
+static unsigned char       fr_pl[128];
+static unsigned char       fr_sh[128];
+static bool                fr_ready;
 
 static const unsigned char fr_alt[128] = {
-    [0x03] = '~',
-    [0x04] = '#',
-    [0x05] = '{',
-    [0x06] = '[',
-    [0x07] = '|',
-    [0x08] = '`',
-    [0x09] = '\\',
-    [0x0a] = '^',
-    [0x0b] = '@',
-    [0x0c] = ']',
-    [0x0d] = '}',
-    [0x1b] = LAT_curr,
+    [0x03] = '~', [0x04] = '#', [0x05] = '{',  [0x06] = '[',
+    [0x07] = '|', [0x08] = '`', [0x09] = '\\', [0x0a] = '^',
+    [0x0b] = '@', [0x0c] = ']', [0x0d] = '}',  [0x1b] = LAT_curr,
 };
 
 static void fr_tables_init(void)
@@ -222,7 +216,8 @@ static const unsigned char *pick_sh(kbd_layout_t id)
 
 static bool fr_caps_scan(u8 key)
 {
-  if((key >= 0x10 && key <= 0x19) || (key >= 0x1e && key <= 0x28) || (key >= 0x2c && key <= 0x31))
+  if((key >= 0x10 && key <= 0x19) || (key >= 0x1e && key <= 0x28) ||
+     (key >= 0x2c && key <= 0x31))
     return true;
   return false;
 }
@@ -239,15 +234,15 @@ static bool         lalt_dn;
 static bool         ralt_dn;
 static key_state_t  mod = {0};
 
-void kbd_set_layout(kbd_layout_t lay)
+void                kbd_set_layout(kbd_layout_t lay)
 {
   if((unsigned)lay >= KBD_LAYOUT_COUNT)
     lay = KBD_LAYOUT_US;
-  layout       = lay;
-  out_pend_w   = out_pend_r = 0;
-  pend_e0      = false;
-  lalt_dn      = false;
-  ralt_dn      = false;
+  layout     = lay;
+  out_pend_w = out_pend_r = 0;
+  pend_e0                 = false;
+  lalt_dn                 = false;
+  ralt_dn                 = false;
 }
 
 kbd_layout_t kbd_get_layout(void)
@@ -387,9 +382,10 @@ u64 kbd_read_translated(char *buf, u64 count)
     if(process_raw(raw, &oc)) {
       buf[filled++] = (char)oc;
       /*
-       * Short reads are required for TTY/input: libc often calls read(..., BUFSIZ).
-       * Returning as soon as we have at least one byte matches POSIX-style partial
-       * reads; otherwise getchar/cat would stall until BUFSIZ keys.
+       * Short reads are required for TTY/input: libc often calls read(...,
+       * BUFSIZ). Returning as soon as we have at least one byte matches
+       * POSIX-style partial reads; otherwise getchar/cat would stall until
+       * BUFSIZ keys.
        */
       break;
     }

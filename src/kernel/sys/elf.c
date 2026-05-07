@@ -1,19 +1,20 @@
 /**
  * @file src/kernel/sys/elf.c
- * @brief ELF64 executable loader: validation, PT_LOAD mapping, file or memory copy, user entry.
+ * @brief ELF64 executable loader: validation, PT_LOAD mapping, file or memory
+ * copy, user entry.
  *
- * Uses `vmm_map_range_alloc` for anonymous page runs and `vfs_read` for `elf_load_fd` (no
- * kernel buffer sized to the whole file).
+ * Uses `vmm_map_range_alloc` for anonymous page runs and `vfs_read` for
+ * `elf_load_fd` (no kernel buffer sized to the whole file).
  */
 
 #include <alcor2/drivers/console.h>
-#include <alcor2/proc/elf.h>
-#include <alcor2/mm/heap.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>
-#include <alcor2/fs/vfs.h>
+#include <alcor2/proc/elf.h>
 
 static void elf_info_init(const Elf64_Ehdr *ehdr, elf_info_t *info)
 {
@@ -63,7 +64,7 @@ static void elf_copy_to_mapped(u64 dst_vaddr, const u8 *src, u64 size)
 
     u64 page_offset   = dst_vaddr & PAGE_OFFSET_MASK;
     u64 bytes_in_page = PAGE_SIZE - page_offset;
-    u64 to_copy = remaining < bytes_in_page ? remaining : bytes_in_page;
+    u64 to_copy       = remaining < bytes_in_page ? remaining : bytes_in_page;
 
     kmemcpy(dst, src, to_copy);
     src += to_copy;
@@ -223,8 +224,8 @@ int elf_load_fd(i64 fd, elf_info_t *info)
   }
 
   /* Read program headers (typically a few KB at most). */
-  u64       phdrs_size = (u64)ehdr.e_phnum * sizeof(Elf64_Phdr);
-  Elf64_Phdr *phdrs    = (Elf64_Phdr *)kmalloc(phdrs_size);
+  u64         phdrs_size = (u64)ehdr.e_phnum * sizeof(Elf64_Phdr);
+  Elf64_Phdr *phdrs      = (Elf64_Phdr *)kmalloc(phdrs_size);
   if(!phdrs)
     return -1;
 

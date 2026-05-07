@@ -3,9 +3,10 @@
  * @brief Framebuffer-based console output.
  *
  * Framebuffer bpp is taken into account (@a bpp / bytes per pixel). Latin-1 and
- * CP437 atlases disagree on octets ≥0x80; select with @c ESC [ 50 m (ISO Latin-1,
- * default) vs @c ESC [ 51 m (CP437 / box drawing). Xterm 256-colour SGR @c ESC [ 38 ; 5 ; n m
- * and @c ESC [ 48 ; 5 ; n m set foreground/background from the fixed palette.
+ * CP437 atlases disagree on octets ≥0x80; select with @c ESC [ 50 m (ISO
+ * Latin-1, default) vs @c ESC [ 51 m (CP437 / box drawing). Xterm 256-colour
+ * SGR @c ESC [ 38 ; 5 ; n m and @c ESC [ 48 ; 5 ; n m set foreground/background
+ * from the fixed palette.
  */
 
 #ifndef ALCOR2_CONSOLE_H

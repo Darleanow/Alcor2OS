@@ -21,11 +21,10 @@
 
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
-#include <alcor2/mm/vmm.h>
-
 
 /* Helper: default signal disposition. */
 
@@ -414,10 +413,10 @@ void proc_check_signals(void *frame_ptr)
     act->sa_handler = SIG_DFL;
 
   /* Redirect the syscall return to the signal handler */
-  frame->rip    = act->sa_handler;   /* jump to handler */
-  frame->rdi    = (u64)signum;       /* arg1: signal number */
-  frame->rsi    = 0;                 /* arg2: siginfo_t* (NULL) */
-  frame->rdx    = (u64)ctx;          /* arg3: ucontext_t* */
-  frame->rsp    = user_rsp;          /* new user stack */
-  frame->rflags = 0x202;             /* IF=1, reserved bit */
+  frame->rip    = act->sa_handler; /* jump to handler */
+  frame->rdi    = (u64)signum;     /* arg1: signal number */
+  frame->rsi    = 0;               /* arg2: siginfo_t* (NULL) */
+  frame->rdx    = (u64)ctx;        /* arg3: ucontext_t* */
+  frame->rsp    = user_rsp;        /* new user stack */
+  frame->rflags = 0x202;           /* IF=1, reserved bit */
 }
