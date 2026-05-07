@@ -318,6 +318,15 @@ i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry);
 i64 ext2_stat(const ext2_volume_t *vol, const char *path, ext2_entry_t *entry);
 
 /**
+ * @brief Read symlink target (final path component only). Path is
+ * mount-relative (e.g. @c "bin/clang"), no leading slash.
+ * @return Target length on success, negative -errno on error.
+ */
+i64 ext2_readlink(
+    const ext2_volume_t *vol, const char *path, char *buf, u64 cap
+);
+
+/**
  * @brief Seek in a file.
  * @param file File handle.
  * @param offset Seek offset.

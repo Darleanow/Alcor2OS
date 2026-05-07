@@ -20,9 +20,9 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/ext2.h>
-#include <alcor2/mm/heap.h>
-#include <alcor2/kstdlib.h>
 #include <alcor2/fs/vfs.h>
+#include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 
 /** @brief Maximum mounted ext2 volumes. */
 #define EXT2_MAX_VOLUMES 4
@@ -41,14 +41,14 @@
 
 typedef struct
 {
-  const ext2_volume_t *vol;      /**< NULL = slot unused */
+  const ext2_volume_t *vol; /**< NULL = slot unused */
   u32                  block_num;
   u8                   data[EXT2_MAX_BLOCK_SIZE];
 } dsk_cache_slot_t;
 
 static dsk_cache_slot_t g_dsk_cache[EXT2_DSK_CACHE_SLOTS];
 
-static inline u32 dsk_cache_idx(const ext2_volume_t *vol, u32 bn)
+static inline u32       dsk_cache_idx(const ext2_volume_t *vol, u32 bn)
 {
   return (u32)(((uintptr_t)vol >> 4) ^ (u64)bn * 2654435761ULL) &
          (EXT2_DSK_CACHE_SLOTS - 1);
@@ -188,7 +188,7 @@ static i64 vol_read_block(const ext2_volume_t *vol, u32 block, void *buf)
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
 
-  i64 ret = vol_read_sectors(vol, sector, sectors_per_block, buf);
+  i64       ret = vol_read_sectors(vol, sector, sectors_per_block, buf);
   if(ret >= 0)
     dsk_cache_insert(vol, block, buf, vol->block_size);
   return ret;
@@ -206,10 +206,10 @@ static i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf)
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
 
-  i64 ret = vol_write_sectors(vol, sector, sectors_per_block, buf);
+  i64       ret = vol_write_sectors(vol, sector, sectors_per_block, buf);
   if(ret >= 0) {
     /* Invalidate cache for this block */
-    u32 idx = dsk_cache_idx(vol, block);
+    u32 idx              = dsk_cache_idx(vol, block);
     g_dsk_cache[idx].vol = NULL;
   }
   return ret;
@@ -1488,9 +1488,9 @@ static bool
  * @param bufsz  Buffer size.
  * @return 0 on success, negative errno on error.
  */
-static i64 read_symlink_target(const ext2_volume_t *vol,
-                                const ext2_inode_t  *inode,
-                                char *buf, u32 bufsz)
+static i64 read_symlink_target(
+    const ext2_volume_t *vol, const ext2_inode_t *inode, char *buf, u32 bufsz
+)
 {
   u32 len = inode->i_size;
   if(len == 0 || len >= bufsz)
@@ -1532,8 +1532,9 @@ static i64 read_symlink_target(const ext2_volume_t *vol,
  * @param out     Output buffer.
  * @param outsz   Output buffer size.
  */
-static void build_symlink_path(const char *base, const char *target,
-                                char *out, u32 outsz)
+static void build_symlink_path(
+    const char *base, const char *target, char *out, u32 outsz
+)
 {
   if(target[0] == '/') {
     kstrncpy(out, target, outsz);
@@ -1597,7 +1598,7 @@ static i64 resolve_path_depth(
   kstrncpy(work, path, VFS_PATH_MAX);
   const char *p = work;
 
-  char component[EXT2_NAME_MAX + 1];
+  char        component[EXT2_NAME_MAX + 1];
 
   while(*p) {
     /* Skip slashes */
@@ -1642,9 +1643,10 @@ static i64 resolve_path_depth(
       /* Build: parent(work[0..comp_offset-1]) + target + rest */
       char followed[VFS_PATH_MAX];
       char base_for_link[VFS_PATH_MAX];
-      kstrncpy(base_for_link, work, comp_offset < VFS_PATH_MAX
-                                       ? comp_offset
-                                       : VFS_PATH_MAX);
+      kstrncpy(
+          base_for_link, work,
+          comp_offset < VFS_PATH_MAX ? comp_offset : VFS_PATH_MAX
+      );
       if(comp_offset < VFS_PATH_MAX)
         base_for_link[comp_offset] = '\0';
 
@@ -1666,8 +1668,9 @@ static i64 resolve_path_depth(
         }
       }
 
-      return resolve_path_depth(vol, followed, out_ino, out_inode,
-                                 follow_depth + 1);
+      return resolve_path_depth(
+          vol, followed, out_ino, out_inode, follow_depth + 1
+      );
     }
   }
 
@@ -2004,7 +2007,7 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
           cache_put_block(block_buf);
           return bytes_read > 0 ? (i64)bytes_read : -EIO;
         }
-      /* Populate cache with freshly read blocks. */
+        /* Populate cache with freshly read blocks. */
         for(u32 i = 0; i < run; i++)
           dsk_cache_insert(
               vol, block_num + i, run_buf + (u64)i * block_size, block_size
@@ -2255,6 +2258,53 @@ i64 ext2_stat(const ext2_volume_t *vol, const char *path, ext2_entry_t *entry)
   }
 
   return 0;
+}
+
+i64 ext2_readlink(
+    const ext2_volume_t *vol, const char *path, char *buf, u64 cap
+)
+{
+  if(!vol || !vol->mounted || !path || !buf || cap == 0)
+    return -EINVAL;
+
+  char parent_path[EXT2_NAME_MAX + 1];
+  char filename[EXT2_NAME_MAX + 1];
+  path_split(path, parent_path, filename);
+
+  if(filename[0] == '\0')
+    return -EINVAL;
+
+  u32          parent_ino;
+  ext2_inode_t parent_inode;
+  if(resolve_path(vol, parent_path, &parent_ino, &parent_inode) < 0)
+    return -ENOENT;
+
+  if((parent_inode.i_mode & EXT2_S_IFMT) != EXT2_S_IFDIR)
+    return -ENOTDIR;
+
+  u32 entry_ino;
+  u8  entry_type;
+  if(dir_find_entry(vol, &parent_inode, filename, &entry_ino, &entry_type) < 0)
+    return -ENOENT;
+
+  ext2_inode_t inode;
+  if(read_inode(vol, entry_ino, &inode) < 0)
+    return -EIO;
+
+  if((inode.i_mode & EXT2_S_IFMT) != EXT2_S_IFLNK)
+    return -EINVAL;
+
+  char target[VFS_PATH_MAX];
+  i64  tlen = read_symlink_target(vol, &inode, target, sizeof(target));
+  if(tlen < 0)
+    return -EIO;
+
+  u64 n = (u64)tlen;
+  if(n >= cap)
+    return -ENAMETOOLONG;
+
+  kmemcpy(buf, target, n);
+  return (i64)n;
 }
 
 /**
@@ -2756,15 +2806,19 @@ static i64 ext2_vfs_fstat(fs_file_t fh, vfs_stat_t *st)
   return 0;
 }
 
-static i64
-    ext2_vfs_stat(void *fs_data, const char *path, u64 *size, u8 *type, u64 *ino)
+static i64 ext2_vfs_stat(
+    void *fs_data, const char *path, u64 *size, u8 *type, u64 *ino
+)
 {
   ext2_entry_t entry;
   i64          ret = ext2_stat((ext2_volume_t *)fs_data, path, &entry);
   if(ret == 0) {
-    if(size) *size = entry.size;
-    if(type) *type = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
-    if(ino)  *ino  = entry.inode;
+    if(size)
+      *size = entry.size;
+    if(type)
+      *type = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
+    if(ino)
+      *ino = entry.inode;
   }
   return ret;
 }
