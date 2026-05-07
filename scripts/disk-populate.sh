@@ -9,9 +9,11 @@
 #
 #   /bin/        shell + builtins + tcc + clang.real + lld + cc-wrapper aliases
 #   /usr/bin/    cxx (alias of cc-wrapper)
-#   /usr/lib/    crt1.o crti.o crtn.o libc.a libgcc*.a libstdc++.a clang/18/...
-#   /usr/include musl headers, c++ headers
-#   /home/       sample sources (simple.c, hi.c)
+#   /usr/lib/    crt1.o … libc.a libncurses.a libtinfo.a libgcc*.a libstdc++.a …
+#   /usr/include musl + ncurses headers (curses.h, …)
+#   /usr/share/terminfo   optional — from host `make ncurses`
+#   /etc/profile TERM default + hints
+#   /home/       sample sources (simple.c, hi.c, ncurses-demo.c when ncurses present)
 #   /etc/motd    welcome banner
 
 set -eu
@@ -27,6 +29,7 @@ MUSL_CROSS=$ROOT/thirdparty/musl-cross
 MUSL_SYSROOT=$MUSL_CROSS/x86_64-linux-musl
 TCC=$ROOT/thirdparty/tcc-install
 CLANG_INSTALL=$ROOT/thirdparty/clang-install
+NCURSES=$ROOT/thirdparty/ncurses-install
 LLVM_BUILD=$ROOT/thirdparty/llvm-build
 BUILD=$ROOT/build
 
@@ -151,10 +154,56 @@ else
   $S ln -sf tcc "$MNT/bin/cc"
 fi
 
+# ----- 4e. ncurses -----------------------------
+if [ -f "$NCURSES/usr/lib/libncurses.a" ]; then
+  echo "[disk] ncurses static libs + headers + terminfo (system-wide under /usr)"
+  $S cp "$NCURSES/usr/lib/libncurses.a" "$MNT/usr/lib/"
+  $S cp "$NCURSES/usr/lib/libtinfo.a" "$MNT/usr/lib/"
+  if [ -d "$NCURSES/usr/include" ]; then
+    $S cp -r "$NCURSES/usr/include/." "$MNT/usr/include/"
+  fi
+  if [ -d "$NCURSES/usr/share/terminfo" ]; then
+    $S mkdir -p "$MNT/usr/share/terminfo"
+    $S cp -r "$NCURSES/usr/share/terminfo/." "$MNT/usr/share/terminfo/"
+  fi
+  $S tee "$MNT/home/ncurses-demo.c" >/dev/null <<'EOF'
+/* Build: cc ncurses-demo.c -lncurses -ltinfo   Run from a real TTY. */
+#include <curses.h>
+
+int main(void)
+{
+  if(!initscr())
+    return 1;
+  raw();
+  noecho();
+  curs_set(0);
+  mvprintw(2, 2, "ncurses on Alcor2 — any key to exit");
+  refresh();
+  (void)getch();
+  endwin();
+  return 0;
+}
+EOF
+else
+  echo "[disk] ncurses skipped (host: make ncurses, then disk-populate again)"
+fi
+
+$S tee "$MNT/etc/profile" >/dev/null <<'EOF'
+# Alcor2 login environment — use: . /etc/profile
+export TERM="${TERM:-xterm-256color}"
+EOF
+
 # ----- 5. Welcome banner -----------------------------------------------------
+NC_ON_DISK=0
+[ -f "$MNT/usr/lib/libncurses.a" ] && NC_ON_DISK=1
+
 {
   echo "Welcome to Alcor2!"
   echo "  C   : cc file.c     (or clang / tcc)"
   echo "  C++ : c++ file.cpp  (or g++ / cxx)"
   echo "  Run : ./a.out"
+  echo "  tip : . /etc/profile   # TERM for ncurses"
+  if [ "$NC_ON_DISK" = 1 ]; then
+    echo "  TUI : cc ui.c -lncurses -ltinfo   (sample: /home/ncurses-demo.c)"
+  fi
 } | $S tee "$MNT/etc/motd" >/dev/null

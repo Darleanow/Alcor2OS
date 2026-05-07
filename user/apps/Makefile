@@ -1,4 +1,7 @@
 SUBDIRS := hello-cpp edi
+ifneq ($(wildcard ../../thirdparty/ncurses-install/usr/lib/libncurses.a),)
+SUBDIRS += ncurses-hello
+endif
 
 .PHONY: all clean
 

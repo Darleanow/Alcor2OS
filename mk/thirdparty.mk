@@ -11,12 +11,13 @@ else
   MUSL_CONFIGURE_EXTRA :=
 endif
 
-.PHONY: musl tcc clang musl-cross
+.PHONY: musl tcc clang musl-cross ncurses
 
 musl:  thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 tcc:   thirdparty/tcc-install/usr/bin/tcc
 clang: thirdparty/clang-install/usr/bin/clang
 musl-cross: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
+ncurses: thirdparty/ncurses-install/usr/lib/libncurses.a
 
 thirdparty/limine/limine:
 	git clone $(LIMINE_URL) --branch=$(LIMINE_REV) --depth=1 thirdparty/limine
@@ -65,6 +66,58 @@ thirdparty/musl-cross/bin/x86_64-linux-musl-gcc:
 	  2>&1 | tee thirdparty/musl-cross-build.log | tail -10
 	@test -f thirdparty/musl-cross/bin/x86_64-linux-musl-gcc || \
 	  { echo >&2 "musl-cross failed — see thirdparty/musl-cross-build.log"; exit 1; }
+
+# Curses + terminfo (libtinfo): static *.a for x86_64-linux-musl. ~1–2 min after configure.
+thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
+	@echo "ncurses $(NCURSES_VER) — static libraries for x86_64-linux-musl (log: thirdparty/ncurses-build.log)"
+	@mkdir -p thirdparty
+	@rm -rf thirdparty/ncurses-src
+	@curl -sL $(NCURSES_URL) | tar xz -C thirdparty
+	@mv thirdparty/ncurses-$(NCURSES_VER) thirdparty/ncurses-src
+	@cd thirdparty/ncurses-src && \
+	  BUILD_CC=cc \
+	  PKG_CONFIG=/bin/false \
+	  ./configure \
+	    --host=x86_64-linux-musl \
+	    --prefix=$(CURDIR)/thirdparty/ncurses-install/usr \
+	    --with-build-cc=cc \
+	    --without-ada \
+	    --without-cxx \
+	    --without-cxx-binding \
+	    --without-progs \
+	    --without-tests \
+	    --without-gpm \
+	    --without-debug \
+	    --without-manpages \
+	    --without-developer \
+	    --disable-rpath-hack \
+	    --with-termlib \
+	    --with-default-terminfo-dir=/usr/share/terminfo \
+	    --with-fallbacks=xterm-256color,vt100 \
+	    --disable-shared \
+	    --enable-static \
+	    --enable-overwrite \
+	    --enable-pc-files=no \
+	    CC=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-gcc \
+	    CXX=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-g++ \
+	    AR=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-ar \
+	    RANLIB=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-ranlib \
+	    STRIP=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-strip \
+	    CFLAGS='-Os -fno-stack-protector' \
+	    >$(CURDIR)/thirdparty/ncurses-config.log 2>&1 || \
+	    { tail -30 $(CURDIR)/thirdparty/ncurses-config.log; echo >&2 "ncurses configure failed"; exit 1; }
+	@$(MAKE) -C thirdparty/ncurses-src -j$(JOBS) \
+	  >$(CURDIR)/thirdparty/ncurses-build.log 2>&1 || \
+	  { tail -40 $(CURDIR)/thirdparty/ncurses-build.log; echo >&2 "ncurses build failed"; exit 1; }
+	@$(MAKE) -C thirdparty/ncurses-src install \
+	  >$(CURDIR)/thirdparty/ncurses-install.log 2>&1 || \
+	  { tail -40 $(CURDIR)/thirdparty/ncurses-install.log; echo >&2 "ncurses install failed"; exit 1; }
+	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/lib/libncurses.a || \
+	  { echo >&2 "expected libncurses.a"; exit 1; }
+	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/include/curses.h || \
+	  test -f $(CURDIR)/thirdparty/ncurses-install/usr/include/ncurses/curses.h || \
+	  { echo >&2 "ncurses headers missing — see thirdparty/ncurses-install.log"; exit 1; }
+	@echo "ncurses → thirdparty/ncurses-install/usr/{include,lib,share/terminfo}"
 
 # Static clang+lld for the guest disk (requires musl-cross).
 CLANG_BIN := $(firstword $(wildcard thirdparty/clang-install/usr/bin/clang-[0-9]*))

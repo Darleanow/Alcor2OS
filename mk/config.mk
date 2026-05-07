@@ -48,7 +48,7 @@ USER_SRCS_C := $(shell find user \( -path '*/.cache/*' \) -prune -o -name '*.c' 
 # Apple Silicon hosts can't accelerate an x86_64 guest, so they stay on TCG.
 # USE_KVM: empty/auto = enable if available, 1 = force, 0 = TCG only (slower).
 QEMU       ?= qemu-system-x86_64
-QEMU_RAM   ?= 512M
+QEMU_RAM   ?= 2048M
 USE_KVM    ?=
 
 QEMU_KVM :=
