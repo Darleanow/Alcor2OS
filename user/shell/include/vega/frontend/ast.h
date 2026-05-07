@@ -9,11 +9,12 @@
 #ifndef VEGA_AST_H
 #define VEGA_AST_H
 
-typedef enum {
+typedef enum
+{
   AST_CMD,
-  AST_AND,  /* left && right, short-circuit on non-zero status */
-  AST_OR,   /* left || right, short-circuit on zero status */
-  AST_SEQ,  /* left ; right, status is right's */
+  AST_AND,   /* left && right, short-circuit on non-zero status */
+  AST_OR,    /* left || right, short-circuit on zero status */
+  AST_SEQ,   /* left ; right, status is right's */
   AST_PIPE,  /* a | b | ... ; status is last stage's */
   AST_IF,    /* if cond { then } [else { else_branch }] */
   AST_WHILE, /* while cond { body } — loops while cond exits 0 */
@@ -21,7 +22,8 @@ typedef enum {
   AST_FN,    /* fn name(args) { body } — registers a function on exec */
 } ast_kind_t;
 
-typedef enum {
+typedef enum
+{
   REDIR_OUT,        /* >   file — truncate */
   REDIR_APPEND,     /* >>  file — append */
   REDIR_IN,         /* <   file */
@@ -52,46 +54,54 @@ typedef struct redir
 typedef struct ast_node
 {
   ast_kind_t kind;
-  union {
-    struct {
-      char    **argv;
-      int       argc;
-      int       cap;
-      redir_t  *redirs;
-      int       fail_fast; /* set by parser when argv[0] ended with `!`;
-                              shell exits with the cmd's status if non-zero */
+  union
+  {
+    struct
+    {
+      char   **argv;
+      int      argc;
+      int      cap;
+      redir_t *redirs;
+      int      fail_fast; /* set by parser when argv[0] ended with `!`;
+                             shell exits with the cmd's status if non-zero */
     } cmd;
-    struct {
+    struct
+    {
       struct ast_node *left;
       struct ast_node *right;
     } binop;
-    struct {
+    struct
+    {
       struct ast_node **stages; /* each stage owns its node */
       int               n;
       int               cap;
     } pipeline;
-    struct {
+    struct
+    {
       struct ast_node *cond;
       struct ast_node *then_branch;
       struct ast_node *else_branch; /* may be NULL; for `else if`, this is
                                        another AST_IF */
     } if_;
-    struct {
+    struct
+    {
       struct ast_node *cond;
       struct ast_node *body;
     } while_;
-    struct {
-      char             *name;   /* loop variable */
-      char            **words;  /* heap array of heap strings */
-      int               nwords;
-      int               cap;
-      struct ast_node  *body;
+    struct
+    {
+      char            *name;  /* loop variable */
+      char           **words; /* heap array of heap strings */
+      int              nwords;
+      int              cap;
+      struct ast_node *body;
     } for_;
-    struct {
-      char             *name;       /* function name */
-      char            **arg_names;  /* heap array of heap strings */
-      int               n_args;
-      struct ast_node  *body;
+    struct
+    {
+      char            *name;      /* function name */
+      char           **arg_names; /* heap array of heap strings */
+      int              n_args;
+      struct ast_node *body;
     } fn;
   } u;
 } ast_t;

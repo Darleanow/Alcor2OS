@@ -3,10 +3,10 @@
  * @brief Alcor2 C/C++ compiler driver.
  *
  * Single binary installed on the guest as `/bin/clang`, `/bin/cc`, `/bin/c++`,
- * `/bin/g++`, and `/usr/bin/cxx`. Forwards to the real Clang at `/bin/clang.real`
- * with a fully explicit command line — no `clang.cfg`, no toolchain
- * auto-detection. Mode (C vs C++) is derived from argv[0] and the input
- * extensions, so:
+ * `/bin/g++`, and `/usr/bin/cxx`. Forwards to the real Clang at
+ * `/bin/clang.real` with a fully explicit command line — no `clang.cfg`, no
+ * toolchain auto-detection. Mode (C vs C++) is derived from argv[0] and the
+ * input extensions, so:
  *
  *   $ clang  hello.c       → C   compile + link → ./a.out
  *   $ cc     hello.c       → C   compile + link → ./a.out
@@ -15,6 +15,11 @@
  *
  * All link inputs (crt1.o, crti.o, libc.a, libgcc.a, crtn.o, …) live under
  * /usr/lib and are passed by absolute path so Clang never has to guess.
+ *
+ * argv[0] forwarded to clang.real must be an absolute path: LLVM’s
+ * getMainExecutable() reads /proc/self/exe (we have no procfs) then falls back
+ * to PATH lookup on basename-only argv[0]. Without PATH, it returns "" and
+ * posix_spawn fails with EACCES (“Permission denied”).
  */
 
 #include <stdio.h>
@@ -26,10 +31,11 @@
 
 /* Canonical paths on the Alcor2 guest disk. Kept in one place so the wrapper
  * and the disk-populate target agree on the layout. */
-#define SYS_LIB        "/usr/lib"
-#define SYS_INC        "/usr/include"
-#define CLANG_RES_INC  "/usr/lib/clang/18/include"
-/* Must match libstdc++ layout installed by scripts/disk-populate.sh (musl-cross). */
+#define SYS_LIB       "/usr/lib"
+#define SYS_INC       "/usr/include"
+#define CLANG_RES_INC "/usr/lib/clang/18/include"
+/* Must match libstdc++ layout installed by scripts/disk-populate.sh
+ * (musl-cross). */
 #define CXX_INC        "/usr/include/c++/9.4.0"
 #define CXX_INC_TARGET "/usr/include/c++/9.4.0/x86_64-linux-musl"
 
@@ -44,7 +50,7 @@ static int wants_cxx(int argc, char *argv[])
 {
   const char *prog = argv[0] ? argv[0] : "";
   const char *base = strrchr(prog, '/');
-  base = base ? base + 1 : prog;
+  base             = base ? base + 1 : prog;
 
   if(strstr(base, "++") || !strcmp(base, "cxx") || !strcmp(base, "g++"))
     return 1;
@@ -84,9 +90,8 @@ int main(int argc, char *argv[])
   int cxx = wants_cxx(argc, argv);
   int n   = 0;
 
-  /* argv[0] selects clang's driver mode (C vs C++ defaults: name lookups,
-   * default libraries, header search). */
-  push(fwd, &n, cxx ? "clang++" : "clang");
+  /* argv[0]: absolute path + driver basename for mode (see file comment). */
+  push(fwd, &n, cxx ? "/bin/clang++" : "/bin/clang");
 
   /* Target + linker. Static link against musl, lld is /bin/lld.
    * Force libstdc++ for C++ — Clang's default for the musl target is libc++,

@@ -29,10 +29,10 @@
  * identifiers and can be passed as arguments.
  */
 
-#include <vega/frontend/parse.h>
-#include <vega/frontend/lexer.h>
-#include <vega/shell.h>
 #include <stdlib.h>
+#include <vega/frontend/lexer.h>
+#include <vega/frontend/parse.h>
+#include <vega/shell.h>
 
 static void diag_unexpected(tok_kind_t k)
 {
@@ -51,11 +51,20 @@ static void diag_expected_after(tok_kind_t after)
 static int redir_kind_from_token(tok_kind_t k, redir_kind_t *out)
 {
   switch(k) {
-    case TOK_REDIR_OUT:    *out = REDIR_OUT;        return 1;
-    case TOK_REDIR_APPEND: *out = REDIR_APPEND;     return 1;
-    case TOK_REDIR_IN:     *out = REDIR_IN;         return 1;
-    case TOK_HERESTRING:   *out = REDIR_HERESTRING; return 1;
-    default:               return 0;
+  case TOK_REDIR_OUT:
+    *out = REDIR_OUT;
+    return 1;
+  case TOK_REDIR_APPEND:
+    *out = REDIR_APPEND;
+    return 1;
+  case TOK_REDIR_IN:
+    *out = REDIR_IN;
+    return 1;
+  case TOK_HERESTRING:
+    *out = REDIR_HERESTRING;
+    return 1;
+  default:
+    return 0;
   }
 }
 
@@ -66,7 +75,7 @@ static ast_t *parse_command(lexer_t *L)
     return NULL;
 
   while(1) {
-    tok_t t = lex_peek(L);
+    tok_t        t = lex_peek(L);
     redir_kind_t rk;
 
     if(t.kind == TOK_WORD || t.kind == TOK_STRING) {

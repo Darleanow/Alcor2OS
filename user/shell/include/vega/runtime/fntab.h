@@ -19,7 +19,7 @@ typedef struct
   char  *name;
   char **arg_names; /* may be NULL when n_args == 0 */
   int    n_args;
-  ast_t *body;      /* never NULL for an occupied entry */
+  ast_t *body; /* never NULL for an occupied entry */
 } fn_entry_t;
 
 /**

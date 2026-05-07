@@ -3,8 +3,8 @@
  * @brief AST node allocation and teardown.
  */
 
-#include <vega/frontend/ast.h>
 #include <stdlib.h>
+#include <vega/frontend/ast.h>
 
 #define INITIAL_ARGV_CAP 4
 
@@ -13,17 +13,17 @@ ast_t *ast_new_cmd(void)
   ast_t *n = (ast_t *)malloc(sizeof(*n));
   if(!n)
     return NULL;
-  n->kind        = AST_CMD;
-  n->u.cmd.argv  = (char **)malloc(sizeof(char *) * INITIAL_ARGV_CAP);
+  n->kind       = AST_CMD;
+  n->u.cmd.argv = (char **)malloc(sizeof(char *) * INITIAL_ARGV_CAP);
   if(!n->u.cmd.argv) {
     free(n);
     return NULL;
   }
-  n->u.cmd.argv[0]    = NULL;
-  n->u.cmd.argc       = 0;
-  n->u.cmd.cap        = INITIAL_ARGV_CAP;
-  n->u.cmd.redirs     = NULL;
-  n->u.cmd.fail_fast  = 0;
+  n->u.cmd.argv[0]   = NULL;
+  n->u.cmd.argc      = 0;
+  n->u.cmd.cap       = INITIAL_ARGV_CAP;
+  n->u.cmd.redirs    = NULL;
+  n->u.cmd.fail_fast = 0;
   return n;
 }
 
@@ -82,7 +82,7 @@ ast_t *ast_new_if(ast_t *cond, ast_t *then_branch, ast_t *else_branch)
     ast_free(else_branch);
     return NULL;
   }
-  n->kind             = AST_IF;
+  n->kind              = AST_IF;
   n->u.if_.cond        = cond;
   n->u.if_.then_branch = then_branch;
   n->u.if_.else_branch = else_branch;
@@ -112,9 +112,9 @@ ast_t *ast_new_for(char *name)
     free(name);
     return NULL;
   }
-  n->kind          = AST_FOR;
-  n->u.for_.name   = name;
-  n->u.for_.words  = (char **)malloc(sizeof(char *) * INITIAL_FOR_CAP);
+  n->kind         = AST_FOR;
+  n->u.for_.name  = name;
+  n->u.for_.words = (char **)malloc(sizeof(char *) * INITIAL_FOR_CAP);
   if(!n->u.for_.words) {
     free(name);
     free(n);
@@ -206,55 +206,55 @@ void ast_free(ast_t *n)
   if(!n)
     return;
   switch(n->kind) {
-    case AST_CMD:
-      for(int i = 0; i < n->u.cmd.argc; i++)
-        free(n->u.cmd.argv[i]);
-      free(n->u.cmd.argv);
-      for(redir_t *r = n->u.cmd.redirs; r;) {
-        redir_t *next = r->next;
-        free(r->target);
-        free(r);
-        r = next;
-      }
-      break;
-    case AST_AND:
-    case AST_OR:
-    case AST_SEQ:
-      ast_free(n->u.binop.left);
-      ast_free(n->u.binop.right);
-      break;
-    case AST_PIPE:
-      for(int i = 0; i < n->u.pipeline.n; i++)
-        ast_free(n->u.pipeline.stages[i]);
-      free(n->u.pipeline.stages);
-      break;
-    case AST_IF:
-      ast_free(n->u.if_.cond);
-      ast_free(n->u.if_.then_branch);
-      ast_free(n->u.if_.else_branch);
-      break;
-    case AST_WHILE:
-      ast_free(n->u.while_.cond);
-      ast_free(n->u.while_.body);
-      break;
-    case AST_FOR:
-      free(n->u.for_.name);
-      for(int i = 0; i < n->u.for_.nwords; i++)
-        free(n->u.for_.words[i]);
-      free(n->u.for_.words);
-      ast_free(n->u.for_.body);
-      break;
-    case AST_FN:
-      /* Fields may have been NULL'd out when the function was registered
-       * (the table steals ownership). Each free() is NULL-safe. */
-      free(n->u.fn.name);
-      if(n->u.fn.arg_names) {
-        for(int i = 0; i < n->u.fn.n_args; i++)
-          free(n->u.fn.arg_names[i]);
-        free(n->u.fn.arg_names);
-      }
-      ast_free(n->u.fn.body);
-      break;
+  case AST_CMD:
+    for(int i = 0; i < n->u.cmd.argc; i++)
+      free(n->u.cmd.argv[i]);
+    free(n->u.cmd.argv);
+    for(redir_t *r = n->u.cmd.redirs; r;) {
+      redir_t *next = r->next;
+      free(r->target);
+      free(r);
+      r = next;
+    }
+    break;
+  case AST_AND:
+  case AST_OR:
+  case AST_SEQ:
+    ast_free(n->u.binop.left);
+    ast_free(n->u.binop.right);
+    break;
+  case AST_PIPE:
+    for(int i = 0; i < n->u.pipeline.n; i++)
+      ast_free(n->u.pipeline.stages[i]);
+    free(n->u.pipeline.stages);
+    break;
+  case AST_IF:
+    ast_free(n->u.if_.cond);
+    ast_free(n->u.if_.then_branch);
+    ast_free(n->u.if_.else_branch);
+    break;
+  case AST_WHILE:
+    ast_free(n->u.while_.cond);
+    ast_free(n->u.while_.body);
+    break;
+  case AST_FOR:
+    free(n->u.for_.name);
+    for(int i = 0; i < n->u.for_.nwords; i++)
+      free(n->u.for_.words[i]);
+    free(n->u.for_.words);
+    ast_free(n->u.for_.body);
+    break;
+  case AST_FN:
+    /* Fields may have been NULL'd out when the function was registered
+     * (the table steals ownership). Each free() is NULL-safe. */
+    free(n->u.fn.name);
+    if(n->u.fn.arg_names) {
+      for(int i = 0; i < n->u.fn.n_args; i++)
+        free(n->u.fn.arg_names[i]);
+      free(n->u.fn.arg_names);
+    }
+    ast_free(n->u.fn.body);
+    break;
   }
   free(n);
 }

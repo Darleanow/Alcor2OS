@@ -3,9 +3,9 @@
  * @brief vega tokenizer implementation.
  */
 
+#include <stdlib.h>
 #include <vega/frontend/lexer.h>
 #include <vega/shell.h>
-#include <stdlib.h>
 
 static int is_hspace(char c)
 {
@@ -17,20 +17,20 @@ static int is_word_delim(char c)
   if(c == '\0' || is_hspace(c) || c == '\n')
     return 1;
   switch(c) {
-    case '|':
-    case '&':
-    case ';':
-    case '>':
-    case '<':
-    case '(':
-    case ')':
-    case '{':
-    case '}':
-    case '"':
-    case '\'':
-      return 1;
-    default:
-      return 0;
+  case '|':
+  case '&':
+  case ';':
+  case '>':
+  case '<':
+  case '(':
+  case ')':
+  case '{':
+  case '}':
+  case '"':
+  case '\'':
+    return 1;
+  default:
+    return 0;
   }
 }
 
@@ -48,7 +48,7 @@ static char *dup_range(const char *start, size_t len)
 /* Read a single-quoted token. Content is taken literally; no escapes. */
 static tok_t read_squote(lexer_t *L)
 {
-  tok_t       t     = { TOK_WORD, NULL };
+  tok_t       t     = {TOK_WORD, NULL};
   const char *start = ++L->cur;
   while(*L->cur && *L->cur != '\'')
     L->cur++;
@@ -66,14 +66,14 @@ static tok_t read_squote(lexer_t *L)
 /* Read a double-quoted token. Recognises \" \\ \$ as escapes. */
 static tok_t read_dquote(lexer_t *L)
 {
-  tok_t       t     = { TOK_STRING, NULL };
+  tok_t       t     = {TOK_STRING, NULL};
   const char *start = ++L->cur;
   /* compute final length first to size the allocation */
   size_t      n    = 0;
   const char *scan = start;
   while(*scan && *scan != '"') {
-    if(*scan == '\\' && scan[1]
-       && (scan[1] == '"' || scan[1] == '\\' || scan[1] == '$')) {
+    if(*scan == '\\' && scan[1] &&
+       (scan[1] == '"' || scan[1] == '\\' || scan[1] == '$')) {
       scan++;
     }
     scan++;
@@ -99,9 +99,9 @@ static tok_t read_dquote(lexer_t *L)
     }
     out[i++] = *p++;
   }
-  out[i]   = '\0';
-  t.text   = out;
-  L->cur   = p + 1; /* skip closing quote */
+  out[i] = '\0';
+  t.text = out;
+  L->cur = p + 1; /* skip closing quote */
   return t;
 }
 
@@ -109,7 +109,7 @@ static tok_t read_dquote(lexer_t *L)
  * otherwise be split by the lexer because '{' is a structural token). */
 static tok_t read_word(lexer_t *L)
 {
-  tok_t       t     = { TOK_WORD, NULL };
+  tok_t       t     = {TOK_WORD, NULL};
   const char *start = L->cur;
   /* sizing pass */
   size_t      n    = 0;
@@ -179,8 +179,8 @@ static tok_t read_word(lexer_t *L)
       continue;
     }
     if(*p == '$' && p[1] == '(') {
-      out[i++] = *p++; /* $ */
-      out[i++] = *p++; /* ( */
+      out[i++]  = *p++; /* $ */
+      out[i++]  = *p++; /* ( */
       int depth = 1;
       while(*p && depth > 0) {
         if(*p == '(')
@@ -216,7 +216,7 @@ static tok_t scan_one(lexer_t *L)
   while(is_hspace(*L->cur))
     L->cur++;
 
-  tok_t t = { TOK_EOF, NULL };
+  tok_t t = {TOK_EOF, NULL};
   char  c = *L->cur;
 
   if(c == '\0')
@@ -232,74 +232,74 @@ static tok_t scan_one(lexer_t *L)
   }
 
   switch(c) {
-    case '|':
+  case '|':
+    L->cur++;
+    if(*L->cur == '|') {
       L->cur++;
-      if(*L->cur == '|') {
-        L->cur++;
-        t.kind = TOK_OR;
-      } else {
-        t.kind = TOK_PIPE;
-      }
-      return t;
-    case '&':
+      t.kind = TOK_OR;
+    } else {
+      t.kind = TOK_PIPE;
+    }
+    return t;
+  case '&':
+    L->cur++;
+    if(*L->cur == '&') {
       L->cur++;
-      if(*L->cur == '&') {
-        L->cur++;
-        t.kind = TOK_AND;
-      } else {
-        sh_puts("vega: '&' (background) not yet supported\n");
-        L->error = 1;
-      }
-      return t;
-    case ';':
+      t.kind = TOK_AND;
+    } else {
+      sh_puts("vega: '&' (background) not yet supported\n");
+      L->error = 1;
+    }
+    return t;
+  case ';':
+    L->cur++;
+    t.kind = TOK_SEMI;
+    return t;
+  case '>':
+    L->cur++;
+    if(*L->cur == '>') {
       L->cur++;
-      t.kind = TOK_SEMI;
-      return t;
-    case '>':
-      L->cur++;
-      if(*L->cur == '>') {
-        L->cur++;
-        t.kind = TOK_REDIR_APPEND;
-      } else {
-        t.kind = TOK_REDIR_OUT;
-      }
-      return t;
-    case '<':
+      t.kind = TOK_REDIR_APPEND;
+    } else {
+      t.kind = TOK_REDIR_OUT;
+    }
+    return t;
+  case '<':
+    L->cur++;
+    if(*L->cur == '<') {
       L->cur++;
       if(*L->cur == '<') {
         L->cur++;
-        if(*L->cur == '<') {
-          L->cur++;
-          t.kind = TOK_HERESTRING;
-        } else {
-          t.kind = TOK_HEREDOC;
-        }
+        t.kind = TOK_HERESTRING;
       } else {
-        t.kind = TOK_REDIR_IN;
+        t.kind = TOK_HEREDOC;
       }
-      return t;
-    case '(':
-      L->cur++;
-      t.kind = TOK_LPAREN;
-      return t;
-    case ')':
-      L->cur++;
-      t.kind = TOK_RPAREN;
-      return t;
-    case '{':
-      L->cur++;
-      t.kind = TOK_LBRACE;
-      return t;
-    case '}':
-      L->cur++;
-      t.kind = TOK_RBRACE;
-      return t;
-    case '\'':
-      return read_squote(L);
-    case '"':
-      return read_dquote(L);
-    default:
-      return read_word(L);
+    } else {
+      t.kind = TOK_REDIR_IN;
+    }
+    return t;
+  case '(':
+    L->cur++;
+    t.kind = TOK_LPAREN;
+    return t;
+  case ')':
+    L->cur++;
+    t.kind = TOK_RPAREN;
+    return t;
+  case '{':
+    L->cur++;
+    t.kind = TOK_LBRACE;
+    return t;
+  case '}':
+    L->cur++;
+    t.kind = TOK_RBRACE;
+    return t;
+  case '\'':
+    return read_squote(L);
+  case '"':
+    return read_dquote(L);
+  default:
+    return read_word(L);
   }
 }
 
@@ -391,22 +391,38 @@ done: {
 const char *tok_name(tok_kind_t k)
 {
   switch(k) {
-    case TOK_EOF:          return "end-of-input";
-    case TOK_WORD:         return "word";
-    case TOK_STRING:       return "string";
-    case TOK_PIPE:         return "'|'";
-    case TOK_AND:          return "'&&'";
-    case TOK_OR:           return "'||'";
-    case TOK_SEMI:         return "';'";
-    case TOK_REDIR_OUT:    return "'>'";
-    case TOK_REDIR_APPEND: return "'>>'";
-    case TOK_REDIR_IN:     return "'<'";
-    case TOK_HEREDOC:      return "'<<'";
-    case TOK_HERESTRING:   return "'<<<'";
-    case TOK_LBRACE:       return "'{'";
-    case TOK_RBRACE:       return "'}'";
-    case TOK_LPAREN:       return "'('";
-    case TOK_RPAREN:       return "')'";
+  case TOK_EOF:
+    return "end-of-input";
+  case TOK_WORD:
+    return "word";
+  case TOK_STRING:
+    return "string";
+  case TOK_PIPE:
+    return "'|'";
+  case TOK_AND:
+    return "'&&'";
+  case TOK_OR:
+    return "'||'";
+  case TOK_SEMI:
+    return "';'";
+  case TOK_REDIR_OUT:
+    return "'>'";
+  case TOK_REDIR_APPEND:
+    return "'>>'";
+  case TOK_REDIR_IN:
+    return "'<'";
+  case TOK_HEREDOC:
+    return "'<<'";
+  case TOK_HERESTRING:
+    return "'<<<'";
+  case TOK_LBRACE:
+    return "'{'";
+  case TOK_RBRACE:
+    return "'}'";
+  case TOK_LPAREN:
+    return "'('";
+  case TOK_RPAREN:
+    return "')'";
   }
   return "?";
 }
