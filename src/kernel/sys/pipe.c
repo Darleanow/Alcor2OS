@@ -65,6 +65,26 @@ void pipe_oft_retain(i32 kind, void *pipe_ptr)
     p->write_open++;
 }
 
+bool pipe_poll_read_ready(void *pipe_ptr)
+{
+  pipe_t *p = (pipe_t *)pipe_ptr;
+  if(!p || !p->allocated || !p->read_open)
+    return false;
+  if(p->count > 0)
+    return true;
+  return !p->write_open;
+}
+
+bool pipe_poll_write_ready(void *pipe_ptr)
+{
+  pipe_t *p = (pipe_t *)pipe_ptr;
+  if(!p || !p->allocated || !p->write_open)
+    return false;
+  if(!p->read_open)
+    return true;
+  return p->count < PIPE_BUF_SIZE;
+}
+
 void pipe_oft_release(i32 kind, void *pipe_ptr)
 {
   pipe_t *p = (pipe_t *)pipe_ptr;

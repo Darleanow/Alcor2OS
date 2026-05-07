@@ -1,7 +1,7 @@
 /**
  * @file src/kernel/sys/sys_io.c
  * @brief I/O syscalls: `read`, `readv`, `write`, `lseek`, `ioctl`, `nanosleep`,
- * `writev`.
+ * `writev`, `select`.
  *
  * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending
  * on descriptor.
@@ -277,4 +277,238 @@ u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
     }
   }
   return total;
+}
+
+#define SEL_NFDBITS    64
+#define SEL_FDSET_LONG 16
+#define SEL_FDSET_SZ   (SEL_FDSET_LONG * sizeof(unsigned long))
+
+static inline bool sel_fdisset(const unsigned long *s, u32 fd)
+{
+  if(fd >= SEL_FDSET_LONG * SEL_NFDBITS)
+    return false;
+  return (s[fd / SEL_NFDBITS] & (1UL << (fd % SEL_NFDBITS))) != 0;
+}
+
+static inline void sel_fdclr(unsigned long *s, u32 fd)
+{
+  if(fd < SEL_FDSET_LONG * SEL_NFDBITS)
+    s[fd / SEL_NFDBITS] &= ~(1UL << (fd % SEL_NFDBITS));
+}
+
+static inline void sel_mask_high_bits(unsigned long *r, unsigned long *w,
+                                      unsigned long *e, u32 nfds, u32 nlongs)
+{
+  if(nfds % SEL_NFDBITS) {
+    unsigned long m = (1UL << (nfds % SEL_NFDBITS)) - 1UL;
+    u32             i = nlongs - 1;
+    r[i] &= m;
+    w[i] &= m;
+    e[i] &= m;
+  }
+}
+
+static i32 sel_read_ready(u64 fd)
+{
+  if(fd >= VFS_MAX_FD)
+    return -EBADF;
+  if(fd == 0 && !fd_has_oft(fd))
+    return kbd_raw_pending() ? 1 : 0;
+  if((fd == 1 || fd == 2) && !fd_has_oft(fd))
+    return -EBADF;
+  return vfs_select_read_ready((i64)fd);
+}
+
+static i32 sel_write_ready(u64 fd)
+{
+  if(fd >= VFS_MAX_FD)
+    return -EBADF;
+  if((fd == 1 || fd == 2) && !fd_has_oft(fd))
+    return 1;
+  if(fd == 0 && !fd_has_oft(fd))
+    return -EBADF;
+  return vfs_select_write_ready((i64)fd);
+}
+
+static i32 select_scan(u32 nfds, const unsigned long *rin,
+                       const unsigned long *win, unsigned long *rout,
+                       unsigned long *wout, unsigned long *eout, int *total)
+{
+  int n = 0;
+  kmemcpy(rout, rin, SEL_FDSET_SZ);
+  kmemcpy(wout, win, SEL_FDSET_SZ);
+  kzero(eout, SEL_FDSET_SZ);
+
+  for(u32 fd = 0; fd < nfds; fd++) {
+    if(sel_fdisset(rin, fd)) {
+      i32 st = sel_read_ready(fd);
+      if(st < 0)
+        return st;
+      if(!st)
+        sel_fdclr(rout, fd);
+      else
+        n++;
+    }
+    if(sel_fdisset(win, fd)) {
+      i32 st = sel_write_ready(fd);
+      if(st < 0)
+        return st;
+      if(!st)
+        sel_fdclr(wout, fd);
+      else
+        n++;
+    }
+  }
+
+  *total = n;
+  return 0;
+}
+
+static i32 parse_timeval(u64 timeout_ptr, bool *poll_immediate, u64 *wait_ticks)
+{
+  struct
+  {
+    i64 sec;
+    i64 nsec_usec;
+  } tv;
+
+  if(!user_rw_ok(timeout_ptr, sizeof(tv)))
+    return -EFAULT;
+  kmemcpy(&tv, (void *)timeout_ptr, sizeof(tv));
+  if(tv.sec < 0 || tv.nsec_usec < 0 || tv.nsec_usec >= 1000000)
+    return -EINVAL;
+
+  if(tv.sec == 0 && tv.nsec_usec == 0) {
+    *poll_immediate = true;
+    *wait_ticks     = 0;
+    return 0;
+  }
+
+  u64 ms = (u64)tv.sec * 1000 + (u64)tv.nsec_usec / 1000;
+  if(tv.nsec_usec && ms == 0)
+    ms = 1;
+  /* ~10 ms per HLT tick (see sys_nanosleep). */
+  u64 ticks = (ms + 9) / 10;
+  if(ticks == 0)
+    ticks = 1;
+  *poll_immediate = false;
+  *wait_ticks     = ticks;
+  return 0;
+}
+
+static void sel_hlt_slice(void)
+{
+  cpu_enable_interrupts();
+  __asm__ volatile("hlt");
+  cpu_disable_interrupts();
+}
+
+u64 sys_select(u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout,
+               u64 a6)
+{
+  (void)a6;
+
+  if(nfds_u > 1024)
+    return (u64)-EINVAL;
+
+  u32 nfds       = (u32)nfds_u;
+  u32 nlongs     = nfds ? (nfds + (SEL_NFDBITS - 1)) / SEL_NFDBITS : 0;
+  bool poll_mode = false;
+  u64  ticks_rem = 0;
+  bool infinite  = false;
+
+  if(nfds && !readfds && !writefds && !exceptfds)
+    return (u64)-EINVAL;
+
+  if(nfds == 0) {
+    if(timeout) {
+      i32 prc = parse_timeval(timeout, &poll_mode, &ticks_rem);
+      if(prc)
+        return (u64)prc;
+      if(poll_mode)
+        return 0;
+      for(u64 t = 0; t < ticks_rem; t++)
+        sel_hlt_slice();
+      return 0;
+    }
+    for(;;)
+      sel_hlt_slice();
+  }
+
+  if(nlongs > SEL_FDSET_LONG)
+    return (u64)-EINVAL;
+
+  unsigned long rin[SEL_FDSET_LONG],  win[SEL_FDSET_LONG],
+      ein[SEL_FDSET_LONG];
+  unsigned long rout[SEL_FDSET_LONG], wout[SEL_FDSET_LONG],
+      eout[SEL_FDSET_LONG];
+
+  kzero(rin, sizeof(rin));
+  kzero(win, sizeof(win));
+  kzero(ein, sizeof(ein));
+
+  if(readfds) {
+    if(!user_rw_ok(readfds, (u64)nlongs * sizeof(unsigned long)))
+      return (u64)-EFAULT;
+    kmemcpy(rin, (void *)readfds, (u64)nlongs * sizeof(unsigned long));
+  }
+  if(writefds) {
+    if(!user_rw_ok(writefds, (u64)nlongs * sizeof(unsigned long)))
+      return (u64)-EFAULT;
+    kmemcpy(win, (void *)writefds, (u64)nlongs * sizeof(unsigned long));
+  }
+  if(exceptfds) {
+    if(!user_rw_ok(exceptfds, (u64)nlongs * sizeof(unsigned long)))
+      return (u64)-EFAULT;
+    kmemcpy(ein, (void *)exceptfds, (u64)nlongs * sizeof(unsigned long));
+  }
+
+  sel_mask_high_bits(rin, win, ein, nfds, nlongs);
+
+  if(timeout) {
+    i32 prc = parse_timeval(timeout, &poll_mode, &ticks_rem);
+    if(prc)
+      return (u64)prc;
+  } else
+    infinite = true;
+
+  for(;;) {
+    int            total = 0;
+    i32            err   =
+        select_scan(nfds, rin, win, rout, wout, eout, &total);
+    if(err)
+      return (u64)err;
+
+    if(total > 0 || poll_mode) {
+      if(readfds)
+        kmemcpy((void *)readfds, rout,
+                (u64)nlongs * sizeof(unsigned long));
+      if(writefds)
+        kmemcpy((void *)writefds, wout,
+                (u64)nlongs * sizeof(unsigned long));
+      if(exceptfds)
+        kmemcpy((void *)exceptfds, eout,
+                (u64)nlongs * sizeof(unsigned long));
+      return (u64)total;
+    }
+
+    if(!infinite) {
+      if(ticks_rem == 0)
+        break;
+      ticks_rem--;
+    }
+
+    sel_hlt_slice();
+  }
+
+  kzero(rout, sizeof(rout));
+  kzero(wout, sizeof(wout));
+  kzero(eout, sizeof(eout));
+  if(readfds)
+    kmemcpy((void *)readfds, rout, (u64)nlongs * sizeof(unsigned long));
+  if(writefds)
+    kmemcpy((void *)writefds, wout, (u64)nlongs * sizeof(unsigned long));
+  if(exceptfds)
+    kmemcpy((void *)exceptfds, eout, (u64)nlongs * sizeof(unsigned long));
+  return 0;
 }

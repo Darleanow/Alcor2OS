@@ -363,6 +363,13 @@ i64 vfs_read(i64 fd, void *buf, u64 count);
 i64 vfs_write(i64 fd, const void *buf, u64 count);
 
 /**
+ * @brief select(2) readiness for an open file description (OFT-backed fd).
+ * @return 1 ready, 0 not ready, negative -errno (e.g. -EBADF for wrong end).
+ */
+i32 vfs_select_read_ready(i64 fd);
+i32 vfs_select_write_ready(i64 fd);
+
+/**
  * @brief Seek in file.
  * @param fd File descriptor.
  * @param offset Seek offset.

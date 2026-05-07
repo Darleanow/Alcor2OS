@@ -152,6 +152,32 @@ static i32 fd_to_oft(i64 fd)
   return idx;
 }
 
+i32 vfs_select_read_ready(i64 fd)
+{
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
+    return -EBADF;
+  vfs_fd_t *f = &fd_table[oft];
+  if(f->kind == VFS_FD_PIPE_WRITE)
+    return -EBADF;
+  if(f->kind == VFS_FD_PIPE_READ)
+    return pipe_poll_read_ready(f->pipe) ? 1 : 0;
+  return 1;
+}
+
+i32 vfs_select_write_ready(i64 fd)
+{
+  i32 oft = fd_to_oft(fd);
+  if(oft < 0)
+    return -EBADF;
+  vfs_fd_t *f = &fd_table[oft];
+  if(f->kind == VFS_FD_PIPE_READ)
+    return -EBADF;
+  if(f->kind == VFS_FD_PIPE_WRITE)
+    return pipe_poll_write_ready(f->pipe) ? 1 : 0;
+  return 1;
+}
+
 /**
  * @brief Install @p oft_idx at the lowest free fd >= 3 in the current
  * process's fd table.

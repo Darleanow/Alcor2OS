@@ -35,6 +35,7 @@ SYSCALL_DECL(sys_ioctl);
 SYSCALL_DECL(sys_nanosleep);
 SYSCALL_DECL(sys_readv);
 SYSCALL_DECL(sys_writev);
+SYSCALL_DECL(sys_select);
 
 /* Memory */
 SYSCALL_DECL(sys_mmap);
@@ -108,6 +109,16 @@ SYSCALL_DECL(sys_arch_prctl);
 /* Pipe */
 SYSCALL_DECL(sys_pipe);
 SYSCALL_DECL(sys_pipe2);
+
+/**
+ * @brief True if @c pipe_read would not block (data in buffer or EOF).
+ */
+bool pipe_poll_read_ready(void *pipe);
+
+/**
+ * @brief True if @c pipe_write would not block (buffer not full).
+ */
+bool pipe_poll_write_ready(void *pipe);
 
 /**
  * @brief Read up to @p count bytes from the read end of a pipe object.
