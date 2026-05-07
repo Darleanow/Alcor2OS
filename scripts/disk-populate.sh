@@ -37,7 +37,11 @@ for _cand in "$CLANG_INSTALL"/usr/bin/clang-[0-9]*; do
     break
   fi
 done
-unset _cand
+if [ -z "$CLANG_BIN" ] || [ ! -f "$CLANG_BIN" ]; then
+  _plain="$CLANG_INSTALL/usr/bin/clang"
+  [ -f "$_plain" ] && CLANG_BIN=$_plain
+fi
+unset _cand _plain
 LLD_BIN=$CLANG_INSTALL/usr/bin/lld
 
 # ----- 1. Skeleton -----------------------------------------------------------
