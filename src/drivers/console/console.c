@@ -12,29 +12,30 @@
 #include <alcor2/types.h>
 #include <stdarg.h>
 
-#define FONT_W 8
-#define FONT_H 16
+#define FONT_W      8
+#define FONT_H      16
 
 #define ESC_BUF_MAX 64
 
 static struct
 {
   volatile u8 *base;
-  u64           width;
-  u64           height;
-  u64           pitch_bytes;
-  u8            bytes_pp;
-  u32           fg;
-  u32           bg;
-  u32           cursor_x;
-  u32           cursor_y;
-  int           esc_state;
-  char          esc_buf[ESC_BUF_MAX];
-  int           esc_len;
-  int           cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
+  u64          width;
+  u64          height;
+  u64          pitch_bytes;
+  u8           bytes_pp;
+  u32          fg;
+  u32          bg;
+  u32          cursor_x;
+  u32          cursor_y;
+  int          esc_state;
+  char         esc_buf[ESC_BUF_MAX];
+  int          esc_len;
+  int cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
 } ctx;
 
-/** Match first three bytes of a little-endian u32 color (same as old u32 store on 32 bpp). */
+/** Match first three bytes of a little-endian u32 color (same as old u32 store
+ * on 32 bpp). */
 static void fb_store24(volatile u8 *p, u32 c)
 {
   p[0] = (u8)(c & 0xffu);
@@ -44,21 +45,19 @@ static void fb_store24(volatile u8 *p, u32 c)
 
 static void fb_store16(volatile u8 *p, u32 c)
 {
-  u32 r         = (c >> 16) & 0xffu;
-  u32 g         = (c >> 8) & 0xffu;
-  u32 bo        = c & 0xffu;
-  u16 rgb565 =
-    (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (bo >> 3));
-  p[0]          = (u8)(rgb565 & 0xffu);
-  p[1]          = (u8)(rgb565 >> 8);
+  u32 r      = (c >> 16) & 0xffu;
+  u32 g      = (c >> 8) & 0xffu;
+  u32 bo     = c & 0xffu;
+  u16 rgb565 = (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (bo >> 3));
+  p[0]       = (u8)(rgb565 & 0xffu);
+  p[1]       = (u8)(rgb565 >> 8);
 }
 
 static void fb_put_pixel(u32 x, u32 y, u32 color)
 {
   if(x >= ctx.width || y >= ctx.height)
     return;
-  volatile u8 *p =
-    ctx.base + (u64)y * ctx.pitch_bytes + (u64)x * ctx.bytes_pp;
+  volatile u8 *p = ctx.base + (u64)y * ctx.pitch_bytes + (u64)x * ctx.bytes_pp;
 
   switch(ctx.bytes_pp) {
   case 4:
@@ -119,7 +118,7 @@ void console_set_theme(console_theme_t theme)
 static void fb_clear_rectangle(u64 y0, u64 y1)
 {
   if(ctx.bytes_pp == 4) {
-    volatile u32 *row32 = (volatile u32 *)ctx.base;
+    volatile u32 *row32  = (volatile u32 *)ctx.base;
     u64           pu     = ctx.pitch_bytes / 4ull;
     u64           pairs  = ctx.width / 2;
     u64           bgpair = ((u64)ctx.bg << 32) | ctx.bg;
@@ -148,7 +147,7 @@ void console_clear(void)
 /** MSB is left pixel (classic PC font / font_bitmap.h). */
 static void draw_glyph(char c, u32 px, u32 py)
 {
-  u8 uc = (u8)c;
+  u8  uc = (u8)c;
   int gi = font_glyph_index(uc);
   if(gi < 0)
     gi = font_glyph_index((unsigned char)'?');
@@ -172,13 +171,15 @@ static void scroll(void)
   u64 span = ctx.height - (u64)FONT_H;
 
   if(ctx.bytes_pp == 4) {
-    volatile u32 *buf = (volatile u32 *)ctx.base;
-    u64             pu = ctx.pitch_bytes / 4ull;
-    u64             rowcopy = ctx.width * sizeof(u32);
+    volatile u32 *buf     = (volatile u32 *)ctx.base;
+    u64           pu      = ctx.pitch_bytes / 4ull;
+    u64           rowcopy = ctx.width * sizeof(u32);
 
     for(u64 y = 0; y < span; y++)
-      kmemcpy((void *)&buf[y * pu], (void const *)&buf[(y + (u64)FONT_H) * pu],
-             rowcopy);
+      kmemcpy(
+          (void *)&buf[y * pu], (const void *)&buf[(y + (u64)FONT_H) * pu],
+          rowcopy
+      );
     fb_clear_rectangle(span, ctx.height);
     return;
   }
@@ -186,9 +187,8 @@ static void scroll(void)
   u64 row_px = ctx.width * ctx.bytes_pp;
   for(u64 y = 0; y < span; y++) {
     volatile u8       *dst = ctx.base + y * ctx.pitch_bytes;
-    const volatile u8 *src =
-      ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
-    kmemcpy((void *)dst, (void const *)src, row_px);
+    const volatile u8 *src = ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
+    kmemcpy((void *)dst, (const void *)src, row_px);
   }
   fb_clear_rectangle(span, ctx.height);
 }
@@ -197,19 +197,19 @@ static void scroll(void)
 static u32 ansi256_to_rgb(unsigned idx)
 {
   static const u32 ansi16_col[16] = {
-    0x000000ul, 0xAA0000ul, 0x00AA00ul, 0xAA5500ul, 0x0000AAul, 0xAA00AAul,
-    0x00AAAAul, 0xAAAAAAul, 0x555555ul, 0xFF5555ul, 0x55FF55ul, 0xFFFF55ul,
-    0x5555FFul, 0xFF55FFul, 0x55FFFFul, 0xFFFFFFul,
+      0x000000ul, 0xAA0000ul, 0x00AA00ul, 0xAA5500ul, 0x0000AAul, 0xAA00AAul,
+      0x00AAAAul, 0xAAAAAAul, 0x555555ul, 0xFF5555ul, 0x55FF55ul, 0xFFFF55ul,
+      0x5555FFul, 0xFF55FFul, 0x55FFFFul, 0xFFFFFFul,
   };
 
   if(idx < 16u)
     return ansi16_col[idx];
   if(idx < 232u) {
-    unsigned i   = idx - 16u;
-    unsigned r6  = i / 36u;
-    unsigned rem = i % 36u;
-    unsigned g6  = rem / 6u;
-    unsigned b6  = rem % 6u;
+    unsigned i     = idx - 16u;
+    unsigned r6    = i / 36u;
+    unsigned rem   = i % 36u;
+    unsigned g6    = rem / 6u;
+    unsigned b6    = rem % 6u;
     u32      rchan = (r6 == 0u) ? 0u : (55u + 40u * (r6 - 1u));
     u32      gchan = (g6 == 0u) ? 0u : (55u + 40u * (g6 - 1u));
     u32      bchan = (b6 == 0u) ? 0u : (55u + 40u * (b6 - 1u));
@@ -365,8 +365,9 @@ void console_putchar(char c)
       ctx.cursor_x -= FONT_W;
       for(int row = 0; row < FONT_H; row++)
         for(int col = 0; col < FONT_W; col++)
-          fb_put_pixel(ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row,
-                       ctx.bg);
+          fb_put_pixel(
+              ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row, ctx.bg
+          );
     }
     break;
   default:
@@ -416,6 +417,25 @@ static void print_int(int n)
   }
 }
 
+static void print_uint(u64 n)
+{
+  char buf[32];
+  int  i = 0;
+
+  if(n == 0) {
+    console_putchar('0');
+    return;
+  }
+
+  while(n > 0) {
+    buf[i++] = (char)('0' + (n % 10));
+    n /= 10;
+  }
+
+  while(--i >= 0)
+    console_putchar(buf[i]);
+}
+
 static void print_hex(u64 n)
 {
   static const char hex[] = "0123456789abcdef";
@@ -435,6 +455,10 @@ void console_printf(const char *fmt, ...)
       switch(*fmt) {
       case 'd':
         print_int(va_arg(args, int)
+        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        break;
+      case 'u':
+        print_uint((u64)va_arg(args, unsigned int)
         ); // NOLINT(clang-analyzer-valist.Uninitialized)
         break;
       case 'x':
