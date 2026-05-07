@@ -3,25 +3,28 @@
  * @brief I/O syscalls: `read`, `readv`, `write`, `lseek`, `ioctl`, `nanosleep`,
  * `writev`.
  *
- * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending on descriptor.
+ * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending
+ * on descriptor.
  */
 
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
-#include <alcor2/errno.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/errno.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/fs/vfs.h>
-#include <alcor2/mm/vmm.h>
 
-/* musl: isatty(3) probes TIOCGWINSZ; tcgetattr uses TCGETS (x86_64 termios is 60 bytes). */
+/* musl: isatty(3) probes TIOCGWINSZ; tcgetattr uses TCGETS (x86_64 termios is
+ * 60 bytes). */
 #define MUSL_NCCS         32
 #define MUSL_TERMIOS_SIZE 60
 
-typedef struct {
+typedef struct
+{
   u32 c_iflag;
   u32 c_oflag;
   u32 c_cflag;
@@ -33,7 +36,9 @@ typedef struct {
   u32 __c_ospeed;
 } musl_termios_t;
 
-_Static_assert(sizeof(musl_termios_t) == MUSL_TERMIOS_SIZE, "musl_termios mismatch");
+_Static_assert(
+    sizeof(musl_termios_t) == MUSL_TERMIOS_SIZE, "musl_termios mismatch"
+);
 
 /* Values from musl arch/generic/bits/termios.h (octal literals). */
 
@@ -51,17 +56,17 @@ _Static_assert(sizeof(musl_termios_t) == MUSL_TERMIOS_SIZE, "musl_termios mismat
 static void tty_fill_default_termios(musl_termios_t *t)
 {
   kzero(t, sizeof(*t));
-  t->c_iflag     = TG_ICRNL;
-  t->c_oflag     = TG_ONLCR;
-  t->c_cflag     = TG_CS8 | TG_CREAD | TG_CLOCAL;
-  t->c_lflag     = TG_ISIG | TG_ICANON | TG_ECHO | TG_IEXTEN;
-  t->__c_ispeed  = TG_B38400;
-  t->__c_ospeed  = TG_B38400;
-  t->c_cc[0]     = '\x03'; /* VINTR Ctrl+C */
-  t->c_cc[1]     = 0x1c; /* VQUIT */
-  t->c_cc[2]     = 0x7f; /* VERASE */
-  t->c_cc[3]     = 0x15; /* VKILL */
-  t->c_cc[4]     = '\x04'; /* VEOF */
+  t->c_iflag    = TG_ICRNL;
+  t->c_oflag    = TG_ONLCR;
+  t->c_cflag    = TG_CS8 | TG_CREAD | TG_CLOCAL;
+  t->c_lflag    = TG_ISIG | TG_ICANON | TG_ECHO | TG_IEXTEN;
+  t->__c_ispeed = TG_B38400;
+  t->__c_ospeed = TG_B38400;
+  t->c_cc[0]    = '\x03'; /* VINTR Ctrl+C */
+  t->c_cc[1]    = 0x1c;   /* VQUIT */
+  t->c_cc[2]    = 0x7f;   /* VERASE */
+  t->c_cc[3]    = 0x15;   /* VKILL */
+  t->c_cc[4]    = '\x04'; /* VEOF */
 }
 
 static inline bool user_rw_ok(u64 ptr, u64 size)
@@ -197,7 +202,7 @@ u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
   {
     i64 sec;
     i64 nsec;
-  } *ts = (void *)req;
+  }  *ts = (void *)req;
 
   u64 ms    = (u64)ts->sec * 1000 + (u64)ts->nsec / 1000000;
   u64 ticks = (ms + 9) / 10;
@@ -231,7 +236,7 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   if(!iov_ptr || !user_rw_ok(iov_ptr, iovcnt * sizeof(struct iovec)))
     return (u64)-EFAULT;
 
-  const struct iovec *vec = (const struct iovec *)iov_ptr;
+  const struct iovec *vec   = (const struct iovec *)iov_ptr;
   u64                 total = 0;
 
   for(u64 i = 0; i < iovcnt; i++) {
@@ -264,7 +269,8 @@ u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   u64                 total = 0;
   for(u64 i = 0; i < iovcnt; i++) {
     if(vec[i].iov_base && vec[i].iov_len > 0) {
-      u64 written = sys_write(fd, (u64)vec[i].iov_base, vec[i].iov_len, 0, 0, 0);
+      u64 written =
+          sys_write(fd, (u64)vec[i].iov_base, vec[i].iov_len, 0, 0, 0);
       if((i64)written < 0)
         return written;
       total += written;

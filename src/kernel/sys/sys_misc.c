@@ -5,9 +5,9 @@
 
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/mm/vmm.h>
 
 static inline bool user_buf_ok(u64 ptr, u64 size)
 {
@@ -67,23 +67,23 @@ u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
 /* Blocking futex. Keys map to the CPU physical backing of each 4-byte futex
  * word — safe with CLONE_THREAD (shared PTEs) unlike raw user VAs alone. */
 
-#define FUTEX_WAIT              0
-#define FUTEX_WAKE              1
-#define FUTEX_FD                2
-#define FUTEX_REQUEUE           3
-#define FUTEX_CMP_REQUEUE       4
-#define FUTEX_WAKE_OP           5
-#define FUTEX_LOCK_PI           6
-#define FUTEX_UNLOCK_PI         7
-#define FUTEX_TRYLOCK_PI        8
-#define FUTEX_WAIT_BITSET       9
-#define FUTEX_WAKE_BITSET       10
-#define FUTEX_WAIT_REQUEUE_PI   11
-#define FUTEX_CMP_REQUEUE_PI    12
-#define FUTEX_PRIVATE_FLAG      128
-#define FUTEX_CLOCK_REALTIME    256
+#define FUTEX_WAIT            0
+#define FUTEX_WAKE            1
+#define FUTEX_FD              2
+#define FUTEX_REQUEUE         3
+#define FUTEX_CMP_REQUEUE     4
+#define FUTEX_WAKE_OP         5
+#define FUTEX_LOCK_PI         6
+#define FUTEX_UNLOCK_PI       7
+#define FUTEX_TRYLOCK_PI      8
+#define FUTEX_WAIT_BITSET     9
+#define FUTEX_WAKE_BITSET     10
+#define FUTEX_WAIT_REQUEUE_PI 11
+#define FUTEX_CMP_REQUEUE_PI  12
+#define FUTEX_PRIVATE_FLAG    128
+#define FUTEX_CLOCK_REALTIME  256
 
-#define FUTEX_QUEUE_LEN 256
+#define FUTEX_QUEUE_LEN       256
 
 extern void proc_schedule(void);
 
@@ -267,7 +267,7 @@ u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
   } *ts = (void *)tp;
   if(!user_buf_ok(tp, sizeof(*ts)))
     return (u64)-EFAULT;
-  ts->s = 0;
+  ts->s  = 0;
   ts->ns = 0;
   return 0;
 }
@@ -293,8 +293,9 @@ u64 sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * one byte (bit 0 set) into the user-supplied @p mask buffer and returns
  * the size of the populated mask in bytes (Linux convention).
  */
-u64 sys_sched_getaffinity(u64 pid, u64 cpusetsize, u64 mask, u64 a4, u64 a5,
-                          u64 a6)
+u64 sys_sched_getaffinity(
+    u64 pid, u64 cpusetsize, u64 mask, u64 a4, u64 a5, u64 a6
+)
 {
   (void)pid;
   (void)a4;
@@ -322,15 +323,15 @@ struct k_rlimit
 };
 
 /* RLIMIT_* indices we care about. */
-#define RLIMIT_CPU     0
-#define RLIMIT_FSIZE   1
-#define RLIMIT_DATA    2
-#define RLIMIT_STACK   3
-#define RLIMIT_CORE    4
-#define RLIMIT_RSS     5
-#define RLIMIT_NPROC   6
-#define RLIMIT_NOFILE  7
-#define RLIMIT_AS      9
+#define RLIMIT_CPU    0
+#define RLIMIT_FSIZE  1
+#define RLIMIT_DATA   2
+#define RLIMIT_STACK  3
+#define RLIMIT_CORE   4
+#define RLIMIT_RSS    5
+#define RLIMIT_NPROC  6
+#define RLIMIT_NOFILE 7
+#define RLIMIT_AS     9
 
 /** Fill in a generous default rlimit so userland (clang/musl) doesn't bail. */
 static void fill_default_rlimit(u64 resource, struct k_rlimit *out)
@@ -340,8 +341,8 @@ static void fill_default_rlimit(u64 resource, struct k_rlimit *out)
 
   switch(resource) {
   case RLIMIT_STACK:
-    out->rlim_cur = 8ULL * 1024 * 1024;       /* 8 MiB */
-    out->rlim_max = 64ULL * 1024 * 1024;      /* 64 MiB */
+    out->rlim_cur = 8ULL * 1024 * 1024;  /* 8 MiB */
+    out->rlim_max = 64ULL * 1024 * 1024; /* 64 MiB */
     break;
   case RLIMIT_NOFILE:
     out->rlim_cur = 1024;
@@ -370,8 +371,9 @@ u64 sys_getrlimit(u64 resource, u64 rlim, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_prlimit64(u64 pid, u64 resource, u64 new_limit, u64 old_limit,
-                  u64 a5, u64 a6)
+u64 sys_prlimit64(
+    u64 pid, u64 resource, u64 new_limit, u64 old_limit, u64 a5, u64 a6
+)
 {
   (void)pid;
   (void)new_limit; /* setting limits is a no-op */
