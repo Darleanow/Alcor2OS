@@ -142,8 +142,7 @@ void cpu_enable_sse(void)
   if(ecx & (1UL << 28))
     xcr0 |= (1UL << 2); /* AVX */
 
-  __asm__ volatile("xsetbv" ::"a"((u32)xcr0), "d"((u32)(xcr0 >> 32)),
-                   "c"(0));
+  __asm__ volatile("xsetbv" ::"a"((u32)xcr0), "d"((u32)(xcr0 >> 32)), "c"(0));
 
   /* Capture a known-good FPU state to copy into each fresh proc on alloc. */
   extern void proc_capture_default_fpu(void);

@@ -2,24 +2,42 @@
  * @file user/shell/exec.c
  * @brief Walks vega AST nodes and runs them.
  *
- * AST_CMD: resolve via /bin or /usr/bin (or absolute path), fork+execve+wait,
+ * AST_CMD: resolve via /bin or /usr/bin, absolute path, or relative path
+ * containing '/' (e.g. ./a.out per POSIX); fork+execve+wait,
  * applying redirections in the child. AST_AND/OR/SEQ short-circuit the obvious
  * way. AST_PIPE forks N children plumbed by N-1 pipes; pipeline status is the
  * last stage's. Builtins run in the shell process when standalone (so cd
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <vega/runtime/exec.h>
 #include <vega/runtime/expand.h>
 #include <vega/runtime/fntab.h>
 #include <vega/shell.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
-#define MAX_EXEC_PATH    256
-#define MAX_PIPE_STAGES  16
+#define MAX_EXEC_PATH   256
+#define MAX_PIPE_STAGES 16
+
+/** musl/clang treat argv[0] like /proc/self/exe — must be the resolved path.
+ *  @return 0 on success, -1 if strdup fails (caller should _exit in the child).
+ */
+static int child_argv0_to_resolved_path(char **argv, const char *path)
+{
+  if(!argv || !argv[0] || !path)
+    return -1;
+  char *copy = strdup(path);
+  if(!copy)
+    return -1;
+  free(argv[0]);
+  argv[0] = copy;
+  return 0;
+}
 
 /* Set up a here-string / heredoc: pipe, write @p text into it, close the
  * write end, dup2 the read end onto fd 0. Caps at the pipe buffer size
@@ -67,10 +85,21 @@ static int apply_one_redir(const redir_t *r)
   int flags = 0;
   int dest_fd;
   switch(r->kind) {
-    case REDIR_OUT:    flags = O_WRONLY | O_CREAT | O_TRUNC;  dest_fd = 1; break;
-    case REDIR_APPEND: flags = O_WRONLY | O_CREAT | O_APPEND; dest_fd = 1; break;
-    case REDIR_IN:     flags = O_RDONLY;                      dest_fd = 0; break;
-    default:           free(target); return -1;
+  case REDIR_OUT:
+    flags   = O_WRONLY | O_CREAT | O_TRUNC;
+    dest_fd = 1;
+    break;
+  case REDIR_APPEND:
+    flags   = O_WRONLY | O_CREAT | O_APPEND;
+    dest_fd = 1;
+    break;
+  case REDIR_IN:
+    flags   = O_RDONLY;
+    dest_fd = 0;
+    break;
+  default:
+    free(target);
+    return -1;
   }
 
   int fd = open(target, flags, 0644);
@@ -107,7 +136,7 @@ static int apply_redirs(const redir_t *list)
  * so loop bodies (re-executed AST nodes) see fresh expansions each call. */
 static char **build_expanded_argv(const ast_t *cmd)
 {
-  int     argc = cmd->u.cmd.argc;
+  int    argc = cmd->u.cmd.argc;
   char **out  = (char **)malloc(sizeof(char *) * (argc + 1));
   if(!out)
     return NULL;
@@ -146,7 +175,21 @@ static int resolve_path(const char *name, char *out_path)
     return 1;
   }
 
-  static const char *const dirs[] = { "/bin/", "/usr/bin/", NULL };
+  /* POSIX: if the command name contains '/', search PATH is skipped — path is
+   * relative to cwd (e.g. ./a.out, bin/foo). */
+  if(strchr(name, '/')) {
+    char       *p = out_path;
+    const char *c = name;
+    while(*c && p < out_path + MAX_EXEC_PATH - 1)
+      *p++ = *c++;
+    *p = '\0';
+    struct stat st;
+    if(sh_stat(out_path, &st) == 0 && S_ISREG(st.st_mode))
+      return 1;
+    return 0;
+  }
+
+  static const char *const dirs[] = {"/bin/", "/usr/bin/", NULL};
   for(int i = 0; dirs[i]; i++) {
     char       *p      = out_path;
     const char *prefix = dirs[i];
@@ -164,7 +207,7 @@ static int resolve_path(const char *name, char *out_path)
   return 0;
 }
 
-static int run_external(char *const argv[], const redir_t *redirs)
+static int run_external(char **argv, const redir_t *redirs)
 {
   char path[MAX_EXEC_PATH];
   if(!resolve_path(argv[0], path))
@@ -176,6 +219,8 @@ static int run_external(char *const argv[], const redir_t *redirs)
   if(pid == 0) {
     if(apply_redirs(redirs) < 0)
       _exit(1);
+    if(child_argv0_to_resolved_path(argv, path) < 0)
+      _exit(127);
     execve(path, argv, NULL);
     _exit(127);
   }
@@ -189,8 +234,8 @@ static int run_external(char *const argv[], const redir_t *redirs)
  * returns -EBADF that just means the shell is using the kernel's stdio
  * fallback (no per-process fd installed), so there's nothing to restore —
  * after the builtin we just close fd 0/1 again to drop back to the fallback. */
-static int run_builtin_redirected(int argc, char *const argv[],
-                                  const redir_t *redirs)
+static int
+    run_builtin_redirected(int argc, char *const argv[], const redir_t *redirs)
 {
   if(!redirs)
     return run_builtin(argc, argv);
@@ -231,8 +276,9 @@ static int call_function(const fn_entry_t *fn, int argc, char *const argv[])
 
 /* Run a function under @p redirs. Mirrors run_builtin_redirected: dup-save
  * fds 0/1, apply redirs, run body, restore. */
-static int call_function_redirected(const fn_entry_t *fn, int argc,
-                                    char *const argv[], const redir_t *redirs)
+static int call_function_redirected(
+    const fn_entry_t *fn, int argc, char *const argv[], const redir_t *redirs
+)
 {
   if(!redirs)
     return call_function(fn, argc, argv);
@@ -293,7 +339,7 @@ static int exec_cmd(ast_t *n)
    * tear down the shell with that status. Pipelines aren't covered: the
    * stage runs in a forked child and can only _exit itself, not the
    * parent. */
-  int fail_fast = n->u.cmd.fail_fast;
+  int   fail_fast    = n->u.cmd.fail_fast;
   char *name_for_msg = NULL;
   if(fail_fast && ret != 0) {
     /* Copy name out before freeing argv so the message survives. */
@@ -364,6 +410,8 @@ static void exec_stage_in_child(ast_t *stage)
     sh_puts(": command not found\n");
     _exit(127);
   }
+  if(child_argv0_to_resolved_path(argv, path) < 0)
+    _exit(127);
   execve(path, argv, NULL);
   _exit(127);
 }
@@ -439,84 +487,85 @@ int vega_exec(ast_t *node)
 
   int status;
   switch(node->kind) {
-    case AST_CMD:
-      status = exec_cmd(node);
-      break;
-    case AST_AND: {
-      int s = vega_exec(node->u.binop.left);
-      status = (s == 0) ? vega_exec(node->u.binop.right) : s;
-      break;
+  case AST_CMD:
+    status = exec_cmd(node);
+    break;
+  case AST_AND: {
+    int s  = vega_exec(node->u.binop.left);
+    status = (s == 0) ? vega_exec(node->u.binop.right) : s;
+    break;
+  }
+  case AST_OR: {
+    int s  = vega_exec(node->u.binop.left);
+    status = (s != 0) ? vega_exec(node->u.binop.right) : s;
+    break;
+  }
+  case AST_SEQ:
+    vega_exec(node->u.binop.left);
+    status = vega_exec(node->u.binop.right);
+    break;
+  case AST_PIPE:
+    status = exec_pipeline(node);
+    break;
+  case AST_IF: {
+    int cond = vega_exec(node->u.if_.cond);
+    if(cond == 0) {
+      status = vega_exec(node->u.if_.then_branch);
+    } else if(node->u.if_.else_branch) {
+      status = vega_exec(node->u.if_.else_branch);
+    } else {
+      status = 0;
     }
-    case AST_OR: {
-      int s = vega_exec(node->u.binop.left);
-      status = (s != 0) ? vega_exec(node->u.binop.right) : s;
-      break;
+    break;
+  }
+  case AST_WHILE: {
+    status = 0;
+    while(vega_exec(node->u.while_.cond) == 0)
+      status = vega_exec(node->u.while_.body);
+    break;
+  }
+  case AST_FOR: {
+    status = 0;
+    for(int i = 0; i < node->u.for_.nwords; i++) {
+      char *expanded = expand_word(node->u.for_.words[i]);
+      if(!expanded) {
+        status = 1;
+        break;
+      }
+      expand_setvar(node->u.for_.name, expanded);
+      free(expanded);
+      if(node->u.for_.body)
+        status = vega_exec(node->u.for_.body);
     }
-    case AST_SEQ:
-      vega_exec(node->u.binop.left);
-      status = vega_exec(node->u.binop.right);
-      break;
-    case AST_PIPE:
-      status = exec_pipeline(node);
-      break;
-    case AST_IF: {
-      int cond = vega_exec(node->u.if_.cond);
-      if(cond == 0) {
-        status = vega_exec(node->u.if_.then_branch);
-      } else if(node->u.if_.else_branch) {
-        status = vega_exec(node->u.if_.else_branch);
+    break;
+  }
+  case AST_FN: {
+    /* Register, transferring ownership to the table. After the steal,
+     * ast_free finds NULL pointers and does nothing. If body is already
+     * NULL (e.g. an AST_FN nested inside another fn body that has been
+     * called once already), this is a no-op — the function stays
+     * registered from the first call. */
+    if(node->u.fn.body) {
+      if(fntab_set(
+             node->u.fn.name, node->u.fn.arg_names, node->u.fn.n_args,
+             node->u.fn.body
+         ) == 0) {
+        node->u.fn.name      = NULL;
+        node->u.fn.arg_names = NULL;
+        node->u.fn.n_args    = 0;
+        node->u.fn.body      = NULL;
+        status               = 0;
       } else {
-        status = 0;
+        sh_puts("vega: function table full\n");
+        status = 1;
       }
-      break;
-    }
-    case AST_WHILE: {
+    } else {
       status = 0;
-      while(vega_exec(node->u.while_.cond) == 0)
-        status = vega_exec(node->u.while_.body);
-      break;
     }
-    case AST_FOR: {
-      status = 0;
-      for(int i = 0; i < node->u.for_.nwords; i++) {
-        char *expanded = expand_word(node->u.for_.words[i]);
-        if(!expanded) {
-          status = 1;
-          break;
-        }
-        expand_setvar(node->u.for_.name, expanded);
-        free(expanded);
-        if(node->u.for_.body)
-          status = vega_exec(node->u.for_.body);
-      }
-      break;
-    }
-    case AST_FN: {
-      /* Register, transferring ownership to the table. After the steal,
-       * ast_free finds NULL pointers and does nothing. If body is already
-       * NULL (e.g. an AST_FN nested inside another fn body that has been
-       * called once already), this is a no-op — the function stays
-       * registered from the first call. */
-      if(node->u.fn.body) {
-        if(fntab_set(node->u.fn.name, node->u.fn.arg_names, node->u.fn.n_args,
-                     node->u.fn.body)
-           == 0) {
-          node->u.fn.name      = NULL;
-          node->u.fn.arg_names = NULL;
-          node->u.fn.n_args    = 0;
-          node->u.fn.body      = NULL;
-          status               = 0;
-        } else {
-          sh_puts("vega: function table full\n");
-          status = 1;
-        }
-      } else {
-        status = 0;
-      }
-      break;
-    }
-    default:
-      status = 0;
+    break;
+  }
+  default:
+    status = 0;
   }
   expand_set_status(status);
   return status;
