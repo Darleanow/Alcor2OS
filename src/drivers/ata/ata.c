@@ -8,18 +8,18 @@
  * Falls back to PIO when no scheduler context or DMA unsupported.
  */
 
-#include <alcor2/drivers/ata.h>
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
-#include <alcor2/errno.h>
 #include <alcor2/arch/io.h>
-#include <alcor2/kstdlib.h>
-#include <alcor2/drivers/pci.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/arch/pit.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/drivers/pci.h>
+#include <alcor2/errno.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/mm/pmm.h>
-#include <alcor2/proc/sched.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/proc/sched.h>
 
 #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
 #define LBA28_LIMIT      0x10000000ULL
@@ -467,7 +467,7 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
   return 0;
 }
 
-/* 
+/*
  * Block cache (read-side, write-through-with-invalidate).
  *
  * 4 KB blocks (8 sectors), 1024 entries = 4 MB total. LRU eviction by
@@ -479,11 +479,11 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
 #define CACHE_BLOCK_SECTORS 8
 #define CACHE_BLOCK_BYTES   (CACHE_BLOCK_SECTORS * 512)
 #define CACHE_NUM_ENTRIES   1024
-#define CACHE_INVALID_LBA   ((u64)-1)
+#define CACHE_INVALID_LBA   ((u64) - 1)
 
 typedef struct
 {
-  u64 block_lba;          /* aligned, CACHE_INVALID_LBA = free slot */
+  u64 block_lba; /* aligned, CACHE_INVALID_LBA = free slot */
   u64 last_used;
   u8  drive;
   u8  pad[7];
@@ -491,10 +491,10 @@ typedef struct
 } ata_cache_entry_t;
 
 static ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];
-static u64               g_cache_counter   = 0;
-static int               g_cache_inited    = 0;
+static u64               g_cache_counter = 0;
+static int               g_cache_inited  = 0;
 
-static void cache_init_once(void)
+static void              cache_init_once(void)
 {
   if(g_cache_inited)
     return;
@@ -506,8 +506,7 @@ static void cache_init_once(void)
 static ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
 {
   for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
-    if(g_ata_cache[i].block_lba == block_lba &&
-       g_ata_cache[i].drive == drive) {
+    if(g_ata_cache[i].block_lba == block_lba && g_ata_cache[i].drive == drive) {
       g_ata_cache[i].last_used = ++g_cache_counter;
       return &g_ata_cache[i];
     }
@@ -518,8 +517,8 @@ static ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
 static ata_cache_entry_t *cache_alloc(void)
 {
   /* Prefer free slot; else evict LRU. */
-  int idx       = 0;
-  u64 oldest    = (u64)-1;
+  int idx    = 0;
+  u64 oldest = (u64)-1;
   for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
     if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)
       return &g_ata_cache[i];
@@ -588,8 +587,8 @@ i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
 
     ata_cache_entry_t *e = cache_lookup(drive, block_lba);
     if(!e) {
-      e               = cache_alloc();
-      u64 block_size  = CACHE_BLOCK_SECTORS;
+      e              = cache_alloc();
+      u64 block_size = CACHE_BLOCK_SECTORS;
       if(block_lba + block_size > d->sectors)
         block_size = d->sectors - block_lba;
 
