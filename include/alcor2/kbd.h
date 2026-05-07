@@ -16,20 +16,23 @@
  *
  * Mirrors musl `_IOW('K', 1, uint32_t)` encoding.
  *
- * Usage (user): uint32_t id = KBD_LAYOUT_FR; ioctl(0, ALCOR2_IOC_KBD_SET_LAYOUT, &id);
+ * Usage (user): uint32_t id = KBD_LAYOUT_FR; ioctl(0,
+ * ALCOR2_IOC_KBD_SET_LAYOUT, &id);
  */
-#define ALCOR2_IOC_KBD_SET_LAYOUT ((1U << 30) | (0x4BU << 8) | 1U | (sizeof(uint32_t) << 16))
+#define ALCOR2_IOC_KBD_SET_LAYOUT                                              \
+  ((1U << 30) | (0x4BU << 8) | 1U | (sizeof(uint32_t) << 16))
 
 typedef enum
 {
   /** US QWERTY (traditional PC mapping). */
   KBD_LAYOUT_US = 0,
-  /** AZERTY-style lettering on a USANSI-style scan map; digit row still US ASCII. */
+  /** AZERTY-style lettering on a USANSI-style scan map; digit row still US
+   * ASCII. */
   KBD_LAYOUT_FR = 1,
   KBD_LAYOUT_COUNT
 } kbd_layout_t;
 
-void kbd_set_layout(kbd_layout_t layout);
+void         kbd_set_layout(kbd_layout_t layout);
 kbd_layout_t kbd_get_layout(void);
 
 /** @brief Blocking read of layout-translated bytes (stdin / fd 0). */

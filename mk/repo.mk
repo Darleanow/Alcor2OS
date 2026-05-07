@@ -12,7 +12,7 @@ help:
 	@echo "  user              userland (crt, init, shell, bin, apps if g++ exists)"
 	@echo "  iso               Limine bootable CD image (+ kernel, shell on ISO)"
 	@echo "  run               QEMU: Limine ISO + $(DISK) (IDE)"
-	@echo "  disk-populate     fill $(DISK) (fuse2fs on Linux if available → no sudo)"
+	@echo "  disk-populate     fill $(DISK) (fuse2fs on Linux → no sudo when available); clang copy if built"
 	@echo "  disk-mount / disk-umount   manual inspect of $(DISK)"
 	@echo "  disk-resync       user + disk-populate"
 	@echo "  make run USE_KVM=0   slower CPU emu (TCG); KVM itself does not use sudo"
@@ -127,49 +127,18 @@ disk-populate: user
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
 	@$(MKE2FS) -t ext2 -L ALCOR2 -d $(DISK_ROOT) -q $(DISK)
 else
+# Linux: single source of truth — scripts/disk-populate.sh installs
+# /bin/clang.real + cc wrapper (see user/bin/cc.c). Do not duplicate logic here.
 disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
-	@disk="$(CURDIR)/$(DISK)"; set -e; mkdir -p mnt; \
+	@set -e; mkdir -p mnt; \
 	if command -v fuse2fs >/dev/null 2>&1 && [ "$$(uname -s)" = Linux ]; then \
-	  fuse2fs "$$disk" mnt; S=''; \
+	  fuse2fs "$(CURDIR)/$(DISK)" mnt; S=''; \
 	else \
-	  sudo mount -o loop "$$disk" mnt; S=sudo; \
+	  sudo mount -o loop "$(CURDIR)/$(DISK)" mnt; S=sudo; \
 	fi; \
-	$$S mkdir -p mnt/bin mnt/etc mnt/tmp mnt/home \
-		mnt/usr/bin mnt/usr/lib/tcc mnt/usr/include mnt/usr/lib; \
-	rm -rf mnt/bin/*; \
-	cp user/build/bin/*.elf mnt/bin/ 2>/dev/null || true; \
-	cp user/build/apps/*.elf mnt/bin/ 2>/dev/null || true; \
-	for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; \
-	$$S cp thirdparty/tcc-install/usr/bin/tcc mnt/bin/tcc; \
-	$$S cp -r thirdparty/tcc-install/usr/lib/tcc/. mnt/usr/lib/tcc/; \
-	$$S cp -r thirdparty/musl/$(MUSL_PREFIX)/include/. mnt/usr/include/; \
-	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a      mnt/usr/lib/libc.a; \
-	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crt1.o      mnt/usr/lib/crt1.o; \
-	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crti.o      mnt/usr/lib/crti.o; \
-	$$S cp thirdparty/musl/$(MUSL_PREFIX)/lib/crtn.o      mnt/usr/lib/crtn.o; \
-	if [ -n "$(strip $(CLANG_BIN))" ] && [ -f "$(CLANG_BIN)" ]; then \
-		echo "installing Clang from $(CLANG_BIN)"; \
-		MUSL_SYSROOT=$(CURDIR)/thirdparty/musl-cross/x86_64-linux-musl; \
-		$$S mkdir -p mnt/usr/bin mnt/usr/lib/clang; \
-		$$S cp "$(CLANG_BIN)" mnt/bin/clang; \
-		$$S strip mnt/bin/clang 2>/dev/null || true; \
-		$$S cp thirdparty/clang-install/usr/bin/lld mnt/bin/lld 2>/dev/null || true; \
-		$$S strip mnt/bin/lld 2>/dev/null || true; \
-		$$S cp -r thirdparty/clang-install/usr/lib/clang/. mnt/usr/lib/clang/ 2>/dev/null || true; \
-		if [ -d "$$MUSL_SYSROOT" ]; then \
-			$$S mkdir -p mnt/usr/include/c++ mnt/usr/lib; \
-			$$S cp -r $$MUSL_SYSROOT/include/c++/. mnt/usr/include/c++/ 2>/dev/null || true; \
-			$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++.a'   -exec $$S cp {} mnt/usr/lib/libstdc++.a \;   2>/dev/null || true; \
-			$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libstdc++fs.a' -exec $$S cp {} mnt/usr/lib/libstdc++fs.a \; 2>/dev/null || true; \
-			$$S find $$MUSL_SYSROOT/lib -maxdepth 3 -name 'libsupc++.a'   -exec $$S cp {} mnt/usr/lib/libsupc++.a \;   2>/dev/null || true; \
-		fi; \
-	else \
-		echo "[disk] no static clang (optional: make clang)"; \
-	fi; \
-	echo "Welcome to Alcor2!" | $$S tee mnt/etc/motd >/dev/null; \
-	$$S sync; \
-	fusermount -u mnt 2>/dev/null || sudo umount mnt; \
-	rmdir mnt
+	trap 'fusermount -u mnt 2>/dev/null || sudo umount mnt 2>/dev/null; rmdir mnt 2>/dev/null' EXIT; \
+	sh scripts/disk-populate.sh mnt "$$S"; \
+	$$S sync
 endif
 
 disk-resync: user disk-populate
@@ -180,7 +149,7 @@ run: iso disk-populate
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM)
 
 clean:
-	rm -rf $(BUILD) compile_commands.json
+	rm -rf $(BUILD)
 	-$(MAKE) -C user/init clean
 	-$(MAKE) -C user/shell clean
 	-$(MAKE) -C user/bin clean

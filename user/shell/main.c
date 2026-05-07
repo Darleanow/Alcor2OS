@@ -3,10 +3,10 @@
  * @brief vega REPL: read a line, hand it to vega_run().
  */
 
-#include <vega/shell.h>
-#include <vega/vega.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <vega/shell.h>
+#include <vega/vega.h>
 
 /**
  * @brief Read a line of input from the user with basic line editing.
@@ -56,7 +56,8 @@ static int read_line(char *buf, size_t size)
       return 0;
     }
 
-    /* ISO 8859-1 (same bytes as Unicode U+0080-U+00FF): allow printable high bytes after user sets `kbd fr`. */
+    /* ISO 8859-1 (same bytes as Unicode U+0080-U+00FF): allow printable high
+     * bytes after user sets `kbd fr`. */
     unsigned char uc = (unsigned char)c;
     if(((uc >= 32u && uc < 127u) || uc >= 160u) && pos < size - 1) {
       buf[pos++] = (char)c;
@@ -115,11 +116,14 @@ static int is_input_complete(const char *buf)
         if(ln == dn) {
           int eq = 1;
           for(int i = 0; i < dn; i++)
-            if(line_buf[i] != delim[i]) { eq = 0; break; }
+            if(line_buf[i] != delim[i]) {
+              eq = 0;
+              break;
+            }
           if(eq) {
             in_hd_body = 0;
-            dn = 0;
-            ln = 0;
+            dn         = 0;
+            ln         = 0;
             continue;
           }
         }
@@ -145,7 +149,7 @@ static int is_input_complete(const char *buf)
         if(dn > 0) {
           want_delim = 0;
           in_hd_body = 1;
-          ln = 0;
+          ln         = 0;
         }
         /* if dn == 0, no delim yet — stay in want_delim, more input needed */
         continue;
@@ -194,7 +198,7 @@ static int is_input_complete(const char *buf)
       if(dn > 0) {
         /* a delim was captured earlier on this line; switch to body now */
         in_hd_body = 1;
-        ln = 0;
+        ln         = 0;
       }
       continue;
     }
@@ -203,8 +207,8 @@ static int is_input_complete(const char *buf)
     else if(c == '}' && brace_depth > 0)
       brace_depth--;
   }
-  return !in_squote && !in_dquote && brace_depth == 0
-         && !want_delim && !in_hd_body;
+  return !in_squote && !in_dquote && brace_depth == 0 && !want_delim &&
+         !in_hd_body;
 }
 
 /* Read input lines into @p buf until they form a complete statement. After
@@ -248,6 +252,9 @@ int main(int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
+
+  /* No procfs on Alcor2; LLVM/musl fall back to PATH for argv-only lookups. */
+  setenv("PATH", "/bin:/usr/bin", 0);
 
   char line[MAX_CMD_LEN];
 

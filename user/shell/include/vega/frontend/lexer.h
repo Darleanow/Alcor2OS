@@ -12,7 +12,8 @@
 
 #include <stddef.h>
 
-typedef enum {
+typedef enum
+{
   TOK_EOF = 0,
   TOK_WORD,         /* bareword or single-quoted literal */
   TOK_STRING,       /* double-quoted; expansion lands later */
@@ -43,10 +44,10 @@ typedef struct
 
 typedef struct
 {
-  const char *cur;     /* read pointer into the source */
-  tok_t       peeked;  /* one-token lookahead */
+  const char *cur;    /* read pointer into the source */
+  tok_t       peeked; /* one-token lookahead */
   int         has_peek;
-  int         error;   /* set by the lexer on malformed input */
+  int         error; /* set by the lexer on malformed input */
 } lexer_t;
 
 /** @brief Initialise a lexer over the given line. The line is not modified. */

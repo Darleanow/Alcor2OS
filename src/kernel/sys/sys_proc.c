@@ -1,19 +1,28 @@
 /**
  * @file src/kernel/sys/sys_proc.c
- * @brief Process syscalls: PID, fork/exec/wait, identities, `clone` (stub).
+ * @brief Process syscalls: PID, fork/exec/wait, `clone` (spawn/fork helpers),
+ * identities.
  *
- * Validates user pointers (strings, `argv`, `wait4` buffers) via the VMM before access.
+ * Validates user pointers (strings, `argv`, `wait4` buffers) via the VMM before
+ * access.
  */
 
 #include <alcor2/errno.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/fs/vfs.h>
-#include <alcor2/mm/vmm.h>
 
-#define MAX_EXEC_ARGS 32
-#define MAX_ARG_LEN   256
+/* Linux `sched.h` clone flags — subset we implement (musl posix_spawn,
+ * faccessat helper). */
+#define ALCOR_CLONE_VM     0x00000100u
+#define ALCOR_CLONE_VFORK  0x00004000u
+#define ALCOR_CLONE_THREAD 0x00010000u
+#define ALCOR_CSIGNAL      0x000000ffu
+
+#define MAX_EXEC_ARGS      PROC_MAX_ARGV
+#define MAX_ARG_LEN        PROC_MAX_ARG_STRLEN
 
 static inline bool user_cstr_ok(u64 ptr)
 {
@@ -58,13 +67,27 @@ u64 sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
 u64 sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
 {
-  (void)flags;
-  (void)child_stack;
   (void)ptid;
   (void)ctid;
   (void)tls;
   (void)a6;
-  return (u64)-ENOSYS;
+
+  /* Threads need shared VM + TID plumbing — not supported. */
+  if(flags & ALCOR_CLONE_THREAD)
+    return (u64)-ENOSYS;
+
+  /* musl: posix_spawn (VM|VFORK|SIGCHLD), faccessat (__clone flags 0). */
+  if(flags & ~(ALCOR_CLONE_VM | ALCOR_CLONE_VFORK | ALCOR_CSIGNAL))
+    return (u64)-EINVAL;
+
+  syscall_frame_t *frame = syscall_get_current_frame();
+  if(!frame)
+    return (u64)-EINVAL;
+
+  if(child_stack != 0 && !vmm_is_user_ptr((void *)child_stack))
+    return (u64)-EFAULT;
+
+  return (u64)proc_clone(frame, child_stack, (u32)flags);
 }
 
 u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
@@ -108,8 +131,8 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   static char *new_argv[MAX_EXEC_ARGS + 1];
   static char  name_storage[MAX_ARG_LEN];
 
-  int    argc      = 0;
-  char **user_argv = (char **)argv;
+  int          argc      = 0;
+  char       **user_argv = (char **)argv;
   if(user_argv && user_argv[0]) {
     for(int i = 0; user_argv[i] && argc < MAX_EXEC_ARGS; i++) {
       if(!user_cstr_ok((u64)user_argv[i]))
@@ -146,6 +169,15 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     /* Old image is gone but a new one couldn't be set up — terminate. */
     proc_exit(127);
   }
+
+  /* Close file descriptors with O_CLOEXEC — POSIX exec semantics.
+   * musl posix_spawn's error pipe uses O_CLOEXEC so the parent's read()
+   * gets EOF when the child execs successfully. */
+  vfs_proc_close_cloexec_fds();
+
+  /* Wake vfork parent AFTER errpipe write-end is closed, so the parent's
+   * read on the errpipe gets EOF and knows exec succeeded. */
+  proc_notify_exec(p);
 
   /* Redirect the in-flight syscall return path to the new entry. The asm
    * stub pops rip / rflags / rsp from the frame and SYSRETs. */

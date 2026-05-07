@@ -3,12 +3,12 @@
  * @brief Ring-3 (userspace) task creation and execution.
  */
 
-#include <alcor2/drivers/console.h>
-#include <alcor2/proc/elf.h>
 #include <alcor2/arch/gdt.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/mm/pmm.h>
-#include <alcor2/proc/user.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/proc/elf.h>
+#include <alcor2/proc/user.h>
 
 /** @brief User stack base address. */
 #define USER_STACK_ADDR 0x800000ULL

@@ -7,21 +7,23 @@
  * MVP; will be revisited if/when scoping gets richer.
  */
 
-#include <vega/runtime/expand.h>
-#include <vega/shell.h>
-#include <vega/vega.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vega/runtime/expand.h>
+#include <vega/shell.h>
+#include <vega/vega.h>
 
 #define MAX_VARS    32
 #define NAME_MAX    64
 #define PID_BUF_MAX 16
 
-static int  last_status = 0;
-static char pid_buf[PID_BUF_MAX]; /* lazily filled with current PID as a string */
+static int last_status = 0;
+static char
+    pid_buf[PID_BUF_MAX]; /* lazily filled with current PID as a string */
 
-typedef struct {
+typedef struct
+{
   char *name;
   char *value;
 } var_t;
@@ -29,7 +31,7 @@ typedef struct {
 static var_t vars[MAX_VARS];
 static int   var_count = 0;
 
-void expand_set_status(int status)
+void         expand_set_status(int status)
 {
   last_status = status;
 }
@@ -94,8 +96,9 @@ const char *expand_getvar(const char *name)
 /* Append @p src (length @p len) to a growing heap buffer. The buffer is
  * realloc'd as needed; *cap reflects the allocated size, *len_out the
  * occupied length. NUL terminator is maintained on success. */
-static int buf_append(char **buf, size_t *cap, size_t *len_out,
-                      const char *src, size_t n)
+static int buf_append(
+    char **buf, size_t *cap, size_t *len_out, const char *src, size_t n
+)
 {
   size_t need = *len_out + n + 1;
   if(need > *cap) {
@@ -265,7 +268,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
 {
   /* $? — last status */
   if(*cur == '?') {
-    char  s[16];
+    char s[16];
     render_int(last_status, s);
     if(buf_append(buf, cap, len, s, sh_strlen(s)) < 0)
       return -1;
@@ -331,7 +334,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
         return -1;
       return 1;
     }
-    char name[NAME_MAX];
+    char   name[NAME_MAX];
     size_t nlen = (size_t)(p - name_start);
     if(nlen >= NAME_MAX)
       nlen = NAME_MAX - 1;
@@ -350,7 +353,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
     const char *p = cur;
     while(is_name_cont(*p))
       p++;
-    char name[NAME_MAX];
+    char   name[NAME_MAX];
     size_t nlen = (size_t)(p - cur);
     if(nlen >= NAME_MAX)
       nlen = NAME_MAX - 1;
@@ -375,9 +378,9 @@ char *expand_word(const char *src)
   if(!src)
     return NULL;
 
-  char  *buf = NULL;
-  size_t cap = 0;
-  size_t len = 0;
+  char       *buf = NULL;
+  size_t      cap = 0;
+  size_t      len = 0;
 
   const char *p = src;
   while(*p) {
@@ -395,8 +398,7 @@ char *expand_word(const char *src)
      * character, $, or ?, so stray literal braces stay literal. Inside
      * unquoted barewords '{' is a structural token (lexer-split), so this
      * effectively only matters for double-quoted strings. */
-    if(*p == '{' &&
-       (is_name_start(p[1]) || p[1] == '?' || p[1] == '$')) {
+    if(*p == '{' && (is_name_start(p[1]) || p[1] == '?' || p[1] == '$')) {
       p++; /* skip '{' */
       int consumed = expand_brace(p, &buf, &cap, &len);
       if(consumed < 0) {

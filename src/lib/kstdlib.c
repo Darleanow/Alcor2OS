@@ -20,7 +20,7 @@ void *kmemcpy(void *dst, const void *src, u64 n)
 {
   void       *d = dst;
   const void *s = src;
-  __asm__ volatile("rep movsb" : "+D"(d), "+S"(s), "+c"(n) :: "memory");
+  __asm__ volatile("rep movsb" : "+D"(d), "+S"(s), "+c"(n)::"memory");
   return dst;
 }
 
@@ -44,7 +44,8 @@ void *kmemset(void *dst, int val, u64 n)
 /**
  * @brief Zero-fill a memory region.
  *
- * Same @c rep stosb sequence as @c kmemset(..., 0, n) without an extra function call.
+ * Same @c rep stosb sequence as @c kmemset(..., 0, n) without an extra function
+ * call.
  *
  * @param dst Destination buffer.
  * @param n   Number of bytes to zero.

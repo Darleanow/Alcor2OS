@@ -6,8 +6,8 @@
  */
 
 #include <alcor2/drivers/console.h>
-#include <alcor2/mm/heap.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>

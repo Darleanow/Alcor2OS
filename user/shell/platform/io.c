@@ -3,8 +3,8 @@
  * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
-#include <vega/shell.h>
 #include <unistd.h>
+#include <vega/shell.h>
 
 /**
  * @brief Write a single character to stdout

@@ -4,13 +4,13 @@
  * Thin wrappers around standard libc functions.
  */
 
-#include <vega/shell.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vega/shell.h>
 
 /** Process Control */
 
@@ -179,4 +179,3 @@ int sh_unlink(const char *path)
 {
   return unlink(path);
 }
-

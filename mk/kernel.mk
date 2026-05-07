@@ -44,7 +44,7 @@ compile_commands: $(OBJS)
 		echo '    "file": "'"$$src"'"' >> compile_commands.json; \
 		echo '  },' >> compile_commands.json; \
 	done
-	@if [ -n "$(strip $(USER_APPS_CPPS))" ] && [ -n "$(strip $(LIBCXX_HDR))" ] && [ -d "$(LIBCXX_HDR)" ]; then \
+	@if [ -n "$(strip $(USER_APPS_CPPS))" ]; then \
 		for cpp in $(USER_APPS_CPPS); do \
 			echo '  {' >> compile_commands.json; \
 			echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \

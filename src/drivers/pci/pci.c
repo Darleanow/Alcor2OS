@@ -6,8 +6,8 @@
  * Enumerates devices on buses 0-255, slots 0-31, functions 0-7.
  */
 
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/io.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/drivers/pci.h>
 
 /* Build PCI config address dword. */

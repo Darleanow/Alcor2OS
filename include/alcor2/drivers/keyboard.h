@@ -1,8 +1,8 @@
 /**
  * @file include/alcor2/drivers/keyboard.h
- * @brief PS/2 keyboard driver — raw scancode ring buffer.
+ * @brief PS/2 keyboard driver.
  *
- * Layout (scancode → characters) is handled in @ref kbd.h / `kbd_layout.c`, not here.
+ * Scancode-to-ASCII translation and input buffering for user programs.
  */
 
 #ifndef ALCOR2_KEYBOARD_H
@@ -39,7 +39,7 @@
 /** @} */
 
 /**
- * @brief Current modifier key state (for tty-style translation layers).
+ * @brief Current modifier key state.
  */
 typedef struct
 {
@@ -49,12 +49,57 @@ typedef struct
   bool capslock;
 } key_state_t;
 
+/**
+ * @brief Keyboard event handler callback.
+ * @param c ASCII character (or 0 if non-printable).
+ * @param scancode Raw scancode.
+ * @param state Modifier key state.
+ */
+typedef void (*keyboard_handler_t)(char c, u8 scancode, key_state_t state);
+
+/**
+ * @brief Initialize the PS/2 keyboard driver.
+ */
 void keyboard_init(void);
 
-/** @brief IRQ path: push raw PS/2 byte onto ring buffer. */
-void keyboard_irq(void);
+/**
+ * @brief Set the keyboard event handler.
+ * @param handler Callback function.
+ */
+void keyboard_set_handler(keyboard_handler_t handler);
 
+/**
+ * @brief Convert scancode to ASCII character.
+ * @param scancode PS/2 scancode.
+ * @param shift True if shift is pressed.
+ * @return ASCII character or 0 if non-printable.
+ */
+char keyboard_scancode_to_char(u8 scancode, bool shift);
+
+/**
+ * @brief Read buffered keyboard input (for SYS_READ).
+ * @param buf Destination buffer.
+ * @param count Bytes to read.
+ * @return Bytes read.
+ */
+u64 keyboard_read(char *buf, u64 count);
+
+/**
+ * @brief Check if keyboard buffer has data.
+ * @return true if data is available.
+ */
+bool keyboard_has_data(void);
+
+/**
+ * @brief Check if the raw scancode ring buffer has data.
+ * @return true if at least one scancode is waiting.
+ */
 bool keyboard_raw_available(void);
-u8   keyboard_raw_pop(void);
+
+/**
+ * @brief Pop one raw scancode from the ring buffer.
+ * @return The oldest unread scancode byte.
+ */
+u8 keyboard_raw_pop(void);
 
 #endif

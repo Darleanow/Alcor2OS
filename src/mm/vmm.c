@@ -1,16 +1,17 @@
 /**
  * @file src/mm/vmm.c
- * @brief x86_64 virtual memory manager (PML4 → PT, address-space clone, tear down user maps).
+ * @brief x86_64 virtual memory manager (PML4 → PT, address-space clone, tear
+ * down user maps).
  *
- * Provides `vmm_map` / `vmm_unmap`, fork-time clone, and `vmm_map_range_alloc` to map a run of
- * pages while reusing page-table levels already walked.
+ * Provides `vmm_map` / `vmm_unmap`, fork-time clone, and `vmm_map_range_alloc`
+ * to map a run of pages while reusing page-table levels already walked.
  */
 
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
-#include <alcor2/types.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/types.h>
 
 static u64 *kernel_pml4;
 static u64  kernel_pml4_phys;
@@ -98,15 +99,22 @@ void vmm_map(u64 virt, u64 phys, u64 flags)
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
-  u64 *pdpt = get_next_level(pml4, (virt >> 39) & PAGE_TABLE_INDEX_MASK, true, flags);
-  if(!pdpt) return;
-  u64 *pd = get_next_level(pdpt, (virt >> 30) & PAGE_TABLE_INDEX_MASK, true, flags);
-  if(!pd) return;
-  u64 *pt = get_next_level(pd, (virt >> 21) & PAGE_TABLE_INDEX_MASK, true, flags);
-  if(!pt) return;
+  u64 *pdpt =
+      get_next_level(pml4, (virt >> 39) & PAGE_TABLE_INDEX_MASK, true, flags);
+  if(!pdpt)
+    return;
+  u64 *pd =
+      get_next_level(pdpt, (virt >> 30) & PAGE_TABLE_INDEX_MASK, true, flags);
+  if(!pd)
+    return;
+  u64 *pt =
+      get_next_level(pd, (virt >> 21) & PAGE_TABLE_INDEX_MASK, true, flags);
+  if(!pt)
+    return;
 
-  pt[(virt >> 12) & PAGE_TABLE_INDEX_MASK] = (phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
-  __asm__ volatile("invlpg (%0)" :: "r"(virt) : "memory");
+  pt[(virt >> 12) & PAGE_TABLE_INDEX_MASK] =
+      (phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
+  __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
 }
 
 /**
@@ -145,31 +153,36 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
     /* Only re-walk levels that changed */
     if(pml4_idx != c_pml4_idx) {
       pdpt = get_next_level(pml4, pml4_idx, true, flags);
-      if(!pdpt) return false;
+      if(!pdpt)
+        return false;
       c_pml4_idx = pml4_idx;
       c_pdpt_idx = ~0ULL;
     }
     if(pdpt_idx != c_pdpt_idx) {
       pd = get_next_level(pdpt, pdpt_idx, true, flags);
-      if(!pd) return false;
+      if(!pd)
+        return false;
       c_pdpt_idx = pdpt_idx;
       c_pd_idx   = ~0ULL;
     }
     if(pd_idx != c_pd_idx) {
       pt = get_next_level(pd, pd_idx, true, flags);
-      if(!pt) return false;
+      if(!pt)
+        return false;
       c_pd_idx = pd_idx;
     }
 
     /* Skip pages already mapped (handles overlapping ELF segments) */
-    if(pt[pt_idx] & VMM_PRESENT) continue;
+    if(pt[pt_idx] & VMM_PRESENT)
+      continue;
 
     void *phys = pmm_alloc();
-    if(!phys) return false;
+    if(!phys)
+      return false;
 
     kzero(phys_to_virt((u64)phys), PAGE_SIZE);
     pt[pt_idx] = ((u64)phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
-    __asm__ volatile("invlpg (%0)" :: "r"(virt) : "memory");
+    __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
   }
   return true;
 }

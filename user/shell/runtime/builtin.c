@@ -4,16 +4,15 @@
  * command name).
  */
 
+#include <stdlib.h>
 #include <vega/runtime/expand.h>
 #include <vega/shell.h>
 #include <vega/vega.h>
-#include <stdlib.h>
 
-static const char *builtins[] = { "help",  "version", "clear", "exit",
-                                  "cd",    "pwd",     "kbd",   "let",
-                                  NULL };
+static const char *builtins[] = {"help", "version", "clear", "exit", "cd",
+                                 "pwd",  "kbd",     "let",   NULL};
 
-static void cmd_help(void)
+static void        cmd_help(void)
 {
   sh_puts("\n");
   sh_puts("  vega - Command Reference\n");
@@ -26,7 +25,8 @@ static void cmd_help(void)
   sh_puts("    exit              Exit the shell\n");
   sh_puts("    cd <dir>          Change directory\n");
   sh_puts("    pwd               Print working directory\n");
-  sh_puts("    kbd us|fr         Set PS/2 keymap layout (US QWERTY or FR AZERTY-ish)\n");
+  sh_puts("    kbd us|fr         Set PS/2 keymap layout (US QWERTY or FR "
+          "AZERTY-ish)\n");
   sh_puts("    let NAME VALUE    Set a vega variable (read with $NAME)\n");
   sh_puts("\n");
 

@@ -112,8 +112,14 @@ void cpu_enable_sse(void)
 
   /* Set OSFXSR (bit 9) - enable SSE instructions */
   /* Set OSXMMEXCPT (bit 10) - enable SSE exceptions */
+  /* Set FSGSBASE (bit 16) - allow user wrfsbase/rdfsbase
+   * (clang+lld+musl-cross emit these for fast TLS init; #GP otherwise).
+   * Set OSXSAVE (bit 18) - allow XSAVE/AVX state management
+   * (lld + libstdc++ use AVX intrinsics; #GP without this flag). */
   cr4 |= (1UL << 9);  /* OSFXSR */
   cr4 |= (1UL << 10); /* OSXMMEXCPT */
+  cr4 |= (1UL << 16); /* FSGSBASE */
+  cr4 |= (1UL << 18); /* OSXSAVE */
 
   /* Write CR4 */
   __asm__ volatile("mov %0, %%cr4" ::"r"(cr4));
@@ -121,5 +127,26 @@ void cpu_enable_sse(void)
   /* Initialize FPU */
   __asm__ volatile("fninit");
 
-  console_print("[CPU] SSE/FPU enabled\n");
+  /* Enable XSAVE feature mask in XCR0:
+   *   bit 0 = x87 state (mandatory)
+   *   bit 1 = SSE state (XMM0..15)
+   *   bit 2 = AVX state (YMM upper halves) — only if CPU supports AVX.
+   *
+   * We probe CPUID.1:ECX[28] (AVX) before setting bit 2; otherwise XSETBV
+   * raises #GP. Without this, lld/libstdc++ AVX instructions fault. */
+  u32 ecx = 0, unused;
+  __asm__ volatile("cpuid"
+                   : "=a"(unused), "=b"(unused), "=c"(ecx), "=d"(unused)
+                   : "a"(1), "c"(0));
+  u64 xcr0 = (1UL << 0) | (1UL << 1); /* x87 + SSE */
+  if(ecx & (1UL << 28))
+    xcr0 |= (1UL << 2); /* AVX */
+
+  __asm__ volatile("xsetbv" ::"a"((u32)xcr0), "d"((u32)(xcr0 >> 32)), "c"(0));
+
+  /* Capture a known-good FPU state to copy into each fresh proc on alloc. */
+  extern void proc_capture_default_fpu(void);
+  proc_capture_default_fpu();
+
+  console_print("[CPU] SSE/AVX/FPU enabled\n");
 }
