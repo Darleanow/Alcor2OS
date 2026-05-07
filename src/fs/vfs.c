@@ -5,11 +5,12 @@
 
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
-#include <alcor2/mm/heap.h>
+#include <alcor2/fs/ext2.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/fs/vfs.h>
 
 #define VFS_MAX_MOUNTS  8
 #define VFS_MAX_FSTYPES 8
@@ -67,6 +68,7 @@ static i32 oft_alloc_file(void)
       fd_table[i].pipe     = NULL;
       fd_table[i].offset   = 0;
       fd_table[i].flags    = 0;
+      fd_table[i].st_dev   = 0;
       return i;
     }
   }
@@ -85,6 +87,7 @@ i32 vfs_oft_alloc_pipe(i32 kind, void *pipe)
       fd_table[i].pipe     = pipe;
       fd_table[i].offset   = 0;
       fd_table[i].flags    = 0;
+      fd_table[i].st_dev   = 0;
       return i;
     }
   }
@@ -96,29 +99,37 @@ void vfs_oft_retain(i32 oft_idx)
   if(oft_idx < 0 || oft_idx >= VFS_MAX_FD || !fd_table[oft_idx].in_use)
     return;
   fd_table[oft_idx].refcount++;
+  if(fd_table[oft_idx].pipe)
+    pipe_oft_retain(fd_table[oft_idx].kind, fd_table[oft_idx].pipe);
 }
 
 void vfs_oft_release(i32 oft_idx)
 {
   if(oft_idx < 0 || oft_idx >= VFS_MAX_FD || !fd_table[oft_idx].in_use)
     return;
+
+  /* Notify the pipe on every close so read_open/write_open accurately track
+   * how many fd-holders remain across all processes (fork bumps the count
+   * via vfs_oft_retain; each close decrements it). */
+  if(fd_table[oft_idx].pipe)
+    pipe_oft_release(fd_table[oft_idx].kind, fd_table[oft_idx].pipe);
+
   if(--fd_table[oft_idx].refcount > 0)
     return;
 
   switch(fd_table[oft_idx].kind) {
-    case VFS_FD_FILE:
-      if(fd_table[oft_idx].ops) {
-        fs_file_t fh = (fs_file_t)fd_table[oft_idx].node;
-        if(fd_table[oft_idx].ops->flush)
-          fd_table[oft_idx].ops->flush(fh);
-        fd_table[oft_idx].ops->close(fh);
-      }
-      break;
-    case VFS_FD_PIPE_READ:
-    case VFS_FD_PIPE_WRITE:
-      if(fd_table[oft_idx].pipe)
-        pipe_oft_release(fd_table[oft_idx].kind, fd_table[oft_idx].pipe);
-      break;
+  case VFS_FD_FILE:
+    if(fd_table[oft_idx].ops) {
+      fs_file_t fh = (fs_file_t)fd_table[oft_idx].node;
+      if(fd_table[oft_idx].ops->flush)
+        fd_table[oft_idx].ops->flush(fh);
+      fd_table[oft_idx].ops->close(fh);
+    }
+    break;
+  case VFS_FD_PIPE_READ:
+  case VFS_FD_PIPE_WRITE:
+    /* pipe_oft_release already called above for every close */
+    break;
   }
   fd_table[oft_idx].in_use = false;
   fd_table[oft_idx].ops    = NULL;
@@ -176,10 +187,14 @@ void vfs_proc_init_fds(i32 *fds)
     fds[i] = -1;
 }
 
-void vfs_proc_inherit_fds(i32 *child_fds, const i32 *parent_fds)
+void vfs_proc_inherit_fds(
+    i32 *child_fds, u8 *child_cloexec, const i32 *parent_fds,
+    const u8 *parent_cloexec
+)
 {
   for(int i = 0; i < VFS_MAX_FD; i++) {
-    child_fds[i] = parent_fds[i];
+    child_fds[i]     = parent_fds[i];
+    child_cloexec[i] = parent_cloexec[i];
     if(child_fds[i] >= 0)
       vfs_oft_retain(child_fds[i]);
   }
@@ -191,6 +206,20 @@ void vfs_proc_release_fds(i32 *fds)
     if(fds[i] >= 0) {
       vfs_oft_release(fds[i]);
       fds[i] = -1;
+    }
+  }
+}
+
+void vfs_proc_close_cloexec_fds(void)
+{
+  proc_t *p = proc_current();
+  if(!p)
+    return;
+  for(int i = 0; i < VFS_MAX_FD; i++) {
+    if(p->fd_cloexec[i] && p->fds[i] >= 0) {
+      vfs_oft_release(p->fds[i]);
+      p->fds[i]        = -1;
+      p->fd_cloexec[i] = 0;
     }
   }
 }
@@ -563,11 +592,8 @@ void vfs_init(void)
 /* Helper: install an opened file/dir in a freshly allocated OFT slot, then
  * publish at the lowest free fd >= 3 in the current process's fd table. */
 static i64 publish_open(
-    vfs_node_t     *node,
-    fs_file_t       fh,
-    const fs_ops_t *ops,
-    u64             offset,
-    u32             flags
+    vfs_node_t *node, fs_file_t fh, const fs_ops_t *ops, u64 offset, u32 flags,
+    u64 st_dev
 )
 {
   i32 oft = oft_alloc_file();
@@ -576,13 +602,18 @@ static i64 publish_open(
   fd_table[oft].node   = ops ? (vfs_node_t *)fh : node;
   fd_table[oft].ops    = ops;
   fd_table[oft].offset = offset;
-  fd_table[oft].flags  = flags;
+  fd_table[oft].flags =
+      flags & ~(u32)O_CLOEXEC; /* cloexec is per-fd, not per-OFT */
+  fd_table[oft].st_dev = st_dev;
 
   i64 fd = proc_install_fd_from(3, oft);
   if(fd < 0) {
     vfs_oft_release(oft);
     return fd;
   }
+  proc_t *p = proc_current();
+  if(p)
+    p->fd_cloexec[fd] = (flags & O_CLOEXEC) ? 1 : 0;
   return fd;
 }
 
@@ -595,8 +626,8 @@ i64 vfs_open(const char *path, u32 flags)
   if(mount && mount->ops) {
     const char *rel_path = get_relative_path(abs_path, mount);
 
-    fs_file_t fh     = NULL;
-    bool      is_dir = false;
+    fs_file_t   fh     = NULL;
+    bool        is_dir = false;
 
     if(flags & O_CREAT) {
       fh = mount->ops->create(mount->fs_data, rel_path);
@@ -605,16 +636,20 @@ i64 vfs_open(const char *path, u32 flags)
     } else {
       fh = mount->ops->open(mount->fs_data, rel_path, flags, &is_dir);
     }
+    /* Must return negative errno (never plain -1): musl maps raw -1 to
+     * errno=EPERM. */
     if(!fh)
-      return -1;
+      return -ENOENT;
 
     if((flags & O_TRUNC) && mount->ops->truncate)
-      mount->ops->truncate(fh);
+      mount->ops->truncate(fh, 0);
     if((flags & O_APPEND) && mount->ops->seek)
       mount->ops->seek(fh, 0, SEEK_END);
 
     u64 off = mount->ops->get_position ? mount->ops->get_position(fh) : 0;
-    return publish_open(NULL, fh, mount->ops, off, flags);
+    return publish_open(
+        NULL, fh, mount->ops, off, flags, (u64)(mount - mounts) + 1
+    );
   }
 
   vfs_node_t *node = resolve_path(abs_path);
@@ -623,23 +658,25 @@ i64 vfs_open(const char *path, u32 flags)
     char        name[VFS_NAME_MAX];
     vfs_node_t *parent = resolve_parent(abs_path, name);
     if(!parent || parent->type != VFS_DIRECTORY)
-      return -1;
+      return parent ? -ENOTDIR : -ENOENT;
     node = create_node(name, VFS_FILE);
     if(!node)
-      return -1;
+      return -ENOMEM;
     add_child(parent, node);
   }
 
   if(!node || node->type != VFS_FILE) {
     if(node && node->type == VFS_DIRECTORY && (flags & O_DIRECTORY))
-      return publish_open(node, NULL, NULL, 0, flags);
-    return -1;
+      return publish_open(node, NULL, NULL, 0, flags, VFS_RAMFS_ST_DEV);
+    if(node && node->type == VFS_DIRECTORY)
+      return -EISDIR;
+    return -ENOENT;
   }
 
   u64 off = (flags & O_APPEND) ? node->size : 0;
   if(flags & O_TRUNC)
     node->size = 0;
-  return publish_open(node, NULL, NULL, off, flags);
+  return publish_open(node, NULL, NULL, off, flags, VFS_RAMFS_ST_DEV);
 }
 
 /**
@@ -660,7 +697,8 @@ i64 vfs_close(i64 fd)
   if(oft < 0)
     return -EBADF;
   vfs_oft_release(oft);
-  p->fds[fd] = -1;
+  p->fds[fd]        = -1;
+  p->fd_cloexec[fd] = 0;
   return 0;
 }
 
@@ -849,7 +887,8 @@ i64 vfs_stat(const char *path, vfs_stat_t *stat)
     const char *rel_path = get_relative_path(abs_path, mount);
     u64         size;
     u8          type;
-    if(mount->ops->stat(mount->fs_data, rel_path, &size, &type) < 0) {
+    u64         ino = 0;
+    if(mount->ops->stat(mount->fs_data, rel_path, &size, &type, &ino) < 0) {
       return -1;
     }
 
@@ -857,6 +896,8 @@ i64 vfs_stat(const char *path, vfs_stat_t *stat)
     stat->type     = type;
     stat->created  = 0;
     stat->modified = 0;
+    stat->dev      = (u64)(mount - mounts) + 1;
+    stat->ino      = ino;
     return 0;
   }
 
@@ -869,6 +910,8 @@ i64 vfs_stat(const char *path, vfs_stat_t *stat)
   stat->type     = node->type;
   stat->created  = 0; /* TODO: timestamps */
   stat->modified = 0;
+  stat->dev      = VFS_RAMFS_ST_DEV;
+  stat->ino      = (u64)(uintptr_t)node;
 
   return 0;
 }
@@ -1200,6 +1243,10 @@ i64 vfs_dup(i64 oldfd)
     vfs_oft_release(oft);
     return new_fd;
   }
+  /* dup always clears FD_CLOEXEC on the new descriptor (POSIX). */
+  proc_t *p = proc_current();
+  if(p)
+    p->fd_cloexec[new_fd] = 0;
   return new_fd;
 }
 
@@ -1232,6 +1279,8 @@ i64 vfs_dup2(i64 oldfd, i64 newfd)
 
   vfs_oft_retain(oft);
   p->fds[newfd] = oft;
+  p->fd_cloexec[newfd] =
+      0; /* dup2 always clears FD_CLOEXEC on newfd (POSIX). */
   return newfd;
 }
 
@@ -1253,23 +1302,41 @@ i64 vfs_fstat_fd(i64 fd, vfs_stat_t *st)
     return -EBADF;
 
   if(is_mounted_oft(oft)) {
-    fs_file_t fh      = (fs_file_t)fd_table[oft].node;
-    u64       saved   = fd_table[oft].offset;
-    i64       end_pos = 0;
+    fs_file_t fh = (fs_file_t)fd_table[oft].node;
+    if(fd_table[oft].ops->fstat) {
+      i64 r = fd_table[oft].ops->fstat(fh, st);
+      if(r < 0)
+        return r;
+      st->dev = fd_table[oft].st_dev;
+      return 0;
+    }
+
+    u64 saved   = fd_table[oft].offset;
+    i64 end_pos = 0;
 
     if(fd_table[oft].ops->seek) {
       end_pos = fd_table[oft].ops->seek(fh, 0, SEEK_END);
       fd_table[oft].ops->seek(fh, (i64)saved, SEEK_SET);
     }
 
-    st->size = (end_pos >= 0) ? (u64)end_pos : 0;
-    st->type = VFS_FILE;
+    st->size     = (end_pos >= 0) ? (u64)end_pos : 0;
+    st->type     = (fd_table[oft].ops->is_dir && fd_table[oft].ops->is_dir(fh))
+                       ? VFS_DIRECTORY
+                       : VFS_FILE;
+    st->created  = 0;
+    st->modified = 0;
+    st->ino      = 0;
+    st->dev      = fd_table[oft].st_dev;
     return 0;
   }
 
   const vfs_node_t *node = fd_table[oft].node;
-  st->size = node->size;
-  st->type = node->type;
+  st->size               = node->size;
+  st->type               = node->type;
+  st->created            = 0;
+  st->modified           = 0;
+  st->ino                = (u64)(uintptr_t)node;
+  st->dev                = fd_table[oft].st_dev;
   return 0;
 }
 
@@ -1326,8 +1393,10 @@ i64 vfs_ftruncate(i64 fd, i64 length)
     return -EINVAL;
 
   if(is_mounted_oft(oft)) {
-    if(length == 0 && fd_table[oft].ops->truncate)
-      return fd_table[oft].ops->truncate((fs_file_t)fd_table[oft].node);
+    if(fd_table[oft].ops->truncate)
+      return fd_table[oft].ops->truncate(
+          (fs_file_t)fd_table[oft].node, (u64)length
+      );
     return (length == 0) ? 0 : -ENOSYS;
   }
 
@@ -1758,4 +1827,23 @@ i64 vfs_register_fs(const fs_type_t *fs)
   fs_types[fs_type_count++] = fs;
   console_printf("[vfs] registered filesystem: %s\n", fs->name);
   return 0;
+}
+
+i64 vfs_readlink(const char *path, char *buf, u64 cap)
+{
+  if(!path || !buf || cap == 0)
+    return -EINVAL;
+
+  char abs_path[VFS_PATH_MAX];
+  make_absolute_path(path, abs_path, VFS_PATH_MAX);
+
+  vfs_mount_t *mount = find_mount(abs_path);
+  if(!mount || !mount->active || !mount->fs_data || !mount->fstype)
+    return -ENOENT;
+
+  if(!kstreq(mount->fstype->name, "ext2"))
+    return -ENOENT;
+
+  const char *rel = get_relative_path(abs_path, mount);
+  return ext2_readlink((ext2_volume_t *)mount->fs_data, rel, buf, cap);
 }

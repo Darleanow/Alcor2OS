@@ -20,7 +20,7 @@
 #define VFS_MAX_FILES 128
 
 /** @brief Maximum open file descriptors per process. */
-#define VFS_MAX_FD 32
+#define VFS_MAX_FD 256
 
 /** @name File types
  * @{ */
@@ -34,6 +34,23 @@
  * This is cast to/from filesystem-specific types (ext2_file_t, vfs_node_t).
  */
 typedef void *fs_file_t;
+
+/** @brief Magic st_dev for ramfs (distinct from mounted volume indices 1..n).
+ */
+#define VFS_RAMFS_ST_DEV 0x726D667300000001ULL
+
+/**
+ * @brief File stat buffer (path stat and fstat).
+ */
+typedef struct
+{
+  u64 size;
+  u8  type;
+  u64 created;
+  u64 modified;
+  u64 dev; /**< Linux st_dev — set by VFS (mount id or ramfs). */
+  u64 ino; /**< Linux st_ino — real inode on disk FS; node pointer on ramfs. */
+} vfs_stat_t;
 
 /**
  * @brief Filesystem operations table.
@@ -95,11 +112,12 @@ typedef struct fs_ops
   i64 (*seek)(fs_file_t fh, i64 offset, i32 whence);
 
   /**
-   * @brief Truncate file to zero length.
+   * @brief Truncate file to @p length bytes.
    * @param fh File handle.
+   * @param length New size; 0 clears to empty on ext2.
    * @return 0 on success, negative on error.
    */
-  i64 (*truncate)(fs_file_t fh);
+  i64 (*truncate)(fs_file_t fh, u64 length);
 
   /**
    * @brief Create a directory.
@@ -131,9 +149,16 @@ typedef struct fs_ops
    * @param path Path relative to mount.
    * @param[out] size File size.
    * @param[out] type VFS_FILE or VFS_DIRECTORY.
+   * @param[out] ino Inode number; optional (NULL allowed).
    * @return 0 on success, negative errno on error.
    */
-  i64 (*stat)(void *fs_data, const char *path, u64 *size, u8 *type);
+  i64 (*stat)(void *fs_data, const char *path, u64 *size, u8 *type, u64 *ino);
+
+  /**
+   * @brief Stat open handle; fill @a st except @a st->dev (VFS sets from OFT).
+   * @return 0 on success, negative errno on error.
+   */
+  i64 (*fstat)(fs_file_t fh, vfs_stat_t *st);
 
   /**
    * @brief Check if file handle is a directory.
@@ -222,17 +247,6 @@ typedef struct
   u64  size;
 } vfs_dirent_t;
 
-/**
- * @brief File stat structure.
- */
-typedef struct
-{
-  u64 size;
-  u8  type;
-  u64 created;
-  u64 modified;
-} vfs_stat_t;
-
 /** @name Directory entry types (for linux_dirent)
  * @{ */
 #define DT_UNKNOWN 0
@@ -295,6 +309,7 @@ typedef struct
   i32             kind;     /**< VFS_FD_FILE / VFS_FD_PIPE_* */
   i32             refcount; /**< Number of fds referencing this entry */
   bool            in_use;   /**< Entry is active */
+  u64             st_dev;   /**< Linux st_dev for this open file description */
 } vfs_fd_t;
 
 /**
@@ -363,6 +378,12 @@ i64 vfs_seek(i64 fd, i64 offset, i32 whence);
  * @return 0 on success, negative on error.
  */
 i64 vfs_stat(const char *path, vfs_stat_t *stat);
+
+/**
+ * @brief Read the target of a symlink at @p path (ext2 only).
+ * @return Byte length of target on success, negative -errno on error.
+ */
+i64 vfs_readlink(const char *path, char *buf, u64 cap);
 
 /**
  * @brief Create a directory.
@@ -512,10 +533,13 @@ i64 vfs_umount(const char *target);
 void vfs_proc_init_fds(i32 *fds);
 
 /**
- * @brief Copy parent's fd table into child and bump OFT refcounts.
- * Called from @c proc_fork after the child is allocated.
+ * @brief Copy parent's fd table and cloexec bits into child; bump OFT
+ * refcounts. Called from @c proc_fork after the child is allocated.
  */
-void vfs_proc_inherit_fds(i32 *child_fds, const i32 *parent_fds);
+void vfs_proc_inherit_fds(
+    i32 *child_fds, u8 *child_cloexec, const i32 *parent_fds,
+    const u8 *parent_cloexec
+);
 
 /**
  * @brief Release every fd held by @p fds and zero the table. Called from
@@ -523,6 +547,14 @@ void vfs_proc_inherit_fds(i32 *child_fds, const i32 *parent_fds);
  * (files, pipe ends) close when nobody else holds them.
  */
 void vfs_proc_release_fds(i32 *fds);
+
+/**
+ * @brief Close every fd in the current process that has O_CLOEXEC set.
+ * Called from @c sys_execve on successful exec — POSIX requires that
+ * file descriptors marked close-on-exec are closed when a new image is
+ * loaded. musl's posix_spawn error-reporting pipe depends on this.
+ */
+void vfs_proc_close_cloexec_fds(void);
 
 /**
  * @brief Install an OFT slot at the lowest free fd of the current process.
