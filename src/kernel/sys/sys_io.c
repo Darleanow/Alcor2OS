@@ -14,60 +14,10 @@
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/ktermios.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-
-/* musl: isatty(3) probes TIOCGWINSZ; tcgetattr uses TCGETS (x86_64 termios is
- * 60 bytes). */
-#define MUSL_NCCS         32
-#define MUSL_TERMIOS_SIZE 60
-
-typedef struct
-{
-  u32 c_iflag;
-  u32 c_oflag;
-  u32 c_cflag;
-  u32 c_lflag;
-  u8  c_line;
-  u8  pad[3];
-  u8  c_cc[MUSL_NCCS];
-  u32 __c_ispeed;
-  u32 __c_ospeed;
-} musl_termios_t;
-
-_Static_assert(
-    sizeof(musl_termios_t) == MUSL_TERMIOS_SIZE, "musl_termios mismatch"
-);
-
-/* Values from musl arch/generic/bits/termios.h (octal literals). */
-
-#define TG_ICRNL  0000400u
-#define TG_ONLCR  0000004u
-#define TG_CS8    0000060u
-#define TG_CREAD  0000200u
-#define TG_CLOCAL 0004000u
-#define TG_ISIG   0000001u
-#define TG_ICANON 0000002u
-#define TG_ECHO   0000010u
-#define TG_IEXTEN 0100000u
-#define TG_B38400 0000017u
-
-static void tty_fill_default_termios(musl_termios_t *t)
-{
-  kzero(t, sizeof(*t));
-  t->c_iflag    = TG_ICRNL;
-  t->c_oflag    = TG_ONLCR;
-  t->c_cflag    = TG_CS8 | TG_CREAD | TG_CLOCAL;
-  t->c_lflag    = TG_ISIG | TG_ICANON | TG_ECHO | TG_IEXTEN;
-  t->__c_ispeed = TG_B38400;
-  t->__c_ospeed = TG_B38400;
-  t->c_cc[0]    = '\x03'; /* VINTR Ctrl+C */
-  t->c_cc[1]    = 0x1c;   /* VQUIT */
-  t->c_cc[2]    = 0x7f;   /* VERASE */
-  t->c_cc[3]    = 0x15;   /* VKILL */
-  t->c_cc[4]    = '\x04'; /* VEOF */
-}
 
 static inline bool user_rw_ok(u64 ptr, u64 size)
 {
@@ -102,8 +52,12 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   if(count == 0)
     return 0;
 
-  if(fd == 0 && !fd_has_oft(fd))
+  if(fd == 0 && !fd_has_oft(fd)) {
+    proc_t *p = proc_current();
+    if(p)
+      return kbd_read_for_process(p, (char *)buf, count);
     return kbd_read_translated((char *)buf, count);
+  }
 
   return (u64)vfs_read((i64)fd, (void *)buf, count);
 }
@@ -135,7 +89,43 @@ u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 
 #define TCGETS     0x5401
 #define TCSETS     0x5402
+#define TCSETSW    0x5403  /* TCSADRAIN */
+#define TCSETSF    0x5404  /* TCSAFLUSH — used by ncurses raw()/noraw() */
 #define TIOCGWINSZ 0x5413
+
+static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
+{
+  switch(request) {
+  case TIOCGWINSZ: {
+    if(!user_rw_ok(arg, 8))
+      return (u64)-EFAULT;
+    struct
+    {
+      u16 row, col, xpixel, ypixel;
+    } ws = {25, 80, 0, 0};
+    kmemcpy((void *)arg, &ws, sizeof(ws));
+    return 0;
+  }
+  case TCGETS:
+    if(!p)
+      return (u64)-EINVAL;
+    if(!user_rw_ok(arg, sizeof(k_termios_t)))
+      return (u64)-EFAULT;
+    kmemcpy((void *)arg, &p->termios, sizeof(p->termios));
+    return 0;
+  case TCSETS:
+  case TCSETSW:
+  case TCSETSF:
+    if(!p)
+      return (u64)-EINVAL;
+    if(!user_rw_ok(arg, sizeof(k_termios_t)))
+      return (u64)-EFAULT;
+    kmemcpy(&p->termios, (void *)arg, sizeof(p->termios));
+    return 0;
+  default:
+    return (u64)-ENOTTY;
+  }
+}
 
 u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
 {
@@ -154,37 +144,11 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
-  if(fd <= 2) {
-    switch(request) {
-    case TIOCGWINSZ: {
-      if(!user_rw_ok(arg, 8))
-        return (u64)-EFAULT;
-      struct
-      {
-        u16 row, col, xpixel, ypixel;
-      } ws = {25, 80, 0, 0};
-      kmemcpy((void *)arg, &ws, sizeof(ws));
-      return 0;
-    }
-    case TCGETS:
-      if(!user_rw_ok(arg, sizeof(musl_termios_t)))
-        return (u64)-EFAULT;
-      {
-        musl_termios_t t;
-        tty_fill_default_termios(&t);
-        kmemcpy((void *)arg, &t, sizeof(t));
-      }
-      return 0;
-    case TCSETS:
-      if(!user_rw_ok(arg, sizeof(musl_termios_t)))
-        return (u64)-EFAULT;
-      return 0;
-    default:
-      return (u64)-ENOTTY;
-    }
-  }
+  /* stdio + pipe ends: isatty(3), ncurses tcgetattr/tcsetattr on stdout pipe. */
+  if(fd <= 2 || vfs_fd_is_pipe(fd))
+    return ioctl_tty_emulated(proc_current(), request, arg);
 
-  return 0;
+  return (u64)-ENOTTY;
 }
 
 u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
@@ -312,8 +276,12 @@ static i32 sel_read_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
     return -EBADF;
-  if(fd == 0 && !fd_has_oft(fd))
-    return kbd_raw_pending() ? 1 : 0;
+  if(fd == 0 && !fd_has_oft(fd)) {
+    proc_t *p = proc_current();
+    if(!p)
+      return kbd_raw_pending() ? 1 : 0;
+    return kbd_select_read_ready(p) ? 1 : 0;
+  }
   if((fd == 1 || fd == 2) && !fd_has_oft(fd))
     return -EBADF;
   return vfs_select_read_ready((i64)fd);

@@ -94,6 +94,8 @@ static const syscall_fn_t g_syscall_table[SYS_MAX] = {
     [SYS_NEWFSTATAT]        = sys_newfstatat,
     [SYS_GETRLIMIT]         = sys_getrlimit,
     [SYS_PRLIMIT64]         = sys_prlimit64,
+    [SYS_ALCOR_FB_INFO]     = sys_alcor_fb_info,
+    [SYS_ALCOR_FB_MMAP]     = sys_alcor_fb_mmap,
 };
 
 u64 syscall_dispatch(syscall_frame_t *frame)
