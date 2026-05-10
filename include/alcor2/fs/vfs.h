@@ -370,6 +370,11 @@ i32 vfs_select_read_ready(i64 fd);
 i32 vfs_select_write_ready(i64 fd);
 
 /**
+ * @brief True if @p fd is an anonymous pipe read or write end (for TTY ioctls).
+ */
+bool vfs_fd_is_pipe(u64 fd);
+
+/**
  * @brief Seek in file.
  * @param fd File descriptor.
  * @param offset Seek offset.

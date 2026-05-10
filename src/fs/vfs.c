@@ -178,6 +178,15 @@ i32 vfs_select_write_ready(i64 fd)
   return 1;
 }
 
+bool vfs_fd_is_pipe(u64 fd)
+{
+  i32 oft = fd_to_oft((i64)fd);
+  if(oft < 0)
+    return false;
+  i32 k = fd_table[oft].kind;
+  return k == VFS_FD_PIPE_READ || k == VFS_FD_PIPE_WRITE;
+}
+
 /**
  * @brief Install @p oft_idx at the lowest free fd >= 3 in the current
  * process's fd table.
