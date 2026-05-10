@@ -3,10 +3,10 @@
  * Explicit move/addstr exercises CSI cursor positioning in the kernel console.
  * UTF-8: U+0000–U+00FF maps to the Latin-1 font; other code points show '?'.
  */
+#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <curses.h>
 
 int main(void)
 {
@@ -14,7 +14,8 @@ int main(void)
   if(!term || !term[0])
     term = "xterm-256color";
 
-  /* Unbuffer before passing to newterm so pipe output reaches the relay immediately. */
+  /* Unbuffer before passing to newterm so pipe output reaches the relay
+   * immediately. */
   (void)setvbuf(stdout, NULL, _IONBF, 0);
 
   SCREEN *scr = newterm(term, stdout, stdin);
@@ -28,7 +29,8 @@ int main(void)
   }
   set_term(scr);
 
-  /* Disable typeahead: avoids read() on stdin during refresh when relayed via pipe. */
+  /* Disable typeahead: avoids read() on stdin during refresh when relayed via
+   * pipe. */
   typeahead(-1);
 
   raw();

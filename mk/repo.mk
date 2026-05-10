@@ -213,13 +213,27 @@ distclean: clean
 	rm -rf thirdparty $(DISK)
 
 format fmt:
-	@find src include user \( -name '*.c' -o -name '*.h' \) ! -path '*/.cache/*' -print0 | xargs -0 clang-format -i
+	@find src include user \
+	  \( -name '*.c' -o -name '*.h' \) \
+	  ! -path '*/thirdparty/*' \
+	  ! -path '*/.cache/*' \
+	  -print0 | xargs -0 clang-format -i
 
 lint:
-	clang-tidy $(KERNEL_SRCS_C) $(USER_SRCS_C) -- -I$(INCLUDE) -Ithirdparty/musl/$(MUSL_PREFIX)/include -std=gnu11
+	clang-tidy \
+	  --header-filter='^(src|include|user)/.*' \
+	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
+	  -- -I$(INCLUDE) -Ithirdparty/musl/$(MUSL_PREFIX)/include -std=gnu11
 
 check:
-	cppcheck --enable=all --suppress=missingIncludeSystem --inline-suppr --inconclusive --quiet \
-		-I$(INCLUDE) $(SRC) user
+	cppcheck \
+	  --enable=all \
+	  --suppress=missingIncludeSystem \
+	  --inline-suppr \
+	  --inconclusive \
+	  --quiet \
+	  -I$(INCLUDE) \
+	  --exclude=thirdparty \
+	  $(SRC) user
 
 qa: lint check

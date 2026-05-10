@@ -34,19 +34,24 @@ void sh_fb_tty_shutdown(void);
 
 void sh_fb_tty_puts(const char *s);
 void sh_fb_tty_putchar(unsigned char c);
-/** Reshape all dirty rows without yielding — for interactive single-char output. */
+/** Reshape all dirty rows without yielding — for interactive single-char
+ * output. */
 void sh_fb_tty_flush(void);
-/** Reshape dirty rows then yield so KVM/QEMU scans VRAM before the next read(). Use after batch writes. */
+/** Reshape dirty rows then yield so KVM/QEMU scans VRAM before the next read().
+ * Use after batch writes. */
 void sh_fb_tty_present(void);
 void sh_fb_tty_clear(void);
 
-/** Toggle blink phase and redraw the text cursor (call when input idle, e.g. select timeout). */
+/** Toggle blink phase and redraw the text cursor (call when input idle, e.g.
+ * select timeout). */
 void sh_fb_tty_cursor_poll(void);
 
-/** Show the block cursor at the current cell and set blink phase to "on" before reading stdin (after @c select, or after line edits). */
+/** Show the block cursor at the current cell and set blink phase to "on" before
+ * reading stdin (after @c select, or after line edits). */
 void sh_fb_tty_cursor_suspend(void);
 
-/** After line editing output, redraw the block cursor at the current cell (TTY-style). */
+/** After line editing output, redraw the block cursor at the current cell
+ * (TTY-style). */
 void sh_fb_tty_cursor_after_edit(void);
 
 #endif

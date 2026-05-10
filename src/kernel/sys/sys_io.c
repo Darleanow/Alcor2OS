@@ -89,8 +89,8 @@ u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 
 #define TCGETS     0x5401
 #define TCSETS     0x5402
-#define TCSETSW    0x5403  /* TCSADRAIN */
-#define TCSETSF    0x5404  /* TCSAFLUSH — used by ncurses raw()/noraw() */
+#define TCSETSW    0x5403 /* TCSADRAIN */
+#define TCSETSF    0x5404 /* TCSAFLUSH — used by ncurses raw()/noraw() */
 #define TIOCGWINSZ 0x5413
 
 static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
@@ -144,7 +144,8 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
-  /* stdio + pipe ends: isatty(3), ncurses tcgetattr/tcsetattr on stdout pipe. */
+  /* stdio + pipe ends: isatty(3), ncurses tcgetattr/tcsetattr on stdout pipe.
+   */
   if(fd <= 2 || vfs_fd_is_pipe(fd))
     return ioctl_tty_emulated(proc_current(), request, arg);
 
@@ -260,12 +261,13 @@ static inline void sel_fdclr(unsigned long *s, u32 fd)
     s[fd / SEL_NFDBITS] &= ~(1UL << (fd % SEL_NFDBITS));
 }
 
-static inline void sel_mask_high_bits(unsigned long *r, unsigned long *w,
-                                      unsigned long *e, u32 nfds, u32 nlongs)
+static inline void sel_mask_high_bits(
+    unsigned long *r, unsigned long *w, unsigned long *e, u32 nfds, u32 nlongs
+)
 {
   if(nfds % SEL_NFDBITS) {
     unsigned long m = (1UL << (nfds % SEL_NFDBITS)) - 1UL;
-    u32             i = nlongs - 1;
+    u32           i = nlongs - 1;
     r[i] &= m;
     w[i] &= m;
     e[i] &= m;
@@ -298,9 +300,10 @@ static i32 sel_write_ready(u64 fd)
   return vfs_select_write_ready((i64)fd);
 }
 
-static i32 select_scan(u32 nfds, const unsigned long *rin,
-                       const unsigned long *win, unsigned long *rout,
-                       unsigned long *wout, unsigned long *eout, int *total)
+static i32 select_scan(
+    u32 nfds, const unsigned long *rin, const unsigned long *win,
+    unsigned long *rout, unsigned long *wout, unsigned long *eout, int *total
+)
 {
   int n = 0;
   kmemcpy(rout, rin, SEL_FDSET_SZ);
@@ -371,16 +374,17 @@ static void sel_hlt_slice(void)
   cpu_disable_interrupts();
 }
 
-u64 sys_select(u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout,
-               u64 a6)
+u64 sys_select(
+    u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout, u64 a6
+)
 {
   (void)a6;
 
   if(nfds_u > 1024)
     return (u64)-EINVAL;
 
-  u32 nfds       = (u32)nfds_u;
-  u32 nlongs     = nfds ? (nfds + (SEL_NFDBITS - 1)) / SEL_NFDBITS : 0;
+  u32  nfds      = (u32)nfds_u;
+  u32  nlongs    = nfds ? (nfds + (SEL_NFDBITS - 1)) / SEL_NFDBITS : 0;
   bool poll_mode = false;
   u64  ticks_rem = 0;
   bool infinite  = false;
@@ -406,8 +410,7 @@ u64 sys_select(u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout
   if(nlongs > SEL_FDSET_LONG)
     return (u64)-EINVAL;
 
-  unsigned long rin[SEL_FDSET_LONG],  win[SEL_FDSET_LONG],
-      ein[SEL_FDSET_LONG];
+  unsigned long rin[SEL_FDSET_LONG], win[SEL_FDSET_LONG], ein[SEL_FDSET_LONG];
   unsigned long rout[SEL_FDSET_LONG], wout[SEL_FDSET_LONG],
       eout[SEL_FDSET_LONG];
 
@@ -441,22 +444,18 @@ u64 sys_select(u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout
     infinite = true;
 
   for(;;) {
-    int            total = 0;
-    i32            err   =
-        select_scan(nfds, rin, win, rout, wout, eout, &total);
+    int total = 0;
+    i32 err   = select_scan(nfds, rin, win, rout, wout, eout, &total);
     if(err)
       return (u64)err;
 
     if(total > 0 || poll_mode) {
       if(readfds)
-        kmemcpy((void *)readfds, rout,
-                (u64)nlongs * sizeof(unsigned long));
+        kmemcpy((void *)readfds, rout, (u64)nlongs * sizeof(unsigned long));
       if(writefds)
-        kmemcpy((void *)writefds, wout,
-                (u64)nlongs * sizeof(unsigned long));
+        kmemcpy((void *)writefds, wout, (u64)nlongs * sizeof(unsigned long));
       if(exceptfds)
-        kmemcpy((void *)exceptfds, eout,
-                (u64)nlongs * sizeof(unsigned long));
+        kmemcpy((void *)exceptfds, eout, (u64)nlongs * sizeof(unsigned long));
       return (u64)total;
     }
 

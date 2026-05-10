@@ -32,7 +32,8 @@ static struct
   char         esc_buf[ESC_BUF_MAX];
   int          esc_len;
   int cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
-  int utf8_rem;   /**< 0 = idle; else continuation bytes left for current UTF-8 char. */
+  int utf8_rem;   /**< 0 = idle; else continuation bytes left for current UTF-8
+                     char. */
   u32 utf8_partial;
 } ctx;
 
@@ -97,19 +98,19 @@ static u8 bytes_pp_from_bpp(u16 bpp)
 
 void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
 {
-  ctx.base        = (volatile u8 *)fb;
-  ctx.width       = width;
-  ctx.height      = height;
-  ctx.pitch_bytes = pitch_bytes;
-  ctx.bytes_pp    = bytes_pp_from_bpp(bpp);
-  ctx.cursor_x    = 0;
-  ctx.cursor_y    = 0;
-  ctx.fg          = 0xFFFFFF;
-  ctx.bg          = 0x000000;
-  ctx.esc_state   = 0;
-  ctx.esc_len     = 0;
-  ctx.cp437_mode  = 0;
-  ctx.utf8_rem    = 0;
+  ctx.base         = (volatile u8 *)fb;
+  ctx.width        = width;
+  ctx.height       = height;
+  ctx.pitch_bytes  = pitch_bytes;
+  ctx.bytes_pp     = bytes_pp_from_bpp(bpp);
+  ctx.cursor_x     = 0;
+  ctx.cursor_y     = 0;
+  ctx.fg           = 0xFFFFFF;
+  ctx.bg           = 0x000000;
+  ctx.esc_state    = 0;
+  ctx.esc_len      = 0;
+  ctx.cp437_mode   = 0;
+  ctx.utf8_rem     = 0;
   ctx.utf8_partial = 0;
 }
 
@@ -180,9 +181,9 @@ static void cup_apply_csi(void)
   int plen = ctx.esc_len - 1;
 
   if(plen > 0) {
-    int i             = 0;
-    int r             = 0;
-    int has_r         = 0;
+    int i     = 0;
+    int r     = 0;
+    int has_r = 0;
     while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
       r = r * 10 + (int)(ctx.esc_buf[i] - '0');
       i++;
@@ -321,7 +322,7 @@ static void utf8_feed(u8 b)
   if(ctx.utf8_rem != 0)
     return;
 
-  u32 cp = ctx.utf8_partial;
+  u32 cp       = ctx.utf8_partial;
   ctx.utf8_rem = 0;
   if(cp <= 0xffu)
     emit_cell((unsigned char)cp);
@@ -469,7 +470,7 @@ static void handle_ansi_sequence(void)
 
   switch(cmd) {
   case 'A': {
-    int n = csi_leading_param_default_1();
+    int n  = csi_leading_param_default_1();
     u64 dy = (u64)n * FONT_H;
     if(ctx.cursor_y >= dy)
       ctx.cursor_y = (u32)(ctx.cursor_y - dy);
@@ -478,22 +479,22 @@ static void handle_ansi_sequence(void)
     break;
   }
   case 'B': {
-    int n      = csi_leading_param_default_1();
-    u64 max_y  = ctx.height - FONT_H;
-    u64 new_y  = (u64)ctx.cursor_y + (u64)n * FONT_H;
+    int n        = csi_leading_param_default_1();
+    u64 max_y    = ctx.height - FONT_H;
+    u64 new_y    = (u64)ctx.cursor_y + (u64)n * FONT_H;
     ctx.cursor_y = new_y > max_y ? (u32)max_y : (u32)new_y;
     break;
   }
   case 'C': {
-    int n      = csi_leading_param_default_1();
-    u64 max_x  = ctx.width - FONT_W;
-    u64 new_x  = (u64)ctx.cursor_x + (u64)n * FONT_W;
+    int n        = csi_leading_param_default_1();
+    u64 max_x    = ctx.width - FONT_W;
+    u64 new_x    = (u64)ctx.cursor_x + (u64)n * FONT_W;
     ctx.cursor_x = new_x > max_x ? (u32)max_x : (u32)new_x;
     break;
   }
   case 'D': {
-    int     n  = csi_leading_param_default_1();
-    u32     dx = (u32)n * FONT_W;
+    int n  = csi_leading_param_default_1();
+    u32 dx = (u32)n * FONT_W;
     if(ctx.cursor_x >= dx)
       ctx.cursor_x -= dx;
     else
@@ -547,7 +548,7 @@ void console_putchar(char c)
 
   if(c == '\033') {
     ctx.esc_state = 1;
-    ctx.utf8_rem   = 0;
+    ctx.utf8_rem  = 0;
     return;
   }
 

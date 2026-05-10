@@ -23,7 +23,8 @@ __attribute__((constructor)) static void alcor2_stdio_tty_buffering(void)
   if(!t || !t[0] || !strcmp(t, "unknown"))
     setenv("TERM", "xterm-256color", 1);
 
-  /* ncurses looks here before the compiled-in default; guest must ship terminfo. */
+  /* ncurses looks here before the compiled-in default; guest must ship
+   * terminfo. */
   if(!getenv("TERMINFO"))
     setenv("TERMINFO", "/usr/share/terminfo", 0);
 

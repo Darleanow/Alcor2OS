@@ -16,7 +16,8 @@ static void fb_cursor_after_edit(void)
     sh_fb_tty_cursor_after_edit();
 }
 
-/* Per-call line-editor state for read_line(): ESC pushback + UTF-8 accumulator. */
+/* Per-call line-editor state for read_line(): ESC pushback + UTF-8 accumulator.
+ */
 typedef struct
 {
   int      pushback;
@@ -26,15 +27,16 @@ typedef struct
 
 static LineEditState s_edit = {.pushback = -1};
 
-static void line_edit_reset(LineEditState *s)
+static void          line_edit_reset(LineEditState *s)
 {
-  s->pushback    = -1;
-  s->utf8_rem    = 0;
+  s->pushback     = -1;
+  s->utf8_rem     = 0;
   s->utf8_partial = 0;
 }
 
 /* Encode @p cp as UTF-8, append to @p buf, and echo each byte to the terminal.
- * Returns 0 on success, -1 if the buffer would overflow or cp is out of range. */
+ * Returns 0 on success, -1 if the buffer would overflow or cp is out of range.
+ */
 static int store_utf8_cp(char *buf, size_t size, size_t *pos, uint32_t cp)
 {
   unsigned char enc[3];
@@ -78,7 +80,7 @@ static int read_line(char *buf, size_t size)
 
   while(1) {
     if(s_edit.pushback >= 0) {
-      c              = s_edit.pushback;
+      c               = s_edit.pushback;
       s_edit.pushback = -1;
     } else {
       if(sh_fb_tty_active())
@@ -142,7 +144,9 @@ static int read_line(char *buf, size_t size)
         /* CSI: param bytes are 0x30–0x3f; the first byte outside that range
          * is the final byte (letter or '~'). Covers arrows, Delete, Home… */
         int cp;
-        do { cp = sh_getchar(); } while(cp >= 0x30 && cp <= 0x3f);
+        do {
+          cp = sh_getchar();
+        } while(cp >= 0x30 && cp <= 0x3f);
         (void)cp;
         continue;
       }
@@ -168,8 +172,8 @@ static int read_line(char *buf, size_t size)
     if(s_edit.utf8_rem > 0) {
       if((u & 0xc0u) != 0x80u) {
         /* Bad continuation — restart with this byte. */
-        s_edit.utf8_rem  = 0;
-        s_edit.pushback  = (int)u;
+        s_edit.utf8_rem = 0;
+        s_edit.pushback = (int)u;
         continue;
       }
       s_edit.utf8_partial = (s_edit.utf8_partial << 6u) | (uint32_t)(u & 0x3fu);
@@ -403,7 +407,8 @@ int main(int argc, char *argv[])
   /* No procfs on Alcor2; LLVM/musl fall back to PATH for argv-only lookups. */
   setenv("PATH", "/bin:/usr/bin", 0);
 
-  /* Raw mode: shell handles its own line editing and echo, character by character. */
+  /* Raw mode: shell handles its own line editing and echo, character by
+   * character. */
   sh_set_stdin_raw();
 
   const char *font = getenv("ALCOR2_FONT");

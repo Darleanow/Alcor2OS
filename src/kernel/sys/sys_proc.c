@@ -40,10 +40,10 @@ static i64 copy_user_strvec(
         return -EFAULT;
       kstrncpy(store[n], user_vec[n], MAX_ARG_LEN);
       store[n][MAX_ARG_LEN - 1] = '\0';
-      ptrs[n] = store[n];
+      ptrs[n]                   = store[n];
     }
   }
-  ptrs[n] = NULL;
+  ptrs[n]    = NULL;
   *out_count = n;
   return 0;
 }
@@ -153,7 +153,7 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   static char *new_envp[MAX_EXEC_ARGS + 1];
   static char  name_storage[MAX_ARG_LEN];
 
-  int argc = 0, envc = 0;
+  int          argc = 0, envc = 0;
 
   i64 rc_argv = copy_user_strvec((char **)argv, arg_storage, new_argv, &argc);
   if(rc_argv < 0)
@@ -162,9 +162,9 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     /* No argv supplied: synthesise argv[0] from path. */
     kstrncpy(arg_storage[0], path, MAX_ARG_LEN);
     arg_storage[0][MAX_ARG_LEN - 1] = '\0';
-    new_argv[0] = arg_storage[0];
-    new_argv[1] = NULL;
-    argc        = 1;
+    new_argv[0]                     = arg_storage[0];
+    new_argv[1]                     = NULL;
+    argc                            = 1;
   }
 
   i64 rc_envp = copy_user_strvec((char **)envp, env_storage, new_envp, &envc);
@@ -186,8 +186,7 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     return (u64)-EINVAL;
   }
 
-  i64 rc =
-      proc_exec_replace_image(p, name_storage, fd, new_argv, new_envp);
+  i64 rc = proc_exec_replace_image(p, name_storage, fd, new_argv, new_envp);
   vfs_close(fd);
   if(rc < 0) {
     /* Old image is gone but a new one couldn't be set up — terminate. */

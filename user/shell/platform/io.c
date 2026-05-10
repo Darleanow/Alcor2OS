@@ -3,8 +3,8 @@
  * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
-#include <unistd.h>
 #include <sys/select.h>
+#include <unistd.h>
 #include <vega/fb_tty.h>
 #include <vega/shell.h>
 
@@ -16,7 +16,8 @@ void sh_putchar(char c)
 {
   if(sh_fb_tty_active()) {
     sh_fb_tty_putchar((unsigned char)c);
-    sh_fb_tty_flush(); /* reshape immediately so char is visible; no yield (interactive) */
+    sh_fb_tty_flush(
+    ); /* reshape immediately so char is visible; no yield (interactive) */
     return;
   }
   sh_write(STDOUT_FILENO, &c, 1);
@@ -108,7 +109,7 @@ int sh_getchar_blinking(int idle_ms)
     struct timeval tv;
     tv.tv_sec  = (long)(idle_ms / 1000);
     tv.tv_usec = (long)((idle_ms % 1000) * 1000);
-    int r = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
+    int r      = select(STDIN_FILENO + 1, &rfds, NULL, NULL, &tv);
     if(r < 0)
       return -1;
     if(r == 0) {

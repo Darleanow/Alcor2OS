@@ -1,6 +1,7 @@
 /**
  * @file include/alcor2/ktermios.h
- * @brief musl-compatible termios blob (60 bytes) for per-process TTY discipline.
+ * @brief musl-compatible termios blob (60 bytes) for per-process TTY
+ * discipline.
  *
  * Must match musl sizeof(struct termios) on x86_64 and sys_ioctl TCGETS/TCSETS.
  */
