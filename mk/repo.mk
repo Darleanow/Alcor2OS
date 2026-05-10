@@ -16,7 +16,7 @@ help:
 	@echo "  disk-mount / disk-umount   manual inspect of $(DISK)"
 	@echo "  disk-resync       user + disk-populate"
 	@echo "  make run USE_KVM=0   slower CPU emu (TCG); KVM itself does not use sudo"
-	@echo "  musl | musl-cross | tcc | clang | ncurses   bootstrap thirdparty/toolchains"
+	@echo "  musl | musl-cross | tcc | clang | ncurses | freetype | harfbuzz   bootstrap"
 	@echo "  format lint check qa — static analysis / style"
 
 kernel: $(BUILD)/$(KERNEL)
@@ -109,7 +109,23 @@ disk-populate: user
 		cp thirdparty/ncurses-install/usr/lib/libtinfo.a $(DISK_ROOT)/usr/lib/; \
 		cp -r thirdparty/ncurses-install/usr/include/. $(DISK_ROOT)/usr/include/; \
 		mkdir -p $(DISK_ROOT)/usr/share/terminfo; \
-		cp -r thirdparty/ncurses-install/usr/share/terminfo/. $(DISK_ROOT)/usr/share/terminfo/; \
+		if [ -d thirdparty/ncurses-install/usr/share/terminfo ] && \
+		   find thirdparty/ncurses-install/usr/share/terminfo -type f -print -quit 2>/dev/null | grep -q .; then \
+			cp -r thirdparty/ncurses-install/usr/share/terminfo/. $(DISK_ROOT)/usr/share/terminfo/; \
+		else \
+			echo "[disk-root] WARN: thirdparty/ncurses-install/usr/share/terminfo empty — use disk-populate.sh or: rm -rf thirdparty/ncurses-install && make ncurses"; \
+		fi; \
+		for n in xterm-256color vt100; do \
+		  if ! find $(DISK_ROOT)/usr/share/terminfo -name "$$n" -print -quit 2>/dev/null | grep -q .; then \
+		    f=$$(find /usr/share/terminfo /lib/terminfo -name "$$n" -type f 2>/dev/null | head -1); \
+		    if [ -n "$$f" ]; then \
+		      b=$$(basename $$(dirname "$$f")); \
+		      mkdir -p "$(DISK_ROOT)/usr/share/terminfo/$$b"; \
+		      cp "$$f" "$(DISK_ROOT)/usr/share/terminfo/$$b/"; \
+		      echo "[disk-root] terminfo fallback: $$n from $$f"; \
+		    fi; \
+		  fi; \
+		done; \
 	fi
 	@if [ -n "$(strip $(CLANG_BIN))" ] && [ -f "$(CLANG_BIN)" ]; then \
 		echo "installing Clang from $(CLANG_BIN)"; \

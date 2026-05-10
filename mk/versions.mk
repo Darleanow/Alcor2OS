@@ -17,3 +17,10 @@ NCURSES_URL := https://invisible-mirror.net/archives/ncurses/ncurses-$(NCURSES_V
 
 LLVM_VER := 18.1.8
 LLVM_URL := https://github.com/llvm/llvm-project/releases/download/llvmorg-$(LLVM_VER)/llvm-project-$(LLVM_VER).src.tar.xz
+
+# Static text stack for userland (musl-cross). Requires host `meson` + `ninja`.
+FREETYPE_VER := 2.13.3
+FREETYPE_URL := https://download.savannah.gnu.org/releases/freetype/freetype-$(FREETYPE_VER).tar.xz
+
+HARFBUZZ_VER := 8.3.0
+HARFBUZZ_URL := https://github.com/harfbuzz/harfbuzz/releases/download/$(HARFBUZZ_VER)/harfbuzz-$(HARFBUZZ_VER).tar.xz

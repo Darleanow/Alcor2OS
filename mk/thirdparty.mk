@@ -11,13 +11,31 @@ else
   MUSL_CONFIGURE_EXTRA :=
 endif
 
-.PHONY: musl tcc clang musl-cross ncurses
+PKGCONFIG := $(shell command -v pkg-config 2>/dev/null)
+
+.PHONY: musl tcc clang musl-cross ncurses ncurses-verify freetype harfbuzz
 
 musl:  thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 tcc:   thirdparty/tcc-install/usr/bin/tcc
 clang: thirdparty/clang-install/usr/bin/clang
 musl-cross: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
-ncurses: thirdparty/ncurses-install/usr/lib/libncurses.a
+# Phony ncurses is always “out of date”; ncurses-verify runs every time so a stale
+# install (lib present but terminfo missing — old --prefix-without-DESTDIR bug)
+# fails fast with a clear fix command.
+ncurses: ncurses-verify thirdparty/ncurses-install/usr/lib/libncurses.a
+
+ncurses-verify:
+	@lib="$(CURDIR)/thirdparty/ncurses-install/usr/lib/libncurses.a"; \
+	ti="$(CURDIR)/thirdparty/ncurses-install/usr/share/terminfo"; \
+	if [ -f "$$lib" ]; then \
+	  if [ ! -d "$$ti" ] || ! find "$$ti" -name 'xterm-256color' -print -quit 2>/dev/null | grep -q .; then \
+	    echo >&2 "ncurses install under thirdparty/ncurses-install is missing usr/share/terminfo (terminfo was installed to the host /usr without DESTDIR)."; \
+	    echo >&2 "Fix: rm -rf thirdparty/ncurses-install && make ncurses   then: make disk-resync (or disk-populate)"; \
+	    exit 1; \
+	  fi; \
+	fi
+freetype: thirdparty/freetype-install/usr/lib/libfreetype.a
+harfbuzz: thirdparty/harfbuzz-install/usr/lib/libharfbuzz.a
 
 thirdparty/limine/limine:
 	git clone $(LIMINE_URL) --branch=$(LIMINE_REV) --depth=1 thirdparty/limine
@@ -68,10 +86,13 @@ thirdparty/musl-cross/bin/x86_64-linux-musl-gcc:
 	  { echo >&2 "musl-cross failed — see thirdparty/musl-cross-build.log"; exit 1; }
 
 # Curses + terminfo (libtinfo): static *.a for x86_64-linux-musl. ~1–2 min after configure.
+# Install MUST use DESTDIR: misc/run_tic.sh sets TERMINFO="${DESTDIR}/usr/share/terminfo"
+# (ticdir is absolute /usr/share/terminfo). With empty DESTDIR, terminfo lands on the host and
+# thirdparty/ncurses-install never gets share/terminfo — guest TUIs break.
 thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
 	@echo "ncurses $(NCURSES_VER) — static libraries for x86_64-linux-musl (log: thirdparty/ncurses-build.log)"
 	@mkdir -p thirdparty
-	@rm -rf thirdparty/ncurses-src
+	@rm -rf thirdparty/ncurses-install thirdparty/ncurses-src
 	@curl -sL $(NCURSES_URL) | tar xz -C thirdparty
 	@mv thirdparty/ncurses-$(NCURSES_VER) thirdparty/ncurses-src
 	@cd thirdparty/ncurses-src && \
@@ -79,7 +100,7 @@ thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_6
 	  PKG_CONFIG=/bin/false \
 	  ./configure \
 	    --host=x86_64-linux-musl \
-	    --prefix=$(CURDIR)/thirdparty/ncurses-install/usr \
+	    --prefix=/usr \
 	    --with-build-cc=cc \
 	    --without-ada \
 	    --without-cxx \
@@ -109,7 +130,7 @@ thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_6
 	@$(MAKE) -C thirdparty/ncurses-src -j$(JOBS) \
 	  >$(CURDIR)/thirdparty/ncurses-build.log 2>&1 || \
 	  { tail -40 $(CURDIR)/thirdparty/ncurses-build.log; echo >&2 "ncurses build failed"; exit 1; }
-	@$(MAKE) -C thirdparty/ncurses-src install \
+	@$(MAKE) -C thirdparty/ncurses-src install DESTDIR=$(CURDIR)/thirdparty/ncurses-install \
 	  >$(CURDIR)/thirdparty/ncurses-install.log 2>&1 || \
 	  { tail -40 $(CURDIR)/thirdparty/ncurses-install.log; echo >&2 "ncurses install failed"; exit 1; }
 	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/lib/libncurses.a || \
@@ -117,7 +138,99 @@ thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_6
 	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/include/curses.h || \
 	  test -f $(CURDIR)/thirdparty/ncurses-install/usr/include/ncurses/curses.h || \
 	  { echo >&2 "ncurses headers missing — see thirdparty/ncurses-install.log"; exit 1; }
+	@test -d $(CURDIR)/thirdparty/ncurses-install/usr/share/terminfo || \
+	  { echo >&2 "terminfo dir missing after install — see thirdparty/ncurses-install.log (host needs /usr/bin/tic)"; exit 1; }
+	@find $(CURDIR)/thirdparty/ncurses-install/usr/share/terminfo -name 'xterm-256color' -print -quit | grep -q . || \
+	  { echo >&2 "xterm-256color terminfo missing in staged tree"; exit 1; }
 	@echo "ncurses → thirdparty/ncurses-install/usr/{include,lib,share/terminfo}"
+
+# FreeType (static, minimal deps) for guest font rasterization.
+thirdparty/freetype-install/usr/lib/libfreetype.a: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
+	@echo "FreeType $(FREETYPE_VER) → thirdparty/freetype-install (log: thirdparty/freetype-build.log)"
+	@command -v pkg-config >/dev/null || { echo >&2 "need pkg-config for HarfBuzz"; exit 1; }
+	@mkdir -p thirdparty
+	@rm -rf thirdparty/freetype-src
+	@curl -fsSL $(FREETYPE_URL) | tar xJ -C thirdparty
+	@mv thirdparty/freetype-$(FREETYPE_VER) thirdparty/freetype-src
+	@cd thirdparty/freetype-src && \
+	  PKG_CONFIG=/bin/false \
+	  ./configure \
+	    --host=x86_64-linux-musl \
+	    --prefix=$(CURDIR)/thirdparty/freetype-install/usr \
+	    --disable-shared --enable-static \
+	    --without-zlib --without-bzip2 --without-png --without-brotli --without-harfbuzz \
+	    CC=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-gcc \
+	    AR=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-ar \
+	    RANLIB=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-ranlib \
+	    CFLAGS='-Os -fno-stack-protector' \
+	    >$(CURDIR)/thirdparty/freetype-config.log 2>&1 || \
+	    { tail -40 $(CURDIR)/thirdparty/freetype-config.log; exit 1; }
+	@$(MAKE) -C thirdparty/freetype-src -j$(JOBS) \
+	  >$(CURDIR)/thirdparty/freetype-build.log 2>&1 || \
+	    { tail -40 $(CURDIR)/thirdparty/freetype-build.log; exit 1; }
+	@$(MAKE) -C thirdparty/freetype-src install \
+	  >$(CURDIR)/thirdparty/freetype-install.log 2>&1 || \
+	    { tail -20 $(CURDIR)/thirdparty/freetype-install.log; exit 1; }
+	@test -f $(CURDIR)/thirdparty/freetype-install/usr/lib/libfreetype.a || exit 1
+
+# HarfBuzz (static, FreeType only): host needs `meson` + `ninja`.
+thirdparty/harfbuzz-install/usr/lib/libharfbuzz.a: thirdparty/freetype-install/usr/lib/libfreetype.a
+	@echo "HarfBuzz $(HARFBUZZ_VER) → thirdparty/harfbuzz-install (log: thirdparty/harfbuzz-build.log)"
+	$(if $(PKGCONFIG),,$(error harfbuzz: install pkg-config \(apt: pkg-config, brew: pkgconf\)))
+	@command -v meson >/dev/null 2>&1 || { echo >&2 "install meson (pip install meson)"; exit 1; }
+	@command -v ninja >/dev/null 2>&1 || { echo >&2 "install ninja (ninja-build package)"; exit 1; }
+	@rm -rf thirdparty/harfbuzz-src thirdparty/harfbuzz-build
+	@curl -fsSL $(HARFBUZZ_URL) | tar xJ -C thirdparty
+	@mv thirdparty/harfbuzz-$(HARFBUZZ_VER) thirdparty/harfbuzz-src
+	@printf '%s\n' \
+	  "[binaries]" \
+	  "c = '$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-gcc'" \
+	  "cpp = '$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-g++'" \
+	  "ar = '$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-ar'" \
+	  "strip = '$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-strip'" \
+	  "pkg-config = '$(PKGCONFIG)'" \
+	  "" \
+	  "[built-in options]" \
+	  "default_library = 'static'" \
+	  "c_args = ['-Os', '-fno-stack-protector']" \
+	  "cpp_args = ['-Os', '-fno-stack-protector']" \
+	  "" \
+	  "[host_machine]" \
+	  "system = 'linux'" \
+	  "cpu_family = 'x86_64'" \
+	  "cpu = 'x86_64'" \
+	  "endian = 'little'" \
+	  "" \
+	  "[properties]" \
+	  "pkg_config_libdir = '$(CURDIR)/thirdparty/freetype-install/usr/lib/pkgconfig'" \
+	  > $(CURDIR)/thirdparty/cross-musl-meson.ini
+	@PKG_CONFIG_LIBDIR=$(CURDIR)/thirdparty/freetype-install/usr/lib/pkgconfig \
+	  meson setup $(CURDIR)/thirdparty/harfbuzz-build $(CURDIR)/thirdparty/harfbuzz-src \
+	    --cross-file $(CURDIR)/thirdparty/cross-musl-meson.ini \
+	    --prefix=/usr \
+	    -Ddefault_library=static \
+	    -Dfreetype=enabled \
+	    -Dcairo=disabled \
+	    -Dchafa=disabled \
+	    -Dicu=disabled \
+	    -Dglib=disabled \
+	    -Dgobject=disabled \
+	    -Dtests=disabled \
+	    -Ddocs=disabled \
+	    -Dutilities=disabled \
+	    -Dbenchmark=disabled \
+	    -Dintrospection=disabled \
+	    >$(CURDIR)/thirdparty/harfbuzz-config.log 2>&1 || \
+	    { tail -50 $(CURDIR)/thirdparty/harfbuzz-config.log; exit 1; }
+	@PKG_CONFIG_LIBDIR=$(CURDIR)/thirdparty/freetype-install/usr/lib/pkgconfig \
+	  meson compile -C $(CURDIR)/thirdparty/harfbuzz-build -j$(JOBS) \
+	    >$(CURDIR)/thirdparty/harfbuzz-build.log 2>&1 || \
+	    { tail -50 $(CURDIR)/thirdparty/harfbuzz-build.log; exit 1; }
+	@DESTDIR=$(CURDIR)/thirdparty/harfbuzz-install \
+	  meson install -C $(CURDIR)/thirdparty/harfbuzz-build \
+	    >$(CURDIR)/thirdparty/harfbuzz-install.log 2>&1 || \
+	    { tail -40 $(CURDIR)/thirdparty/harfbuzz-install.log; exit 1; }
+	@test -f $(CURDIR)/thirdparty/harfbuzz-install/usr/lib/libharfbuzz.a || exit 1
 
 # Static clang+lld for the guest disk (requires musl-cross).
 CLANG_BIN := $(firstword $(wildcard thirdparty/clang-install/usr/bin/clang-[0-9]*))
