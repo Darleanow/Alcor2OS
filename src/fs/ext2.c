@@ -289,7 +289,8 @@ static inline void bitmap_clear(u8 *bitmap, u32 bit)
 }
 
 /** @brief Test if a bit is set in a bitmap. */
-static inline bool bitmap_test(const u8 *bitmap, u32 bit) __attribute__((unused));
+static inline bool bitmap_test(const u8 *bitmap, u32 bit)
+    __attribute__((unused));
 static inline bool bitmap_test(const u8 *bitmap, u32 bit)
 {
   return (bitmap[bit >> 3] & (1 << (bit & 7))) != 0;
