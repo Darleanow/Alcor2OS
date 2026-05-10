@@ -41,7 +41,8 @@ kbd_layout_t kbd_get_layout(void);
 u64 kbd_read_translated(char *buf, u64 count);
 
 /**
- * @brief read(2) on stdin using this process's termios (ICANON/!ICANON, VMIN/VTIME).
+ * @brief read(2) on stdin using this process's termios (ICANON/!ICANON,
+ * VMIN/VTIME).
  */
 u64 kbd_read_for_process(struct proc *p, char *buf, u64 count);
 
@@ -51,7 +52,8 @@ u64 kbd_read_for_process(struct proc *p, char *buf, u64 count);
  */
 bool kbd_raw_pending(void);
 
-/** @brief select(2) readability for fd 0 honoring ICANON / line-ready semantics. */
+/** @brief select(2) readability for fd 0 honoring ICANON / line-ready
+ * semantics. */
 bool kbd_select_read_ready(struct proc *p);
 
 #endif /* ALCOR2_KBD_H */

@@ -47,15 +47,16 @@ jobs:
       - name: clang-format diff check
         run: |
           # Run clang-format in check mode; any diff means the file is
-          # not formatted → fail with a useful diff printed to the log.
+          # not formatted → fail with a useful hint printed to the log.
           find src include user \
             \( -name '*.c' -o -name '*.h' \) \
+            ! -path '*/thirdparty/*' \
             ! -path '*/.cache/*' \
             -print0 \
           | xargs -0 clang-format-18 --dry-run --Werror 2>&1 \
           || {
             echo ""
-            echo "┌─ Format violations detected ──────────────────────────────────┐"
+            echo "┌─ Format violations detected ────────────────────────────────────────┐"
             echo "│  Run: make fmt   (or: clang-format -i <files>)                │"
             echo "└───────────────────────────────────────────────────────────────┘"
             exit 1
@@ -69,6 +70,7 @@ jobs:
             --inline-suppr \
             --quiet \
             --error-exitcode=1 \
+            --exclude=thirdparty \
             -I include \
             src/ user/ \
           2>&1 | tee cppcheck.log

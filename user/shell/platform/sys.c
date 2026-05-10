@@ -62,7 +62,9 @@ long sh_write(int fd, const void *buf, size_t len)
 
 int sh_ioctl(int fd, unsigned long request, void *arg)
 {
-  return ioctl(fd, request, arg);
+  return ioctl(
+      fd, (int)request, arg
+  ); /* request fits int; cast silences narrowing */
 }
 
 /**

@@ -25,56 +25,60 @@
 
 enum
 {
-  kMargin      = 20,
-  kPixelHt     = 22,
-  kTabCols  = 8,
-  kEscMax   = 64
+  kMargin  = 20,
+  kPixelHt = 22,
+  kTabCols = 8,
+  kEscMax  = 64
 };
 
-static int        s_active;
-static uint8_t   *s_fb;
+static int             s_active;
+static uint8_t        *s_fb;
 static alcor_fb_info_t s_inf;
 
-static FT_Library s_ft;
-static FT_Face    s_face;
-static hb_font_t *s_hb;
-static uint8_t   *s_font_blob;
-static size_t     s_font_len;
-static hb_buffer_t *s_buf;
+static FT_Library      s_ft;
+static FT_Face         s_face;
+static hb_font_t      *s_hb;
+static uint8_t        *s_font_blob;
+static size_t          s_font_len;
+static hb_buffer_t    *s_buf;
 
 /** Full-row HarfBuzz (liga+calt) — one codepoint per cell in @c s_cells. */
 static hb_feature_t s_feat_liga[] = {
-    {HB_TAG('l', 'i', 'g', 'a'), 1, HB_FEATURE_GLOBAL_START, HB_FEATURE_GLOBAL_END},
-    {HB_TAG('c', 'a', 'l', 't'), 1, HB_FEATURE_GLOBAL_START, HB_FEATURE_GLOBAL_END},
+    {HB_TAG('l', 'i', 'g', 'a'), 1, HB_FEATURE_GLOBAL_START,
+     HB_FEATURE_GLOBAL_END},
+    {HB_TAG('c', 'a', 'l', 't'), 1, HB_FEATURE_GLOBAL_START,
+     HB_FEATURE_GLOBAL_END},
 };
 static const unsigned s_feat_liga_n =
-    (unsigned)(sizeof(s_feat_liga) / sizeof(s_feat_liga[0]));
+    (unsigned)(sizeof(s_feat_liga) / sizeof(s_feat_liga[0])
+    ); // NOLINT(bugprone-sizeof-expression)
 
-static int s_line_h, s_ascent_px, s_descent_px;
-static int s_cell_w, s_cell_h;
-static int s_term_cols, s_term_rows;
-static int s_tc_x, s_tc_y;
+static int       s_line_h, s_ascent_px, s_descent_px;
+static int       s_cell_w, s_cell_h;
+static int       s_term_cols, s_term_rows;
+static int       s_tc_x, s_tc_y;
 
 static uint32_t *s_cells;
 static int       s_saved_cx, s_saved_cy;
 
-static uint32_t s_fg, s_bg;
-static uint32_t s_term_fg, s_term_bg;
-static int      s_bold;
-static int      s_rev;
+static uint32_t  s_fg, s_bg;
+static uint32_t  s_term_fg, s_term_bg;
+static int       s_bold;
+static int       s_rev;
 
-static int s_csr_visible;
-static int s_blink_show_bar;
-static int s_bar_on;
-static int s_bar_cx, s_bar_cy;
+static int       s_csr_visible;
+static int       s_blink_show_bar;
+static int       s_bar_on;
+static int       s_bar_cx, s_bar_cy;
 
 /* Deferred reshape: bits set by mark_dirty(), flushed in flush_dirty_rows().
- * Two u64s cover up to 128 rows (enough for any framebuffer at this cell size). */
+ * Two u64s cover up to 128 rows (enough for any framebuffer at this cell size).
+ */
 static uint64_t s_dirty_rows[2];
 
-static int   s_esc_state;
-static int   s_esc_len;
-static char  s_esc_buf[kEscMax];
+static int      s_esc_state;
+static int      s_esc_len;
+static char     s_esc_buf[kEscMax];
 static unsigned s_utf8_rem;
 static uint32_t s_utf8_partial;
 
@@ -113,15 +117,16 @@ static uint32_t eff_ink(void)
 
 static void put_px(int x, int y, uint32_t rgb, int a)
 {
-  if(x < 0 || y < 0 || (uint32_t)x >= s_inf.width || (uint32_t)y >= s_inf.height)
+  if(x < 0 || y < 0 || (uint32_t)x >= s_inf.width ||
+     (uint32_t)y >= s_inf.height)
     return;
   if(s_inf.bpp != 32 || s_inf.pitch < 4)
     return;
-  size_t     o  = (size_t)y * s_inf.pitch + (size_t)x * 4;
-  uint8_t    nr = (uint8_t)((rgb >> 16) & 0xffu),
+  size_t  o  = (size_t)y * s_inf.pitch + (size_t)x * 4;
+  uint8_t nr = (uint8_t)((rgb >> 16) & 0xffu),
           ng = (uint8_t)((rgb >> 8) & 0xffu), nb = (uint8_t)(rgb & 0xffu);
-  uint8_t   *p  = s_fb + o;
-  uint32_t  aa  = (uint32_t)a;
+  uint8_t *p  = s_fb + o;
+  uint32_t aa = (uint32_t)a;
   if(aa >= 255u) {
     p[0] = nb;
     p[1] = ng;
@@ -130,10 +135,10 @@ static void put_px(int x, int y, uint32_t rgb, int a)
     return;
   }
   uint32_t b0 = p[0], g0 = p[1], r0 = p[2];
-  p[0]        = (uint8_t)((nb * aa + b0 * (255u - aa)) / 255u);
-  p[1]        = (uint8_t)((ng * aa + g0 * (255u - aa)) / 255u);
-  p[2]        = (uint8_t)((nr * aa + r0 * (255u - aa)) / 255u);
-  p[3]        = 0xff;
+  p[0] = (uint8_t)((nb * aa + b0 * (255u - aa)) / 255u);
+  p[1] = (uint8_t)((ng * aa + g0 * (255u - aa)) / 255u);
+  p[2] = (uint8_t)((nr * aa + r0 * (255u - aa)) / 255u);
+  p[3] = 0xff;
 }
 
 static void fill_rect_px(int x0, int y0, int x1, int y1, uint32_t rgb)
@@ -177,10 +182,10 @@ static void metrics_refresh(void)
   if(!s_face)
     return;
   FT_Size_Metrics *m = &s_face->size->metrics;
-  s_line_h       = (int)(m->height >> 6) + 2;
-  s_ascent_px    = (int)(m->ascender >> 6);
-  s_descent_px   = (int)((-m->descender) >> 6);
-  s_cell_h       = s_line_h;
+  s_line_h           = (int)(m->height >> 6) + 2;
+  s_ascent_px        = (int)(m->ascender >> 6);
+  s_descent_px       = (int)((-m->descender) >> 6);
+  s_cell_h           = s_line_h;
 
   if(FT_Load_Char(s_face, 'M', FT_LOAD_DEFAULT) == 0) {
     int w = (int)(s_face->glyph->advance.x >> 6) + 4;
@@ -194,8 +199,8 @@ static void metrics_refresh(void)
 
 static void term_recompute_grid(void)
 {
-  int iw = (int)s_inf.width - 2 * kMargin;
-  int ih = (int)s_inf.height - 2 * kMargin;
+  int iw      = (int)s_inf.width - 2 * kMargin;
+  int ih      = (int)s_inf.height - 2 * kMargin;
   s_term_cols = iw / s_cell_w;
   if(s_term_cols < 1)
     s_term_cols = 1;
@@ -216,22 +221,23 @@ static void term_clear_cell(int cx, int cy)
 /**
  * Draw a shaped row on the cell grid: each new HarfBuzz cluster starts at
  * @c cell_px_x(cluster). Font x_advance is only applied within the same cluster
- * (stacked marks). Accumulating raw advances would misplace glyphs vs @c s_tc_x.
+ * (stacked marks). Accumulating raw advances would misplace glyphs vs @c
+ * s_tc_x.
  */
 static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, uint32_t fg)
 {
-  unsigned              len;
-  hb_glyph_info_t      *info = hb_buffer_get_glyph_infos(buf, &len);
+  unsigned             len;
+  hb_glyph_info_t     *info = hb_buffer_get_glyph_infos(buf, &len);
   hb_glyph_position_t *pos  = hb_buffer_get_glyph_positions(buf, &len);
 
-  uint32_t prev_cluster = ~(uint32_t)0u;
-  int      px            = 0;
-  int      py            = y_baseline;
+  uint32_t             prev_cluster = ~(uint32_t)0u;
+  int                  px           = 0;
+  int                  py           = y_baseline;
 
   for(unsigned i = 0; i < len; i++) {
     if(info[i].cluster != prev_cluster) {
-      prev_cluster     = info[i].cluster;
-      int cp_idx       = (int)info[i].cluster;
+      prev_cluster = info[i].cluster;
+      int cp_idx   = (int)info[i].cluster;
       if(cp_idx < 0)
         cp_idx = 0;
       if(cp_idx >= s_term_cols)
@@ -282,7 +288,7 @@ static void flush_dirty_rows(void)
 {
   for(int w = 0; w < 2; w++) {
     while(s_dirty_rows[w]) {
-      int bit          = __builtin_ctzll(s_dirty_rows[w]);
+      int bit = __builtin_ctzll(s_dirty_rows[w]);
       s_dirty_rows[w] &= s_dirty_rows[w] - 1;
       redraw_line_shaped(w * 64 + bit);
     }
@@ -293,7 +299,8 @@ static void cell_set(int cx, int cy, uint32_t cp)
 {
   if(!s_cells || cx < 0 || cy < 0 || cx >= s_term_cols || cy >= s_term_rows)
     return;
-  s_cells[(size_t)cy * (size_t)s_term_cols + (size_t)cx] = cp ? cp : (uint32_t)' ';
+  s_cells[(size_t)cy * (size_t)s_term_cols + (size_t)cx] =
+      cp ? cp : (uint32_t)' ';
 }
 
 static void redraw_line_shaped(int cy)
@@ -308,7 +315,7 @@ static void redraw_line_shaped(int cy)
     term_clear_cell(x, cy);
 
   hb_buffer_clear_contents(s_buf);
-  hb_buffer_add_utf32(s_buf, row, (unsigned)cols, 0, (unsigned)cols);
+  hb_buffer_add_utf32(s_buf, row, cols, 0, cols);
   hb_buffer_guess_segment_properties(s_buf);
   hb_shape(s_hb, s_buf, s_feat_liga, s_feat_liga_n);
 
@@ -337,7 +344,8 @@ static void cursor_draw_bar(void)
   if(!s_csr_visible || !s_blink_show_bar || s_tc_x < 0 || s_tc_y < 0 ||
      s_tc_x >= s_term_cols || s_tc_y >= s_term_rows)
     return;
-  /* Block cursor (~Linux TTY): left of cell, high contrast vs Nord background. */
+  /* Block cursor (~Linux TTY): left of cell, high contrast vs Nord background.
+   */
   int x0 = cell_px_x(s_tc_x);
   int y0 = cell_px_y_top(s_tc_y) + 1;
   int y1 = cell_px_y_top(s_tc_y) + s_cell_h - 1;
@@ -351,9 +359,9 @@ static void cursor_draw_bar(void)
     for(int x = x0; x < x0 + w && x < (int)s_inf.width; x++)
       put_px(x, y, col, 255);
   }
-  s_bar_on   = 1;
-  s_bar_cx   = s_tc_x;
-  s_bar_cy   = s_tc_y;
+  s_bar_on = 1;
+  s_bar_cx = s_tc_x;
+  s_bar_cy = s_tc_y;
 }
 
 static void term_scroll_one(void)
@@ -367,7 +375,7 @@ static void term_scroll_one(void)
   u32 dy    = (u32)s_cell_h;
   u32 pitch = s_inf.pitch;
   for(u32 y = y0; y + dy < y_end; y++)
-    memmove(s_fb + y * pitch, s_fb + (y + dy) * pitch, pitch);
+    memmove(s_fb + (size_t)y * pitch, s_fb + (size_t)(y + dy) * pitch, pitch);
   fill_rect_px(
       kMargin, (int)(y_end - dy), (int)s_inf.width - kMargin, (int)y_end,
       eff_bg_raw()
@@ -376,10 +384,7 @@ static void term_scroll_one(void)
   if(s_cells) {
     size_t rowb = (size_t)s_term_cols * sizeof(uint32_t);
     memmove(s_cells, s_cells + s_term_cols, rowb * (size_t)(s_term_rows - 1));
-    memset(
-        s_cells + (size_t)(s_term_rows - 1) * (size_t)s_term_cols, 0,
-        rowb
-    );
+    memset(s_cells + (size_t)(s_term_rows - 1) * (size_t)s_term_cols, 0, rowb);
     uint32_t *last = s_cells + (size_t)(s_term_rows - 1) * (size_t)s_term_cols;
     for(int x = 0; x < s_term_cols; x++)
       last[x] = (uint32_t)' ';
@@ -400,7 +405,8 @@ static uint32_t ansi256_to_rgb(unsigned idx)
   static const uint32_t ansi16[16] = {
       0x000000u, 0xcc5555u, 0x55cc55u, 0xcccc55u, 0x5555ffu, 0xcc55ccu,
       0x55ccccu, 0xddddddu, 0x555555u, 0xff8888u, 0x88ff88u, 0xffff88u,
-      0x8888ffu, 0xff88ffu, 0x88ffffu, 0xffffffu};
+      0x8888ffu, 0xff88ffu, 0x88ffffu, 0xffffffu
+  };
   if(idx < 16u)
     return ansi16[idx];
   if(idx < 232u) {
@@ -420,9 +426,9 @@ static uint32_t ansi256_to_rgb(unsigned idx)
 
 static uint32_t ansi8_fg(unsigned i)
 {
-  static const uint32_t c[8] = {
-      0x003b4252u, 0x00bf616au, 0x00a3be8cu, 0x00ebcb8bu, 0x005e81acu,
-      0x00b48eadu, 0x0088c0d0u, 0x00eceff4u};
+  static const uint32_t c[8] = {0x003b4252u, 0x00bf616au, 0x00a3be8cu,
+                                0x00ebcb8bu, 0x005e81acu, 0x00b48eadu,
+                                0x0088c0d0u, 0x00eceff4u};
   if(i < 8u)
     return c[i];
   return s_term_fg;
@@ -430,9 +436,9 @@ static uint32_t ansi8_fg(unsigned i)
 
 static uint32_t ansi8_fg_bright(unsigned i)
 {
-  static const uint32_t c[8] = {
-      0x004c566au, 0x00d08770u, 0x00b8d99bu, 0x00f2e9c4u, 0x0081a1c1u,
-      0x00c89fc8u, 0x008fbcbbu, 0x00e5e9f0u};
+  static const uint32_t c[8] = {0x004c566au, 0x00d08770u, 0x00b8d99bu,
+                                0x00f2e9c4u, 0x0081a1c1u, 0x00c89fc8u,
+                                0x008fbcbbu, 0x00e5e9f0u};
   if(i < 8u)
     return c[i];
   return s_term_fg;
@@ -440,9 +446,9 @@ static uint32_t ansi8_fg_bright(unsigned i)
 
 static uint32_t ansi8_bg(unsigned i)
 {
-  static const uint32_t c[8] = {
-      0x002e3440u, 0x006a4a4eu, 0x003b5348u, 0x0057564eu, 0x003d4f66u,
-      0x00403d52u, 0x003b5254u, 0x00e5e9f0u};
+  static const uint32_t c[8] = {0x002e3440u, 0x006a4a4eu, 0x003b5348u,
+                                0x0057564eu, 0x003d4f66u, 0x00403d52u,
+                                0x003b5254u, 0x00e5e9f0u};
   if(i < 8u)
     return c[i];
   return s_term_bg;
@@ -648,9 +654,8 @@ static void handle_sgr(void)
         pi += 2;
       } else if(pi + 4 < np && pv[pi + 1] == 2) {
         int r = pv[pi + 2], g = pv[pi + 3], b = pv[pi + 4];
-        s_term_fg =
-            ((uint32_t)(r & 255) << 16) | ((uint32_t)(g & 255) << 8) |
-            (uint32_t)(b & 255);
+        s_term_fg = ((uint32_t)(r & 255) << 16) | ((uint32_t)(g & 255) << 8) |
+                    (uint32_t)(b & 255);
         pi += 4;
       }
       break;
@@ -660,9 +665,8 @@ static void handle_sgr(void)
         pi += 2;
       } else if(pi + 4 < np && pv[pi + 1] == 2) {
         int r = pv[pi + 2], g = pv[pi + 3], b = pv[pi + 4];
-        s_term_bg =
-            ((uint32_t)(r & 255) << 16) | ((uint32_t)(g & 255) << 8) |
-            (uint32_t)(b & 255);
+        s_term_bg = ((uint32_t)(r & 255) << 16) | ((uint32_t)(g & 255) << 8) |
+                    (uint32_t)(b & 255);
         pi += 4;
       }
       break;
@@ -767,7 +771,7 @@ static void handle_ansi_sequence(void)
     break;
   case 'J': {
     int pv[4];
-    int np = csi_parse_semicolon_params(pv, 4);
+    int np   = csi_parse_semicolon_params(pv, 4);
     int mode = (np > 0) ? pv[0] : 0;
     if(mode == 2) {
       sh_fb_tty_clear();
@@ -778,7 +782,7 @@ static void handle_ansi_sequence(void)
   }
   case 'K': {
     int pv[4];
-    int np = csi_parse_semicolon_params(pv, 4);
+    int np   = csi_parse_semicolon_params(pv, 4);
     int mode = (np > 0) ? pv[0] : 0;
     if(mode == 0) {
       erase_cells_rect(s_tc_y, s_tc_x, s_tc_y, s_term_cols - 1);
@@ -907,15 +911,15 @@ static void term_feed_byte(unsigned char b)
       return;
     }
     if(b == '7') {
-      s_saved_cx = s_tc_x;
-      s_saved_cy = s_tc_y;
+      s_saved_cx  = s_tc_x;
+      s_saved_cy  = s_tc_y;
       s_esc_state = 0;
       return;
     }
     if(b == '8') {
       cursor_hide_bar();
-      s_tc_x = s_saved_cx;
-      s_tc_y = s_saved_cy;
+      s_tc_x      = s_saved_cx;
+      s_tc_y      = s_saved_cy;
       s_esc_state = 0;
       return;
     }
@@ -971,20 +975,20 @@ static int load_font_file(const char *path, uint8_t **out, size_t *osz)
 
 bool sh_fb_tty_init(const char *font_path)
 {
-  s_fg          = 0x00d8dee9u;
-  s_bg          = 0x002e3440u;
-  s_term_fg     = s_fg;
-  s_term_bg     = s_bg;
-  s_bold        = 0;
-  s_rev         = 0;
-  s_utf8_rem    = 0;
-  s_esc_state   = 0;
-  s_cells       = NULL;
-  s_csr_visible = 1;
+  s_fg             = 0x00d8dee9u;
+  s_bg             = 0x002e3440u;
+  s_term_fg        = s_fg;
+  s_term_bg        = s_bg;
+  s_bold           = 0;
+  s_rev            = 0;
+  s_utf8_rem       = 0;
+  s_esc_state      = 0;
+  s_cells          = NULL;
+  s_csr_visible    = 1;
   s_blink_show_bar = 0;
-  s_bar_on      = 0;
-  s_saved_cx    = 0;
-  s_saved_cy    = 0;
+  s_bar_on         = 0;
+  s_saved_cx       = 0;
+  s_saved_cy       = 0;
 
   if(!font_path || alcor_fb_info(&s_inf) != 0)
     return false;
@@ -1112,8 +1116,8 @@ void sh_fb_tty_shutdown(void)
     s_font_blob = NULL;
   }
   free(s_cells);
-  s_cells = NULL;
-  s_fb    = NULL;
+  s_cells  = NULL;
+  s_fb     = NULL;
   s_active = 0;
 }
 
@@ -1148,7 +1152,8 @@ void sh_fb_tty_cursor_poll(void)
     cursor_draw_bar();
 }
 
-/** Clear bar pixels on framebuffer, then show bar at @c s_tc (before read or after edit). */
+/** Clear bar pixels on framebuffer, then show bar at @c s_tc (before read or
+ * after edit). */
 static void cursor_sync_visible(void)
 {
   if(!s_active)
@@ -1197,6 +1202,7 @@ void sh_fb_tty_present(void)
     return;
   flush_dirty_rows();
   /* Under KVM, VRAM updates can lag until the next VM-exit. A yield triggers
-   * a syscall that lets QEMU/KVM scan the framebuffer before the next read(). */
+   * a syscall that lets QEMU/KVM scan the framebuffer before the next read().
+   */
   (void)sched_yield();
 }

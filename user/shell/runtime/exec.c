@@ -252,9 +252,8 @@ static int run_external(char **argv, const redir_t *redirs)
   if(!resolve_path(argv[0], path))
     return -1;
 
-  int         capture =
-      sh_fb_tty_active() && !redir_touches_stdout(redirs);
-  int         relay[2];
+  int capture = sh_fb_tty_active() && !redir_touches_stdout(redirs);
+  int relay[2];
   if(capture && pipe(relay) < 0)
     return -1;
 
@@ -271,7 +270,8 @@ static int run_external(char **argv, const redir_t *redirs)
     if(capture) {
       if(dup2(relay[1], 1) < 0)
         _exit(1);
-      /* Merge stderr into the relay so initscr()/linker errors reach the FB TTY. */
+      /* Merge stderr into the relay so initscr()/linker errors reach the FB
+       * TTY. */
       if(dup2(1, 2) < 0)
         _exit(1);
       sh_close(relay[0]);
@@ -495,7 +495,7 @@ static int exec_pipeline(ast_t *n)
   /* Expansion happens inside each child via exec_stage_in_child to avoid
    * mutating the shared AST (loop bodies re-execute the same nodes). */
 
-  int cap    = sh_fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
+  int cap = sh_fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
   int relay[2];
   if(cap && pipe(relay) < 0) {
     sh_puts("vega: pipe failed\n");

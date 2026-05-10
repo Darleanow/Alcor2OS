@@ -51,10 +51,10 @@ u64 sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
   if(!p)
     return (u64)-ENOMEM;
 
-  u64 map_sz   = fb_user_map_size();
-  u64 px_off   = fb_user_mmap_pixel_offset();
-  u64 phys0    = fb_user_phys_base();
-  u64 n_pages  = map_sz / PAGE_SIZE;
+  u64 map_sz  = fb_user_map_size();
+  u64 px_off  = fb_user_mmap_pixel_offset();
+  u64 phys0   = fb_user_phys_base();
+  u64 n_pages = map_sz / PAGE_SIZE;
 
   if(size_req != 0 && size_req != map_sz)
     return (u64)-EINVAL;

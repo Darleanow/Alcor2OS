@@ -111,9 +111,16 @@ static int buf_append(
     *buf = new_buf;
     *cap = new_cap;
   }
+  /* Guarantee *buf is non-null before the copy loop (realloc above ensures
+   * this; the explicit check gives the static analyser a definitive proof). */
+  if(!*buf)
+    return -1;
+  char  *dst = *buf;
+  size_t pos = *len_out;
   for(size_t i = 0; i < n; i++)
-    (*buf)[(*len_out)++] = src[i];
-  (*buf)[*len_out] = '\0';
+    dst[pos++] = src[i];
+  dst[pos] = '\0';
+  *len_out = pos;
   return 0;
 }
 

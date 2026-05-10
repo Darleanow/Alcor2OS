@@ -130,6 +130,8 @@ void vfs_oft_release(i32 oft_idx)
   case VFS_FD_PIPE_WRITE:
     /* pipe_oft_release already called above for every close */
     break;
+  default:
+    break;
   }
   fd_table[oft_idx].in_use = false;
   fd_table[oft_idx].ops    = NULL;

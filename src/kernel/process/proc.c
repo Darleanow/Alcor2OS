@@ -8,8 +8,8 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
-#include <alcor2/ktermios.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/ktermios.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
@@ -285,11 +285,11 @@ static int proc_setup_image(
   }
 
   /* 1b. env strings (name=value), below argv strings on the stack */
-  int   envc = 0;
-  u64   env_ptrs[PROC_MAX_ARGV];
+  int envc = 0;
+  u64 env_ptrs[PROC_MAX_ARGV];
   if(envp) {
     while(envp[envc] && envc < PROC_MAX_ARGV) {
-      sp           = push_string(sp, envp[envc]);
+      sp             = push_string(sp, envp[envc]);
       env_ptrs[envc] = sp;
       envc++;
     }

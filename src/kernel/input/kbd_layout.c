@@ -237,23 +237,23 @@ static kbd_layout_t layout = KBD_LAYOUT_US;
 
 typedef struct
 {
-  bool         pend_e0;
-  bool         lalt_dn;
-  bool         ralt_dn;
-  key_state_t  mod;
+  bool        pend_e0;
+  bool        lalt_dn;
+  bool        ralt_dn;
+  key_state_t mod;
 } kbd_ev_ctx_t;
 
 static kbd_ev_ctx_t g_kbd = {0};
 
-void kbd_set_layout(kbd_layout_t lay)
+void                kbd_set_layout(kbd_layout_t lay)
 {
   if((unsigned)lay >= KBD_LAYOUT_COUNT)
     lay = KBD_LAYOUT_US;
-  layout              = lay;
-  out_pend_w          = out_pend_r = 0;
-  g_kbd.pend_e0       = false;
-  g_kbd.lalt_dn       = false;
-  g_kbd.ralt_dn       = false;
+  layout     = lay;
+  out_pend_w = out_pend_r = 0;
+  g_kbd.pend_e0           = false;
+  g_kbd.lalt_dn           = false;
+  g_kbd.ralt_dn           = false;
 }
 
 kbd_layout_t kbd_get_layout(void)
@@ -266,9 +266,8 @@ kbd_layout_t kbd_get_layout(void)
  *            produce a user-visible byte (for select(2) readability).
  * @return true when @a *out should be delivered (dry) or out_pend was fed.
  */
-static bool process_raw_ctx(
-    u8 raw, kbd_ev_ctx_t *s, unsigned char *out, bool dry
-)
+static bool
+    process_raw_ctx(u8 raw, kbd_ev_ctx_t *s, unsigned char *out, bool dry)
 {
   if(raw == 0xe0) {
     s->pend_e0 = true;
@@ -276,12 +275,12 @@ static bool process_raw_ctx(
   }
 
   if(s->pend_e0) {
-    s->pend_e0       = false;
+    s->pend_e0    = false;
     bool released = (raw & KEY_RELEASE) != 0;
     u8   ext      = raw & (u8)~KEY_RELEASE;
 
     if(ext == 0x38) {
-      s->ralt_dn   = !released;
+      s->ralt_dn = !released;
       s->mod.alt = (s->lalt_dn || s->ralt_dn);
       return false;
     }
@@ -334,7 +333,7 @@ static bool process_raw_ctx(
     s->mod.ctrl = !released;
     return false;
   case KEY_LALT:
-    s->lalt_dn   = !released;
+    s->lalt_dn = !released;
     s->mod.alt = (s->lalt_dn || s->ralt_dn);
     return false;
   case KEY_CAPSLOCK:
@@ -466,7 +465,9 @@ static u64 kbd_deliver_ready(proc_t *p, char *buf, u64 count)
   kmemcpy(buf, p->kbd_ready, to_copy);
   if(to_copy < p->kbd_ready_len) {
     u32 rest = p->kbd_ready_len - (u32)to_copy;
-    kmemcpy(p->kbd_ready, p->kbd_ready + to_copy, rest); /* src > dst, no overlap */
+    kmemcpy(
+        p->kbd_ready, p->kbd_ready + to_copy, rest
+    ); /* src > dst, no overlap */
     p->kbd_ready_len = rest;
   } else
     p->kbd_ready_len = 0;
@@ -480,12 +481,12 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   if(!p || count == 0)
     return 0;
 
-  k_termios_t *t         = &p->termios;
-  u32          lflag    = t->c_lflag;
-  bool         icanon   = (lflag & KTERM_ICANON) != 0;
-  bool         echo_on  = (lflag & KTERM_ECHO) != 0;
-  u8           vmin     = t->c_cc[KTERM_VMIN];
-  u8           vtime    = t->c_cc[KTERM_VTIME];
+  k_termios_t  *t       = &p->termios;
+  u32           lflag   = t->c_lflag;
+  bool          icanon  = (lflag & KTERM_ICANON) != 0;
+  bool          echo_on = (lflag & KTERM_ECHO) != 0;
+  u8            vmin    = t->c_cc[KTERM_VMIN];
+  u8            vtime   = t->c_cc[KTERM_VTIME];
   unsigned char verase  = t->c_cc[KTERM_VERASE];
   unsigned char vkill   = t->c_cc[KTERM_VKILL];
   unsigned char veof    = t->c_cc[KTERM_VEOF];
@@ -520,9 +521,9 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
         if(p->kbd_edit_len >= PROC_KBD_LINE_CAP)
           p->kbd_edit_len = PROC_KBD_LINE_CAP - 1;
         kmemcpy(p->kbd_ready, p->kbd_edit, p->kbd_edit_len);
-        p->kbd_ready_len          = p->kbd_edit_len + 1;
+        p->kbd_ready_len              = p->kbd_edit_len + 1;
         p->kbd_ready[p->kbd_edit_len] = '\n';
-        p->kbd_edit_len           = 0;
+        p->kbd_edit_len               = 0;
         return kbd_deliver_ready(p, buf, count);
       }
 
