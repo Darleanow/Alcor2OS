@@ -8,6 +8,7 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
+#include <alcor2/ktermios.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/memory_layout.h>
@@ -108,6 +109,9 @@ static proc_t *proc_alloc(void)
     if(proc_table[i].state == PROC_STATE_FREE) {
       vfs_proc_init_fds(proc_table[i].fds);
       kzero(proc_table[i].fd_cloexec, sizeof(proc_table[i].fd_cloexec));
+      ktermios_init_default(&proc_table[i].termios);
+      proc_table[i].kbd_edit_len  = 0;
+      proc_table[i].kbd_ready_len = 0;
       return &proc_table[i];
     }
   }
@@ -167,7 +171,7 @@ static u64 push_string(u64 sp, const char *str)
  */
 static int proc_setup_image(
     proc_t *p, const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
-    char *const argv[]
+    char *const argv[], char *const envp[]
 )
 {
   u64   stack_pages     = (PROC_USER_STACK / 4096) + 1;
@@ -226,11 +230,11 @@ static int proc_setup_image(
    *
    * We push from stack_top downward, so the LAST push ends up at the
    * LOWEST address (= sp).  Order of pushes:
-   *   1. argv strings  (highest)
+   *   1. argv strings, then env strings  (highest)
    *   2. auxv terminator AT_NULL (val then type — struct layout: type@low,
    * val@high)
    *   3. other auxv entries (AT_PHDR last pushed = lowest among auxv)
-   *   4. envp NULL
+   *   4. envp NULL + envp pointers (if any)
    *   5. argv NULL terminator
    *   6. argv pointers  (argv[0] last pushed = just above argc)
    *   7. argc           (lowest address = final sp)
@@ -280,6 +284,17 @@ static int proc_setup_image(
     arg_ptrs[0] = sp;
   }
 
+  /* 1b. env strings (name=value), below argv strings on the stack */
+  int   envc = 0;
+  u64   env_ptrs[PROC_MAX_ARGV];
+  if(envp) {
+    while(envp[envc] && envc < PROC_MAX_ARGV) {
+      sp           = push_string(sp, envp[envc]);
+      env_ptrs[envc] = sp;
+      envc++;
+    }
+  }
+
   /* Align to 16 bytes before the pointer/auxv area */
   sp &= ALIGN_16_MASK;
 
@@ -299,9 +314,13 @@ static int proc_setup_image(
     PUSH_AUX(AT_PHDR, elf_info.phdr);
   }
 
-  /* 4. envp NULL terminator (no environment variables) */
+  /* 4. envp pointers + NULL terminator (musl: envp = argv + argc + 1) */
   sp -= 8;
   *(u64 *)sp = 0;
+  for(int i = envc - 1; i >= 0; i--) {
+    sp -= 8;
+    *(u64 *)sp = env_ptrs[i];
+  }
 
   /* 5. argv NULL terminator */
   sp -= 8;
@@ -345,7 +364,7 @@ static int proc_setup_image(
 
 u64 proc_create(
     const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
-    char *const argv[]
+    char *const argv[], char *const envp[]
 )
 {
   proc_t *p = proc_alloc();
@@ -368,7 +387,7 @@ u64 proc_create(
   }
   p->kernel_stack_top = (void *)((u64)p->kernel_stack + PROC_KERNEL_STACK);
 
-  if(proc_setup_image(p, name, elf_data, elf_size, elf_fd, argv) < 0) {
+  if(proc_setup_image(p, name, elf_data, elf_size, elf_fd, argv, envp) < 0) {
     kfree(p->kernel_stack);
     vmm_destroy_user_mappings(p->cr3);
     console_print("[PROC] Failed to load image\n");
@@ -427,16 +446,26 @@ extern void proc_enter_first_time(void);
 static void proc_vfork_wake_parent(proc_t *child);
 
 i64         proc_exec_replace_image(
-            proc_t *p, const char *name, i64 elf_fd, char *const argv[]
+            proc_t *p, const char *name, i64 elf_fd, char *const argv[],
+            char *const envp[]
         )
 {
   /* We are running on @p p (this is its syscall handler), so p->cr3 IS the
    * current cr3. Wipe the user-space portion before loading the new image. */
   vmm_clear_user_mappings(p->cr3);
 
-  int rc = proc_setup_image(p, name, NULL, 0, elf_fd, argv);
+  int rc = proc_setup_image(p, name, NULL, 0, elf_fd, argv, envp);
   if(rc < 0)
     return rc;
+
+  /* Old TLS base pointed into the previous address space. Mappings are gone,
+   * but %fs MSR is not cleared by loading a new ELF — keep proc_t in sync
+   * and let context switch install 0 until arch_prctl(SET_FS) runs.
+   *
+   * execve returns on the same CPU without context_switch, so clear the MSR
+   * now; otherwise the next %fs-relative access uses a stale linear address. */
+  p->fs_base = 0;
+  cpu_set_fs_base(0);
 
   kstrncpy(p->name, name, PROC_NAME_MAX);
   kstrncpy(p->exe_path, name, PROC_EXE_PATH_MAX);
@@ -453,6 +482,8 @@ i64         proc_exec_replace_image(
       p->sig_actions[i].sa_restorer = 0;
     }
   }
+  p->kbd_edit_len  = 0;
+  p->kbd_ready_len = 0;
   return 0;
 }
 
@@ -686,10 +717,9 @@ void proc_switch(proc_t *next)
   /* Switch address space */
   vmm_switch(next->cr3);
 
-  /* Restore FS base (TLS) for new process */
-  if(next->fs_base) {
-    cpu_set_fs_base(next->fs_base);
-  }
+  /* Restore FS base (TLS) for new process. Must run even when 0: otherwise
+   * the previous task's %fs leaks across switches (fatal after execve). */
+  cpu_set_fs_base(next->fs_base);
 
   /* Context switch */
   if(prev) {
@@ -726,7 +756,7 @@ void proc_start_first(
     const void *elf_data, u64 elf_size, const char *name, const char *exe_path
 )
 {
-  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL);
+  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL, NULL);
   if(pid == 0) {
     console_print("[PROC] Failed to create first process\n");
     return;
@@ -843,6 +873,10 @@ static i64 proc_fork_impl(
 
   kstrncpy(child->exe_path, parent->exe_path, PROC_EXE_PATH_MAX);
   child->exe_path[PROC_EXE_PATH_MAX - 1] = '\0';
+
+  kmemcpy(&child->termios, &parent->termios, sizeof(child->termios));
+  child->kbd_edit_len  = 0;
+  child->kbd_ready_len = 0;
 
   /* Copy user context from syscall frame */
   child->user_rip    = frame->rip;
