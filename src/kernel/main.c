@@ -14,6 +14,7 @@
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/ata.h>
 #include <alcor2/drivers/console.h>
+#include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/fs/ext2.h>
 #include <alcor2/fs/vfs.h>
@@ -77,7 +78,10 @@ static void print_banner(void)
  *
  * @param fb Limine framebuffer for console output.
  */
-static void init_early(struct limine_framebuffer *fb)
+static void init_early(
+    struct limine_framebuffer *fb, struct limine_memmap_response *memmap,
+    struct limine_hhdm_response *hhdm
+)
 {
   /* Console */
   console_init(fb->address, fb->width, fb->height, fb->pitch, fb->bpp);
@@ -94,14 +98,16 @@ static void init_early(struct limine_framebuffer *fb)
   );
 
   /* Memory management */
-  pmm_init(memmap_request.response, hhdm_request.response->offset);
+  pmm_init(memmap, hhdm->offset);
   console_printf(
       "PMM: %dMB total, %dMB free\n", (int)(pmm_get_total() / 1024 / 1024),
       (int)(pmm_get_free() / 1024 / 1024)
   );
 
-  vmm_init(hhdm_request.response->offset);
+  vmm_init(hhdm->offset);
   console_print("VMM initialized.\n");
+
+  fb_user_boot_init(fb, memmap, hhdm->offset);
 
   heap_init();
 }
@@ -210,7 +216,10 @@ void kmain(void)
     cpu_halt();
 
   /* Early init (console, memory) */
-  init_early(fb_request.response->framebuffers[0]);
+  init_early(
+      fb_request.response->framebuffers[0], memmap_request.response,
+      hhdm_request.response
+  );
 
   /* Core kernel (GDT, IDT, scheduler) */
   init_core();
