@@ -223,7 +223,10 @@ lint:
 	clang-tidy \
 	  --header-filter='^(src|include|user)/.*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
-	  -- -I$(INCLUDE) -Ithirdparty/musl/$(MUSL_PREFIX)/include -std=gnu11
+	  -- -I$(INCLUDE) \
+	     -Iuser/shell/include \
+	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
+	     -std=gnu11
 
 check:
 	cppcheck \

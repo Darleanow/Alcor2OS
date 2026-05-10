@@ -20,7 +20,7 @@ int main(void)
 
   SCREEN *scr = newterm(term, stdout, stdin);
   if(!scr) {
-    fputs(
+    (void)fputs(
         "ncurses-hello: newterm() failed — check /usr/share/terminfo "
         "(host: make ncurses; guest: . /etc/profile)\n",
         stderr

@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
 {
   /* Worst-case size: our own injected flags (~24) + every user arg. */
   int    cap = argc + 32;
-  char **fwd = malloc((size_t)cap * sizeof(*fwd));
+  char **fwd = (char **)malloc((size_t)cap * sizeof(*fwd));
   if(!fwd) {
-    fprintf(stderr, "cc: out of memory\n");
+    (void)fprintf(stderr, "cc: out of memory\n");
     return 1;
   }
 
@@ -146,6 +146,6 @@ int main(int argc, char *argv[])
   fwd[n] = NULL;
 
   execv(REAL_CLANG, fwd);
-  fprintf(stderr, "cc: cannot exec %s\n", REAL_CLANG);
+  (void)fprintf(stderr, "cc: cannot exec %s\n", REAL_CLANG);
   return 127;
 }

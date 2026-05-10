@@ -476,8 +476,8 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
  * fetch a full 4 KB block so adjacent reads land hot.
  */
 
-#define CACHE_BLOCK_SECTORS 8
-#define CACHE_BLOCK_BYTES   (CACHE_BLOCK_SECTORS * 512)
+#define CACHE_BLOCK_SECTORS 8u
+#define CACHE_BLOCK_BYTES   ((u64)CACHE_BLOCK_SECTORS * 512u)
 #define CACHE_NUM_ENTRIES   1024
 #define CACHE_INVALID_LBA   ((u64) - 1)
 

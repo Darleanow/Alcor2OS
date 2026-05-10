@@ -51,6 +51,8 @@ static hb_feature_t s_feat_liga[] = {
 };
 static const unsigned s_feat_liga_n =
     (unsigned)(sizeof(s_feat_liga) / sizeof(s_feat_liga[0]));
+/* NOLINTBEGIN(bugprone-sizeof-expression) — array/element division is correct
+ */
 
 static int       s_line_h, s_ascent_px, s_descent_px;
 static int       s_cell_w, s_cell_h;
@@ -374,7 +376,7 @@ static void term_scroll_one(void)
   u32 dy    = (u32)s_cell_h;
   u32 pitch = s_inf.pitch;
   for(u32 y = y0; y + dy < y_end; y++)
-    memmove(s_fb + y * pitch, s_fb + (y + dy) * pitch, pitch);
+    memmove(s_fb + (size_t)y * pitch, s_fb + (size_t)(y + dy) * pitch, pitch);
   fill_rect_px(
       kMargin, (int)(y_end - dy), (int)s_inf.width - kMargin, (int)y_end,
       eff_bg_raw()

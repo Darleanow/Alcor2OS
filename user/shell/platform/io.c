@@ -72,7 +72,7 @@ void sh_putnum(long n)
   }
 
   while(n > 0) {
-    buf[i++] = '0' + (n % 10);
+    buf[i++] = (char)('0' + (int)(n % 10));
     n /= 10;
   }
 

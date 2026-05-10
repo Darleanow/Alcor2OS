@@ -29,8 +29,8 @@ __attribute__((constructor)) static void alcor2_stdio_tty_buffering(void)
     setenv("TERMINFO", "/usr/share/terminfo", 0);
 
   if(isatty(STDIN_FILENO))
-    setvbuf(stdin, NULL, _IONBF, 0);
+    (void)setvbuf(stdin, NULL, _IONBF, 0);
 
-  setvbuf(stdout, NULL, _IONBF, 0);
-  setvbuf(stderr, NULL, _IONBF, 0);
+  (void)setvbuf(stdout, NULL, _IONBF, 0);
+  (void)setvbuf(stderr, NULL, _IONBF, 0);
 }
