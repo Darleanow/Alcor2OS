@@ -65,9 +65,9 @@ void pipe_oft_retain(i32 kind, void *pipe_ptr)
     p->write_open++;
 }
 
-bool pipe_poll_read_ready(void *pipe_ptr)
+bool pipe_poll_read_ready(const void *pipe_ptr)
 {
-  pipe_t *p = (pipe_t *)pipe_ptr;
+  const pipe_t *p = (const pipe_t *)pipe_ptr;
   if(!p || !p->allocated || !p->read_open)
     return false;
   if(p->count > 0)
@@ -75,9 +75,9 @@ bool pipe_poll_read_ready(void *pipe_ptr)
   return !p->write_open;
 }
 
-bool pipe_poll_write_ready(void *pipe_ptr)
+bool pipe_poll_write_ready(const void *pipe_ptr)
 {
-  pipe_t *p = (pipe_t *)pipe_ptr;
+  const pipe_t *p = (const pipe_t *)pipe_ptr;
   if(!p || !p->allocated || !p->write_open)
     return false;
   if(!p->read_open)
@@ -266,8 +266,8 @@ u64 sys_pipe2(u64 pipefd, u64 flags, u64 a3, u64 a4, u64 a5, u64 a6)
    * relies on this for its error-reporting pipe).  FD_CLOEXEC is a per-fd
    * attribute — it must NOT be stored in the shared OFT entry. */
   if((u32)flags & O_CLOEXEC) {
-    int    *fds = (int *)pipefd;
-    proc_t *p   = proc_current();
+    const int *fds = (const int *)pipefd;
+    proc_t    *p   = proc_current();
     if(p) {
       p->fd_cloexec[fds[0]] = 1;
       p->fd_cloexec[fds[1]] = 1;

@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 
+// cppcheck-suppress constParameter
 int main(int argc, char *argv[])
 {
   if(argc < 2) {

@@ -575,7 +575,7 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   return filled;
 }
 
-bool kbd_select_read_ready(proc_t *p)
+bool kbd_select_read_ready(const proc_t *p)
 {
   if(!p)
     return kbd_raw_pending();

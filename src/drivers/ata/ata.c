@@ -35,21 +35,21 @@ static ata_drive_t   drives[4];
 static void         *bounce_virt[2]; /* DMA bounce buffer (virtual, 64 KB) */
 static u64           bounce_phys[2]; /* DMA bounce buffer (physical)        */
 
-static inline u8     reg_read(ata_channel_t *ch, u8 reg)
+static inline u8     reg_read(const ata_channel_t *ch, u8 reg)
 {
   return inb(ch->base + reg);
 }
-static inline void reg_write(ata_channel_t *ch, u8 reg, u8 v)
+static inline void reg_write(const ata_channel_t *ch, u8 reg, u8 v)
 {
   outb(ch->base + reg, v);
 }
-static inline u8 alt_status(ata_channel_t *ch)
+static inline u8 alt_status(const ata_channel_t *ch)
 {
   return inb(ch->ctrl);
 }
 
 /* ~400 ns delay (ATA spec after drive select / command issue). */
-static inline void delay_400ns(ata_channel_t *ch)
+static inline void delay_400ns(const ata_channel_t *ch)
 {
   alt_status(ch);
   alt_status(ch);
@@ -63,7 +63,7 @@ static inline void delay_400ns(ata_channel_t *ch)
  * @param iters Maximum iterations.
  * @return Last status byte.
  */
-static u8 poll_bsy(ata_channel_t *ch, u32 iters)
+static u8 poll_bsy(const ata_channel_t *ch, u32 iters)
 {
   u8 s = 0xFF;
   for(u32 i = 0; i < iters; i++) {
@@ -81,7 +81,7 @@ static u8 poll_bsy(ata_channel_t *ch, u32 iters)
  * @param iters Maximum iterations.
  * @return true if DRQ set, false on error/timeout.
  */
-static bool poll_drq(ata_channel_t *ch, u32 iters)
+static bool poll_drq(const ata_channel_t *ch, u32 iters)
 {
   for(u32 i = 0; i < iters; i++) {
     u8 s = reg_read(ch, ATA_REG_STATUS);
@@ -98,7 +98,7 @@ static bool poll_drq(ata_channel_t *ch, u32 iters)
  * @brief Select a drive on its channel (master or slave).
  * @param d Drive to select.
  */
-static void select_drive(ata_drive_t *d)
+static void select_drive(const ata_drive_t *d)
 {
   reg_write(d->channel, ATA_REG_HDDEVSEL, 0xA0 | (d->slave << 4));
   delay_400ns(d->channel);
@@ -122,7 +122,7 @@ static void trim_string(char *s, size_t len)
  * @param ch Channel to probe.
  * @return true if device present.
  */
-static bool channel_exists(ata_channel_t *ch)
+static bool channel_exists(const ata_channel_t *ch)
 {
   return reg_read(ch, ATA_REG_STATUS) != 0xFF;
 }
@@ -133,7 +133,7 @@ static bool channel_exists(ata_channel_t *ch)
  */
 static void identify(ata_drive_t *d)
 {
-  ata_channel_t *ch = d->channel;
+  const ata_channel_t *ch = d->channel;
 
   d->present = false;
   d->atapi   = false;
@@ -214,7 +214,7 @@ static void identify(ata_drive_t *d)
  */
 static i64 wait_irq(ata_channel_t *ch)
 {
-  task_t *me = (task_t *)ch->waiter;
+  const task_t *me = (const task_t *)ch->waiter;
 
   if(!me) {
     cpu_enable_interrupts();
@@ -266,7 +266,7 @@ static void prepare_irq_wait(ata_channel_t *ch)
  */
 static void setup_lba28(ata_drive_t *d, u64 lba, u8 count)
 {
-  ata_channel_t *ch = d->channel;
+  const ata_channel_t *ch = d->channel;
   reg_write(
       ch, ATA_REG_HDDEVSEL, 0xE0 | (d->slave << 4) | ((lba >> 24) & 0x0F)
   );
@@ -285,7 +285,7 @@ static void setup_lba28(ata_drive_t *d, u64 lba, u8 count)
  */
 static void setup_lba48(ata_drive_t *d, u64 lba, u16 count)
 {
-  ata_channel_t *ch = d->channel;
+  const ata_channel_t *ch = d->channel;
   reg_write(ch, ATA_REG_HDDEVSEL, 0x40 | (d->slave << 4));
   delay_400ns(ch);
   reg_write(ch, ATA_REG_SECCOUNT, (u8)(count >> 8));
@@ -481,13 +481,15 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
 #define CACHE_NUM_ENTRIES   1024
 #define CACHE_INVALID_LBA   ((u64) - 1)
 
+// cppcheck-suppress unusedStructMember
 typedef struct
 {
   u64 block_lba; /* aligned, CACHE_INVALID_LBA = free slot */
   u64 last_used;
   u8  drive;
-  u8  pad[7];
-  u8  data[CACHE_BLOCK_BYTES];
+  // cppcheck-suppress unusedStructMember
+  u8 pad[7];
+  u8 data[CACHE_BLOCK_BYTES];
 } ata_cache_entry_t;
 
 static ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];

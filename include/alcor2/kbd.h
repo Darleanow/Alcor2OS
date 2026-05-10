@@ -54,6 +54,6 @@ bool kbd_raw_pending(void);
 
 /** @brief select(2) readability for fd 0 honoring ICANON / line-ready
  * semantics. */
-bool kbd_select_read_ready(struct proc *p);
+bool kbd_select_read_ready(const struct proc *p);
 
 #endif /* ALCOR2_KBD_H */

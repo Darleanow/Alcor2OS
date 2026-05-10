@@ -103,6 +103,10 @@ static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
     {
       u16 row, col, xpixel, ypixel;
     } ws = {25, 80, 0, 0};
+    (void)ws.row;
+    (void)ws.col;
+    (void)ws.xpixel;
+    (void)ws.ypixel;
     kmemcpy((void *)arg, &ws, sizeof(ws));
     return 0;
   }

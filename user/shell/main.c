@@ -10,6 +10,10 @@
 #include <vega/shell.h>
 #include <vega/vega.h>
 
+#ifndef VEGA_VERSION
+  #define VEGA_VERSION "1.0.0"
+#endif
+
 static void fb_cursor_after_edit(void)
 {
   if(sh_fb_tty_active())

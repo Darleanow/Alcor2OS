@@ -183,7 +183,7 @@ u64 sys_access(u64 path, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
     return (u64)-EFAULT;
 
   if(path_is_proc_self_exe((const char *)path)) {
-    proc_t *p = proc_current();
+    const proc_t *p = proc_current();
     if(!p || !p->exe_path[0])
       return (u64)-ENOENT;
     return 0;
@@ -317,7 +317,7 @@ u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
     proc_t *p = proc_current();
     if(!p)
       return (u64)-EINVAL;
-    if(fd > 2 && p->fds[fd] < 0)
+    if(fd > 2 && fd < 256 && p->fds[fd] < 0)
       return (u64)-EBADF;
     p->fd_cloexec[fd] = (arg & FD_CLOEXEC) ? 1 : 0;
     return 0;
@@ -567,7 +567,7 @@ u64 sys_readlink(u64 path, u64 buf, u64 bufsiz, u64 a4, u64 a5, u64 a6)
   const char *pstr = (const char *)path;
 
   if(path_is_proc_self_exe(pstr)) {
-    proc_t *p = proc_current();
+    const proc_t *p = proc_current();
     if(!p || !p->exe_path[0])
       return (u64)-ENOENT;
     u64 len = kstrlen(p->exe_path);

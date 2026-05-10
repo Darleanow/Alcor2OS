@@ -172,7 +172,7 @@ u64 sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
     return (u64)-EINVAL;
 
   /* frame->rsp is user RSP at sigreturn call time = &sig_ucontext_t */
-  sig_ucontext_t *ctx = (sig_ucontext_t *)frame->rsp;
+  const sig_ucontext_t *ctx = (const sig_ucontext_t *)frame->rsp;
   if(!vmm_is_user_range(ctx, sizeof(sig_ucontext_t)))
     return (u64)-EFAULT;
 
@@ -229,7 +229,7 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
-  proc_t *target = proc_get((u64)pid);
+  const proc_t *target = proc_get((u64)pid);
   if(!target)
     return (u64)-ESRCH;
 

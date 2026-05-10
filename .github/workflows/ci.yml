@@ -70,7 +70,7 @@ jobs:
             --inline-suppr \
             --quiet \
             --error-exitcode=1 \
-            --exclude=thirdparty \
+            -ithirdparty \
             -I include \
             src/ user/ \
           2>&1 | tee cppcheck.log

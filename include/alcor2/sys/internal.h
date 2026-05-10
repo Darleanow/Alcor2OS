@@ -117,12 +117,14 @@ SYSCALL_DECL(sys_alcor_fb_mmap);
 /**
  * @brief True if @c pipe_read would not block (data in buffer or EOF).
  */
-bool pipe_poll_read_ready(void *pipe);
+bool pipe_poll_read_ready(const void *pipe);
 
 /**
- * @brief True if @c pipe_write would not block (buffer not full).
+ * @brief Check if a pipe can be written to without blocking.
+ * @param pipe Opaque pointer to the pipe.
+ * @return true if space is available or read end is closed.
  */
-bool pipe_poll_write_ready(void *pipe);
+bool pipe_poll_write_ready(const void *pipe);
 
 /**
  * @brief Read up to @p count bytes from the read end of a pipe object.
