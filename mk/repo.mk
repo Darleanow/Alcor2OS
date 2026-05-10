@@ -17,7 +17,7 @@ help:
 	@echo "  disk-mount / disk-umount   manual inspect of $(DISK)"
 	@echo "  disk-resync       user + disk-populate"
 	@echo "  make run USE_KVM=0   slower CPU emu (TCG); KVM itself does not use sudo"
-	@echo "  musl | musl-cross | tcc | clang | ncurses | freetype | harfbuzz   bootstrap"
+	@echo "  musl | musl-cross | clang | ncurses | freetype | harfbuzz   bootstrap"
 	@echo "  format lint check qa — static analysis / style"
 
 kernel: $(BUILD)/$(KERNEL)
@@ -109,18 +109,13 @@ disk-populate: user
 	@echo "stage → $(DISK_ROOT)"
 	@rm -rf $(DISK_ROOT)
 	@mkdir -p $(DISK_ROOT)/bin $(DISK_ROOT)/etc $(DISK_ROOT)/tmp $(DISK_ROOT)/home \
-		$(DISK_ROOT)/usr/bin $(DISK_ROOT)/usr/lib/tcc \
+		$(DISK_ROOT)/usr/bin \
 		$(DISK_ROOT)/usr/include $(DISK_ROOT)/usr/lib
 	@sh scripts/macos-disk-preserve.sh $(DISK) $(DISK_ROOT) || true
 	@cp user/build/bin/*.elf  $(DISK_ROOT)/bin/ 2>/dev/null || true
 	@cp user/build/apps/*.elf $(DISK_ROOT)/bin/ 2>/dev/null || true
 	@for f in $(DISK_ROOT)/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done
-	@if [ -f thirdparty/tcc-install/usr/bin/tcc ]; then \
-		cp thirdparty/tcc-install/usr/bin/tcc $(DISK_ROOT)/bin/tcc; \
-		cp -r thirdparty/tcc-install/usr/lib/tcc/. $(DISK_ROOT)/usr/lib/tcc/; \
-	else \
-		echo "[disk] no tcc on disk (optional: make tcc)"; \
-	fi
+
 	@cp -r thirdparty/musl/$(MUSL_PREFIX)/include/. $(DISK_ROOT)/usr/include/
 	@cp thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a $(DISK_ROOT)/usr/lib/libc.a
 	@cp thirdparty/musl/$(MUSL_PREFIX)/lib/crt1.o $(DISK_ROOT)/usr/lib/crt1.o
@@ -178,12 +173,7 @@ disk-populate: user
 else
 # Linux: single source of truth — scripts/disk-populate.sh installs
 # /bin/clang.real + cc wrapper (see user/bin/cc.c). Do not duplicate logic here.
-# TCC is optional — if not yet built it is skipped gracefully by the script.
 disk-populate: $(DISK) user
-	@echo "[disk-populate] checking tcc..."
-	@if [ ! -f thirdparty/tcc-install/usr/bin/tcc ]; then \
-	  echo "[disk] tcc not built — run 'make tcc' to include it on the guest disk (optional)"; \
-	fi
 	@set -e; mkdir -p mnt; \
 	if command -v fuse2fs >/dev/null 2>&1 && [ "$$(uname -s)" = Linux ]; then \
 	  fuse2fs "$(CURDIR)/$(DISK)" mnt; S=''; \

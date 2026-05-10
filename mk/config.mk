@@ -66,14 +66,14 @@ QEMU       ?= qemu-system-x86_64
 QEMU_RAM   ?= 2048M
 USE_KVM    ?=
 
-QEMU_KVM :=
+QEMU_KVM := -cpu max
 ifeq ($(UNAME),Linux)
   ifeq ($(USE_KVM),0)
-    QEMU_KVM :=
+    QEMU_KVM := -cpu max
   else ifeq ($(USE_KVM),1)
     QEMU_KVM := -enable-kvm -cpu host
   else
-    QEMU_KVM := $(shell test -r /dev/kvm && printf '%s' '-enable-kvm -cpu host')
+    QEMU_KVM := $(shell test -r /dev/kvm && printf '%s' '-enable-kvm -cpu host' || printf '%s' '-cpu max')
   endif
 else ifeq ($(UNAME),Darwin)
   ifneq ($(USE_KVM),0)
