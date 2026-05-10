@@ -116,6 +116,11 @@ jobs:
             CCACHE=1 \
             -j$(nproc)
 
+      - name: Build third-party dependencies
+        run: |
+          make freetype harfbuzz ncurses musl-cross \
+            -j$(nproc)
+
       - name: Build userland
         run: |
           make user \
