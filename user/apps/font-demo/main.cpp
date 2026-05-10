@@ -95,7 +95,7 @@ static void blit_gray(
 }
 
 static void shape_draw_line(
-    uint8_t *fb, alcor_fb_info_t *inf, FT_Face face, hb_font_t *hbfont,
+    uint8_t *fb, const alcor_fb_info_t *inf, FT_Face face, hb_font_t *hbfont,
     unsigned pixel_h, int pen_x, int baseline_y, const char *utf8,
     uint32_t fg
 )
@@ -149,7 +149,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  uint8_t *fb = (uint8_t *)alcor_fb_mmap();
+  uint8_t *fb = static_cast<uint8_t *>(alcor_fb_mmap());
   if(!fb || fb == (uint8_t *)-1) {
     const char msg[] = "font-demo: fb_mmap syscall failed\n";
     write(2, msg, sizeof(msg) - 1);

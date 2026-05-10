@@ -181,7 +181,7 @@ static void metrics_refresh(void)
 {
   if(!s_face)
     return;
-  FT_Size_Metrics *m = &s_face->size->metrics;
+  const FT_Size_Metrics *m = &s_face->size->metrics;
   s_line_h           = (int)(m->height >> 6) + 2;
   s_ascent_px        = (int)(m->ascender >> 6);
   s_descent_px       = (int)((-m->descender) >> 6);

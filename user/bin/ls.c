@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  struct dirent *entry;
+  const struct dirent *entry;
   while((entry = readdir(dir)) != NULL) {
     if(entry->d_type == DT_DIR) {
       print("[DIR]  ");

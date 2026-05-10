@@ -35,7 +35,7 @@ static i64 copy_user_strvec(
 {
   int n = 0;
   if(user_vec && user_vec[0]) {
-    for(; user_vec[n] && n < MAX_EXEC_ARGS; n++) {
+    for(; n < MAX_EXEC_ARGS && user_vec[n]; n++) {
       if(!user_cstr_ok((u64)user_vec[n]))
         return -EFAULT;
       kstrncpy(store[n], user_vec[n], MAX_ARG_LEN);
@@ -99,7 +99,7 @@ u64 sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
   if(flags & ~(ALCOR_CLONE_VM | ALCOR_CLONE_VFORK | ALCOR_CSIGNAL))
     return (u64)-EINVAL;
 
-  syscall_frame_t *frame = syscall_get_current_frame();
+  const syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
     return (u64)-EINVAL;
 
@@ -118,7 +118,7 @@ u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  syscall_frame_t *frame = syscall_get_current_frame();
+  const syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
     return (u64)-EINVAL;
   return (u64)proc_fork(frame);

@@ -266,7 +266,7 @@ static int proc_setup_image(
   /* Count arguments */
   int argc = 0;
   if(argv) {
-    while(argv[argc] && argc < PROC_MAX_ARGV)
+    while(argc < PROC_MAX_ARGV && argv[argc])
       argc++;
   }
   if(argc == 0)
@@ -288,7 +288,7 @@ static int proc_setup_image(
   int envc = 0;
   u64 env_ptrs[PROC_MAX_ARGV];
   if(envp) {
-    while(envp[envc] && envc < PROC_MAX_ARGV) {
+    while(envc < PROC_MAX_ARGV && envp[envc]) {
       sp             = push_string(sp, envp[envc]);
       env_ptrs[envc] = sp;
       envc++;
@@ -443,7 +443,7 @@ u64 proc_create(
  */
 extern void proc_enter_first_time(void);
 
-static void proc_vfork_wake_parent(proc_t *child);
+static void proc_vfork_wake_parent(const proc_t *child);
 
 i64         proc_exec_replace_image(
             proc_t *p, const char *name, i64 elf_fd, char *const argv[],
@@ -488,7 +488,7 @@ i64         proc_exec_replace_image(
 }
 
 /** Wake parent blocked in CLONE_VFORK after @p child exec'd or is exiting. */
-static void proc_vfork_wake_parent(proc_t *child)
+static void proc_vfork_wake_parent(const proc_t *child)
 {
   if(!child)
     return;
@@ -506,7 +506,7 @@ static void proc_vfork_wake_parent(proc_t *child)
  * Wakes a parent that blocked in CLONE_VFORK. Must be called AFTER
  * vfs_proc_close_cloexec_fds() so the parent's errpipe read gets EOF.
  */
-void proc_notify_exec(proc_t *p)
+void proc_notify_exec(const proc_t *p)
 {
   proc_vfork_wake_parent(p);
 }

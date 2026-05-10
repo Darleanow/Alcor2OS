@@ -127,7 +127,7 @@ static u64 futex_wake_pa(u64 key_pa, u64 max_wake)
     proc_t *w           = g_futex_q[i].waiter;
     g_futex_q[i].key_pa = 0;
     g_futex_q[i].waiter = NULL;
-    if(w && w->state == PROC_STATE_BLOCKED)
+    if(w->state == PROC_STATE_BLOCKED)
       w->state = PROC_STATE_READY;
     woke++;
   }

@@ -39,7 +39,7 @@ void fb_user_boot_init(
 
   if(memmap) {
     for(u64 i = 0; i < memmap->entry_count; i++) {
-      struct limine_memmap_entry *e = memmap->entries[i];
+      const struct limine_memmap_entry *e = memmap->entries[i];
       if(e->type == LIMINE_MEMMAP_FRAMEBUFFER) {
         fb_phys = e->base;
         break;

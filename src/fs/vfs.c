@@ -673,6 +673,7 @@ i64 vfs_open(const char *path, u32 flags)
     } else {
       fh = mount->ops->open(mount->fs_data, rel_path, flags, &is_dir);
     }
+    (void)is_dir;
     /* Must return negative errno (never plain -1): musl maps raw -1 to
      * errno=EPERM. */
     if(!fh)
@@ -1874,7 +1875,7 @@ i64 vfs_readlink(const char *path, char *buf, u64 cap)
   char abs_path[VFS_PATH_MAX];
   make_absolute_path(path, abs_path, VFS_PATH_MAX);
 
-  vfs_mount_t *mount = find_mount(abs_path);
+  const vfs_mount_t *mount = find_mount(abs_path);
   if(!mount || !mount->active || !mount->fs_data || !mount->fstype)
     return -ENOENT;
 

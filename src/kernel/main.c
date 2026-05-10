@@ -80,7 +80,7 @@ static void print_banner(void)
  */
 static void init_early(
     struct limine_framebuffer *fb, struct limine_memmap_response *memmap,
-    struct limine_hhdm_response *hhdm
+    const struct limine_hhdm_response *hhdm
 )
 {
   /* Console */

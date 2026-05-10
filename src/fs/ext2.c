@@ -1204,7 +1204,7 @@ static i64 dir_find_entry(
 
     u32 block_offset = 0;
     while(block_offset < block_size) {
-      ext2_dirent_t *de = (ext2_dirent_t *)(block_buf + block_offset);
+      const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + block_offset);
 
       if(de->rec_len == 0)
         break;
@@ -1349,7 +1349,7 @@ static i64 dir_add_entry(
  * @return 0 on success, negative on error.
  */
 static i64 dir_remove_entry(
-    ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name
+    const ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name
 )
 {
   u32 name_len   = kstrlen(name);
@@ -1455,7 +1455,7 @@ static bool
 
     u32 block_offset = 0;
     while(block_offset < block_size) {
-      ext2_dirent_t *de = (ext2_dirent_t *)(block_buf + block_offset);
+      const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + block_offset);
 
       if(de->rec_len == 0)
         break;
@@ -2160,7 +2160,7 @@ i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry)
       return -EIO;
     }
 
-    ext2_dirent_t *de = (ext2_dirent_t *)(block_buf + block_offset);
+    const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + block_offset);
 
     if(de->rec_len == 0) {
       dir->position = (file_block + 1) * block_size;

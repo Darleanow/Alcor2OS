@@ -190,7 +190,7 @@ i64 proc_clone(const syscall_frame_t *frame, u64 child_stack, u32 clone_flags);
  * @brief Wake a vfork-blocked parent after exec succeeds and cloexec fds are
  *        closed. Call from sys_execve AFTER vfs_proc_close_cloexec_fds().
  */
-void proc_notify_exec(proc_t *p);
+void proc_notify_exec(const proc_t *p);
 
 /**
  * @brief POSIX-style exec: replace @p p's user image with the ELF read from

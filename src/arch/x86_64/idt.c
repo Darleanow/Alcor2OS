@@ -104,7 +104,7 @@ void exception_handler(interrupt_frame_t *frame)
     console_printf("%d", (int)frame->vector);
   }
 
-  proc_t *p = proc_current();
+  const proc_t *p = proc_current();
   if(p) {
     console_print(" [");
     console_print(p->name);
