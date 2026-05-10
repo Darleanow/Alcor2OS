@@ -87,6 +87,8 @@
 #define SYS_NEWFSTATAT        262
 #define SYS_PIPE2             293
 #define SYS_SIGALTSTACK       131
+#define SYS_ALCOR_FB_INFO     498 /**< User FB geometry (@ref alcor_fb_info_t). */
+#define SYS_ALCOR_FB_MMAP     499 /**< Map linear framebuffer (RW, shared). */
 #define SYS_MAX               512
 /* Unmapped syscall numbers in dispatcher intentionally return -ENOSYS. */
 /** @} */

@@ -110,6 +110,10 @@ SYSCALL_DECL(sys_arch_prctl);
 SYSCALL_DECL(sys_pipe);
 SYSCALL_DECL(sys_pipe2);
 
+/* Userspace FB / compositors */
+SYSCALL_DECL(sys_alcor_fb_info);
+SYSCALL_DECL(sys_alcor_fb_mmap);
+
 /**
  * @brief True if @c pipe_read would not block (data in buffer or EOF).
  */
