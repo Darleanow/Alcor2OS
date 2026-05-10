@@ -226,6 +226,8 @@ lint:
 	  -- -I$(INCLUDE) \
 	     -Iuser/shell/include \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
+	     -Ithirdparty/freetype-install/usr/include/freetype2 \
+	     -Ithirdparty/harfbuzz-install/usr/include/harfbuzz \
 	     -std=gnu11
 
 check:

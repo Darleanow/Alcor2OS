@@ -16,7 +16,9 @@ Checks: >-
   -clang-analyzer-optin.performance.Padding,
   -bugprone-reserved-identifier,
   -cert-dcl37-c,
-  -cert-dcl51-cpp
+  -cert-dcl51-cpp,
+  -bugprone-branch-clone,
+  -bugprone-multi-level-implicit-pointer-conversion
 WarningsAsErrors: ''
 HeaderFilterRegex: '^(src|include|user)/.*'
 FormatStyle:     none

@@ -351,7 +351,8 @@ char *lex_read_heredoc_body(lexer_t *L, const char *delim)
 
   /* Collect lines until one equals @p delim. */
   const char *body_start = L->cur;
-  const char *body_end   = body_start;
+  const char *body_end =
+      body_start; // NOLINT(clang-analyzer-deadcode.DeadStores)
   while(*L->cur) {
     const char *line_start = L->cur;
     while(*L->cur && *L->cur != '\n')
@@ -365,7 +366,7 @@ char *lex_read_heredoc_body(lexer_t *L, const char *delim)
     }
     if(*L->cur == '\n')
       L->cur++;
-    body_end = L->cur;
+    /* body_end is only read on the goto-done path above; no update needed */
   }
   /* Reached EOF without seeing the delimiter. */
   sh_puts("vega: unterminated heredoc (missing '");

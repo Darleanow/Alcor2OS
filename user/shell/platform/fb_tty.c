@@ -50,9 +50,8 @@ static hb_feature_t s_feat_liga[] = {
      HB_FEATURE_GLOBAL_END},
 };
 static const unsigned s_feat_liga_n =
-    (unsigned)(sizeof(s_feat_liga) / sizeof(s_feat_liga[0]));
-/* NOLINTBEGIN(bugprone-sizeof-expression) — array/element division is correct
- */
+    (unsigned)(sizeof(s_feat_liga) / sizeof(s_feat_liga[0])
+    ); // NOLINT(bugprone-sizeof-expression)
 
 static int       s_line_h, s_ascent_px, s_descent_px;
 static int       s_cell_w, s_cell_h;
@@ -316,7 +315,7 @@ static void redraw_line_shaped(int cy)
     term_clear_cell(x, cy);
 
   hb_buffer_clear_contents(s_buf);
-  hb_buffer_add_utf32(s_buf, row, (unsigned)cols, 0, (unsigned)cols);
+  hb_buffer_add_utf32(s_buf, row, cols, 0, cols);
   hb_buffer_guess_segment_properties(s_buf);
   hb_shape(s_hb, s_buf, s_feat_liga, s_feat_liga_n);
 
