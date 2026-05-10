@@ -1,7 +1,7 @@
 # Userland, images, disk, QA
 
-.PHONY: all help kernel user iso run disk disk-mount disk-umount \
-        disk-populate disk-resync clean distclean format lint check qa
+.PHONY: all help kernel user iso iso-kernel run disk disk-mount disk-umount \
+        disk-populate disk-resync clean distclean format fmt lint check qa
 
 all: kernel compile_commands
 
@@ -9,6 +9,7 @@ help:
 	@echo "Alcor2 — useful targets"
 	@echo "  all (default)     kernel + compile_commands (clangd)"
 	@echo "  kernel            link $(BUILD)/$(KERNEL) only"
+	@echo "  iso-kernel        bootable ISO with kernel only (no user/ step) — fastest CI check"
 	@echo "  user              userland (crt, init, shell, bin, apps if g++ exists)"
 	@echo "  iso               Limine bootable CD image (+ kernel, shell on ISO)"
 	@echo "  run               QEMU: Limine ISO + $(DISK) (IDE)"
@@ -32,11 +33,33 @@ user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 		echo "[user] skipping user/apps (no musl-cross g++)"; \
 	fi
 
+# iso-kernel: fastest path used by CI on every push/PR.
+# Produces a bootable ISO with the kernel only — no user/ binaries required.
+iso-kernel: $(BUILD)/$(KERNEL) thirdparty/limine/limine
+	@rm -rf $(BUILD)/iso
+	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT
+	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
+	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
+	@cp thirdparty/limine/limine-bios.sys      $(BUILD)/iso/boot/limine/
+	@cp thirdparty/limine/limine-bios-cd.bin   $(BUILD)/iso/boot/limine/
+	@cp thirdparty/limine/limine-uefi-cd.bin   $(BUILD)/iso/boot/limine/
+	@cp thirdparty/limine/BOOTX64.EFI          $(BUILD)/iso/EFI/BOOT/
+	@cp thirdparty/limine/BOOTIA32.EFI         $(BUILD)/iso/EFI/BOOT/
+	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		--efi-boot boot/limine/limine-uefi-cd.bin \
+		-efi-boot-part --efi-boot-image --protective-msdos-label \
+		$(BUILD)/iso -o $(BUILD)/$(ISO) 2>/dev/null
+	@thirdparty/limine/limine bios-install $(BUILD)/$(ISO) 2>/dev/null
+	@echo "$(BUILD)/$(ISO) [kernel-only]"
+
 iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user
 	@rm -rf $(BUILD)/iso
 	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT $(BUILD)/iso/bin
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
-	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/
+	# shell.elf is optional — it may not exist if user/shell failed to build
+	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || \
+		echo "[iso] warning: user/build/shell/shell.elf not found — ISO boots without shell"
 	@cp user/build/bin/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp user/build/apps/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
@@ -146,7 +169,7 @@ disk-populate: user
 	fi
 	@echo "Welcome to Alcor2!" > $(DISK_ROOT)/etc/motd
 	@echo "  tip : . /etc/profile   # TERM;  ncurses: cc ui.c -lncurses -ltinfo" >> $(DISK_ROOT)/etc/motd
-	@echo 'export TERM="$${TERM:-xterm-256color}"' > $(DISK_ROOT)/etc/profile
+	@echo 'export TERM="${TERM:-xterm-256color}"' > $(DISK_ROOT)/etc/profile
 	@mkdir -p $(BUILD)
 	@echo "ext2 $(DISK_SIZE) → $(DISK) (populated)"
 	@rm -f $(DISK)
@@ -155,7 +178,12 @@ disk-populate: user
 else
 # Linux: single source of truth — scripts/disk-populate.sh installs
 # /bin/clang.real + cc wrapper (see user/bin/cc.c). Do not duplicate logic here.
-disk-populate: $(DISK) user thirdparty/tcc-install/usr/bin/tcc
+# TCC is optional — if not yet built it is skipped gracefully by the script.
+disk-populate: $(DISK) user
+	@echo "[disk-populate] checking tcc..."
+	@if [ ! -f thirdparty/tcc-install/usr/bin/tcc ]; then \
+	  echo "[disk] tcc not built — run 'make tcc' to include it on the guest disk (optional)"; \
+	fi
 	@set -e; mkdir -p mnt; \
 	if command -v fuse2fs >/dev/null 2>&1 && [ "$$(uname -s)" = Linux ]; then \
 	  fuse2fs "$(CURDIR)/$(DISK)" mnt; S=''; \
@@ -184,7 +212,7 @@ clean:
 distclean: clean
 	rm -rf thirdparty $(DISK)
 
-format:
+format fmt:
 	@find src include user \( -name '*.c' -o -name '*.h' \) ! -path '*/.cache/*' -print0 | xargs -0 clang-format -i
 
 lint:

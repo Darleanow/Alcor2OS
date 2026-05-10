@@ -12,9 +12,11 @@ USER_APPS_CPPS := $(shell find user/apps \( -path '*/.cache/*' \) -prune -o -nam
 MUSL_CROSS_SYS := thirdparty/musl-cross/x86_64-linux-musl
 LIBCXX_HDR     := $(firstword $(wildcard $(MUSL_CROSS_SYS)/include/c++/*))
 
+# Each .c is compiled via ccache (when CCACHE=1) so that CI hits the object
+# cache on unchanged files.  CCACHE_PREFIX is set in mk/config.mk.
 $(BUILD)/%.c.o: $(SRC)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CCACHE_PREFIX) $(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/%.asm.o: $(SRC)/%.asm
 	@mkdir -p $(@D)

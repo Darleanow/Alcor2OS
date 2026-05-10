@@ -12,8 +12,8 @@ DISK_SIZE := 1024M
 UNAME := $(shell uname -s)
 # mke2fs is keg-only in Homebrew so PATH may not have it; fall back to the standard install dir.
 ifeq ($(UNAME), Darwin)
-  CC          := x86_64-elf-gcc
-  LD          := x86_64-elf-ld
+  CC          ?= x86_64-elf-gcc
+  LD          ?= x86_64-elf-ld
   JOBS        := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 1)
   MUSL_PREFIX := _install
   MKE2FS      := $(shell command -v mke2fs 2>/dev/null \
@@ -21,13 +21,28 @@ ifeq ($(UNAME), Darwin)
                  || ls /usr/local/opt/e2fsprogs/sbin/mke2fs 2>/dev/null \
                  || echo mke2fs)
 else
-  CC          := gcc
-  LD          := ld
+  CC          ?= clang
+  LD          ?= ld
   JOBS        := $(shell nproc 2>/dev/null || echo 1)
   MUSL_PREFIX := install
   MKE2FS      := mke2fs
 endif
 AS := nasm
+
+# ccache wrapper — set CCACHE=1 to transparently wrap CC.
+# CI sets this automatically; local builds can opt-in.
+CCACHE        ?= 0
+CCACHE_BIN    := $(shell command -v ccache 2>/dev/null)
+ifeq ($(CCACHE),1)
+  ifneq ($(CCACHE_BIN),)
+    CCACHE_PREFIX := $(CCACHE_BIN)
+  else
+    $(warning ccache requested but not found in PATH — building without it)
+    CCACHE_PREFIX :=
+  endif
+else
+  CCACHE_PREFIX :=
+endif
 
 # Kernel compile / link
 CFLAGS := -std=gnu11 -Wall -Wextra -Werror \

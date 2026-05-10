@@ -1,0 +1,313 @@
+# release.yml — Full build triggered on:
+#   • push to main   → rolling "nightly" GitHub Release (tag force-pushed)
+#   • push of v* tag → versioned GitHub Release
+#
+# Produces: bootable ISO + populated 1 GiB ext2 disk image.
+# Both ccache and thirdparty deps are cached for fast subsequent runs.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+    tags:     ["v*"]
+  workflow_dispatch:
+
+# Only one release build at a time per branch/tag.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false   # don't cancel in-flight release builds
+
+permissions:
+  contents: write   # needed to create / update GitHub Releases
+
+env:
+  MUSL_VER:       "1.2.5"
+  LIMINE_REV:     "v8.x-binary"
+  TCC_VER:        "0.9.27"
+  LLVM_VER:       "18"
+
+jobs:
+  # ── Full build: ISO + disk image ─────────────────────────────────────────
+  build-full:
+    name: Full build — ISO + disk image
+    runs-on: ubuntu-24.04
+
+    outputs:
+      iso_artifact: alcor2-iso-${{ github.sha }}
+      disk_artifact: alcor2-disk-${{ github.sha }}
+      release_tag: ${{ steps.tag.outputs.value }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── System packages ──────────────────────────────────────────────────
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang-18 \
+            lld-18 \
+            gcc \
+            nasm \
+            xorriso \
+            mtools \
+            e2fsprogs \
+            fuse2fs \
+            curl \
+            git \
+            make \
+            ccache \
+            ca-certificates
+
+          sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-18   100
+          sudo update-alternatives --install /usr/bin/ld.lld  ld.lld  /usr/bin/ld.lld-18  100
+
+      # ── ccache ───────────────────────────────────────────────────────────
+      - name: Restore ccache
+        id: ccache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.ccache
+          key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
+          restore-keys: |
+            ccache-clang18-
+
+      - name: Configure ccache
+        run: |
+          ccache --max-size=512M
+          ccache --zero-stats
+          echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+
+      # ── Third-party caches ───────────────────────────────────────────────
+      - name: Restore Limine cache
+        uses: actions/cache@v4
+        with:
+          path: thirdparty/limine
+          key: limine-${{ env.LIMINE_REV }}-${{ hashFiles('mk/versions.mk') }}
+          restore-keys: |
+            limine-${{ env.LIMINE_REV }}-
+
+      - name: Restore musl cache
+        uses: actions/cache@v4
+        with:
+          path: thirdparty/musl
+          key: musl-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
+          restore-keys: |
+            musl-${{ env.MUSL_VER }}-
+
+      - name: Restore TCC cache
+        uses: actions/cache@v4
+        with:
+          path: thirdparty/tcc-install
+          key: tcc-${{ env.TCC_VER }}-musl-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
+          restore-keys: |
+            tcc-${{ env.TCC_VER }}-musl-${{ env.MUSL_VER }}-
+
+      # ── Build kernel + full ISO (with user/) ─────────────────────────────
+      - name: Build kernel
+        run: |
+          make kernel \
+            CC=clang \
+            LD=ld.lld \
+            CCACHE=1 \
+            -j$(nproc)
+
+      - name: Build userland
+        run: |
+          make user \
+            -j$(nproc)
+
+      - name: Build ISO (kernel + userland)
+        run: |
+          make iso \
+            CC=clang \
+            LD=ld.lld \
+            -j$(nproc)
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.ccache
+          key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
+
+      - name: Print ccache stats
+        if: always()
+        run: ccache --show-stats
+
+      # ── Build disk image ──────────────────────────────────────────────────
+      - name: Create ext2 disk image
+        run: make disk
+
+      - name: Populate disk image
+        run: |
+          # fuse2fs is installed → no sudo required in the runner
+          make disk-populate
+
+      # ── Prepare release assets ────────────────────────────────────────────
+      - name: Determine release tag
+        id: tag
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "value=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "is_tag=true"                  >> $GITHUB_OUTPUT
+          else
+            echo "value=nightly"                >> $GITHUB_OUTPUT
+            echo "is_tag=false"                 >> $GITHUB_OUTPUT
+          fi
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          cp build/alcor2.iso  release/alcor2.iso
+          cp disk.img          release/disk.img
+
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
+
+          cat > release/BUILD_INFO.txt <<EOF
+          Alcor2 OS — Release build
+          =========================
+          Commit  : ${{ github.sha }}
+          Short   : ${SHORT_SHA}
+          Ref     : ${{ github.ref_name }}
+          Tag     : ${{ steps.tag.outputs.value }}
+          Compiler: clang-${{ env.LLVM_VER }}
+          Runner  : ubuntu-24.04
+          Date    : $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alcor2-iso-${{ github.sha }}
+          path: release/alcor2.iso
+          retention-days: 30
+          compression-level: 0
+
+      - name: Upload disk image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alcor2-disk-${{ github.sha }}
+          path: release/disk.img
+          retention-days: 30
+          compression-level: 0
+
+      - name: Upload build info artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alcor2-build-info-${{ github.sha }}
+          path: release/BUILD_INFO.txt
+          retention-days: 30
+
+  # ── Publish GitHub Release ────────────────────────────────────────────────
+  publish:
+    name: Publish GitHub Release
+    runs-on: ubuntu-24.04
+    needs: build-full
+
+    steps:
+      - name: Download ISO
+        uses: actions/download-artifact@v4
+        with:
+          name: alcor2-iso-${{ github.sha }}
+          path: release
+
+      - name: Download disk image
+        uses: actions/download-artifact@v4
+        with:
+          name: alcor2-disk-${{ github.sha }}
+          path: release
+
+      - name: Download build info
+        uses: actions/download-artifact@v4
+        with:
+          name: alcor2-build-info-${{ github.sha }}
+          path: release
+
+      # Rolling nightly: force-push the nightly tag to HEAD so the release
+      # always points at the latest main commit. Versioned releases use the
+      # actual v* tag which is never force-pushed.
+      - name: Publish nightly release (rolling)
+        if: ${{ needs.build-full.outputs.release_tag == 'nightly' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: "Alcor2 nightly — ${{ github.ref_name }}@${{ github.sha }}"
+          prerelease: true
+          draft: false
+          make_latest: false
+          body: |
+            ## Alcor2 — nightly build
+
+            > **This release is automatically updated on every push to `main`.**
+            > Previous assets are replaced. Pin a commit SHA if you need stability.
+
+            Built from [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) on `${{ github.ref_name }}`.
+
+            Compiler: **clang-${{ env.LLVM_VER }}** · Runner: `ubuntu-24.04`
+
+            ---
+
+            ### Assets
+
+            | File | Description |
+            |------|-------------|
+            | `alcor2.iso` | Bootable ISO (BIOS + UEFI) — burn or boot with QEMU |
+            | `disk.img`   | Pre-populated ext2 disk image (userland binaries) |
+            | `BUILD_INFO.txt` | Build metadata |
+
+            ### Quick boot
+
+            ```bash
+            qemu-system-x86_64 \
+              -cdrom alcor2.iso \
+              -drive file=disk.img,format=raw,if=ide,cache=writethrough \
+              -boot d -m 256M
+            ```
+          files: |
+            release/alcor2.iso
+            release/disk.img
+            release/BUILD_INFO.txt
+
+      - name: Publish versioned release
+        if: ${{ needs.build-full.outputs.release_tag != 'nightly' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build-full.outputs.release_tag }}
+          name: "Alcor2 ${{ needs.build-full.outputs.release_tag }}"
+          prerelease: false
+          draft: false
+          make_latest: true
+          body: |
+            ## Alcor2 ${{ needs.build-full.outputs.release_tag }}
+
+            Built from [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).
+
+            Compiler: **clang-${{ env.LLVM_VER }}** · Runner: `ubuntu-24.04`
+
+            ---
+
+            ### Assets
+
+            | File | Description |
+            |------|-------------|
+            | `alcor2.iso` | Bootable ISO (BIOS + UEFI) — burn or boot with QEMU |
+            | `disk.img`   | Pre-populated ext2 disk image (userland binaries) |
+            | `BUILD_INFO.txt` | Build metadata |
+
+            ### Quick boot
+
+            ```bash
+            qemu-system-x86_64 \
+              -cdrom alcor2.iso \
+              -drive file=disk.img,format=raw,if=ide,cache=writethrough \
+              -boot d -m 256M
+            ```
+          files: |
+            release/alcor2.iso
+            release/disk.img
+            release/BUILD_INFO.txt

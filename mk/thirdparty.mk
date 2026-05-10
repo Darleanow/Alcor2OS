@@ -37,9 +37,11 @@ ncurses-verify:
 freetype: thirdparty/freetype-install/usr/lib/libfreetype.a
 harfbuzz: thirdparty/harfbuzz-install/usr/lib/libharfbuzz.a
 
+# limine is a binary-release repo — no build step needed.
+# We use the `limine` binary itself as the sentinel (already a real file).
 thirdparty/limine/limine:
+	@echo "Limine $(LIMINE_REV) — cloning binary release"
 	git clone $(LIMINE_URL) --branch=$(LIMINE_REV) --depth=1 thirdparty/limine
-	$(MAKE) -C thirdparty/limine
 
 thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a:
 	@echo "musl $(MUSL_VER) — download & build"
