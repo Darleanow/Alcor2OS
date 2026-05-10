@@ -39,3 +39,5 @@ void sh_fb_tty_cursor_poll(void) {}
 void sh_fb_tty_cursor_suspend(void) {}
 
 void sh_fb_tty_cursor_after_edit(void) {}
+
+void sh_fb_tty_flush(void) {}
