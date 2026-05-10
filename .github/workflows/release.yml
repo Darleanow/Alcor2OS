@@ -61,7 +61,9 @@ jobs:
             git \
             make \
             ccache \
-            ca-certificates
+            ca-certificates \
+            meson \
+            ninja-build
 
           sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-18   100
           sudo update-alternatives --install /usr/bin/ld.lld  ld.lld  /usr/bin/ld.lld-18  100
@@ -107,6 +109,17 @@ jobs:
           restore-keys: |
             tcc-${{ env.TCC_VER }}-musl-${{ env.MUSL_VER }}-
 
+      - name: Restore heavy third-party cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            thirdparty/musl-cross
+            thirdparty/clang-install
+            thirdparty/freetype-install
+            thirdparty/harfbuzz-install
+            thirdparty/ncurses-install
+          key: thirdparty-heavy-${{ env.LLVM_VER }}-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
+
       # ── Build kernel + full ISO (with user/) ─────────────────────────────
       - name: Build kernel
         run: |
@@ -118,7 +131,7 @@ jobs:
 
       - name: Build third-party dependencies
         run: |
-          make freetype harfbuzz ncurses musl-cross \
+          make thirdparty \
             -j$(nproc)
 
       - name: Build userland
