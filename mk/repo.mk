@@ -82,7 +82,7 @@ $(DISK):
 	@mkdir -p $(BUILD)
 	@echo "ext2 $(DISK_SIZE) → $(DISK)"
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
-	@$(MKE2FS) -t ext2 -L ALCOR2 -q $(DISK)
+	@$(MKE2FS) -t ext2 -E root_owner=$$(id -u):$$(id -g) -L ALCOR2 -q $(DISK)
 
 disk-mount: $(DISK)
 	@mkdir -p mnt
@@ -174,7 +174,7 @@ disk-populate: user
 	@echo "ext2 $(DISK_SIZE) → $(DISK) (populated)"
 	@rm -f $(DISK)
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
-	@$(MKE2FS) -t ext2 -L ALCOR2 -d $(DISK_ROOT) -q $(DISK)
+	@$(MKE2FS) -t ext2 -E root_owner=$$(id -u):$$(id -g) -L ALCOR2 -d $(DISK_ROOT) -q $(DISK)
 else
 # Linux: single source of truth — scripts/disk-populate.sh installs
 # /bin/clang.real + cc wrapper (see user/bin/cc.c). Do not duplicate logic here.
