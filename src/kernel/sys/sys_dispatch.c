@@ -47,6 +47,7 @@ static const syscall_fn_t g_syscall_table[SYS_MAX] = {
     [SYS_ACCESS]            = sys_access,
     [SYS_FACCESSAT]         = sys_faccessat,
     [SYS_PIPE]              = sys_pipe,
+    [SYS_SELECT]            = sys_select,
     [SYS_PIPE2]             = sys_pipe2,
     [SYS_SIGALTSTACK]       = sys_sigaltstack,
     [SYS_SCHED_YIELD]       = sys_sched_yield,
@@ -93,6 +94,8 @@ static const syscall_fn_t g_syscall_table[SYS_MAX] = {
     [SYS_NEWFSTATAT]        = sys_newfstatat,
     [SYS_GETRLIMIT]         = sys_getrlimit,
     [SYS_PRLIMIT64]         = sys_prlimit64,
+    [SYS_ALCOR_FB_INFO]     = sys_alcor_fb_info,
+    [SYS_ALCOR_FB_MMAP]     = sys_alcor_fb_mmap,
 };
 
 u64 syscall_dispatch(syscall_frame_t *frame)

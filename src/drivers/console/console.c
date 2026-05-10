@@ -32,6 +32,8 @@ static struct
   char         esc_buf[ESC_BUF_MAX];
   int          esc_len;
   int cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
+  int utf8_rem;   /**< 0 = idle; else continuation bytes left for current UTF-8 char. */
+  u32 utf8_partial;
 } ctx;
 
 /** Match first three bytes of a little-endian u32 color (same as old u32 store
@@ -107,6 +109,8 @@ void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
   ctx.esc_state   = 0;
   ctx.esc_len     = 0;
   ctx.cp437_mode  = 0;
+  ctx.utf8_rem    = 0;
+  ctx.utf8_partial = 0;
 }
 
 void console_set_theme(console_theme_t theme)
@@ -140,8 +144,10 @@ static void fb_clear_rectangle(u64 y0, u64 y1)
 void console_clear(void)
 {
   fb_clear_rectangle(0, ctx.height);
-  ctx.cursor_x = 0;
-  ctx.cursor_y = 0;
+  ctx.cursor_x     = 0;
+  ctx.cursor_y     = 0;
+  ctx.utf8_rem     = 0;
+  ctx.utf8_partial = 0;
 }
 
 /** MSB is left pixel (classic PC font / font_bitmap.h). */
@@ -164,6 +170,163 @@ static void draw_glyph(char c, u32 px, u32 py)
       fb_put_pixel(x, y, ((b & (0x80u >> col)) != 0) ? ctx.fg : ctx.bg);
     }
   }
+}
+
+static void scroll(void);
+
+static void cup_apply_csi(void)
+{
+  int row = 1, col = 1;
+  int plen = ctx.esc_len - 1;
+
+  if(plen > 0) {
+    int i             = 0;
+    int r             = 0;
+    int has_r         = 0;
+    while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
+      r = r * 10 + (int)(ctx.esc_buf[i] - '0');
+      i++;
+      has_r = 1;
+    }
+    if(has_r)
+      row = r;
+    if(i < plen && ctx.esc_buf[i] == ';') {
+      i++;
+      int c     = 0;
+      int has_c = 0;
+      while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
+        c = c * 10 + (int)(ctx.esc_buf[i] - '0');
+        i++;
+        has_c = 1;
+      }
+      if(has_c)
+        col = c;
+    } else if(has_r)
+      col = 1;
+  }
+
+  u32 max_r = ctx.height / FONT_H;
+  u32 max_c = ctx.width / FONT_W;
+  if(max_r < 1)
+    max_r = 1;
+  if(max_c < 1)
+    max_c = 1;
+  if(row < 1)
+    row = 1;
+  if(col < 1)
+    col = 1;
+  if((u32)row > max_r)
+    row = (int)max_r;
+  if((u32)col > max_c)
+    col = (int)max_c;
+
+  ctx.cursor_y = (u32)(row - 1) * FONT_H;
+  ctx.cursor_x = (u32)(col - 1) * FONT_W;
+}
+
+/** Leading unsigned for CSI like [5A — default 1 when absent or 0. */
+static int csi_leading_param_default_1(void)
+{
+  int plen = ctx.esc_len - 1;
+  if(plen <= 0)
+    return 1;
+  int v = 0;
+  for(int i = 0; i < plen; i++) {
+    if(ctx.esc_buf[i] < '0' || ctx.esc_buf[i] > '9')
+      return 1;
+    v = v * 10 + (int)(ctx.esc_buf[i] - '0');
+    if(v > 4096)
+      return 4096;
+  }
+  return (v < 1) ? 1 : v;
+}
+
+static void emit_cell(unsigned char ub)
+{
+  char c = (char)ub;
+
+  switch(c) {
+  case '\n':
+    ctx.cursor_x = 0;
+    ctx.cursor_y += FONT_H;
+    break;
+  case '\r':
+    ctx.cursor_x = 0;
+    break;
+  case '\t':
+    ctx.cursor_x = (ctx.cursor_x + 32u) & ~31u;
+    break;
+  case '\b':
+    if(ctx.cursor_x >= FONT_W) {
+      ctx.cursor_x -= FONT_W;
+      for(int row = 0; row < FONT_H; row++)
+        for(int col = 0; col < FONT_W; col++)
+          fb_put_pixel(
+              ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row, ctx.bg
+          );
+    }
+    break;
+  default:
+    draw_glyph(c, ctx.cursor_x, ctx.cursor_y);
+    ctx.cursor_x += FONT_W;
+    break;
+  }
+
+  if(ctx.cursor_x + FONT_W > ctx.width) {
+    ctx.cursor_x = 0;
+    ctx.cursor_y += FONT_H;
+  }
+
+  if(ctx.cursor_y + FONT_H > ctx.height) {
+    scroll();
+    ctx.cursor_y -= FONT_H;
+  }
+}
+
+static void utf8_feed(u8 b)
+{
+  if(ctx.utf8_rem == 0) {
+    if(b < 0x80u) {
+      emit_cell(b);
+      return;
+    }
+    if((b & 0xe0u) == 0xc0u) {
+      ctx.utf8_partial = (u32)(b & 0x1fu);
+      ctx.utf8_rem     = 1;
+      return;
+    }
+    if((b & 0xf0u) == 0xe0u) {
+      ctx.utf8_partial = (u32)(b & 0x0fu);
+      ctx.utf8_rem     = 2;
+      return;
+    }
+    if((b & 0xf8u) == 0xf0u) {
+      ctx.utf8_partial = (u32)(b & 0x07u);
+      ctx.utf8_rem     = 3;
+      return;
+    }
+    emit_cell((unsigned char)'?');
+    return;
+  }
+
+  if((b & 0xc0u) != 0x80u) {
+    ctx.utf8_rem = 0;
+    emit_cell((unsigned char)'?');
+    utf8_feed(b);
+    return;
+  }
+
+  ctx.utf8_partial = (ctx.utf8_partial << 6u) | (u32)(b & 0x3fu);
+  ctx.utf8_rem--;
+  if(ctx.utf8_rem != 0)
+    return;
+
+  u32 cp = ctx.utf8_partial;
+  ctx.utf8_rem = 0;
+  if(cp <= 0xffu)
+    emit_cell((unsigned char)cp);
+  else
+    emit_cell((unsigned char)'?');
 }
 
 static void scroll(void)
@@ -300,14 +463,50 @@ static void handle_ansi_sequence(void)
 
   char cmd = ctx.esc_buf[ctx.esc_len - 1];
 
+  /* DEC private CSI (leading ?): cursor visibility, alt screen, mouse, … */
+  if((cmd == 'h' || cmd == 'l') && ctx.esc_len >= 2 && ctx.esc_buf[0] == '?')
+    return;
+
   switch(cmd) {
+  case 'A': {
+    int n = csi_leading_param_default_1();
+    u64 dy = (u64)n * FONT_H;
+    if(ctx.cursor_y >= dy)
+      ctx.cursor_y = (u32)(ctx.cursor_y - dy);
+    else
+      ctx.cursor_y = 0;
+    break;
+  }
+  case 'B': {
+    int n      = csi_leading_param_default_1();
+    u64 max_y  = ctx.height - FONT_H;
+    u64 new_y  = (u64)ctx.cursor_y + (u64)n * FONT_H;
+    ctx.cursor_y = new_y > max_y ? (u32)max_y : (u32)new_y;
+    break;
+  }
+  case 'C': {
+    int n      = csi_leading_param_default_1();
+    u64 max_x  = ctx.width - FONT_W;
+    u64 new_x  = (u64)ctx.cursor_x + (u64)n * FONT_W;
+    ctx.cursor_x = new_x > max_x ? (u32)max_x : (u32)new_x;
+    break;
+  }
+  case 'D': {
+    int     n  = csi_leading_param_default_1();
+    u32     dx = (u32)n * FONT_W;
+    if(ctx.cursor_x >= dx)
+      ctx.cursor_x -= dx;
+    else
+      ctx.cursor_x = 0;
+    break;
+  }
+  case 'H':
+  case 'f':
+    cup_apply_csi();
+    break;
   case 'J':
     if(ctx.esc_len >= 2 && ctx.esc_buf[0] == '2')
       console_clear();
-    break;
-  case 'H':
-    ctx.cursor_x = 0;
-    ctx.cursor_y = 0;
     break;
   case 'K':
     for(u32 x = ctx.cursor_x; x < ctx.width; x++) {
@@ -325,6 +524,8 @@ static void handle_ansi_sequence(void)
 
 void console_putchar(char c)
 {
+  u8 b = (u8)c;
+
   if(ctx.esc_state == 1) {
     if(c == '[') {
       ctx.esc_state = 2;
@@ -333,7 +534,7 @@ void console_putchar(char c)
     }
     ctx.esc_state = 0;
   } else if(ctx.esc_state == 2) {
-    if((c >= '0' && c <= '9') || c == ';') {
+    if((c >= '0' && c <= '9') || c == ';' || c == '?') {
       if(ctx.esc_len < ESC_BUF_MAX - 1)
         ctx.esc_buf[ctx.esc_len++] = c;
       return;
@@ -346,44 +547,11 @@ void console_putchar(char c)
 
   if(c == '\033') {
     ctx.esc_state = 1;
+    ctx.utf8_rem   = 0;
     return;
   }
 
-  switch(c) {
-  case '\n':
-    ctx.cursor_x = 0;
-    ctx.cursor_y += FONT_H;
-    break;
-  case '\r':
-    ctx.cursor_x = 0;
-    break;
-  case '\t':
-    ctx.cursor_x = (ctx.cursor_x + 32u) & ~31u;
-    break;
-  case '\b':
-    if(ctx.cursor_x >= FONT_W) {
-      ctx.cursor_x -= FONT_W;
-      for(int row = 0; row < FONT_H; row++)
-        for(int col = 0; col < FONT_W; col++)
-          fb_put_pixel(
-              ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row, ctx.bg
-          );
-    }
-    break;
-  default:
-    draw_glyph(c, ctx.cursor_x, ctx.cursor_y);
-    ctx.cursor_x += FONT_W;
-  }
-
-  if(ctx.cursor_x + FONT_W > ctx.width) {
-    ctx.cursor_x = 0;
-    ctx.cursor_y += FONT_H;
-  }
-
-  if(ctx.cursor_y + FONT_H > ctx.height) {
-    scroll();
-    ctx.cursor_y -= FONT_H;
-  }
+  utf8_feed(b);
 }
 
 void console_print(const char *s)

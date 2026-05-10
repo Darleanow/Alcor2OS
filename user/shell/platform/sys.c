@@ -7,20 +7,31 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <termios.h>
 #include <unistd.h>
+#include <vega/fb_tty.h>
 #include <vega/shell.h>
 
 /** Process Control */
 
-/**
- * @brief Exit shell with status code
- * @param code Exit status
- */
 void sh_exit(int code)
 {
   exit(code);
+}
+
+void sh_set_stdin_raw(void)
+{
+  struct termios t;
+  if(tcgetattr(STDIN_FILENO, &t) != 0)
+    return;
+  t.c_lflag &= ~(tcflag_t)(ICANON | ECHO | ISIG | IEXTEN);
+  t.c_iflag &= ~(tcflag_t)(ICRNL | IXON);
+  t.c_cc[VMIN]  = 1;
+  t.c_cc[VTIME] = 0;
+  tcsetattr(STDIN_FILENO, TCSANOW, &t);
 }
 
 /** I/O Functions */
@@ -70,9 +81,12 @@ void sh_kbd_layout(kbd_layout_t layout)
  */
 void sh_clear(void)
 {
-  /* ANSI escape sequence to clear screen */
+  if(sh_fb_tty_active()) {
+    sh_fb_tty_clear();
+    return;
+  }
   const char *clear = "\033[2J\033[H";
-  write(STDOUT_FILENO, clear, 7);
+  write(STDOUT_FILENO, clear, strlen(clear));
 }
 
 /** Filesystem Functions */

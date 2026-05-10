@@ -7,11 +7,13 @@
 #
 # Layout produced on the guest:
 #
-#   /bin/        shell + builtins + tcc + clang.real + lld + cc-wrapper aliases
+#   /bin/        shell … font-demo (+ Fira Code TTF when built), cc-wrapper …
 #   /usr/bin/    cxx (alias of cc-wrapper)
-#   /usr/lib/    crt1.o crti.o crtn.o libc.a libgcc*.a libstdc++.a clang/18/...
-#   /usr/include musl headers, c++ headers
-#   /home/       sample sources (simple.c, hi.c)
+#   /usr/lib/    crt1.o … libc.a libncurses.a libtinfo.a libgcc*.a libstdc++.a …
+#   /usr/include musl + ncurses headers (curses.h, …)
+#   /usr/share/terminfo   optional — from host `make ncurses`
+#   /etc/profile TERM default + hints
+#   /home/       sample sources (simple.c, hi.c, ncurses-demo.c when ncurses present)
 #   /etc/motd    welcome banner
 
 set -eu
@@ -27,6 +29,7 @@ MUSL_CROSS=$ROOT/thirdparty/musl-cross
 MUSL_SYSROOT=$MUSL_CROSS/x86_64-linux-musl
 TCC=$ROOT/thirdparty/tcc-install
 CLANG_INSTALL=$ROOT/thirdparty/clang-install
+NCURSES=$ROOT/thirdparty/ncurses-install
 LLVM_BUILD=$ROOT/thirdparty/llvm-build
 BUILD=$ROOT/build
 
@@ -64,10 +67,14 @@ $S find "$MNT/bin" -mindepth 1 -maxdepth 1 \
 for f in "$USER_BUILD/bin"/*.elf "$USER_BUILD/apps"/*.elf; do
   [ -f "$f" ] || continue
   bn=$(basename "$f" .elf)
-  # `cc` is our compiler-driver wrapper — installed under multiple names below.
+  # `cc` is our explicit compiler-driver wrapper — installed under multiple names below.
   [ "$bn" = cc ] && continue
   $S cp "$f" "$MNT/bin/$bn"
 done
+
+# Fonts for font-demo (FreeType + HarfBuzz on guest).
+fd_fira="$USER_BUILD/apps/font-demo/FiraCode-Regular.ttf"
+[ -f "$fd_fira" ] && $S cp "$fd_fira" "$MNT/bin/FiraCode-Regular.ttf"
 
 # ----- 3. tcc + musl runtime -------------------------------------------------
 $S cp "$TCC/usr/bin/tcc"            "$MNT/bin/tcc"
@@ -83,7 +90,9 @@ $S cp    "$MUSL/lib/libc.a"         "$MNT/usr/lib/libc.a"
 }
 
 # Bundle Alcor's crt0.o into a single relocatable named crt1.o so Clang/lld
-# pick it up under the standard musl name.
+# pick it up under the standard musl name. (BUILD/ is not always present —
+# e.g. after `make clean` or a fresh clone that never ran `make all`.)
+mkdir -p "$BUILD"
 ld -r "$USER_BUILD/crt/crt0.o" -o "$BUILD/crt1.o"
 $S cp "$BUILD/crt1.o"          "$MNT/usr/lib/crt1.o"
 $S cp "$MUSL/lib/crti.o"       "$MNT/usr/lib/crti.o"
@@ -151,10 +160,85 @@ else
   $S ln -sf tcc "$MNT/bin/cc"
 fi
 
+# ----- 4e. ncurses -----------------------------
+# Staged tree should be thirdparty/ncurses-install/usr/share/terminfo (mk/thirdparty.mk:
+# install with DESTDIR + --prefix=/usr). Old installs only put terminfo on the *host*
+# /usr; we still copy minimal entries from the dev machine so TERM=xterm-256color works.
+copy_terminfo_entry_from_host()
+{
+  name=$1
+  found=$(find /usr/share/terminfo /lib/terminfo -name "$name" -type f 2>/dev/null | head -1)
+  [ -n "$found" ] || return 1
+  bucket=$(basename "$(dirname "$found")")
+  $S mkdir -p "$MNT/usr/share/terminfo/$bucket"
+  $S cp "$found" "$MNT/usr/share/terminfo/$bucket/"
+  echo "[disk] terminfo fallback: copied $name from host ($found)"
+  return 0
+}
+
+if [ -f "$NCURSES/usr/lib/libncurses.a" ]; then
+  echo "[disk] ncurses static libs + headers (terminfo from staging or host fallback)"
+  $S mkdir -p "$MNT/usr/share/terminfo"
+  $S cp "$NCURSES/usr/lib/libncurses.a" "$MNT/usr/lib/"
+  $S cp "$NCURSES/usr/lib/libtinfo.a" "$MNT/usr/lib/"
+  if [ -d "$NCURSES/usr/include" ]; then
+    $S cp -r "$NCURSES/usr/include/." "$MNT/usr/include/"
+  fi
+  if [ -d "$NCURSES/usr/share/terminfo" ] && \
+     find "$NCURSES/usr/share/terminfo" -type f -print -quit 2>/dev/null | grep -q .; then
+    $S cp -r "$NCURSES/usr/share/terminfo/." "$MNT/usr/share/terminfo/"
+  else
+    echo "[disk] WARN: thirdparty/ncurses-install/usr/share/terminfo missing or empty (broken staging)."
+    echo "[disk]       Fix: rm -rf thirdparty/ncurses-install && make ncurses"
+  fi
+  if ! find "$MNT/usr/share/terminfo" -name 'xterm-256color' -print -quit 2>/dev/null | grep -q .; then
+    copy_terminfo_entry_from_host xterm-256color || true
+  fi
+  if ! find "$MNT/usr/share/terminfo" -name 'vt100' -print -quit 2>/dev/null | grep -q .; then
+    copy_terminfo_entry_from_host vt100 || true
+  fi
+  if ! find "$MNT/usr/share/terminfo" -name 'xterm-256color' -print -quit 2>/dev/null | grep -q .; then
+    echo "[disk] WARN: no xterm-256color on guest — install ncurses terminfo on this host, or rebuild thirdparty/ncurses-install"
+  fi
+  $S tee "$MNT/home/ncurses-demo.c" >/dev/null <<'EOF'
+/* Build: cc ncurses-demo.c -lncurses -ltinfo   Run from a real TTY. */
+#include <curses.h>
+
+int main(void)
+{
+  if(!initscr())
+    return 1;
+  raw();
+  noecho();
+  curs_set(0);
+  mvprintw(2, 2, "ncurses on Alcor2 — any key to exit");
+  refresh();
+  (void)getch();
+  endwin();
+  return 0;
+}
+EOF
+else
+  echo "[disk] ncurses skipped (host: make ncurses, then disk-populate again)"
+fi
+
+$S tee "$MNT/etc/profile" >/dev/null <<'EOF'
+# Alcor2 login environment — use: . /etc/profile
+export TERM="${TERM:-xterm-256color}"
+export TERMINFO="${TERMINFO:-/usr/share/terminfo}"
+EOF
+
 # ----- 5. Welcome banner -----------------------------------------------------
+NC_ON_DISK=0
+[ -f "$MNT/usr/lib/libncurses.a" ] && NC_ON_DISK=1
+
 {
   echo "Welcome to Alcor2!"
   echo "  C   : cc file.c     (or clang / tcc)"
   echo "  C++ : c++ file.cpp  (or g++ / cxx)"
   echo "  Run : ./a.out"
+  echo "  tip : . /etc/profile   # TERM for ncurses"
+  if [ "$NC_ON_DISK" = 1 ]; then
+    echo "  TUI : cc ui.c -lncurses -ltinfo   (sample: /home/ncurses-demo.c)"
+  fi
 } | $S tee "$MNT/etc/motd" >/dev/null

@@ -6,6 +6,7 @@
  * and anonymous ranges via `vmm_map_range_alloc` where applicable.
  */
 
+#include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
@@ -52,7 +53,8 @@ static void unmap_and_free_range(u64 start, u64 length)
     u64 phys = vmm_get_phys(va);
     if(phys) {
       vmm_unmap(va);
-      pmm_free((void *)phys);
+      if(!fb_user_phys_page_is_framebuffer(phys))
+        pmm_free((void *)phys);
     }
   }
 }

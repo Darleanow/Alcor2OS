@@ -10,6 +10,7 @@
 #define ALCOR2_PROC_H
 
 #include <alcor2/fs/vfs.h>
+#include <alcor2/ktermios.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
@@ -26,6 +27,9 @@
 
 /** @brief Maximum process name length. */
 #define PROC_NAME_MAX 32
+
+/** @brief Canonical kbd line edit + ready buffers (stdin discipline). */
+#define PROC_KBD_LINE_CAP 256
 
 /** @brief Stored path for @c /proc/self/exe (LLVM, musl @c realpath). */
 #define PROC_EXE_PATH_MAX 256
@@ -87,6 +91,14 @@ typedef struct proc
   u64           sig_mask;          /**< Bitmask of blocked signals */
   k_sigaction_t sig_actions[NSIG]; /**< Per-signal action table */
 
+  /** Emulated TTY attributes (TCGETS/TCSETS on fd 0/1/2 and pipe ends). */
+  k_termios_t termios;
+  /** @name Keyboard line discipline (ICANON) */
+  u32  kbd_edit_len;
+  u32  kbd_ready_len;
+  char kbd_edit[PROC_KBD_LINE_CAP];
+  char kbd_ready[PROC_KBD_LINE_CAP];
+
   /** @brief Per-process fd table; each entry is an index into the global
    * open file table, or -1 for closed. Inherited on fork, preserved across
    * exec, released on exit. */
@@ -123,6 +135,7 @@ int proc_table_index(const proc_t *p);
  * @param elf_data Pointer to ELF file data.
  * @param elf_size Size of ELF file.
  * @param argv NULL-terminated array of arguments (argv[0] = program name).
+ * @param envp NULL-terminated environment (name=value), or NULL for empty.
  * @return New process's PID, or 0 on failure.
  */
 /**
@@ -133,7 +146,7 @@ int proc_table_index(const proc_t *p);
 
 u64 proc_create(
     const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
-    char *const argv[]
+    char *const argv[], char *const envp[]
 );
 
 /**
@@ -193,7 +206,8 @@ void proc_notify_exec(proc_t *p);
  * @return 0 on success, negative -errno on failure.
  */
 i64 proc_exec_replace_image(
-    proc_t *p, const char *name, i64 elf_fd, char *const argv[]
+    proc_t *p, const char *name, i64 elf_fd, char *const argv[],
+    char *const envp[]
 );
 
 /** After XCR0 setup: snapshot a clean FPU/SSE state (see cpu_enable_sse). */

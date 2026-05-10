@@ -16,10 +16,15 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vega/fb_tty.h>
 #include <vega/runtime/exec.h>
 #include <vega/runtime/expand.h>
 #include <vega/runtime/fntab.h>
 #include <vega/shell.h>
+
+/* musl exposes this; must not pass NULL to execve — breaks getenv, setenv,
+ * ncurses terminfo lookup, etc. (undefined environ → faults like CR2 ~0x45). */
+extern char **environ;
 
 #define MAX_EXEC_PATH   256
 #define MAX_PIPE_STAGES 16
@@ -130,6 +135,40 @@ static int apply_redirs(const redir_t *list)
   return 0;
 }
 
+/** True if @p list redirects fd 1 (capturing child stdout would fight it). */
+static int redir_touches_stdout(const redir_t *list)
+{
+  for(const redir_t *r = list; r; r = r->next) {
+    if(r->kind == REDIR_OUT || r->kind == REDIR_APPEND)
+      return 1;
+  }
+  return 0;
+}
+
+static int stage_redir_touches_stdout(const ast_t *stage)
+{
+  if(!stage || stage->kind != AST_CMD)
+    return 0;
+  return redir_touches_stdout(stage->u.cmd.redirs);
+}
+
+/** Read pipe from child into the same FB terminal (Fira + CSI).
+ *
+ * Blocking read: pipe_read_obj sets the process BLOCKED so proc_schedule()
+ * correctly wakes this process when the child writes or exits. select()-based
+ * relaying cannot be used here because sys_select keeps the process RUNNING
+ * during its HLT loop, so pipe_oft_release never sees it as BLOCKED and the
+ * parent hangs when the child exits.
+ */
+static void relay_pipe_to_stdout(int rfd)
+{
+  char buf[4096];
+  long n;
+  while((n = sh_read(rfd, buf, sizeof buf)) > 0)
+    sh_stdout_bytes(buf, (size_t)n);
+  sh_close(rfd);
+}
+
 /* Build a fresh, NULL-terminated argv with each word expanded. Returns a
  * heap-allocated array of heap-allocated strings; caller frees via
  * free_expanded_argv. NULL on allocation failure. The AST is left untouched
@@ -213,16 +252,42 @@ static int run_external(char **argv, const redir_t *redirs)
   if(!resolve_path(argv[0], path))
     return -1;
 
-  int pid = fork();
-  if(pid < 0)
+  int         capture =
+      sh_fb_tty_active() && !redir_touches_stdout(redirs);
+  int         relay[2];
+  if(capture && pipe(relay) < 0)
     return -1;
+
+  int pid = fork();
+  if(pid < 0) {
+    if(capture) {
+      sh_close(relay[0]);
+      sh_close(relay[1]);
+    }
+    return -1;
+  }
   if(pid == 0) {
+    sh_fb_tty_on_fork_child();
+    if(capture) {
+      if(dup2(relay[1], 1) < 0)
+        _exit(1);
+      /* Merge stderr into the relay so initscr()/linker errors reach the FB TTY. */
+      if(dup2(1, 2) < 0)
+        _exit(1);
+      sh_close(relay[0]);
+      if(relay[1] != 1)
+        sh_close(relay[1]);
+    }
     if(apply_redirs(redirs) < 0)
       _exit(1);
     if(child_argv0_to_resolved_path(argv, path) < 0)
       _exit(127);
-    execve(path, argv, NULL);
+    execve(path, argv, environ);
     _exit(127);
+  }
+  if(capture) {
+    sh_close(relay[1]);
+    relay_pipe_to_stdout(relay[0]);
   }
   int status = 0;
   if(waitpid(pid, &status, 0) < 0)
@@ -377,6 +442,7 @@ static int exec_cmd(ast_t *n)
 static void exec_stage_in_child(ast_t *stage) __attribute__((noreturn));
 static void exec_stage_in_child(ast_t *stage)
 {
+  sh_fb_tty_on_fork_child();
   if(stage->kind != AST_CMD) {
     int rc = vega_exec(stage);
     _exit(rc);
@@ -412,7 +478,7 @@ static void exec_stage_in_child(ast_t *stage)
   }
   if(child_argv0_to_resolved_path(argv, path) < 0)
     _exit(127);
-  execve(path, argv, NULL);
+  execve(path, argv, environ);
   _exit(127);
 }
 
@@ -429,9 +495,20 @@ static int exec_pipeline(ast_t *n)
   /* Expansion happens inside each child via exec_stage_in_child to avoid
    * mutating the shared AST (loop bodies re-execute the same nodes). */
 
+  int cap    = sh_fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
+  int relay[2];
+  if(cap && pipe(relay) < 0) {
+    sh_puts("vega: pipe failed\n");
+    return 1;
+  }
+
   int pipes[MAX_PIPE_STAGES - 1][2];
   for(int i = 0; i < N - 1; i++) {
     if(pipe(pipes[i]) < 0) {
+      if(cap) {
+        close(relay[0]);
+        close(relay[1]);
+      }
       for(int j = 0; j < i; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
@@ -445,6 +522,10 @@ static int exec_pipeline(ast_t *n)
   for(int i = 0; i < N; i++) {
     pids[i] = fork();
     if(pids[i] < 0) {
+      if(cap) {
+        close(relay[0]);
+        close(relay[1]);
+      }
       for(int j = 0; j < N - 1; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
@@ -457,9 +538,20 @@ static int exec_pipeline(ast_t *n)
         dup2(pipes[i - 1][0], 0);
       if(i < N - 1)
         dup2(pipes[i][1], 1);
+      else if(cap) {
+        if(dup2(relay[1], 1) < 0)
+          _exit(1);
+        if(dup2(1, 2) < 0)
+          _exit(1);
+      }
       for(int j = 0; j < N - 1; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
+      }
+      if(cap) {
+        close(relay[0]);
+        if(relay[1] != 1)
+          close(relay[1]);
       }
       exec_stage_in_child(stages[i]);
     }
@@ -468,6 +560,10 @@ static int exec_pipeline(ast_t *n)
   for(int i = 0; i < N - 1; i++) {
     close(pipes[i][0]);
     close(pipes[i][1]);
+  }
+  if(cap) {
+    close(relay[1]);
+    relay_pipe_to_stdout(relay[0]);
   }
 
   int last_status = 0;

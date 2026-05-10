@@ -7,6 +7,11 @@
  * Latin-1, default) vs @c ESC [ 51 m (CP437 / box drawing). Xterm 256-colour
  * SGR @c ESC [ 38 ; 5 ; n m and @c ESC [ 48 ; 5 ; n m set foreground/background
  * from the fixed palette.
+ *
+ * UTF-8 input is decoded; code points U+0000–U+00FF map to the active 8×16
+ * atlas. Other Unicode is shown as '?'. CSI cursor position @c ESC [ row ; col H
+ * and moves @c A / @c B / @c C / @c D are supported for ncurses and similar TUI
+ * libraries. Private sequences @c ESC [ ? … h / l are accepted and ignored.
  */
 
 #ifndef ALCOR2_CONSOLE_H

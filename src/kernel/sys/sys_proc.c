@@ -29,6 +29,25 @@ static inline bool user_cstr_ok(u64 ptr)
   return ptr && vmm_is_user_ptr((void *)ptr);
 }
 
+static i64 copy_user_strvec(
+    char **user_vec, char store[][MAX_ARG_LEN], char *ptrs[], int *out_count
+)
+{
+  int n = 0;
+  if(user_vec && user_vec[0]) {
+    for(; user_vec[n] && n < MAX_EXEC_ARGS; n++) {
+      if(!user_cstr_ok((u64)user_vec[n]))
+        return -EFAULT;
+      kstrncpy(store[n], user_vec[n], MAX_ARG_LEN);
+      store[n][MAX_ARG_LEN - 1] = '\0';
+      ptrs[n] = store[n];
+    }
+  }
+  ptrs[n] = NULL;
+  *out_count = n;
+  return 0;
+}
+
 static inline bool user_buf_ok(u64 ptr, u64 size)
 {
   return ptr && vmm_is_user_range((void *)ptr, size);
@@ -107,7 +126,6 @@ u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
 u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 {
-  (void)envp;
   (void)a4;
   (void)a5;
   (void)a6;
@@ -117,6 +135,8 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   const char *path = (const char *)pathname;
 
   if(argv && !user_buf_ok(argv, sizeof(char *)))
+    return (u64)-EFAULT;
+  if(envp && !user_buf_ok(envp, sizeof(char *)))
     return (u64)-EFAULT;
 
   vfs_stat_t st;
@@ -129,29 +149,32 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
    * the user-space argv buffers will be gone. */
   static char  arg_storage[MAX_EXEC_ARGS][MAX_ARG_LEN];
   static char *new_argv[MAX_EXEC_ARGS + 1];
+  static char  env_storage[MAX_EXEC_ARGS][MAX_ARG_LEN];
+  static char *new_envp[MAX_EXEC_ARGS + 1];
   static char  name_storage[MAX_ARG_LEN];
 
-  int          argc      = 0;
-  char       **user_argv = (char **)argv;
-  if(user_argv && user_argv[0]) {
-    for(int i = 0; user_argv[i] && argc < MAX_EXEC_ARGS; i++) {
-      if(!user_cstr_ok((u64)user_argv[i]))
-        return (u64)-EFAULT;
-      kstrncpy(arg_storage[argc], user_argv[i], MAX_ARG_LEN);
-      new_argv[argc] = arg_storage[argc];
-      argc++;
-    }
-  } else {
+  int argc = 0, envc = 0;
+
+  i64 rc_argv = copy_user_strvec((char **)argv, arg_storage, new_argv, &argc);
+  if(rc_argv < 0)
+    return (u64)rc_argv;
+  if(argc == 0) {
     /* No argv supplied: synthesise argv[0] from path. */
     kstrncpy(arg_storage[0], path, MAX_ARG_LEN);
+    arg_storage[0][MAX_ARG_LEN - 1] = '\0';
     new_argv[0] = arg_storage[0];
+    new_argv[1] = NULL;
     argc        = 1;
   }
-  new_argv[argc] = NULL;
+
+  i64 rc_envp = copy_user_strvec((char **)envp, env_storage, new_envp, &envc);
+  if(rc_envp < 0)
+    return (u64)rc_envp;
 
   /* Snapshot the basename for the proc's name field — argv[0] may be relative
    * (e.g. "ls"), but we want a stable kernel-side string. */
   kstrncpy(name_storage, path, MAX_ARG_LEN);
+  name_storage[MAX_ARG_LEN - 1] = '\0';
 
   i64 fd = vfs_open(path, 0);
   if(fd < 0)
@@ -163,7 +186,8 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     return (u64)-EINVAL;
   }
 
-  i64 rc = proc_exec_replace_image(p, name_storage, fd, new_argv);
+  i64 rc =
+      proc_exec_replace_image(p, name_storage, fd, new_argv, new_envp);
   vfs_close(fd);
   if(rc < 0) {
     /* Old image is gone but a new one couldn't be set up — terminate. */
