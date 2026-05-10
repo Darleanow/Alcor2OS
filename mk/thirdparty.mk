@@ -13,10 +13,10 @@ endif
 
 PKGCONFIG := $(shell command -v pkg-config 2>/dev/null)
 
-.PHONY: musl tcc clang musl-cross ncurses ncurses-verify freetype harfbuzz
+.PHONY: musl clang musl-cross ncurses ncurses-verify freetype harfbuzz
 
 musl:  thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
-tcc:   thirdparty/tcc-install/usr/bin/tcc
+
 clang: thirdparty/clang-install/usr/bin/clang
 musl-cross: thirdparty/musl-cross/bin/x86_64-linux-musl-gcc
 # Phony ncurses is always “out of date”; ncurses-verify runs every time so a stale
@@ -54,23 +54,7 @@ thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a:
 	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
 
-thirdparty/tcc-install/usr/bin/tcc: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
-	@echo "TCC $(TCC_VER) — download & build"
-	@mkdir -p thirdparty
-	@rm -rf thirdparty/tcc-src
-	@curl -sL $(TCC_URL) | tar xj -C thirdparty
-	@mv thirdparty/tcc-$(TCC_VER) thirdparty/tcc-src
-	@cd thirdparty/tcc-src && \
-		./configure \
-			--prefix=/usr \
-			--cc=$(CURDIR)/thirdparty/musl/$(MUSL_PREFIX)/bin/musl-gcc \
-			--extra-ldflags="-static" \
-			--cpu=x86_64 \
-			--config-musl \
-			--sysincludepaths=$(CURDIR)/thirdparty/musl/$(MUSL_PREFIX)/include \
-			>/dev/null 2>&1 && \
-		make -j$(JOBS) 2>&1 | tail -5 && \
-		make install DESTDIR=$(CURDIR)/thirdparty/tcc-install >/dev/null 2>&1
+
 
 thirdparty/musl-cross/bin/x86_64-linux-musl-gcc:
 	@echo "musl-cross (x86_64-linux-musl) — long build, log: thirdparty/musl-cross-build.log"

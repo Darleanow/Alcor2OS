@@ -27,7 +27,6 @@ USER_BUILD=$ROOT/user/build
 MUSL=$ROOT/thirdparty/musl/install
 MUSL_CROSS=$ROOT/thirdparty/musl-cross
 MUSL_SYSROOT=$MUSL_CROSS/x86_64-linux-musl
-TCC=$ROOT/thirdparty/tcc-install
 CLANG_INSTALL=$ROOT/thirdparty/clang-install
 NCURSES=$ROOT/thirdparty/ncurses-install
 LLVM_BUILD=$ROOT/thirdparty/llvm-build
@@ -51,7 +50,7 @@ LLD_BIN=$CLANG_INSTALL/usr/bin/lld
 $S mkdir -p \
   "$MNT/bin" "$MNT/etc" "$MNT/tmp" "$MNT/home" \
   "$MNT/usr/bin" "$MNT/usr/include" "$MNT/usr/lib" \
-  "$MNT/usr/lib/tcc" "$MNT/usr/lib/clang"
+  "$MNT/usr/lib/clang"
 
 # Sample sources for testing the in-OS toolchains.
 printf 'int main(void){return 0;}\n' \
@@ -76,9 +75,7 @@ done
 fd_fira="$USER_BUILD/apps/font-demo/FiraCode-Regular.ttf"
 [ -f "$fd_fira" ] && $S cp "$fd_fira" "$MNT/bin/FiraCode-Regular.ttf"
 
-# ----- 3. tcc + musl runtime -------------------------------------------------
-$S cp "$TCC/usr/bin/tcc"            "$MNT/bin/tcc"
-$S cp -r "$TCC/usr/lib/tcc/."       "$MNT/usr/lib/tcc/"
+# ----- 3. musl runtime ---------------------------------------------------------
 $S cp -r "$MUSL/include/."          "$MNT/usr/include/"
 $S cp    "$MUSL/lib/libc.a"         "$MNT/usr/lib/libc.a"
 
@@ -155,9 +152,7 @@ if [ -n "$CLANG_BIN" ] && [ -f "$CLANG_BIN" ]; then
     $S ln -sf ../../bin/cc "$MNT/usr/bin/cxx"
   fi
 else
-  echo "[disk] no static clang installed — only tcc available (run: make clang)"
-  # Fallback: keep `cc` as tcc, like the previous setup.
-  $S ln -sf tcc "$MNT/bin/cc"
+  echo "[disk] no static clang installed (run: make clang)"
 fi
 
 # ----- 4e. ncurses -----------------------------
@@ -234,7 +229,7 @@ NC_ON_DISK=0
 
 {
   echo "Welcome to Alcor2!"
-  echo "  C   : cc file.c     (or clang / tcc)"
+  echo "  C   : cc file.c     (or clang)"
   echo "  C++ : c++ file.cpp  (or g++ / cxx)"
   echo "  Run : ./a.out"
   echo "  tip : . /etc/profile   # TERM for ncurses"

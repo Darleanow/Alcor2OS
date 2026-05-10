@@ -24,7 +24,6 @@ concurrency:
 env:
   MUSL_VER:    "1.2.5"
   LIMINE_REV:  "v8.x-binary"
-  TCC_VER:     "0.9.27"
   LLVM_VER:    "18"
 
 jobs:
