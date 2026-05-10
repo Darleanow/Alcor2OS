@@ -101,14 +101,6 @@ jobs:
           restore-keys: |
             musl-${{ env.MUSL_VER }}-
 
-      - name: Restore TCC cache
-        uses: actions/cache@v4
-        with:
-          path: thirdparty/tcc-install
-          key: tcc-${{ env.TCC_VER }}-musl-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
-          restore-keys: |
-            tcc-${{ env.TCC_VER }}-musl-${{ env.MUSL_VER }}-
-
       - name: Restore heavy third-party cache
         uses: actions/cache@v4
         with:
@@ -131,7 +123,7 @@ jobs:
 
       - name: Build third-party dependencies
         run: |
-          make thirdparty \
+          make clang ncurses freetype harfbuzz \
             -j$(nproc)
 
       - name: Build userland
