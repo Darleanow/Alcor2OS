@@ -39,6 +39,22 @@ u8 keyboard_raw_pop(void)
   return b;
 }
 
+u32 keyboard_raw_peek(u8 *dst, u32 cap)
+{
+  if(!dst || cap == 0)
+    return 0;
+  cpu_disable_interrupts();
+  u32 rp = kb_read_pos;
+  u32 wp = kb_write_pos;
+  u32 n  = (wp + KB_BUFFER_SIZE - rp) % KB_BUFFER_SIZE;
+  if(n > cap)
+    n = cap;
+  for(u32 i = 0; i < n; i++)
+    dst[i] = kb_buffer[(rp + i) % KB_BUFFER_SIZE];
+  cpu_enable_interrupts();
+  return n;
+}
+
 void keyboard_irq(void)
 {
   u8 scancode = inb(KB_DATA_PORT);
