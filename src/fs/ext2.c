@@ -1204,7 +1204,8 @@ static i64 dir_find_entry(
 
     u32 block_offset = 0;
     while(block_offset < block_size) {
-      const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + block_offset);
+      const ext2_dirent_t *de =
+          (const ext2_dirent_t *)(block_buf + block_offset);
 
       if(de->rec_len == 0)
         break;
@@ -1455,7 +1456,8 @@ static bool
 
     u32 block_offset = 0;
     while(block_offset < block_size) {
-      const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + block_offset);
+      const ext2_dirent_t *de =
+          (const ext2_dirent_t *)(block_buf + block_offset);
 
       if(de->rec_len == 0)
         break;

@@ -11,7 +11,7 @@
 #include <vega/vega.h>
 
 #ifndef VEGA_VERSION
-#define VEGA_VERSION "1.0.0"
+  #define VEGA_VERSION "1.0.0"
 #endif
 
 static void fb_cursor_after_edit(void)

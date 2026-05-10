@@ -182,10 +182,10 @@ static void metrics_refresh(void)
   if(!s_face)
     return;
   const FT_Size_Metrics *m = &s_face->size->metrics;
-  s_line_h           = (int)(m->height >> 6) + 2;
-  s_ascent_px        = (int)(m->ascender >> 6);
-  s_descent_px       = (int)((-m->descender) >> 6);
-  s_cell_h           = s_line_h;
+  s_line_h                 = (int)(m->height >> 6) + 2;
+  s_ascent_px              = (int)(m->ascender >> 6);
+  s_descent_px             = (int)((-m->descender) >> 6);
+  s_cell_h                 = s_line_h;
 
   if(FT_Load_Char(s_face, 'M', FT_LOAD_DEFAULT) == 0) {
     int w = (int)(s_face->glyph->advance.x >> 6) + 4;

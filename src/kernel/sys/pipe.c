@@ -267,7 +267,7 @@ u64 sys_pipe2(u64 pipefd, u64 flags, u64 a3, u64 a4, u64 a5, u64 a6)
    * attribute — it must NOT be stored in the shared OFT entry. */
   if((u32)flags & O_CLOEXEC) {
     const int *fds = (const int *)pipefd;
-    proc_t *p   = proc_current();
+    proc_t    *p   = proc_current();
     if(p) {
       p->fd_cloexec[fds[0]] = 1;
       p->fd_cloexec[fds[1]] = 1;
