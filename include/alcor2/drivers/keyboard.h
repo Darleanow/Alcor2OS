@@ -102,4 +102,12 @@ bool keyboard_raw_available(void);
  */
 u8 keyboard_raw_pop(void);
 
+/**
+ * @brief Copy pending scancodes without consuming (irq snapshot).
+ * @param dst Output buffer (caller-sized).
+ * @param cap Capacity of @p dst.
+ * @return Number of bytes copied (0 if empty).
+ */
+u32 keyboard_raw_peek(u8 *dst, u32 cap);
+
 #endif
