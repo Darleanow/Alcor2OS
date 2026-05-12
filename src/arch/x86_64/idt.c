@@ -4,6 +4,7 @@
  */
 
 #include <alcor2/arch/cpu.h>
+#include <alcor2/arch/gdt.h>
 #include <alcor2/arch/idt.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/ata.h>
@@ -19,58 +20,32 @@ static idt_ptr_t   idtr;
 extern void       *isr_stub_table[];
 extern void       *irq_stub_table[];
 
-/** @brief CPU exception names (vectors 0-31). */
-static const char *exception_names[] = {
-    "Division Error",
-    "Debug",
-    "NMI",
-    "Breakpoint",
-    "Overflow",
-    "Bound Range Exceeded",
-    "Invalid Opcode",
-    "Device Not Available",
-    "Double Fault",
-    "Coprocessor Segment Overrun",
-    "Invalid TSS",
-    "Segment Not Present",
-    "Stack-Segment Fault",
-    "General Protection Fault",
-    "Page Fault",
-    "Reserved",
-    "x87 FPU Error",
-    "Alignment Check",
-    "Machine Check",
-    "SIMD Floating-Point",
-    "Virtualization",
-    "Control Protection",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Hypervisor Injection",
-    "VMM Communication",
-    "Security Exception",
-    "Reserved"
+/** Vector layout: CPU exceptions, then PIC IRQs at 32..47.
+ *  @c X86_SEGMENT_RPL_MASK masks the CS/SS RPL; user ring is 3. */
+enum {
+  X86_EXCEPTION_VECTOR_COUNT = 32,
+  X86_VEC_PAGE_FAULT         = 14,
+  X86_SEGMENT_RPL_MASK       = 3,
 };
 
-/**
- * @brief Set an IDT entry to point to a handler.
- *
- * Configures an interrupt gate with the specified handler address and flags.
- * Uses kernel code segment selector (0x28) and IST 0.
- *
- * @param vector Interrupt vector number (0-255).
- * @param handler Address of the interrupt handler function.
- * @param flags Gate type and DPL (e.g., IDT_GATE_INT, IDT_GATE_TRAP).
- */
+/** @brief CPU exception names (vectors 0-31). */
+static const char *exception_names[] = {
+    "Division Error", "Debug", "NMI", "Breakpoint", "Overflow",
+    "Bound Range Exceeded", "Invalid Opcode", "Device Not Available",
+    "Double Fault", "Coprocessor Segment Overrun", "Invalid TSS",
+    "Segment Not Present", "Stack-Segment Fault", "General Protection Fault",
+    "Page Fault", "Reserved", "x87 FPU Error", "Alignment Check",
+    "Machine Check", "SIMD Floating-Point", "Virtualization",
+    "Control Protection", "Reserved", "Reserved", "Reserved", "Reserved",
+    "Reserved", "Reserved", "Hypervisor Injection", "VMM Communication",
+    "Security Exception", "Reserved"};
+
 void idt_set_gate(u8 vector, void *handler, u8 flags)
 {
   u64 addr = (u64)handler;
 
   idt[vector].offset_low  = addr & 0xFFFF;
-  idt[vector].selector    = 0x28;
+  idt[vector].selector    = GDT_KERNEL_CODE;
   idt[vector].ist         = 0;
   idt[vector].flags       = flags;
   idt[vector].offset_mid  = (addr >> 16) & 0xFFFF;
@@ -78,25 +53,15 @@ void idt_set_gate(u8 vector, void *handler, u8 flags)
   idt[vector].reserved    = 0;
 }
 
-/**
- * @brief Generic CPU exception handler.
- *
- * Displays detailed exception information and halts the system.
- * Handles all CPU exceptions (vectors 0-31) including page faults.
- *
- * @param frame Saved interrupt frame with CPU state and exception info.
- */
 // cppcheck-suppress unusedFunction
 void exception_handler(interrupt_frame_t *frame)
 {
-  /* CS RPL 3 = fault occurred in user mode (any exception, not just #PF). */
-  int user_fault = (frame->cs & 3) == 3;
+  int user_fault = (frame->cs & X86_SEGMENT_RPL_MASK) == X86_SEGMENT_RPL_MASK;
 
-  if(!user_fault) {
+  if(!user_fault)
     console_print("\n\n*** KERNEL PANIC ***\n\n");
-  }
 
-  if(frame->vector < 32) {
+  if(frame->vector < X86_EXCEPTION_VECTOR_COUNT) {
     console_print("Exception: ");
     console_print(exception_names[frame->vector]);
   } else {
@@ -112,14 +77,14 @@ void exception_handler(interrupt_frame_t *frame)
   }
   console_print("\n");
 
-  console_printf("RIP: 0x%x\n", frame->rip);
-  console_printf("RSP: 0x%x\n", frame->rsp);
-  console_printf("ERR: 0x%x\n", frame->error_code);
+  console_printf("RIP: 0x%lx\n", frame->rip);
+  console_printf("RSP: 0x%lx\n", frame->rsp);
+  console_printf("ERR: 0x%lx\n", frame->error_code);
 
-  if(frame->vector == 14) {
+  if(frame->vector == X86_VEC_PAGE_FAULT) {
     u64 cr2;
     __asm__ volatile("mov %%cr2, %0" : "=r"(cr2));
-    console_printf("CR2: 0x%x\n", cr2);
+    console_printf("CR2: 0x%lx\n", cr2);
   }
 
   if(user_fault) {
@@ -130,50 +95,83 @@ void exception_handler(interrupt_frame_t *frame)
   cpu_halt();
 }
 
-/**
- * @brief Hardware IRQ handler.
- *
- * Dispatches IRQs to their respective device handlers (timer, keyboard, etc.)
- * and sends EOI to the PIC.
- *
- * @param irq IRQ number (0-15).
- */
+/** @brief IRQ handler callback signature. */
+typedef void (*irq_handler_fn)(u8 irq);
+
+/** @brief Descriptor for a hardware IRQ routing entry. */
+typedef struct
+{
+  u8             irq;     /**< Hardware IRQ number (0-15) */
+  const char    *name;    /**< Symbolic name for tracing */
+  irq_handler_fn handler; /**< Implementation callback */
+} irq_def_t;
+
+static void irq__pit_wrapper(u8 i)
+{
+  (void)i;
+  pit_tick();
+}
+static void irq__kbd_wrapper(u8 i)
+{
+  (void)i;
+  keyboard_irq();
+}
+static void irq__ata0_wrapper(u8 i)
+{
+  (void)i;
+  ata_irq(0);
+}
+static void irq__ata1_wrapper(u8 i)
+{
+  (void)i;
+  ata_irq(1);
+}
+
+#define IRQ_DEF(v, n, h)                                                       \
+  {                                                                            \
+    (v), (n), (h)                                                              \
+  }
+#define IRQ_END                                                                \
+  {                                                                            \
+    0, NULL, NULL                                                              \
+  }
+
+/** @brief IRQ routing table, sentinel-terminated. */
+static const irq_def_t irq_table[] = {
+    IRQ_DEF(IRQ_TIMER, "pit", irq__pit_wrapper),
+    IRQ_DEF(IRQ_KEYBOARD, "keyboard", irq__kbd_wrapper),
+    IRQ_DEF(IRQ_ATA_PRIMARY, "ata0", irq__ata0_wrapper),
+    IRQ_DEF(IRQ_ATA_SECONDARY, "ata1", irq__ata1_wrapper),
+    IRQ_END};
+
+/* Set to 1 to trace hardware interrupts */
+#define IRQ_TRACE 0
+
 // cppcheck-suppress unusedFunction
 void irq_handler(u8 irq)
 {
-  switch(irq) {
-  case IRQ_TIMER:
-    pit_tick();
-    break;
-  case IRQ_KEYBOARD:
-    keyboard_irq();
-    break;
-  case IRQ_ATA_PRIMARY:
-    ata_irq(0);
-    break;
-  case IRQ_ATA_SECONDARY:
-    ata_irq(1);
-    break;
-  default:
-    break;
+  for(const irq_def_t *d = irq_table; d->name != NULL; d++) {
+    if(d->irq == irq) {
+#if IRQ_TRACE
+      if(irq != IRQ_TIMER)
+        console_printf("[irq] %d (%s)\n", (int)irq, d->name);
+#endif
+      d->handler(irq);
+      break;
+    }
   }
+
   pic_eoi(irq);
 }
 
-/**
- * @brief Initialize the Interrupt Descriptor Table.
- *
- * Installs exception handlers for vectors 0-31 and IRQ handlers for
- * vectors 32-47, then loads the IDT into the CPU.
- */
 void idt_init(void)
 {
-  for(u16 i = 0; i < 32; i++) {
+  for(u16 i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++) {
     idt_set_gate(i, isr_stub_table[i], IDT_GATE_INT);
   }
 
-  for(u16 i = 0; i < 16; i++) {
-    idt_set_gate(32 + i, irq_stub_table[i], IDT_GATE_INT);
+  for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++) {
+    idt_set_gate(X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT);
   }
 
   idtr.limit = sizeof(idt) - 1;
