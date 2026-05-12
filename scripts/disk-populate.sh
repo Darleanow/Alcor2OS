@@ -75,6 +75,11 @@ done
 fd_fira="$USER_BUILD/apps/font-demo/FiraCode-Regular.ttf"
 [ -f "$fd_fira" ] && $S cp "$fd_fira" "$MNT/bin/FiraCode-Regular.ttf"
 
+# ----- 3a. User-space OS library headers -------------------------------------
+$S mkdir -p "$MNT/usr/include"
+$S cp "$ROOT/user/include/grendizer.h" "$MNT/usr/include/grendizer.h"
+[ -f "$USER_BUILD/lib/libgrendizer.a" ] && $S cp "$USER_BUILD/lib/libgrendizer.a" "$MNT/usr/lib/libgrendizer.a" || true
+
 # ----- 3. musl runtime ---------------------------------------------------------
 $S cp -r "$MUSL/include/."          "$MNT/usr/include/"
 $S cp    "$MUSL/lib/libc.a"         "$MNT/usr/lib/libc.a"

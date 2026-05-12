@@ -1,13 +1,16 @@
 # Alcor2 userland — shared by init, shell, bin, apps
 
 UNAME := $(shell uname -s)
+# AR runs the Unix archiver: packs .o files into a static library (.a).
 ifeq ($(UNAME), Darwin)
   CC          := x86_64-elf-gcc
   LD          := x86_64-elf-ld
+  AR          := x86_64-elf-ar
   MUSL_PREFIX := _install
 else
   CC          := gcc
   LD          := ld
+  AR          := ar
   MUSL_PREFIX := install
 endif
 
@@ -26,12 +29,13 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Os \
           -fno-lto -fno-PIC -fno-PIE -m64 -march=x86-64 \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -I$(MUSL_INC) \
-          -I$(USER_BASE)/../include
+          -I$(USER_BASE)/../include \
+          -I$(USER_BASE)/include
 
 LDFLAGS := -nostdlib -static -T $(USER_LD) --gc-sections
 
 CRT0  := $(BUILD_DIR)/crt/crt0.o $(BUILD_DIR)/crt/alcor2_stdio_tty.o
-LIBS  := $(MUSL_LIB)/libc.a
+LIBS  := $(BUILD_DIR)/lib/libgrendizer.a $(MUSL_LIB)/libc.a
 
 # C++ apps: musl-cross g++ matches musl-hosted libstdc++ (avoid host libstdc++).
 MUSL_CROSS_GXX := $(wildcard $(USER_BASE)/../thirdparty/musl-cross/bin/x86_64-linux-musl-g++)
@@ -46,7 +50,8 @@ CXXFLAGS := -std=gnu++17 -Wall -Wextra -Os \
             -fno-lto -fno-PIC -fno-PIE -m64 -march=x86-64 \
             -mno-red-zone \
             -I$(MUSL_INC) \
-            -I$(USER_BASE)/../include
+            -I$(USER_BASE)/../include \
+            -I$(USER_BASE)/include
 
 # libgcc_eh before libc (unwind / dl_iterate_phdr from libc.a)
 CXX_SHLIBS := -lstdc++ -lgcc_eh -lc -lgcc

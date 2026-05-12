@@ -24,6 +24,7 @@ kernel: $(BUILD)/$(KERNEL)
 
 user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/crt
+	$(MAKE) -C user/lib
 	$(MAKE) -C user/init
 	$(MAKE) -C user/shell
 	$(MAKE) -C user/bin
@@ -194,6 +195,8 @@ run: iso disk-populate
 
 clean:
 	rm -rf $(BUILD)
+	-$(MAKE) -C user/crt clean
+	-$(MAKE) -C user/lib clean
 	-$(MAKE) -C user/init clean
 	-$(MAKE) -C user/shell clean
 	-$(MAKE) -C user/bin clean
