@@ -1,121 +1,144 @@
 /**
  * @file src/kernel/sys/sys_dispatch.c
- * @brief Syscall table and dispatch from the ASM entry stub.
- *
- * @par Behaviour
- * Sets `g_current_syscall_frame` for the duration of the handler (signals /
- * rt_sigreturn), invokes the handler with RDI…R9 per Linux x86_64 ABI, then
- * calls `sched_check_resched()` before returning the value in RAX.
- *
- * Unknown syscall number or NULL table slot: return `(u64)-ENOSYS`.
+ * @brief Numbered syscall lookup and dispatch.
  */
 
-#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/proc/proc.h>
-#include <alcor2/proc/sched.h>
 #include <alcor2/sys/internal.h>
+#include <alcor2/sys/syscall.h>
 
-static syscall_frame_t *g_current_syscall_frame = NULL;
+/* Set to 1 to trace every syscall with its arguments */
+#define SYS_TRACE 0
 
-syscall_frame_t        *syscall_get_current_frame(void)
+#define SYS_DEF(n, nm, na, fn)                                                 \
+  {                                                                            \
+    (n), (nm), (na), (fn)                                                      \
+  }
+#define SYS_END                                                                \
+  {                                                                            \
+    0, NULL, 0, NULL                                                           \
+  }
+
+/**
+ * @brief Table of all supported syscalls.
+ *
+ * Ordered logically but uses explicit indices for RAX mapping.
+ * Terminated by ::SYS_END sentinel.
+ */
+static const sys_def_t sys_table[] = {
+    SYS_DEF(SYS_READ, "read", 3, sys_read),
+    SYS_DEF(SYS_WRITE, "write", 3, sys_write),
+    SYS_DEF(SYS_OPEN, "open", 3, sys_open),
+    SYS_DEF(SYS_CLOSE, "close", 1, sys_close),
+    SYS_DEF(SYS_STAT, "stat", 2, sys_stat),
+    SYS_DEF(SYS_FSTAT, "fstat", 2, sys_fstat),
+    SYS_DEF(SYS_LSTAT, "lstat", 2, sys_lstat),
+    SYS_DEF(SYS_POLL, "poll", 3, sys_poll),
+    SYS_DEF(SYS_LSEEK, "lseek", 3, sys_lseek),
+    SYS_DEF(SYS_MMAP, "mmap", 6, sys_mmap),
+    SYS_DEF(SYS_MPROTECT, "mprotect", 3, sys_mprotect),
+    SYS_DEF(SYS_MUNMAP, "munmap", 2, sys_munmap),
+    SYS_DEF(SYS_BRK, "brk", 1, sys_brk),
+    SYS_DEF(SYS_RT_SIGACTION, "rt_sigaction", 4, sys_rt_sigaction),
+    SYS_DEF(SYS_RT_SIGPROCMASK, "rt_sigprocmask", 4, sys_rt_sigprocmask),
+    SYS_DEF(SYS_RT_SIGRETURN, "rt_sigreturn", 0, sys_rt_sigreturn),
+    SYS_DEF(SYS_IOCTL, "ioctl", 3, sys_ioctl),
+    SYS_DEF(SYS_PREAD64, "pread64", 4, sys_pread64),
+    SYS_DEF(SYS_PWRITE64, "pwrite64", 4, sys_pwrite64),
+    SYS_DEF(SYS_READV, "readv", 3, sys_readv),
+    SYS_DEF(SYS_WRITEV, "writev", 3, sys_writev),
+    SYS_DEF(SYS_ACCESS, "access", 2, sys_access),
+    SYS_DEF(SYS_PIPE, "pipe", 1, sys_pipe),
+    SYS_DEF(SYS_SELECT, "select", 5, sys_select),
+    SYS_DEF(SYS_SCHED_YIELD, "sched_yield", 0, sys_sched_yield),
+    SYS_DEF(SYS_DUP, "dup", 1, sys_dup),
+    SYS_DEF(SYS_DUP2, "dup2", 2, sys_dup2),
+    SYS_DEF(SYS_NANOSLEEP, "nanosleep", 2, sys_nanosleep),
+    SYS_DEF(SYS_GETPID, "getpid", 0, sys_getpid),
+    SYS_DEF(SYS_FORK, "fork", 0, sys_fork),
+    SYS_DEF(SYS_EXECVE, "execve", 3, sys_execve),
+    SYS_DEF(SYS_EXIT, "exit", 1, sys_exit),
+    SYS_DEF(SYS_WAIT4, "wait4", 4, sys_wait4),
+    SYS_DEF(SYS_KILL, "kill", 2, sys_kill),
+    SYS_DEF(SYS_UNAME, "uname", 1, sys_uname),
+    SYS_DEF(SYS_FCNTL, "fcntl", 3, sys_fcntl),
+    SYS_DEF(SYS_GETDENTS, "getdents", 3, sys_getdents),
+    SYS_DEF(SYS_GETCWD, "getcwd", 2, sys_getcwd),
+    SYS_DEF(SYS_MKDIR, "mkdir", 2, sys_mkdir),
+    SYS_DEF(SYS_RMDIR, "rmdir", 1, sys_rmdir),
+    SYS_DEF(SYS_CREAT, "creat", 2, sys_creat),
+    SYS_DEF(SYS_UNLINK, "unlink", 1, sys_unlink),
+    SYS_DEF(SYS_RENAME, "rename", 2, sys_rename),
+    SYS_DEF(SYS_GETTIMEOFDAY, "gettimeofday", 2, sys_gettimeofday),
+    SYS_DEF(SYS_GETRLIMIT, "getrlimit", 2, sys_getrlimit),
+    SYS_DEF(SYS_ARCH_PRCTL, "arch_prctl", 2, sys_arch_prctl),
+    SYS_DEF(SYS_GETTID, "gettid", 0, sys_gettid),
+    SYS_DEF(SYS_FUTEX, "futex", 6, sys_futex),
+    SYS_DEF(SYS_SCHED_GETAFFINITY, "sched_getaffinity", 3, sys_sched_getaffinity),
+    SYS_DEF(SYS_GETDENTS64, "getdents64", 3, sys_getdents64),
+    SYS_DEF(SYS_CLOCK_GETTIME, "clock_gettime", 2, sys_clock_gettime),
+    SYS_DEF(SYS_EXIT_GROUP, "exit_group", 1, sys_exit_group),
+    SYS_DEF(SYS_OPENAT, "openat", 4, sys_openat),
+    SYS_DEF(SYS_NEWFSTATAT, "newfstatat", 4, sys_newfstatat),
+    SYS_DEF(SYS_FACCESSAT, "faccessat", 4, sys_faccessat),
+    SYS_DEF(SYS_SET_TID_ADDRESS, "set_tid_address", 1, sys_set_tid_address),
+    SYS_DEF(SYS_PRLIMIT64, "prlimit64", 4, sys_prlimit64),
+    SYS_END};
+
+/** @brief Global tracking of the current syscall frame for nested/internal access. */
+static syscall_frame_t *sys__current_frame = NULL;
+
+/**
+ * @brief Return the syscall_frame_t for the currently executing syscall.
+ */
+syscall_frame_t *syscall_get_current_frame(void)
 {
-  return g_current_syscall_frame;
+  return sys__current_frame;
 }
 
-static const syscall_fn_t g_syscall_table[SYS_MAX] = {
-    [SYS_READ]              = sys_read,
-    [SYS_WRITE]             = sys_write,
-    [SYS_OPEN]              = sys_open,
-    [SYS_CLOSE]             = sys_close,
-    [SYS_STAT]              = sys_stat,
-    [SYS_FSTAT]             = sys_fstat,
-    [SYS_LSTAT]             = sys_lstat,
-    [SYS_LSEEK]             = sys_lseek,
-    [SYS_MMAP]              = sys_mmap,
-    [SYS_MPROTECT]          = sys_mprotect,
-    [SYS_MUNMAP]            = sys_munmap,
-    [SYS_BRK]               = sys_brk,
-    [SYS_RT_SIGACTION]      = sys_rt_sigaction,
-    [SYS_RT_SIGPROCMASK]    = sys_rt_sigprocmask,
-    [SYS_RT_SIGRETURN]      = sys_rt_sigreturn,
-    [SYS_IOCTL]             = sys_ioctl,
-    [SYS_PREAD64]           = sys_pread64,
-    [SYS_PWRITE64]          = sys_pwrite64,
-    [SYS_READV]             = sys_readv,
-    [SYS_WRITEV]            = sys_writev,
-    [SYS_ACCESS]            = sys_access,
-    [SYS_FACCESSAT]         = sys_faccessat,
-    [SYS_PIPE]              = sys_pipe,
-    [SYS_SELECT]            = sys_select,
-    [SYS_PIPE2]             = sys_pipe2,
-    [SYS_SIGALTSTACK]       = sys_sigaltstack,
-    [SYS_SCHED_YIELD]       = sys_sched_yield,
-    [SYS_SCHED_GETAFFINITY] = sys_sched_getaffinity,
-    [SYS_DUP]               = sys_dup,
-    [SYS_DUP2]              = sys_dup2,
-    [SYS_NANOSLEEP]         = sys_nanosleep,
-    [SYS_GETPID]            = sys_getpid,
-    [SYS_CLONE]             = sys_clone,
-    [SYS_FORK]              = sys_fork,
-    [SYS_EXECVE]            = sys_execve,
-    [SYS_EXIT]              = sys_exit,
-    [SYS_WAIT4]             = sys_wait4,
-    [SYS_KILL]              = sys_kill,
-    [SYS_TKILL]             = sys_tkill,
-    [SYS_TGKILL]            = sys_tgkill,
-    [SYS_UNAME]             = sys_uname,
-    [SYS_FCNTL]             = sys_fcntl,
-    [SYS_FTRUNCATE]         = sys_ftruncate,
-    [SYS_GETDENTS]          = sys_getdents,
-    [SYS_GETCWD]            = sys_getcwd,
-    [SYS_CHDIR]             = sys_chdir,
-    [SYS_RENAME]            = sys_rename,
-    [SYS_MKDIR]             = sys_mkdir,
-    [SYS_RMDIR]             = sys_rmdir,
-    [SYS_CREAT]             = sys_creat,
-    [SYS_SYMLINK]           = sys_symlink,
-    [SYS_UNLINK]            = sys_unlink,
-    [SYS_READLINK]          = sys_readlink,
-    [SYS_GETTIMEOFDAY]      = sys_gettimeofday,
-    [SYS_GETUID]            = sys_getuid,
-    [SYS_GETGID]            = sys_getgid,
-    [SYS_GETEUID]           = sys_geteuid,
-    [SYS_GETEGID]           = sys_getegid,
-    [SYS_GETPPID]           = sys_getppid,
-    [SYS_ARCH_PRCTL]        = sys_arch_prctl,
-    [SYS_GETTID]            = sys_gettid,
-    [SYS_FUTEX]             = sys_futex,
-    [SYS_SET_TID_ADDRESS]   = sys_set_tid_address,
-    [SYS_CLOCK_GETTIME]     = sys_clock_gettime,
-    [SYS_EXIT_GROUP]        = sys_exit,
-    [SYS_GETDENTS64]        = sys_getdents64,
-    [SYS_OPENAT]            = sys_openat,
-    [SYS_NEWFSTATAT]        = sys_newfstatat,
-    [SYS_GETRLIMIT]         = sys_getrlimit,
-    [SYS_PRLIMIT64]         = sys_prlimit64,
-    [SYS_ALCOR_FB_INFO]     = sys_alcor_fb_info,
-    [SYS_ALCOR_FB_MMAP]     = sys_alcor_fb_mmap,
-};
+static const sys_def_t *sys__find(u64 num)
+{
+  for(const sys_def_t *d = sys_table; d->name != NULL; d++) {
+    if(d->num == num)
+      return d;
+  }
+  return NULL;
+}
 
+/**
+ * @brief Dispatch a syscall from the architecture-specific entry point.
+ *
+ * Implements optional tracing and lookup through the declarative syscall table.
+ */
 u64 syscall_dispatch(syscall_frame_t *frame)
 {
-  u64 num = frame->rax;
-  if(num >= SYS_MAX || g_syscall_table[num] == NULL) {
-    console_printf(
-        "[SYS?%d pid=%d]\n", (int)num,
-        proc_current() ? (int)proc_current()->pid : -1
-    );
+  u64              num = frame->rax;
+  const sys_def_t *d   = sys__find(num);
+
+  sys__current_frame = frame;
+
+  if(!d || !d->handler) {
+#if SYS_TRACE
+    console_printf("[sys] unknown syscall %d\n", (int)num);
+#endif
+    sys__current_frame = NULL;
     return (u64)-ENOSYS;
   }
 
-  g_current_syscall_frame = frame;
-  u64 result              = g_syscall_table[num](
-      frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
-  );
-  g_current_syscall_frame = NULL;
+#if SYS_TRACE
+  console_printf("[sys] %s(%lx, %lx, %lx, %lx, %lx, %lx)", d->name, frame->rdi,
+                 frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9);
+#endif
 
-  sched_check_resched();
+  u64 ret = d->handler(frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8,
+                       frame->r9);
 
-  return result;
+#if SYS_TRACE
+  console_printf(" = %lx\n", ret);
+#endif
+
+  sys__current_frame = NULL;
+  return ret;
 }

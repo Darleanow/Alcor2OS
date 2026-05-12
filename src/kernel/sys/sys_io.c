@@ -1,7 +1,7 @@
 /**
  * @file src/kernel/sys/sys_io.c
  * @brief I/O syscalls: `read`, `readv`, `write`, `lseek`, `ioctl`, `nanosleep`,
- * `writev`, `select`.
+ * `writev`, `select`, `poll`.
  *
  * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending
  * on descriptor.
@@ -304,6 +304,88 @@ static i32 sel_write_ready(u64 fd)
   return vfs_select_write_ready((i64)fd);
 }
 
+/** @brief ~10 ms of wall time per tick (matches @c sys_nanosleep heuristics). */
+static u64 io__ms_to_hlt_ticks(u64 ms)
+{
+  u64 t = (ms + 9) / 10;
+  return t ? t : 1;
+}
+
+/** Linux-compatible @c poll(2) event bits (subset). */
+#define POLL__IN   0x001
+#define POLL__PRI  0x002
+#define POLL__OUT  0x004
+#define POLL__NVAL 0x020
+
+#define POLL__MAX_NFDS VFS_MAX_FD
+
+typedef struct
+{
+  i32 fd;
+  i16 events;
+  i16 revents;
+} poll__fd_abi_t;
+
+static void poll__timeout_from_ms(
+    i32 timeout_ms, bool *immediate, bool *infinite, u64 *wait_ticks
+)
+{
+  if(timeout_ms < 0) {
+    *immediate  = false;
+    *infinite   = true;
+    *wait_ticks = 0;
+    return;
+  }
+  *infinite = false;
+  if(timeout_ms == 0) {
+    *immediate  = true;
+    *wait_ticks = 0;
+    return;
+  }
+  *immediate = false;
+  u64 ms    = (u64)timeout_ms;
+  *wait_ticks = io__ms_to_hlt_ticks(ms);
+}
+
+static bool poll__fd_is_open(i32 fd)
+{
+  if(fd < 0)
+    return false;
+  if(fd == 0 && !fd_has_oft(0))
+    return true;
+  if((fd == 1 || fd == 2) && !fd_has_oft((u64)fd))
+    return true;
+  return vfs_fd_is_valid(fd);
+}
+
+static int poll__fill_one(poll__fd_abi_t *e)
+{
+  e->revents = 0;
+  if(e->fd < 0)
+    return 0;
+  if(!poll__fd_is_open(e->fd)) {
+    e->revents = POLL__NVAL;
+    return 1;
+  }
+
+  i16 want = e->events;
+  if(want & (POLL__IN | POLL__PRI)) {
+    i32 st = sel_read_ready((u64)e->fd);
+    if(st > 0) {
+      if(want & POLL__IN)
+        e->revents |= POLL__IN;
+      if(want & POLL__PRI)
+        e->revents |= POLL__PRI;
+    }
+  }
+  if(want & POLL__OUT) {
+    i32 st = sel_write_ready((u64)e->fd);
+    if(st > 0)
+      e->revents |= POLL__OUT;
+  }
+  return e->revents != 0;
+}
+
 static i32 select_scan(
     u32 nfds, const unsigned long *rin, const unsigned long *win,
     unsigned long *rout, unsigned long *wout, unsigned long *eout, int *total
@@ -362,12 +444,8 @@ static i32 parse_timeval(u64 timeout_ptr, bool *poll_immediate, u64 *wait_ticks)
   u64 ms = (u64)tv.sec * 1000 + (u64)tv.nsec_usec / 1000;
   if(tv.nsec_usec && ms == 0)
     ms = 1;
-  /* ~10 ms per HLT tick (see sys_nanosleep). */
-  u64 ticks = (ms + 9) / 10;
-  if(ticks == 0)
-    ticks = 1;
   *poll_immediate = false;
-  *wait_ticks     = ticks;
+  *wait_ticks     = io__ms_to_hlt_ticks(ms);
   return 0;
 }
 
@@ -481,5 +559,65 @@ u64 sys_select(
     kmemcpy((void *)writefds, wout, (u64)nlongs * sizeof(unsigned long));
   if(exceptfds)
     kmemcpy((void *)exceptfds, eout, (u64)nlongs * sizeof(unsigned long));
+  return 0;
+}
+
+u64 sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
+{
+  (void)a4;
+  (void)a5;
+  (void)a6;
+
+  if(nfds_u > (u64)POLL__MAX_NFDS)
+    return (u64)-EINVAL;
+
+  u32 nfds = (u32)nfds_u;
+  if(nfds != 0 && (!fds || !user_rw_ok(fds, (u64)nfds * sizeof(poll__fd_abi_t))))
+    return (u64)-EFAULT;
+
+  i32       timeout_ms = (i32)timeout_u;
+  bool      immediate, infinite;
+  u64       ticks_rem = 0;
+  poll__fd_abi_t local[POLL__MAX_NFDS];
+
+  poll__timeout_from_ms(timeout_ms, &immediate, &infinite, &ticks_rem);
+
+  if(nfds == 0) {
+    if(immediate)
+      return 0;
+    if(infinite) {
+      for(;;)
+        sel_hlt_slice();
+    }
+    for(u64 t = 0; t < ticks_rem; t++)
+      sel_hlt_slice();
+    return 0;
+  }
+
+  kmemcpy(local, (void *)fds, (u64)nfds * sizeof(poll__fd_abi_t));
+
+  for(;;) {
+    int nready = 0;
+    for(u32 i = 0; i < nfds; i++) {
+      if(poll__fill_one(&local[i]))
+        nready++;
+    }
+
+    if(nready > 0 || immediate) {
+      kmemcpy((void *)fds, local, (u64)nfds * sizeof(poll__fd_abi_t));
+      return (u64)nready;
+    }
+
+    if(!infinite) {
+      if(ticks_rem == 0)
+        break;
+      ticks_rem--;
+    }
+    sel_hlt_slice();
+  }
+
+  for(u32 i = 0; i < nfds; i++)
+    local[i].revents = 0;
+  kmemcpy((void *)fds, local, (u64)nfds * sizeof(poll__fd_abi_t));
   return 0;
 }

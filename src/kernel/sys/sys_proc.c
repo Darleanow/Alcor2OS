@@ -224,6 +224,11 @@ u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   proc_exit((i64)status);
 }
 
+u64 sys_exit_group(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  return sys_exit(status, a2, a3, a4, a5, a6);
+}
+
 u64 sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
 {
   (void)rusage;
