@@ -22,6 +22,9 @@
 /** @brief IRQ number for ATA secondary channel. */
 #define IRQ_ATA_SECONDARY 15
 
+/** @brief IRQ line count on the cascaded 8259 pair (0-15). */
+#define PIC_IRQ_LINE_COUNT 16
+
 /**
  * @brief Initialize and remap the PIC.
  */

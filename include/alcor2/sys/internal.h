@@ -25,6 +25,14 @@
 
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
 
+/** @brief Descriptor for a single syscall mapping. */
+typedef struct {
+    u64          num;     /**< Syscall number (RAX) */
+    const char  *name;    /**< Symbolic name for tracing */
+    int          nargs;   /**< Argument count (0-6) */
+    syscall_fn_t handler; /**< Implementation function */
+} sys_def_t;
+
 #define SYSCALL_DECL(name) u64 name(u64, u64, u64, u64, u64, u64)
 
 /* I/O */
@@ -36,6 +44,7 @@ SYSCALL_DECL(sys_nanosleep);
 SYSCALL_DECL(sys_readv);
 SYSCALL_DECL(sys_writev);
 SYSCALL_DECL(sys_select);
+SYSCALL_DECL(sys_poll);
 
 /* Memory */
 SYSCALL_DECL(sys_mmap);
@@ -109,6 +118,7 @@ SYSCALL_DECL(sys_arch_prctl);
 /* Pipe */
 SYSCALL_DECL(sys_pipe);
 SYSCALL_DECL(sys_pipe2);
+SYSCALL_DECL(sys_exit_group);
 
 /* Userspace FB / compositors */
 SYSCALL_DECL(sys_alcor_fb_info);

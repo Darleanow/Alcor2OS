@@ -189,6 +189,11 @@ bool vfs_fd_is_pipe(u64 fd)
   return k == VFS_FD_PIPE_READ || k == VFS_FD_PIPE_WRITE;
 }
 
+bool vfs_fd_is_valid(i64 fd)
+{
+  return fd_to_oft(fd) >= 0;
+}
+
 /**
  * @brief Install @p oft_idx at the lowest free fd >= 3 in the current
  * process's fd table.

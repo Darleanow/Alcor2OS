@@ -375,6 +375,12 @@ i32 vfs_select_write_ready(i64 fd);
 bool vfs_fd_is_pipe(u64 fd);
 
 /**
+ * @brief True if @p fd is open in the current process (maps to an in-use OFT
+ * slot).
+ */
+bool vfs_fd_is_valid(i64 fd);
+
+/**
  * @brief Seek in file.
  * @param fd File descriptor.
  * @param offset Seek offset.
