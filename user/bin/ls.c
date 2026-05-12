@@ -17,10 +17,11 @@ int main(int argc, char *argv[])
   int    show_all = 0;
   gr_opt opts[]   = {
       GR_FLAG('a', "all", &show_all, "Do not ignore entries starting with ."),
-      GR_END};
+      GR_END
+  };
 
-  gr_spec spec = {
-      .program = "ls", .usage = "[options] [path]", .options = opts};
+  gr_spec spec =
+      {.program = "ls", .usage = "[options] [path]", .options = opts};
 
   gr_rest rest;
   int     rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
 
   const char *path = (rest.argc > 0) ? rest.argv[0] : ".";
 
-  DIR *dir = opendir(path);
+  DIR        *dir = opendir(path);
   if(!dir) {
     fprintf(stderr, "ls: cannot access '%s': No such directory\n", path);
     return 1;

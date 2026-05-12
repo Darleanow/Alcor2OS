@@ -304,7 +304,8 @@ static i32 sel_write_ready(u64 fd)
   return vfs_select_write_ready((i64)fd);
 }
 
-/** @brief ~10 ms of wall time per tick (matches @c sys_nanosleep heuristics). */
+/** @brief ~10 ms of wall time per tick (matches @c sys_nanosleep heuristics).
+ */
 static u64 io__ms_to_hlt_ticks(u64 ms)
 {
   u64 t = (ms + 9) / 10;
@@ -312,10 +313,10 @@ static u64 io__ms_to_hlt_ticks(u64 ms)
 }
 
 /** Linux-compatible @c poll(2) event bits (subset). */
-#define POLL__IN   0x001
-#define POLL__PRI  0x002
-#define POLL__OUT  0x004
-#define POLL__NVAL 0x020
+#define POLL__IN       0x001
+#define POLL__PRI      0x002
+#define POLL__OUT      0x004
+#define POLL__NVAL     0x020
 
 #define POLL__MAX_NFDS VFS_MAX_FD
 
@@ -342,8 +343,8 @@ static void poll__timeout_from_ms(
     *wait_ticks = 0;
     return;
   }
-  *immediate = false;
-  u64 ms    = (u64)timeout_ms;
+  *immediate  = false;
+  u64 ms      = (u64)timeout_ms;
   *wait_ticks = io__ms_to_hlt_ticks(ms);
 }
 
@@ -572,12 +573,13 @@ u64 sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
     return (u64)-EINVAL;
 
   u32 nfds = (u32)nfds_u;
-  if(nfds != 0 && (!fds || !user_rw_ok(fds, (u64)nfds * sizeof(poll__fd_abi_t))))
+  if(nfds != 0 &&
+     (!fds || !user_rw_ok(fds, (u64)nfds * sizeof(poll__fd_abi_t))))
     return (u64)-EFAULT;
 
-  i32       timeout_ms = (i32)timeout_u;
-  bool      immediate, infinite;
-  u64       ticks_rem = 0;
+  i32            timeout_ms = (i32)timeout_u;
+  bool           immediate, infinite;
+  u64            ticks_rem = 0;
   poll__fd_abi_t local[POLL__MAX_NFDS];
 
   poll__timeout_from_ms(timeout_ms, &immediate, &infinite, &ticks_rem);

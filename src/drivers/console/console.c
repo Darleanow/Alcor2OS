@@ -64,7 +64,7 @@ static void fb_put_pixel(u32 x, u32 y, u32 color)
 
   switch(ctx.bytes_pp) {
   case 4:
-    *(volatile u32 *)p = color;
+    *(volatile u32 *)p = color | 0xFF000000u;
     return;
   case 3:
     fb_store24(p, color);
@@ -105,8 +105,8 @@ void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
   ctx.bytes_pp     = bytes_pp_from_bpp(bpp);
   ctx.cursor_x     = 0;
   ctx.cursor_y     = 0;
-  ctx.fg           = 0xFFFFFF;
-  ctx.bg           = 0x000000;
+  ctx.fg           = 0xFFFFFFFF;
+  ctx.bg           = 0xFF000000;
   ctx.esc_state    = 0;
   ctx.esc_len      = 0;
   ctx.cp437_mode   = 0;
@@ -116,8 +116,8 @@ void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
 
 void console_set_theme(console_theme_t theme)
 {
-  ctx.fg = theme.foreground;
-  ctx.bg = theme.background;
+  ctx.fg = theme.foreground | 0xFF000000u;
+  ctx.bg = theme.background | 0xFF000000u;
 }
 
 static void fb_clear_rectangle(u64 y0, u64 y1)
@@ -621,26 +621,24 @@ void console_printf(const char *fmt, ...)
   while(*fmt) {
     if(*fmt == '%' && *(fmt + 1)) {
       fmt++;
+      if(*fmt == 'l')
+        fmt++;
+
       switch(*fmt) {
       case 'd':
-        print_int(va_arg(args, int)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_int(va_arg(args, int));
         break;
       case 'u':
-        print_uint((u64)va_arg(args, unsigned int)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_uint((u64)va_arg(args, unsigned int));
         break;
       case 'x':
-        print_hex(va_arg(args, u64)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_hex(va_arg(args, u64));
         break;
       case 's':
-        console_print(va_arg(args, const char *)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        console_print(va_arg(args, const char *));
         break;
       case 'c':
-        console_putchar((char)va_arg(args, int)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        console_putchar((char)va_arg(args, int));
         break;
       case '%':
         console_putchar('%');

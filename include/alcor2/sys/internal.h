@@ -26,11 +26,12 @@
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
 
 /** @brief Descriptor for a single syscall mapping. */
-typedef struct {
-    u64          num;     /**< Syscall number (RAX) */
-    const char  *name;    /**< Symbolic name for tracing */
-    int          nargs;   /**< Argument count (0-6) */
-    syscall_fn_t handler; /**< Implementation function */
+typedef struct
+{
+  u64          num;     /**< Syscall number (RAX) */
+  const char  *name;    /**< Symbolic name for tracing */
+  int          nargs;   /**< Argument count (0-6) */
+  syscall_fn_t handler; /**< Implementation function */
 } sys_def_t;
 
 #define SYSCALL_DECL(name) u64 name(u64, u64, u64, u64, u64, u64)

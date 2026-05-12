@@ -145,18 +145,23 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     return (u64)-EACCES;
 
   // Allocate storage for argv and envp on the heap
-  char (*arg_storage)[MAX_ARG_LEN] = kmalloc(MAX_EXEC_ARGS * MAX_ARG_LEN);
-  char **new_argv                 = kmalloc((MAX_EXEC_ARGS + 1) * sizeof(char *));
-  char (*env_storage)[MAX_ARG_LEN] = kmalloc(MAX_EXEC_ARGS * MAX_ARG_LEN);
-  char **new_envp                 = kmalloc((MAX_EXEC_ARGS + 1) * sizeof(char *));
-  char *name_storage              = kmalloc(MAX_ARG_LEN);
+  char(*arg_storage)[MAX_ARG_LEN] = kmalloc(MAX_EXEC_ARGS * MAX_ARG_LEN);
+  char **new_argv = kmalloc((MAX_EXEC_ARGS + 1) * sizeof(char *));
+  char(*env_storage)[MAX_ARG_LEN] = kmalloc(MAX_EXEC_ARGS * MAX_ARG_LEN);
+  char **new_envp     = kmalloc((MAX_EXEC_ARGS + 1) * sizeof(char *));
+  char  *name_storage = kmalloc(MAX_ARG_LEN);
 
   if(!arg_storage || !new_argv || !env_storage || !new_envp || !name_storage) {
-    if(arg_storage) kfree(arg_storage);
-    if(new_argv) kfree(new_argv);
-    if(env_storage) kfree(env_storage);
-    if(new_envp) kfree(new_envp);
-    if(name_storage) kfree(name_storage);
+    if(arg_storage)
+      kfree(arg_storage);
+    if(new_argv)
+      kfree(new_argv);
+    if(env_storage)
+      kfree(env_storage);
+    if(new_envp)
+      kfree(new_envp);
+    if(name_storage)
+      kfree(name_storage);
     return (u64)-ENOMEM;
   }
 
@@ -164,7 +169,11 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   i64 rc_argv = copy_user_strvec((char **)argv, arg_storage, new_argv, &argc);
   if(rc_argv < 0) {
-    kfree(arg_storage); kfree(new_argv); kfree(env_storage); kfree(new_envp); kfree(name_storage);
+    kfree(arg_storage);
+    kfree(new_argv);
+    kfree(env_storage);
+    kfree(new_envp);
+    kfree(name_storage);
     return (u64)rc_argv;
   }
   if(argc == 0) {
@@ -178,7 +187,11 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   i64 rc_envp = copy_user_strvec((char **)envp, env_storage, new_envp, &envc);
   if(rc_envp < 0) {
-    kfree(arg_storage); kfree(new_argv); kfree(env_storage); kfree(new_envp); kfree(name_storage);
+    kfree(arg_storage);
+    kfree(new_argv);
+    kfree(env_storage);
+    kfree(new_envp);
+    kfree(name_storage);
     return (u64)rc_envp;
   }
 

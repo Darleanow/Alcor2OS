@@ -22,7 +22,8 @@ extern void       *irq_stub_table[];
 
 /** Vector layout: CPU exceptions, then PIC IRQs at 32..47.
  *  @c X86_SEGMENT_RPL_MASK masks the CS/SS RPL; user ring is 3. */
-enum {
+enum
+{
   X86_EXCEPTION_VECTOR_COUNT = 32,
   X86_VEC_PAGE_FAULT         = 14,
   X86_SEGMENT_RPL_MASK       = 3,
@@ -30,15 +31,39 @@ enum {
 
 /** @brief CPU exception names (vectors 0-31). */
 static const char *exception_names[] = {
-    "Division Error", "Debug", "NMI", "Breakpoint", "Overflow",
-    "Bound Range Exceeded", "Invalid Opcode", "Device Not Available",
-    "Double Fault", "Coprocessor Segment Overrun", "Invalid TSS",
-    "Segment Not Present", "Stack-Segment Fault", "General Protection Fault",
-    "Page Fault", "Reserved", "x87 FPU Error", "Alignment Check",
-    "Machine Check", "SIMD Floating-Point", "Virtualization",
-    "Control Protection", "Reserved", "Reserved", "Reserved", "Reserved",
-    "Reserved", "Reserved", "Hypervisor Injection", "VMM Communication",
-    "Security Exception", "Reserved"};
+    "Division Error",
+    "Debug",
+    "NMI",
+    "Breakpoint",
+    "Overflow",
+    "Bound Range Exceeded",
+    "Invalid Opcode",
+    "Device Not Available",
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+    "General Protection Fault",
+    "Page Fault",
+    "Reserved",
+    "x87 FPU Error",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point",
+    "Virtualization",
+    "Control Protection",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Hypervisor Injection",
+    "VMM Communication",
+    "Security Exception",
+    "Reserved"
+};
 
 void idt_set_gate(u8 vector, void *handler, u8 flags)
 {
@@ -141,8 +166,8 @@ static const irq_def_t irq_table[] = {
     IRQ_DEF(IRQ_TIMER, "pit", irq__pit_wrapper),
     IRQ_DEF(IRQ_KEYBOARD, "keyboard", irq__kbd_wrapper),
     IRQ_DEF(IRQ_ATA_PRIMARY, "ata0", irq__ata0_wrapper),
-    IRQ_DEF(IRQ_ATA_SECONDARY, "ata1", irq__ata1_wrapper),
-    IRQ_END};
+    IRQ_DEF(IRQ_ATA_SECONDARY, "ata1", irq__ata1_wrapper), IRQ_END
+};
 
 /* Set to 1 to trace hardware interrupts */
 #define IRQ_TRACE 0
@@ -171,7 +196,9 @@ void idt_init(void)
   }
 
   for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++) {
-    idt_set_gate(X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT);
+    idt_set_gate(
+        X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT
+    );
   }
 
   idtr.limit = sizeof(idt) - 1;
