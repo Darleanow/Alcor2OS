@@ -10,12 +10,11 @@
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
 
-/* Linux `sched.h` clone flags — subset we implement (musl posix_spawn,
- * faccessat helper). */
 #define ALCOR_CLONE_VM     0x00000100u
 #define ALCOR_CLONE_VFORK  0x00004000u
 #define ALCOR_CLONE_THREAD 0x00010000u
@@ -145,19 +144,29 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   if(st.type != VFS_FILE)
     return (u64)-EACCES;
 
-  /* Snapshot argv into kernel storage now — once we tear down user mappings
-   * the user-space argv buffers will be gone. */
-  static char  arg_storage[MAX_EXEC_ARGS][MAX_ARG_LEN];
-  static char *new_argv[MAX_EXEC_ARGS + 1];
-  static char  env_storage[MAX_EXEC_ARGS][MAX_ARG_LEN];
-  static char *new_envp[MAX_EXEC_ARGS + 1];
-  static char  name_storage[MAX_ARG_LEN];
+  // Allocate storage for argv and envp on the heap
+  char (*arg_storage)[MAX_ARG_LEN] = kmalloc(MAX_EXEC_ARGS * MAX_ARG_LEN);
+  char **new_argv                 = kmalloc((MAX_EXEC_ARGS + 1) * sizeof(char *));
+  char (*env_storage)[MAX_ARG_LEN] = kmalloc(MAX_EXEC_ARGS * MAX_ARG_LEN);
+  char **new_envp                 = kmalloc((MAX_EXEC_ARGS + 1) * sizeof(char *));
+  char *name_storage              = kmalloc(MAX_ARG_LEN);
 
-  int          argc = 0, envc = 0;
+  if(!arg_storage || !new_argv || !env_storage || !new_envp || !name_storage) {
+    if(arg_storage) kfree(arg_storage);
+    if(new_argv) kfree(new_argv);
+    if(env_storage) kfree(env_storage);
+    if(new_envp) kfree(new_envp);
+    if(name_storage) kfree(name_storage);
+    return (u64)-ENOMEM;
+  }
+
+  int argc = 0, envc = 0;
 
   i64 rc_argv = copy_user_strvec((char **)argv, arg_storage, new_argv, &argc);
-  if(rc_argv < 0)
+  if(rc_argv < 0) {
+    kfree(arg_storage); kfree(new_argv); kfree(env_storage); kfree(new_envp); kfree(name_storage);
     return (u64)rc_argv;
+  }
   if(argc == 0) {
     /* No argv supplied: synthesise argv[0] from path. */
     kstrncpy(arg_storage[0], path, MAX_ARG_LEN);
@@ -168,8 +177,10 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   }
 
   i64 rc_envp = copy_user_strvec((char **)envp, env_storage, new_envp, &envc);
-  if(rc_envp < 0)
+  if(rc_envp < 0) {
+    kfree(arg_storage); kfree(new_argv); kfree(env_storage); kfree(new_envp); kfree(name_storage);
     return (u64)rc_envp;
+  }
 
   /* Snapshot the basename for the proc's name field — argv[0] may be relative
    * (e.g. "ls"), but we want a stable kernel-side string. */
@@ -210,6 +221,13 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     frame->rsp    = p->user_rsp;
     frame->rflags = p->user_rflags;
   }
+
+  kfree(arg_storage);
+  kfree(new_argv);
+  kfree(env_storage);
+  kfree(new_envp);
+  kfree(name_storage);
+
   return 0;
 }
 

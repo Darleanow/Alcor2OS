@@ -99,6 +99,10 @@ typedef struct proc
   char kbd_edit[PROC_KBD_LINE_CAP];
   char kbd_ready[PROC_KBD_LINE_CAP];
 
+  /** @brief Pointer to the saved registers of the currently executing syscall.
+   * Required for rt_sigreturn and clone/fork to access user registers. */
+  syscall_frame_t *current_frame;
+
   /** @brief Per-process fd table; each entry is an index into the global
    * open file table, or -1 for closed. Inherited on fork, preserved across
    * exec, released on exit. */
