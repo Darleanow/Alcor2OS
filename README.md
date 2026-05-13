@@ -1,55 +1,146 @@
-# 🚀 Alcor2 OS
+[![CI](https://github.com/Darleanow/Alcor2OS/actions/workflows/ci.yml/badge.svg)](https://github.com/Darleanow/Alcor2OS/actions/workflows/ci.yml)
+[![Release](https://github.com/Darleanow/Alcor2OS/actions/workflows/release.yml/badge.svg)](https://github.com/Darleanow/Alcor2OS/actions/workflows/release.yml)
 
-A modern, from-scratch `x86_64` operating system kernel and userland, built with a clean Clang/LLVM toolchain.
+# Alcor2
 
-## 🌟 Philosophy & Features
+x86_64 operating system written from scratch. Clang/LLVM toolchain only — no GCC.
 
-- **Clang-Native Toolchain**: Built entirely without GCC/TCC, leveraging modern LLVM features and LLD for fast, strict linking.
-- **Custom Userland**: Includes a bespoke, zero-allocation CLI framework (**Grendizer**) for advanced command parsing and routing.
-- **POSIX-like Environment**: Custom standard C library integration (musl-based) and shell tools.
-- **Robust Build System**: Automated ISO generation and `ext2` disk population via `fuse2fs`.
+---
 
-## 🛠️ Requirements
+## What's in it
 
-To build and run Alcor2, ensure you have the following dependencies installed on your host Linux system:
-- **Compilers**: `clang`, `lld`, `nasm`
-- **Build Tools**: `make`, `xorriso`, `e2fsprogs` (for `fuse2fs` and `mke2fs`)
-- **Emulation**: `qemu-system-x86_64`
+**Kernel**
+- Physical and virtual memory management (PMM, VMM, slab heap)
+- Process model: fork, exec (ELF), scheduler, signals
+- VFS layer with ext2 (read) and ramfs
+- Syscall table dispatched from ring 0 → ring 3
+- Drivers: ATA block device, PS/2 keyboard, PIC, PIT, PCI, framebuffer console
 
-## 🚀 Getting Started
+**Userland** (statically linked against musl)
+- `init` — PID 1, launches the shell
+- `vega` — custom shell with bash-flavored syntax (brace-delimited control flow, `fn` functions, `let` variables, pipes, heredocs, `cmd!` fail-fast)
+- Standard binaries: `cat`, `echo`, `ls`, `mkdir`, `pwd`, `rm`, `touch`, `cc`
+- **Grendizer** — zero-allocation CLI option parser and subcommand dispatcher ([docs](user/docs/grendizer.md))
+- TUI library (`libalcor_tui`) with C and C++ bindings
+- ncurses, FreeType, HarfBuzz (cross-compiled for the target)
 
-Clone the repository and build the operating system:
+**Toolchain**
+- Kernel: `clang` + `lld` + `nasm`
+- Userland: `musl-cross` (`x86_64-linux-musl`) + `clang++` for C++ apps
+- Bootloader: Limine (BIOS + UEFI)
+- Disk image: 1 GiB ext2, populated via `fuse2fs`
+
+---
+
+## Requirements
+
+Host: Linux with the following packages installed.
+
+| Tool | Purpose |
+|------|---------|
+| `clang`, `lld`, `nasm` | Compiler + assembler |
+| `make` | Build orchestration |
+| `xorriso` | ISO generation |
+| `e2fsprogs`, `fuse2fs` | ext2 disk image creation and population |
+| `qemu-system-x86_64` | Emulation |
+| `meson`, `ninja` | Third-party builds (ncurses, FreeType, HarfBuzz) |
+
+---
+
+## Build
 
 ```sh
-# Build the ISO and populate the ext2 disk image
-make
+# Kernel only (fast — no userland, no third-party)
+make iso-kernel
 
-# Run the OS in QEMU (automatically attaches the disk)
+# Full build: kernel + third-party + userland
+make kernel
+make clang ncurses freetype harfbuzz
+make user
+make iso
+
+# Create and populate the ext2 disk image
+make disk
+make disk-populate
+
+# Run in QEMU (ISO + disk image)
 make run
 
-# Clean all build artifacts
+# Clean
 make clean
 ```
 
-## 📁 Architecture
+CI accelerates builds with ccache. Pass `CCACHE=1` to enable it locally.
 
-```text
+---
+
+## Repository layout
+
+```
 Alcor2/
-├── include/           # Kernel UAPI and driver headers
-├── src/               # Kernel Source Code
-│   ├── arch/x86_64/   # Architecture-specific initialization (GDT, IDT, CPUID)
-│   ├── drivers/       # Device drivers (ATA block devices, PS/2 Keyboard)
-│   └── kernel/        # Core kernel logic
-├── user/              # Userland Ecosystem
-│   ├── bin/           # Standard binaries (ls, shell, etc.)
-│   ├── docs/          # Userland documentation
-│   ├── include/       # Userland headers (no kernel linkage)
-│   └── lib/           # Userland static libraries (e.g., libgrendizer.a)
-├── scripts/           # Build system and CI scripts
-└── thirdparty/        # External dependencies (Limine bootloader, musl libc)
+├── src/                        Kernel source
+│   ├── arch/x86_64/            GDT, IDT, ISR, syscall entry, user trampoline
+│   ├── drivers/                ATA, console, keyboard, PCI, PIC, PIT
+│   ├── fs/                     VFS, ext2, ramfs
+│   ├── kernel/                 Process, scheduler, signals, syscall handlers
+│   ├── lib/                    Kernel stdlib, compiler ABI stubs
+│   └── mm/                     PMM, VMM, heap
+├── include/alcor2/             Kernel headers (UAPI + internal)
+├── user/
+│   ├── bin/                    cat, echo, ls, mkdir, pwd, rm, touch, cc
+│   ├── shell/                  vega shell (lexer, parser, runtime)
+│   ├── lib/                    Grendizer option parser
+│   ├── apps/                   Demo apps (C++, ncurses, font rendering, edi)
+│   ├── tui/                    libalcor_tui — TUI widget library
+│   ├── crt/                    crt0, stdio TTY shim
+│   └── init/                   PID 1
+├── mk/                         Makefile modules (config, kernel, thirdparty, repo)
+├── scripts/                    Linker script, Limine config, disk population
+├── thirdparty/                 Limine, musl, musl-cross, ncurses, FreeType, HarfBuzz
+└── .github/workflows/          CI (lint + kernel build) and Release (full ISO + disk)
 ```
 
-## 📚 Userland Libraries
+---
 
-Alcor2 provides custom-built libraries for userland development.
-- **[Grendizer CLI Framework](user/docs/grendizer.md)**: A zero-allocation option parser and subcommand dispatcher for C.
+## CI / Release
+
+**CI** runs on every push and pull request:
+- `clang-format` diff check + `cppcheck` static analysis
+- Kernel ISO build with clang-18 and ccache
+
+**Release** runs on `main` push and `v*` tags:
+- Full build: kernel + userland + third-party
+- Produces `alcor2.iso` (bootable BIOS/UEFI) and `disk.img` (ext2 userland)
+- Pushes to a rolling `nightly` GitHub Release, or a named release for `v*` tags
+
+### Quick boot from a release
+
+```sh
+qemu-system-x86_64 \
+  -cdrom alcor2.iso \
+  -drive file=disk.img,format=raw,if=ide,cache=writeback \
+  -boot order=d \
+  -m 2048M
+```
+
+---
+
+## Vega shell
+
+Vega is the Alcor2 userland shell. Bash-flavored syntax with a few cleanups:
+
+```sh
+let name alcor2
+echo "running on {name}"
+
+fn greet(who) {
+  echo "hi, {who}"
+}
+greet world
+
+ls / | cat > /tmp.out
+if cd /work { echo ok } else { echo missing }
+cd! /work    # exits shell on failure
+```
+
+Full language reference: [user/shell/README.md](user/shell/README.md)
