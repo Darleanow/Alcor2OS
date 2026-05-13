@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
   DIR        *dir = opendir(path);
   if(!dir) {
-    fprintf(stderr, "ls: cannot access '%s': No such directory\n", path);
+    (void)fprintf(stderr, "ls: cannot access '%s': No such directory\n", path);
     return 1;
   }
 
