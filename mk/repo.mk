@@ -58,9 +58,7 @@ iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user
 	@rm -rf $(BUILD)/iso
 	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT $(BUILD)/iso/bin
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
-	# shell.elf is optional — it may not exist if user/shell failed to build
-	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || \
-		echo "[iso] warning: user/build/shell/shell.elf not found — ISO boots without shell"
+	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || true
 	@cp user/build/bin/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp user/build/apps/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
@@ -218,6 +216,7 @@ lint:
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
 	     -Iuser/shell/include \
+	     -Iuser/include \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
 	     -Ithirdparty/freetype-install/usr/include/freetype2 \
 	     -Ithirdparty/harfbuzz-install/usr/include/harfbuzz \
