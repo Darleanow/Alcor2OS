@@ -8,13 +8,13 @@
  * refcount, so fork-inheritance and dup/dup2 work the same as for files.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/drivers/console.h>
 
 extern void proc_schedule(void);
 
@@ -34,7 +34,7 @@ typedef struct pipe
   proc_t *waiting_writer; /**< Process blocked waiting for space to write. */
 } pipe_t;
 
-static pipe_t  pipes[MAX_PIPES];
+static pipe_t pipes[MAX_PIPES];
 
 /** @brief Find a free pipe slot, zero it, and mark both ends open. */
 static pipe_t *alloc_pipe(void)
@@ -55,7 +55,6 @@ void *pipe_alloc_obj(void)
 {
   return alloc_pipe();
 }
-
 
 bool pipe_poll_read_ready(const void *pipe_ptr)
 {
@@ -98,7 +97,7 @@ void pipe_oft_release(i32 kind, void *pipe_ptr)
     if(!p->write_open && p->waiting_reader &&
        p->waiting_reader->state == PROC_STATE_BLOCKED) {
       p->waiting_reader->state = PROC_STATE_READY;
-      p->waiting_reader = NULL;
+      p->waiting_reader        = NULL;
     }
   }
 
@@ -143,7 +142,7 @@ i64 pipe_read_obj(void *pipe_ptr, void *buf, u64 count)
   /* Wake a blocked writer now that space is available. */
   if(p->waiting_writer && p->waiting_writer->state == PROC_STATE_BLOCKED) {
     p->waiting_writer->state = PROC_STATE_READY;
-    p->waiting_writer = NULL;
+    p->waiting_writer        = NULL;
   }
 
   return (i64)to_read;
@@ -193,7 +192,7 @@ i64 pipe_write_obj(void *pipe_ptr, const void *buf, u64 count)
     /* Wake a blocked reader now that data is available. */
     if(p->waiting_reader && p->waiting_reader->state == PROC_STATE_BLOCKED) {
       p->waiting_reader->state = PROC_STATE_READY;
-      p->waiting_reader = NULL;
+      p->waiting_reader        = NULL;
     }
   }
 

@@ -20,7 +20,8 @@
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
 
-/** @brief Return @c true if @p ptr..@p ptr+size is a valid user read/write range. */
+/** @brief Return @c true if @p ptr..@p ptr+size is a valid user read/write
+ * range. */
 static inline bool user_rw_ok(u64 ptr, u64 size)
 {
   return ptr && vmm_is_user_range((void *)ptr, size);
@@ -301,7 +302,8 @@ static inline void sel_fdclr(unsigned long *s, u32 fd)
     s[fd / SEL_NFDBITS] &= ~(1UL << (fd % SEL_NFDBITS));
 }
 
-/** @brief Zero bits above @p nfds in the three @c fd_set arrays to avoid stale results. */
+/** @brief Zero bits above @p nfds in the three @c fd_set arrays to avoid stale
+ * results. */
 static inline void sel_mask_high_bits(
     unsigned long *r, unsigned long *w, unsigned long *e, u32 nfds, u32 nlongs
 )
@@ -315,7 +317,8 @@ static inline void sel_mask_high_bits(
   }
 }
 
-/** @brief Return positive if @p fd has data available, 0 if not, negative on error. */
+/** @brief Return positive if @p fd has data available, 0 if not, negative on
+ * error. */
 static i32 sel_read_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
@@ -331,7 +334,8 @@ static i32 sel_read_ready(u64 fd)
   return vfs_select_read_ready((i64)fd);
 }
 
-/** @brief Return positive if @p fd can accept a write, 0 if not, negative on error. */
+/** @brief Return positive if @p fd can accept a write, 0 if not, negative on
+ * error. */
 static i32 sel_write_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
@@ -477,7 +481,8 @@ static i32 select_scan(
 /**
  * @brief Parse a @c struct @c timeval from user space into poll parameters.
  *
- * @return 0 on success, negative errno if the pointer is bad or values out of range.
+ * @return 0 on success, negative errno if the pointer is bad or values out of
+ * range.
  */
 static i32 parse_timeval(u64 timeout_ptr, bool *poll_immediate, u64 *wait_ticks)
 {

@@ -129,7 +129,7 @@ static int buf_append(
 static void render_uint(unsigned long n, char *out)
 {
   char tmp[24] = {0};
-  int  i = 0;
+  int  i       = 0;
   if(n == 0)
     tmp[i++] = '0';
   while(n > 0) {

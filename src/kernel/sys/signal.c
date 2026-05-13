@@ -19,13 +19,13 @@
  *      resumes the interrupted code.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
-#include <alcor2/drivers/console.h>
 
 /* Helper: default signal disposition. */
 

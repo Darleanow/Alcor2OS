@@ -140,9 +140,9 @@ static void launch_init(void)
 /** @brief Represents a single phase of the kernel boot process. */
 typedef struct
 {
-  const char *name;         /**< Display name for logging */
-  void (*init)(void);       /**< Phase-specific initialization function */
-  bool critical;            /**< Halt if this phase fails (not used yet) */
+  const char *name;          /**< Display name for logging */
+  void        (*init)(void); /**< Phase-specific initialization function */
+  bool        critical;      /**< Halt if this phase fails (not used yet) */
 } boot_phase_t;
 
 /**
@@ -194,17 +194,17 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"Core Scheduler", sched_init, true},
-    {"GDT Structure", gdt_init, true},
-    {"IDT Structure", idt_init, true},
-    {"SSE/FPU Support", cpu_enable_sse, true},
-    {"Syscall Interface", syscall_init, true},
-    {"PIC/PIT Timers", pic_init, true},
-    {"Hardware Interrupts", init_interrupts, true},
-    {"VFS Orchestrator", vfs_init, true},
-    {"Storage & VFS", init_storage, true},
-    {"Global Interrupts", init_enable_irqs, true},
-    {NULL, NULL, false}
+    {"Core Scheduler",      sched_init,       true },
+    {"GDT Structure",       gdt_init,         true },
+    {"IDT Structure",       idt_init,         true },
+    {"SSE/FPU Support",     cpu_enable_sse,   true },
+    {"Syscall Interface",   syscall_init,     true },
+    {"PIC/PIT Timers",      pic_init,         true },
+    {"Hardware Interrupts", init_interrupts,  true },
+    {"VFS Orchestrator",    vfs_init,         true },
+    {"Storage & VFS",       init_storage,     true },
+    {"Global Interrupts",   init_enable_irqs, true },
+    {NULL,                  NULL,             false}
 };
 
 /**

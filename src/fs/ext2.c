@@ -1956,10 +1956,10 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count, u64 offset)
   u8 *run_buf = kmalloc((u64)EXT2_READ_RUN_MAX * block_size);
 
   while(bytes_read < count) {
-    u64  current_pos  = offset + bytes_read;
-    u32  file_block   = current_pos / block_size;
-    u32  block_offset = current_pos % block_size;
-    u32  block_num    = get_block_num(vol, &file->inode, file_block);
+    u64 current_pos  = offset + bytes_read;
+    u32 file_block   = current_pos / block_size;
+    u32 block_offset = current_pos % block_size;
+    u32 block_num    = get_block_num(vol, &file->inode, file_block);
 
     if(block_num == 0) {
       /* Sparse file - return zeros */
@@ -2070,9 +2070,9 @@ i64 ext2_write(ext2_file_t *file, const void *buf, u64 count, u64 offset)
     return -ENOMEM;
 
   while(bytes_written < count) {
-    u64  current_pos  = offset + bytes_written;
-    u32  file_block   = current_pos / block_size;
-    u32  block_offset = current_pos % block_size;
+    u64 current_pos  = offset + bytes_written;
+    u32 file_block   = current_pos / block_size;
+    u32 block_offset = current_pos % block_size;
 
     /* Allocate block if needed */
     u32 block_num = get_block_num(vol, &file->inode, file_block);
@@ -2137,7 +2137,7 @@ i64 ext2_readdir(ext2_file_t *dir, u64 index, ext2_entry_t *entry)
   const ext2_volume_t *vol        = dir->vol;
   u32                  block_size = vol->block_size;
 
-  u8 *block_buf = cache_get_block(block_size);
+  u8                  *block_buf = cache_get_block(block_size);
   if(!block_buf)
     return -ENOMEM;
 
@@ -2757,7 +2757,8 @@ static i64 ext2_vfs_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
   return ext2_read((ext2_file_t *)fh, buf, count, offset);
 }
 
-static i64 ext2_vfs_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
+static i64
+    ext2_vfs_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
 {
   return ext2_write((ext2_file_t *)fh, buf, count, offset);
 }
@@ -2827,7 +2828,8 @@ static i64 ext2_vfs_truncate(fs_handle_t fh, u64 length)
   return ext2_truncate((ext2_file_t *)fh, length);
 }
 
-static i64 ext2_vfs_readlink(void *fs_data, const char *path, char *buf, u64 cap)
+static i64
+    ext2_vfs_readlink(void *fs_data, const char *path, char *buf, u64 cap)
 {
   return ext2_readlink((ext2_volume_t *)fs_data, path, buf, cap);
 }

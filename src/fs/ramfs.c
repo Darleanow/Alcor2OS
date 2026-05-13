@@ -25,7 +25,8 @@ typedef struct ram_node
 
 static ram_node_t *root = NULL;
 
-/** @brief Allocate and zero a new ramfs node with the given @p name and @p type. */
+/** @brief Allocate and zero a new ramfs node with the given @p name and @p
+ * type. */
 static ram_node_t *ram__create_node(const char *name, u8 type)
 {
   ram_node_t *node = kzalloc(sizeof(ram_node_t));
@@ -37,7 +38,8 @@ static ram_node_t *ram__create_node(const char *name, u8 type)
   return node;
 }
 
-/** @brief Prepend @p child to @p parent's children list and set its parent pointer. */
+/** @brief Prepend @p child to @p parent's children list and set its parent
+ * pointer. */
 static void ram__add_child(ram_node_t *parent, ram_node_t *child)
 {
   child->parent    = parent;
@@ -163,7 +165,7 @@ static i64 ram_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
 
   u64 end = offset + count;
   if(end > node->capacity) {
-    u64   new_cap = (end + 1023) & ~1023ULL;
+    u64   new_cap  = (end + 1023) & ~1023ULL;
     void *new_data = krealloc(node->data, new_cap);
     if(!new_data)
       return -ENOMEM;

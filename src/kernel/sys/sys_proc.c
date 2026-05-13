@@ -19,8 +19,8 @@
 #define ALCOR_CLONE_THREAD 0x00010000u
 #define ALCOR_CSIGNAL      0x000000ffu
 
-#define MAX_EXEC_ARGS PROC_MAX_ARGV
-#define MAX_ARG_LEN   PROC_MAX_ARG_STRLEN
+#define MAX_EXEC_ARGS      PROC_MAX_ARGV
+#define MAX_ARG_LEN        PROC_MAX_ARG_STRLEN
 
 /** @brief Return @c true if @p ptr is a valid, non-NULL user-space pointer. */
 static inline bool user_cstr_ok(u64 ptr)
@@ -65,7 +65,12 @@ static i64 copy_user_strvec(
 /** @brief Return the calling process's PID (or 1 if no process is running). */
 u64 sys_getpid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   proc_t *p = proc_current();
   return p ? p->pid : 1;
 }
@@ -79,7 +84,12 @@ u64 sys_gettid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 /** @brief Return the calling process's parent PID. */
 u64 sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   proc_t *p = proc_current();
   return p ? p->parent_pid : 0;
 }
@@ -117,7 +127,12 @@ u64 sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
 /** @brief Duplicate the calling process (@c fork). */
 u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
 
   const syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
@@ -173,8 +188,10 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   i64 rc_argv = copy_user_strvec((char **)argv, arg_storage, new_argv, &argc);
   if(rc_argv < 0) {
-    kfree(arg_storage); kfree(new_argv);
-    kfree(env_storage); kfree(new_envp);
+    kfree(arg_storage);
+    kfree(new_argv);
+    kfree(env_storage);
+    kfree(new_envp);
     kfree(name_storage);
     return (u64)rc_argv;
   }
@@ -188,8 +205,10 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   i64 rc_envp = copy_user_strvec((char **)envp, env_storage, new_envp, &envc);
   if(rc_envp < 0) {
-    kfree(arg_storage); kfree(new_argv);
-    kfree(env_storage); kfree(new_envp);
+    kfree(arg_storage);
+    kfree(new_argv);
+    kfree(env_storage);
+    kfree(new_envp);
     kfree(name_storage);
     return (u64)rc_envp;
   }
@@ -199,8 +218,10 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   i64 fd = vfs_open(path, 0);
   if(fd < 0) {
-    kfree(arg_storage); kfree(new_argv);
-    kfree(env_storage); kfree(new_envp);
+    kfree(arg_storage);
+    kfree(new_argv);
+    kfree(env_storage);
+    kfree(new_envp);
     kfree(name_storage);
     return (u64)-ENOENT;
   }
@@ -208,8 +229,10 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   proc_t *p = proc_current();
   if(!p) {
     vfs_close(fd);
-    kfree(arg_storage); kfree(new_argv);
-    kfree(env_storage); kfree(new_envp);
+    kfree(arg_storage);
+    kfree(new_argv);
+    kfree(env_storage);
+    kfree(new_envp);
     kfree(name_storage);
     return (u64)-EINVAL;
   }
@@ -243,11 +266,16 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 /** @brief Terminate the calling process with @p status. */
 u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   proc_exit((i64)status);
 }
 
-/** @brief Terminate all threads in the group — equivalent to ::sys_exit here. */
+/** @brief Terminate all threads in the group — equivalent to ::sys_exit here.
+ */
 u64 sys_exit_group(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_exit(status, a2, a3, a4, a5, a6);
@@ -265,10 +293,10 @@ u64 sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  i32  kstatus    = 0;
+  i32  kstatus     = 0;
   i32 *kstatus_ptr = wstatus ? &kstatus : NULL;
 
-  i64 ret = proc_waitpid((i64)pid, kstatus_ptr, (i32)options);
+  i64  ret = proc_waitpid((i64)pid, kstatus_ptr, (i32)options);
   if(ret > 0 && wstatus) {
     if(!user_buf_ok(wstatus, sizeof(i32)))
       return (u64)-EFAULT;
@@ -281,36 +309,61 @@ u64 sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
 /** @brief Return the calling process's real user ID (always 0 — root). */
 u64 sys_getuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   return 0;
 }
 
 /** @brief Return the calling process's real group ID (always 0 — root). */
 u64 sys_getgid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   return 0;
 }
 
 /** @brief Return the calling process's effective user ID (always 0 — root). */
 u64 sys_geteuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   return 0;
 }
 
 /** @brief Return the calling process's effective group ID (always 0 — root). */
 u64 sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
-  (void)a1; (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a1;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   return 0;
 }
 
-/** @brief Store the clear-child-tid address (no-op); returns the current TID. */
+/** @brief Store the clear-child-tid address (no-op); returns the current TID.
+ */
 u64 sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)tidptr;
-  (void)a2; (void)a3; (void)a4; (void)a5; (void)a6;
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
   proc_t *p = proc_current();
   return p ? p->pid : 1;
 }

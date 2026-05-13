@@ -39,20 +39,21 @@
  */
 typedef struct
 {
-  char             target[VFS_PATH_MAX]; /**< Normalised absolute mount point. */
-  void            *fs_data;             /**< Volume-private data from @c mount callback. */
-  const fs_ops_t  *ops;                 /**< Driver operations for this volume. */
-  const fs_type_t *type;                /**< Registered type descriptor. */
-  bool             active;              /**< @c true when this slot holds a live mount. */
+  char            target[VFS_PATH_MAX]; /**< Normalised absolute mount point. */
+  void           *fs_data; /**< Volume-private data from @c mount callback. */
+  const fs_ops_t *ops;     /**< Driver operations for this volume. */
+  const fs_type_t *type;   /**< Registered type descriptor. */
+  bool             active; /**< @c true when this slot holds a live mount. */
 } vfs_mount_t;
 
-static vfs_mount_t     mounts[VFS_MAX_MOUNTS];
-static vfs_oft_entry_t oft[VFS_MAX_OFT];
+static vfs_mount_t      mounts[VFS_MAX_MOUNTS];
+static vfs_oft_entry_t  oft[VFS_MAX_OFT];
 
 static const fs_type_t *fs_registry[8];
 static u32              fs_registry_count = 0;
 
-/** @brief Return @c true if @p path begins with @p prefix as a path component. */
+/** @brief Return @c true if @p path begins with @p prefix as a path component.
+ */
 static bool vfs_path_starts_with(const char *path, const char *prefix)
 {
   if(prefix[0] == '/' && prefix[1] == '\0')
@@ -71,7 +72,8 @@ static bool vfs_path_starts_with(const char *path, const char *prefix)
  * set to @c "/" when the path exactly equals the mount point.
  *
  * @param path      Normalised absolute path to look up.
- * @param rel_path  Out-pointer receiving the driver-relative path; may be @c NULL.
+ * @param rel_path  Out-pointer receiving the driver-relative path; may be @c
+ * NULL.
  * @return Pointer to the best-matching mount, or @c NULL if none is active.
  */
 static vfs_mount_t *vfs_find_mount(const char *path, const char **rel_path)
@@ -237,7 +239,8 @@ void vfs_oft_release(i32 idx)
 }
 
 /**
- * @brief Install a new fd in the calling process pointing at OFT slot @p oft_idx.
+ * @brief Install a new fd in the calling process pointing at OFT slot @p
+ * oft_idx.
  *
  * Searches for the lowest free fd ≥ 3 (slots 0–2 are reserved for stdio).
  * Does not increment the OFT refcount — the caller owns that responsibility.
@@ -274,7 +277,8 @@ i64 vfs_register_fs(const fs_type_t *fstype)
   return 0;
 }
 
-/** @brief Unmount the filesystem at @p target, calling the driver's unmount if provided. */
+/** @brief Unmount the filesystem at @p target, calling the driver's unmount if
+ * provided. */
 i64 vfs_umount(const char *target)
 {
   char abs[VFS_PATH_MAX];
@@ -465,7 +469,8 @@ i64 vfs_stat(const char *path, vfs_stat_t *st)
   return mount->ops->stat(mount->fs_data, rel, st);
 }
 
-/** @brief Stat an open file descriptor, returning synthetic metadata for pipes. */
+/** @brief Stat an open file descriptor, returning synthetic metadata for pipes.
+ */
 i64 vfs_fstat(i64 fd, vfs_stat_t *st)
 {
   i32 idx = fd_to_oft(fd);
@@ -533,8 +538,12 @@ i64 vfs_seek(i64 fd, i64 offset, i32 whence)
 
   u64 base;
   switch(whence) {
-  case SEEK_SET: base = 0;         break;
-  case SEEK_CUR: base = e->offset; break;
+  case SEEK_SET:
+    base = 0;
+    break;
+  case SEEK_CUR:
+    base = e->offset;
+    break;
   case SEEK_END: {
     vfs_stat_t st;
     if(e->ops->fstat(e->handle, &st) < 0)
@@ -542,7 +551,8 @@ i64 vfs_seek(i64 fd, i64 offset, i32 whence)
     base = st.size;
     break;
   }
-  default: return -EINVAL;
+  default:
+    return -EINVAL;
   }
 
   i64 target = (i64)base + offset;
@@ -724,7 +734,8 @@ i64 vfs_set_flags(i64 fd, u32 flags)
   return 0;
 }
 
-/** @brief Duplicate @p oldfd into the lowest free fd ≥ 3 and retain the OFT entry. */
+/** @brief Duplicate @p oldfd into the lowest free fd ≥ 3 and retain the OFT
+ * entry. */
 i64 vfs_dup(i64 oldfd)
 {
   i32 idx = fd_to_oft(oldfd);
@@ -759,7 +770,8 @@ i64 vfs_dup2(i64 oldfd, i64 newfd)
   return newfd;
 }
 
-/** @brief Return positive if @p fd has data available without blocking, 0 if not ready. */
+/** @brief Return positive if @p fd has data available without blocking, 0 if
+ * not ready. */
 i32 vfs_select_read_ready(i64 fd)
 {
   i32 idx = fd_to_oft(fd);
@@ -772,7 +784,8 @@ i32 vfs_select_read_ready(i64 fd)
   return 1;
 }
 
-/** @brief Return positive if @p fd can accept a write without blocking, 0 if not ready. */
+/** @brief Return positive if @p fd can accept a write without blocking, 0 if
+ * not ready. */
 i32 vfs_select_write_ready(i64 fd)
 {
   i32 idx = fd_to_oft(fd);

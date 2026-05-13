@@ -47,14 +47,16 @@ struct stat_buf
 #define S_IFREG 0100000
 #define S_IFLNK 0120000
 
-/** @brief Return non-zero if @p path refers to the @c /proc/self/exe virtual symlink. */
+/** @brief Return non-zero if @p path refers to the @c /proc/self/exe virtual
+ * symlink. */
 static int path_is_proc_self_exe(const char *path)
 {
   return !kstrcmp(path, "/proc/self/exe") ||
          !kstrcmp(path, "/proc/thread-self/exe");
 }
 
-/** @brief Fill @p st with synthetic stat data for the @c /proc/self/exe virtual symlink. */
+/** @brief Fill @p st with synthetic stat data for the @c /proc/self/exe virtual
+ * symlink. */
 static void fill_proc_self_exe_stat(struct stat_buf *st, proc_t *p)
 {
   kzero(st, sizeof(*st));
@@ -89,12 +91,12 @@ static inline bool user_buf_ok(u64 ptr, u64 size)
 static void fill_stat_buf(struct stat_buf *st, const vfs_stat_t *vst)
 {
   kzero(st, sizeof(*st));
-  st->st_dev   = vst->dev;
-  st->st_ino   = vst->ino;
-  st->st_nlink = 1;
-  st->st_mode  = (vst->type == VFS_DIRECTORY) ? (S_IFDIR | 0755) :
-                 (vst->type == VFS_FIFO)      ? (S_IFIFO | 0666) :
-                                                (S_IFREG | 0755);
+  st->st_dev     = vst->dev;
+  st->st_ino     = vst->ino;
+  st->st_nlink   = 1;
+  st->st_mode    = (vst->type == VFS_DIRECTORY) ? (S_IFDIR | 0755)
+                   : (vst->type == VFS_FIFO)    ? (S_IFIFO | 0666)
+                                                : (S_IFREG | 0755);
   st->st_size    = (i64)vst->size;
   st->st_blksize = 4096;
   st->st_blocks  = ((i64)vst->size + 511) / 512;
@@ -270,8 +272,7 @@ u64 sys_newfstatat(
       return (u64)-EINVAL;
   }
 
-  if(!user_cstr_ok(pathname) ||
-     !user_buf_ok(statbuf, sizeof(struct stat_buf)))
+  if(!user_cstr_ok(pathname) || !user_buf_ok(statbuf, sizeof(struct stat_buf)))
     return (u64)-EFAULT;
 
   const char *p = (const char *)pathname;
@@ -373,7 +374,8 @@ u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
   }
 }
 
-/** @brief Fill @p dirp with @c dirent64 entries from the open directory @p fd. */
+/** @brief Fill @p dirp with @c dirent64 entries from the open directory @p fd.
+ */
 u64 sys_getdents(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -463,7 +465,8 @@ u64 sys_rmdir(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return (result < 0) ? (u64)result : 0;
 }
 
-/** @brief Create or truncate a file at @p pathname (@c open with @c O_WRONLY|O_CREAT|O_TRUNC). */
+/** @brief Create or truncate a file at @p pathname (@c open with @c
+ * O_WRONLY|O_CREAT|O_TRUNC). */
 u64 sys_creat(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
@@ -488,7 +491,8 @@ u64 sys_unlink(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return (result < 0) ? (u64)-ENOENT : 0;
 }
 
-/** @brief Rename @p oldpath to @p newpath, copying across mount points if necessary. */
+/** @brief Rename @p oldpath to @p newpath, copying across mount points if
+ * necessary. */
 u64 sys_rename(u64 oldpath, u64 newpath, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
@@ -519,7 +523,8 @@ u64 sys_ftruncate(u64 fd, u64 length, u64 a3, u64 a4, u64 a5, u64 a6)
 }
 
 /**
- * @brief Read @p count bytes from @p fd at absolute @p offset without moving the seek position.
+ * @brief Read @p count bytes from @p fd at absolute @p offset without moving
+ * the seek position.
  *
  * Saves and restores the OFT offset around the read; returns @c -ESPIPE if
  * the offset cannot be saved (e.g. pipe).
@@ -541,7 +546,8 @@ u64 sys_pread64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
 }
 
 /**
- * @brief Write @p count bytes to @p fd at absolute @p offset without moving the seek position.
+ * @brief Write @p count bytes to @p fd at absolute @p offset without moving the
+ * seek position.
  *
  * Stdio fds (0–2) delegate to ::sys_write since they have no seekable OFT
  * entry.  For regular files, the OFT offset is saved and restored.
@@ -577,7 +583,8 @@ u64 sys_symlink(u64 target, u64 linkpath, u64 a3, u64 a4, u64 a5, u64 a6)
   return (u64)-ENOSYS;
 }
 
-/** @brief @c openat — only @c AT_FDCWD is supported; delegates to ::sys_open. */
+/** @brief @c openat — only @c AT_FDCWD is supported; delegates to ::sys_open.
+ */
 u64 sys_openat(u64 dirfd, u64 path, u64 flags, u64 mode, u64 a5, u64 a6)
 {
   const i64 AT_FDCWD = -100;

@@ -63,7 +63,8 @@ typedef struct proc
   u64  pid;
   u64  parent_pid;
   char name[PROC_NAME_MAX];
-  /** @brief Last successfully executed file (for readlink("/proc/self/exe")). */
+  /** @brief Last successfully executed file (for readlink("/proc/self/exe")).
+   */
   char exe_path[PROC_EXE_PATH_MAX];
   /** @brief Current working directory; updated by chdir, inherited on fork. */
   char         cwd[VFS_PATH_MAX];

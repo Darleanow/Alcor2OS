@@ -43,7 +43,7 @@
 /** @brief Maximum absolute path length, including the NUL byte. */
 #define VFS_PATH_MAX 256
 /** @brief Maximum open file descriptors per process. */
-#define VFS_MAX_FD   256
+#define VFS_MAX_FD 256
 
 /** @name Node types
  *
@@ -157,7 +157,8 @@ typedef struct
    * @param index Zero-based entry index; the VFS tracks this in the OFT offset.
    * @param name  Caller buffer of at least ::VFS_NAME_MAX + 1 bytes.
    * @param st    Filled with entry metadata; may be @c NULL.
-   * @return 1 if an entry was produced, 0 at end-of-directory, negative @c -errno.
+   * @return 1 if an entry was produced, 0 at end-of-directory, negative @c
+   * -errno.
    */
   i64 (*readdir)(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st);
 
@@ -208,14 +209,15 @@ typedef struct
 
 /** @name Open flags (POSIX-compatible subset)
  * @{ */
-#define O_RDONLY    0x0000  /**< Open for reading only. */
-#define O_WRONLY    0x0001  /**< Open for writing only. */
-#define O_RDWR      0x0002  /**< Open for reading and writing. */
-#define O_CREAT     0x0040  /**< Create the file if it does not exist. */
-#define O_TRUNC     0x0200  /**< Truncate to zero length on open. */
-#define O_APPEND    0x0400  /**< All writes advance to end-of-file first. */
-#define O_DIRECTORY 0x10000 /**< Fail if path does not resolve to a directory. */
-#define O_CLOEXEC   0x80000 /**< Close this fd automatically on @c execve. */
+#define O_RDONLY 0x0000 /**< Open for reading only. */
+#define O_WRONLY 0x0001 /**< Open for writing only. */
+#define O_RDWR   0x0002 /**< Open for reading and writing. */
+#define O_CREAT  0x0040 /**< Create the file if it does not exist. */
+#define O_TRUNC  0x0200 /**< Truncate to zero length on open. */
+#define O_APPEND 0x0400 /**< All writes advance to end-of-file first. */
+#define O_DIRECTORY                                                            \
+  0x10000                 /**< Fail if path does not resolve to a directory. */
+#define O_CLOEXEC 0x80000 /**< Close this fd automatically on @c execve. */
 /** @} */
 
 /** @name Seek origins (POSIX)
@@ -240,10 +242,10 @@ typedef struct
  */
 typedef struct
 {
-  u64  d_ino;    /**< Inode number. */
-  i64  d_off;    /**< Opaque offset hint to the next entry. */
-  u16  d_reclen; /**< Total record size including @c d_name and alignment pad. */
-  u8   d_type;   /**< Entry type: ::DT_DIR, ::DT_REG, or ::DT_UNKNOWN. */
+  u64 d_ino;    /**< Inode number. */
+  i64 d_off;    /**< Opaque offset hint to the next entry. */
+  u16 d_reclen; /**< Total record size including @c d_name and alignment pad. */
+  u8  d_type;   /**< Entry type: ::DT_DIR, ::DT_REG, or ::DT_UNKNOWN. */
   char d_name[]; /**< NUL-terminated filename. */
 } PACKED dirent_t;
 
@@ -259,16 +261,16 @@ typedef struct
  */
 typedef struct
 {
-  fs_handle_t     handle;   /**< Driver handle; @c NULL for pipes. */
-  const fs_ops_t *ops;      /**< Driver operations; @c NULL for pipes. */
-  void           *pipe;     /**< Opaque pipe object; @c NULL for regular files. */
-  u64             offset;   /**< Current byte offset (or entry index for dirs). */
-  u32             flags;    /**< Open flags: @c O_RDONLY, @c O_APPEND, etc. */
-  i32             kind;     /**< ::VFS_KIND_FILE, ::VFS_KIND_PIPE_RD, or
-                                 ::VFS_KIND_PIPE_WR. */
-  i32             refcount; /**< Number of fd slots sharing this description. */
-  u64             st_dev;   /**< Cached device ID (used by @c fstat). */
-  bool            in_use;   /**< @c true when this slot is allocated. */
+  fs_handle_t     handle; /**< Driver handle; @c NULL for pipes. */
+  const fs_ops_t *ops;    /**< Driver operations; @c NULL for pipes. */
+  void           *pipe;   /**< Opaque pipe object; @c NULL for regular files. */
+  u64             offset; /**< Current byte offset (or entry index for dirs). */
+  u32             flags;  /**< Open flags: @c O_RDONLY, @c O_APPEND, etc. */
+  i32             kind;   /**< ::VFS_KIND_FILE, ::VFS_KIND_PIPE_RD, or
+                               ::VFS_KIND_PIPE_WR. */
+  i32  refcount;          /**< Number of fd slots sharing this description. */
+  u64  st_dev;            /**< Cached device ID (used by @c fstat). */
+  bool in_use;            /**< @c true when this slot is allocated. */
 } vfs_oft_entry_t;
 
 /** @name OFT kind — also used as pipe-direction argument to @c pipe_oft_release
@@ -373,7 +375,8 @@ i64 vfs_write(i64 fd, const void *buf, u64 count);
  * @param whence  ::SEEK_SET, ::SEEK_CUR, or ::SEEK_END.
  * @return New absolute byte offset on success.
  * @retval -ESPIPE  @p fd refers to a pipe.
- * @retval -EINVAL  Invalid @p whence, or the resulting offset would be negative.
+ * @retval -EINVAL  Invalid @p whence, or the resulting offset would be
+ * negative.
  */
 i64 vfs_seek(i64 fd, i64 offset, i32 whence);
 
@@ -499,8 +502,9 @@ void vfs_proc_init_fds(i32 *fds);
  * @param parent_fds  Source fd array (read-only).
  * @param parent_clox Source cloexec bitmap (read-only).
  */
-void vfs_proc_inherit_fds(i32 *child_fds, u8 *child_clox,
-                          const i32 *parent_fds, const u8 *parent_clox);
+void vfs_proc_inherit_fds(
+    i32 *child_fds, u8 *child_clox, const i32 *parent_fds, const u8 *parent_clox
+);
 
 /**
  * @brief Release all file descriptors held by an exiting process.

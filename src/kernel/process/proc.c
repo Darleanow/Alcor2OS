@@ -21,7 +21,8 @@
 
 /** @brief POSIX @c clone flag: parent blocks until child @c execve or @c _exit.
  * musl @c posix_spawn relies on this so the parent does not run concurrently
- * with the child in the critical region before exec (avoids pipe sync deadlocks).
+ * with the child in the critical region before exec (avoids pipe sync
+ * deadlocks).
  */
 #define ALCOR_CLONE_VFORK 0x00004000u
 
@@ -46,7 +47,6 @@ void proc_init(void)
     proc_table[i].state = PROC_STATE_FREE;
     proc_table[i].pid   = 0;
   }
-
 }
 
 /**
