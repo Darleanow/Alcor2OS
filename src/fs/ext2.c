@@ -1932,7 +1932,7 @@ void ext2_close(ext2_file_t *file)
  * @param count Maximum bytes to read.
  * @return Bytes read, or negative errno on error.
  */
-i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
+i64 ext2_read(ext2_file_t *file, void *buf, u64 count, u64 offset)
 {
   if(!file || !file->in_use || file->is_dir)
     return -EINVAL;
@@ -1943,10 +1943,10 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
   u32                  block_size = vol->block_size;
 
   /* Limit to file size */
-  if(file->position >= file->inode.i_size)
+  if(offset >= file->inode.i_size)
     return 0;
-  if(file->position + count > file->inode.i_size)
-    count = file->inode.i_size - file->position;
+  if(offset + count > file->inode.i_size)
+    count = file->inode.i_size - offset;
 
   u8 *block_buf = cache_get_block(block_size);
   if(!block_buf)
@@ -1956,8 +1956,9 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
   u8 *run_buf = kmalloc((u64)EXT2_READ_RUN_MAX * block_size);
 
   while(bytes_read < count) {
-    u32 file_block   = file->position / block_size;
-    u32 block_offset = file->position % block_size;
+    u64 current_pos  = offset + bytes_read;
+    u32 file_block   = current_pos / block_size;
+    u32 block_offset = current_pos % block_size;
     u32 block_num    = get_block_num(vol, &file->inode, file_block);
 
     if(block_num == 0) {
@@ -1967,7 +1968,6 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
         to_read = count - bytes_read;
       kzero(dst + bytes_read, to_read);
       bytes_read += to_read;
-      file->position += to_read;
       continue;
     }
 
@@ -2001,7 +2001,6 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
           to_read = remaining;
         kmemcpy(dst + bytes_read, block_buf + block_offset, to_read);
         bytes_read += to_read;
-        file->position += to_read;
       } else {
         /* Multi-block DMA: read `run` consecutive disk blocks at once. */
         u32 sectors  = run * (block_size / EXT2_SECTOR_SIZE);
@@ -2021,7 +2020,6 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
         u64 to_read = remaining < avail ? remaining : avail;
         kmemcpy(dst + bytes_read, run_buf + block_offset, to_read);
         bytes_read += to_read;
-        file->position += to_read;
       }
     } else {
       /* run_buf unavailable: fall back to single-block reads. */
@@ -2034,7 +2032,6 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
         to_read = remaining;
       kmemcpy(dst + bytes_read, block_buf + block_offset, to_read);
       bytes_read += to_read;
-      file->position += to_read;
     }
   }
 
@@ -2054,7 +2051,7 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count)
  * @param count Number of bytes to write.
  * @return Bytes written, or negative errno on error.
  */
-i64 ext2_write(ext2_file_t *file, const void *buf, u64 count)
+i64 ext2_write(ext2_file_t *file, const void *buf, u64 count, u64 offset)
 {
   if(!file || !file->in_use || file->is_dir)
     return -EINVAL;
@@ -2073,8 +2070,9 @@ i64 ext2_write(ext2_file_t *file, const void *buf, u64 count)
     return -ENOMEM;
 
   while(bytes_written < count) {
-    u32 file_block   = file->position / block_size;
-    u32 block_offset = file->position % block_size;
+    u64 current_pos  = offset + bytes_written;
+    u32 file_block   = current_pos / block_size;
+    u32 block_offset = current_pos % block_size;
 
     /* Allocate block if needed */
     u32 block_num = get_block_num(vol, &file->inode, file_block);
@@ -2108,10 +2106,9 @@ i64 ext2_write(ext2_file_t *file, const void *buf, u64 count)
     }
 
     bytes_written += to_write;
-    file->position += to_write;
 
-    if(file->position > file->inode.i_size) {
-      file->inode.i_size = file->position;
+    if(current_pos + to_write > file->inode.i_size) {
+      file->inode.i_size = current_pos + to_write;
       file->dirty        = true;
     }
   }
@@ -2132,7 +2129,7 @@ i64 ext2_write(ext2_file_t *file, const void *buf, u64 count)
  * @param entry Output entry structure.
  * @return 1 if an entry was read, 0 at end, or negative errno on error.
  */
-i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry)
+i64 ext2_readdir(ext2_file_t *dir, u64 index, ext2_entry_t *entry)
 {
   if(!dir || !dir->in_use || !dir->is_dir)
     return -EINVAL;
@@ -2140,20 +2137,20 @@ i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry)
   const ext2_volume_t *vol        = dir->vol;
   u32                  block_size = vol->block_size;
 
-  if(dir->position >= dir->inode.i_size)
-    return 0;
-
-  u8 *block_buf = cache_get_block(block_size);
+  u8                  *block_buf = cache_get_block(block_size);
   if(!block_buf)
     return -ENOMEM;
 
-  while(dir->position < dir->inode.i_size) {
-    u32 file_block   = dir->position / block_size;
-    u32 block_offset = dir->position % block_size;
+  u32 current_entry = 0;
+  u32 pos           = 0;
+
+  while(pos < dir->inode.i_size) {
+    u32 file_block   = pos / block_size;
+    u32 block_offset = pos % block_size;
     u32 block_num    = get_block_num(vol, &dir->inode, file_block);
 
     if(block_num == 0) {
-      dir->position = (file_block + 1) * block_size;
+      pos = (file_block + 1) * block_size;
       continue;
     }
 
@@ -2165,34 +2162,36 @@ i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry)
     const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + block_offset);
 
     if(de->rec_len == 0) {
-      dir->position = (file_block + 1) * block_size;
+      pos = (file_block + 1) * block_size;
       continue;
     }
 
-    dir->position += de->rec_len;
+    if(de->inode != 0) {
+      if(current_entry == index) {
+        /* Copy entry info */
+        u32 name_len = de->name_len;
+        if(name_len > EXT2_NAME_MAX)
+          name_len = EXT2_NAME_MAX;
+        kmemcpy(entry->name, de->name, name_len);
+        entry->name[name_len] = '\0';
+        entry->inode          = de->inode;
+        entry->file_type      = de->file_type;
 
-    if(de->inode == 0)
-      continue;
+        /* Get file size */
+        ext2_inode_t file_inode;
+        if(read_inode(vol, de->inode, &file_inode) == 0) {
+          entry->size = file_inode.i_size;
+        } else {
+          entry->size = 0;
+        }
 
-    /* Copy entry info */
-    u32 name_len = de->name_len;
-    if(name_len > EXT2_NAME_MAX)
-      name_len = EXT2_NAME_MAX;
-    kmemcpy(entry->name, de->name, name_len);
-    entry->name[name_len] = '\0';
-    entry->inode          = de->inode;
-    entry->file_type      = de->file_type;
-
-    /* Get file size */
-    ext2_inode_t file_inode;
-    if(read_inode(vol, de->inode, &file_inode) == 0) {
-      entry->size = file_inode.i_size;
-    } else {
-      entry->size = 0;
+        cache_put_block(block_buf);
+        return 1;
+      }
+      current_entry++;
     }
 
-    cache_put_block(block_buf);
-    return 1;
+    pos += de->rec_len;
   }
 
   cache_put_block(block_buf);
@@ -2739,45 +2738,29 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
  * @{
  */
 
-static fs_file_t
-    ext2_vfs_open(void *fs_data, const char *path, u32 flags, bool *is_dir)
+static fs_handle_t ext2_vfs_open(void *fs_data, const char *path, u32 flags)
 {
-  (void)flags;
-  ext2_file_t *f = ext2_open((ext2_volume_t *)fs_data, path);
-  if(f && is_dir) {
-    *is_dir = f->is_dir;
+  ext2_volume_t *vol = (ext2_volume_t *)fs_data;
+  if(flags & O_CREAT) {
+    return (fs_handle_t)ext2_create(vol, path);
   }
-  return f;
+  return (fs_handle_t)ext2_open(vol, path);
 }
 
-static fs_file_t ext2_vfs_create(void *fs_data, const char *path)
-{
-  return ext2_create((ext2_volume_t *)fs_data, path);
-}
-
-static void ext2_vfs_close(fs_file_t fh)
+static void ext2_vfs_close(fs_handle_t fh)
 {
   ext2_close((ext2_file_t *)fh);
 }
 
-static i64 ext2_vfs_read(fs_file_t fh, void *buf, u64 count)
+static i64 ext2_vfs_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
 {
-  return ext2_read((ext2_file_t *)fh, buf, count);
+  return ext2_read((ext2_file_t *)fh, buf, count, offset);
 }
 
-static i64 ext2_vfs_write(fs_file_t fh, const void *buf, u64 count)
+static i64
+    ext2_vfs_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
 {
-  return ext2_write((ext2_file_t *)fh, buf, count);
-}
-
-static i64 ext2_vfs_seek(fs_file_t fh, i64 offset, i32 whence)
-{
-  return ext2_seek((ext2_file_t *)fh, offset, whence);
-}
-
-static i64 ext2_vfs_truncate(fs_file_t fh, u64 length)
-{
-  return ext2_truncate((ext2_file_t *)fh, length);
+  return ext2_write((ext2_file_t *)fh, buf, count, offset);
 }
 
 static i64 ext2_vfs_mkdir(void *fs_data, const char *path)
@@ -2795,7 +2778,7 @@ static i64 ext2_vfs_rmdir(void *fs_data, const char *path)
   return ext2_rmdir((ext2_volume_t *)fs_data, path);
 }
 
-static i64 ext2_vfs_fstat(fs_file_t fh, vfs_stat_t *st)
+static i64 ext2_vfs_fstat(fs_handle_t fh, vfs_stat_t *st)
 {
   ext2_file_t *f = (ext2_file_t *)fh;
   if(!f || !f->in_use || !st)
@@ -2810,79 +2793,70 @@ static i64 ext2_vfs_fstat(fs_file_t fh, vfs_stat_t *st)
   return 0;
 }
 
-static i64 ext2_vfs_stat(
-    void *fs_data, const char *path, u64 *size, u8 *type, u64 *ino
-)
+static i64 ext2_vfs_stat(void *fs_data, const char *path, vfs_stat_t *st)
 {
   ext2_entry_t entry;
   i64          ret = ext2_stat((ext2_volume_t *)fs_data, path, &entry);
   if(ret == 0) {
-    if(size)
-      *size = entry.size;
-    if(type)
-      *type = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
-    if(ino)
-      *ino = entry.inode;
+    st->size = entry.size;
+    st->type = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
+    st->ino  = entry.inode;
+    st->dev  = 0;
   }
   return ret;
-}
-
-static bool ext2_vfs_is_dir(fs_file_t fh)
-{
-  ext2_file_t *f = (ext2_file_t *)fh;
-  return f ? f->is_dir : false;
-}
-
-static u64 ext2_vfs_get_position(fs_file_t fh)
-{
-  ext2_file_t *f = (ext2_file_t *)fh;
-  return f ? f->position : 0;
-}
-
-static i64 ext2_vfs_flush(fs_file_t fh)
-{
-  return ext2_flush((ext2_file_t *)fh);
 }
 
 static i64
-    ext2_vfs_readdir(fs_file_t fh, char *name, u8 *type, u64 *size, u64 *inode)
+    ext2_vfs_readdir(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st)
 {
   ext2_file_t *dir = (ext2_file_t *)fh;
   ext2_entry_t entry;
-  i64          ret = ext2_readdir(dir, &entry);
+  i64          ret = ext2_readdir(dir, index, &entry);
   if(ret > 0) {
     kstrncpy(name, entry.name, VFS_NAME_MAX);
-    *type  = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
-    *size  = entry.size;
-    *inode = entry.inode;
+    if(st) {
+      st->type = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
+      st->size = entry.size;
+      st->ino  = entry.inode;
+    }
   }
   return ret;
+}
+
+static i64 ext2_vfs_truncate(fs_handle_t fh, u64 length)
+{
+  return ext2_truncate((ext2_file_t *)fh, length);
+}
+
+static i64
+    ext2_vfs_readlink(void *fs_data, const char *path, char *buf, u64 cap)
+{
+  return ext2_readlink((ext2_volume_t *)fs_data, path, buf, cap);
 }
 
 /** @brief ext2 VFS operations table. */
 static const fs_ops_t g_ext2_vfs_ops = {
-    .open         = ext2_vfs_open,
-    .create       = ext2_vfs_create,
-    .close        = ext2_vfs_close,
-    .read         = ext2_vfs_read,
-    .write        = ext2_vfs_write,
-    .seek         = ext2_vfs_seek,
-    .truncate     = ext2_vfs_truncate,
-    .mkdir        = ext2_vfs_mkdir,
-    .unlink       = ext2_vfs_unlink,
-    .rmdir        = ext2_vfs_rmdir,
-    .stat         = ext2_vfs_stat,
-    .fstat        = ext2_vfs_fstat,
-    .is_dir       = ext2_vfs_is_dir,
-    .get_position = ext2_vfs_get_position,
-    .flush        = ext2_vfs_flush,
-    .readdir      = ext2_vfs_readdir,
+    .open     = ext2_vfs_open,
+    .close    = ext2_vfs_close,
+    .read     = ext2_vfs_read,
+    .write    = ext2_vfs_write,
+    .mkdir    = ext2_vfs_mkdir,
+    .unlink   = ext2_vfs_unlink,
+    .rmdir    = ext2_vfs_rmdir,
+    .stat     = ext2_vfs_stat,
+    .fstat    = ext2_vfs_fstat,
+    .readdir  = ext2_vfs_readdir,
+    .truncate = ext2_vfs_truncate,
+    .readlink = ext2_vfs_readlink,
 };
 
 /** @brief ext2 mount wrapper for fs_type_t. */
-static void *ext2_vfs_mount(u8 drive, u8 partition)
+static void *ext2_vfs_mount(const char *source, u32 flags)
 {
-  return ext2_mount(drive, partition);
+  (void)source;
+  (void)flags;
+  /* Hardcoded to ATA 0 sector 0 (no partition table) */
+  return ext2_mount(0, 0);
 }
 
 /** @brief ext2 unmount wrapper for fs_type_t. */

@@ -65,7 +65,9 @@ typedef struct proc
   char name[PROC_NAME_MAX];
   /** @brief Last successfully executed file (for readlink("/proc/self/exe")).
    */
-  char         exe_path[PROC_EXE_PATH_MAX];
+  char exe_path[PROC_EXE_PATH_MAX];
+  /** @brief Current working directory; updated by chdir, inherited on fork. */
+  char         cwd[VFS_PATH_MAX];
   proc_state_t state;
   i64          exit_code;
   u64          cr3;
@@ -98,6 +100,10 @@ typedef struct proc
   u32  kbd_ready_len;
   char kbd_edit[PROC_KBD_LINE_CAP];
   char kbd_ready[PROC_KBD_LINE_CAP];
+
+  /** @brief Pointer to the saved registers of the currently executing syscall.
+   * Required for rt_sigreturn and clone/fork to access user registers. */
+  syscall_frame_t *current_frame;
 
   /** @brief Per-process fd table; each entry is an index into the global
    * open file table, or -1 for closed. Inherited on fork, preserved across
@@ -180,7 +186,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options);
 i64 proc_fork(const void *syscall_frame);
 
 /**
- * @brief Linux `clone` without threads: duplicate the task like fork, but the
+ * @brief Clone the task like fork, but the
  * child resumes with user RSP @p child_stack when non-zero (musl `posix_spawn`,
  * `faccessat` helper); when zero, same as fork (parent RSP).
  */

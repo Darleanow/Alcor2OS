@@ -19,6 +19,7 @@
  *      resumes the interrupted code.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>

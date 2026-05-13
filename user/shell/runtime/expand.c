@@ -128,8 +128,8 @@ static int buf_append(
  * for u64; PID_BUF_MAX is plenty). */
 static void render_uint(unsigned long n, char *out)
 {
-  char tmp[24];
-  int  i = 0;
+  char tmp[24] = {0};
+  int  i       = 0;
   if(n == 0)
     tmp[i++] = '0';
   while(n > 0) {
@@ -275,7 +275,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
 {
   /* $? — last status */
   if(*cur == '?') {
-    char s[16];
+    char s[16] = {0};
     render_int(last_status, s);
     if(buf_append(buf, cap, len, s, sh_strlen(s)) < 0)
       return -1;

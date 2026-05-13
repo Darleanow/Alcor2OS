@@ -2,12 +2,13 @@
  * @file src/kernel/sys/pipe.c
  * @brief Anonymous pipes backed by a fixed-size ring buffer.
  *
- * Pipes live in the open file table as VFS_FD_PIPE_READ / VFS_FD_PIPE_WRITE
+ * Pipes live in the open file table as VFS_KIND_PIPE_RD / VFS_KIND_PIPE_WR
  * entries; per-process file descriptors point at those entries the same way
  * file fds do. End-of-pipe lifetime is reference-counted via the OFT
  * refcount, so fork-inheritance and dup/dup2 work the same as for files.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
@@ -33,8 +34,9 @@ typedef struct pipe
   proc_t *waiting_writer; /**< Process blocked waiting for space to write. */
 } pipe_t;
 
-static pipe_t  pipes[MAX_PIPES];
+static pipe_t pipes[MAX_PIPES];
 
+/** @brief Find a free pipe slot, zero it, and mark both ends open. */
 static pipe_t *alloc_pipe(void)
 {
   for(int i = 0; i < MAX_PIPES; i++) {
@@ -52,17 +54,6 @@ static pipe_t *alloc_pipe(void)
 void *pipe_alloc_obj(void)
 {
   return alloc_pipe();
-}
-
-void pipe_oft_retain(i32 kind, void *pipe_ptr)
-{
-  pipe_t *p = (pipe_t *)pipe_ptr;
-  if(!p || !p->allocated)
-    return;
-  if(kind == VFS_FD_PIPE_READ)
-    p->read_open++;
-  else if(kind == VFS_FD_PIPE_WRITE)
-    p->write_open++;
 }
 
 bool pipe_poll_read_ready(const void *pipe_ptr)
@@ -91,20 +82,23 @@ void pipe_oft_release(i32 kind, void *pipe_ptr)
   if(!p)
     return;
 
-  if(kind == VFS_FD_PIPE_READ) {
+  if(kind == VFS_KIND_PIPE_RD) {
     if(p->read_open > 0)
       p->read_open--;
     /* Wake blocked writer so it sees EPIPE. */
     if(!p->read_open && p->waiting_writer &&
        p->waiting_writer->state == PROC_STATE_BLOCKED)
       p->waiting_writer->state = PROC_STATE_READY;
-  } else if(kind == VFS_FD_PIPE_WRITE) {
+  } else if(kind == VFS_KIND_PIPE_WR) {
     if(p->write_open > 0)
       p->write_open--;
+
     /* Wake blocked reader so it returns EOF (0). */
     if(!p->write_open && p->waiting_reader &&
-       p->waiting_reader->state == PROC_STATE_BLOCKED)
+       p->waiting_reader->state == PROC_STATE_BLOCKED) {
       p->waiting_reader->state = PROC_STATE_READY;
+      p->waiting_reader        = NULL;
+    }
   }
 
   if(!p->read_open && !p->write_open)
@@ -146,8 +140,10 @@ i64 pipe_read_obj(void *pipe_ptr, void *buf, u64 count)
   p->count -= to_read;
 
   /* Wake a blocked writer now that space is available. */
-  if(p->waiting_writer && p->waiting_writer->state == PROC_STATE_BLOCKED)
+  if(p->waiting_writer && p->waiting_writer->state == PROC_STATE_BLOCKED) {
     p->waiting_writer->state = PROC_STATE_READY;
+    p->waiting_writer        = NULL;
+  }
 
   return (i64)to_read;
 }
@@ -194,8 +190,10 @@ i64 pipe_write_obj(void *pipe_ptr, const void *buf, u64 count)
     written += to_write;
 
     /* Wake a blocked reader now that data is available. */
-    if(p->waiting_reader && p->waiting_reader->state == PROC_STATE_BLOCKED)
+    if(p->waiting_reader && p->waiting_reader->state == PROC_STATE_BLOCKED) {
       p->waiting_reader->state = PROC_STATE_READY;
+      p->waiting_reader        = NULL;
+    }
   }
 
   return (i64)written;
@@ -220,12 +218,12 @@ u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   if(!p)
     return (u64)-ENOMEM;
 
-  i32 read_oft = vfs_oft_alloc_pipe(VFS_FD_PIPE_READ, p);
+  i32 read_oft = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, p);
   if(read_oft < 0) {
     p->allocated = 0;
     return (u64)-ENFILE;
   }
-  i32 write_oft = vfs_oft_alloc_pipe(VFS_FD_PIPE_WRITE, p);
+  i32 write_oft = vfs_oft_alloc_pipe(VFS_KIND_PIPE_WR, p);
   if(write_oft < 0) {
     vfs_oft_release(read_oft);
     return (u64)-ENFILE;

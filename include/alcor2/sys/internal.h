@@ -25,6 +25,15 @@
 
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
 
+/** @brief Descriptor for a single syscall mapping. */
+typedef struct
+{
+  u64          num;     /**< Syscall number (RAX) */
+  const char  *name;    /**< Symbolic name for tracing */
+  int          nargs;   /**< Argument count (0-6) */
+  syscall_fn_t handler; /**< Implementation function */
+} sys_def_t;
+
 #define SYSCALL_DECL(name) u64 name(u64, u64, u64, u64, u64, u64)
 
 /* I/O */
@@ -36,6 +45,7 @@ SYSCALL_DECL(sys_nanosleep);
 SYSCALL_DECL(sys_readv);
 SYSCALL_DECL(sys_writev);
 SYSCALL_DECL(sys_select);
+SYSCALL_DECL(sys_poll);
 
 /* Memory */
 SYSCALL_DECL(sys_mmap);
@@ -109,6 +119,7 @@ SYSCALL_DECL(sys_arch_prctl);
 /* Pipe */
 SYSCALL_DECL(sys_pipe);
 SYSCALL_DECL(sys_pipe2);
+SYSCALL_DECL(sys_exit_group);
 
 /* Userspace FB / compositors */
 SYSCALL_DECL(sys_alcor_fb_info);
@@ -148,28 +159,13 @@ i64 pipe_write_obj(void *pipe, const void *buf, u64 count);
 void *pipe_alloc_obj(void);
 
 /**
- * @brief Increment the read_open or write_open count for one new fd-holder.
- * Called by vfs_oft_retain (e.g. on fork) so the child's future close
- * decrements the count without affecting the parent.
+ * @brief Decrement read_open or write_open when an OFT entry's refcount hits
+ * zero. Called only from vfs_oft_release after the last fd reference drops.
  *
- * @param kind  VFS_FD_PIPE_READ or VFS_FD_PIPE_WRITE.
- * @param pipe  Pipe pointer.
- */
-void pipe_oft_retain(i32 kind, void *pipe);
-
-/**
- * @brief Decrement read_open or write_open for one fd-holder closing.
- * Called by vfs_oft_release on every close (not just when OFT refcount hits 0)
- * so readers see EOF as soon as all writers across all processes have closed.
- *
- * @param kind  VFS_FD_PIPE_READ or VFS_FD_PIPE_WRITE.
+ * @param kind  VFS_KIND_PIPE_RD or VFS_KIND_PIPE_WR.
  * @param pipe  Pipe pointer.
  */
 void pipe_oft_release(i32 kind, void *pipe);
-
-/** @brief Release every pipe end held by an exiting process; wakes blocked
- * peers. */
-void pipe_close_for_exit(u64 pid);
 
 #undef SYSCALL_DECL
 

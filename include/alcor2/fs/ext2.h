@@ -8,6 +8,7 @@
 #ifndef ALCOR2_EXT2_H
 #define ALCOR2_EXT2_H
 
+#include <alcor2/fs/vfs.h>
 #include <alcor2/types.h>
 
 /** @brief ext2 magic number in superblock. */
@@ -289,7 +290,7 @@ void ext2_close(ext2_file_t *file);
  * @param count Bytes to read.
  * @return Bytes read, or negative on error.
  */
-i64 ext2_read(ext2_file_t *file, void *buf, u64 count);
+i64 ext2_read(ext2_file_t *file, void *buf, u64 count, u64 offset);
 
 /**
  * @brief Write data to a file.
@@ -298,7 +299,7 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count);
  * @param count Number of bytes to write.
  * @return Bytes written, or negative on error.
  */
-i64 ext2_write(ext2_file_t *file, const void *buf, u64 count);
+i64 ext2_write(ext2_file_t *file, const void *buf, u64 count, u64 offset);
 
 /**
  * @brief Read next directory entry.
@@ -306,7 +307,7 @@ i64 ext2_write(ext2_file_t *file, const void *buf, u64 count);
  * @param entry Output entry.
  * @return 1 if entry read, 0 if end, negative on error.
  */
-i64 ext2_readdir(ext2_file_t *dir, ext2_entry_t *entry);
+i64 ext2_readdir(ext2_file_t *dir, u64 index, ext2_entry_t *entry);
 
 /**
  * @brief Get file/directory info.
@@ -392,7 +393,7 @@ struct fs_ops;
  *
  * @return Pointer to ext2 fs_ops_t structure.
  */
-const struct fs_ops *ext2_get_ops(void);
+const fs_ops_t *ext2_get_ops(void);
 
 /**
  * @brief Initialize and register ext2 filesystem with VFS.

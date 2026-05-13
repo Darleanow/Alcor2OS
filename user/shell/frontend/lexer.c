@@ -351,9 +351,7 @@ char *lex_read_heredoc_body(lexer_t *L, const char *delim)
 
   /* Collect lines until one equals @p delim. */
   const char *body_start = L->cur;
-  // cppcheck-suppress unreadVariable
-  const char *body_end =
-      body_start; // NOLINT(clang-analyzer-deadcode.DeadStores)
+  const char *body_end;
   while(*L->cur) {
     const char *line_start = L->cur;
     while(*L->cur && *L->cur != '\n')

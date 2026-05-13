@@ -243,3 +243,41 @@ int ktolower(int c)
     return c + 32;
   return c;
 }
+
+/**
+ * @brief Compare two strings up to n characters.
+ * @param a First string.
+ * @param b Second string.
+ * @param n Maximum count.
+ * @return 0 if equal.
+ */
+int kstrncmp(const char *a, const char *b, u64 n)
+{
+  if(n == 0)
+    return 0;
+  while(n-- > 0 && *a && (*a == *b)) {
+    if(n == 0)
+      return 0;
+    a++;
+    b++;
+  }
+  return *(unsigned char *)a - *(unsigned char *)b;
+}
+
+/**
+ * @brief Concatenate strings with maximum length.
+ * @param dst Destination.
+ * @param src Source.
+ * @param max Maximum bytes to add.
+ * @return dst pointer.
+ */
+char *kstrncat(char *dst, const char *src, u64 max)
+{
+  u64 len = kstrlen(dst);
+  u64 i;
+  for(i = 0; i < max && src[i] != '\0'; i++) {
+    dst[len + i] = src[i];
+  }
+  dst[len + i] = '\0';
+  return dst;
+}
