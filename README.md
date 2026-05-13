@@ -3,7 +3,7 @@
 
 # Alcor2
 
-x86_64 operating system written from scratch. Clang/LLVM toolchain only — no GCC.
+x86_64 operating system written from scratch.
 
 ---
 
@@ -21,7 +21,6 @@ x86_64 operating system written from scratch. Clang/LLVM toolchain only — no G
 - `vega` — custom shell with bash-flavored syntax (brace-delimited control flow, `fn` functions, `let` variables, pipes, heredocs, `cmd!` fail-fast)
 - Standard binaries: `cat`, `echo`, `ls`, `mkdir`, `pwd`, `rm`, `touch`, `cc`
 - **Grendizer** — zero-allocation CLI option parser and subcommand dispatcher ([docs](user/docs/grendizer.md))
-- TUI library (`libalcor_tui`) with C and C++ bindings
 - ncurses, FreeType, HarfBuzz (cross-compiled for the target)
 
 **Toolchain**
@@ -91,7 +90,6 @@ Alcor2/
 │   ├── shell/                  vega shell (lexer, parser, runtime)
 │   ├── lib/                    Grendizer option parser
 │   ├── apps/                   Demo apps (C++, ncurses, font rendering, edi)
-│   ├── tui/                    libalcor_tui — TUI widget library
 │   ├── crt/                    crt0, stdio TTY shim
 │   └── init/                   PID 1
 ├── mk/                         Makefile modules (config, kernel, thirdparty, repo)
@@ -120,7 +118,7 @@ qemu-system-x86_64 \
   -cdrom alcor2.iso \
   -drive file=disk.img,format=raw,if=ide,cache=writeback \
   -boot order=d \
-  -m 2048M
+  -m 2048M -enable-kvm -cpu host
 ```
 
 ---
