@@ -1,10 +1,11 @@
 /**
  * @file src/kernel/sys/sys_io.c
- * @brief I/O syscalls: `read`, `readv`, `write`, `lseek`, `ioctl`, `nanosleep`,
- * `writev`, `select`, `poll`.
+ * @brief I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep,
+ *        select, poll.
  *
- * FD 0: keyboard (wait for IRQ with STI/HLT). Other FDs: VFS or pipes depending
- * on descriptor.
+ * fd 0 (stdin) reads from the keyboard IRQ path when no OFT entry is mapped.
+ * fd 1/2 (stdout/stderr) fall back to the framebuffer console under the same
+ * condition.  All other fds are dispatched through the VFS layer.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -19,14 +20,18 @@
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
 
+/** @brief Return @c true if @p ptr..@p ptr+size is a valid user read/write range. */
 static inline bool user_rw_ok(u64 ptr, u64 size)
 {
   return ptr && vmm_is_user_range((void *)ptr, size);
 }
 
-/* Stdout fallback for fd 1/2 when the per-process fd table has no OFT entry
- * mapped — keeps the console wired up for unredirected programs. (Stdin uses
- * kbd_read_translated directly via the layout-aware path.) */
+/**
+ * @brief Write @p count bytes from @p buf directly to the framebuffer console.
+ *
+ * Used as a fallback for fd 1/2 when no OFT entry is mapped (unredirected
+ * programs).  Stdin uses the keyboard path directly; this only covers stdout.
+ */
 static u64 stdout_fallback(u64 buf, u64 count)
 {
   const char *str = (const char *)buf;
@@ -35,12 +40,19 @@ static u64 stdout_fallback(u64 buf, u64 count)
   return count;
 }
 
+/** @brief Return @c true if @p fd has an OFT entry in the current process. */
 static bool fd_has_oft(u64 fd)
 {
   proc_t *p = proc_current();
   return p && fd < (u64)VFS_MAX_FD && p->fds[fd] >= 0;
 }
 
+/**
+ * @brief Read up to @p count bytes from @p fd into @p buf.
+ *
+ * fd 0 without an OFT entry is served by the keyboard line discipline.
+ * All other fds are dispatched to ::vfs_read.
+ */
 u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -62,6 +74,12 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   return (u64)vfs_read((i64)fd, (void *)buf, count);
 }
 
+/**
+ * @brief Write @p count bytes from @p buf to @p fd.
+ *
+ * fd 1/2 without an OFT entry go to the framebuffer console fallback.
+ * All other fds are dispatched to ::vfs_write.
+ */
 u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -79,6 +97,7 @@ u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   return (u64)vfs_write((i64)fd, (void *)buf, count);
 }
 
+/** @brief Reposition the file offset of @p fd (@c lseek). */
 u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -89,12 +108,22 @@ u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 
 #define TCGETS     0x5401
 #define TCSETS     0x5402
-#define TCSETSW    0x5403 /* TCSADRAIN */
-#define TCSETSF    0x5404 /* TCSAFLUSH — used by ncurses raw()/noraw() */
+#define TCSETSW    0x5403
+#define TCSETSF    0x5404
 #define TIOCGWINSZ 0x5413
 
+/**
+ * @brief Handle emulated TTY ioctls for stdio fds and pipe ends.
+ *
+ * Supports @c TIOCGWINSZ (returns 25×80), @c TCGETS, @c TCSETS, @c TCSETSW,
+ * and @c TCSETSF against the per-process @c k_termios_t.  All other requests
+ * return @c -ENOTTY.
+ */
 static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
 {
+  if(!p)
+    return (u64)-EINVAL;
+
   switch(request) {
   case TIOCGWINSZ: {
     if(!user_rw_ok(arg, 8))
@@ -103,16 +132,10 @@ static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
     {
       u16 row, col, xpixel, ypixel;
     } ws = {25, 80, 0, 0};
-    (void)ws.row;
-    (void)ws.col;
-    (void)ws.xpixel;
-    (void)ws.ypixel;
     kmemcpy((void *)arg, &ws, sizeof(ws));
     return 0;
   }
   case TCGETS:
-    if(!p)
-      return (u64)-EINVAL;
     if(!user_rw_ok(arg, sizeof(k_termios_t)))
       return (u64)-EFAULT;
     kmemcpy((void *)arg, &p->termios, sizeof(p->termios));
@@ -120,8 +143,6 @@ static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
   case TCSETS:
   case TCSETSW:
   case TCSETSF:
-    if(!p)
-      return (u64)-EINVAL;
     if(!user_rw_ok(arg, sizeof(k_termios_t)))
       return (u64)-EFAULT;
     kmemcpy(&p->termios, (void *)arg, sizeof(p->termios));
@@ -131,6 +152,13 @@ static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
   }
 }
 
+/**
+ * @brief Perform a device control operation on @p fd.
+ *
+ * fd 0 handles the Alcor2-specific keyboard layout request
+ * (@c ALCOR2_IOC_KBD_SET_LAYOUT).  stdio fds and pipe ends use the emulated
+ * TTY path.  All other fds return @c -ENOTTY.
+ */
 u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -148,14 +176,18 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
-  /* stdio + pipe ends: isatty(3), ncurses tcgetattr/tcsetattr on stdout pipe.
-   */
   if(fd <= 2 || vfs_fd_is_pipe(fd))
     return ioctl_tty_emulated(proc_current(), request, arg);
 
   return (u64)-ENOTTY;
 }
 
+/**
+ * @brief Sleep for the duration described by @p req (@c struct @c timespec).
+ *
+ * Implemented as a sequence of STI/HLT pairs, each ~10 ms.  @p rem is not
+ * filled because preemption is cooperative and we don't track elapsed time.
+ */
 u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)rem;
@@ -186,6 +218,7 @@ u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
+/** @brief Scatter-gather read: read from @p fd into @p iovcnt buffers. */
 struct iovec
 {
   void *iov_base;
@@ -225,6 +258,7 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   return total;
 }
 
+/** @brief Gather-write: write @p iovcnt buffers to @p fd in order. */
 u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -252,6 +286,7 @@ u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 #define SEL_FDSET_LONG 16
 #define SEL_FDSET_SZ   (SEL_FDSET_LONG * sizeof(unsigned long))
 
+/** @brief Test whether bit @p fd is set in the @c fd_set @p s. */
 static inline bool sel_fdisset(const unsigned long *s, u32 fd)
 {
   if(fd >= SEL_FDSET_LONG * SEL_NFDBITS)
@@ -259,12 +294,14 @@ static inline bool sel_fdisset(const unsigned long *s, u32 fd)
   return (s[fd / SEL_NFDBITS] & (1UL << (fd % SEL_NFDBITS))) != 0;
 }
 
+/** @brief Clear bit @p fd in the @c fd_set @p s. */
 static inline void sel_fdclr(unsigned long *s, u32 fd)
 {
   if(fd < SEL_FDSET_LONG * SEL_NFDBITS)
     s[fd / SEL_NFDBITS] &= ~(1UL << (fd % SEL_NFDBITS));
 }
 
+/** @brief Zero bits above @p nfds in the three @c fd_set arrays to avoid stale results. */
 static inline void sel_mask_high_bits(
     unsigned long *r, unsigned long *w, unsigned long *e, u32 nfds, u32 nlongs
 )
@@ -278,6 +315,7 @@ static inline void sel_mask_high_bits(
   }
 }
 
+/** @brief Return positive if @p fd has data available, 0 if not, negative on error. */
 static i32 sel_read_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
@@ -293,6 +331,7 @@ static i32 sel_read_ready(u64 fd)
   return vfs_select_read_ready((i64)fd);
 }
 
+/** @brief Return positive if @p fd can accept a write, 0 if not, negative on error. */
 static i32 sel_write_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
@@ -304,20 +343,18 @@ static i32 sel_write_ready(u64 fd)
   return vfs_select_write_ready((i64)fd);
 }
 
-/** @brief ~10 ms of wall time per tick (matches @c sys_nanosleep heuristics).
- */
+/** @brief ~10 ms of wall time per tick (matches ::sys_nanosleep heuristics). */
 static u64 io__ms_to_hlt_ticks(u64 ms)
 {
   u64 t = (ms + 9) / 10;
   return t ? t : 1;
 }
 
-/** Linux-compatible @c poll(2) event bits (subset). */
+/** POSIX @c poll(2) event bits (subset). */
 #define POLL__IN       0x001
 #define POLL__PRI      0x002
 #define POLL__OUT      0x004
 #define POLL__NVAL     0x020
-
 #define POLL__MAX_NFDS VFS_MAX_FD
 
 typedef struct
@@ -327,27 +364,34 @@ typedef struct
   i16 revents;
 } poll__fd_abi_t;
 
-static void poll__timeout_from_ms(
-    i32 timeout_ms, bool *immediate, bool *infinite, u64 *wait_ticks
+/**
+ * @brief Compute select/poll timeout parameters from a millisecond value.
+ *
+ * Negative @p ms_signed means infinite wait.  Zero means poll-and-return.
+ * Positive values are converted to HLT ticks via ::io__ms_to_hlt_ticks.
+ */
+static void io__timeout_calc(
+    i32 ms_signed, bool *immediate, bool *infinite, u64 *wait_ticks
 )
 {
-  if(timeout_ms < 0) {
+  if(ms_signed < 0) {
     *immediate  = false;
     *infinite   = true;
     *wait_ticks = 0;
     return;
   }
   *infinite = false;
-  if(timeout_ms == 0) {
+  if(ms_signed == 0) {
     *immediate  = true;
     *wait_ticks = 0;
     return;
   }
   *immediate  = false;
-  u64 ms      = (u64)timeout_ms;
+  u64 ms      = (u64)ms_signed;
   *wait_ticks = io__ms_to_hlt_ticks(ms);
 }
 
+/** @brief Return @c true if @p fd is open (including unmapped stdio fds). */
 static bool poll__fd_is_open(i32 fd)
 {
   if(fd < 0)
@@ -359,6 +403,7 @@ static bool poll__fd_is_open(i32 fd)
   return vfs_fd_is_valid(fd);
 }
 
+/** @brief Fill @p e->revents for one poll entry; return non-zero if ready. */
 static int poll__fill_one(poll__fd_abi_t *e)
 {
   e->revents = 0;
@@ -387,6 +432,13 @@ static int poll__fill_one(poll__fd_abi_t *e)
   return e->revents != 0;
 }
 
+/**
+ * @brief Scan @p nfds descriptors and fill @p rout / @p wout / @p eout.
+ *
+ * Copies @p rin / @p win into the output sets, then clears each bit that is
+ * not ready.  @p eout is always zeroed (no exceptional condition support).
+ * Returns negative errno on the first bad fd, otherwise 0 with @p *total set.
+ */
 static i32 select_scan(
     u32 nfds, const unsigned long *rin, const unsigned long *win,
     unsigned long *rout, unsigned long *wout, unsigned long *eout, int *total
@@ -422,6 +474,11 @@ static i32 select_scan(
   return 0;
 }
 
+/**
+ * @brief Parse a @c struct @c timeval from user space into poll parameters.
+ *
+ * @return 0 on success, negative errno if the pointer is bad or values out of range.
+ */
 static i32 parse_timeval(u64 timeout_ptr, bool *poll_immediate, u64 *wait_ticks)
 {
   struct
@@ -436,20 +493,13 @@ static i32 parse_timeval(u64 timeout_ptr, bool *poll_immediate, u64 *wait_ticks)
   if(tv.sec < 0 || tv.nsec_usec < 0 || tv.nsec_usec >= 1000000)
     return -EINVAL;
 
-  if(tv.sec == 0 && tv.nsec_usec == 0) {
-    *poll_immediate = true;
-    *wait_ticks     = 0;
-    return 0;
-  }
-
-  u64 ms = (u64)tv.sec * 1000 + (u64)tv.nsec_usec / 1000;
-  if(tv.nsec_usec && ms == 0)
-    ms = 1;
-  *poll_immediate = false;
-  *wait_ticks     = io__ms_to_hlt_ticks(ms);
+  u64  ms = (u64)tv.sec * 1000 + (u64)tv.nsec_usec / 1000;
+  bool infinite;
+  io__timeout_calc((i32)ms, poll_immediate, &infinite, wait_ticks);
   return 0;
 }
 
+/** @brief Yield the CPU for one ~10 ms timer tick via STI/HLT. */
 static void sel_hlt_slice(void)
 {
   cpu_enable_interrupts();
@@ -457,6 +507,13 @@ static void sel_hlt_slice(void)
   cpu_disable_interrupts();
 }
 
+/**
+ * @brief Monitor up to @p nfds_u descriptors for I/O readiness (@c select).
+ *
+ * Copies the caller's @c fd_set bitmaps into kernel buffers, scans them in a
+ * loop sleeping one HLT tick per iteration until at least one fd is ready or
+ * the timeout expires.  The output sets are zeroed on timeout.
+ */
 u64 sys_select(
     u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout, u64 a6
 )
@@ -477,10 +534,11 @@ u64 sys_select(
 
   if(nfds == 0) {
     if(timeout) {
-      i32 prc = parse_timeval(timeout, &poll_mode, &ticks_rem);
+      bool immediate = false;
+      i32  prc       = parse_timeval(timeout, &immediate, &ticks_rem);
       if(prc)
         return (u64)prc;
-      if(poll_mode)
+      if(immediate)
         return 0;
       for(u64 t = 0; t < ticks_rem; t++)
         sel_hlt_slice();
@@ -520,9 +578,11 @@ u64 sys_select(
   sel_mask_high_bits(rin, win, ein, nfds, nlongs);
 
   if(timeout) {
-    i32 prc = parse_timeval(timeout, &poll_mode, &ticks_rem);
+    bool immediate = false;
+    i32  prc       = parse_timeval(timeout, &immediate, &ticks_rem);
     if(prc)
       return (u64)prc;
+    poll_mode = immediate;
   } else
     infinite = true;
 
@@ -563,6 +623,13 @@ u64 sys_select(
   return 0;
 }
 
+/**
+ * @brief Wait for events on an array of @p nfds_u file descriptors (@c poll).
+ *
+ * Copies the @c pollfd array into a kernel-side buffer, checks readiness in a
+ * loop sleeping one HLT tick per iteration, and copies results back on exit.
+ * Returns 0 on timeout, the number of ready fds otherwise.
+ */
 u64 sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -582,7 +649,7 @@ u64 sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
   u64            ticks_rem = 0;
   poll__fd_abi_t local[POLL__MAX_NFDS];
 
-  poll__timeout_from_ms(timeout_ms, &immediate, &infinite, &ticks_rem);
+  io__timeout_calc(timeout_ms, &immediate, &infinite, &ticks_rem);
 
   if(nfds == 0) {
     if(immediate)
