@@ -19,9 +19,9 @@
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
 
-/** Linux `clone(2)` flag: parent blocks until child execve(2) or _exit(2). musl
- * posix_spawn relies on this so the parent does not run concurrently with the
- * child in the critical region before exec (avoids deadlocks with pipe sync).
+/** @brief POSIX @c clone flag: parent blocks until child @c execve or @c _exit.
+ * musl @c posix_spawn relies on this so the parent does not run concurrently
+ * with the child in the critical region before exec (avoids pipe sync deadlocks).
  */
 #define ALCOR_CLONE_VFORK 0x00004000u
 
@@ -47,7 +47,6 @@ void proc_init(void)
     proc_table[i].pid   = 0;
   }
 
-  console_print("[PROC] Process subsystem initialized\n");
 }
 
 /**
@@ -109,6 +108,7 @@ static proc_t *proc_alloc(void)
     if(proc_table[i].state == PROC_STATE_FREE) {
       vfs_proc_init_fds(proc_table[i].fds);
       kzero(proc_table[i].fd_cloexec, sizeof(proc_table[i].fd_cloexec));
+      kstrncpy(proc_table[i].cwd, "/", 2);
       ktermios_init_default(&proc_table[i].termios);
       proc_table[i].kbd_edit_len  = 0;
       proc_table[i].kbd_ready_len = 0;
@@ -427,11 +427,6 @@ u64 proc_create(
 
   p->saved_rsp = (u64)ksp;
 
-  /*console_printf(
-      "[PROC] Created process '%s' (pid=%d, entry=0x%x)\n", name, (int)p->pid,
-      (int)elf_info.entry
-  );*/
-
   return p->pid;
 }
 
@@ -529,7 +524,6 @@ void proc_exit(i64 code)
   }
 
   proc_vfork_wake_parent(p);
-
   p->exit_code = code;
   p->state     = PROC_STATE_ZOMBIE;
 
@@ -630,31 +624,15 @@ void proc_schedule(void)
       cpu_enable_interrupts();
       return;
     }
+
     /* All procs blocked: HLT until an IRQ fires, then re-scan for READY.
      * IRQs (timer, keyboard, ATA completion) can flip a process to READY by
-     * waking a sleeper. Without the re-scan we'd halt forever even though
-     * progress is possible. */
-    {
-      static int s_halted_log = 0;
-      if(!s_halted_log) {
-        s_halted_log = 1;
-        console_print("[PROC] all blocked; halting; states:");
-        for(int i = 0; i < PROC_MAX; i++) {
-          if(proc_table[i].state != PROC_STATE_FREE) {
-            console_printf(
-                " pid=%d/s=%d/wfp=%d/vfw=%d", (int)proc_table[i].pid,
-                (int)proc_table[i].state, (int)proc_table[i].waiting_for_pid,
-                (int)proc_table[i].vfork_waiting_for
-            );
-          }
-        }
-        console_print("\n");
-      }
-    }
+     * waking a sleeper. */
     for(;;) {
       cpu_enable_interrupts();
       __asm__ volatile("hlt");
       cpu_disable_interrupts();
+
       for(int i = 0; i < PROC_MAX; i++) {
         if(proc_table[i].state == PROC_STATE_READY) {
           proc_switch(&proc_table[i]);
@@ -800,7 +778,7 @@ void proc_start_first(
 }
 
 /**
- * @brief Fork / Linux-style clone (no threads): duplicate task.
+ * @brief Fork / clone (no threads): duplicate the calling task.
  *
  * If @p child_stack_arg is 0, the child uses the same user RSP as the parent
  * syscall frame (fork). Otherwise the child resumes at @p child_stack_arg
@@ -871,6 +849,7 @@ static i64 proc_fork_impl(
       child->fds, child->fd_cloexec, parent->fds, parent->fd_cloexec
   );
 
+  kstrncpy(child->cwd, parent->cwd, VFS_PATH_MAX);
   kstrncpy(child->exe_path, parent->exe_path, PROC_EXE_PATH_MAX);
   child->exe_path[PROC_EXE_PATH_MAX - 1] = '\0';
 
@@ -1083,7 +1062,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options)
   /* Get exit status */
   i64 child_pid = (i64)child->pid;
   if(status) {
-    /* Linux status format: exit_code << 8 for normal exit */
+    /* POSIX wait status: exit_code << 8 for normal termination */
     *status = (i32)((child->exit_code & 0xFF) << 8);
   }
 

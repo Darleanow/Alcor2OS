@@ -63,9 +63,10 @@ typedef struct proc
   u64  pid;
   u64  parent_pid;
   char name[PROC_NAME_MAX];
-  /** @brief Last successfully executed file (for readlink("/proc/self/exe")).
-   */
-  char         exe_path[PROC_EXE_PATH_MAX];
+  /** @brief Last successfully executed file (for readlink("/proc/self/exe")). */
+  char exe_path[PROC_EXE_PATH_MAX];
+  /** @brief Current working directory; updated by chdir, inherited on fork. */
+  char         cwd[VFS_PATH_MAX];
   proc_state_t state;
   i64          exit_code;
   u64          cr3;
@@ -184,7 +185,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options);
 i64 proc_fork(const void *syscall_frame);
 
 /**
- * @brief Linux `clone` without threads: duplicate the task like fork, but the
+ * @brief Clone the task like fork, but the
  * child resumes with user RSP @p child_stack when non-zero (musl `posix_spawn`,
  * `faccessat` helper); when zero, same as fork (parent RSP).
  */
