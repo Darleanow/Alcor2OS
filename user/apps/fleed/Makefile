@@ -4,7 +4,7 @@ ifeq ($(strip $(CXX)),)
 $(error Need thirdparty/musl-cross/bin/x86_64-linux-musl-g++)
 endif
 
-APP     := edi
+APP     := fleed
 OUT_DIR := $(BUILD_DIR)/apps/$(APP)
 SRCS    := src/main.cpp
 OBJS    := $(SRCS:%.cpp=$(OUT_DIR)/%.o)

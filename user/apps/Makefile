@@ -1,4 +1,4 @@
-SUBDIRS := hello-cpp edi font-demo
+SUBDIRS := hello-cpp fleed font-demo
 ifneq ($(wildcard ../../thirdparty/ncurses-install/usr/lib/libncurses.a),)
 SUBDIRS += ncurses-hello
 endif
