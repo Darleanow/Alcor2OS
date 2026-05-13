@@ -25,6 +25,7 @@
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
+#include <alcor2/drivers/console.h>
 
 /* Helper: default signal disposition. */
 
