@@ -1,9 +1,16 @@
 /**
  * @file src/drivers/console/console.c
- * @brief Framebuffer console.
+ * @brief Boot/panic logger on the linear framebuffer.
  *
- * Limine @a pitch is bytes per scanline. Pixel offset is
- * y * pitch_bytes + x * bytes_pp — do not assume 32 bpp.
+ * Minimal text output for the kernel: an 8x16 ISO Latin-1 bitmap font,
+ * cursor advance, scroll, plus @c \\n / @c \\r / @c \\b / @c \\t. No escape
+ * sequences, no SGR, no charset switching, no UTF-8 multibyte. Anything
+ * richer (ncurses, ANSI colors, line drawing, Fira) lives in the user-space
+ * terminal at @c user/shell/platform/fb_tty.c.
+ *
+ * Reached from kernel boot prints (main.c, sched, mm, ...) and from
+ * @c sys_write whenever a process writes to stdout/stderr without an OFT
+ * entry — which after the shell takes over is essentially never.
  */
 
 #include "font.h"
@@ -12,10 +19,8 @@
 #include <alcor2/types.h>
 #include <stdarg.h>
 
-#define FONT_W      8
-#define FONT_H      16
-
-#define ESC_BUF_MAX 64
+#define FONT_W 8
+#define FONT_H 16
 
 static struct
 {
@@ -28,17 +33,9 @@ static struct
   u32          bg;
   u32          cursor_x;
   u32          cursor_y;
-  int          esc_state;
-  char         esc_buf[ESC_BUF_MAX];
-  int          esc_len;
-  int cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
-  int utf8_rem;   /**< 0 = idle; else continuation bytes left for current UTF-8
-                     char. */
-  u32 utf8_partial;
 } ctx;
 
-/** Match first three bytes of a little-endian u32 color (same as old u32 store
- * on 32 bpp). */
+/** @brief Write a 24bpp pixel as B,G,R in little-endian order. */
 static void fb_store24(volatile u8 *p, u32 c)
 {
   p[0] = (u8)(c & 0xffu);
@@ -46,16 +43,18 @@ static void fb_store24(volatile u8 *p, u32 c)
   p[2] = (u8)((c >> 16) & 0xffu);
 }
 
+/** @brief Write a 16bpp pixel by reducing @p c to RGB565. */
 static void fb_store16(volatile u8 *p, u32 c)
 {
   u32 r      = (c >> 16) & 0xffu;
   u32 g      = (c >> 8) & 0xffu;
-  u32 bo     = c & 0xffu;
-  u16 rgb565 = (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (bo >> 3));
+  u32 b      = c & 0xffu;
+  u16 rgb565 = (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
   p[0]       = (u8)(rgb565 & 0xffu);
   p[1]       = (u8)(rgb565 >> 8);
 }
 
+/** @brief Paint one pixel at (@p x, @p y) honoring the framebuffer's bpp. */
 static void fb_put_pixel(u32 x, u32 y, u32 color)
 {
   if(x >= ctx.width || y >= ctx.height)
@@ -77,7 +76,7 @@ static void fb_put_pixel(u32 x, u32 y, u32 color)
   }
 }
 
-/** Bytes per pixel from bpp; Limine QEMU is usually 32. */
+/** @brief Translate bits-per-pixel to bytes-per-pixel, clamped to [2, 4]. */
 static u8 bytes_pp_from_bpp(u16 bpp)
 {
   switch(bpp) {
@@ -98,20 +97,15 @@ static u8 bytes_pp_from_bpp(u16 bpp)
 
 void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
 {
-  ctx.base         = (volatile u8 *)fb;
-  ctx.width        = width;
-  ctx.height       = height;
-  ctx.pitch_bytes  = pitch_bytes;
-  ctx.bytes_pp     = bytes_pp_from_bpp(bpp);
-  ctx.cursor_x     = 0;
-  ctx.cursor_y     = 0;
-  ctx.fg           = 0xFFFFFFFF;
-  ctx.bg           = 0xFF000000;
-  ctx.esc_state    = 0;
-  ctx.esc_len      = 0;
-  ctx.cp437_mode   = 0;
-  ctx.utf8_rem     = 0;
-  ctx.utf8_partial = 0;
+  ctx.base        = (volatile u8 *)fb;
+  ctx.width       = width;
+  ctx.height      = height;
+  ctx.pitch_bytes = pitch_bytes;
+  ctx.bytes_pp    = bytes_pp_from_bpp(bpp);
+  ctx.cursor_x    = 0;
+  ctx.cursor_y    = 0;
+  ctx.fg          = 0xFFFFFFFF;
+  ctx.bg          = 0xFF000000;
 }
 
 void console_set_theme(console_theme_t theme)
@@ -120,6 +114,7 @@ void console_set_theme(console_theme_t theme)
   ctx.bg = theme.background | 0xFF000000u;
 }
 
+/** @brief Fill rows [y0, y1) with @c ctx.bg, fast-path on 32 bpp. */
 static void fb_clear_rectangle(u64 y0, u64 y1)
 {
   if(ctx.bytes_pp == 4) {
@@ -145,107 +140,64 @@ static void fb_clear_rectangle(u64 y0, u64 y1)
 void console_clear(void)
 {
   fb_clear_rectangle(0, ctx.height);
-  ctx.cursor_x     = 0;
-  ctx.cursor_y     = 0;
-  ctx.utf8_rem     = 0;
-  ctx.utf8_partial = 0;
+  ctx.cursor_x = 0;
+  ctx.cursor_y = 0;
 }
 
-/** MSB is left pixel (classic PC font / font_bitmap.h). */
+/**
+ * @brief Render glyph @p c from the Latin-1 atlas at (@p px, @p py).
+ *
+ * Unmapped bytes fall back to @c '?'.
+ */
 static void draw_glyph(char c, u32 px, u32 py)
 {
-  u8  uc = (u8)c;
-  int gi = font_glyph_index(uc);
+  int gi = font_glyph_index((u8)c);
   if(gi < 0)
     gi = font_glyph_index((unsigned char)'?');
   if(gi < 0)
     return;
 
-  const u8 *glyph = ctx.cp437_mode ? font_cp437[gi] : font_latin1[gi];
-
+  const u8 *glyph = font_latin1[gi];
   for(int row = 0; row < FONT_H; row++) {
-    u8 b = glyph[row];
+    u8 bits = glyph[row];
     for(int col = 0; col < FONT_W; col++) {
       u32 x = px + (u32)col;
       u32 y = py + (u32)row;
-      fb_put_pixel(x, y, ((b & (0x80u >> col)) != 0) ? ctx.fg : ctx.bg);
+      fb_put_pixel(x, y, ((bits & (0x80u >> col)) != 0) ? ctx.fg : ctx.bg);
     }
   }
 }
 
-static void scroll(void);
-
-static void cup_apply_csi(void)
+/** @brief Shift the framebuffer up by one cell row and clear the bottom row. */
+static void scroll(void)
 {
-  int row = 1, col = 1;
-  int plen = ctx.esc_len - 1;
+  u64 span = ctx.height - (u64)FONT_H;
 
-  if(plen > 0) {
-    int i     = 0;
-    int r     = 0;
-    int has_r = 0;
-    while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
-      r = r * 10 + (int)(ctx.esc_buf[i] - '0');
-      i++;
-      has_r = 1;
-    }
-    if(has_r)
-      row = r;
-    if(i < plen && ctx.esc_buf[i] == ';') {
-      i++;
-      int c     = 0;
-      int has_c = 0;
-      while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
-        c = c * 10 + (int)(ctx.esc_buf[i] - '0');
-        i++;
-        has_c = 1;
-      }
-      if(has_c)
-        col = c;
-    } else if(has_r)
-      col = 1;
+  if(ctx.bytes_pp == 4) {
+    volatile u32 *buf     = (volatile u32 *)ctx.base;
+    u64           pu      = ctx.pitch_bytes / 4ull;
+    u64           rowcopy = ctx.width * sizeof(u32);
+
+    for(u64 y = 0; y < span; y++)
+      kmemcpy(
+          (void *)&buf[y * pu], (const void *)&buf[(y + (u64)FONT_H) * pu],
+          rowcopy
+      );
+    fb_clear_rectangle(span, ctx.height);
+    return;
   }
 
-  u32 max_r = ctx.height / FONT_H;
-  u32 max_c = ctx.width / FONT_W;
-  if(max_r < 1)
-    max_r = 1;
-  if(max_c < 1)
-    max_c = 1;
-  if(row < 1)
-    row = 1;
-  if(col < 1)
-    col = 1;
-  if((u32)row > max_r)
-    row = (int)max_r;
-  if((u32)col > max_c)
-    col = (int)max_c;
-
-  ctx.cursor_y = (u32)(row - 1) * FONT_H;
-  ctx.cursor_x = (u32)(col - 1) * FONT_W;
-}
-
-/** Leading unsigned for CSI like [5A — default 1 when absent or 0. */
-static int csi_leading_param_default_1(void)
-{
-  int plen = ctx.esc_len - 1;
-  if(plen <= 0)
-    return 1;
-  int v = 0;
-  for(int i = 0; i < plen; i++) {
-    if(ctx.esc_buf[i] < '0' || ctx.esc_buf[i] > '9')
-      return 1;
-    v = v * 10 + (int)(ctx.esc_buf[i] - '0');
-    if(v > 4096)
-      return 4096;
+  u64 row_px = ctx.width * ctx.bytes_pp;
+  for(u64 y = 0; y < span; y++) {
+    volatile u8       *dst = ctx.base + y * ctx.pitch_bytes;
+    const volatile u8 *src = ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
+    kmemcpy((void *)dst, (const void *)src, row_px);
   }
-  return (v < 1) ? 1 : v;
+  fb_clear_rectangle(span, ctx.height);
 }
 
-static void emit_cell(unsigned char ub)
+void console_putchar(char c)
 {
-  char c = (char)ub;
-
   switch(c) {
   case '\n':
     ctx.cursor_x = 0;
@@ -284,283 +236,13 @@ static void emit_cell(unsigned char ub)
   }
 }
 
-static void utf8_feed(u8 b)
-{
-  if(ctx.utf8_rem == 0) {
-    if(b < 0x80u) {
-      emit_cell(b);
-      return;
-    }
-    if((b & 0xe0u) == 0xc0u) {
-      ctx.utf8_partial = (u32)(b & 0x1fu);
-      ctx.utf8_rem     = 1;
-      return;
-    }
-    if((b & 0xf0u) == 0xe0u) {
-      ctx.utf8_partial = (u32)(b & 0x0fu);
-      ctx.utf8_rem     = 2;
-      return;
-    }
-    if((b & 0xf8u) == 0xf0u) {
-      ctx.utf8_partial = (u32)(b & 0x07u);
-      ctx.utf8_rem     = 3;
-      return;
-    }
-    emit_cell((unsigned char)'?');
-    return;
-  }
-
-  if((b & 0xc0u) != 0x80u) {
-    ctx.utf8_rem = 0;
-    emit_cell((unsigned char)'?');
-    utf8_feed(b);
-    return;
-  }
-
-  ctx.utf8_partial = (ctx.utf8_partial << 6u) | (u32)(b & 0x3fu);
-  ctx.utf8_rem--;
-  if(ctx.utf8_rem != 0)
-    return;
-
-  u32 cp       = ctx.utf8_partial;
-  ctx.utf8_rem = 0;
-  if(cp <= 0xffu)
-    emit_cell((unsigned char)cp);
-  else
-    emit_cell((unsigned char)'?');
-}
-
-static void scroll(void)
-{
-  u64 span = ctx.height - (u64)FONT_H;
-
-  if(ctx.bytes_pp == 4) {
-    volatile u32 *buf     = (volatile u32 *)ctx.base;
-    u64           pu      = ctx.pitch_bytes / 4ull;
-    u64           rowcopy = ctx.width * sizeof(u32);
-
-    for(u64 y = 0; y < span; y++)
-      kmemcpy(
-          (void *)&buf[y * pu], (const void *)&buf[(y + (u64)FONT_H) * pu],
-          rowcopy
-      );
-    fb_clear_rectangle(span, ctx.height);
-    return;
-  }
-
-  u64 row_px = ctx.width * ctx.bytes_pp;
-  for(u64 y = 0; y < span; y++) {
-    volatile u8       *dst = ctx.base + y * ctx.pitch_bytes;
-    const volatile u8 *src = ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
-    kmemcpy((void *)dst, (const void *)src, row_px);
-  }
-  fb_clear_rectangle(span, ctx.height);
-}
-
-/** xterm-like 256-color palette (ANSI 38/48;5). */
-static u32 ansi256_to_rgb(unsigned idx)
-{
-  static const u32 ansi16_col[16] = {
-      0x000000ul, 0xAA0000ul, 0x00AA00ul, 0xAA5500ul, 0x0000AAul, 0xAA00AAul,
-      0x00AAAAul, 0xAAAAAAul, 0x555555ul, 0xFF5555ul, 0x55FF55ul, 0xFFFF55ul,
-      0x5555FFul, 0xFF55FFul, 0x55FFFFul, 0xFFFFFFul,
-  };
-
-  if(idx < 16u)
-    return ansi16_col[idx];
-  if(idx < 232u) {
-    unsigned i     = idx - 16u;
-    unsigned r6    = i / 36u;
-    unsigned rem   = i % 36u;
-    unsigned g6    = rem / 6u;
-    unsigned b6    = rem % 6u;
-    u32      rchan = (r6 == 0u) ? 0u : (55u + 40u * (r6 - 1u));
-    u32      gchan = (g6 == 0u) ? 0u : (55u + 40u * (g6 - 1u));
-    u32      bchan = (b6 == 0u) ? 0u : (55u + 40u * (b6 - 1u));
-    return (rchan << 16) | (gchan << 8u) | bchan;
-  }
-  {
-    unsigned k = idx - 232u;
-    u32      v = 8u + 10u * k;
-    return (v << 16) | (v << 8) | v;
-  }
-}
-
-static void handle_sgr(void)
-{
-  if(ctx.esc_len < 1 || ctx.esc_buf[ctx.esc_len - 1] != 'm')
-    return;
-
-  int pn = ctx.esc_len - 1; /* excludes trailing ASCII 'm'. */
-  if(pn <= 0) {
-    ctx.fg         = 0xFFFFFFu;
-    ctx.bg         = 0x000000u;
-    ctx.cp437_mode = 0;
-    return;
-  }
-
-  int pv[32];
-  int np = 0;
-
-  /* Parse ';'-separated unsigned numbers (missing numbers become 0). */
-  int i = 0;
-  while(i < pn && np < (int)(sizeof(pv) / sizeof(pv[0]))) {
-    unsigned acc = 0u;
-    int      dig = 0;
-    while(i < pn && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
-      acc = acc * 10u + (unsigned)(ctx.esc_buf[i] - '0');
-      i++;
-      dig++;
-    }
-    pv[np++] = (int)((dig != 0) ? acc % 256u : 0u);
-    if(i < pn && ctx.esc_buf[i] == ';')
-      i++;
-  }
-
-  for(int pi = 0; pi < np; pi++) {
-    int p = pv[pi];
-
-    switch(p) {
-    case 0:
-      ctx.fg         = 0xFFFFFFu;
-      ctx.bg         = 0x000000u;
-      ctx.cp437_mode = 0;
-      break;
-    case 39:
-      ctx.fg = 0xFFFFFFu;
-      break;
-    case 49:
-      ctx.bg = 0x000000u;
-      break;
-    case 38:
-      if(pi + 2 < np && pv[pi + 1] == 5) {
-        ctx.fg = ansi256_to_rgb((unsigned)pv[pi + 2]);
-        pi += 2;
-      }
-      break;
-    case 48:
-      if(pi + 2 < np && pv[pi + 1] == 5) {
-        ctx.bg = ansi256_to_rgb((unsigned)pv[pi + 2]);
-        pi += 2;
-      }
-      break;
-    /* Private: atlas select (outside standard 30–37/90–97 foreground set). */
-    case 50:
-      ctx.cp437_mode = 0;
-      break;
-    case 51:
-      ctx.cp437_mode = 1;
-      break;
-    default:
-      break;
-    }
-  }
-}
-
-static void handle_ansi_sequence(void)
-{
-  if(ctx.esc_len < 1)
-    return;
-
-  char cmd = ctx.esc_buf[ctx.esc_len - 1];
-
-  /* DEC private CSI (leading ?): cursor visibility, alt screen, mouse, … */
-  if((cmd == 'h' || cmd == 'l') && ctx.esc_len >= 2 && ctx.esc_buf[0] == '?')
-    return;
-
-  switch(cmd) {
-  case 'A': {
-    int n  = csi_leading_param_default_1();
-    u64 dy = (u64)n * FONT_H;
-    if(ctx.cursor_y >= dy)
-      ctx.cursor_y = (u32)(ctx.cursor_y - dy);
-    else
-      ctx.cursor_y = 0;
-    break;
-  }
-  case 'B': {
-    int n        = csi_leading_param_default_1();
-    u64 max_y    = ctx.height - FONT_H;
-    u64 new_y    = (u64)ctx.cursor_y + (u64)n * FONT_H;
-    ctx.cursor_y = new_y > max_y ? (u32)max_y : (u32)new_y;
-    break;
-  }
-  case 'C': {
-    int n        = csi_leading_param_default_1();
-    u64 max_x    = ctx.width - FONT_W;
-    u64 new_x    = (u64)ctx.cursor_x + (u64)n * FONT_W;
-    ctx.cursor_x = new_x > max_x ? (u32)max_x : (u32)new_x;
-    break;
-  }
-  case 'D': {
-    int n  = csi_leading_param_default_1();
-    u32 dx = (u32)n * FONT_W;
-    if(ctx.cursor_x >= dx)
-      ctx.cursor_x -= dx;
-    else
-      ctx.cursor_x = 0;
-    break;
-  }
-  case 'H':
-  case 'f':
-    cup_apply_csi();
-    break;
-  case 'J':
-    if(ctx.esc_len >= 2 && ctx.esc_buf[0] == '2')
-      console_clear();
-    break;
-  case 'K':
-    for(u32 x = ctx.cursor_x; x < ctx.width; x++) {
-      for(int row = 0; row < FONT_H; row++)
-        fb_put_pixel(x, ctx.cursor_y + (u32)row, ctx.bg);
-    }
-    break;
-  case 'm':
-    handle_sgr();
-    break;
-  default:
-    break;
-  }
-}
-
-void console_putchar(char c)
-{
-  u8 b = (u8)c;
-
-  if(ctx.esc_state == 1) {
-    if(c == '[') {
-      ctx.esc_state = 2;
-      ctx.esc_len   = 0;
-      return;
-    }
-    ctx.esc_state = 0;
-  } else if(ctx.esc_state == 2) {
-    if((c >= '0' && c <= '9') || c == ';' || c == '?') {
-      if(ctx.esc_len < ESC_BUF_MAX - 1)
-        ctx.esc_buf[ctx.esc_len++] = c;
-      return;
-    }
-    ctx.esc_buf[ctx.esc_len++] = c;
-    handle_ansi_sequence();
-    ctx.esc_state = 0;
-    return;
-  }
-
-  if(c == '\033') {
-    ctx.esc_state = 1;
-    ctx.utf8_rem  = 0;
-    return;
-  }
-
-  utf8_feed(b);
-}
-
 void console_print(const char *s)
 {
   while(*s)
     console_putchar(*s++);
 }
 
+/** @brief Print a signed decimal integer. */
 static void print_int(int n)
 {
   char buf[32];
@@ -570,22 +252,19 @@ static void print_int(int n)
     console_putchar('0');
     return;
   }
-
   if(n < 0) {
     console_putchar('-');
     n = -n;
   }
-
   while(n > 0) {
     buf[i++] = (char)('0' + (n % 10));
     n /= 10;
   }
-
-  while(--i >= 0) {
+  while(--i >= 0)
     console_putchar(buf[i]);
-  }
 }
 
+/** @brief Print an unsigned 64-bit decimal integer. */
 static void print_uint(u64 n)
 {
   char buf[32];
@@ -595,16 +274,15 @@ static void print_uint(u64 n)
     console_putchar('0');
     return;
   }
-
   while(n > 0) {
     buf[i++] = (char)('0' + (n % 10));
     n /= 10;
   }
-
   while(--i >= 0)
     console_putchar(buf[i]);
 }
 
+/** @brief Print an unsigned 64-bit value as @c 0x-prefixed 16-digit hex. */
 static void print_hex(u64 n)
 {
   static const char hex[] = "0123456789abcdef";
