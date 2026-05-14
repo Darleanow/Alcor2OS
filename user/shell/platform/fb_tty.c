@@ -1,10 +1,20 @@
 /**
  * @file user/shell/platform/fb_tty.c
- * @brief Framebuffer terminal: Fira via FreeType + HarfBuzz + CSI.
+ * @brief Framebuffer terminal: Fira via FreeType + HarfBuzz, full ANSI/CSI.
  *
- * Ligatures: the grid still stores one UTF-32 codepoint per cell; each row is
- * shaped with liga/calt as a whole so ==>, arrows, etc. draw with one glyph
- * spanning the correct monospace width.
+ * This is the user-facing terminal emulator. Bytes written by the shell or
+ * relayed from child processes (ncurses, less, ...) come in through
+ * @c term_feed_byte, get parsed for ANSI / CSI / charset designations, and
+ * land in a cell grid that is reshaped row-by-row with HarfBuzz.
+ *
+ * The grid stores one ::cell_t per position (codepoint plus effective fg/bg
+ * captured at write time). Per-cell colors are what make SGR-driven
+ * highlights survive a row reshape; without them, every cell would render
+ * with the *current* SGR state, which is back to default by the time
+ * @c wrefresh fires.
+ *
+ * The terminal grid size is published via @c TIOCSWINSZ on init so children
+ * see the real on-screen rows/cols, not a hardcoded 80x25.
  */
 
 #include <fcntl.h>
@@ -12,6 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 #include <alcor2/alcor_fb_user.h>
@@ -42,7 +53,23 @@ static uint8_t        *s_font_blob;
 static size_t          s_font_len;
 static hb_buffer_t    *s_buf;
 
-/** Full-row HarfBuzz (liga+calt) — one codepoint per cell in @c s_cells. */
+enum
+{
+  kAttrBold      = 1u << 0,
+  kAttrUnderline = 1u << 1,
+  kAttrBlink     = 1u << 2,
+};
+
+/** @brief One grid position: codepoint, captured fg/bg, and SGR attribute bits. */
+typedef struct
+{
+  uint32_t cp;
+  uint32_t fg;
+  uint32_t bg;
+  uint8_t  attrs;
+} cell_t;
+
+/** Full-row HarfBuzz (liga+calt) — one ::cell_t per grid position. */
 static hb_feature_t s_feat_liga[] = {
     {HB_TAG('l', 'i', 'g', 'a'), 1, HB_FEATURE_GLOBAL_START,
      HB_FEATURE_GLOBAL_END},
@@ -58,12 +85,15 @@ static int       s_cell_w, s_cell_h;
 static int       s_term_cols, s_term_rows;
 static int       s_tc_x, s_tc_y;
 
-static uint32_t *s_cells;
+static cell_t   *s_cells;
 static int       s_saved_cx, s_saved_cy;
 
 static uint32_t  s_fg, s_bg;
 static uint32_t  s_term_fg, s_term_bg;
 static int       s_bold;
+static int       s_dim;
+static int       s_underline;
+static int       s_blink;
 static int       s_rev;
 
 static int       s_csr_visible;
@@ -81,6 +111,8 @@ static int      s_esc_len;
 static char     s_esc_buf[kEscMax];
 static unsigned s_utf8_rem;
 static uint32_t s_utf8_partial;
+static int      s_g0_acs;  /**< 1 when G0 is DEC Special Graphics (ESC(0). */
+static uint32_t s_last_cp; /**< Last codepoint emitted, replayed by CSI REP. */
 
 static uint32_t eff_fg_raw(void)
 {
@@ -92,6 +124,7 @@ static uint32_t eff_bg_raw(void)
   return s_rev ? s_term_fg : s_term_bg;
 }
 
+/** @brief Lift @p c toward white; A_BOLD nudges the color a touch. */
 static uint32_t brighten(uint32_t c)
 {
   int r = (int)((c >> 16) & 0xffu);
@@ -109,10 +142,27 @@ static uint32_t brighten(uint32_t c)
   return ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
 }
 
+/** @brief Scale @p c toward black; used for A_DIM. */
+static uint32_t darken(uint32_t c)
+{
+  int r = (int)((c >> 16) & 0xffu);
+  int g = (int)((c >> 8) & 0xffu);
+  int b = (int)(c & 0xffu);
+  r     = (r * 3) / 5;
+  g     = (g * 3) / 5;
+  b     = (b * 3) / 5;
+  return ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+}
+
+/** @brief Effective ink color for the next glyph (applies bold and dim). */
 static uint32_t eff_ink(void)
 {
   uint32_t c = eff_fg_raw();
-  return s_bold ? brighten(c) : c;
+  if(s_bold)
+    c = brighten(c);
+  if(s_dim)
+    c = darken(c);
+  return c;
 }
 
 static void put_px(int x, int y, uint32_t rgb, int a)
@@ -197,34 +247,70 @@ static void metrics_refresh(void)
   }
 }
 
+/**
+ * @brief Publish the cell grid as the kernel's TTY winsize.
+ *
+ * Children inherit it through @c TIOCGWINSZ so ncurses lays out against the
+ * real on-screen dimensions. Failure is ignored: the kernel keeps the
+ * previous value, which is still better than crashing init.
+ */
+static void term_publish_winsize(void)
+{
+  struct winsize ws = {
+      .ws_row    = (unsigned short)s_term_rows,
+      .ws_col    = (unsigned short)s_term_cols,
+      .ws_xpixel = (unsigned short)s_inf.width,
+      .ws_ypixel = (unsigned short)s_inf.height,
+  };
+  (void)ioctl(STDOUT_FILENO, TIOCSWINSZ, &ws);
+}
+
+/**
+ * @brief Recompute cols/rows from current cell metrics and republish them.
+ */
 static void term_recompute_grid(void)
 {
   int iw      = (int)s_inf.width - 2 * kMargin;
   int ih      = (int)s_inf.height - 2 * kMargin;
   s_term_cols = iw / s_cell_w;
+  s_term_rows = ih / s_cell_h;
   if(s_term_cols < 1)
     s_term_cols = 1;
-  s_term_rows = ih / s_cell_h;
   if(s_term_rows < 1)
     s_term_rows = 1;
+  term_publish_winsize();
 }
 
+/**
+ * @brief Clear a single cell's pixels, using that cell's stored bg.
+ *
+ * Falls back to @c eff_bg_raw() before the grid is allocated so early-init
+ * fills still work.
+ */
 static void term_clear_cell(int cx, int cy)
 {
   if(cx < 0 || cy < 0 || cx >= s_term_cols || cy >= s_term_rows)
     return;
+  uint32_t bg = eff_bg_raw();
+  if(s_cells) {
+    uint32_t stored = s_cells[(size_t)cy * (size_t)s_term_cols + (size_t)cx].bg;
+    if(stored)
+      bg = stored;
+  }
   int x0 = cell_px_x(cx);
   int y0 = cell_px_y_top(cy);
-  fill_rect_px(x0, y0, x0 + s_cell_w, y0 + s_cell_h, eff_bg_raw());
+  fill_rect_px(x0, y0, x0 + s_cell_w, y0 + s_cell_h, bg);
 }
 
 /**
- * Draw a shaped row on the cell grid: each new HarfBuzz cluster starts at
- * @c cell_px_x(cluster). Font x_advance is only applied within the same cluster
- * (stacked marks). Accumulating raw advances would misplace glyphs vs @c
- * s_tc_x.
+ * @brief Draw a shaped row, anchoring each cluster to its cell and coloring
+ *        each glyph with the source cell's fg.
+ *
+ * Font x_advance is only applied within the same cluster (stacked marks).
+ * Accumulating raw advances across clusters would misplace glyphs relative
+ * to the monospace grid.
  */
-static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, uint32_t fg)
+static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, const cell_t *row)
 {
   unsigned             len;
   hb_glyph_info_t     *info = hb_buffer_get_glyph_infos(buf, &len);
@@ -233,6 +319,8 @@ static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, uint32_t fg)
   uint32_t             prev_cluster = ~(uint32_t)0u;
   int                  px           = 0;
   int                  py           = y_baseline;
+  uint32_t             cur_fg       = eff_ink();
+  int                  cur_bold     = 0;
 
   for(unsigned i = 0; i < len; i++) {
     if(info[i].cluster != prev_cluster) {
@@ -242,7 +330,9 @@ static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, uint32_t fg)
         cp_idx = 0;
       if(cp_idx >= s_term_cols)
         cp_idx = s_term_cols - 1;
-      px = cell_px_x(cp_idx);
+      px       = cell_px_x(cp_idx);
+      cur_fg   = row[cp_idx].fg ? row[cp_idx].fg : eff_ink();
+      cur_bold = (row[cp_idx].attrs & kAttrBold) != 0;
     }
 
     px += pos[i].x_offset >> 6;
@@ -259,7 +349,9 @@ static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, uint32_t fg)
     FT_GlyphSlot slot = s_face->glyph;
     int          bx   = px + slot->bitmap_left;
     int          by   = py - slot->bitmap_top;
-    blit_gray(bx, by, &slot->bitmap, fg);
+    blit_gray(bx, by, &slot->bitmap, cur_fg);
+    if(cur_bold)
+      blit_gray(bx + 1, by, &slot->bitmap, cur_fg);
 
     px += pos[i].x_advance >> 6;
     py -= pos[i].y_advance >> 6;
@@ -295,32 +387,94 @@ static void flush_dirty_rows(void)
   }
 }
 
+/**
+ * @brief Store @p cp at (cx,cy) along with the current effective fg/bg.
+ *
+ * Snapshotting colors here is what lets a later @c redraw_line_shaped reach
+ * back through time to the SGR state that was active when the cell was
+ * written, instead of the now-default state.
+ */
+/** @brief Capture the current SGR attribute bits for a cell. */
+static uint8_t cur_attrs(void)
+{
+  uint8_t a = 0;
+  if(s_bold)
+    a |= kAttrBold;
+  if(s_underline)
+    a |= kAttrUnderline;
+  if(s_blink)
+    a |= kAttrBlink;
+  return a;
+}
+
 static void cell_set(int cx, int cy, uint32_t cp)
 {
   if(!s_cells || cx < 0 || cy < 0 || cx >= s_term_cols || cy >= s_term_rows)
     return;
-  s_cells[(size_t)cy * (size_t)s_term_cols + (size_t)cx] =
-      cp ? cp : (uint32_t)' ';
+  cell_t *c = &s_cells[(size_t)cy * (size_t)s_term_cols + (size_t)cx];
+  c->cp     = cp ? cp : (uint32_t)' ';
+  c->fg     = eff_ink();
+  c->bg     = eff_bg_raw();
+  c->attrs  = cur_attrs();
 }
 
+/**
+ * @brief Repaint row @p cy: background per cell, then one shaped pass for fg.
+ *
+ * Codepoints are copied into a scratch buffer (stack for typical widths,
+ * heap as a fallback) so HarfBuzz can shape the whole row in one call while
+ * each glyph still picks up its source cell's fg.
+ */
 static void redraw_line_shaped(int cy)
 {
   if(!s_buf || !s_cells || cy < 0 || cy >= s_term_rows)
     return;
-  unmark_dirty(cy); /* we are redrawing right now — clear deferred mark */
-  int       cols = s_term_cols;
-  uint32_t *row  = s_cells + (size_t)cy * (size_t)cols;
+  unmark_dirty(cy);
+
+  int     cols = s_term_cols;
+  cell_t *row  = s_cells + (size_t)cy * (size_t)cols;
 
   for(int x = 0; x < cols; x++)
     term_clear_cell(x, cy);
 
+  uint32_t  stack_cps[256];
+  uint32_t *cps      = stack_cps;
+  uint32_t *cps_heap = NULL;
+  if(cols > (int)(sizeof stack_cps / sizeof stack_cps[0])) {
+    cps_heap = (uint32_t *)malloc((size_t)cols * sizeof(uint32_t));
+    if(!cps_heap)
+      return;
+    cps = cps_heap;
+  }
+  for(int x = 0; x < cols; x++)
+    cps[x] = row[x].cp ? row[x].cp : (uint32_t)' ';
+
   hb_buffer_clear_contents(s_buf);
-  hb_buffer_add_utf32(s_buf, row, cols, 0, cols);
+  hb_buffer_add_utf32(s_buf, cps, cols, 0, cols);
   hb_buffer_guess_segment_properties(s_buf);
   hb_shape(s_hb, s_buf, s_feat_liga, s_feat_liga_n);
 
-  int bas = cell_px_y_top(cy) + s_ascent_px;
-  draw_shaped_at_pen(bas, s_buf, eff_ink());
+  draw_shaped_at_pen(cell_px_y_top(cy) + s_ascent_px, s_buf, row);
+  free(cps_heap);
+
+  /* Underline pass: draw 1px strokes under runs of underlined cells. The
+   * line sits just under the baseline so it doesn't clip descenders too
+   * hard while staying clear of the next row. */
+  int uy = cell_px_y_top(cy) + s_cell_h - 2;
+  int x  = 0;
+  while(x < cols) {
+    if(!(row[x].attrs & kAttrUnderline)) {
+      x++;
+      continue;
+    }
+    int      x1 = x;
+    while(x1 < cols && (row[x1].attrs & kAttrUnderline))
+      x1++;
+    int px0 = cell_px_x(x);
+    int px1 = cell_px_x(x1);
+    fill_rect_px(px0, uy, px1, uy + 1, row[x].fg ? row[x].fg : eff_ink());
+    x = x1;
+  }
 }
 
 /** After EL/ED: cells cleared then one shaped repaint of the row. */
@@ -382,12 +536,15 @@ static void term_scroll_one(void)
   );
 
   if(s_cells) {
-    size_t rowb = (size_t)s_term_cols * sizeof(uint32_t);
+    size_t rowb = (size_t)s_term_cols * sizeof(cell_t);
     memmove(s_cells, s_cells + s_term_cols, rowb * (size_t)(s_term_rows - 1));
-    memset(s_cells + (size_t)(s_term_rows - 1) * (size_t)s_term_cols, 0, rowb);
-    uint32_t *last = s_cells + (size_t)(s_term_rows - 1) * (size_t)s_term_cols;
-    for(int x = 0; x < s_term_cols; x++)
-      last[x] = (uint32_t)' ';
+    cell_t *last = s_cells + (size_t)(s_term_rows - 1) * (size_t)s_term_cols;
+    for(int x = 0; x < s_term_cols; x++) {
+      last[x].cp    = (uint32_t)' ';
+      last[x].fg    = eff_ink();
+      last[x].bg    = eff_bg_raw();
+      last[x].attrs = 0;
+    }
   }
 }
 
@@ -571,10 +728,13 @@ static void handle_sgr(void)
 
   int pn = s_esc_len - 1;
   if(pn <= 0) {
-    s_term_fg = s_fg;
-    s_term_bg = s_bg;
-    s_bold    = 0;
-    s_rev     = 0;
+    s_term_fg   = s_fg;
+    s_term_bg   = s_bg;
+    s_bold      = 0;
+    s_dim       = 0;
+    s_underline = 0;
+    s_blink     = 0;
+    s_rev       = 0;
     return;
   }
 
@@ -584,22 +744,42 @@ static void handle_sgr(void)
   for(int pi = 0; pi < np; pi++) {
     int p = pv[pi];
     switch(p) {
-    case 0:
-      s_term_fg = s_fg;
-      s_term_bg = s_bg;
-      s_bold    = 0;
-      s_rev     = 0;
+    case 0: /* reset */
+      s_term_fg   = s_fg;
+      s_term_bg   = s_bg;
+      s_bold      = 0;
+      s_dim       = 0;
+      s_underline = 0;
+      s_blink     = 0;
+      s_rev       = 0;
       break;
-    case 1:
+    case 1: /* bold */
       s_bold = 1;
       break;
-    case 7:
+    case 2: /* dim / faint */
+      s_dim = 1;
+      break;
+    case 4: /* underline */
+      s_underline = 1;
+      break;
+    case 5: /* blink (slow) */
+    case 6: /* blink (rapid) */
+      s_blink = 1;
+      break;
+    case 7: /* reverse */
       s_rev = 1;
       break;
-    case 22:
+    case 22: /* bold + dim off */
       s_bold = 0;
+      s_dim  = 0;
       break;
-    case 27:
+    case 24: /* underline off */
+      s_underline = 0;
+      break;
+    case 25: /* blink off */
+      s_blink = 0;
+      break;
+    case 27: /* reverse off */
       s_rev = 0;
       break;
     case 39:
@@ -716,6 +896,8 @@ static void handle_dec_private(char cmd)
   }
 }
 
+static void term_emit_cp(uint32_t cp);
+
 static void handle_ansi_sequence(void)
 {
   if(s_esc_len < 1)
@@ -796,6 +978,51 @@ static void handle_ansi_sequence(void)
   case 'm':
     handle_sgr();
     break;
+  case 'b': {
+    /* REP: repeat the last printed codepoint Pn times. ncurses uses the
+     * xterm-256color `rep` capability for long box-border runs, so without
+     * this every horizontal/vertical border collapses to one cell. */
+    if(s_last_cp == 0)
+      break;
+    int      n  = csi_leading_param_default_1();
+    uint32_t cp = s_last_cp;
+    for(int i = 0; i < n; i++)
+      term_emit_cp(cp);
+    break;
+  }
+  case 'G': {
+    /* CHA: absolute column position (1-based). */
+    int n = csi_leading_param_default_1();
+    if(n > s_term_cols)
+      n = s_term_cols;
+    s_tc_x = n - 1;
+    break;
+  }
+  case 'd': {
+    /* VPA: absolute line position (1-based). */
+    int n = csi_leading_param_default_1();
+    if(n > s_term_rows)
+      n = s_term_rows;
+    s_tc_y = n - 1;
+    break;
+  }
+  case 'X': {
+    /* ECH: erase Pn chars at cursor without moving it. */
+    int n  = csi_leading_param_default_1();
+    int x1 = s_tc_x + n - 1;
+    if(x1 >= s_term_cols)
+      x1 = s_term_cols - 1;
+    erase_cells_rect(s_tc_y, s_tc_x, s_tc_y, x1);
+    break;
+  }
+  case 's': /* SCO save cursor. */
+    s_saved_cx = s_tc_x;
+    s_saved_cy = s_tc_y;
+    break;
+  case 'u': /* SCO restore cursor. */
+    s_tc_x = s_saved_cx;
+    s_tc_y = s_saved_cy;
+    break;
   default:
     break;
   }
@@ -849,6 +1076,7 @@ static void term_emit_cp(uint32_t cp)
   }
   cell_set(s_tc_x, s_tc_y, cp);
   mark_dirty(s_tc_y);
+  s_last_cp = cp;
   s_tc_x++;
   if(s_tc_x >= s_term_cols) {
     s_tc_x = 0;
@@ -856,10 +1084,54 @@ static void term_emit_cp(uint32_t cp)
   }
 }
 
+/**
+ * @brief Map a DEC Special Graphics byte (active after @c ESC(0) to Unicode.
+ *
+ * Fira ships the box-drawing and math blocks, so the returned codepoints
+ * shape into proper glyphs through the normal HarfBuzz path.
+ */
+static uint32_t acs_to_unicode(uint8_t b)
+{
+  switch(b) {
+  case '`': return 0x25C6u; /* ◆ */
+  case 'a': return 0x2592u; /* ▒ */
+  case 'f': return 0x00B0u; /* ° */
+  case 'g': return 0x00B1u; /* ± */
+  case 'h': return 0x2592u; /* ▒ (NL placeholder) */
+  case 'i': return 0x240Bu; /* VT symbol */
+  case 'j': return 0x2518u; /* ┘ */
+  case 'k': return 0x2510u; /* ┐ */
+  case 'l': return 0x250Cu; /* ┌ */
+  case 'm': return 0x2514u; /* └ */
+  case 'n': return 0x253Cu; /* ┼ */
+  case 'o': return 0x23BAu; /* scan 1 */
+  case 'p': return 0x23BBu; /* scan 3 */
+  case 'q': return 0x2500u; /* ─ */
+  case 'r': return 0x23BCu; /* scan 7 */
+  case 's': return 0x23BDu; /* scan 9 */
+  case 't': return 0x251Cu; /* ├ */
+  case 'u': return 0x2524u; /* ┤ */
+  case 'v': return 0x2534u; /* ┴ */
+  case 'w': return 0x252Cu; /* ┬ */
+  case 'x': return 0x2502u; /* │ */
+  case 'y': return 0x2264u; /* ≤ */
+  case 'z': return 0x2265u; /* ≥ */
+  case '{': return 0x03C0u; /* π */
+  case '|': return 0x2260u; /* ≠ */
+  case '}': return 0x00A3u; /* £ */
+  case '~': return 0x00B7u; /* · */
+  default:  return (uint32_t)b;
+  }
+}
+
 static void feed_utf8_byte(uint8_t b)
 {
   if(s_utf8_rem == 0) {
     if(b < 0x80u) {
+      if(s_g0_acs && b >= 0x60u && b <= 0x7Eu) {
+        term_emit_cp(acs_to_unicode(b));
+        return;
+      }
       term_emit_cp((uint32_t)b);
       return;
     }
@@ -923,7 +1195,20 @@ static void term_feed_byte(unsigned char b)
       s_esc_state = 0;
       return;
     }
+    if(b == '(' || b == ')') {
+      /* G0/G1 charset designation — wait for the designator byte. */
+      s_esc_state = 3;
+      return;
+    }
     s_esc_state = 0;
+  } else if(s_esc_state == 3) {
+    /* '0' selects DEC Special Graphics; ASCII/UK/Latin-1 turn it back off. */
+    if(b == '0')
+      s_g0_acs = 1;
+    else if(b == 'B' || b == 'A' || b == 'U' || b == '1' || b == '2')
+      s_g0_acs = 0;
+    s_esc_state = 0;
+    return;
   } else if(s_esc_state == 2) {
     if((b >= '0' && b <= '9') || b == ';' || b == '?') {
       if(s_esc_len < kEscMax - 1)
@@ -980,9 +1265,14 @@ bool sh_fb_tty_init(const char *font_path)
   s_term_fg        = s_fg;
   s_term_bg        = s_bg;
   s_bold           = 0;
+  s_dim            = 0;
+  s_underline      = 0;
+  s_blink          = 0;
   s_rev            = 0;
   s_utf8_rem       = 0;
   s_esc_state      = 0;
+  s_g0_acs         = 0;
+  s_last_cp        = 0;
   s_cells          = NULL;
   s_csr_visible    = 1;
   s_blink_show_bar = 0;
@@ -1056,7 +1346,7 @@ bool sh_fb_tty_init(const char *font_path)
   term_recompute_grid();
 
   size_t ncell = (size_t)s_term_rows * (size_t)s_term_cols;
-  s_cells      = calloc(ncell, sizeof(uint32_t));
+  s_cells      = calloc(ncell, sizeof(cell_t));
   if(!s_cells) {
     hb_buffer_destroy(s_buf);
     s_buf = NULL;
@@ -1071,8 +1361,12 @@ bool sh_fb_tty_init(const char *font_path)
     s_fb        = NULL;
     return false;
   }
-  for(size_t i = 0; i < ncell; i++)
-    s_cells[i] = (uint32_t)' ';
+  for(size_t i = 0; i < ncell; i++) {
+    s_cells[i].cp    = (uint32_t)' ';
+    s_cells[i].fg    = eff_ink();
+    s_cells[i].bg    = eff_bg_raw();
+    s_cells[i].attrs = 0;
+  }
 
   s_tc_x = 0;
   s_tc_y = 0;
@@ -1134,11 +1428,18 @@ void sh_fb_tty_clear(void)
   s_term_fg   = s_fg;
   s_term_bg   = s_bg;
   s_bold      = 0;
+  s_dim       = 0;
+  s_underline = 0;
+  s_blink     = 0;
   s_rev       = 0;
   if(s_cells) {
     size_t n = (size_t)s_term_rows * (size_t)s_term_cols;
-    for(size_t i = 0; i < n; i++)
-      s_cells[i] = (uint32_t)' ';
+    for(size_t i = 0; i < n; i++) {
+      s_cells[i].cp    = (uint32_t)' ';
+      s_cells[i].fg    = eff_ink();
+      s_cells[i].bg    = eff_bg_raw();
+      s_cells[i].attrs = 0;
+    }
   }
 }
 
