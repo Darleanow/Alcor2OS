@@ -11,6 +11,7 @@
  */
 
 #include <curses.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -209,40 +210,156 @@ static void
 }
 
 /**
- * @brief Log every key press as keycode + keyname until 'q' is pressed.
+ * @brief Running UTF-8 byte assembler for ::screen_input.
+ *
+ * The kernel keyboard layer emits UTF-8 (so é arrives as 0xC3 0xA9, à as
+ * 0xC3 0xA0, …). Narrow ncurses returns one byte at a time and labels every
+ * high-bit byte as @c "M-x", which is useless for the demo. We keep our own
+ * UTF-8 state machine: lead byte starts a sequence, continuation bytes feed
+ * into it, and on completion we surface the codepoint plus its raw bytes.
+ */
+typedef struct
+{
+  unsigned remaining;   /**< Continuation bytes still expected (1..3). */
+  uint32_t codepoint;   /**< Partial codepoint accumulated so far. */
+  unsigned char raw[4]; /**< Bytes of the in-flight sequence, for display. */
+  unsigned      n_raw;
+} utf8_acc_t;
+
+/**
+ * @brief Feed one byte to @p acc; return decoded codepoint when complete.
+ *
+ * @return Codepoint on completion, @c 0 while a sequence is still in flight,
+ *         or @c (uint32_t)-1 when @p byte is an invalid continuation.
+ */
+static uint32_t utf8_feed(utf8_acc_t *acc, unsigned char byte)
+{
+  if(acc->remaining == 0) {
+    acc->raw[0] = byte;
+    acc->n_raw  = 1;
+    if(byte < 0x80u) {
+      acc->codepoint = byte;
+      return byte;
+    }
+    if((byte & 0xe0u) == 0xc0u) {
+      acc->codepoint = byte & 0x1fu;
+      acc->remaining = 1;
+      return 0;
+    }
+    if((byte & 0xf0u) == 0xe0u) {
+      acc->codepoint = byte & 0x0fu;
+      acc->remaining = 2;
+      return 0;
+    }
+    if((byte & 0xf8u) == 0xf0u) {
+      acc->codepoint = byte & 0x07u;
+      acc->remaining = 3;
+      return 0;
+    }
+    return (uint32_t)-1;
+  }
+
+  if((byte & 0xc0u) != 0x80u) {
+    acc->remaining = 0;
+    return (uint32_t)-1;
+  }
+  if(acc->n_raw < sizeof acc->raw)
+    acc->raw[acc->n_raw++] = byte;
+  acc->codepoint = (acc->codepoint << 6) | (byte & 0x3fu);
+  acc->remaining--;
+  return acc->remaining ? 0 : acc->codepoint;
+}
+
+/**
+ * @brief Format the raw bytes of @p acc as @c "0xAA 0xBB ..." into @p buf.
+ */
+static void utf8_format_raw(const utf8_acc_t *acc, char *buf, size_t cap)
+{
+  static const char hex[] = "0123456789abcdef";
+  size_t            w     = 0;
+  for(unsigned i = 0; i < acc->n_raw && w + 6 < cap; i++) {
+    if(i)
+      buf[w++] = ' ';
+    buf[w++] = '0';
+    buf[w++] = 'x';
+    buf[w++] = hex[(acc->raw[i] >> 4) & 0xfu];
+    buf[w++] = hex[acc->raw[i] & 0xfu];
+  }
+  buf[w] = '\0';
+}
+
+/**
+ * @brief Log every key press as keycode + name (UTF-8 aware) until 'q' is hit.
+ *
+ * ASCII and ncurses key codes (>= 0x100, e.g. KEY_UP) print straight away.
+ * Bytes in a UTF-8 multi-byte sequence are buffered and only logged once the
+ * whole codepoint is in hand, so é shows up as "é (U+00E9, 0xc3 0xa9)" rather
+ * than two consecutive @c "M-X" lines.
  */
 static void
     screen_input(WINDOW *hdr, WINDOW *body, WINDOW *ftr, int rows, int cols)
 {
-  int brows = rows - 2;
-  int log_y = 4;
-  int max_y = brows - 2;
+  int        brows = rows - 2;
+  int        log_y = 4;
+  int        max_y = brows - 2;
+  utf8_acc_t acc   = {0};
 
   draw_header(hdr, cols, "Keyboard Input");
   draw_footer(ftr, cols, "press keys to see their names   q  back");
 
   werase(body);
   box(body, 0, 0);
-  mvwprintw(body, 2, 4, "Key log (keyname / raw code):");
+  mvwprintw(body, 2, 4, "Key log (codepoint / raw bytes):");
   wrefresh(body);
 
   for(;;) {
-    int         ch   = wgetch(body);
-    const char *name = keyname(ch);
+    int ch = wgetch(body);
 
     if(ch == 'q' || ch == 'Q')
       return;
+
+    /* Routing:
+     *   - bytes >= 0x100 are ncurses KEY_* codes (arrows, function keys);
+     *   - bytes < 0x80 are plain ASCII/control — keyname() already prints
+     *     them nicely as "a" / "^C" / "^[";
+     *   - bytes 0x80..0xff are UTF-8 fragments — assemble them ourselves
+     *     so an é shows up as one line, not two anonymous M-X codes. */
+    char line[64];
+    if(ch >= 0x100) {
+      const char *name = keyname(ch);
+      snprintf(line, sizeof line, "%-12s  code %d", name ? name : "?", ch);
+    } else if(ch < 0x80) {
+      const char *name = keyname(ch);
+      snprintf(line, sizeof line, "%-12s  0x%02x", name ? name : "?", ch);
+      acc.remaining = 0;
+    } else {
+      uint32_t cp = utf8_feed(&acc, (unsigned char)ch);
+      if(cp == 0)
+        continue;
+      if(cp == (uint32_t)-1) {
+        snprintf(line, sizeof line, "invalid UTF-8 byte 0x%02x", ch);
+      } else {
+        char     raw[24];
+        char     ch_buf[5];
+        unsigned cn = 0;
+        utf8_format_raw(&acc, raw, sizeof raw);
+        for(unsigned i = 0; i < acc.n_raw && cn < sizeof ch_buf - 1; i++)
+          ch_buf[cn++] = (char)acc.raw[i];
+        ch_buf[cn] = '\0';
+        snprintf(line, sizeof line, "%-4s U+%04X  %s", ch_buf, cp, raw);
+      }
+    }
 
     if(log_y >= max_y) {
       for(int y = 4; y < max_y; y++)
         mvwhline(body, y, 1, ' ', cols - 2);
       box(body, 0, 0);
-      mvwprintw(body, 2, 4, "Key log (keyname / raw code):");
+      mvwprintw(body, 2, 4, "Key log (codepoint / raw bytes):");
       log_y = 4;
     }
 
     wattron(body, COLOR_PAIR(CP_HILITE) | A_BOLD);
-    mvwprintw(body, log_y, 6, "  %4d  %-24s", ch, name ? name : "?");
+    mvwprintw(body, log_y, 6, "  %-*s", cols - 12, line);
     wattroff(body, COLOR_PAIR(CP_HILITE) | A_BOLD);
     log_y++;
     wrefresh(body);
