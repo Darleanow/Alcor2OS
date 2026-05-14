@@ -113,7 +113,11 @@ int sh_getchar_blinking(int idle_ms)
     if(r < 0)
       return -1;
     if(r == 0) {
+      /* cursor_poll owns s_blink_show_bar; blink_tick consults it when it
+       * restores the bar, so the prompt cursor stays in sync regardless of
+       * which rows the A_BLINK pass repaints. */
       sh_fb_tty_cursor_poll();
+      sh_fb_tty_blink_tick();
       continue;
     }
     if(!FD_ISSET(STDIN_FILENO, &rfds))

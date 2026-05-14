@@ -46,6 +46,13 @@ void sh_fb_tty_clear(void);
  * select timeout). */
 void sh_fb_tty_cursor_poll(void);
 
+/** Flip the A_BLINK phase and repaint affected rows. Call from any idle hook
+ * (line-edit select timeout and child-pipe-relay poll timeout both do).
+ * Self-contained around the line-edit cursor: the bar is hidden across the
+ * row repaints and re-drawn at the end if cursor_poll is currently in the
+ * "on" half of its blink. */
+void sh_fb_tty_blink_tick(void);
+
 /** Show the block cursor at the current cell and set blink phase to "on" before
  * reading stdin (after @c select, or after line edits). */
 void sh_fb_tty_cursor_suspend(void);

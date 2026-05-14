@@ -111,8 +111,9 @@ static int      s_esc_len;
 static char     s_esc_buf[kEscMax];
 static unsigned s_utf8_rem;
 static uint32_t s_utf8_partial;
-static int      s_g0_acs;  /**< 1 when G0 is DEC Special Graphics (ESC(0). */
-static uint32_t s_last_cp; /**< Last codepoint emitted, replayed by CSI REP. */
+static int      s_g0_acs;     /**< 1 when G0 is DEC Special Graphics (ESC(0). */
+static uint32_t s_last_cp;    /**< Last codepoint emitted, replayed by CSI REP. */
+static int      s_blink_phase;/**< 0: show blink cells; 1: hide them. */
 
 static uint32_t eff_fg_raw(void)
 {
@@ -358,7 +359,97 @@ static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, const cell_t *r
   }
 }
 
-static void redraw_line_shaped(int cy); /* forward — defined below cell_set */
+/** @brief True when @p cp lies in the Unicode Box Drawing block. */
+static int is_box_drawing(uint32_t cp)
+{
+  return cp >= 0x2500u && cp <= 0x257Fu;
+}
+
+/** @brief Stroke thickness in pixels for box-drawing rendering. */
+static int box_stroke_px(int bold)
+{
+  int t = s_cell_w / 8;
+  if(t < 1)
+    t = 1;
+  return bold ? t + 1 : t;
+}
+
+/**
+ * @brief Render a Unicode box-drawing glyph as geometric primitives.
+ *
+ * Most monospace fonts (Fira included) ship box-drawing glyphs with side
+ * bearings, which leaves a hairline gap between adjacent cells. Drawing the
+ * strokes directly with @c fill_rect_px guarantees pixel-tight joins at
+ * corners and along long runs.
+ *
+ * Only the subset of the U+2500 block that ncurses' @c box / @c wborder
+ * emits is covered; anything else falls through to the regular font path
+ * the caller already invoked.
+ */
+static void draw_box_primitive(int cx, int cy, uint32_t cp, uint32_t fg, int bold)
+{
+  int x0  = cell_px_x(cx);
+  int y0  = cell_px_y_top(cy);
+  int x1  = x0 + s_cell_w;
+  int y1  = y0 + s_cell_h;
+  int mx  = x0 + s_cell_w / 2;
+  int my  = y0 + s_cell_h / 2;
+  int th  = box_stroke_px(bold);
+  int hth = th / 2;
+  int hx0 = mx - hth;
+  int hx1 = hx0 + th;
+  int hy0 = my - hth;
+  int hy1 = hy0 + th;
+
+  switch(cp) {
+  case 0x2500u: /* ─ */
+    fill_rect_px(x0, hy0, x1, hy1, fg);
+    break;
+  case 0x2502u: /* │ */
+    fill_rect_px(hx0, y0, hx1, y1, fg);
+    break;
+  case 0x250Cu: /* ┌ */
+    fill_rect_px(hx0, hy0, x1, hy1, fg);
+    fill_rect_px(hx0, hy0, hx1, y1, fg);
+    break;
+  case 0x2510u: /* ┐ */
+    fill_rect_px(x0, hy0, hx1, hy1, fg);
+    fill_rect_px(hx0, hy0, hx1, y1, fg);
+    break;
+  case 0x2514u: /* └ */
+    fill_rect_px(hx0, hy0, x1, hy1, fg);
+    fill_rect_px(hx0, y0, hx1, hy1, fg);
+    break;
+  case 0x2518u: /* ┘ */
+    fill_rect_px(x0, hy0, hx1, hy1, fg);
+    fill_rect_px(hx0, y0, hx1, hy1, fg);
+    break;
+  case 0x251Cu: /* ├ */
+    fill_rect_px(hx0, y0, hx1, y1, fg);
+    fill_rect_px(hx0, hy0, x1, hy1, fg);
+    break;
+  case 0x2524u: /* ┤ */
+    fill_rect_px(hx0, y0, hx1, y1, fg);
+    fill_rect_px(x0, hy0, hx1, hy1, fg);
+    break;
+  case 0x252Cu: /* ┬ */
+    fill_rect_px(x0, hy0, x1, hy1, fg);
+    fill_rect_px(hx0, hy0, hx1, y1, fg);
+    break;
+  case 0x2534u: /* ┴ */
+    fill_rect_px(x0, hy0, x1, hy1, fg);
+    fill_rect_px(hx0, y0, hx1, hy1, fg);
+    break;
+  case 0x253Cu: /* ┼ */
+    fill_rect_px(x0, hy0, x1, hy1, fg);
+    fill_rect_px(hx0, y0, hx1, y1, fg);
+    break;
+  default:
+    break;
+  }
+}
+
+static void redraw_line_shaped(int cy); /* forward; defined after cell_set. */
 
 static void mark_dirty(int cy)
 {
@@ -446,8 +537,18 @@ static void redraw_line_shaped(int cy)
       return;
     cps = cps_heap;
   }
-  for(int x = 0; x < cols; x++)
-    cps[x] = row[x].cp ? row[x].cp : (uint32_t)' ';
+  /* Build the shape buffer:
+   *   - box drawing cells render as primitives below, so mask them to space;
+   *   - blink cells in the "hide" phase also mask to space so the glyph
+   *     disappears while the background stays put. */
+  for(int x = 0; x < cols; x++) {
+    uint32_t cp = row[x].cp ? row[x].cp : (uint32_t)' ';
+    if(is_box_drawing(cp))
+      cp = (uint32_t)' ';
+    if(s_blink_phase && (row[x].attrs & kAttrBlink))
+      cp = (uint32_t)' ';
+    cps[x] = cp;
+  }
 
   hb_buffer_clear_contents(s_buf);
   hb_buffer_add_utf32(s_buf, cps, cols, 0, cols);
@@ -456,6 +557,16 @@ static void redraw_line_shaped(int cy)
 
   draw_shaped_at_pen(cell_px_y_top(cy) + s_ascent_px, s_buf, row);
   free(cps_heap);
+
+  for(int x = 0; x < cols; x++) {
+    if(!is_box_drawing(row[x].cp))
+      continue;
+    if(s_blink_phase && (row[x].attrs & kAttrBlink))
+      continue;
+    uint32_t fg   = row[x].fg ? row[x].fg : eff_ink();
+    int      bold = (row[x].attrs & kAttrBold) != 0;
+    draw_box_primitive(x, cy, row[x].cp, fg, bold);
+  }
 
   /* Underline pass: draw 1px strokes under runs of underlined cells. The
    * line sits just under the baseline so it doesn't clip descenders too
@@ -1273,6 +1384,7 @@ bool sh_fb_tty_init(const char *font_path)
   s_esc_state      = 0;
   s_g0_acs         = 0;
   s_last_cp        = 0;
+  s_blink_phase    = 0;
   s_cells          = NULL;
   s_csr_visible    = 1;
   s_blink_show_bar = 0;
@@ -1449,6 +1561,38 @@ void sh_fb_tty_cursor_poll(void)
     return;
   cursor_hide_bar();
   s_blink_show_bar = !s_blink_show_bar;
+  if(s_csr_visible && s_blink_show_bar)
+    cursor_draw_bar();
+}
+
+/**
+ * @brief Flip the blink phase and repaint every row that contains a blink
+ *        cell. Call this periodically (e.g. every ~400-500ms) from an idle
+ *        hook to drive A_BLINK animation.
+ *
+ * Self-contained with respect to the line-edit cursor: the bar is hidden
+ * before any row repaint and re-drawn at the end if cursor_poll currently
+ * has it in the "on" half of its blink. This way the prompt cursor doesn't
+ * flicker off for a whole tick whenever a blink cell shares the screen.
+ */
+void sh_fb_tty_blink_tick(void)
+{
+  if(!s_active || !s_cells)
+    return;
+  s_blink_phase = !s_blink_phase;
+  cursor_hide_bar();
+  for(int cy = 0; cy < s_term_rows; cy++) {
+    cell_t *row = s_cells + (size_t)cy * (size_t)s_term_cols;
+    int     has = 0;
+    for(int cx = 0; cx < s_term_cols; cx++) {
+      if(row[cx].attrs & kAttrBlink) {
+        has = 1;
+        break;
+      }
+    }
+    if(has)
+      redraw_line_shaped(cy);
+  }
   if(s_csr_visible && s_blink_show_bar)
     cursor_draw_bar();
 }
