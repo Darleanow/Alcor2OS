@@ -31,7 +31,14 @@ typedef struct
 
 static LineEditState s_edit = {.pushback = -1};
 
-static void          line_edit_reset(LineEditState *s)
+/** Special return codes for read_line(): negative values that don't clash
+ *  with a byte-count. RL_EOF is the existing "user hit Ctrl-D on an empty
+ *  line"; RL_INTERRUPT signals SIGINT-style Ctrl-C so the caller can drop
+ *  any pending multiline buffer instead of treating it like a bare \n. */
+#define RL_EOF       (-1)
+#define RL_INTERRUPT (-2)
+
+static void line_edit_reset(LineEditState *s)
 {
   s->pushback     = -1;
   s->utf8_rem     = 0;
@@ -119,14 +126,14 @@ static int read_line(char *buf, size_t size)
       sh_puts("^C\n");
       buf[0] = '\0';
       line_edit_reset(&s_edit);
-      return 0;
+      return RL_INTERRUPT;
     }
 
     if(c == 0x04) {
       if(pos == 0) {
         s_edit.pushback = -1;
         s_edit.utf8_rem = 0;
-        return -1;
+        return RL_EOF;
       }
       continue;
     }
@@ -371,7 +378,11 @@ static int is_input_complete(const char *buf)
 /* Read input lines into @p buf until they form a complete statement. After
  * each newline we append '\n' so the lexer (which treats '\n' as SEMI) sees
  * a separator between stitched lines. PS2 ('> ') is shown for continuation
- * prompts. Returns total bytes accumulated, or -1 on EOF. */
+ * prompts.
+ *
+ * Returns total bytes accumulated, ::RL_EOF on Ctrl-D at an empty line, or
+ * 0 when the user interrupts with Ctrl-C — in that case any pending
+ * multiline buffer is discarded so the next call starts at PS1, not PS2. */
 static int read_complete_statement(char *buf, size_t size)
 {
   size_t pos = 0;
@@ -379,8 +390,10 @@ static int read_complete_statement(char *buf, size_t size)
 
   while(1) {
     int len = read_line(buf + pos, size - pos);
-    if(len < 0)
-      return -1;
+    if(len == RL_EOF)
+      return RL_EOF;
+    if(len == RL_INTERRUPT)
+      return 0;
 
     pos += (size_t)len;
     if(pos >= size - 2) /* leave room for '\n' and '\0' */
@@ -438,7 +451,7 @@ int main(int argc, char *argv[])
 
     int len = read_complete_statement(line, sizeof(line));
 
-    if(len < 0) {
+    if(len == RL_EOF) {
       sh_puts("exit\n");
       exit(0);
     }
