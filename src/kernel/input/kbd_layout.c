@@ -489,6 +489,26 @@ static void tty_echo_erase(bool echo_on)
   console_putchar('\b');
 }
 
+/**
+ * @brief Trim one UTF-8 codepoint from the tail of @p buf.
+ *
+ * The kbd line discipline appends incoming bytes one at a time, so a
+ * Latin-1 character like é lands as the pair 0xC3 0xA9. Plain backspace
+ * would erase a single byte and leave a dangling lead, corrupting the
+ * line. Walk backwards through any continuation bytes (10xxxxxx) and
+ * then over the lead byte itself.
+ *
+ * @return Updated length after the trim (0 when @p len was already 0).
+ */
+static u32 utf8_trim_one(const char *buf, u32 len)
+{
+  while(len > 0 && ((unsigned char)buf[len - 1] & 0xc0u) == 0x80u)
+    len--;
+  if(len > 0)
+    len--;
+  return len;
+}
+
 static u64 kbd_deliver_ready(proc_t *p, char *buf, u64 count)
 {
   u64 to_copy = count;
@@ -536,7 +556,7 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
 
       if(c == verase || c == '\b') {
         if(p->kbd_edit_len > 0) {
-          p->kbd_edit_len--;
+          p->kbd_edit_len = utf8_trim_one(p->kbd_edit, p->kbd_edit_len);
           tty_echo_erase(echo_on);
         }
         continue;
@@ -544,7 +564,7 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
 
       if(c == vkill) {
         while(p->kbd_edit_len > 0) {
-          p->kbd_edit_len--;
+          p->kbd_edit_len = utf8_trim_one(p->kbd_edit, p->kbd_edit_len);
           tty_echo_erase(echo_on);
         }
         continue;
