@@ -19,7 +19,9 @@ static inline int font_glyph_index(unsigned char uc)
   return (int)uc;
 }
 
-static const u8 font_cp437[FONT_GLYPHS][FONT_H_CELL] = {
+/* CP437 atlas is unused since the user-facing terminal (shell fb_tty) renders
+ * box drawing via Fira+Unicode. Kept for boot-time fallback only. */
+__attribute__((unused)) static const u8 font_cp437[FONT_GLYPHS][FONT_H_CELL] = {
     {0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u  }, /* 0x00 */
     {0u,   0u,   126u, 129u, 165u, 129u, 129u, 189u, 153u, 129u, 129u, 126u, 0u,   0u,
      0u,                                                                                       0u  }, /* 0x01 */
