@@ -213,7 +213,10 @@ static int read_line(char *buf, size_t size)
       s_edit.utf8_partial = (uint32_t)(u & 0x07u);
       s_edit.utf8_rem     = 3;
     } else {
-      /* Latin-1 single byte from kbd layout (e.g. é → 0xE9) */
+      /* Stray high-bit byte that wasn't a UTF-8 lead — the kbd layer now
+       * emits UTF-8 for the whole Latin-1 supplement, so this only fires
+       * for malformed input streams (paste from a Latin-1 source, etc.).
+       * Transcode defensively so the line buffer stays valid UTF-8. */
       (void)store_utf8_cp(buf, size, &pos, (uint32_t)u);
       fb_cursor_after_edit();
     }
