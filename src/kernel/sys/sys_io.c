@@ -523,12 +523,23 @@ static i32 parse_timeval(u64 timeout_ptr, bool *poll_immediate, u64 *wait_ticks)
   return 0;
 }
 
-/** @brief Yield the CPU for one ~10 ms timer tick via STI/HLT. */
+/** @brief Yield the CPU for one ~10 ms timer tick, then yield to any other
+ *         READY user proc.
+ *
+ * Syscall context runs with interrupts masked, so the timer alone doesn't
+ * preempt this proc into another one (see "Pipe busy-wait must yield" in
+ * user/shell/README.md). Without the explicit @c proc_schedule() call, a
+ * select/poll loop here would hog the CPU for the full timeout, and any
+ * child it's polling on (e.g. an ncurses app writing into the shell's
+ * relay pipe) would never run.
+ *
+ * Matches the pattern used by the keyboard wait loop in @c kbd_layout.c. */
 static void sel_hlt_slice(void)
 {
   cpu_enable_interrupts();
   __asm__ volatile("hlt");
   cpu_disable_interrupts();
+  proc_schedule();
 }
 
 /**
