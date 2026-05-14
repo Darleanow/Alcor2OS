@@ -112,13 +112,32 @@ u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 #define TCSETSW    0x5403
 #define TCSETSF    0x5404
 #define TIOCGWINSZ 0x5413
+#define TIOCSWINSZ 0x5414
 
 /**
- * @brief Handle emulated TTY ioctls for stdio fds and pipe ends.
+ * @brief Linux-compatible @c struct @c winsize layout for ioctl wire ABI.
+ */
+typedef struct
+{
+  u16 row, col, xpixel, ypixel;
+} k_winsize_t;
+
+/**
+ * @brief Current terminal grid, published by the shell's fb_tty on startup.
  *
- * Supports @c TIOCGWINSZ (returns 25×80), @c TCGETS, @c TCSETS, @c TCSETSW,
- * and @c TCSETSF against the per-process @c k_termios_t.  All other requests
- * return @c -ENOTTY.
+ * Children inherit it through @c TIOCGWINSZ so TUIs (ncurses, less, ...)
+ * lay out against the real on-screen rows/cols instead of a hardcoded
+ * default. The fallback below is only used before the shell has had a
+ * chance to publish.
+ */
+static k_winsize_t g_winsize = {25, 80, 0, 0};
+
+/**
+ * @brief Emulated TTY ioctls for stdio fds and pipe ends.
+ *
+ * Handles @c TIOCGWINSZ / @c TIOCSWINSZ against the shared ::g_winsize and
+ * @c TCGETS / @c TCSETS variants against the per-process @c k_termios_t.
+ * Any other request returns @c -ENOTTY.
  */
 static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
 {
@@ -126,16 +145,16 @@ static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
     return (u64)-EINVAL;
 
   switch(request) {
-  case TIOCGWINSZ: {
-    if(!user_rw_ok(arg, 8))
+  case TIOCGWINSZ:
+    if(!user_rw_ok(arg, sizeof(k_winsize_t)))
       return (u64)-EFAULT;
-    struct
-    {
-      u16 row, col, xpixel, ypixel;
-    } ws = {25, 80, 0, 0};
-    kmemcpy((void *)arg, &ws, sizeof(ws));
+    kmemcpy((void *)arg, &g_winsize, sizeof(g_winsize));
     return 0;
-  }
+  case TIOCSWINSZ:
+    if(!user_rw_ok(arg, sizeof(k_winsize_t)))
+      return (u64)-EFAULT;
+    kmemcpy(&g_winsize, (void *)arg, sizeof(g_winsize));
+    return 0;
   case TCGETS:
     if(!user_rw_ok(arg, sizeof(k_termios_t)))
       return (u64)-EFAULT;
