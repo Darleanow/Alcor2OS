@@ -220,9 +220,9 @@ static void
  */
 typedef struct
 {
-  unsigned remaining;   /**< Continuation bytes still expected (1..3). */
-  uint32_t codepoint;   /**< Partial codepoint accumulated so far. */
-  unsigned char raw[4]; /**< Bytes of the in-flight sequence, for display. */
+  unsigned      remaining; /**< Continuation bytes still expected (1..3). */
+  uint32_t      codepoint; /**< Partial codepoint accumulated so far. */
+  unsigned char raw[4];    /**< Bytes of the in-flight sequence, for display. */
   unsigned      n_raw;
 } utf8_acc_t;
 
@@ -411,9 +411,9 @@ int main(void)
   int cols;
   getmaxyx(stdscr, rows, cols);
 
-  WINDOW *hdr  = newwin(1, cols, 0, 0);
-  WINDOW *body = newwin(rows - 2, cols, 1, 0);
-  WINDOW *ftr  = newwin(1, cols, rows - 1, 0);
+  WINDOW  *hdr  = newwin(1, cols, 0, 0);
+  WINDOW  *body = newwin(rows - 2, cols, 1, 0);
+  WINDOW  *ftr  = newwin(1, cols, rows - 1, 0);
 
   screen_t cur = SCR_MENU;
   while(cur != SCR_QUIT) {

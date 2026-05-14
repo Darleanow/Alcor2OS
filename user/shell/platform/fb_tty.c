@@ -60,7 +60,8 @@ enum
   kAttrBlink     = 1u << 2,
 };
 
-/** @brief One grid position: codepoint, captured fg/bg, and SGR attribute bits. */
+/** @brief One grid position: codepoint, captured fg/bg, and SGR attribute bits.
+ */
 typedef struct
 {
   uint32_t cp;
@@ -80,26 +81,26 @@ static const unsigned s_feat_liga_n =
     (unsigned)(sizeof(s_feat_liga) / sizeof(s_feat_liga[0])
     ); // NOLINT(bugprone-sizeof-expression)
 
-static int       s_line_h, s_ascent_px, s_descent_px;
-static int       s_cell_w, s_cell_h;
-static int       s_term_cols, s_term_rows;
-static int       s_tc_x, s_tc_y;
+static int      s_line_h, s_ascent_px, s_descent_px;
+static int      s_cell_w, s_cell_h;
+static int      s_term_cols, s_term_rows;
+static int      s_tc_x, s_tc_y;
 
-static cell_t   *s_cells;
-static int       s_saved_cx, s_saved_cy;
+static cell_t  *s_cells;
+static int      s_saved_cx, s_saved_cy;
 
-static uint32_t  s_fg, s_bg;
-static uint32_t  s_term_fg, s_term_bg;
-static int       s_bold;
-static int       s_dim;
-static int       s_underline;
-static int       s_blink;
-static int       s_rev;
+static uint32_t s_fg, s_bg;
+static uint32_t s_term_fg, s_term_bg;
+static int      s_bold;
+static int      s_dim;
+static int      s_underline;
+static int      s_blink;
+static int      s_rev;
 
-static int       s_csr_visible;
-static int       s_blink_show_bar;
-static int       s_bar_on;
-static int       s_bar_cx, s_bar_cy;
+static int      s_csr_visible;
+static int      s_blink_show_bar;
+static int      s_bar_on;
+static int      s_bar_cx, s_bar_cy;
 
 /* Deferred reshape: bits set by mark_dirty(), flushed in flush_dirty_rows().
  * Two u64s cover up to 128 rows (enough for any framebuffer at this cell size).
@@ -111,9 +112,9 @@ static int      s_esc_len;
 static char     s_esc_buf[kEscMax];
 static unsigned s_utf8_rem;
 static uint32_t s_utf8_partial;
-static int      s_g0_acs;     /**< 1 when G0 is DEC Special Graphics (ESC(0). */
-static uint32_t s_last_cp;    /**< Last codepoint emitted, replayed by CSI REP. */
-static int      s_blink_phase;/**< 0: show blink cells; 1: hide them. */
+static int      s_g0_acs;  /**< 1 when G0 is DEC Special Graphics (ESC(0). */
+static uint32_t s_last_cp; /**< Last codepoint emitted, replayed by CSI REP. */
+static int      s_blink_phase; /**< 0: show blink cells; 1: hide them. */
 
 static uint32_t eff_fg_raw(void)
 {
@@ -311,7 +312,8 @@ static void term_clear_cell(int cx, int cy)
  * Accumulating raw advances across clusters would misplace glyphs relative
  * to the monospace grid.
  */
-static void draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, const cell_t *row)
+static void
+    draw_shaped_at_pen(int y_baseline, hb_buffer_t *buf, const cell_t *row)
 {
   unsigned             len;
   hb_glyph_info_t     *info = hb_buffer_get_glyph_infos(buf, &len);
@@ -386,7 +388,8 @@ static int box_stroke_px(int bold)
  * emits is covered; anything else falls through to the regular font path
  * the caller already invoked.
  */
-static void draw_box_primitive(int cx, int cy, uint32_t cp, uint32_t fg, int bold)
+static void
+    draw_box_primitive(int cx, int cy, uint32_t cp, uint32_t fg, int bold)
 {
   int x0  = cell_px_x(cx);
   int y0  = cell_px_y_top(cy);
@@ -578,7 +581,7 @@ static void redraw_line_shaped(int cy)
       x++;
       continue;
     }
-    int      x1 = x;
+    int x1 = x;
     while(x1 < cols && (row[x1].attrs & kAttrUnderline))
       x1++;
     int px0 = cell_px_x(x);
@@ -1204,34 +1207,62 @@ static void term_emit_cp(uint32_t cp)
 static uint32_t acs_to_unicode(uint8_t b)
 {
   switch(b) {
-  case '`': return 0x25C6u; /* ◆ */
-  case 'a': return 0x2592u; /* ▒ */
-  case 'f': return 0x00B0u; /* ° */
-  case 'g': return 0x00B1u; /* ± */
-  case 'h': return 0x2592u; /* ▒ (NL placeholder) */
-  case 'i': return 0x240Bu; /* VT symbol */
-  case 'j': return 0x2518u; /* ┘ */
-  case 'k': return 0x2510u; /* ┐ */
-  case 'l': return 0x250Cu; /* ┌ */
-  case 'm': return 0x2514u; /* └ */
-  case 'n': return 0x253Cu; /* ┼ */
-  case 'o': return 0x23BAu; /* scan 1 */
-  case 'p': return 0x23BBu; /* scan 3 */
-  case 'q': return 0x2500u; /* ─ */
-  case 'r': return 0x23BCu; /* scan 7 */
-  case 's': return 0x23BDu; /* scan 9 */
-  case 't': return 0x251Cu; /* ├ */
-  case 'u': return 0x2524u; /* ┤ */
-  case 'v': return 0x2534u; /* ┴ */
-  case 'w': return 0x252Cu; /* ┬ */
-  case 'x': return 0x2502u; /* │ */
-  case 'y': return 0x2264u; /* ≤ */
-  case 'z': return 0x2265u; /* ≥ */
-  case '{': return 0x03C0u; /* π */
-  case '|': return 0x2260u; /* ≠ */
-  case '}': return 0x00A3u; /* £ */
-  case '~': return 0x00B7u; /* · */
-  default:  return (uint32_t)b;
+  case '`':
+    return 0x25C6u; /* ◆ */
+  case 'a':
+    return 0x2592u; /* ▒ */
+  case 'f':
+    return 0x00B0u; /* ° */
+  case 'g':
+    return 0x00B1u; /* ± */
+  case 'h':
+    return 0x2592u; /* ▒ (NL placeholder) */
+  case 'i':
+    return 0x240Bu; /* VT symbol */
+  case 'j':
+    return 0x2518u; /* ┘ */
+  case 'k':
+    return 0x2510u; /* ┐ */
+  case 'l':
+    return 0x250Cu; /* ┌ */
+  case 'm':
+    return 0x2514u; /* └ */
+  case 'n':
+    return 0x253Cu; /* ┼ */
+  case 'o':
+    return 0x23BAu; /* scan 1 */
+  case 'p':
+    return 0x23BBu; /* scan 3 */
+  case 'q':
+    return 0x2500u; /* ─ */
+  case 'r':
+    return 0x23BCu; /* scan 7 */
+  case 's':
+    return 0x23BDu; /* scan 9 */
+  case 't':
+    return 0x251Cu; /* ├ */
+  case 'u':
+    return 0x2524u; /* ┤ */
+  case 'v':
+    return 0x2534u; /* ┴ */
+  case 'w':
+    return 0x252Cu; /* ┬ */
+  case 'x':
+    return 0x2502u; /* │ */
+  case 'y':
+    return 0x2264u; /* ≤ */
+  case 'z':
+    return 0x2265u; /* ≥ */
+  case '{':
+    return 0x03C0u; /* π */
+  case '|':
+    return 0x2260u; /* ≠ */
+  case '}':
+    return 0x00A3u; /* £ */
+  case '~':
+    return 0x00B7u; /* · */
+  default:
+    return (uint32_t)b;
   }
 }
 

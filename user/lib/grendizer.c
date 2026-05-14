@@ -215,7 +215,7 @@ static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
 {
-  const char *p   = text;
+  const char *p    = text;
   double      acc  = 0.0;
   double      frac = 0.0;
   int         sig  = 1;
@@ -733,9 +733,7 @@ static int gr__dispatch(
       return 0;
     }
     char empty[256] = {0};
-    return gr__help_walk(
-        prog, app, cmds, n, empty, argc - 1, argv + 1
-    );
+    return gr__help_walk(prog, app, cmds, n, empty, argc - 1, argv + 1);
   }
 
   cmd = gr__find_cmd(cmds, n, argv[0]);
