@@ -3,8 +3,8 @@
  * @brief vega top-level: lex → parse → execute → free.
  */
 
-#include <vega/internal/exec.h>
 #include <vega/ast.h>
+#include <vega/internal/exec.h>
 #include <vega/parse.h>
 #include <vega/vega.h>
 

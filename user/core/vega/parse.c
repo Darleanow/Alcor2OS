@@ -29,10 +29,10 @@
  * identifiers and can be passed as arguments.
  */
 
-#include <vega/internal/lexer.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vega/host.h>
+#include <vega/internal/lexer.h>
 #include <vega/parse.h>
 
 static void diag_unexpected(tok_kind_t k)

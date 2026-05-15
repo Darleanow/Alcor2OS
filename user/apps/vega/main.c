@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
   const char *code    = NULL;
   int         version = 0;
 
-  gr_opt opts[] = {
+  gr_opt      opts[] = {
       GR_STR('c', "code", &code, "CODE", "evaluate CODE and exit"),
       GR_FLAG('v', "version", &version, "print version and exit"),
       GR_END,
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   gr_rest rest;
   char    errbuf[128];
 
-  int rc = gr_parse(&spec, argc, argv, &rest, errbuf, sizeof errbuf);
+  int     rc = gr_parse(&spec, argc, argv, &rest, errbuf, sizeof errbuf);
   if(rc == GR_HELP)
     return 0;
   if(rc == GR_ERR) {

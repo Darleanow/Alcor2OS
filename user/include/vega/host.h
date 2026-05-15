@@ -23,7 +23,6 @@
 /** Cap on path-string buffers used inside libvega (cwd, redir targets, …). */
 #define MAX_PATH 256
 
-
 /* I/O */
 void sh_putchar(char c);
 void sh_puts(const char *s);

@@ -3,9 +3,9 @@
  * @brief vega tokenizer implementation.
  */
 
-#include <vega/internal/lexer.h>
 #include <stdlib.h>
 #include <vega/host.h>
+#include <vega/internal/lexer.h>
 
 static int is_hspace(char c)
 {

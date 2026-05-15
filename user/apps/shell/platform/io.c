@@ -3,9 +3,9 @@
  * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
-#include <string.h>
 #include <shell/fb_tty.h>
 #include <shell/shell.h>
+#include <string.h>
 #include <sys/select.h>
 #include <unistd.h>
 
