@@ -3,8 +3,8 @@
  * @brief Small string helpers for the shell
  */
 
-#include <stddef.h>
 #include <shell/shell.h>
+#include <stddef.h>
 
 /**
  * @brief Calculate string length

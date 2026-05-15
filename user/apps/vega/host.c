@@ -180,10 +180,6 @@ bool sh_fb_tty_active(void)
   return false;
 }
 
-void sh_fb_tty_on_fork_child(void)
-{
-}
+void sh_fb_tty_on_fork_child(void) {}
 
-void sh_fb_tty_blink_tick(void)
-{
-}
+void sh_fb_tty_blink_tick(void) {}

@@ -22,9 +22,9 @@ static int run_string(const char *src)
 
 static char *slurp(int fd, size_t *out_len)
 {
-  size_t cap  = 4096;
-  size_t len  = 0;
-  char  *buf  = (char *)malloc(cap);
+  size_t cap = 4096;
+  size_t len = 0;
+  char  *buf = (char *)malloc(cap);
   if(!buf)
     return NULL;
   for(;;) {
@@ -72,11 +72,12 @@ static int run_file(const char *path)
 
 static void usage(void)
 {
-  fprintf(stderr,
-          "usage: vega [-c CODE | SCRIPT]\n"
-          "  -c CODE    evaluate CODE and exit\n"
-          "  SCRIPT     run script file\n"
-          "  (no args)  read program from stdin\n");
+  fprintf(
+      stderr, "usage: vega [-c CODE | SCRIPT]\n"
+              "  -c CODE    evaluate CODE and exit\n"
+              "  SCRIPT     run script file\n"
+              "  (no args)  read program from stdin\n"
+  );
 }
 
 int main(int argc, char *argv[])

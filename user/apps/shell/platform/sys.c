@@ -6,14 +6,14 @@
 
 #include <dirent.h>
 #include <fcntl.h>
+#include <shell/fb_tty.h>
+#include <shell/shell.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
-#include <shell/fb_tty.h>
-#include <shell/shell.h>
 
 /** Process Control */
 

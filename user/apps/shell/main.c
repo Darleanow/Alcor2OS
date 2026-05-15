@@ -3,11 +3,11 @@
  * @brief vega REPL: read a line, hand it to vega_run().
  */
 
+#include <shell/fb_tty.h>
+#include <shell/shell.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <shell/fb_tty.h>
-#include <shell/shell.h>
 #include <vega/vega.h>
 
 #ifndef VEGA_VERSION

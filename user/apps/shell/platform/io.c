@@ -3,10 +3,10 @@
  * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
-#include <sys/select.h>
-#include <unistd.h>
 #include <shell/fb_tty.h>
 #include <shell/shell.h>
+#include <sys/select.h>
+#include <unistd.h>
 
 /**
  * @brief Write a single character to stdout
