@@ -110,10 +110,21 @@ void cpu_enable_sse(void)
   /* Read CR4 */
   __asm__ volatile("mov %%cr4, %0" : "=r"(cr4));
 
-  /* Set OSFXSR (bit 9) - enable SSE instructions */
-  /* Set OSXMMEXCPT (bit 10) - enable SSE exceptions */
+  /* Check CPU features */
+  u32 ecx1 = 0, ebx7 = 0, unused;
+  __asm__ volatile("cpuid"
+                   : "=a"(unused), "=b"(unused), "=c"(ecx1), "=d"(unused)
+                   : "a"(1), "c"(0));
+  __asm__ volatile("cpuid"
+                   : "=a"(unused), "=b"(ebx7), "=c"(unused), "=d"(unused)
+                   : "a"(7), "c"(0));
+
   cr4 |= (1UL << 9);  /* OSFXSR */
   cr4 |= (1UL << 10); /* OSXMMEXCPT */
+  if(ebx7 & (1UL << 0))
+    cr4 |= (1UL << 16); /* FSGSBASE */
+  if(ecx1 & (1UL << 26))
+    cr4 |= (1UL << 18); /* OSXSAVE */
 
   /* Write CR4 */
   __asm__ volatile("mov %0, %%cr4" ::"r"(cr4));
@@ -121,5 +132,16 @@ void cpu_enable_sse(void)
   /* Initialize FPU */
   __asm__ volatile("fninit");
 
-  console_print("[CPU] SSE/FPU enabled\n");
+  if(ecx1 & (1UL << 26)) {
+    u64 xcr0 = (1UL << 0) | (1UL << 1); /* x87 + SSE */
+    if(ecx1 & (1UL << 28))
+      xcr0 |= (1UL << 2); /* AVX */
+    __asm__ volatile("xsetbv" ::"a"((u32)xcr0), "d"((u32)(xcr0 >> 32)), "c"(0));
+  }
+
+  /* Capture a known-good FPU state to copy into each fresh proc on alloc. */
+  extern void proc_capture_default_fpu(void);
+  proc_capture_default_fpu();
+
+  console_print("[CPU] SSE/AVX/FPU enabled\n");
 }

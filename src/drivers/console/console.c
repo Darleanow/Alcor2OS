@@ -12,29 +12,33 @@
 #include <alcor2/types.h>
 #include <stdarg.h>
 
-#define FONT_W 8
-#define FONT_H 16
+#define FONT_W      8
+#define FONT_H      16
 
 #define ESC_BUF_MAX 64
 
 static struct
 {
   volatile u8 *base;
-  u64           width;
-  u64           height;
-  u64           pitch_bytes;
-  u8            bytes_pp;
-  u32           fg;
-  u32           bg;
-  u32           cursor_x;
-  u32           cursor_y;
-  int           esc_state;
-  char          esc_buf[ESC_BUF_MAX];
-  int           esc_len;
-  int           cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
+  u64          width;
+  u64          height;
+  u64          pitch_bytes;
+  u8           bytes_pp;
+  u32          fg;
+  u32          bg;
+  u32          cursor_x;
+  u32          cursor_y;
+  int          esc_state;
+  char         esc_buf[ESC_BUF_MAX];
+  int          esc_len;
+  int cp437_mode; /**< 0: ISO Latin-1 atlas, 1: CP437 / VGA box glyphs. */
+  int utf8_rem;   /**< 0 = idle; else continuation bytes left for current UTF-8
+                     char. */
+  u32 utf8_partial;
 } ctx;
 
-/** Match first three bytes of a little-endian u32 color (same as old u32 store on 32 bpp). */
+/** Match first three bytes of a little-endian u32 color (same as old u32 store
+ * on 32 bpp). */
 static void fb_store24(volatile u8 *p, u32 c)
 {
   p[0] = (u8)(c & 0xffu);
@@ -44,25 +48,23 @@ static void fb_store24(volatile u8 *p, u32 c)
 
 static void fb_store16(volatile u8 *p, u32 c)
 {
-  u32 r         = (c >> 16) & 0xffu;
-  u32 g         = (c >> 8) & 0xffu;
-  u32 bo        = c & 0xffu;
-  u16 rgb565 =
-    (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (bo >> 3));
-  p[0]          = (u8)(rgb565 & 0xffu);
-  p[1]          = (u8)(rgb565 >> 8);
+  u32 r      = (c >> 16) & 0xffu;
+  u32 g      = (c >> 8) & 0xffu;
+  u32 bo     = c & 0xffu;
+  u16 rgb565 = (u16)(((r >> 3) << 11) | ((g >> 2) << 5) | (bo >> 3));
+  p[0]       = (u8)(rgb565 & 0xffu);
+  p[1]       = (u8)(rgb565 >> 8);
 }
 
 static void fb_put_pixel(u32 x, u32 y, u32 color)
 {
   if(x >= ctx.width || y >= ctx.height)
     return;
-  volatile u8 *p =
-    ctx.base + (u64)y * ctx.pitch_bytes + (u64)x * ctx.bytes_pp;
+  volatile u8 *p = ctx.base + (u64)y * ctx.pitch_bytes + (u64)x * ctx.bytes_pp;
 
   switch(ctx.bytes_pp) {
   case 4:
-    *(volatile u32 *)p = color;
+    *(volatile u32 *)p = color | 0xFF000000u;
     return;
   case 3:
     fb_store24(p, color);
@@ -96,30 +98,32 @@ static u8 bytes_pp_from_bpp(u16 bpp)
 
 void console_init(void *fb, u64 width, u64 height, u64 pitch_bytes, u16 bpp)
 {
-  ctx.base        = (volatile u8 *)fb;
-  ctx.width       = width;
-  ctx.height      = height;
-  ctx.pitch_bytes = pitch_bytes;
-  ctx.bytes_pp    = bytes_pp_from_bpp(bpp);
-  ctx.cursor_x    = 0;
-  ctx.cursor_y    = 0;
-  ctx.fg          = 0xFFFFFF;
-  ctx.bg          = 0x000000;
-  ctx.esc_state   = 0;
-  ctx.esc_len     = 0;
-  ctx.cp437_mode  = 0;
+  ctx.base         = (volatile u8 *)fb;
+  ctx.width        = width;
+  ctx.height       = height;
+  ctx.pitch_bytes  = pitch_bytes;
+  ctx.bytes_pp     = bytes_pp_from_bpp(bpp);
+  ctx.cursor_x     = 0;
+  ctx.cursor_y     = 0;
+  ctx.fg           = 0xFFFFFFFF;
+  ctx.bg           = 0xFF000000;
+  ctx.esc_state    = 0;
+  ctx.esc_len      = 0;
+  ctx.cp437_mode   = 0;
+  ctx.utf8_rem     = 0;
+  ctx.utf8_partial = 0;
 }
 
 void console_set_theme(console_theme_t theme)
 {
-  ctx.fg = theme.foreground;
-  ctx.bg = theme.background;
+  ctx.fg = theme.foreground | 0xFF000000u;
+  ctx.bg = theme.background | 0xFF000000u;
 }
 
 static void fb_clear_rectangle(u64 y0, u64 y1)
 {
   if(ctx.bytes_pp == 4) {
-    volatile u32 *row32 = (volatile u32 *)ctx.base;
+    volatile u32 *row32  = (volatile u32 *)ctx.base;
     u64           pu     = ctx.pitch_bytes / 4ull;
     u64           pairs  = ctx.width / 2;
     u64           bgpair = ((u64)ctx.bg << 32) | ctx.bg;
@@ -141,14 +145,16 @@ static void fb_clear_rectangle(u64 y0, u64 y1)
 void console_clear(void)
 {
   fb_clear_rectangle(0, ctx.height);
-  ctx.cursor_x = 0;
-  ctx.cursor_y = 0;
+  ctx.cursor_x     = 0;
+  ctx.cursor_y     = 0;
+  ctx.utf8_rem     = 0;
+  ctx.utf8_partial = 0;
 }
 
 /** MSB is left pixel (classic PC font / font_bitmap.h). */
 static void draw_glyph(char c, u32 px, u32 py)
 {
-  u8 uc = (u8)c;
+  u8  uc = (u8)c;
   int gi = font_glyph_index(uc);
   if(gi < 0)
     gi = font_glyph_index((unsigned char)'?');
@@ -167,18 +173,177 @@ static void draw_glyph(char c, u32 px, u32 py)
   }
 }
 
+static void scroll(void);
+
+static void cup_apply_csi(void)
+{
+  int row = 1, col = 1;
+  int plen = ctx.esc_len - 1;
+
+  if(plen > 0) {
+    int i     = 0;
+    int r     = 0;
+    int has_r = 0;
+    while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
+      r = r * 10 + (int)(ctx.esc_buf[i] - '0');
+      i++;
+      has_r = 1;
+    }
+    if(has_r)
+      row = r;
+    if(i < plen && ctx.esc_buf[i] == ';') {
+      i++;
+      int c     = 0;
+      int has_c = 0;
+      while(i < plen && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
+        c = c * 10 + (int)(ctx.esc_buf[i] - '0');
+        i++;
+        has_c = 1;
+      }
+      if(has_c)
+        col = c;
+    } else if(has_r)
+      col = 1;
+  }
+
+  u32 max_r = ctx.height / FONT_H;
+  u32 max_c = ctx.width / FONT_W;
+  if(max_r < 1)
+    max_r = 1;
+  if(max_c < 1)
+    max_c = 1;
+  if(row < 1)
+    row = 1;
+  if(col < 1)
+    col = 1;
+  if((u32)row > max_r)
+    row = (int)max_r;
+  if((u32)col > max_c)
+    col = (int)max_c;
+
+  ctx.cursor_y = (u32)(row - 1) * FONT_H;
+  ctx.cursor_x = (u32)(col - 1) * FONT_W;
+}
+
+/** Leading unsigned for CSI like [5A — default 1 when absent or 0. */
+static int csi_leading_param_default_1(void)
+{
+  int plen = ctx.esc_len - 1;
+  if(plen <= 0)
+    return 1;
+  int v = 0;
+  for(int i = 0; i < plen; i++) {
+    if(ctx.esc_buf[i] < '0' || ctx.esc_buf[i] > '9')
+      return 1;
+    v = v * 10 + (int)(ctx.esc_buf[i] - '0');
+    if(v > 4096)
+      return 4096;
+  }
+  return (v < 1) ? 1 : v;
+}
+
+static void emit_cell(unsigned char ub)
+{
+  char c = (char)ub;
+
+  switch(c) {
+  case '\n':
+    ctx.cursor_x = 0;
+    ctx.cursor_y += FONT_H;
+    break;
+  case '\r':
+    ctx.cursor_x = 0;
+    break;
+  case '\t':
+    ctx.cursor_x = (ctx.cursor_x + 32u) & ~31u;
+    break;
+  case '\b':
+    if(ctx.cursor_x >= FONT_W) {
+      ctx.cursor_x -= FONT_W;
+      for(int row = 0; row < FONT_H; row++)
+        for(int col = 0; col < FONT_W; col++)
+          fb_put_pixel(
+              ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row, ctx.bg
+          );
+    }
+    break;
+  default:
+    draw_glyph(c, ctx.cursor_x, ctx.cursor_y);
+    ctx.cursor_x += FONT_W;
+    break;
+  }
+
+  if(ctx.cursor_x + FONT_W > ctx.width) {
+    ctx.cursor_x = 0;
+    ctx.cursor_y += FONT_H;
+  }
+
+  if(ctx.cursor_y + FONT_H > ctx.height) {
+    scroll();
+    ctx.cursor_y -= FONT_H;
+  }
+}
+
+static void utf8_feed(u8 b)
+{
+  if(ctx.utf8_rem == 0) {
+    if(b < 0x80u) {
+      emit_cell(b);
+      return;
+    }
+    if((b & 0xe0u) == 0xc0u) {
+      ctx.utf8_partial = (u32)(b & 0x1fu);
+      ctx.utf8_rem     = 1;
+      return;
+    }
+    if((b & 0xf0u) == 0xe0u) {
+      ctx.utf8_partial = (u32)(b & 0x0fu);
+      ctx.utf8_rem     = 2;
+      return;
+    }
+    if((b & 0xf8u) == 0xf0u) {
+      ctx.utf8_partial = (u32)(b & 0x07u);
+      ctx.utf8_rem     = 3;
+      return;
+    }
+    emit_cell((unsigned char)'?');
+    return;
+  }
+
+  if((b & 0xc0u) != 0x80u) {
+    ctx.utf8_rem = 0;
+    emit_cell((unsigned char)'?');
+    utf8_feed(b);
+    return;
+  }
+
+  ctx.utf8_partial = (ctx.utf8_partial << 6u) | (u32)(b & 0x3fu);
+  ctx.utf8_rem--;
+  if(ctx.utf8_rem != 0)
+    return;
+
+  u32 cp       = ctx.utf8_partial;
+  ctx.utf8_rem = 0;
+  if(cp <= 0xffu)
+    emit_cell((unsigned char)cp);
+  else
+    emit_cell((unsigned char)'?');
+}
+
 static void scroll(void)
 {
   u64 span = ctx.height - (u64)FONT_H;
 
   if(ctx.bytes_pp == 4) {
-    volatile u32 *buf = (volatile u32 *)ctx.base;
-    u64             pu = ctx.pitch_bytes / 4ull;
-    u64             rowcopy = ctx.width * sizeof(u32);
+    volatile u32 *buf     = (volatile u32 *)ctx.base;
+    u64           pu      = ctx.pitch_bytes / 4ull;
+    u64           rowcopy = ctx.width * sizeof(u32);
 
     for(u64 y = 0; y < span; y++)
-      kmemcpy((void *)&buf[y * pu], (void const *)&buf[(y + (u64)FONT_H) * pu],
-             rowcopy);
+      kmemcpy(
+          (void *)&buf[y * pu], (const void *)&buf[(y + (u64)FONT_H) * pu],
+          rowcopy
+      );
     fb_clear_rectangle(span, ctx.height);
     return;
   }
@@ -186,9 +351,8 @@ static void scroll(void)
   u64 row_px = ctx.width * ctx.bytes_pp;
   for(u64 y = 0; y < span; y++) {
     volatile u8       *dst = ctx.base + y * ctx.pitch_bytes;
-    const volatile u8 *src =
-      ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
-    kmemcpy((void *)dst, (void const *)src, row_px);
+    const volatile u8 *src = ctx.base + (y + (u64)FONT_H) * ctx.pitch_bytes;
+    kmemcpy((void *)dst, (const void *)src, row_px);
   }
   fb_clear_rectangle(span, ctx.height);
 }
@@ -197,19 +361,19 @@ static void scroll(void)
 static u32 ansi256_to_rgb(unsigned idx)
 {
   static const u32 ansi16_col[16] = {
-    0x000000ul, 0xAA0000ul, 0x00AA00ul, 0xAA5500ul, 0x0000AAul, 0xAA00AAul,
-    0x00AAAAul, 0xAAAAAAul, 0x555555ul, 0xFF5555ul, 0x55FF55ul, 0xFFFF55ul,
-    0x5555FFul, 0xFF55FFul, 0x55FFFFul, 0xFFFFFFul,
+      0x000000ul, 0xAA0000ul, 0x00AA00ul, 0xAA5500ul, 0x0000AAul, 0xAA00AAul,
+      0x00AAAAul, 0xAAAAAAul, 0x555555ul, 0xFF5555ul, 0x55FF55ul, 0xFFFF55ul,
+      0x5555FFul, 0xFF55FFul, 0x55FFFFul, 0xFFFFFFul,
   };
 
   if(idx < 16u)
     return ansi16_col[idx];
   if(idx < 232u) {
-    unsigned i   = idx - 16u;
-    unsigned r6  = i / 36u;
-    unsigned rem = i % 36u;
-    unsigned g6  = rem / 6u;
-    unsigned b6  = rem % 6u;
+    unsigned i     = idx - 16u;
+    unsigned r6    = i / 36u;
+    unsigned rem   = i % 36u;
+    unsigned g6    = rem / 6u;
+    unsigned b6    = rem % 6u;
     u32      rchan = (r6 == 0u) ? 0u : (55u + 40u * (r6 - 1u));
     u32      gchan = (g6 == 0u) ? 0u : (55u + 40u * (g6 - 1u));
     u32      bchan = (b6 == 0u) ? 0u : (55u + 40u * (b6 - 1u));
@@ -300,14 +464,50 @@ static void handle_ansi_sequence(void)
 
   char cmd = ctx.esc_buf[ctx.esc_len - 1];
 
+  /* DEC private CSI (leading ?): cursor visibility, alt screen, mouse, … */
+  if((cmd == 'h' || cmd == 'l') && ctx.esc_len >= 2 && ctx.esc_buf[0] == '?')
+    return;
+
   switch(cmd) {
+  case 'A': {
+    int n  = csi_leading_param_default_1();
+    u64 dy = (u64)n * FONT_H;
+    if(ctx.cursor_y >= dy)
+      ctx.cursor_y = (u32)(ctx.cursor_y - dy);
+    else
+      ctx.cursor_y = 0;
+    break;
+  }
+  case 'B': {
+    int n        = csi_leading_param_default_1();
+    u64 max_y    = ctx.height - FONT_H;
+    u64 new_y    = (u64)ctx.cursor_y + (u64)n * FONT_H;
+    ctx.cursor_y = new_y > max_y ? (u32)max_y : (u32)new_y;
+    break;
+  }
+  case 'C': {
+    int n        = csi_leading_param_default_1();
+    u64 max_x    = ctx.width - FONT_W;
+    u64 new_x    = (u64)ctx.cursor_x + (u64)n * FONT_W;
+    ctx.cursor_x = new_x > max_x ? (u32)max_x : (u32)new_x;
+    break;
+  }
+  case 'D': {
+    int n  = csi_leading_param_default_1();
+    u32 dx = (u32)n * FONT_W;
+    if(ctx.cursor_x >= dx)
+      ctx.cursor_x -= dx;
+    else
+      ctx.cursor_x = 0;
+    break;
+  }
+  case 'H':
+  case 'f':
+    cup_apply_csi();
+    break;
   case 'J':
     if(ctx.esc_len >= 2 && ctx.esc_buf[0] == '2')
       console_clear();
-    break;
-  case 'H':
-    ctx.cursor_x = 0;
-    ctx.cursor_y = 0;
     break;
   case 'K':
     for(u32 x = ctx.cursor_x; x < ctx.width; x++) {
@@ -325,6 +525,8 @@ static void handle_ansi_sequence(void)
 
 void console_putchar(char c)
 {
+  u8 b = (u8)c;
+
   if(ctx.esc_state == 1) {
     if(c == '[') {
       ctx.esc_state = 2;
@@ -333,7 +535,7 @@ void console_putchar(char c)
     }
     ctx.esc_state = 0;
   } else if(ctx.esc_state == 2) {
-    if((c >= '0' && c <= '9') || c == ';') {
+    if((c >= '0' && c <= '9') || c == ';' || c == '?') {
       if(ctx.esc_len < ESC_BUF_MAX - 1)
         ctx.esc_buf[ctx.esc_len++] = c;
       return;
@@ -346,43 +548,11 @@ void console_putchar(char c)
 
   if(c == '\033') {
     ctx.esc_state = 1;
+    ctx.utf8_rem  = 0;
     return;
   }
 
-  switch(c) {
-  case '\n':
-    ctx.cursor_x = 0;
-    ctx.cursor_y += FONT_H;
-    break;
-  case '\r':
-    ctx.cursor_x = 0;
-    break;
-  case '\t':
-    ctx.cursor_x = (ctx.cursor_x + 32u) & ~31u;
-    break;
-  case '\b':
-    if(ctx.cursor_x >= FONT_W) {
-      ctx.cursor_x -= FONT_W;
-      for(int row = 0; row < FONT_H; row++)
-        for(int col = 0; col < FONT_W; col++)
-          fb_put_pixel(ctx.cursor_x + (u32)col, ctx.cursor_y + (u32)row,
-                       ctx.bg);
-    }
-    break;
-  default:
-    draw_glyph(c, ctx.cursor_x, ctx.cursor_y);
-    ctx.cursor_x += FONT_W;
-  }
-
-  if(ctx.cursor_x + FONT_W > ctx.width) {
-    ctx.cursor_x = 0;
-    ctx.cursor_y += FONT_H;
-  }
-
-  if(ctx.cursor_y + FONT_H > ctx.height) {
-    scroll();
-    ctx.cursor_y -= FONT_H;
-  }
+  utf8_feed(b);
 }
 
 void console_print(const char *s)
@@ -416,6 +586,25 @@ static void print_int(int n)
   }
 }
 
+static void print_uint(u64 n)
+{
+  char buf[32];
+  int  i = 0;
+
+  if(n == 0) {
+    console_putchar('0');
+    return;
+  }
+
+  while(n > 0) {
+    buf[i++] = (char)('0' + (n % 10));
+    n /= 10;
+  }
+
+  while(--i >= 0)
+    console_putchar(buf[i]);
+}
+
 static void print_hex(u64 n)
 {
   static const char hex[] = "0123456789abcdef";
@@ -432,22 +621,24 @@ void console_printf(const char *fmt, ...)
   while(*fmt) {
     if(*fmt == '%' && *(fmt + 1)) {
       fmt++;
+      if(*fmt == 'l')
+        fmt++;
+
       switch(*fmt) {
       case 'd':
-        print_int(va_arg(args, int)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_int(va_arg(args, int));
+        break;
+      case 'u':
+        print_uint((u64)va_arg(args, unsigned int));
         break;
       case 'x':
-        print_hex(va_arg(args, u64)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        print_hex(va_arg(args, u64));
         break;
       case 's':
-        console_print(va_arg(args, const char *)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        console_print(va_arg(args, const char *));
         break;
       case 'c':
-        console_putchar((char)va_arg(args, int)
-        ); // NOLINT(clang-analyzer-valist.Uninitialized)
+        console_putchar((char)va_arg(args, int));
         break;
       case '%':
         console_putchar('%');

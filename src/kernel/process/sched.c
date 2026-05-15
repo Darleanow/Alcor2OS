@@ -3,10 +3,10 @@
  * @brief Round-robin preemptive scheduler.
  */
 
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
-#include <alcor2/mm/heap.h>
+#include <alcor2/drivers/console.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/proc/sched.h>
 
 /** @brief Circular doubly-linked task list. */

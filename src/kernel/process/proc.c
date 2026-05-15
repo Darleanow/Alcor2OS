@@ -3,20 +3,28 @@
  * @brief Process management with per-process kernel stacks.
  */
 
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
-#include <alcor2/proc/elf.h>
-#include <alcor2/errno.h>
 #include <alcor2/arch/gdt.h>
-#include <alcor2/mm/heap.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/errno.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/ktermios.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
+#include <alcor2/mm/vmm.h>
+#include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
-#include <alcor2/fs/vfs.h>
-#include <alcor2/mm/vmm.h>
+
+/** @brief POSIX @c clone flag: parent blocks until child @c execve or @c _exit.
+ * musl @c posix_spawn relies on this so the parent does not run concurrently
+ * with the child in the critical region before exec (avoids pipe sync
+ * deadlocks).
+ */
+#define ALCOR_CLONE_VFORK 0x00004000u
 
 static proc_t  proc_table[PROC_MAX];
 static proc_t *current_proc = NULL;
@@ -39,8 +47,6 @@ void proc_init(void)
     proc_table[i].state = PROC_STATE_FREE;
     proc_table[i].pid   = 0;
   }
-
-  console_print("[PROC] Process subsystem initialized\n");
 }
 
 /**
@@ -50,6 +56,31 @@ void proc_init(void)
 proc_t *proc_current(void)
 {
   return current_proc;
+}
+
+/**
+ * @brief FXSAVE area filled at boot after FPU init — baseline for future
+ *        per-process FPU on fork/switch (see cpu_enable_sse).
+ */
+static u8 g_default_fpu_state[512] __attribute__((aligned(16)));
+
+void      proc_capture_default_fpu(void)
+{
+  __asm__ volatile("fxsave (%0)" ::"r"(g_default_fpu_state) : "memory");
+}
+
+/**
+ * @brief Map a live proc_t* to its fixed slot in proc_table.
+ */
+int proc_table_index(const proc_t *p)
+{
+  if(!p)
+    return -1;
+  for(unsigned i = 0; i < PROC_MAX; i++) {
+    if(&proc_table[i] == p)
+      return (int)i;
+  }
+  return -1;
 }
 
 /**
@@ -75,6 +106,12 @@ static proc_t *proc_alloc(void)
 {
   for(int i = 0; i < PROC_MAX; i++) {
     if(proc_table[i].state == PROC_STATE_FREE) {
+      vfs_proc_init_fds(proc_table[i].fds);
+      kzero(proc_table[i].fd_cloexec, sizeof(proc_table[i].fd_cloexec));
+      kstrncpy(proc_table[i].cwd, "/", 2);
+      ktermios_init_default(&proc_table[i].termios);
+      proc_table[i].kbd_edit_len  = 0;
+      proc_table[i].kbd_ready_len = 0;
       return &proc_table[i];
     }
   }
@@ -122,52 +159,29 @@ static u64 push_string(u64 sp, const char *str)
  * @param argv     Null-terminated argument array.
  * @return PID of the new process, or 0 on failure.
  */
-u64 proc_create(
-    const char  *name,
-    const void  *elf_data,
-    u64          elf_size,
-    i64          elf_fd,
-    char *const  argv[]
+/* Allocate a user stack and load an ELF into @p p's address space, then
+ * build the System V AMD64 startup stack (argc / argv / envp / auxv) and
+ * populate p->user_*, p->program_break, p->heap_break, p->mmap_base.
+ *
+ * Caller invariant: @p p->cr3 is allocated and (for execve) the user-space
+ * portion has already been cleared.
+ *
+ * Returns 0 on success, -errno on failure with no partial state left in @p p
+ * other than possibly-mapped stack pages (the caller decides how to recover).
+ */
+static int proc_setup_image(
+    proc_t *p, const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
+    char *const argv[], char *const envp[]
 )
 {
-  proc_t *p = proc_alloc();
-  if(!p) {
-    console_print("[PROC] No free process slots\n");
-    return 0;
-  }
-
-  /* Create new address space for this process */
-  p->cr3 = vmm_create_address_space();
-  if(!p->cr3) {
-    console_print("[PROC] Failed to create address space\n");
-    return 0;
-  }
-
-  /* Allocate kernel stack */
-  p->kernel_stack = kmalloc(PROC_KERNEL_STACK);
-  if(!p->kernel_stack) {
-    console_print("[PROC] Failed to allocate kernel stack\n");
-    return 0;
-  }
-  p->kernel_stack_top = (void *)((u64)p->kernel_stack + PROC_KERNEL_STACK);
-
-  /* Allocate user stack */
-  /* Allocate one extra page to cover the stack_top address itself */
   u64   stack_pages     = (PROC_USER_STACK / 4096) + 1;
   void *user_stack_phys = pmm_alloc_pages(stack_pages);
-  if(!user_stack_phys) {
-    kfree(p->kernel_stack);
-    vmm_destroy_user_mappings(p->cr3);
-    console_print("[PROC] Failed to allocate user stack\n");
-    return 0;
-  }
+  if(!user_stack_phys)
+    return -ENOMEM;
 
-  /* User stack at fixed address (each process has own address space now) */
   u64 user_stack_base = USER_STACK_BASE;
   u64 stack_top       = USER_STACK_TOP;
 
-  /* Map user stack in process's address space (including the page at stack_top)
-   */
   for(u64 off = 0; off < stack_pages * 4096; off += 4096) {
     vmm_map_in(
         p->cr3, user_stack_base + off, (u64)user_stack_phys + off,
@@ -177,24 +191,15 @@ u64 proc_create(
   p->user_stack     = (void *)user_stack_base;
   p->user_stack_top = (void *)stack_top;
 
-  /* Load ELF into process's address space */
-  /* Temporarily switch to process's address space to load ELF */
   u64 old_cr3 = vmm_get_current_pml4();
   vmm_switch(p->cr3);
 
   elf_info_t elf_info;
-  int        elf_result;
-  if(elf_fd >= 0)
-    elf_result = elf_load_fd(elf_fd, &elf_info);
-  else
-    elf_result = elf_load(elf_data, elf_size, &elf_info);
-
+  int        elf_result = (elf_fd >= 0) ? elf_load_fd(elf_fd, &elf_info)
+                                        : elf_load(elf_data, elf_size, &elf_info);
   if(elf_result != 0) {
     vmm_switch(old_cr3);
-    kfree(p->kernel_stack);
-    vmm_destroy_user_mappings(p->cr3);
-    console_print("[PROC] Failed to load ELF\n");
-    return 0;
+    return -ENOEXEC;
   }
 
   /**
@@ -225,10 +230,11 @@ u64 proc_create(
    *
    * We push from stack_top downward, so the LAST push ends up at the
    * LOWEST address (= sp).  Order of pushes:
-   *   1. argv strings  (highest)
-   *   2. auxv terminator AT_NULL (val then type — struct layout: type@low, val@high)
+   *   1. argv strings, then env strings  (highest)
+   *   2. auxv terminator AT_NULL (val then type — struct layout: type@low,
+   * val@high)
    *   3. other auxv entries (AT_PHDR last pushed = lowest among auxv)
-   *   4. envp NULL
+   *   4. envp NULL + envp pointers (if any)
    *   5. argv NULL terminator
    *   6. argv pointers  (argv[0] last pushed = just above argc)
    *   7. argc           (lowest address = final sp)
@@ -247,9 +253,12 @@ u64 proc_create(
 
   /* Each PUSH_AUX stores: val at higher address, type at lower address,
    * so reading as Elf64_auxv_t {u64 type; u64 val} gives the right layout. */
-#define PUSH_AUX(type, val) do { \
-    sp -= 8; *(u64 *)sp = (u64)(val);  \
-    sp -= 8; *(u64 *)sp = (u64)(type); \
+#define PUSH_AUX(type, val)                                                    \
+  do {                                                                         \
+    sp -= 8;                                                                   \
+    *(u64 *)sp = (u64)(val);                                                   \
+    sp -= 8;                                                                   \
+    *(u64 *)sp = (u64)(type);                                                  \
   } while(0)
 
   u64 sp = stack_top;
@@ -257,14 +266,14 @@ u64 proc_create(
   /* Count arguments */
   int argc = 0;
   if(argv) {
-    while(argv[argc])
+    while(argc < PROC_MAX_ARGV && argv[argc])
       argc++;
   }
   if(argc == 0)
     argc = 1; /* will synthesise argv[0] = name below */
 
   /* 1. Push argv strings (highest addresses) */
-  u64 arg_ptrs[32];
+  u64 arg_ptrs[PROC_MAX_ARGV];
   if(argv && argv[0]) {
     for(int i = argc - 1; i >= 0; i--) {
       sp          = push_string(sp, argv[i]);
@@ -275,6 +284,17 @@ u64 proc_create(
     arg_ptrs[0] = sp;
   }
 
+  /* 1b. env strings (name=value), below argv strings on the stack */
+  int envc = 0;
+  u64 env_ptrs[PROC_MAX_ARGV];
+  if(envp) {
+    while(envc < PROC_MAX_ARGV && envp[envc]) {
+      sp             = push_string(sp, envp[envc]);
+      env_ptrs[envc] = sp;
+      envc++;
+    }
+  }
+
   /* Align to 16 bytes before the pointer/auxv area */
   sp &= ALIGN_16_MASK;
 
@@ -282,21 +302,25 @@ u64 proc_create(
   PUSH_AUX(AT_NULL_V, 0);
 
   /* 3. auxv entries (last pushed = lowest auxv address, first read by musl) */
-  PUSH_AUX(AT_EGID,   0);
-  PUSH_AUX(AT_GID,    0);
-  PUSH_AUX(AT_EUID,   0);
-  PUSH_AUX(AT_UID,    0);
-  PUSH_AUX(AT_ENTRY,  elf_info.entry);
+  PUSH_AUX(AT_EGID, 0);
+  PUSH_AUX(AT_GID, 0);
+  PUSH_AUX(AT_EUID, 0);
+  PUSH_AUX(AT_UID, 0);
+  PUSH_AUX(AT_ENTRY, elf_info.entry);
   PUSH_AUX(AT_PAGESZ, 4096);
   if(elf_info.phdr) {
     PUSH_AUX(AT_PHNUM, elf_info.phnum);
     PUSH_AUX(AT_PHENT, elf_info.phent);
-    PUSH_AUX(AT_PHDR,  elf_info.phdr);
+    PUSH_AUX(AT_PHDR, elf_info.phdr);
   }
 
-  /* 4. envp NULL terminator (no environment variables) */
+  /* 4. envp pointers + NULL terminator (musl: envp = argv + argc + 1) */
   sp -= 8;
   *(u64 *)sp = 0;
+  for(int i = envc - 1; i >= 0; i--) {
+    sp -= 8;
+    *(u64 *)sp = env_ptrs[i];
+  }
 
   /* 5. argv NULL terminator */
   sp -= 8;
@@ -324,33 +348,61 @@ u64 proc_create(
 #undef AT_GID
 #undef AT_EGID
 
-  /* Switch back to kernel/current address space */
   vmm_switch(old_cr3);
 
-  /* Initialize process */
-  p->pid        = next_pid++;
-  p->parent_pid = current_proc ? current_proc->pid : 0;
-  kstrncpy(p->name, name, PROC_NAME_MAX);
-  p->state           = PROC_STATE_READY;
-  p->exit_code       = 0;
-  p->waiting_for_pid = 0;
-  p->fs_base         = 0;
-
-  /* Initialize per-process memory regions based on ELF layout
-   * program_break starts at end of loaded ELF segments (page-aligned)
-   * heap_break (for mmap) starts higher to avoid conflicts */
   u64 elf_end_aligned = (elf_info.end + 0xFFF) & ALIGN_16_MASK;
   p->program_break    = elf_end_aligned;
   p->heap_break       = USER_HEAP_START;
   p->mmap_base        = USER_MMAP_BASE;
 
-  /* Set user context - stack now contains argc/argv */
   p->user_rip    = elf_info.entry;
   p->user_rsp    = sp;
   p->user_rflags = 0x202; /* IF enabled */
 
-  /* Setup initial kernel stack for first switch */
-  /* When we switch to this process, we'll iret to userspace */
+  return 0;
+}
+
+u64 proc_create(
+    const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
+    char *const argv[], char *const envp[]
+)
+{
+  proc_t *p = proc_alloc();
+  if(!p) {
+    console_print("[PROC] No free process slots\n");
+    return 0;
+  }
+
+  p->cr3 = vmm_create_address_space();
+  if(!p->cr3) {
+    console_print("[PROC] Failed to create address space\n");
+    return 0;
+  }
+
+  p->kernel_stack = kmalloc(PROC_KERNEL_STACK);
+  if(!p->kernel_stack) {
+    vmm_destroy_user_mappings(p->cr3);
+    console_print("[PROC] Failed to allocate kernel stack\n");
+    return 0;
+  }
+  p->kernel_stack_top = (void *)((u64)p->kernel_stack + PROC_KERNEL_STACK);
+
+  if(proc_setup_image(p, name, elf_data, elf_size, elf_fd, argv, envp) < 0) {
+    kfree(p->kernel_stack);
+    vmm_destroy_user_mappings(p->cr3);
+    console_print("[PROC] Failed to load image\n");
+    return 0;
+  }
+
+  p->pid        = next_pid++;
+  p->parent_pid = current_proc ? current_proc->pid : 0;
+  kstrncpy(p->name, name, PROC_NAME_MAX);
+  p->state             = PROC_STATE_READY;
+  p->exit_code         = 0;
+  p->waiting_for_pid   = 0;
+  p->vfork_waiting_for = 0;
+  p->fs_base           = 0;
+
   u64 *ksp = (u64 *)p->kernel_stack_top;
 
   /* Build iretq frame on kernel stack */
@@ -375,11 +427,6 @@ u64 proc_create(
 
   p->saved_rsp = (u64)ksp;
 
-  /*console_printf(
-      "[PROC] Created process '%s' (pid=%d, entry=0x%x)\n", name, (int)p->pid,
-      (int)elf_info.entry
-  );*/
-
   return p->pid;
 }
 
@@ -390,6 +437,74 @@ u64 proc_create(
  * mode for newly created processes.
  */
 extern void proc_enter_first_time(void);
+
+static void proc_vfork_wake_parent(const proc_t *child);
+
+i64         proc_exec_replace_image(
+            proc_t *p, const char *name, i64 elf_fd, char *const argv[],
+            char *const envp[]
+        )
+{
+  /* We are running on @p p (this is its syscall handler), so p->cr3 IS the
+   * current cr3. Wipe the user-space portion before loading the new image. */
+  vmm_clear_user_mappings(p->cr3);
+
+  int rc = proc_setup_image(p, name, NULL, 0, elf_fd, argv, envp);
+  if(rc < 0)
+    return rc;
+
+  /* Old TLS base pointed into the previous address space. Mappings are gone,
+   * but %fs MSR is not cleared by loading a new ELF — keep proc_t in sync
+   * and let context switch install 0 until arch_prctl(SET_FS) runs.
+   *
+   * execve returns on the same CPU without context_switch, so clear the MSR
+   * now; otherwise the next %fs-relative access uses a stale linear address. */
+  p->fs_base = 0;
+  cpu_set_fs_base(0);
+
+  kstrncpy(p->name, name, PROC_NAME_MAX);
+  kstrncpy(p->exe_path, name, PROC_EXE_PATH_MAX);
+  p->exe_path[PROC_EXE_PATH_MAX - 1] = '\0';
+
+  /* POSIX execve: reset every caught signal to SIG_DFL. SIG_IGN stays IGN.
+   * Without this, a stale handler from the old image points into freed user
+   * memory — first signal delivery faults and the new image dies. */
+  for(int i = 1; i < NSIG; i++) {
+    if(p->sig_actions[i].sa_handler != SIG_IGN) {
+      p->sig_actions[i].sa_handler  = SIG_DFL;
+      p->sig_actions[i].sa_flags    = 0;
+      p->sig_actions[i].sa_mask     = 0;
+      p->sig_actions[i].sa_restorer = 0;
+    }
+  }
+  p->kbd_edit_len  = 0;
+  p->kbd_ready_len = 0;
+  return 0;
+}
+
+/** Wake parent blocked in CLONE_VFORK after @p child exec'd or is exiting. */
+static void proc_vfork_wake_parent(const proc_t *child)
+{
+  if(!child)
+    return;
+  proc_t *parent = proc_get(child->parent_pid);
+  if(!parent || parent->vfork_waiting_for != child->pid)
+    return;
+  parent->vfork_waiting_for = 0;
+  if(parent->state == PROC_STATE_BLOCKED)
+    parent->state = PROC_STATE_READY;
+}
+
+/**
+ * @brief Called by sys_execve after exec succeeds and cloexec fds are closed.
+ *
+ * Wakes a parent that blocked in CLONE_VFORK. Must be called AFTER
+ * vfs_proc_close_cloexec_fds() so the parent's errpipe read gets EOF.
+ */
+void proc_notify_exec(const proc_t *p)
+{
+  proc_vfork_wake_parent(p);
+}
 
 /**
  * @brief Exit the current process with the given exit code.
@@ -408,15 +523,12 @@ void proc_exit(i64 code)
       cpu_halt();
   }
 
-  console_printf(
-      "[PROC] Process %d exited with code %d\n", (int)p->pid, (int)code
-  );
-
+  proc_vfork_wake_parent(p);
   p->exit_code = code;
   p->state     = PROC_STATE_ZOMBIE;
 
-  /* Clean up open file descriptors */
-  vfs_close_for_pid(p->pid);
+  /* Release per-process fd table; OFT entries close when refcount hits 0 */
+  vfs_proc_release_fds(p->fds);
 
   /* Notify parent via SIGCHLD and wake it if blocked in waitpid */
   proc_t *parent = proc_get(p->parent_pid);
@@ -506,11 +618,27 @@ void proc_schedule(void)
   }
 
   if(!next) {
-    /* No ready process, halt */
-    console_print("[PROC] No runnable process, halting\n");
+    /* If the current process is still runnable (just yielding cooperatively),
+     * let it keep running — no context switch needed. */
+    if(current_proc && current_proc->state == PROC_STATE_RUNNING) {
+      cpu_enable_interrupts();
+      return;
+    }
+
+    /* All procs blocked: HLT until an IRQ fires, then re-scan for READY.
+     * IRQs (timer, keyboard, ATA completion) can flip a process to READY by
+     * waking a sleeper. */
     for(;;) {
       cpu_enable_interrupts();
-      cpu_halt();
+      __asm__ volatile("hlt");
+      cpu_disable_interrupts();
+
+      for(int i = 0; i < PROC_MAX; i++) {
+        if(proc_table[i].state == PROC_STATE_READY) {
+          proc_switch(&proc_table[i]);
+          return;
+        }
+      }
     }
   }
 
@@ -567,10 +695,9 @@ void proc_switch(proc_t *next)
   /* Switch address space */
   vmm_switch(next->cr3);
 
-  /* Restore FS base (TLS) for new process */
-  if(next->fs_base) {
-    cpu_set_fs_base(next->fs_base);
-  }
+  /* Restore FS base (TLS) for new process. Must run even when 0: otherwise
+   * the previous task's %fs leaks across switches (fatal after execve). */
+  cpu_set_fs_base(next->fs_base);
 
   /* Context switch */
   if(prev) {
@@ -603,9 +730,11 @@ void proc_switch(proc_t *next)
  * @param elf_size Size of the ELF file in bytes.
  * @param name Name for the process.
  */
-void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
+void proc_start_first(
+    const void *elf_data, u64 elf_size, const char *name, const char *exe_path
+)
 {
-  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL);
+  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL, NULL);
   if(pid == 0) {
     console_print("[PROC] Failed to create first process\n");
     return;
@@ -614,6 +743,13 @@ void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
   proc_t *p = proc_get(pid);
   if(!p) {
     return;
+  }
+
+  if(exe_path && exe_path[0]) {
+    kstrncpy(p->exe_path, exe_path, PROC_EXE_PATH_MAX);
+    p->exe_path[PROC_EXE_PATH_MAX - 1] = '\0';
+  } else {
+    p->exe_path[0] = '\0';
   }
 
   /* Switch to first process */
@@ -626,8 +762,6 @@ void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
 
   /* Switch to process's address space */
   vmm_switch(p->cr3);
-
-  console_print("[PROC] Starting first process...\n");
 
   /* Jump to process (never returns) - matches context_switch pop order */
   __asm__ volatile("mov %0, %%rsp\n"
@@ -644,20 +778,22 @@ void proc_start_first(const void *elf_data, u64 elf_size, const char *name)
 }
 
 /**
- * @brief Fork the current process (create a copy).
+ * @brief Fork / clone (no threads): duplicate the calling task.
  *
- * Creates a child process that is a copy of the current process with its own
- * address space (cloned page tables) and kernel stack. The child returns 0,
- * while the parent receives the child's PID.
+ * If @p child_stack_arg is 0, the child uses the same user RSP as the parent
+ * syscall frame (fork). Otherwise the child resumes at @p child_stack_arg
+ * (musl `__clone` after syscall).
  *
- * @param frame_ptr Pointer to syscall_frame_t containing parent's saved
- * registers.
- * @return Child PID to parent process, 0 to child process, negative on error.
+ * @param frame_ptr Saved syscall frame.
+ * @param child_stack_arg User stack for child, or 0 for parent's RSP.
+ * @return Child PID to parent, negative errno on failure.
  */
-i64 proc_fork(const void *syscall_frame)
+static i64 proc_fork_impl(
+    const syscall_frame_t *frame, u64 child_stack_arg, u32 clone_flags
+)
 {
-  const syscall_frame_t *frame  = (const syscall_frame_t *)syscall_frame;
-  proc_t                *parent = current_proc;
+  u64     child_rsp = child_stack_arg ? child_stack_arg : frame->rsp;
+  proc_t *parent    = current_proc;
   if(!parent) {
     return -1;
   }
@@ -697,19 +833,33 @@ i64 proc_fork(const void *syscall_frame)
   child->pid        = next_pid++;
   child->parent_pid = parent->pid;
   kstrncpy(child->name, parent->name, PROC_NAME_MAX);
-  child->state           = PROC_STATE_READY;
-  child->exit_code       = 0;
-  child->waiting_for_pid = 0;
-  child->fs_base         = parent->fs_base;
+  child->state             = PROC_STATE_READY;
+  child->exit_code         = 0;
+  child->waiting_for_pid   = 0;
+  child->vfork_waiting_for = 0;
+  child->fs_base           = parent->fs_base;
 
   /* Copy per-process memory state */
   child->program_break = parent->program_break;
   child->heap_break    = parent->heap_break;
   child->mmap_base     = parent->mmap_base;
 
+  /* Inherit parent's open file descriptors and per-fd cloexec bits. */
+  vfs_proc_inherit_fds(
+      child->fds, child->fd_cloexec, parent->fds, parent->fd_cloexec
+  );
+
+  kstrncpy(child->cwd, parent->cwd, VFS_PATH_MAX);
+  kstrncpy(child->exe_path, parent->exe_path, PROC_EXE_PATH_MAX);
+  child->exe_path[PROC_EXE_PATH_MAX - 1] = '\0';
+
+  kmemcpy(&child->termios, &parent->termios, sizeof(child->termios));
+  child->kbd_edit_len  = 0;
+  child->kbd_ready_len = 0;
+
   /* Copy user context from syscall frame */
   child->user_rip    = frame->rip;
-  child->user_rsp    = frame->rsp;
+  child->user_rsp    = child_rsp;
   child->user_rflags = frame->rflags;
 
   /* Build kernel stack for child (same as proc_create) */
@@ -762,7 +912,7 @@ i64 proc_fork(const void *syscall_frame)
   child_frame->rax    = 0; /* Child returns 0 from fork! */
   child_frame->rip    = frame->rip;
   child_frame->rflags = frame->rflags;
-  child_frame->rsp    = frame->rsp;
+  child_frame->rsp    = child_rsp;
 
   /* Now we need the child to return through syscall_return */
   /* proc_fork_child_entry will pop the frame and do sysret */
@@ -781,12 +931,24 @@ i64 proc_fork(const void *syscall_frame)
 
   child->saved_rsp = (u64)ksp;
 
-  console_printf(
-      "[PROC] fork: parent %d -> child %d\n", (int)parent->pid, (int)child->pid
-  );
+  if(clone_flags & ALCOR_CLONE_VFORK) {
+    parent->vfork_waiting_for = child->pid;
+    parent->state             = PROC_STATE_BLOCKED;
+    proc_schedule();
+  }
 
   /* Parent returns child PID */
   return (i64)child->pid;
+}
+
+i64 proc_fork(const void *syscall_frame)
+{
+  return proc_fork_impl((const syscall_frame_t *)syscall_frame, 0, 0);
+}
+
+i64 proc_clone(const syscall_frame_t *frame, u64 child_stack, u32 clone_flags)
+{
+  return proc_fork_impl(frame, child_stack, clone_flags);
 }
 
 /**
@@ -851,17 +1013,18 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options)
         return 0; /* No child ready yet */
       }
 
-      /* Block until a child exits */
-      parent->state           = PROC_STATE_BLOCKED;
-      parent->waiting_for_pid = 0; /* Any child */
-      proc_schedule();
+      /* Block until a child exits, looping against spurious wakeups. */
+      while(!child) {
+        parent->state           = PROC_STATE_BLOCKED;
+        parent->waiting_for_pid = 0;
+        proc_schedule();
 
-      /* Woken up - find zombie child */
-      for(int i = 0; i < PROC_MAX; i++) {
-        if(proc_table[i].parent_pid == parent->pid &&
-           proc_table[i].state == PROC_STATE_ZOMBIE) {
-          child = &proc_table[i];
-          break;
+        for(int i = 0; i < PROC_MAX; i++) {
+          if(proc_table[i].parent_pid == parent->pid &&
+             proc_table[i].state == PROC_STATE_ZOMBIE) {
+            child = &proc_table[i];
+            break;
+          }
         }
       }
     }
@@ -877,11 +1040,15 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options)
         return 0;
       }
 
-      parent->state           = PROC_STATE_BLOCKED;
-      parent->waiting_for_pid = pid;
-      proc_schedule();
-
-      child = proc_get(pid);
+      /* Loop in case we are woken by a signal before the child zombifies. */
+      while(child->state != PROC_STATE_ZOMBIE) {
+        parent->state           = PROC_STATE_BLOCKED;
+        parent->waiting_for_pid = (u64)pid;
+        proc_schedule();
+        child = proc_get((u64)pid);
+        if(!child || child->parent_pid != parent->pid)
+          return -ECHILD;
+      }
     }
   } else {
     /* pid == 0 or pid < -1: wait for process group (not implemented) */
@@ -895,7 +1062,7 @@ i64 proc_waitpid(i64 pid, i32 *status, i32 options)
   /* Get exit status */
   i64 child_pid = (i64)child->pid;
   if(status) {
-    /* Linux status format: exit_code << 8 for normal exit */
+    /* POSIX wait status: exit_code << 8 for normal termination */
     *status = (i32)((child->exit_code & 0xFF) << 8);
   }
 

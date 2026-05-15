@@ -48,8 +48,8 @@
 /** @brief User heap start for brk() allocations (1GB) */
 #define USER_HEAP_START 0x0000000040000000ULL
 
-/** @brief Dedicated mmap region base (256GB — well above brk, below stack) */
-#define USER_MMAP_BASE  0x0000100000000000ULL
+/* 256 GiB; must stay below USER_SPACE_END */
+#define USER_MMAP_BASE 0x0000000400000000ULL
 
 /** @} */
 

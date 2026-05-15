@@ -3,8 +3,8 @@
  * @brief Small string helpers for the shell
  */
 
-#include "shell.h"
 #include <stddef.h>
+#include <vega/shell.h>
 
 /**
  * @brief Calculate string length

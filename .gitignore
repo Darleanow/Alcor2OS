@@ -7,3 +7,4 @@ thirdparty/
 *.img
 user/apps/**/.cache/
 .vscode
+mnt

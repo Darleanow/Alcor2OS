@@ -1,1682 +1,886 @@
 /**
  * @file src/fs/vfs.c
- * @brief Virtual File System (ramfs + mountable filesystems).
+ * @brief Virtual File System orchestration layer.
+ *
+ * Implements mount management, the Open File Table (OFT), per-process fd
+ * tables, path normalisation, and dispatch to registered filesystem drivers.
+ *
+ * @par Mount resolution
+ * Paths are made absolute with ::vfs_make_absolute — relative paths are
+ * anchored to the calling process's CWD stored in @c proc_t::cwd — then
+ * normalised in-place by ::vfs_normalize.  ::vfs_find_mount performs
+ * longest-prefix matching over the active mount table to select the
+ * responsible driver.
+ *
+ * @par Open File Table lifetime
+ * Each ::vfs_oft_entry_t carries a reference count.  ::vfs_oft_retain
+ * increments it (fork, dup) and ::vfs_oft_release decrements it; when the
+ * count reaches zero the driver's @c close or ::pipe_oft_release is invoked
+ * and the slot is returned to the pool.  Per-process fd numbers are small
+ * integers that index into this shared table.
  */
 
-#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
-#include <alcor2/mm/heap.h>
-#include <alcor2/kstdlib.h>
-#include <alcor2/proc/proc.h>
 #include <alcor2/fs/vfs.h>
+#include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
+#include <alcor2/proc/proc.h>
+#include <alcor2/sys/internal.h>
 
-#define VFS_MAX_MOUNTS  8
-#define VFS_MAX_FSTYPES 8
-
-/** @brief Mount point descriptor. */
-typedef struct
-{
-  void            *fs_data;            /**< FS-specific data */
-  const fs_ops_t  *ops;                /**< Filesystem operations */
-  bool             active;             /**< Mount active */
-  char             path[VFS_PATH_MAX]; /**< Mount point path */
-  const fs_type_t *fstype;             /**< Filesystem type (for unmount) */
-} vfs_mount_t;
-
-static vfs_mount_t mounts[VFS_MAX_MOUNTS];
-
-/** @brief Registered filesystem types */
-static const fs_type_t *fs_types[VFS_MAX_FSTYPES];
-static int              fs_type_count = 0;
-
-static vfs_node_t      *root_node = NULL;
-static vfs_fd_t         fd_table[VFS_MAX_FD];
-static vfs_dir_t        dir_table[VFS_MAX_FD];
-static char             cwd[VFS_PATH_MAX] = "/";
-
-static vfs_mount_t     *find_mount(const char *path);
-static const char *
-    get_relative_path(const char *path, const vfs_mount_t *mount);
+#define VFS_MAX_MOUNTS 16
+#define VFS_MAX_OFT    256
 
 /**
- * @brief Check if file descriptor is on a mounted filesystem (not ramfs)
- * @param fd File descriptor to check
- * @return true if mounted fs, false if ramfs
+ * @brief Internal mount point descriptor.
+ *
+ * One slot per active mount.  The @c target string is normalised at mount
+ * time so that ::vfs_find_mount can compare it directly against normalised
+ * absolute paths.
  */
-static inline bool is_mounted_fd(i64 fd)
+typedef struct
 {
-  return fd_table[fd].ops != NULL;
+  char            target[VFS_PATH_MAX]; /**< Normalised absolute mount point. */
+  void           *fs_data; /**< Volume-private data from @c mount callback. */
+  const fs_ops_t *ops;     /**< Driver operations for this volume. */
+  const fs_type_t *type;   /**< Registered type descriptor. */
+  bool             active; /**< @c true when this slot holds a live mount. */
+} vfs_mount_t;
+
+static vfs_mount_t      mounts[VFS_MAX_MOUNTS];
+static vfs_oft_entry_t  oft[VFS_MAX_OFT];
+
+static const fs_type_t *fs_registry[8];
+static u32              fs_registry_count = 0;
+
+/** @brief Return @c true if @p path begins with @p prefix as a path component.
+ */
+static bool vfs_path_starts_with(const char *path, const char *prefix)
+{
+  if(prefix[0] == '/' && prefix[1] == '\0')
+    return path[0] == '/';
+
+  u64 plen = kstrlen(prefix);
+  if(kstrncmp(path, prefix, plen) == 0)
+    return path[plen] == '\0' || path[plen] == '/';
+  return false;
 }
 
 /**
- * @brief Normalize a path by resolving . and .. components.
- * @param path Path to normalize (modified in place).
+ * @brief Find the mount whose target is the longest prefix of @p path.
+ *
+ * Sets @p *rel_path to the portion of @p path after the mount target; it is
+ * set to @c "/" when the path exactly equals the mount point.
+ *
+ * @param path      Normalised absolute path to look up.
+ * @param rel_path  Out-pointer receiving the driver-relative path; may be @c
+ * NULL.
+ * @return Pointer to the best-matching mount, or @c NULL if none is active.
  */
-static void normalize_path(char *path)
+static vfs_mount_t *vfs_find_mount(const char *path, const char **rel_path)
+{
+  vfs_mount_t *best     = NULL;
+  u64          best_len = 0;
+
+  for(u32 i = 0; i < VFS_MAX_MOUNTS; i++) {
+    if(!mounts[i].active)
+      continue;
+    u64 plen = kstrlen(mounts[i].target);
+    if(vfs_path_starts_with(path, mounts[i].target) && plen >= best_len) {
+      best     = &mounts[i];
+      best_len = plen;
+    }
+  }
+
+  if(best && rel_path) {
+    *rel_path = path + best_len;
+    if((*rel_path)[0] == '\0')
+      *rel_path = "/";
+  }
+  return best;
+}
+
+/**
+ * @brief Normalise an absolute path in-place.
+ *
+ * Collapses repeated slashes, resolves @c . components, and resolves @c ..
+ * by stripping the preceding segment.  The root @c / is always preserved.
+ *
+ * @param path  Buffer of at least ::VFS_PATH_MAX bytes containing an
+ *              absolute path.  Modified in-place.
+ */
+static void vfs_normalize(char *path)
 {
   if(!path || path[0] != '/')
     return;
 
-  /* Work buffer to build normalized path */
-  char  result[VFS_PATH_MAX];
-  char *out = result;
-  char *p   = path + 1; /* Skip initial '/' */
+  char  res[VFS_PATH_MAX];
+  char *out = res;
+  *out++    = '/';
 
-  *out++ = '/';
-
-  while(*p) {
-    /* Skip consecutive slashes */
-    while(*p == '/')
-      p++;
-    if(!*p)
+  const char *curr = path + 1;
+  while(*curr) {
+    while(*curr == '/')
+      curr++;
+    if(!*curr)
       break;
 
-    /* Extract component into temp buffer */
-    char comp[VFS_NAME_MAX];
-    u64  len = 0;
-    while(*p && *p != '/' && len < VFS_NAME_MAX - 1) {
-      comp[len++] = *p++;
-    }
-    comp[len] = '\0';
+    const char *start = curr;
+    while(*curr && *curr != '/')
+      curr++;
+    u64 len = (u64)(curr - start);
 
-    /* Handle . (current dir) - skip it */
-    if(len == 1 && comp[0] == '.') {
+    if(len == 1 && start[0] == '.')
       continue;
-    }
-
-    /* Handle .. (parent dir) - go back to previous / */
-    if(len == 2 && comp[0] == '.' && comp[1] == '.') {
-      /* Back up to previous component */
-      if(out > result + 1) {
-        out--; /* Remove trailing char */
-        while(out > result + 1 && *(out - 1) != '/')
+    if(len == 2 && start[0] == '.' && start[1] == '.') {
+      if(out > res + 1) {
+        out--;
+        while(out > res + 1 && *(out - 1) != '/')
           out--;
       }
       continue;
     }
 
-    /* Regular component - append to result */
-    if(out > result + 1) {
+    if(out > res + 1)
       *out++ = '/';
-    }
-    for(u64 i = 0; i < len && out < result + VFS_PATH_MAX - 1; i++) {
-      *out++ = comp[i];
-    }
-  }
-
-  /* Ensure at least "/" */
-  if(out == result + 1 && result[0] == '/') {
-    /* Just "/" is fine */
+    kmemcpy(out, start, len);
+    out += len;
   }
   *out = '\0';
-
-  /* Copy back to original */
-  kstrncpy(path, result, VFS_PATH_MAX);
+  kstrncpy(path, res, VFS_PATH_MAX);
 }
 
 /**
- * @brief Convert a relative path to absolute path using cwd.
- * @param path Input path (relative or absolute).
- * @param out Output buffer for absolute path.
- * @param out_size Size of output buffer.
+ * @brief Build an absolute, normalised path in @p out.
+ *
+ * If @p path is relative it is appended to the calling process's CWD,
+ * falling back to @c "/" when no process is running.  The result is always
+ * normalised via ::vfs_normalize.
+ *
+ * @param path  Input path (absolute or relative).
+ * @param out   Destination buffer of at least ::VFS_PATH_MAX bytes.
  */
-static void make_absolute_path(const char *path, char *out, u64 out_size)
+static void vfs_make_absolute(const char *path, char *out)
 {
-  if(!path || !out || out_size == 0) {
-    if(out && out_size > 0)
-      out[0] = '\0';
-    return;
-  }
-
-  /* Build combined path first */
   if(path[0] == '/') {
-    /* Already absolute */
-    kstrncpy(out, path, out_size);
+    kstrncpy(out, path, VFS_PATH_MAX);
   } else {
-    /* Build absolute path from cwd + path */
-    u64 path_len = kstrlen(path);
-
-    /* Copy cwd first */
-    kstrncpy(out, cwd, out_size);
-
-    /* Add separator if needed */
-    u64 pos = kstrlen(out);
-    if(pos > 0 && out[pos - 1] != '/' && pos + 1 < out_size) {
-      out[pos++] = '/';
-      out[pos]   = '\0';
+    proc_t     *p   = proc_current();
+    const char *cwd = (p && p->cwd[0]) ? p->cwd : "/";
+    kstrncpy(out, cwd, VFS_PATH_MAX);
+    u64 len = kstrlen(out);
+    if(out[len - 1] != '/') {
+      out[len++] = '/';
+      out[len]   = '\0';
     }
-
-    /* Append path */
-    for(u64 i = 0; i < path_len && pos + i < out_size - 1; i++) {
-      out[pos + i] = path[i];
-    }
-    out[pos + path_len < out_size ? pos + path_len : out_size - 1] = '\0';
+    kstrncat(out, path, VFS_PATH_MAX - len - 1);
   }
-
-  /* Normalize to resolve . and .. */
-  normalize_path(out);
+  vfs_normalize(out);
 }
 
-/**
- * @brief Resolve path to VFS node.
- * @param path Path to resolve (absolute or relative).
- * @return Node pointer or NULL.
- */
-static vfs_node_t *resolve_path(const char *path)
+/** @brief Allocate and zero a free OFT slot; refcount is initialised to 1. */
+static i32 oft_alloc(void)
 {
-  if(!path || !path[0]) {
-    return NULL;
-  }
-
-  vfs_node_t *node;
-  char        component[VFS_NAME_MAX];
-  u64         i = 0;
-
-  /* Absolute vs relative */
-  if(path[0] == '/') {
-    node = root_node;
-    i    = 1;
-  } else {
-    /* Resolve from current working directory */
-    /* First, find the cwd node */
-    node     = root_node;
-    u64 cwdi = 0;
-    if(cwd[0] == '/')
-      cwdi = 1;
-
-    while(cwd[cwdi]) {
-      while(cwd[cwdi] == '/')
-        cwdi++;
-      if(!cwd[cwdi])
-        break;
-
-      u64  j = 0;
-      char comp[VFS_NAME_MAX];
-      while(cwd[cwdi] && cwd[cwdi] != '/' && j < VFS_NAME_MAX - 1) {
-        comp[j++] = cwd[cwdi++];
-      }
-      comp[j] = '\0';
-
-      if(j == 0)
-        break;
-
-      vfs_node_t *child = node->children;
-      while(child) {
-        if(kstreq(child->name, comp)) {
-          node = child;
-          break;
-        }
-        child = child->next;
-      }
-      if(!child) {
-        /* cwd is invalid, fallback to root */
-        node = root_node;
-        break;
-      }
-    }
-  }
-
-  /* Root path */
-  if(path[0] == '/' && path[1] == '\0') {
-    return root_node;
-  }
-
-  while(path[i]) {
-    /* Skip slashes */
-    while(path[i] == '/')
-      i++;
-    if(!path[i])
-      break;
-
-    /* Extract component */
-    u64 j = 0;
-    while(path[i] && path[i] != '/' && j < VFS_NAME_MAX - 1) {
-      component[j++] = path[i++];
-    }
-    component[j] = '\0';
-
-    /* Handle . and .. */
-    if(kstreq(component, ".")) {
-      continue;
-    }
-    if(kstreq(component, "..")) {
-      if(node->parent) {
-        node = node->parent;
-      }
-      continue;
-    }
-
-    /* Find child */
-    if(node->type != VFS_DIRECTORY) {
-      return NULL;
-    }
-
-    vfs_node_t *child = node->children;
-    while(child) {
-      if(kstreq(child->name, component)) {
-        break;
-      }
-      child = child->next;
-    }
-
-    if(!child) {
-      return NULL;
-    }
-
-    node = child;
-  }
-
-  return node;
-}
-
-/**
- * @brief Resolve parent directory and extract filename from path.
- *
- * Splits a path into its parent directory node and the final filename
- * component. Handles both absolute and relative paths.
- *
- * @param path Path to resolve.
- * @param name_out Output buffer for filename (VFS_NAME_MAX bytes).
- * @return Parent directory node, or NULL on error.
- */
-static vfs_node_t *resolve_parent(const char *path, char *name_out)
-{
-  if(!path || !path[0]) {
-    return NULL;
-  }
-
-  /* Find last slash */
-  u64 len        = kstrlen(path);
-  i64 last_slash = -1;
-
-  for(u64 i = 0; i < len; i++) {
-    if(path[i] == '/') {
-      last_slash = (i64)i;
-    }
-  }
-
-  if(last_slash == -1) {
-    /* No slash - parent is cwd */
-    kstrncpy(name_out, path, VFS_NAME_MAX);
-    /* Resolve cwd to get the actual current directory node */
-    return resolve_path(cwd);
-  }
-
-  if(last_slash == 0) {
-    /* Root directory is parent */
-    kstrncpy(name_out, path + 1, VFS_NAME_MAX);
-    return root_node;
-  }
-
-  /* Extract parent path */
-  char parent_path[VFS_PATH_MAX];
-  for(i64 i = 0; i < last_slash; i++) {
-    parent_path[i] = path[i];
-  }
-  parent_path[last_slash] = '\0';
-
-  /* Extract name */
-  kstrncpy(name_out, path + last_slash + 1, VFS_NAME_MAX);
-
-  return resolve_path(parent_path);
-}
-
-/**
- * @brief Create a new VFS node.
- *
- * Allocates and initializes a new node with the given name and type.
- *
- * @param name Node name (copied into node).
- * @param type Node type (VFS_FILE or VFS_DIRECTORY).
- * @return Pointer to new node, or NULL on allocation failure.
- */
-static vfs_node_t *create_node(const char *name, u8 type)
-{
-  vfs_node_t *node = kzalloc(sizeof(vfs_node_t));
-  if(!node)
-    return NULL;
-
-  kstrncpy(node->name, name, VFS_NAME_MAX);
-  node->type     = type;
-  node->size     = 0;
-  node->data     = NULL;
-  node->capacity = 0;
-  node->parent   = NULL;
-  node->children = NULL;
-  node->next     = NULL;
-
-  return node;
-}
-
-/**
- * @brief Add a child node to a parent directory.
- *
- * Links the child into the parent's children list and sets the child's parent
- * pointer.
- *
- * @param parent Parent directory node.
- * @param child Child node to add.
- */
-static void add_child(vfs_node_t *parent, vfs_node_t *child)
-{
-  child->parent    = parent;
-  child->next      = parent->children;
-  parent->children = child;
-}
-
-/**
- * @brief Initialize the Virtual File System.
- *
- * Creates the root directory, initializes file descriptor and directory tables,
- * and sets up the initial mount table.
- */
-void vfs_init(void)
-{
-  /* Initialize tables */
-  kzero(fd_table, sizeof(fd_table));
-  kzero(dir_table, sizeof(dir_table));
-  kzero(mounts, sizeof(mounts));
-
-  /* Create root directory */
-  root_node = create_node("/", VFS_DIRECTORY);
-  if(!root_node) {
-    console_print("[VFS] Failed to create root!\n");
-    return;
-  }
-  root_node->parent = root_node; /* Root is its own parent */
-
-  /* Create /dev for device nodes - kept in ramfs */
-  vfs_mkdir("/dev");
-
-  /* Create device nodes for ATA drives
-   * /dev/hda = Primary Master
-   * /dev/hdb = Primary Slave
-   * /dev/hdc = Secondary Master
-   * /dev/hdd = Secondary Slave
-   */
-  vfs_touch("/dev/hda");
-  vfs_touch("/dev/hdb");
-  vfs_touch("/dev/hdc");
-  vfs_touch("/dev/hdd");
-
-  console_print("[VFS] Initialized (minimal ramfs + /dev)\n");
-}
-
-/**
- * @brief Open a file.
- *
- * Opens a file in ramfs or mounted filesystem. Supports creation,
- * truncation, and various access modes. File descriptors 0-2 are reserved for
- * stdin/stdout/stderr.
- *
- * @param path Path to file (absolute or relative).
- * @param flags Open flags (O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC, etc.).
- * @return File descriptor on success, negative on error.
- */
-i64 vfs_open(const char *path, u32 flags)
-{
-  /* Convert to absolute path for mount point detection */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Check if path is on a mounted filesystem with ops */
-  vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops) {
-    /* Route to mounted filesystem via ops */
-    const char *rel_path = get_relative_path(abs_path, mount);
-
-    /* Find free fd (skip 0,1,2 reserved for stdin/stdout/stderr) */
-    i64 fd = -1;
-    for(i64 i = 3; i < VFS_MAX_FD; i++) {
-      if(!fd_table[i].in_use) {
-        fd = i;
-        break;
-      }
-    }
-    if(fd < 0)
-      return -1;
-
-    fs_file_t fh     = NULL;
-    bool      is_dir = false;
-
-    /* Handle create flag */
-    if(flags & O_CREAT) {
-      fh = mount->ops->create(mount->fs_data, rel_path);
-      if(fh && mount->ops->is_dir) {
-        is_dir = mount->ops->is_dir(fh);
-      }
-    } else {
-      fh = mount->ops->open(mount->fs_data, rel_path, flags, &is_dir);
-    }
-
-    if(!fh)
-      return -1;
-
-    /* Handle truncate flag */
-    if((flags & O_TRUNC) && mount->ops->truncate) {
-      mount->ops->truncate(fh);
-    }
-
-    /* Handle append flag - seek to end */
-    if((flags & O_APPEND) && mount->ops->seek) {
-      mount->ops->seek(fh, 0, SEEK_END);
-    }
-
-    fd_table[fd].in_use = true;
-    fd_table[fd].node   = (vfs_node_t *)fh;
-    fd_table[fd].ops    = mount->ops;
-    fd_table[fd].offset =
-        mount->ops->get_position ? mount->ops->get_position(fh) : 0;
-    fd_table[fd].flags = flags;
-
-    /* Set owner PID */
-    proc_t *p              = proc_current();
-    fd_table[fd].owner_pid = p ? p->pid : 0;
-
-    return fd;
-  }
-
-  /* Ramfs path - use abs_path for consistency */
-  vfs_node_t *node = resolve_path(abs_path);
-
-  /* Create if needed */
-  if(!node && (flags & O_CREAT)) {
-    char        name[VFS_NAME_MAX];
-    vfs_node_t *parent = resolve_parent(abs_path, name);
-
-    if(!parent || parent->type != VFS_DIRECTORY) {
-      return -1;
-    }
-
-    node = create_node(name, VFS_FILE);
-    if(!node)
-      return -1;
-
-    add_child(parent, node);
-  }
-
-  if(!node || node->type != VFS_FILE) {
-    /* Allow opening directories if O_DIRECTORY is set */
-    if(node && node->type == VFS_DIRECTORY && (flags & O_DIRECTORY)) {
-      /* Open directory for reading (getdents) */
-      for(i64 i = 3; i < VFS_MAX_FD; i++) {
-        if(!fd_table[i].in_use) {
-          fd_table[i].node   = node;
-          fd_table[i].ops    = NULL;
-          fd_table[i].offset = 0;
-          fd_table[i].flags  = flags;
-          fd_table[i].in_use = true;
-
-          /* Set owner PID */
-          proc_t *p             = proc_current();
-          fd_table[i].owner_pid = p ? p->pid : 0;
-
-          return i;
-        }
-      }
-      return -1;
-    }
-    return -1;
-  }
-
-  /* Find free fd (skip 0,1,2 reserved for stdin/stdout/stderr) */
-  for(i64 i = 3; i < VFS_MAX_FD; i++) {
-    if(!fd_table[i].in_use) {
-      fd_table[i].node   = node;
-      fd_table[i].ops    = NULL;
-      fd_table[i].offset = (flags & O_APPEND) ? node->size : 0;
-      fd_table[i].flags  = flags;
-      fd_table[i].in_use = true;
-
-      /* Set owner PID */
-      proc_t *p             = proc_current();
-      fd_table[i].owner_pid = p ? p->pid : 0;
-
-      /* Truncate if needed */
-      if(flags & O_TRUNC) {
-        node->size = 0;
-      }
-
+  for(i32 i = 0; i < VFS_MAX_OFT; i++) {
+    if(!oft[i].in_use) {
+      kzero(&oft[i], sizeof(vfs_oft_entry_t));
+      oft[i].in_use   = true;
+      oft[i].refcount = 1;
       return i;
     }
   }
-
-  return -1; /* No free fd */
+  return -ENFILE;
 }
 
 /**
- * @brief Close a file descriptor.
+ * @brief Translate a process fd number to its OFT index.
  *
- * Closes an open file descriptor and marks it as available for reuse.
- * For mounted filesystem files, flushes changes and calls the close handler.
- *
- * @param fd File descriptor to close.
- * @return 0 on success, negative on error.
+ * @return OFT index on success, or @c -1 if @p fd is out of range, closed,
+ *         or the OFT slot is no longer in use.
  */
-i64 vfs_close(i64 fd)
+static i32 fd_to_oft(i64 fd)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
+  proc_t *p = proc_current();
+  if(!p || fd < 0 || fd >= VFS_MAX_FD)
     return -1;
-  }
+  i32 idx = p->fds[fd];
+  if(idx < 0 || idx >= VFS_MAX_OFT || !oft[idx].in_use)
+    return -1;
+  return idx;
+}
 
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fd_table[fd].node;
-    if(fd_table[fd].ops->flush) {
-      fd_table[fd].ops->flush(fh);
-    }
-    fd_table[fd].ops->close(fh);
-    fd_table[fd].in_use = false;
-    fd_table[fd].ops    = NULL;
-    return 0;
-  }
-
-  fd_table[fd].in_use = false;
-  return 0;
+/** @brief Increment the OFT refcount for slot @p idx. */
+void vfs_oft_retain(i32 idx)
+{
+  if(idx >= 0 && idx < VFS_MAX_OFT && oft[idx].in_use)
+    oft[idx].refcount++;
 }
 
 /**
- * @brief Read data from an open file.
+ * @brief Decrement the OFT refcount for slot @p idx.
  *
- * Reads up to count bytes from the file at the current offset.
- * Handles both ramfs and mounted filesystem files.
- *
- * @param fd File descriptor.
- * @param buf Destination buffer.
- * @param count Maximum bytes to read.
- * @return Number of bytes read, 0 on EOF, negative on error.
+ * When the count reaches zero the entry is torn down: ::pipe_oft_release is
+ * called for pipe entries; the driver's @c close is called for file entries.
  */
-i64 vfs_read(i64 fd, void *buf, u64 count)
+void vfs_oft_release(i32 idx)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
+  if(idx < 0 || idx >= VFS_MAX_OFT || !oft[idx].in_use)
+    return;
 
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fd_table[fd].node;
-    /* Sync position from fd table to file handle */
-    if(fd_table[fd].ops->seek) {
-      fd_table[fd].ops->seek(fh, (i64)fd_table[fd].offset, SEEK_SET);
-    }
-    i64 bytes = fd_table[fd].ops->read(fh, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
-    return bytes;
-  }
+  if(--oft[idx].refcount > 0)
+    return;
 
-  vfs_fd_t         *f    = &fd_table[fd];
-  const vfs_node_t *node = f->node;
+  if(oft[idx].pipe)
+    pipe_oft_release(oft[idx].kind, oft[idx].pipe);
 
-  if(f->offset >= node->size) {
-    return 0; /* EOF */
-  }
+  if(oft[idx].handle && oft[idx].ops && oft[idx].ops->close)
+    oft[idx].ops->close(oft[idx].handle);
 
-  u64 available = node->size - f->offset;
-  u64 to_read   = (count < available) ? count : available;
-
-  kmemcpy(buf, node->data + f->offset, to_read);
-  f->offset += to_read;
-
-  return (i64)to_read;
+  oft[idx].in_use = false;
 }
 
 /**
- * @brief Write data to an open file.
+ * @brief Install a new fd in the calling process pointing at OFT slot @p
+ * oft_idx.
  *
- * Writes up to count bytes to the file at the current offset.
- * Automatically expands the file buffer if necessary.
- * Handles both ramfs and mounted filesystem files.
+ * Searches for the lowest free fd ≥ 3 (slots 0–2 are reserved for stdio).
+ * Does not increment the OFT refcount — the caller owns that responsibility.
  *
- * @param fd File descriptor.
- * @param buf Source buffer.
- * @param count Number of bytes to write.
- * @return Number of bytes written, negative on error.
+ * @return New fd on success, @c -EMFILE if the process fd table is full.
  */
-i64 vfs_write(i64 fd, const void *buf, u64 count)
+i64 vfs_install_fd(i32 oft_idx)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  /* Handle mounted filesystem files */
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fd_table[fd].node;
-
-    /* Sync position from fd table to file */
-    if(fd_table[fd].ops->seek) {
-      fd_table[fd].ops->seek(fh, (i64)fd_table[fd].offset, SEEK_SET);
-    }
-
-    i64 bytes = fd_table[fd].ops->write(fh, buf, count);
-    if(bytes > 0) {
-      fd_table[fd].offset += (u64)bytes;
-    }
-    return bytes;
-  }
-
-  vfs_fd_t   *f    = &fd_table[fd];
-  vfs_node_t *node = f->node;
-
-  u64         end_pos = f->offset + count;
-
-  /* Grow buffer if needed */
-  if(end_pos > node->capacity) {
-    u64 new_cap  = (end_pos < 4096) ? 4096 : (end_pos * 2);
-    u8 *new_data = kmalloc(new_cap);
-    if(!new_data)
-      return -1;
-
-    if(node->data) {
-      kmemcpy(new_data, node->data, node->size);
-      kfree(node->data);
-    }
-
-    node->data     = new_data;
-    node->capacity = new_cap;
-  }
-
-  kmemcpy(node->data + f->offset, buf, count);
-  f->offset += count;
-
-  if(f->offset > node->size) {
-    node->size = f->offset;
-  }
-
-  return (i64)count;
-}
-
-/**
- * @brief Seek to a position in an open file.
- *
- * Changes the file offset according to whence parameter.
- * Handles both ramfs and mounted filesystem files.
- *
- * @param fd File descriptor.
- * @param offset Offset to seek to (interpretation depends on whence).
- * @param whence Seek mode: SEEK_SET (absolute), SEEK_CUR (relative), SEEK_END
- * (from end).
- * @return New file offset, negative on error.
- */
-i64 vfs_seek(i64 fd, i64 offset, i32 whence)
-{
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
-
-  /* Handle mounted filesystem files */
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh      = (fs_file_t)fd_table[fd].node;
-    i64       new_pos = fd_table[fd].ops->seek(fh, offset, whence);
-    if(new_pos >= 0) {
-      fd_table[fd].offset = (u64)new_pos;
-    }
-    return new_pos;
-  }
-
-  vfs_fd_t *f = &fd_table[fd];
-  i64       new_offset;
-
-  switch(whence) {
-  case SEEK_SET:
-    new_offset = offset;
-    break;
-  case SEEK_CUR:
-    new_offset = (i64)f->offset + offset;
-    break;
-  case SEEK_END:
-    new_offset = (i64)f->node->size + offset;
-    break;
-  default:
-    return -1;
-  }
-
-  if(new_offset < 0) {
-    return -1;
-  }
-
-  f->offset = (u64)new_offset;
-  return new_offset;
-}
-
-/**
- * @brief Get file status information.
- *
- * Returns file metadata including size, type, and timestamps.
- * Handles both ramfs and mounted filesystem files.
- *
- * @param path Path to file or directory.
- * @param st Output buffer for stat structure.
- * @return 0 on success, negative on error.
- */
-i64 vfs_stat(const char *path, vfs_stat_t *stat)
-{
-  /* Convert to absolute path for mount point detection */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Check if path is on a mounted filesystem with ops */
-  const vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops && mount->ops->stat) {
-    const char *rel_path = get_relative_path(abs_path, mount);
-    u64         size;
-    u8          type;
-    if(mount->ops->stat(mount->fs_data, rel_path, &size, &type) < 0) {
-      return -1;
-    }
-
-    stat->size     = size;
-    stat->type     = type;
-    stat->created  = 0;
-    stat->modified = 0;
-    return 0;
-  }
-
-  /* Ramfs path - use abs_path for consistency */
-  const vfs_node_t *node = resolve_path(abs_path);
-  if(!node)
-    return -1;
-
-  stat->size     = node->size;
-  stat->type     = node->type;
-  stat->created  = 0; /* TODO: timestamps */
-  stat->modified = 0;
-
-  return 0;
-}
-
-/**
- * @brief Create a new directory.
- *
- * Creates a directory in ramfs or mounted filesystem. Parent directory must
- * exist. Returns error if directory already exists.
- *
- * @param path Path to new directory.
- * @return 0 on success, negative on error.
- */
-i64 vfs_mkdir(const char *path)
-{
-  /* Convert to absolute path */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Check if on mounted filesystem with ops */
-  vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops && mount->ops->mkdir) {
-    const char *rel_path = get_relative_path(abs_path, mount);
-    return mount->ops->mkdir(mount->fs_data, rel_path);
-  }
-
-  /* Check if already exists in ramfs */
-  if(resolve_path(abs_path)) {
-    return -1;
-  }
-
-  char        name[VFS_NAME_MAX];
-  vfs_node_t *parent = resolve_parent(abs_path, name);
-
-  if(!parent || parent->type != VFS_DIRECTORY) {
-    return -1;
-  }
-
-  vfs_node_t *dir = create_node(name, VFS_DIRECTORY);
-  if(!dir)
-    return -1;
-
-  add_child(parent, dir);
-  return 0;
-}
-
-/**
- * @brief Open a directory for reading.
- *
- * Opens a directory and returns a directory handle for use with vfs_readdir().
- * Handles both ramfs and mounted filesystem directories.
- *
- * @param path Path to directory.
- * @return Directory handle on success, negative on error.
- */
-// cppcheck-suppress unusedFunction
-i64 vfs_opendir(const char *path)
-{
-  /* Convert to absolute path for mount point detection */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Find free dirfd first */
-  i64 dirfd = -1;
-  for(i64 i = 0; i < VFS_MAX_FD; i++) {
-    if(!dir_table[i].in_use) {
-      dirfd = i;
-      break;
-    }
-  }
-  if(dirfd < 0)
-    return -1;
-
-  /* Check if path is on a mounted filesystem with ops */
-  vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops && mount->ops->open) {
-    const char *rel_path = get_relative_path(abs_path, mount);
-    bool        is_dir   = false;
-    fs_file_t   fh = mount->ops->open(mount->fs_data, rel_path, 0, &is_dir);
-    if(!fh) {
-      return -1;
-    }
-    if(!is_dir) {
-      mount->ops->close(fh);
-      return -1;
-    }
-
-    dir_table[dirfd].in_use  = true;
-    dir_table[dirfd].node    = (vfs_node_t *)fh;
-    dir_table[dirfd].current = NULL;
-    dir_table[dirfd].index   = 0;
-    dir_table[dirfd].ops     = mount->ops;
-
-    return dirfd;
-  }
-
-  /* Ramfs path */
-  vfs_node_t *node = resolve_path(abs_path);
-  if(!node || node->type != VFS_DIRECTORY) {
-    return -1;
-  }
-
-  dir_table[dirfd].in_use  = true;
-  dir_table[dirfd].node    = node;
-  dir_table[dirfd].current = node->children;
-  dir_table[dirfd].index   = 0;
-  dir_table[dirfd].ops     = NULL;
-
-  return dirfd;
-}
-
-/**
- * @brief Read next directory entry.
- *
- * Reads the next entry from an open directory. Returns 1 on success,
- * 0 when no more entries, negative on error.
- *
- * @param dirfd Directory handle from vfs_opendir().
- * @param entry Output buffer for directory entry.
- * @return 1 on success, 0 at end, negative on error.
- */
-// cppcheck-suppress unusedFunction
-i64 vfs_readdir(i64 dirfd, vfs_dirent_t *entry)
-{
-  if(dirfd < 0 || dirfd >= VFS_MAX_FD || !dir_table[dirfd].in_use) {
-    return -1;
-  }
-
-  vfs_dir_t *d = &dir_table[dirfd];
-
-  /* Mounted filesystem directory (has ops) */
-  if(d->ops && d->ops->readdir) {
-    fs_file_t fh = (fs_file_t)d->node;
-    u64       inode;
-    i64       ret =
-        d->ops->readdir(fh, entry->name, &entry->type, &entry->size, &inode);
-    return ret;
-  }
-
-  /* Ramfs directory */
-  if(!d->current) {
-    return 0; /* End of directory */
-  }
-
-  kstrncpy(entry->name, d->current->name, VFS_NAME_MAX);
-  entry->type = d->current->type;
-  entry->size = d->current->size;
-
-  d->current = d->current->next;
-  return 1;
-}
-
-/**
- * @brief Close a directory handle
- * @param dirfd Directory handle from vfs_opendir()
- * @return 0 on success, negative on error
- */
-// cppcheck-suppress unusedFunction
-i64 vfs_closedir(i64 dirfd)
-{
-  if(dirfd < 0 || dirfd >= VFS_MAX_FD || !dir_table[dirfd].in_use) {
-    return -1;
-  }
-
-  vfs_dir_t *d = &dir_table[dirfd];
-
-  /* Close mounted FS handle if needed */
-  if(d->ops && d->ops->close && d->node) {
-    d->ops->close((fs_file_t)d->node);
-  }
-
-  /* Clear the entry */
-  d->in_use  = false;
-  d->node    = NULL;
-  d->current = NULL;
-  d->index   = 0;
-  d->ops     = NULL;
-
-  return 0;
-}
-
-/**
- * @brief Create an empty file (like Unix touch command).
- *
- * Creates an empty file if it doesn't exist. Does nothing if file exists.
- *
- * @param path Path to file.
- * @return 0 on success, negative on error.
- */
-i64 vfs_touch(const char *path)
-{
-  /* Convert to absolute path */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* If exists, just return success */
-  if(resolve_path(abs_path)) {
-    return 0;
-  }
-
-  /* Create empty file - vfs_open will handle the path */
-  i64 fd = vfs_open(abs_path, O_CREAT | O_WRONLY);
-  if(fd < 0)
-    return -1;
-
-  vfs_close(fd);
-  return 0;
-}
-
-/**
- * @brief Remove/delete a file
- * @param path Path to file to remove
- * @return 0 on success, negative errno on error
- */
-i64 vfs_unlink(const char *path)
-{
-  /* Convert to absolute path */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Check if path is on a mounted filesystem with ops */
-  const vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops && mount->ops->unlink) {
-    const char *rel_path = get_relative_path(abs_path, mount);
-    return mount->ops->unlink(mount->fs_data, rel_path);
-  }
-
-  /* Ramfs path */
-  vfs_node_t *node = resolve_path(abs_path);
-  if(!node) {
-    return -ENOENT;
-  }
-  if(node->type != VFS_FILE) {
-    return -EISDIR; /* Can't remove directories with unlink */
-  }
-
-  /* Remove from parent's children list */
-  vfs_node_t *parent = node->parent;
-  if(parent->children == node) {
-    parent->children = node->next;
-  } else {
-    vfs_node_t *prev = parent->children;
-    while(prev && prev->next != node) {
-      prev = prev->next;
-    }
-    if(prev) {
-      prev->next = node->next;
-    }
-  }
-
-  /* Free node data */
-  if(node->data) {
-    kfree(node->data);
-  }
-  kfree(node);
-
-  return 0;
-}
-
-/**
- * @brief Remove an empty directory.
- * @param path Path to directory to remove.
- * @return 0 on success, negative errno on error.
- */
-i64 vfs_rmdir(const char *path)
-{
-  /* Convert to absolute path */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Check if path is on a mounted filesystem with ops */
-  const vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops && mount->ops->rmdir) {
-    const char *rel_path = get_relative_path(abs_path, mount);
-    return mount->ops->rmdir(mount->fs_data, rel_path);
-  }
-
-  /* Ramfs path */
-  vfs_node_t *node = resolve_path(abs_path);
-  if(!node) {
-    return -ENOENT;
-  }
-  if(node->type != VFS_DIRECTORY) {
-    return -ENOTDIR;
-  }
-  if(node->children != NULL) {
-    return -ENOTEMPTY;
-  }
-  if(node == root_node) {
+  proc_t *p = proc_current();
+  if(!p)
     return -EINVAL;
-  }
-
-  /* Remove from parent's children list */
-  vfs_node_t *parent = node->parent;
-  if(parent->children == node) {
-    parent->children = node->next;
-  } else {
-    vfs_node_t *prev = parent->children;
-    while(prev && prev->next != node) {
-      prev = prev->next;
-    }
-    if(prev) {
-      prev->next = node->next;
-    }
-  }
-
-  kfree(node);
-  return 0;
-}
-
-/**
- * @brief Duplicate a file descriptor to the lowest free slot (>= 3).
- *
- * Both the old and the new descriptor share the same node pointer and
- * start with the same offset (POSIX: they share the open file description).
- *
- * @param oldfd Source file descriptor.
- * @return New fd on success, -EBADF / -EMFILE on error.
- */
-i64 vfs_dup(i64 oldfd)
-{
-  if(oldfd < 0 || oldfd >= VFS_MAX_FD || !fd_table[oldfd].in_use)
-    return -EBADF;
-
   for(i64 i = 3; i < VFS_MAX_FD; i++) {
-    if(!fd_table[i].in_use) {
-      fd_table[i] = fd_table[oldfd];
+    if(p->fds[i] < 0) {
+      p->fds[i] = oft_idx;
       return i;
     }
   }
   return -EMFILE;
 }
 
-/**
- * @brief Duplicate a file descriptor to a specific slot.
- *
- * Closes newfd first if it is already open. If oldfd == newfd, returns
- * immediately without any side-effects.
- *
- * @param oldfd Source file descriptor.
- * @param newfd Target file descriptor.
- * @return newfd on success, -EBADF on error.
- */
-i64 vfs_dup2(i64 oldfd, i64 newfd)
+/** @brief Zero the mount table and OFT. */
+void vfs_init(void)
 {
-  if(oldfd < 0 || oldfd >= VFS_MAX_FD || !fd_table[oldfd].in_use)
-    return -EBADF;
-  if(newfd < 0 || newfd >= VFS_MAX_FD)
-    return -EBADF;
-  if(oldfd == newfd)
-    return newfd;
-
-  if(fd_table[newfd].in_use)
-    vfs_close(newfd);
-
-  fd_table[newfd] = fd_table[oldfd];
-  return newfd;
+  kzero(mounts, sizeof(mounts));
+  kzero(oft, sizeof(oft));
 }
 
-/**
- * @brief Get file statistics from an open file descriptor.
- *
- * For ramfs files the node size and type are returned directly.
- * For mounted-filesystem files the file size is obtained by seeking to
- * the end and back.
- *
- * @param fd   Open file descriptor.
- * @param st   Output stat buffer.
- * @return 0 on success, -EBADF on error.
- */
-i64 vfs_fstat_fd(i64 fd, vfs_stat_t *st)
+/** @brief Register a filesystem driver in the type registry. */
+i64 vfs_register_fs(const fs_type_t *fstype)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
-    return -EBADF;
+  if(fs_registry_count >= 8)
+    return -ENOMEM;
+  fs_registry[fs_registry_count++] = fstype;
+  return 0;
+}
 
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh      = (fs_file_t)fd_table[fd].node;
-    u64       saved   = fd_table[fd].offset;
-    i64       end_pos = 0;
-
-    if(fd_table[fd].ops->seek) {
-      end_pos = fd_table[fd].ops->seek(fh, 0, SEEK_END);
-      fd_table[fd].ops->seek(fh, (i64)saved, SEEK_SET);
+/** @brief Unmount the filesystem at @p target, calling the driver's unmount if
+ * provided. */
+i64 vfs_umount(const char *target)
+{
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(target, abs);
+  for(i32 i = 0; i < VFS_MAX_MOUNTS; i++) {
+    if(mounts[i].active && kstreq(mounts[i].target, abs)) {
+      if(mounts[i].type->unmount)
+        mounts[i].type->unmount(mounts[i].fs_data);
+      mounts[i].active = false;
+      return 0;
     }
-
-    st->size = (end_pos >= 0) ? (u64)end_pos : 0;
-    st->type = VFS_FILE;
-    return 0;
   }
+  return -ENOENT;
+}
 
-  const vfs_node_t *node = fd_table[fd].node;
-  st->size = node->size;
-  st->type = node->type;
+/**
+ * @brief Mount @p source at @p target using the named filesystem driver.
+ *
+ * Looks up @p fstype in the driver registry, invokes its @c mount callback to
+ * obtain the volume-private pointer, and records the mount in the first free
+ * slot.  The mount-point path is normalised before storage.
+ */
+i64 vfs_mount(const char *source, const char *target, const char *fstype)
+{
+  const fs_type_t *type = NULL;
+  for(u32 i = 0; i < fs_registry_count; i++) {
+    if(kstreq(fs_registry[i]->name, fstype)) {
+      type = fs_registry[i];
+      break;
+    }
+  }
+  if(!type)
+    return -ENODEV;
+
+  i32 slot = -1;
+  for(i32 i = 0; i < VFS_MAX_MOUNTS; i++) {
+    if(!mounts[i].active) {
+      slot = i;
+      break;
+    }
+  }
+  if(slot < 0)
+    return -ENOMEM;
+
+  void *fs_data = type->mount(source, 0);
+  if(!fs_data)
+    return -EINVAL;
+
+  mounts[slot].active  = true;
+  mounts[slot].type    = type;
+  mounts[slot].ops     = type->ops;
+  mounts[slot].fs_data = fs_data;
+  kstrncpy(mounts[slot].target, target, VFS_PATH_MAX);
+  vfs_normalize(mounts[slot].target);
+
   return 0;
 }
 
 /**
- * @brief Return the open flags of a file descriptor.
- * @param fd File descriptor.
- * @return Flags on success, -EBADF on error.
+ * @brief Open or create a file and install a file descriptor.
+ *
+ * Resolves @p path to an absolute form, dispatches to the responsible driver,
+ * allocates an OFT entry, and returns the lowest available fd ≥ 3.
  */
-i64 vfs_get_flags(i64 fd)
+i64 vfs_open(const char *path, u32 flags)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
-    return -EBADF;
-  return (i64)fd_table[fd].flags;
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+
+  const char  *rel   = NULL;
+  vfs_mount_t *mount = vfs_find_mount(abs, &rel);
+  if(!mount)
+    return -ENOENT;
+
+  fs_handle_t fh = mount->ops->open(mount->fs_data, rel, flags);
+  if(!fh)
+    return -ENOENT;
+
+  i32 oft_idx = oft_alloc();
+  if(oft_idx < 0) {
+    mount->ops->close(fh);
+    return oft_idx;
+  }
+
+  oft[oft_idx].handle = fh;
+  oft[oft_idx].ops    = mount->ops;
+  oft[oft_idx].flags  = flags;
+  oft[oft_idx].kind   = VFS_KIND_FILE;
+  oft[oft_idx].offset = 0;
+
+  i64 fd = vfs_install_fd(oft_idx);
+  if(fd < 0) {
+    vfs_oft_release(oft_idx);
+    return fd;
+  }
+
+  proc_t *p = proc_current();
+  if(p)
+    p->fd_cloexec[fd] = (flags & O_CLOEXEC) ? 1 : 0;
+
+  return fd;
 }
 
 /**
- * @brief Set the open flags of a file descriptor (O_APPEND, O_NONBLOCK…).
+ * @brief Read up to @p count bytes from @p fd into @p buf.
  *
- * Only flags that make sense to change after open are updated;
- * O_RDONLY / O_WRONLY / O_RDWR bits are preserved from the original.
- *
- * @param fd    File descriptor.
- * @param flags Replacement flags.
- * @return 0 on success, -EBADF on error.
+ * Pipe read-ends block until data is available or the write end closes.
+ * The OFT file offset is advanced by the number of bytes actually read.
  */
-i64 vfs_set_flags(i64 fd, u32 flags)
+i64 vfs_read(i64 fd, void *buf, u64 count)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+  i32 oft_idx = fd_to_oft(fd);
+  if(oft_idx < 0)
     return -EBADF;
 
-  /* Keep the access-mode bits, replace the rest */
-  u32 access = fd_table[fd].flags & O_RDWR;
-  fd_table[fd].flags = access | (flags & ~(u32)O_RDWR);
+  vfs_oft_entry_t *e = &oft[oft_idx];
+  if(e->kind == VFS_KIND_PIPE_RD)
+    return pipe_read_obj(e->pipe, buf, count);
+  if(e->kind == VFS_KIND_PIPE_WR)
+    return -EBADF;
+
+  i64 bytes = e->ops->read(e->handle, buf, count, e->offset);
+  if(bytes > 0)
+    e->offset += (u64)bytes;
+  return bytes;
+}
+
+/**
+ * @brief Write @p count bytes from @p buf to @p fd.
+ *
+ * If @c O_APPEND is set the offset is moved to end-of-file before writing.
+ * Pipe write-ends block when the ring buffer is full.
+ */
+i64 vfs_write(i64 fd, const void *buf, u64 count)
+{
+  i32 oft_idx = fd_to_oft(fd);
+  if(oft_idx < 0)
+    return -EBADF;
+
+  vfs_oft_entry_t *e = &oft[oft_idx];
+  if(e->kind == VFS_KIND_PIPE_WR)
+    return pipe_write_obj(e->pipe, buf, count);
+  if(e->kind == VFS_KIND_PIPE_RD)
+    return -EBADF;
+
+  if(e->flags & O_APPEND) {
+    vfs_stat_t st;
+    if(e->ops->fstat(e->handle, &st) == 0)
+      e->offset = st.size;
+  }
+
+  i64 bytes = e->ops->write(e->handle, buf, count, e->offset);
+  if(bytes > 0)
+    e->offset += (u64)bytes;
+  return bytes;
+}
+
+/**
+ * @brief Release a file descriptor and decrement the OFT refcount.
+ *
+ * The fd slot is cleared in the calling process's table.  The underlying OFT
+ * entry is destroyed only when its refcount reaches zero.
+ */
+i64 vfs_close(i64 fd)
+{
+  proc_t *p = proc_current();
+  if(!p || fd < 0 || fd >= VFS_MAX_FD)
+    return -EBADF;
+  i32 oft_idx = p->fds[fd];
+  if(oft_idx < 0)
+    return -EBADF;
+
+  vfs_oft_release(oft_idx);
+  p->fds[fd]        = -1;
+  p->fd_cloexec[fd] = 0;
   return 0;
 }
 
-/**
- * @brief Truncate an open file to the given length.
- *
- * For ramfs files: sets node->size.  Extension with zero-fill is not
- * yet supported (returns -ENOSYS when length > current size).
- * For mounted-FS files: only length == 0 is supported via ops->truncate.
- *
- * @param fd     Open, writable file descriptor.
- * @param length Target length.
- * @return 0 on success, negative errno on error.
- */
-i64 vfs_ftruncate(i64 fd, i64 length)
+/** @brief Stat the node at @p path via the responsible driver. */
+i64 vfs_stat(const char *path, vfs_stat_t *st)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use)
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+  const char  *rel   = NULL;
+  vfs_mount_t *mount = vfs_find_mount(abs, &rel);
+  if(!mount)
+    return -ENOENT;
+  return mount->ops->stat(mount->fs_data, rel, st);
+}
+
+/** @brief Stat an open file descriptor, returning synthetic metadata for pipes.
+ */
+i64 vfs_fstat(i64 fd, vfs_stat_t *st)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
     return -EBADF;
-  if(length < 0)
-    return -EINVAL;
-
-  if(is_mounted_fd(fd)) {
-    if(length == 0 && fd_table[fd].ops->truncate)
-      return fd_table[fd].ops->truncate((fs_file_t)fd_table[fd].node);
-    return (length == 0) ? 0 : -ENOSYS;
-  }
-
-  vfs_node_t *node = fd_table[fd].node;
-  if(!node || node->type != VFS_FILE)
-    return -EINVAL;
-
-  if((u64)length <= node->size) {
-    node->size = (u64)length;
-    if(fd_table[fd].offset > node->size)
-      fd_table[fd].offset = node->size;
+  if(oft[idx].pipe) {
+    kzero(st, sizeof(*st));
+    st->type = VFS_FIFO;
     return 0;
   }
-
-  return -ENOSYS;
+  return oft[idx].ops->fstat(oft[idx].handle, st);
 }
 
-/**
- * @brief Get current working directory
- * @return Pointer to static buffer containing current directory path
- */
-const char *vfs_getcwd(void)
+/** @brief Create a directory at @p path via the responsible driver. */
+i64 vfs_mkdir(const char *path)
 {
-  return cwd;
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+  const char  *rel   = NULL;
+  vfs_mount_t *mount = vfs_find_mount(abs, &rel);
+  if(!mount)
+    return -ENOENT;
+  return mount->ops->mkdir(mount->fs_data, rel);
+}
+
+/** @brief Delete the file at @p path; fails if it is a directory. */
+i64 vfs_unlink(const char *path)
+{
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+  const char  *rel   = NULL;
+  vfs_mount_t *mount = vfs_find_mount(abs, &rel);
+  if(!mount)
+    return -ENOENT;
+  return mount->ops->unlink(mount->fs_data, rel);
+}
+
+/** @brief Remove the empty directory at @p path. */
+i64 vfs_rmdir(const char *path)
+{
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+  const char  *rel   = NULL;
+  vfs_mount_t *mount = vfs_find_mount(abs, &rel);
+  if(!mount)
+    return -ENOENT;
+  return mount->ops->rmdir(mount->fs_data, rel);
 }
 
 /**
- * @brief Get directory entries (Linux getdents syscall)
- * @param fd Directory file descriptor
- * @param buf Buffer to fill with dirent structures
- * @param count Size of buffer in bytes
- * @return Bytes written, 0 at end, negative on error
+ * @brief Reposition the file offset of @p fd.
+ *
+ * @p whence must be ::SEEK_SET, ::SEEK_CUR, or ::SEEK_END.  Seeking on a
+ * pipe returns @c -ESPIPE.  A resulting negative offset returns @c -EINVAL.
+ */
+i64 vfs_seek(i64 fd, i64 offset, i32 whence)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  vfs_oft_entry_t *e = &oft[idx];
+
+  if(e->pipe)
+    return -ESPIPE;
+
+  u64 base;
+  switch(whence) {
+  case SEEK_SET:
+    base = 0;
+    break;
+  case SEEK_CUR:
+    base = e->offset;
+    break;
+  case SEEK_END: {
+    vfs_stat_t st;
+    if(e->ops->fstat(e->handle, &st) < 0)
+      return -EINVAL;
+    base = st.size;
+    break;
+  }
+  default:
+    return -EINVAL;
+  }
+
+  i64 target = (i64)base + offset;
+  if(target < 0)
+    return -EINVAL;
+  e->offset = (u64)target;
+  return target;
+}
+
+/**
+ * @brief Fill @p buf with @c dirent64 entries from an open directory fd.
+ *
+ * Reads as many complete entries as fit within @p count bytes, advancing the
+ * OFT directory position on each successful entry.  Returns 0 when exhausted.
  */
 i64 vfs_getdents(i64 fd, void *buf, u64 count)
 {
-  if(fd < 0 || fd >= VFS_MAX_FD || !fd_table[fd].in_use) {
-    return -1;
-  }
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
 
-  vfs_fd_t *fde = &fd_table[fd];
+  vfs_oft_entry_t *e       = &oft[idx];
+  u8              *out     = (u8 *)buf;
+  u64              written = 0;
 
-  /* Must be opened with O_DIRECTORY */
-  if(!(fde->flags & O_DIRECTORY)) {
-    return -1;
-  }
+  while(written + 32 <= count) {
+    vfs_stat_t st;
+    char       name[VFS_NAME_MAX + 1];
+    i64        ret = e->ops->readdir(e->handle, e->offset, name, &st);
+    if(ret <= 0)
+      break;
 
-  u8 *out     = (u8 *)buf;
-  u64 written = 0;
+    u32 namelen = (u32)kstrlen(name);
+    u32 reclen  = (u32)((19 + namelen + 1 + 7) & ~7ULL);
 
-  /* Handle mounted filesystem directories */
-  if(is_mounted_fd(fd)) {
-    fs_file_t fh = (fs_file_t)fde->node;
+    if(written + reclen > count)
+      break;
 
-    /* Check if it's a directory */
-    if(fde->ops->is_dir && !fde->ops->is_dir(fh)) {
-      return -1;
-    }
-
-    if(!fde->ops->readdir) {
-      return -1;
-    }
-
-    char name[VFS_NAME_MAX];
-    u8   type;
-    u64  size;
-    u64  inode;
-
-    while(written < count) {
-      i64 ret = fde->ops->readdir(fh, name, &type, &size, &inode);
-      if(ret <= 0) {
-        break; /* End of directory or error */
-      }
-
-      u64 namelen = kstrlen(name);
-      u64 reclen  = 8 + 8 + 2 + 1 + namelen + 1;
-      reclen      = (reclen + 7) & ~7; /* Align to 8 bytes */
-
-      if(written + reclen > count) {
-        break; /* No more room */
-      }
-
-      u8 *p            = out + written;
-      *(u64 *)p        = inode;                  /* d_ino */
-      *(i64 *)(p + 8)  = (i64)(fde->offset + 1); /* d_off */
-      *(u16 *)(p + 16) = (u16)reclen;            /* d_reclen */
-      *(u8 *)(p + 18)  = (type == VFS_DIRECTORY) ? DT_DIR : DT_REG; /* d_type */
-      kstrncpy((char *)(p + 19), name, namelen + 1);                /* d_name */
-
-      written += reclen;
-      fde->offset++;
-    }
-
-    return (i64)written;
-  }
-
-  /* Ramfs directory */
-  vfs_node_t *dir = fde->node;
-  if(!dir || dir->type != VFS_DIRECTORY) {
-    return -1;
-  }
-
-  /* Get current position in directory listing */
-  u64         pos   = fde->offset;
-  vfs_node_t *child = dir->children;
-
-  /* Skip to current position */
-  for(u64 i = 0; i < pos && child; i++) {
-    child = child->next;
-  }
-
-  if(!child) {
-    return 0; /* End of directory */
-  }
-
-  while(child && written < count) {
-    /* Calculate record length (must be 8-byte aligned) */
-    u64 namelen = kstrlen(child->name);
-    /* Size: d_ino(8) + d_off(8) + d_reclen(2) + d_type(1) + name + null */
-    u64 reclen = 8 + 8 + 2 + 1 + namelen + 1;
-    reclen     = (reclen + 7) & ~7; /* Align to 8 bytes */
-
-    if(written + reclen > count) {
-      break; /* No more room */
-    }
-
-    /* Write fields manually to avoid struct padding issues */
-    u8 *p            = out + written;
-    *(u64 *)p        = (u64)(uintptr_t)child; /* d_ino */
-    *(i64 *)(p + 8)  = (i64)(pos + 1);        /* d_off */
-    *(u16 *)(p + 16) = (u16)reclen;           /* d_reclen */
-    *(u8 *)(p + 18) =
-        (child->type == VFS_DIRECTORY) ? DT_DIR : DT_REG; /* d_type */
-    kstrncpy((char *)(p + 19), child->name, namelen + 1); /* d_name */
+    dirent_t *d = (dirent_t *)(out + written);
+    d->d_ino    = st.ino;
+    d->d_off    = (i64)(e->offset + 1);
+    d->d_reclen = (u16)reclen;
+    d->d_type   = (st.type == VFS_DIRECTORY) ? DT_DIR : DT_REG;
+    kstrncpy(d->d_name, name, namelen + 1);
 
     written += reclen;
-    fde->offset++;
-    pos++;
-    child = child->next;
+    e->offset++;
   }
 
   return (i64)written;
 }
 
 /**
- * @brief Change current working directory.
+ * @brief Change the calling process's working directory to @p path.
  *
- * Updates the process's current working directory to the specified path.
- * Handles both ramfs and mounted filesystem directories.
- *
- * @param path Path to new directory (absolute or relative).
- * @return 0 on success, negative on error.
+ * The path is validated as an existing directory before updating
+ * @c proc_t::cwd.  Returns @c -ENOTDIR if the target does not exist or is
+ * not a directory.
  */
 i64 vfs_chdir(const char *path)
 {
-  /* Build absolute path first */
-  char abs_path[VFS_PATH_MAX];
-  make_absolute_path(path, abs_path, VFS_PATH_MAX);
-
-  /* Check if on mounted filesystem with ops */
-  vfs_mount_t *mount = find_mount(abs_path);
-  if(mount && mount->ops && mount->ops->open) {
-    const char *rel_path = get_relative_path(abs_path, mount);
-
-    /* Verify directory exists */
-    bool      is_dir = false;
-    fs_file_t dir    = mount->ops->open(mount->fs_data, rel_path, 0, &is_dir);
-    if(!dir || !is_dir) {
-      if(dir)
-        mount->ops->close(dir);
-      return -1;
-    }
-    mount->ops->close(dir);
-
-    /* Update cwd to normalized absolute path */
-    kstrncpy(cwd, abs_path, VFS_PATH_MAX);
-    return 0;
-  }
-
-  /* Ramfs path - verify with resolve_path */
-  const vfs_node_t *node = resolve_path(path);
-  if(!node || node->type != VFS_DIRECTORY) {
-    return -1;
-  }
-
-  /* Update cwd to normalized absolute path */
-  kstrncpy(cwd, abs_path, VFS_PATH_MAX);
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+  vfs_stat_t st;
+  if(vfs_stat(abs, &st) < 0 || st.type != VFS_DIRECTORY)
+    return -ENOTDIR;
+  proc_t *p = proc_current();
+  if(p)
+    kstrncpy(p->cwd, abs, VFS_PATH_MAX);
   return 0;
 }
 
 /**
- * @brief Check if path starts with a specific prefix.
- * @param path Path to check.
- * @param prefix Prefix to match.
- * @return true if path starts with prefix.
- */
-static bool starts_with(const char *path, const char *prefix)
-{
-  /* Special case: root mount point "/" matches everything starting with "/" */
-  if(prefix[0] == '/' && prefix[1] == '\0') {
-    return path[0] == '/';
-  }
-
-  while(*prefix) {
-    if(*path != *prefix)
-      return false;
-    path++;
-    prefix++;
-  }
-  /* After prefix, must be / or end */
-  return (*path == '\0' || *path == '/');
-}
-
-/**
- * @brief Find mount point for path
- * @param path Path to search for mount point
- * @return Mount point structure or NULL if path is on ramfs
- */
-static vfs_mount_t *find_mount(const char *path)
-{
-  vfs_mount_t *best     = NULL;
-  u64          best_len = 0;
-
-  for(int i = 0; i < VFS_MAX_MOUNTS; i++) {
-    if(!mounts[i].active)
-      continue;
-
-    u64 len = kstrlen(mounts[i].path);
-    if(starts_with(path, mounts[i].path) && len > best_len) {
-      best     = &mounts[i];
-      best_len = len;
-    }
-  }
-
-  return best;
-}
-
-/**
- * @brief Get path relative to mount point
- * @param path Absolute path
- * @param mount Mount point
- * @return Relative path within mounted filesystem
- */
-static const char *get_relative_path(const char *path, const vfs_mount_t *mount)
-{
-  const char *rel = path + kstrlen(mount->path);
-  if(*rel == '\0')
-    return "/";
-  return rel;
-}
-
-/**
- * @brief Parse device path to get drive number
- * @param source Device path (e.g., "/dev/hda")
- * @return Drive number (0-3), or 0 as default
+ * @brief Return a pointer to the calling process's current working directory.
  *
- * Mappings:
- * - /dev/hda -> 0 (Primary Master)
- * - /dev/hdb -> 1 (Primary Slave)
- * - /dev/hdc -> 2 (Secondary Master)
- * - /dev/hdd -> 3 (Secondary Slave)
+ * The pointer addresses storage inside the current @c proc_t.  Returns
+ * @c "/" when no process is running (early-boot context).
  */
-static i32 parse_device_path(const char *source)
+const char *vfs_getcwd(void)
 {
-  if(!source)
-    return 0; /* Default to drive 0 */
-
-  /* Check for /dev/hdX format */
-  if(source[0] == '/' && source[1] == 'd' && source[2] == 'e' &&
-     source[3] == 'v' && source[4] == '/' && source[5] == 'h' &&
-     source[6] == 'd') {
-    char drive_letter = source[7];
-    if(drive_letter >= 'a' && drive_letter <= 'd') {
-      return drive_letter - 'a';
-    }
-  }
-
-  /* Try to parse as raw number */
-  if(source[0] >= '0' && source[0] <= '3') {
-    return source[0] - '0';
-  }
-
-  return 0; /* Default */
+  proc_t *p = proc_current();
+  return p ? p->cwd : "/";
 }
 
+#define RENAME_CHUNK 4096
+
 /**
- * @brief Mount a filesystem
- * @param source Device path (e.g., "/dev/hda") or NULL
- * @param target Mount point path (must exist)
- * @param fstype Filesystem type
- * @return 0 on success, negative on error
+ * @brief Rename (move) a file, copying across mount points if necessary.
+ *
+ * Opens @p oldpath and @p newpath directly through their driver handles to
+ * avoid consuming process fd slots.  The copy-and-unlink is not atomic.
+ * Directories and files larger than 16 MiB are rejected.
  */
-i64 vfs_mount(const char *source, const char *target, const char *fstype)
+i64 vfs_rename(const char *oldpath, const char *newpath)
 {
-  if(!target || !fstype)
-    return -1;
+  char abs_old[VFS_PATH_MAX];
+  char abs_new[VFS_PATH_MAX];
+  vfs_make_absolute(oldpath, abs_old);
+  vfs_make_absolute(newpath, abs_new);
 
-  /* Find free mount slot */
-  int slot = -1;
-  for(int i = 0; i < VFS_MAX_MOUNTS; i++) {
-    if(!mounts[i].active) {
-      slot = i;
-      break;
-    }
+  vfs_stat_t st;
+  if(vfs_stat(abs_old, &st) < 0)
+    return -ENOENT;
+  if(st.type == VFS_DIRECTORY)
+    return -EISDIR;
+  if(st.size > 16ULL * 1024 * 1024)
+    return -ENOSYS;
+
+  const char  *src_rel, *dst_rel;
+  vfs_mount_t *src_m = vfs_find_mount(abs_old, &src_rel);
+  vfs_mount_t *dst_m = vfs_find_mount(abs_new, &dst_rel);
+  if(!src_m || !dst_m)
+    return -ENOENT;
+
+  fs_handle_t src_fh = src_m->ops->open(src_m->fs_data, src_rel, O_RDONLY);
+  if(!src_fh)
+    return -ENOENT;
+
+  fs_handle_t dst_fh =
+      dst_m->ops->open(dst_m->fs_data, dst_rel, O_WRONLY | O_CREAT | O_TRUNC);
+  if(!dst_fh) {
+    src_m->ops->close(src_fh);
+    return -EIO;
   }
 
-  if(slot < 0) {
-    console_printf("[vfs] mount: no free mount slots\n");
-    return -1;
+  static u8 rename_buf[RENAME_CHUNK];
+  u64       off = 0;
+  i64       n;
+  while((n = src_m->ops->read(src_fh, rename_buf, RENAME_CHUNK, off)) > 0) {
+    dst_m->ops->write(dst_fh, rename_buf, (u64)n, off);
+    off += (u64)n;
   }
 
-  /* Create mount point directory in ramfs if needed */
-  const vfs_node_t *mp = resolve_path(target);
-  if(!mp) {
-    if(vfs_mkdir(target) < 0) {
-      console_printf("[vfs] mount: failed to create mount point %s\n", target);
-      return -1;
-    }
-  }
-
-  /* Handle ramfs specially (no device needed) */
-  if(kstreq(fstype, "ramfs")) {
-    mounts[slot].ops     = NULL;
-    mounts[slot].fs_data = NULL;
-    mounts[slot].fstype  = NULL;
-    kstrncpy(mounts[slot].path, target, VFS_PATH_MAX);
-    mounts[slot].active = true;
-
-    console_printf("[vfs] mounted ramfs at %s\n", target);
-    return 0;
-  }
-
-  /* Look up registered filesystem by name */
-  const fs_type_t *fs = NULL;
-  for(int i = 0; i < fs_type_count; i++) {
-    if(kstreq(fs_types[i]->name, fstype)) {
-      fs = fs_types[i];
-      break;
-    }
-  }
-  if(!fs) {
-    console_printf("[vfs] mount: unknown filesystem type '%s'\n", fstype);
-    return -1;
-  }
-
-  /* Parse device path */
-  i32 drive = parse_device_path(source);
-  if(drive < 0) {
-    console_printf("[vfs] mount: invalid device %s\n", source);
-    return -1;
-  }
-
-  /* Mount via registered fs type */
-  void *vol = fs->mount((u8)drive, 0);
-  if(!vol) {
-    console_printf(
-        "[vfs] mount: failed to mount %s from drive %d\n", fstype, drive
-    );
-    return -1;
-  }
-
-  mounts[slot].ops     = fs->ops;
-  mounts[slot].fs_data = vol;
-  mounts[slot].fstype  = fs;
-  kstrncpy(mounts[slot].path, target, VFS_PATH_MAX);
-  mounts[slot].active = true;
-
-  console_printf(
-      "[vfs] mounted %s (%s) on %s\n", source ? source : "/dev/hda", fstype,
-      target
-  );
+  src_m->ops->close(src_fh);
+  dst_m->ops->close(dst_fh);
+  src_m->ops->unlink(src_m->fs_data, src_rel);
   return 0;
 }
 
-/**
- * @brief Unmount a filesystem
- * @param target Mount point path to unmount
- * @return 0 on success, negative on error
- */
-// cppcheck-suppress unusedFunction
-i64 vfs_umount(const char *target)
+/** @brief Read the target of the symbolic link at @p path into @p buf. */
+i64 vfs_readlink(const char *path, char *buf, u64 cap)
 {
-  if(!target)
-    return -1;
+  char abs[VFS_PATH_MAX];
+  vfs_make_absolute(path, abs);
+  const char  *rel;
+  vfs_mount_t *m = vfs_find_mount(abs, &rel);
+  if(!m || !m->ops->readlink)
+    return -ENOSYS;
+  return m->ops->readlink(m->fs_data, rel, buf, cap);
+}
 
-  for(int i = 0; i < VFS_MAX_MOUNTS; i++) {
-    if(mounts[i].active && kstreq(mounts[i].path, target)) {
-      /* Unmount via registered fs type if present */
-      if(mounts[i].fstype && mounts[i].fstype->unmount && mounts[i].fs_data) {
-        mounts[i].fstype->unmount(mounts[i].fs_data);
-      }
-      mounts[i].active = false;
-      mounts[i].fstype = NULL;
-      console_printf("[vfs] unmounted %s\n", target);
-      return 0;
-    }
-  }
+/** @brief Truncate @p fd to exactly @p length bytes via the driver. */
+i64 vfs_ftruncate(i64 fd, u64 length)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  if(oft[idx].pipe)
+    return -EINVAL;
+  return oft[idx].ops->truncate(oft[idx].handle, length);
+}
 
-  return -1;
+/** @brief Return the open flags stored in the OFT for @p fd. */
+i64 vfs_get_flags(i64 fd)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  return oft[idx].flags;
+}
+
+/** @brief Overwrite the open flags for @p fd (used by @c fcntl @c F_SETFL). */
+i64 vfs_set_flags(i64 fd, u32 flags)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  oft[idx].flags = flags;
+  return 0;
+}
+
+/** @brief Duplicate @p oldfd into the lowest free fd ≥ 3 and retain the OFT
+ * entry. */
+i64 vfs_dup(i64 oldfd)
+{
+  i32 idx = fd_to_oft(oldfd);
+  if(idx < 0)
+    return -EBADF;
+  i64 newfd = vfs_install_fd(idx);
+  if(newfd >= 0)
+    vfs_oft_retain(idx);
+  return newfd;
 }
 
 /**
- * @brief Close all FDs owned by a specific PID.
+ * @brief Duplicate @p oldfd into the specific slot @p newfd.
  *
- * Called by proc_exit to clean up resources.
- *
- * @param pid Process ID.
+ * If @p newfd is already open it is silently closed first.  If @p oldfd
+ * equals @p newfd the call is a no-op.
  */
-void vfs_close_for_pid(u64 pid)
+i64 vfs_dup2(i64 oldfd, i64 newfd)
 {
-  if(pid == 0)
-    return;
+  if(oldfd == newfd)
+    return newfd;
+  i32 idx = fd_to_oft(oldfd);
+  if(idx < 0)
+    return -EBADF;
+  proc_t *p = proc_current();
+  if(newfd < 0 || newfd >= VFS_MAX_FD)
+    return -EBADF;
+  if(p->fds[newfd] >= 0)
+    vfs_close(newfd);
+  p->fds[newfd] = idx;
+  vfs_oft_retain(idx);
+  return newfd;
+}
 
+/** @brief Return positive if @p fd has data available without blocking, 0 if
+ * not ready. */
+i32 vfs_select_read_ready(i64 fd)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  if(oft[idx].kind == VFS_KIND_PIPE_WR)
+    return -EBADF;
+  if(oft[idx].kind == VFS_KIND_PIPE_RD)
+    return pipe_poll_read_ready(oft[idx].pipe) ? 1 : 0;
+  return 1;
+}
+
+/** @brief Return positive if @p fd can accept a write without blocking, 0 if
+ * not ready. */
+i32 vfs_select_write_ready(i64 fd)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  if(oft[idx].kind == VFS_KIND_PIPE_RD)
+    return -EBADF;
+  if(oft[idx].kind == VFS_KIND_PIPE_WR)
+    return pipe_poll_write_ready(oft[idx].pipe) ? 1 : 0;
+  return 1;
+}
+
+/** @brief Return @c true if @p fd refers to either end of a pipe. */
+bool vfs_fd_is_pipe(u64 fd)
+{
+  i32 idx = fd_to_oft((i64)fd);
+  if(idx < 0)
+    return false;
+  return oft[idx].kind == VFS_KIND_PIPE_RD || oft[idx].kind == VFS_KIND_PIPE_WR;
+}
+
+/** @brief Return @c true if @p fd is currently open in the calling process. */
+bool vfs_fd_is_valid(i64 fd)
+{
+  return fd_to_oft(fd) >= 0;
+}
+
+/** @brief Allocate an OFT entry for one end of a pipe and set its kind. */
+i32 vfs_oft_alloc_pipe(i32 kind, void *pipe)
+{
+  i32 idx = oft_alloc();
+  if(idx < 0)
+    return idx;
+  oft[idx].kind = kind;
+  oft[idx].pipe = pipe;
+  return idx;
+}
+
+/** @brief Initialise @p fds to the "all closed" state (-1 in every slot). */
+void vfs_proc_init_fds(i32 *fds)
+{
+  for(int i = 0; i < VFS_MAX_FD; i++)
+    fds[i] = -1;
+}
+
+/**
+ * @brief Copy the parent's fd table into the child's after @c fork.
+ *
+ * Retains every open OFT entry so parent and child hold independent
+ * references to the same descriptions.
+ */
+void vfs_proc_inherit_fds(
+    i32 *child_fds, u8 *child_clox, const i32 *parent_fds, const u8 *parent_clox
+)
+{
   for(int i = 0; i < VFS_MAX_FD; i++) {
-    if(fd_table[i].in_use && fd_table[i].owner_pid == pid) {
-      vfs_close(i);
+    child_fds[i]  = parent_fds[i];
+    child_clox[i] = parent_clox[i];
+    if(child_fds[i] >= 0)
+      vfs_oft_retain(child_fds[i]);
+  }
+}
+
+/**
+ * @brief Release all file descriptors held by an exiting process.
+ *
+ * Calls ::vfs_oft_release for every open slot and sets each entry to -1.
+ * OFT entries are destroyed only when their refcount reaches zero.
+ */
+void vfs_proc_release_fds(i32 *fds)
+{
+  for(int i = 0; i < VFS_MAX_FD; i++) {
+    if(fds[i] >= 0) {
+      vfs_oft_release(fds[i]);
+      fds[i] = -1;
     }
   }
 }
 
 /**
- * @brief Register a filesystem type.
+ * @brief Close every fd in the calling process that has @c FD_CLOEXEC set.
  *
- * Called by filesystem drivers during init to make themselves mountable.
- *
- * @param fs Filesystem type descriptor.
- * @return 0 on success, negative on error.
+ * Called by the @c execve path after the new image is loaded, before waking
+ * any vfork-blocked parent.
  */
-i64 vfs_register_fs(const fs_type_t *fs)
+void vfs_proc_close_cloexec_fds(void)
 {
-  if(!fs || !fs->name || !fs->ops) {
-    return -1;
-  }
-
-  if(fs_type_count >= VFS_MAX_FSTYPES) {
-    console_printf("[vfs] register_fs: too many filesystem types\n");
-    return -1;
-  }
-
-  /* Check for duplicate */
-  for(int i = 0; i < fs_type_count; i++) {
-    if(kstreq(fs_types[i]->name, fs->name)) {
-      console_printf("[vfs] register_fs: '%s' already registered\n", fs->name);
-      return -1;
+  proc_t *p = proc_current();
+  if(!p)
+    return;
+  for(int i = 0; i < VFS_MAX_FD; i++) {
+    if(p->fd_cloexec[i] && p->fds[i] >= 0) {
+      vfs_oft_release(p->fds[i]);
+      p->fds[i]        = -1;
+      p->fd_cloexec[i] = 0;
     }
   }
-
-  fs_types[fs_type_count++] = fs;
-  console_printf("[vfs] registered filesystem: %s\n", fs->name);
-  return 0;
 }

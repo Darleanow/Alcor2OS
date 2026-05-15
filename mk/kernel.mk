@@ -12,9 +12,11 @@ USER_APPS_CPPS := $(shell find user/apps \( -path '*/.cache/*' \) -prune -o -nam
 MUSL_CROSS_SYS := thirdparty/musl-cross/x86_64-linux-musl
 LIBCXX_HDR     := $(firstword $(wildcard $(MUSL_CROSS_SYS)/include/c++/*))
 
+# Each .c is compiled via ccache (when CCACHE=1) so that CI hits the object
+# cache on unchanged files.  CCACHE_PREFIX is set in mk/config.mk.
 $(BUILD)/%.c.o: $(SRC)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CCACHE_PREFIX) $(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/%.asm.o: $(SRC)/%.asm
 	@mkdir -p $(@D)
@@ -44,7 +46,7 @@ compile_commands: $(OBJS)
 		echo '    "file": "'"$$src"'"' >> compile_commands.json; \
 		echo '  },' >> compile_commands.json; \
 	done
-	@if [ -n "$(strip $(USER_APPS_CPPS))" ] && [ -n "$(strip $(LIBCXX_HDR))" ] && [ -d "$(LIBCXX_HDR)" ]; then \
+	@if [ -n "$(strip $(USER_APPS_CPPS))" ]; then \
 		for cpp in $(USER_APPS_CPPS); do \
 			echo '  {' >> compile_commands.json; \
 			echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \
@@ -60,7 +62,7 @@ compile_commands: $(OBJS)
 			echo '      "-isystem",' >> compile_commands.json; \
 			echo '      "'"$(MUSL_CROSS_SYS)/include"'",' >> compile_commands.json; \
 			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"thirdparty/musl/install/include"'",' >> compile_commands.json; \
+			echo '      "'"thirdparty/musl/$(MUSL_PREFIX)/include"'",' >> compile_commands.json; \
 			echo '      "-isystem",' >> compile_commands.json; \
 			echo '      "'"$(INCLUDE)"'",' >> compile_commands.json; \
 			echo '      "-Wall",' >> compile_commands.json; \

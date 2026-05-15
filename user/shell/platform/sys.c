@@ -4,23 +4,34 @@
  * Thin wrappers around standard libc functions.
  */
 
-#include "shell.h"
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <termios.h>
 #include <unistd.h>
+#include <vega/fb_tty.h>
+#include <vega/shell.h>
 
 /** Process Control */
 
-/**
- * @brief Exit shell with status code
- * @param code Exit status
- */
 void sh_exit(int code)
 {
   exit(code);
+}
+
+void sh_set_stdin_raw(void)
+{
+  struct termios t;
+  if(tcgetattr(STDIN_FILENO, &t) != 0)
+    return;
+  t.c_lflag &= ~(tcflag_t)(ICANON | ECHO | ISIG | IEXTEN);
+  t.c_iflag &= ~(tcflag_t)(ICRNL | IXON);
+  t.c_cc[VMIN]  = 1;
+  t.c_cc[VTIME] = 0;
+  tcsetattr(STDIN_FILENO, TCSANOW, &t);
 }
 
 /** I/O Functions */
@@ -51,7 +62,9 @@ long sh_write(int fd, const void *buf, size_t len)
 
 int sh_ioctl(int fd, unsigned long request, void *arg)
 {
-  return ioctl(fd, request, arg);
+  return ioctl(
+      fd, (int)request, arg
+  ); /* request fits int; cast silences narrowing */
 }
 
 /**
@@ -70,9 +83,12 @@ void sh_kbd_layout(kbd_layout_t layout)
  */
 void sh_clear(void)
 {
-  /* ANSI escape sequence to clear screen */
+  if(sh_fb_tty_active()) {
+    sh_fb_tty_clear();
+    return;
+  }
   const char *clear = "\033[2J\033[H";
-  write(STDOUT_FILENO, clear, 7);
+  write(STDOUT_FILENO, clear, strlen(clear));
 }
 
 /** Filesystem Functions */
@@ -178,22 +194,4 @@ char *sh_getcwd(char *buf, size_t size)
 int sh_unlink(const char *path)
 {
   return unlink(path);
-}
-
-/** Process Execution */
-
-/* Simple exec wrapper using fork/exec pattern */
-extern int execve(const char *path, char *const argv[], char *const envp[]);
-
-/**
- * @brief Execute a program
- * @param path Path to executable
- * @param argv Argument array (NULL-terminated)
- * @return Exit code of child process, or negative on error
- */
-int sh_exec(const char *path, char *const argv[])
-{
-  /* For now, directly call execve syscall */
-  /* Our kernel's execve creates a child process and waits */
-  return execve(path, argv, NULL);
 }

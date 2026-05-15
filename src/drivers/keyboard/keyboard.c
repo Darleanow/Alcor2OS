@@ -1,6 +1,6 @@
 /**
  * @file src/drivers/keyboard/keyboard.c
- * @brief PS/2 keyboard: raw scancode ring; translation in kbd_layout.c.
+ * @brief PS/2 keyboard driver with scancode translation.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -16,7 +16,7 @@ static u8           kb_buffer[KB_BUFFER_SIZE];
 static volatile u32 kb_read_pos  = 0;
 static volatile u32 kb_write_pos = 0;
 
-static void kb_push(u8 b)
+static void         kb_push(u8 b)
 {
   u32 next = (kb_write_pos + 1) % KB_BUFFER_SIZE;
   if(next != kb_read_pos) {
@@ -33,10 +33,26 @@ bool keyboard_raw_available(void)
 u8 keyboard_raw_pop(void)
 {
   cpu_disable_interrupts();
-  u8 b = kb_buffer[kb_read_pos];
+  u8 b        = kb_buffer[kb_read_pos];
   kb_read_pos = (kb_read_pos + 1) % KB_BUFFER_SIZE;
   cpu_enable_interrupts();
   return b;
+}
+
+u32 keyboard_raw_peek(u8 *dst, u32 cap)
+{
+  if(!dst || cap == 0)
+    return 0;
+  cpu_disable_interrupts();
+  u32 rp = kb_read_pos;
+  u32 wp = kb_write_pos;
+  u32 n  = (wp + KB_BUFFER_SIZE - rp) % KB_BUFFER_SIZE;
+  if(n > cap)
+    n = cap;
+  for(u32 i = 0; i < n; i++)
+    dst[i] = kb_buffer[(rp + i) % KB_BUFFER_SIZE];
+  cpu_enable_interrupts();
+  return n;
 }
 
 void keyboard_irq(void)

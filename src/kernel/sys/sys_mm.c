@@ -2,27 +2,29 @@
  * @file src/kernel/sys/sys_mm.c
  * @brief Memory syscalls: `mmap`, `mprotect`, `munmap`, `brk`.
  *
- * Page alignment, prot → PTE flags, filling file-backed pages through the VFS, and anonymous
- * ranges via `vmm_map_range_alloc` where applicable.
+ * Page alignment, prot → PTE flags, filling file-backed pages through the VFS,
+ * and anonymous ranges via `vmm_map_range_alloc` where applicable.
  */
 
+#include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/fs/vfs.h>
-#include <alcor2/mm/vmm.h>
 
-#define MAP_SHARED    0x01
-#define MAP_PRIVATE   0x02
-#define MAP_FIXED     0x10
-#define MAP_ANONYMOUS 0x20
+#define MAP_SHARED      0x01
+#define MAP_PRIVATE     0x02
+#define MAP_FIXED       0x10
+#define MAP_ANONYMOUS   0x20
 
-#define PROT_NONE  0x00
-#define PROT_READ  0x01
-#define PROT_WRITE 0x02
-#define PROT_EXEC  0x04
+#define PROT_NONE       0x00
+#define PROT_READ       0x01
+#define PROT_WRITE      0x02
+#define PROT_EXEC       0x04
 
 #define PAGE_MASK_LOCAL (PAGE_SIZE - 1)
 
@@ -51,7 +53,8 @@ static void unmap_and_free_range(u64 start, u64 length)
     u64 phys = vmm_get_phys(va);
     if(phys) {
       vmm_unmap(va);
-      pmm_free((void *)phys);
+      if(!fb_user_phys_page_is_framebuffer(phys))
+        pmm_free((void *)phys);
     }
   }
 }
@@ -82,8 +85,10 @@ static void fill_file_backed_pages(u64 base, u64 length, i64 fd, u64 offset)
   vfs_seek(fd, (i64)offset, SEEK_SET);
 
   for(u64 map_off = 0; map_off < length;) {
-    u64 page_virt  = base + map_off;
-    u64 phys       = vmm_get_phys(page_virt);
+    u64 page_virt = base + map_off;
+    u64 phys      = vmm_get_phys(page_virt);
+    if(!phys)
+      break;
     u8 *dst        = (u8 *)(phys + vmm_get_hhdm());
     u64 page_local = map_off & PAGE_MASK_LOCAL;
     u64 chunk      = PAGE_SIZE - page_local;
@@ -108,17 +113,41 @@ u64 sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
   if(!p)
     return (u64)-ENOMEM;
 
+  const bool fixed = (flags & MAP_FIXED) != 0;
+  if(fixed && addr == 0)
+    return (u64)-EINVAL;
+
   u64 aligned_len = page_align_up(length);
-  u64 base = ((flags & MAP_FIXED) && addr != 0) ? page_align_down(addr) : p->mmap_base;
-  if(!(flags & MAP_FIXED) || addr == 0)
-    p->mmap_base += aligned_len;
+  if(aligned_len < length)
+    return (u64)-ENOMEM;
+
+  u64 base = (fixed && addr != 0) ? page_align_down(addr)
+                                  : page_align_down(p->mmap_base);
+  u64 end  = base + aligned_len;
+  if(end < base || end > USER_SPACE_END)
+    return (u64)-ENOMEM;
+
+  bool is_anon = (flags & MAP_ANONYMOUS) != 0 || fd == (u64)-1;
+  if(!is_anon && (offset & PAGE_MASK_LOCAL))
+    return (u64)-EINVAL;
 
   u64 map_flags = build_vmm_flags(prot);
-  i64 map_ret   = map_zeroed_user_range(base, aligned_len, map_flags);
+
+  /* MAP_FIXED requires "replace any existing mapping at this range with a
+   * fresh zero-filled mapping" semantics. vmm_map_range_alloc skips pages
+   * already PRESENT, so the new contents would be stale parent/peer data —
+   * which is what causes mallocng's a_crash() (heap metadata mismatch).
+   * Unmap the range first so the subsequent alloc sees only fresh pages. */
+  if(fixed)
+    unmap_and_free_range(base, aligned_len);
+
+  i64 map_ret = map_zeroed_user_range(base, aligned_len, map_flags);
   if(map_ret < 0)
     return (u64)map_ret;
 
-  bool is_anon = (flags & MAP_ANONYMOUS) || (fd == (u64)-1);
+  if(!fixed)
+    p->mmap_base = end;
+
   if(!is_anon)
     fill_file_backed_pages(base, length, (i64)fd, offset);
 

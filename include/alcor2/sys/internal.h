@@ -2,18 +2,20 @@
  * @file include/alcor2/sys/internal.h
  * @brief Kernel-only declarations for the syscall implementation layer.
  *
- * Not a user-facing API. Centralizes prototypes expected by `syscall_dispatch` and the
- * `sys_*.c`, `pipe.c`, and `signal.c` modules.
+ * Not a user-facing API. Centralizes prototypes expected by `syscall_dispatch`
+ * and the `sys_*.c`, `pipe.c`, and `signal.c` modules.
  *
  * @par Handler contract
- * Each `sys_*` takes six `u64` arguments in Linux x86_64 order: RDI, RSI, RDX, R10, R8, R9
- * (the dispatcher reads the syscall frame and passes them through unchanged).
- * Return value is `u64`; on error use `(u64)-errno` with codes from `errno.h` (e.g. `(u64)-EINVAL`).
+ * Each `sys_*` takes six `u64` arguments in Linux x86_64 order: RDI, RSI, RDX,
+ * R10, R8, R9 (the dispatcher reads the syscall frame and passes them through
+ * unchanged). Return value is `u64`; on error use `(u64)-errno` with codes from
+ * `errno.h` (e.g. `(u64)-EINVAL`).
  *
  * The `SYSCALL_DECL(name)` macro pins this signature so it cannot drift.
  *
  * @par Unimplemented numbers
- * Numbers not present in the table in `sys_dispatch.c` yield `-ENOSYS` (see implementation).
+ * Numbers not present in the table in `sys_dispatch.c` yield `-ENOSYS` (see
+ * implementation).
  */
 
 #ifndef ALCOR2_SYS_INTERNAL_H
@@ -23,6 +25,15 @@
 
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
 
+/** @brief Descriptor for a single syscall mapping. */
+typedef struct
+{
+  u64          num;     /**< Syscall number (RAX) */
+  const char  *name;    /**< Symbolic name for tracing */
+  int          nargs;   /**< Argument count (0-6) */
+  syscall_fn_t handler; /**< Implementation function */
+} sys_def_t;
+
 #define SYSCALL_DECL(name) u64 name(u64, u64, u64, u64, u64, u64)
 
 /* I/O */
@@ -31,7 +42,10 @@ SYSCALL_DECL(sys_write);
 SYSCALL_DECL(sys_lseek);
 SYSCALL_DECL(sys_ioctl);
 SYSCALL_DECL(sys_nanosleep);
+SYSCALL_DECL(sys_readv);
 SYSCALL_DECL(sys_writev);
+SYSCALL_DECL(sys_select);
+SYSCALL_DECL(sys_poll);
 
 /* Memory */
 SYSCALL_DECL(sys_mmap);
@@ -46,6 +60,8 @@ SYSCALL_DECL(sys_stat);
 SYSCALL_DECL(sys_fstat);
 SYSCALL_DECL(sys_lstat);
 SYSCALL_DECL(sys_access);
+SYSCALL_DECL(sys_faccessat);
+SYSCALL_DECL(sys_newfstatat);
 SYSCALL_DECL(sys_dup);
 SYSCALL_DECL(sys_dup2);
 SYSCALL_DECL(sys_fcntl);
@@ -86,34 +102,70 @@ SYSCALL_DECL(sys_gettimeofday);
 SYSCALL_DECL(sys_futex);
 SYSCALL_DECL(sys_clock_gettime);
 SYSCALL_DECL(sys_sched_yield);
+SYSCALL_DECL(sys_sched_getaffinity);
+SYSCALL_DECL(sys_getrlimit);
+SYSCALL_DECL(sys_prlimit64);
 
 /* Signals and arch (Linux ABI) */
 SYSCALL_DECL(sys_rt_sigaction);
 SYSCALL_DECL(sys_rt_sigprocmask);
 SYSCALL_DECL(sys_rt_sigreturn);
+SYSCALL_DECL(sys_sigaltstack);
 SYSCALL_DECL(sys_kill);
+SYSCALL_DECL(sys_tkill);
+SYSCALL_DECL(sys_tgkill);
 SYSCALL_DECL(sys_arch_prctl);
 
 /* Pipe */
 SYSCALL_DECL(sys_pipe);
+SYSCALL_DECL(sys_pipe2);
+SYSCALL_DECL(sys_exit_group);
+
+/* Userspace FB / compositors */
+SYSCALL_DECL(sys_alcor_fb_info);
+SYSCALL_DECL(sys_alcor_fb_mmap);
 
 /**
- * @brief Read from a pipe FD (called from sys_read when the FD is a pipe).
- * @return Bytes read, 0 if write end closed with no data, or negative `-errno`.
+ * @brief True if @c pipe_read would not block (data in buffer or EOF).
  */
-i64 pipe_read(int fd, void *buf, u64 count);
+bool pipe_poll_read_ready(const void *pipe);
 
 /**
- * @brief Write to a pipe FD (called from sys_write).
- * @return Bytes written or negative `-errno`.
+ * @brief Check if a pipe can be written to without blocking.
+ * @param pipe Opaque pointer to the pipe.
+ * @return true if space is available or read end is closed.
  */
-i64 pipe_write(int fd, const void *buf, u64 count);
+bool pipe_poll_write_ready(const void *pipe);
 
 /**
- * @brief Close one end of a pipe; frees the pipe object when both ends are closed.
- * @return 0 or negative error code.
+ * @brief Read up to @p count bytes from the read end of a pipe object.
+ * @return Bytes read (0 on EOF when write end is closed), or negative -errno.
  */
-int pipe_close(int fd);
+i64 pipe_read_obj(void *pipe, void *buf, u64 count);
+
+/**
+ * @brief Write up to @p count bytes to the write end of a pipe object.
+ * @return Bytes written, or negative -errno.
+ */
+i64 pipe_write_obj(void *pipe, const void *buf, u64 count);
+
+/**
+ * @brief Allocate a fresh pipe object. Both ends start refcount=1; the caller
+ * is expected to wrap it in two OFT entries via @c vfs_oft_alloc_pipe and
+ * release one of them if any setup step fails.
+ *
+ * @return Opaque pipe pointer, or NULL on exhaustion.
+ */
+void *pipe_alloc_obj(void);
+
+/**
+ * @brief Decrement read_open or write_open when an OFT entry's refcount hits
+ * zero. Called only from vfs_oft_release after the last fd reference drops.
+ *
+ * @param kind  VFS_KIND_PIPE_RD or VFS_KIND_PIPE_WR.
+ * @param pipe  Pipe pointer.
+ */
+void pipe_oft_release(i32 kind, void *pipe);
 
 #undef SYSCALL_DECL
 

@@ -1,6 +1,7 @@
 /**
  * @file user/init/main.c
- * @brief Minimal init process (demo message); the kernel starts the shell separately.
+ * @brief Minimal init process (demo message); the kernel starts the shell
+ * separately.
  */
 
 #include <stdio.h>

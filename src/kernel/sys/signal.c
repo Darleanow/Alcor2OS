@@ -19,13 +19,13 @@
  *      resumes the interrupted code.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/sys/syscall.h>
-#include <alcor2/mm/vmm.h>
-
 
 /* Helper: default signal disposition. */
 
@@ -173,7 +173,7 @@ u64 sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
     return (u64)-EINVAL;
 
   /* frame->rsp is user RSP at sigreturn call time = &sig_ucontext_t */
-  sig_ucontext_t *ctx = (sig_ucontext_t *)frame->rsp;
+  const sig_ucontext_t *ctx = (const sig_ucontext_t *)frame->rsp;
   if(!vmm_is_user_range(ctx, sizeof(sig_ucontext_t)))
     return (u64)-EFAULT;
 
@@ -230,7 +230,7 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
-  proc_t *target = proc_get((u64)pid);
+  const proc_t *target = proc_get((u64)pid);
   if(!target)
     return (u64)-ESRCH;
 
@@ -238,6 +238,39 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
     return 0; /* Existence check */
 
   proc_signal((u64)pid, (int)sig);
+  return 0;
+}
+
+/* tkill(tid, sig) — single-threaded kernel: tid maps to pid. */
+u64 sys_tkill(u64 tid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  return sys_kill(tid, sig, a3, a4, a5, a6);
+}
+
+/* tgkill(tgid, tid, sig) — same: route to sys_kill on the tgid. */
+u64 sys_tgkill(u64 tgid, u64 tid, u64 sig, u64 a4, u64 a5, u64 a6)
+{
+  (void)tid;
+  return sys_kill(tgid, sig, 0, a4, a5, a6);
+}
+
+/* sigaltstack(const stack_t *ss, stack_t *old_ss) — alternate signal stack.
+ * No real altstack support: zero out old_ss if requested, ignore ss. */
+u64 sys_sigaltstack(u64 ss, u64 old_ss, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  (void)ss;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
+  if(old_ss) {
+    /* stack_t = { void *ss_sp; int ss_flags; size_t ss_size; } = 24 bytes */
+    u8 *p = (u8 *)old_ss;
+    for(unsigned i = 0; i < 24; i++)
+      p[i] = 0;
+    /* mark SS_DISABLE = 2 in ss_flags */
+    *(int *)(p + 8) = 2;
+  }
   return 0;
 }
 
@@ -381,10 +414,10 @@ void proc_check_signals(void *frame_ptr)
     act->sa_handler = SIG_DFL;
 
   /* Redirect the syscall return to the signal handler */
-  frame->rip    = act->sa_handler;   /* jump to handler */
-  frame->rdi    = (u64)signum;       /* arg1: signal number */
-  frame->rsi    = 0;                 /* arg2: siginfo_t* (NULL) */
-  frame->rdx    = (u64)ctx;          /* arg3: ucontext_t* */
-  frame->rsp    = user_rsp;          /* new user stack */
-  frame->rflags = 0x202;             /* IF=1, reserved bit */
+  frame->rip    = act->sa_handler; /* jump to handler */
+  frame->rdi    = (u64)signum;     /* arg1: signal number */
+  frame->rsi    = 0;               /* arg2: siginfo_t* (NULL) */
+  frame->rdx    = (u64)ctx;        /* arg3: ucontext_t* */
+  frame->rsp    = user_rsp;        /* new user stack */
+  frame->rflags = 0x202;           /* IF=1, reserved bit */
 }

@@ -81,6 +81,24 @@ int kstrcmp(const char *a, const char *b);
 int kstricmp(const char *a, const char *b);
 
 /**
+ * @brief Compare two strings up to n characters.
+ * @param a First string.
+ * @param b Second string.
+ * @param n Maximum count.
+ * @return 0 if equal.
+ */
+int kstrncmp(const char *a, const char *b, u64 n);
+
+/**
+ * @brief Concatenate strings with maximum length.
+ * @param dst Destination.
+ * @param src Source.
+ * @param max Maximum bytes to add.
+ * @return dst pointer.
+ */
+char *kstrncat(char *dst, const char *src, u64 max);
+
+/**
  * @brief Check if strings are equal.
  * @param a First string.
  * @param b Second string.

@@ -8,18 +8,18 @@
  * Falls back to PIO when no scheduler context or DMA unsupported.
  */
 
-#include <alcor2/drivers/ata.h>
-#include <alcor2/drivers/console.h>
 #include <alcor2/arch/cpu.h>
-#include <alcor2/errno.h>
 #include <alcor2/arch/io.h>
-#include <alcor2/kstdlib.h>
-#include <alcor2/drivers/pci.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/arch/pit.h>
+#include <alcor2/drivers/ata.h>
+#include <alcor2/drivers/console.h>
+#include <alcor2/drivers/pci.h>
+#include <alcor2/errno.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/mm/pmm.h>
-#include <alcor2/proc/sched.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/proc/sched.h>
 
 #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
 #define LBA28_LIMIT      0x10000000ULL
@@ -35,21 +35,21 @@ static ata_drive_t   drives[4];
 static void         *bounce_virt[2]; /* DMA bounce buffer (virtual, 64 KB) */
 static u64           bounce_phys[2]; /* DMA bounce buffer (physical)        */
 
-static inline u8     reg_read(ata_channel_t *ch, u8 reg)
+static inline u8     reg_read(const ata_channel_t *ch, u8 reg)
 {
   return inb(ch->base + reg);
 }
-static inline void reg_write(ata_channel_t *ch, u8 reg, u8 v)
+static inline void reg_write(const ata_channel_t *ch, u8 reg, u8 v)
 {
   outb(ch->base + reg, v);
 }
-static inline u8 alt_status(ata_channel_t *ch)
+static inline u8 alt_status(const ata_channel_t *ch)
 {
   return inb(ch->ctrl);
 }
 
 /* ~400 ns delay (ATA spec after drive select / command issue). */
-static inline void delay_400ns(ata_channel_t *ch)
+static inline void delay_400ns(const ata_channel_t *ch)
 {
   alt_status(ch);
   alt_status(ch);
@@ -63,7 +63,7 @@ static inline void delay_400ns(ata_channel_t *ch)
  * @param iters Maximum iterations.
  * @return Last status byte.
  */
-static u8 poll_bsy(ata_channel_t *ch, u32 iters)
+static u8 poll_bsy(const ata_channel_t *ch, u32 iters)
 {
   u8 s = 0xFF;
   for(u32 i = 0; i < iters; i++) {
@@ -81,7 +81,7 @@ static u8 poll_bsy(ata_channel_t *ch, u32 iters)
  * @param iters Maximum iterations.
  * @return true if DRQ set, false on error/timeout.
  */
-static bool poll_drq(ata_channel_t *ch, u32 iters)
+static bool poll_drq(const ata_channel_t *ch, u32 iters)
 {
   for(u32 i = 0; i < iters; i++) {
     u8 s = reg_read(ch, ATA_REG_STATUS);
@@ -98,7 +98,7 @@ static bool poll_drq(ata_channel_t *ch, u32 iters)
  * @brief Select a drive on its channel (master or slave).
  * @param d Drive to select.
  */
-static void select_drive(ata_drive_t *d)
+static void select_drive(const ata_drive_t *d)
 {
   reg_write(d->channel, ATA_REG_HDDEVSEL, 0xA0 | (d->slave << 4));
   delay_400ns(d->channel);
@@ -122,7 +122,7 @@ static void trim_string(char *s, size_t len)
  * @param ch Channel to probe.
  * @return true if device present.
  */
-static bool channel_exists(ata_channel_t *ch)
+static bool channel_exists(const ata_channel_t *ch)
 {
   return reg_read(ch, ATA_REG_STATUS) != 0xFF;
 }
@@ -133,7 +133,7 @@ static bool channel_exists(ata_channel_t *ch)
  */
 static void identify(ata_drive_t *d)
 {
-  ata_channel_t *ch = d->channel;
+  const ata_channel_t *ch = d->channel;
 
   d->present = false;
   d->atapi   = false;
@@ -214,7 +214,7 @@ static void identify(ata_drive_t *d)
  */
 static i64 wait_irq(ata_channel_t *ch)
 {
-  task_t *me = (task_t *)ch->waiter;
+  const task_t *me = (const task_t *)ch->waiter;
 
   if(!me) {
     cpu_enable_interrupts();
@@ -266,7 +266,7 @@ static void prepare_irq_wait(ata_channel_t *ch)
  */
 static void setup_lba28(ata_drive_t *d, u64 lba, u8 count)
 {
-  ata_channel_t *ch = d->channel;
+  const ata_channel_t *ch = d->channel;
   reg_write(
       ch, ATA_REG_HDDEVSEL, 0xE0 | (d->slave << 4) | ((lba >> 24) & 0x0F)
   );
@@ -285,7 +285,7 @@ static void setup_lba28(ata_drive_t *d, u64 lba, u8 count)
  */
 static void setup_lba48(ata_drive_t *d, u64 lba, u16 count)
 {
-  ata_channel_t *ch = d->channel;
+  const ata_channel_t *ch = d->channel;
   reg_write(ch, ATA_REG_HDDEVSEL, 0x40 | (d->slave << 4));
   delay_400ns(ch);
   reg_write(ch, ATA_REG_SECCOUNT, (u8)(count >> 8));
@@ -467,8 +467,96 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
   return 0;
 }
 
+/*
+ * Block cache (read-side, write-through-with-invalidate).
+ *
+ * 4 KB blocks (8 sectors), 1024 entries = 4 MB total. LRU eviction by
+ * monotonic counter. Hits (the common case after warm-up) skip DMA/PIO
+ * entirely — clang's repeated ELF page reads now cost a memcpy. Misses
+ * fetch a full 4 KB block so adjacent reads land hot.
+ */
+
+#define CACHE_BLOCK_SECTORS 8u
+#define CACHE_BLOCK_BYTES   ((u64)CACHE_BLOCK_SECTORS * 512u)
+#define CACHE_NUM_ENTRIES   1024
+#define CACHE_INVALID_LBA   ((u64) - 1)
+
+// cppcheck-suppress unusedStructMember
+typedef struct
+{
+  u64 block_lba; /* aligned, CACHE_INVALID_LBA = free slot */
+  u64 last_used;
+  u8  drive;
+  // cppcheck-suppress unusedStructMember
+  u8 pad[7];
+  u8 data[CACHE_BLOCK_BYTES];
+} ata_cache_entry_t;
+
+static ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];
+static u64               g_cache_counter = 0;
+static int               g_cache_inited  = 0;
+
+static void              cache_init_once(void)
+{
+  if(g_cache_inited)
+    return;
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++)
+    g_ata_cache[i].block_lba = CACHE_INVALID_LBA;
+  g_cache_inited = 1;
+}
+
+static ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
+{
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    if(g_ata_cache[i].block_lba == block_lba && g_ata_cache[i].drive == drive) {
+      g_ata_cache[i].last_used = ++g_cache_counter;
+      return &g_ata_cache[i];
+    }
+  }
+  return NULL;
+}
+
+static ata_cache_entry_t *cache_alloc(void)
+{
+  /* Prefer free slot; else evict LRU. */
+  int idx    = 0;
+  u64 oldest = (u64)-1;
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)
+      return &g_ata_cache[i];
+    if(g_ata_cache[i].last_used < oldest) {
+      oldest = g_ata_cache[i].last_used;
+      idx    = i;
+    }
+  }
+  return &g_ata_cache[idx];
+}
+
+static void cache_invalidate_range(u8 drive, u64 lba, u32 count)
+{
+  u64 end = lba + count;
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)
+      continue;
+    if(g_ata_cache[i].drive != drive)
+      continue;
+    u64 b_start = g_ata_cache[i].block_lba;
+    u64 b_end   = b_start + CACHE_BLOCK_SECTORS;
+    if(b_start < end && b_end > lba)
+      g_ata_cache[i].block_lba = CACHE_INVALID_LBA;
+  }
+}
+
+static i64 ata_read_raw(ata_drive_t *d, u64 lba, u32 count, void *buf)
+{
+  if(d->dma && d->channel->dma_ok && sched_current() &&
+     count <= DMA_MAX_SECTORS)
+    return dma_transfer(d, lba, count, buf, false);
+  return pio_read(d, lba, count, buf);
+}
+
 /**
- * @brief Read sectors from an ATA drive (DMA if available, else PIO).
+ * @brief Read sectors from an ATA drive (cache + DMA/PIO fallback).
  * @param drive Drive index (0-3).
  * @param lba   Starting sector.
  * @param count Number of sectors.
@@ -486,11 +574,46 @@ i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)
   if(lba + count > d->sectors)
     return -EINVAL;
 
-  if(d->dma && d->channel->dma_ok && sched_current() &&
-     count <= DMA_MAX_SECTORS)
-    return dma_transfer(d, lba, count, buf, false);
+  cache_init_once();
 
-  return pio_read(d, lba, count, buf);
+  u64 cur = lba;
+  u64 end = lba + count;
+  u8 *out = (u8 *)buf;
+
+  while(cur < end) {
+    u64 block_lba     = cur & ~(u64)(CACHE_BLOCK_SECTORS - 1);
+    u64 in_block      = cur - block_lba;
+    u64 left_in_block = CACHE_BLOCK_SECTORS - in_block;
+    u64 left_total    = end - cur;
+    u64 take          = left_in_block < left_total ? left_in_block : left_total;
+
+    ata_cache_entry_t *e = cache_lookup(drive, block_lba);
+    if(!e) {
+      e              = cache_alloc();
+      u64 block_size = CACHE_BLOCK_SECTORS;
+      if(block_lba + block_size > d->sectors)
+        block_size = d->sectors - block_lba;
+
+      i64 r = ata_read_raw(d, block_lba, (u32)block_size, e->data);
+      if(r < 0) {
+        e->block_lba = CACHE_INVALID_LBA;
+        return r;
+      }
+      /* Zero unread tail (partial block at disk end). */
+      for(u64 i = block_size * 512; i < CACHE_BLOCK_BYTES; i++)
+        e->data[i] = 0;
+
+      e->block_lba = block_lba;
+      e->drive     = drive;
+      e->last_used = ++g_cache_counter;
+    }
+
+    kmemcpy(out, &e->data[in_block * 512], take * 512);
+    out += take * 512;
+    cur += take;
+  }
+
+  return 0;
 }
 
 /**
@@ -511,6 +634,12 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
     return -ENODEV;
   if(lba + count > d->sectors)
     return -EINVAL;
+
+  /* Write-through: invalidate any cached blocks overlapping this range so
+   * the next read sees fresh data. Simpler and safer than mutating cache
+   * entries in place (handles unaligned writes too). */
+  cache_init_once();
+  cache_invalidate_range(drive, lba, count);
 
   if(d->dma && d->channel->dma_ok && sched_current() &&
      count <= DMA_MAX_SECTORS)

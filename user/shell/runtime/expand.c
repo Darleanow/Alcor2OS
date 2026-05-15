@@ -1,0 +1,432 @@
+/**
+ * @file user/shell/expand.c
+ * @brief vega expansion: $-syntax in words, special vars, user vars.
+ *
+ * The expander writes into a growing heap buffer to keep the implementation
+ * straightforward. User variable storage is a tiny static table — fine for
+ * MVP; will be revisited if/when scoping gets richer.
+ */
+
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <vega/runtime/expand.h>
+#include <vega/shell.h>
+#include <vega/vega.h>
+
+#define MAX_VARS    32
+#define NAME_MAX    64
+#define PID_BUF_MAX 16
+
+static int last_status = 0;
+static char
+    pid_buf[PID_BUF_MAX]; /* lazily filled with current PID as a string */
+
+typedef struct
+{
+  char *name;
+  char *value;
+} var_t;
+
+static var_t vars[MAX_VARS];
+static int   var_count = 0;
+
+void         expand_set_status(int status)
+{
+  last_status = status;
+}
+
+static var_t *find_var(const char *name)
+{
+  for(int i = 0; i < var_count; i++) {
+    if(sh_strcmp(vars[i].name, name) == 0)
+      return &vars[i];
+  }
+  return NULL;
+}
+
+static char *strdup_alcor(const char *s)
+{
+  size_t n = sh_strlen(s);
+  char  *p = (char *)malloc(n + 1);
+  if(!p)
+    return NULL;
+  for(size_t i = 0; i <= n; i++)
+    p[i] = s[i];
+  return p;
+}
+
+int expand_setvar(const char *name, const char *value)
+{
+  if(!name || !*name)
+    return -1;
+
+  var_t *existing = find_var(name);
+  if(existing) {
+    char *new_val = strdup_alcor(value);
+    if(!new_val)
+      return -1;
+    free(existing->value);
+    existing->value = new_val;
+    return 0;
+  }
+
+  if(var_count >= MAX_VARS)
+    return -1;
+
+  char *n = strdup_alcor(name);
+  char *v = strdup_alcor(value);
+  if(!n || !v) {
+    free(n);
+    free(v);
+    return -1;
+  }
+  vars[var_count].name  = n;
+  vars[var_count].value = v;
+  var_count++;
+  return 0;
+}
+
+const char *expand_getvar(const char *name)
+{
+  var_t *v = find_var(name);
+  return v ? v->value : "";
+}
+
+/* Append @p src (length @p len) to a growing heap buffer. The buffer is
+ * realloc'd as needed; *cap reflects the allocated size, *len_out the
+ * occupied length. NUL terminator is maintained on success. */
+static int buf_append(
+    char **buf, size_t *cap, size_t *len_out, const char *src, size_t n
+)
+{
+  size_t need = *len_out + n + 1;
+  if(need > *cap) {
+    size_t new_cap = (*cap == 0) ? 32 : *cap * 2;
+    while(new_cap < need)
+      new_cap *= 2;
+    char *new_buf = (char *)realloc(*buf, new_cap);
+    if(!new_buf)
+      return -1;
+    *buf = new_buf;
+    *cap = new_cap;
+  }
+  /* Guarantee *buf is non-null before the copy loop (realloc above ensures
+   * this; the explicit check gives the static analyser a definitive proof). */
+  if(!*buf)
+    return -1;
+  char  *dst = *buf;
+  size_t pos = *len_out;
+  for(size_t i = 0; i < n; i++)
+    dst[pos++] = src[i];
+  dst[pos] = '\0';
+  *len_out = pos;
+  return 0;
+}
+
+/* Render an unsigned integer in decimal into @p out (caller-sized big enough
+ * for u64; PID_BUF_MAX is plenty). */
+static void render_uint(unsigned long n, char *out)
+{
+  char tmp[24] = {0};
+  int  i       = 0;
+  if(n == 0)
+    tmp[i++] = '0';
+  while(n > 0) {
+    tmp[i++] = (char)('0' + (n % 10));
+    n /= 10;
+  }
+  int j = 0;
+  while(i > 0)
+    out[j++] = tmp[--i];
+  out[j] = '\0';
+}
+
+static void render_int(int n, char *out)
+{
+  if(n < 0) {
+    out[0] = '-';
+    render_uint((unsigned long)(-n), out + 1);
+  } else {
+    render_uint((unsigned long)n, out);
+  }
+}
+
+static int is_name_start(char c)
+{
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
+static int is_name_cont(char c)
+{
+  return is_name_start(c) || (c >= '0' && c <= '9');
+}
+
+/* Run @p cmd_str through vega_run in a forked child with stdout redirected
+ * to a pipe; capture stdout into a heap-allocated string. Trailing newlines
+ * are stripped (matches bash $(...)). Returns NULL on any failure. */
+static char *run_substitution(const char *cmd_str)
+{
+  int pipefd[2];
+  if(pipe(pipefd) < 0)
+    return NULL;
+
+  int pid = fork();
+  if(pid < 0) {
+    close(pipefd[0]);
+    close(pipefd[1]);
+    return NULL;
+  }
+  if(pid == 0) {
+    close(pipefd[0]);
+    dup2(pipefd[1], 1);
+    close(pipefd[1]);
+    int rc = vega_run(cmd_str);
+    _exit(rc);
+  }
+
+  close(pipefd[1]);
+
+  size_t cap = 256;
+  size_t len = 0;
+  char  *buf = (char *)malloc(cap);
+  if(!buf) {
+    close(pipefd[0]);
+    waitpid(pid, NULL, 0);
+    return NULL;
+  }
+
+  while(1) {
+    if(len + 256 + 1 > cap) {
+      size_t new_cap = cap * 2;
+      char  *new_buf = (char *)realloc(buf, new_cap);
+      if(!new_buf) {
+        free(buf);
+        close(pipefd[0]);
+        waitpid(pid, NULL, 0);
+        return NULL;
+      }
+      buf = new_buf;
+      cap = new_cap;
+    }
+    long n = read(pipefd[0], buf + len, 256);
+    if(n <= 0)
+      break;
+    len += (size_t)n;
+  }
+  close(pipefd[0]);
+  waitpid(pid, NULL, 0);
+
+  while(len > 0 && buf[len - 1] == '\n')
+    len--;
+  buf[len] = '\0';
+  return buf;
+}
+
+/* Substitute a {NAME}-style brace expression starting at *cur (which points
+ * just past '{'). Returns bytes consumed past '{' on success (so caller can
+ * advance src + 1 + returned), or -1 on allocation failure. If the construct
+ * is malformed (no closing '}'), emits the literal '{' and returns 0 so the
+ * caller continues past it.
+ *
+ * Used only inside double-quoted strings to interpolate variables — vega's
+ * cleaner alternative to ${NAME} (which still works via the $-prefix path). */
+static int expand_brace(const char *cur, char **buf, size_t *cap, size_t *len)
+{
+  const char *name_start = cur;
+  const char *p          = name_start;
+  while(*p && *p != '}')
+    p++;
+  if(*p != '}') {
+    if(buf_append(buf, cap, len, "{", 1) < 0)
+      return -1;
+    return 0;
+  }
+  size_t nlen = (size_t)(p - name_start);
+  if(nlen >= NAME_MAX)
+    nlen = NAME_MAX - 1;
+  char name[NAME_MAX];
+  for(size_t i = 0; i < nlen; i++)
+    name[i] = name_start[i];
+  name[nlen] = '\0';
+
+  /* Special vars get the same treatment they do under $-syntax. */
+  const char *val;
+  char        special[16];
+  if(sh_strcmp(name, "?") == 0) {
+    render_int(last_status, special);
+    val = special;
+  } else if(sh_strcmp(name, "$") == 0) {
+    if(pid_buf[0] == '\0')
+      render_uint((unsigned long)getpid(), pid_buf);
+    val = pid_buf;
+  } else {
+    val = expand_getvar(name);
+  }
+  if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+    return -1;
+  return (int)(p - cur) + 1; /* consumed NAME } */
+}
+
+/* Substitute one $-expression starting at *cur (which points just past '$').
+ * Returns the number of source bytes consumed past the '$' (so caller can
+ * advance src + 1 + returned). On allocation failure returns -1. */
+static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
+{
+  /* $? — last status */
+  if(*cur == '?') {
+    char s[16] = {0};
+    render_int(last_status, s);
+    if(buf_append(buf, cap, len, s, sh_strlen(s)) < 0)
+      return -1;
+    return 1;
+  }
+
+  /* $$ — current PID */
+  if(*cur == '$') {
+    if(pid_buf[0] == '\0')
+      render_uint((unsigned long)getpid(), pid_buf);
+    if(buf_append(buf, cap, len, pid_buf, sh_strlen(pid_buf)) < 0)
+      return -1;
+    return 1;
+  }
+
+  /* $(cmd) — command substitution */
+  if(*cur == '(') {
+    const char *body_start = cur + 1;
+    const char *p          = body_start;
+    int         depth      = 1;
+    while(*p && depth > 0) {
+      if(*p == '(')
+        depth++;
+      else if(*p == ')') {
+        if(--depth == 0)
+          break;
+      }
+      p++;
+    }
+    if(*p != ')') {
+      if(buf_append(buf, cap, len, "$(", 2) < 0)
+        return -1;
+      return 1; /* unterminated; let caller continue past '(' */
+    }
+    size_t body_len = (size_t)(p - body_start);
+    char  *body     = (char *)malloc(body_len + 1);
+    if(!body)
+      return -1;
+    for(size_t i = 0; i < body_len; i++)
+      body[i] = body_start[i];
+    body[body_len] = '\0';
+
+    char *captured = run_substitution(body);
+    free(body);
+    if(!captured)
+      return -1;
+    int rc = buf_append(buf, cap, len, captured, sh_strlen(captured));
+    free(captured);
+    if(rc < 0)
+      return -1;
+    return (int)(p - cur) + 1; /* consumed ( ... ) */
+  }
+
+  /* ${NAME} */
+  if(*cur == '{') {
+    const char *name_start = cur + 1;
+    const char *p          = name_start;
+    while(*p && *p != '}')
+      p++;
+    if(*p != '}') {
+      /* unterminated; emit the literal '${' and let the caller continue */
+      if(buf_append(buf, cap, len, "${", 2) < 0)
+        return -1;
+      return 1;
+    }
+    char   name[NAME_MAX];
+    size_t nlen = (size_t)(p - name_start);
+    if(nlen >= NAME_MAX)
+      nlen = NAME_MAX - 1;
+    for(size_t i = 0; i < nlen; i++)
+      name[i] = name_start[i];
+    name[nlen] = '\0';
+
+    const char *val = expand_getvar(name);
+    if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+      return -1;
+    return (int)(p - cur) + 1; /* consumed { ... } */
+  }
+
+  /* $NAME — bareword variable */
+  if(is_name_start(*cur)) {
+    const char *p = cur;
+    while(is_name_cont(*p))
+      p++;
+    char   name[NAME_MAX];
+    size_t nlen = (size_t)(p - cur);
+    if(nlen >= NAME_MAX)
+      nlen = NAME_MAX - 1;
+    for(size_t i = 0; i < nlen; i++)
+      name[i] = cur[i];
+    name[nlen] = '\0';
+
+    const char *val = expand_getvar(name);
+    if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+      return -1;
+    return (int)(p - cur);
+  }
+
+  /* Lone '$' followed by something non-special — emit the '$' literally. */
+  if(buf_append(buf, cap, len, "$", 1) < 0)
+    return -1;
+  return 0;
+}
+
+char *expand_word(const char *src)
+{
+  if(!src)
+    return NULL;
+
+  char       *buf = NULL;
+  size_t      cap = 0;
+  size_t      len = 0;
+
+  const char *p = src;
+  while(*p) {
+    if(*p == '$') {
+      p++; /* skip '$' */
+      int consumed = expand_one(p, &buf, &cap, &len);
+      if(consumed < 0) {
+        free(buf);
+        return NULL;
+      }
+      p += consumed;
+      continue;
+    }
+    /* {name} interpolation — only kicks in when '{' is followed by a name
+     * character, $, or ?, so stray literal braces stay literal. Inside
+     * unquoted barewords '{' is a structural token (lexer-split), so this
+     * effectively only matters for double-quoted strings. */
+    if(*p == '{' && (is_name_start(p[1]) || p[1] == '?' || p[1] == '$')) {
+      p++; /* skip '{' */
+      int consumed = expand_brace(p, &buf, &cap, &len);
+      if(consumed < 0) {
+        free(buf);
+        return NULL;
+      }
+      p += consumed;
+      continue;
+    }
+    if(buf_append(&buf, &cap, &len, p, 1) < 0) {
+      free(buf);
+      return NULL;
+    }
+    p++;
+  }
+
+  if(!buf) {
+    /* Empty input — return empty heap string so caller can free uniformly. */
+    buf = (char *)malloc(1);
+    if(buf)
+      buf[0] = '\0';
+  }
+  return buf;
+}
