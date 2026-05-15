@@ -10,8 +10,9 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <vega/runtime/expand.h>
+#include <vega/frontend/lexer.h>
 #include <vega/host.h>
+#include <vega/runtime/expand.h>
 #include <vega/vega.h>
 
 #define MAX_VARS    32
@@ -384,6 +385,12 @@ char *expand_word(const char *src)
 {
   if(!src)
     return NULL;
+
+  /* Single-quoted tokens are prefixed with VEGA_LITERAL_SENTINEL by the
+   * lexer — emit the remainder verbatim, no $ or {} interpolation. */
+  if(src[0] == VEGA_LITERAL_SENTINEL) {
+    return strdup_alcor(src + 1);
+  }
 
   char       *buf = NULL;
   size_t      cap = 0;

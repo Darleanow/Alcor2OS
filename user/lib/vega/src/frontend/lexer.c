@@ -45,7 +45,9 @@ static char *dup_range(const char *start, size_t len)
   return out;
 }
 
-/* Read a single-quoted token. Content is taken literally; no escapes. */
+/* Read a single-quoted token. Content is taken literally; no escapes.
+ * Prefixes the heap text with VEGA_LITERAL_SENTINEL so the runtime's
+ * expand_word knows to skip $/{}-interpolation for this argument. */
 static tok_t read_squote(lexer_t *L)
 {
   tok_t       t     = {TOK_WORD, NULL};
@@ -58,7 +60,18 @@ static tok_t read_squote(lexer_t *L)
     t.kind   = TOK_EOF;
     return t;
   }
-  t.text = dup_range(start, (size_t)(L->cur - start));
+  size_t len = (size_t)(L->cur - start);
+  char  *out = (char *)malloc(len + 2);
+  if(!out) {
+    L->error = 1;
+    t.kind   = TOK_EOF;
+    return t;
+  }
+  out[0] = VEGA_LITERAL_SENTINEL;
+  for(size_t i = 0; i < len; i++)
+    out[i + 1] = start[i];
+  out[len + 1] = '\0';
+  t.text       = out;
   L->cur++; /* skip closing quote */
   return t;
 }
