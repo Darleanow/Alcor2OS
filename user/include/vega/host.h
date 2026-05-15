@@ -74,4 +74,12 @@ bool sh_fb_tty_active(void);
 void sh_fb_tty_on_fork_child(void);
 void sh_fb_tty_blink_tick(void);
 
+/* Host-side builtin hooks. exec.c consults these AFTER the sdk's own builtin
+ * table, so a host can add commands that only make sense in its context
+ * (e.g., shell-UX commands like clear, kbd, help) without polluting the
+ * language. Hosts that have no extra builtins (the vega CLI) return false
+ * from sh_is_builtin. */
+bool sh_is_builtin(const char *name);
+int  sh_run_builtin(int argc, char *const argv[]);
+
 #endif /* VEGA_HOST_H */

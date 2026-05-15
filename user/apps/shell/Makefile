@@ -13,13 +13,14 @@ HB_LIB := $(HB_PRE)/lib/libharfbuzz.a
 HAVE_FB_TTY := $(if $(and $(strip $(CXX)),$(wildcard $(FT_LIB)),$(wildcard $(HB_LIB))),1,)
 
 CFLAGS += -I$(USER_BASE)/apps/shell/include \
-          -I$(USER_BASE)/lib/vega/include
+          -I$(USER_BASE)/sdk/vega/include
 
 BASE_SRCS := \
   main.c \
   platform/io.c \
   platform/str.c \
-  platform/sys.c
+  platform/sys.c \
+  platform/builtins.c
 
 ifeq ($(HAVE_FB_TTY),1)
 FB_TTY_SRC := platform/fb_tty.c

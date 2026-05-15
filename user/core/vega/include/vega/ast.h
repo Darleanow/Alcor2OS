@@ -9,6 +9,17 @@
 #ifndef VEGA_AST_H
 #define VEGA_AST_H
 
+/**
+ * In-band marker the lexer prepends to a word string when the token came
+ * from a single-quoted source. The runtime's expand_word checks for this
+ * byte and emits the remainder verbatim — no $-interpolation or
+ * {}-interpolation. Single quotes are guaranteed not to contain this byte
+ * (raw input is text, not binary), so the prefix is a safe in-band signal.
+ * Lives in ast.h because it travels on AST argv strings, which is the
+ * shared contract between core (producer) and sdk (consumer).
+ */
+#define VEGA_LITERAL_SENTINEL '\x01'
+
 typedef enum
 {
   AST_CMD,

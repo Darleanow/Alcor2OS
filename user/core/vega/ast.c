@@ -4,7 +4,7 @@
  */
 
 #include <stdlib.h>
-#include <vega/frontend/ast.h>
+#include <vega/ast.h>
 
 #define INITIAL_ARGV_CAP 4
 

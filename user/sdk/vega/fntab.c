@@ -3,9 +3,9 @@
  * @brief Fixed-capacity function table.
  */
 
+#include "fntab.h"
 #include <stdlib.h>
 #include <vega/host.h>
-#include <vega/runtime/fntab.h>
 
 #define MAX_FUNCTIONS 16
 

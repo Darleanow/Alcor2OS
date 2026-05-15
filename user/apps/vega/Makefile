@@ -4,7 +4,7 @@ OUT_DIR := $(BUILD_DIR)/apps/vega
 TARGET  := $(BUILD_DIR)/apps/vega.elf
 LIBVEGA := $(BUILD_DIR)/lib/libvega.a
 
-CFLAGS += -I$(USER_BASE)/lib/vega/include
+CFLAGS += -I$(USER_BASE)/sdk/vega/include
 
 SRCS := main.c host.c
 OBJS := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))

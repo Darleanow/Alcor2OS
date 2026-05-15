@@ -3,8 +3,8 @@
  * @brief vega tokenizer implementation.
  */
 
+#include "lexer.h"
 #include <stdlib.h>
-#include <vega/frontend/lexer.h>
 #include <vega/host.h>
 
 static int is_hspace(char c)
@@ -32,17 +32,6 @@ static int is_word_delim(char c)
   default:
     return 0;
   }
-}
-
-static char *dup_range(const char *start, size_t len)
-{
-  char *out = (char *)malloc(len + 1);
-  if(!out)
-    return NULL;
-  for(size_t i = 0; i < len; i++)
-    out[i] = start[i];
-  out[len] = '\0';
-  return out;
 }
 
 /* Read a single-quoted token. Content is taken literally; no escapes.

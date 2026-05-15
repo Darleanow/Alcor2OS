@@ -183,3 +183,17 @@ bool sh_fb_tty_active(void)
 void sh_fb_tty_on_fork_child(void) {}
 
 void sh_fb_tty_blink_tick(void) {}
+
+/* Host builtin hooks: the CLI has no shell-UX commands. */
+bool sh_is_builtin(const char *name)
+{
+  (void)name;
+  return false;
+}
+
+int sh_run_builtin(int argc, char *const argv[])
+{
+  (void)argc;
+  (void)argv;
+  return -1;
+}

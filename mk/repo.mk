@@ -26,6 +26,8 @@ kernel: $(BUILD)/$(KERNEL)
 user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/crt
 	$(MAKE) -C user/lib
+	$(MAKE) -C user/core/vega
+	$(MAKE) -C user/sdk/vega
 	$(MAKE) -C user/init
 	$(MAKE) -C user/apps/shell
 	$(MAKE) -C user/apps/vega
@@ -206,6 +208,8 @@ clean:
 	rm -rf $(BUILD)
 	-$(MAKE) -C user/crt clean
 	-$(MAKE) -C user/lib clean
+	-$(MAKE) -C user/core/vega clean
+	-$(MAKE) -C user/sdk/vega clean
 	-$(MAKE) -C user/init clean
 	-$(MAKE) -C user/apps/shell clean
 	-$(MAKE) -C user/apps/vega clean
@@ -227,7 +231,8 @@ lint:
 	  --header-filter='^(src|include|user)/.*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
-	     -Iuser/lib/vega/include \
+	     -Iuser/sdk/vega/include \
+	     -Iuser/core/vega/include \
 	     -Iuser/apps/shell/include \
 	     -Iuser/include \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \

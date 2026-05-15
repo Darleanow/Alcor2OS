@@ -10,6 +10,10 @@
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
+#include "exec.h"
+#include "builtin.h"
+#include "expand.h"
+#include "fntab.h"
 #include <fcntl.h>
 #include <poll.h>
 #include <stdlib.h>
@@ -18,10 +22,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vega/host.h>
-#include <vega/runtime/builtin.h>
-#include <vega/runtime/exec.h>
-#include <vega/runtime/expand.h>
-#include <vega/runtime/fntab.h>
 
 /* musl exposes this; must not pass NULL to execve — breaks getenv, setenv,
  * ncurses terminfo lookup, etc. (undefined environ → faults like CR2 ~0x45). */
@@ -308,22 +308,26 @@ static int run_external(char **argv, const redir_t *redirs)
   return (status >> 8) & 0xff;
 }
 
-/* Run a builtin under @p redirs. We try to save fds 0/1 with dup; if dup
- * returns -EBADF that just means the shell is using the kernel's stdio
- * fallback (no per-process fd installed), so there's nothing to restore —
- * after the builtin we just close fd 0/1 again to drop back to the fallback. */
-static int
-    run_builtin_redirected(int argc, char *const argv[], const redir_t *redirs)
+/* Run an in-process callee (language builtin or host builtin) under @p redirs.
+ * Saves fds 0/1 with dup; if dup returns -EBADF that just means the shell is
+ * using the kernel's stdio fallback (no per-process fd installed), so there's
+ * nothing to restore — after the call we close fd 0/1 again to drop back to
+ * the fallback. */
+typedef int (*builtin_fn_t)(int argc, char *const argv[]);
+
+static int  run_in_process_redirected(
+     builtin_fn_t fn, int argc, char *const argv[], const redir_t *redirs
+ )
 {
   if(!redirs)
-    return run_builtin(argc, argv);
+    return fn(argc, argv);
 
   int saved_in  = dup(0); /* may be -1 (fallback) */
   int saved_out = dup(1);
 
   int rc = apply_redirs(redirs);
   if(rc == 0)
-    rc = run_builtin(argc, argv);
+    rc = fn(argc, argv);
 
   if(saved_in >= 0) {
     dup2(saved_in, 0);
@@ -402,7 +406,9 @@ static int exec_cmd(ast_t *n)
     if(fn) {
       ret = call_function_redirected(fn, argc, argv, redirs);
     } else if(is_builtin(argv[0])) {
-      ret = run_builtin_redirected(argc, argv, redirs);
+      ret = run_in_process_redirected(run_builtin, argc, argv, redirs);
+    } else if(sh_is_builtin(argv[0])) {
+      ret = run_in_process_redirected(sh_run_builtin, argc, argv, redirs);
     } else {
       ret = run_external(argv, redirs);
       if(ret < 0) {
@@ -480,6 +486,10 @@ static void exec_stage_in_child(ast_t *stage)
 
   if(is_builtin(argv[0])) {
     int rc = run_builtin(argc, argv);
+    _exit(rc);
+  }
+  if(sh_is_builtin(argv[0])) {
+    int rc = sh_run_builtin(argc, argv);
     _exit(rc);
   }
 

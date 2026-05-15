@@ -12,14 +12,7 @@
 
 #include <stddef.h>
 
-/**
- * Internal marker the lexer prepends to a token's text when the token came
- * from a single-quoted string. expand_word checks for this byte and emits
- * the remainder verbatim — no $-interpolation or {}-interpolation. Single
- * quotes are guaranteed not to contain this byte (raw input is text, not
- * binary), so the prefix is a safe in-band signal.
- */
-#define VEGA_LITERAL_SENTINEL '\x01'
+#include <vega/ast.h> /* VEGA_LITERAL_SENTINEL — emitted into argv text */
 
 typedef enum
 {

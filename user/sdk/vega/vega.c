@@ -3,9 +3,9 @@
  * @brief vega top-level: lex → parse → execute → free.
  */
 
-#include <vega/frontend/ast.h>
-#include <vega/frontend/parse.h>
-#include <vega/runtime/exec.h>
+#include "exec.h"
+#include <vega/ast.h>
+#include <vega/parse.h>
 #include <vega/vega.h>
 
 int vega_run(const char *line)

@@ -6,7 +6,7 @@
 #ifndef VEGA_PARSE_H
 #define VEGA_PARSE_H
 
-#include <vega/frontend/ast.h>
+#include <vega/ast.h>
 
 /**
  * @brief Parse @p line into an AST.
