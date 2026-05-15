@@ -1342,7 +1342,12 @@ static void term_feed_byte(unsigned char b)
       s_esc_state = 3;
       return;
     }
+    /* Unrecognized single-byte ESC follower (e.g. ESC > / ESC = / ESC D /
+     * ESC M / ESC c). ncurses sends DECKPNM/DECKPAM around every keypad()
+     * program, so falling through to feed_utf8_byte here paints a stray
+     * '>' or '=' at the cursor. Swallow it instead. */
     s_esc_state = 0;
+    return;
   } else if(s_esc_state == 3) {
     /* '0' selects DEC Special Graphics; ASCII/UK/Latin-1 turn it back off. */
     if(b == '0')
