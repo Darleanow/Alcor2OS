@@ -1,45 +1,31 @@
 /**
  * @file apps/shell/platform/builtins.c
- * @brief Shell-UX builtins — only meaningful when vega is running interactively
- * inside a terminal shell. Hook into libvega via sh_is_builtin / sh_run_builtin
- * (called by exec.c after its own builtin table).
+ * @brief Shell-side builtins — implementations run in-process via libvega's
+ * sh_is_builtin / sh_run_builtin host hooks. libvega itself has no builtin
+ * commands; the language only knows expressions and control flow.
  */
 
 #include <shell/shell.h>
 #include <stdlib.h>
+#include <string.h>
 #include <vega/host.h>
 #include <vega/vega.h>
 
-static const char *shell_builtins[] = {"help", "version", "clear", "kbd", NULL};
+static const char *shell_builtins[] = {
+    "exit", "cd", "pwd", "let", "help", "version", "clear", NULL,
+};
 
-static void        cmd_help(void)
+static void cmd_help(void)
 {
   sh_puts("\n");
-  sh_puts("  vega - Command Reference\n");
-  sh_puts("\n");
-
-  sh_puts("  Language builtins:\n");
-  sh_puts("    exit              Exit the shell\n");
-  sh_puts("    cd <dir>          Change directory\n");
-  sh_puts("    pwd               Print working directory\n");
-  sh_puts("    let NAME VALUE    Set a vega variable (read with $NAME)\n");
-  sh_puts("\n");
-
-  sh_puts("  Shell builtins:\n");
-  sh_puts("    help              Show this help message\n");
-  sh_puts("    version           Show OS + vega version\n");
-  sh_puts("    clear             Clear the screen\n");
-  sh_puts("    kbd us|fr         Set PS/2 keymap layout (US QWERTY or FR "
-          "AZERTY-ish)\n");
-  sh_puts("\n");
-
-  sh_puts("  External Commands (/bin):\n");
-  sh_puts("    ls [dir]          List directory contents\n");
-  sh_puts("    cat <file>        Display file contents\n");
-  sh_puts("    mkdir <dir>       Create directory\n");
-  sh_puts("    touch <file>      Create empty file\n");
-  sh_puts("    rm <file>         Remove file\n");
-  sh_puts("    vega [-c | FILE]  Standalone vega interpreter\n");
+  sh_puts("  shell builtins:\n");
+  sh_puts("    exit              quit the shell\n");
+  sh_puts("    cd <dir>          change directory\n");
+  sh_puts("    pwd               print working directory\n");
+  sh_puts("    let NAME VALUE    set a vega variable (read with $NAME)\n");
+  sh_puts("    help              this message\n");
+  sh_puts("    version           OS + vega version\n");
+  sh_puts("    clear             clear the screen\n");
   sh_puts("\n");
 }
 
@@ -51,33 +37,47 @@ static void cmd_version(void)
   sh_puts("\n");
 }
 
-static void cmd_clear(void)
+static int cmd_cd(int argc, char *const argv[])
 {
-  sh_clear();
+  const char *path = (argc > 1) ? argv[1] : "/";
+  if(sh_chdir(path) < 0) {
+    sh_puts("cd: ");
+    sh_puts(path);
+    sh_puts(": no such directory\n");
+    return 1;
+  }
+  return 0;
 }
 
-/* Set keyboard layout (`us` | `fr`); semantics match kernel tty layer. */
-static int cmd_kbd(int argc, char *const argv[])
+static int cmd_pwd(void)
 {
-  const char *what = (argc > 1) ? argv[1] : "us";
-  if(sh_strcmp(what, "us") == 0) {
-    sh_kbd_layout(KBD_LAYOUT_US);
-    sh_puts("keyboard: layout us\n");
+  char cwd[MAX_PATH];
+  if(sh_getcwd(cwd, sizeof(cwd)) != NULL) {
+    sh_puts(cwd);
+    sh_putchar('\n');
     return 0;
   }
-  if(sh_strcmp(what, "fr") == 0) {
-    sh_kbd_layout(KBD_LAYOUT_FR);
-    sh_puts("keyboard: layout fr\n");
-    return 0;
-  }
-  sh_puts("usage: kbd [us|fr]\n");
+  sh_puts("pwd: error\n");
   return 1;
+}
+
+static int cmd_let(int argc, char *const argv[])
+{
+  if(argc < 3) {
+    sh_puts("usage: let NAME VALUE\n");
+    return 1;
+  }
+  if(vega_setvar(argv[1], argv[2]) < 0) {
+    sh_puts("let: failed to set variable\n");
+    return 1;
+  }
+  return 0;
 }
 
 bool sh_is_builtin(const char *name)
 {
   for(int i = 0; shell_builtins[i]; i++) {
-    if(sh_strcmp(name, shell_builtins[i]) == 0)
+    if(strcmp(name, shell_builtins[i]) == 0)
       return true;
   }
   return false;
@@ -87,20 +87,25 @@ int sh_run_builtin(int argc, char *const argv[])
 {
   const char *name = argv[0];
 
-  if(sh_strcmp(name, "help") == 0) {
+  if(strcmp(name, "exit") == 0)
+    exit(0);
+  if(strcmp(name, "cd") == 0)
+    return cmd_cd(argc, argv);
+  if(strcmp(name, "pwd") == 0)
+    return cmd_pwd();
+  if(strcmp(name, "let") == 0)
+    return cmd_let(argc, argv);
+  if(strcmp(name, "help") == 0) {
     cmd_help();
     return 0;
   }
-  if(sh_strcmp(name, "version") == 0) {
+  if(strcmp(name, "version") == 0) {
     cmd_version();
     return 0;
   }
-  if(sh_strcmp(name, "clear") == 0) {
-    cmd_clear();
+  if(strcmp(name, "clear") == 0) {
+    sh_clear();
     return 0;
   }
-  if(sh_strcmp(name, "kbd") == 0)
-    return cmd_kbd(argc, argv);
-
   return -1;
 }

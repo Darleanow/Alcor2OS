@@ -72,11 +72,6 @@ int sh_ioctl(int fd, unsigned long request, void *arg)
  *
  * Usage: ioctl with `ALCOR2_IOC_KBD_SET_LAYOUT` — see `<alcor2/kbd.h>`.
  */
-void sh_kbd_layout(kbd_layout_t layout)
-{
-  uint32_t v = (uint32_t)layout;
-  (void)sh_ioctl(0, (unsigned long)ALCOR2_IOC_KBD_SET_LAYOUT, &v);
-}
 
 /**
  * @brief Clear the terminal screen

@@ -10,7 +10,7 @@ OBJS := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
 HEADERS := \
   include/vega/ast.h \
   include/vega/parse.h \
-  lexer.h
+  include/vega/internal/lexer.h
 
 .PHONY: all clean
 

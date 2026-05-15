@@ -1,5 +1,5 @@
 /**
- * @file user/shell/fntab.h
+ * @file vega/internal/fntab.h
  * @brief vega user-defined function table.
  *
  * Stores registered functions keyed by name. Defining a function via the

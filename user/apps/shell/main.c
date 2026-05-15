@@ -1,5 +1,5 @@
 /**
- * @file user/shell/main.c
+ * @file apps/shell/main.c
  * @brief vega REPL: read a line, hand it to vega_run().
  */
 

@@ -18,7 +18,6 @@ CFLAGS += -I$(USER_BASE)/apps/shell/include \
 BASE_SRCS := \
   main.c \
   platform/io.c \
-  platform/str.c \
   platform/sys.c \
   platform/builtins.c
 

@@ -17,31 +17,6 @@
 #include <unistd.h>
 #include <vega/host.h>
 
-size_t sh_strlen(const char *s)
-{
-  return strlen(s);
-}
-
-int sh_strcmp(const char *a, const char *b)
-{
-  return strcmp(a, b);
-}
-
-int sh_strncmp(const char *a, const char *b, size_t n)
-{
-  return strncmp(a, b, n);
-}
-
-char *sh_strcpy(char *dst, const char *src)
-{
-  return strcpy(dst, src);
-}
-
-char *sh_strcat(char *dst, const char *src)
-{
-  return strcat(dst, src);
-}
-
 void sh_putchar(char c)
 {
   write(STDOUT_FILENO, &c, 1);
@@ -110,12 +85,6 @@ long sh_write(int fd, const void *buf, size_t len)
 int sh_ioctl(int fd, unsigned long request, void *arg)
 {
   return ioctl(fd, (int)request, arg);
-}
-
-void sh_kbd_layout(kbd_layout_t layout)
-{
-  uint32_t v = (uint32_t)layout;
-  (void)sh_ioctl(0, (unsigned long)ALCOR2_IOC_KBD_SET_LAYOUT, &v);
 }
 
 void sh_clear(void)

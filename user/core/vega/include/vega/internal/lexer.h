@@ -1,5 +1,5 @@
 /**
- * @file user/shell/lexer.h
+ * @file vega/internal/lexer.h
  * @brief vega tokenizer.
  *
  * Splits a line of input into tokens. The full vega token vocabulary is
@@ -12,7 +12,7 @@
 
 #include <stddef.h>
 
-#include <vega/ast.h> /* VEGA_LITERAL_SENTINEL — emitted into argv text */
+#include <vega/ast.h>
 
 typedef enum
 {

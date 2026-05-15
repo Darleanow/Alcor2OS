@@ -1,5 +1,5 @@
 /**
- * @file user/shell/expand.c
+ * @file sdk/vega/expand.c
  * @brief vega expansion: $-syntax in words, special vars, user vars.
  *
  * The expander writes into a growing heap buffer to keep the implementation
@@ -7,12 +7,13 @@
  * MVP; will be revisited if/when scoping gets richer.
  */
 
-#include "expand.h"
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <vega/ast.h> /* VEGA_LITERAL_SENTINEL */
+#include <vega/ast.h>
 #include <vega/host.h>
+#include <vega/internal/expand.h>
 #include <vega/vega.h>
 
 #define MAX_VARS    32
@@ -40,7 +41,7 @@ void         expand_set_status(int status)
 static var_t *find_var(const char *name)
 {
   for(int i = 0; i < var_count; i++) {
-    if(sh_strcmp(vars[i].name, name) == 0)
+    if(strcmp(vars[i].name, name) == 0)
       return &vars[i];
   }
   return NULL;
@@ -48,7 +49,7 @@ static var_t *find_var(const char *name)
 
 static char *strdup_alcor(const char *s)
 {
-  size_t n = sh_strlen(s);
+  size_t n = strlen(s);
   char  *p = (char *)malloc(n + 1);
   if(!p)
     return NULL;
@@ -57,7 +58,7 @@ static char *strdup_alcor(const char *s)
   return p;
 }
 
-int expand_setvar(const char *name, const char *value)
+int vega_setvar(const char *name, const char *value)
 {
   if(!name || !*name)
     return -1;
@@ -254,17 +255,17 @@ static int expand_brace(const char *cur, char **buf, size_t *cap, size_t *len)
   /* Special vars get the same treatment they do under $-syntax. */
   const char *val;
   char        special[16];
-  if(sh_strcmp(name, "?") == 0) {
+  if(strcmp(name, "?") == 0) {
     render_int(last_status, special);
     val = special;
-  } else if(sh_strcmp(name, "$") == 0) {
+  } else if(strcmp(name, "$") == 0) {
     if(pid_buf[0] == '\0')
       render_uint((unsigned long)getpid(), pid_buf);
     val = pid_buf;
   } else {
     val = expand_getvar(name);
   }
-  if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+  if(buf_append(buf, cap, len, val, strlen(val)) < 0)
     return -1;
   return (int)(p - cur) + 1; /* consumed NAME } */
 }
@@ -278,7 +279,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
   if(*cur == '?') {
     char s[16] = {0};
     render_int(last_status, s);
-    if(buf_append(buf, cap, len, s, sh_strlen(s)) < 0)
+    if(buf_append(buf, cap, len, s, strlen(s)) < 0)
       return -1;
     return 1;
   }
@@ -287,7 +288,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
   if(*cur == '$') {
     if(pid_buf[0] == '\0')
       render_uint((unsigned long)getpid(), pid_buf);
-    if(buf_append(buf, cap, len, pid_buf, sh_strlen(pid_buf)) < 0)
+    if(buf_append(buf, cap, len, pid_buf, strlen(pid_buf)) < 0)
       return -1;
     return 1;
   }
@@ -323,7 +324,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
     free(body);
     if(!captured)
       return -1;
-    int rc = buf_append(buf, cap, len, captured, sh_strlen(captured));
+    int rc = buf_append(buf, cap, len, captured, strlen(captured));
     free(captured);
     if(rc < 0)
       return -1;
@@ -351,7 +352,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
     name[nlen] = '\0';
 
     const char *val = expand_getvar(name);
-    if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+    if(buf_append(buf, cap, len, val, strlen(val)) < 0)
       return -1;
     return (int)(p - cur) + 1; /* consumed { ... } */
   }
@@ -370,7 +371,7 @@ static int expand_one(const char *cur, char **buf, size_t *cap, size_t *len)
     name[nlen] = '\0';
 
     const char *val = expand_getvar(name);
-    if(buf_append(buf, cap, len, val, sh_strlen(val)) < 0)
+    if(buf_append(buf, cap, len, val, strlen(val)) < 0)
       return -1;
     return (int)(p - cur);
   }

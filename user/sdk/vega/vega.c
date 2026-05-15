@@ -1,9 +1,9 @@
 /**
- * @file user/shell/vega.c
+ * @file sdk/vega/vega.c
  * @brief vega top-level: lex → parse → execute → free.
  */
 
-#include "exec.h"
+#include <vega/internal/exec.h>
 #include <vega/ast.h>
 #include <vega/parse.h>
 #include <vega/vega.h>

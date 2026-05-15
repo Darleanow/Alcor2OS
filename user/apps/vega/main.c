@@ -2,25 +2,19 @@
  * @file apps/vega/main.c
  * @brief Standalone vega interpreter CLI.
  *
- *   vega script.veg     run a script file
- *   vega -c "code"      evaluate a string
- *   vega                read from stdin until EOF, then evaluate
+ *   vega SCRIPT          run a script file
+ *   vega -c CODE         evaluate CODE and exit
+ *   vega                 read program from stdin until EOF
  */
 
 #include <fcntl.h>
+#include <grendizer.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <vega/vega.h>
 
-static int run_string(const char *src)
-{
-  return vega_run(src);
-}
-
-static char *slurp(int fd, size_t *out_len)
+static char *slurp(int fd)
 {
   size_t cap = 4096;
   size_t len = 0;
@@ -47,8 +41,6 @@ static char *slurp(int fd, size_t *out_len)
     len += (size_t)n;
   }
   buf[len] = '\0';
-  if(out_len)
-    *out_len = len;
   return buf;
 }
 
@@ -59,7 +51,7 @@ static int run_file(const char *path)
     fprintf(stderr, "vega: cannot open %s\n", path);
     return 1;
   }
-  char *src = slurp(fd, NULL);
+  char *src = slurp(fd);
   close(fd);
   if(!src) {
     fprintf(stderr, "vega: read failed for %s\n", path);
@@ -70,42 +62,52 @@ static int run_file(const char *path)
   return rc;
 }
 
-static void usage(void)
+static int run_stdin(void)
 {
-  fprintf(
-      stderr, "usage: vega [-c CODE | SCRIPT]\n"
-              "  -c CODE    evaluate CODE and exit\n"
-              "  SCRIPT     run script file\n"
-              "  (no args)  read program from stdin\n"
-  );
+  char *src = slurp(STDIN_FILENO);
+  if(!src) {
+    fprintf(stderr, "vega: read failed\n");
+    return 1;
+  }
+  int rc = vega_run(src);
+  free(src);
+  return rc;
 }
 
 int main(int argc, char *argv[])
 {
-  if(argc == 1) {
-    char *src = slurp(STDIN_FILENO, NULL);
-    if(!src) {
-      fprintf(stderr, "vega: read failed\n");
-      return 1;
-    }
-    int rc = run_string(src);
-    free(src);
-    return rc;
+  const char *code    = NULL;
+  int         version = 0;
+
+  gr_opt opts[] = {
+      GR_STR('c', "code", &code, "CODE", "evaluate CODE and exit"),
+      GR_FLAG('v', "version", &version, "print version and exit"),
+      GR_END,
+  };
+  gr_spec spec = {
+      .program = "vega",
+      .usage   = "vega [-c CODE | SCRIPT]",
+      .options = opts,
+      .epilog  = "  (no args)  read program from stdin",
+  };
+  gr_rest rest;
+  char    errbuf[128];
+
+  int rc = gr_parse(&spec, argc, argv, &rest, errbuf, sizeof errbuf);
+  if(rc == GR_HELP)
+    return 0;
+  if(rc == GR_ERR) {
+    fprintf(stderr, "vega: %s\n", errbuf);
+    return 2;
   }
-  if(argc == 2) {
-    if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
-      usage();
-      return 0;
-    }
-    if(strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
-      printf("vega %s\n", VEGA_VERSION);
-      return 0;
-    }
-    return run_file(argv[1]);
+
+  if(version) {
+    printf("vega %s\n", VEGA_VERSION);
+    return 0;
   }
-  if(argc == 3 && strcmp(argv[1], "-c") == 0) {
-    return run_string(argv[2]);
-  }
-  usage();
-  return 2;
+  if(code)
+    return vega_run(code);
+  if(rest.argc >= 1)
+    return run_file(rest.argv[0]);
+  return run_stdin();
 }

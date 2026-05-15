@@ -1,9 +1,9 @@
 /**
- * @file user/shell/lexer.c
+ * @file core/vega/lexer.c
  * @brief vega tokenizer implementation.
  */
 
-#include "lexer.h"
+#include <vega/internal/lexer.h>
 #include <stdlib.h>
 #include <vega/host.h>
 

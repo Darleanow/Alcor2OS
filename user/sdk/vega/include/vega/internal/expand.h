@@ -1,14 +1,7 @@
 /**
- * @file user/shell/expand.h
- * @brief vega variable + command expansion.
- *
- * Currently handles $-prefixed expansion in argv strings:
- *   $VAR, ${VAR}   user variables (empty if unset)
- *   $?             last command exit status
- *   $$             current shell PID
- *
- * Phase 7b will add $(cmd) substitution; Phase 7c will add {var} brace
- * interpolation in double-quoted strings.
+ * @file vega/internal/expand.h
+ * @brief Sdk-internal expansion helpers. vega_setvar lives in <vega/vega.h>
+ * because hosts implement `let` against it.
  */
 
 #ifndef VEGA_EXPAND_H
@@ -16,12 +9,6 @@
 
 /** @brief Record the exit status of the most recently completed command. */
 void expand_set_status(int status);
-
-/**
- * @brief Set a user variable. Both name and value are copied.
- * @return 0 on success, -1 on allocation failure or if @p name is empty.
- */
-int expand_setvar(const char *name, const char *value);
 
 /**
  * @brief Look up a user variable.

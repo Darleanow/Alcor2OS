@@ -10,12 +10,14 @@ CORE_OBJS  := $(CORE_DIR)/ast.o $(CORE_DIR)/lexer.o $(CORE_DIR)/parse.o
 CFLAGS  += -I$(USER_BASE)/sdk/vega/include \
            -I$(USER_BASE)/core/vega/include
 
-SRCS := vega.c exec.c expand.c fntab.c builtin.c
+SRCS := vega.c exec.c expand.c fntab.c
 OBJS := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
 
 HEADERS := \
   include/vega/vega.h \
-  exec.h expand.h fntab.h builtin.h
+  include/vega/internal/exec.h \
+  include/vega/internal/expand.h \
+  include/vega/internal/fntab.h
 
 .PHONY: all clean
 

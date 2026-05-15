@@ -1,5 +1,5 @@
 /**
- * @file user/shell/parse.h
+ * @file vega/parse.h
  * @brief vega parser entry point.
  */
 

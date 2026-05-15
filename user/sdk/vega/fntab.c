@@ -1,10 +1,11 @@
 /**
- * @file user/shell/fntab.c
+ * @file sdk/vega/fntab.c
  * @brief Fixed-capacity function table.
  */
 
-#include "fntab.h"
+#include <vega/internal/fntab.h>
 #include <stdlib.h>
+#include <string.h>
 #include <vega/host.h>
 
 #define MAX_FUNCTIONS 16
@@ -15,7 +16,7 @@ static int         g_count = 0;
 static fn_entry_t *find_slot(const char *name)
 {
   for(int i = 0; i < g_count; i++) {
-    if(sh_strcmp(g_table[i].name, name) == 0)
+    if(strcmp(g_table[i].name, name) == 0)
       return &g_table[i];
   }
   return NULL;

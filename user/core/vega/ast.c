@@ -1,5 +1,5 @@
 /**
- * @file user/shell/ast.c
+ * @file core/vega/ast.c
  * @brief AST node allocation and teardown.
  */
 

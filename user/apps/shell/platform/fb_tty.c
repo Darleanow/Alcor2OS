@@ -1,5 +1,5 @@
 /**
- * @file user/shell/platform/fb_tty.c
+ * @file apps/shell/platform/fb_tty.c
  * @brief Framebuffer terminal: Fira via FreeType + HarfBuzz, full ANSI/CSI.
  *
  * This is the user-facing terminal emulator. Bytes written by the shell or

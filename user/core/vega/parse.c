@@ -1,5 +1,5 @@
 /**
- * @file user/shell/parse.c
+ * @file core/vega/parse.c
  * @brief Recursive-descent parser building vega AST nodes from tokens.
  *
  * Grammar:
@@ -29,8 +29,9 @@
  * identifiers and can be passed as arguments.
  */
 
-#include "lexer.h"
+#include <vega/internal/lexer.h>
 #include <stdlib.h>
+#include <string.h>
 #include <vega/host.h>
 #include <vega/parse.h>
 
@@ -167,7 +168,7 @@ static ast_t *parse_unit(lexer_t *L);
 static int match_keyword(lexer_t *L, const char *keyword)
 {
   tok_t t = lex_peek(L);
-  if(t.kind != TOK_WORD || sh_strcmp(t.text, keyword) != 0)
+  if(t.kind != TOK_WORD || strcmp(t.text, keyword) != 0)
     return 0;
   lex_next(L);
   lex_token_free(&t);
@@ -374,22 +375,22 @@ static ast_t *parse_fn(lexer_t *L)
 static ast_t *parse_unit(lexer_t *L)
 {
   tok_t t = lex_peek(L);
-  if(t.kind == TOK_WORD && sh_strcmp(t.text, "if") == 0) {
+  if(t.kind == TOK_WORD && strcmp(t.text, "if") == 0) {
     lex_next(L);
     lex_token_free(&t);
     return parse_if(L);
   }
-  if(t.kind == TOK_WORD && sh_strcmp(t.text, "while") == 0) {
+  if(t.kind == TOK_WORD && strcmp(t.text, "while") == 0) {
     lex_next(L);
     lex_token_free(&t);
     return parse_while(L);
   }
-  if(t.kind == TOK_WORD && sh_strcmp(t.text, "for") == 0) {
+  if(t.kind == TOK_WORD && strcmp(t.text, "for") == 0) {
     lex_next(L);
     lex_token_free(&t);
     return parse_for(L);
   }
-  if(t.kind == TOK_WORD && sh_strcmp(t.text, "fn") == 0) {
+  if(t.kind == TOK_WORD && strcmp(t.text, "fn") == 0) {
     lex_next(L);
     lex_token_free(&t);
     return parse_fn(L);

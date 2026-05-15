@@ -1,9 +1,6 @@
 /**
- * @file user/shell/ast.h
- * @brief vega abstract syntax tree.
- *
- * AST node kinds are introduced as the parser learns them. Phase 1 only
- * defines AST_CMD; later phases extend the union.
+ * @file vega/ast.h
+ * @brief vega abstract syntax tree node types and constructors.
  */
 
 #ifndef VEGA_AST_H

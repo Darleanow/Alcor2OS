@@ -1,5 +1,5 @@
 /**
- * @file user/shell/exec.c
+ * @file sdk/vega/exec.c
  * @brief Walks vega AST nodes and runs them.
  *
  * AST_CMD: resolve via /bin or /usr/bin, absolute path, or relative path
@@ -10,10 +10,6 @@
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
-#include "exec.h"
-#include "builtin.h"
-#include "expand.h"
-#include "fntab.h"
 #include <fcntl.h>
 #include <poll.h>
 #include <stdlib.h>
@@ -22,6 +18,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vega/host.h>
+#include <vega/internal/exec.h>
+#include <vega/internal/expand.h>
+#include <vega/internal/fntab.h>
+#include <vega/vega.h>
 
 /* musl exposes this; must not pass NULL to execve — breaks getenv, setenv,
  * ncurses terminfo lookup, etc. (undefined environ → faults like CR2 ~0x45). */
@@ -56,7 +56,7 @@ static int apply_pipe_input(const char *text, int append_newline)
   if(pipe(pipefd) < 0)
     return -1;
 
-  size_t len = sh_strlen(text);
+  size_t len = strlen(text);
   if(len > 0)
     write(pipefd[1], text, len);
   if(append_newline)
@@ -351,7 +351,7 @@ static int call_function(const fn_entry_t *fn, int argc, char *const argv[])
 {
   for(int i = 0; i < fn->n_args; i++) {
     const char *val = (i + 1 < argc) ? argv[i + 1] : "";
-    expand_setvar(fn->arg_names[i], val);
+    vega_setvar(fn->arg_names[i], val);
   }
   return vega_exec(fn->body);
 }
@@ -405,8 +405,6 @@ static int exec_cmd(ast_t *n)
     const fn_entry_t *fn = fntab_get(argv[0]);
     if(fn) {
       ret = call_function_redirected(fn, argc, argv, redirs);
-    } else if(is_builtin(argv[0])) {
-      ret = run_in_process_redirected(run_builtin, argc, argv, redirs);
     } else if(sh_is_builtin(argv[0])) {
       ret = run_in_process_redirected(sh_run_builtin, argc, argv, redirs);
     } else {
@@ -484,10 +482,6 @@ static void exec_stage_in_child(ast_t *stage)
     _exit(rc);
   }
 
-  if(is_builtin(argv[0])) {
-    int rc = run_builtin(argc, argv);
-    _exit(rc);
-  }
   if(sh_is_builtin(argv[0])) {
     int rc = sh_run_builtin(argc, argv);
     _exit(rc);
@@ -651,7 +645,7 @@ int vega_exec(ast_t *node)
         status = 1;
         break;
       }
-      expand_setvar(node->u.for_.name, expanded);
+      vega_setvar(node->u.for_.name, expanded);
       free(expanded);
       if(node->u.for_.body)
         status = vega_exec(node->u.for_.body);

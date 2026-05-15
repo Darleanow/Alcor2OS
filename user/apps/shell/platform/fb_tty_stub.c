@@ -1,5 +1,5 @@
 /**
- * @file user/shell/platform/fb_tty_stub.c
+ * @file apps/shell/platform/fb_tty_stub.c
  * @brief No-op framebuffer TTY when FreeType/HarfBuzz/musl-g++ are not built.
  */
 

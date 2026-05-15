@@ -1,8 +1,9 @@
 /**
- * @file user/shell/io.c
+ * @file apps/shell/platform/io.c
  * @brief Minimal I/O for the shell (line read/write, prompts).
  */
 
+#include <string.h>
 #include <shell/fb_tty.h>
 #include <shell/shell.h>
 #include <sys/select.h>
@@ -34,7 +35,7 @@ void sh_puts(const char *s)
     sh_fb_tty_present();
     return;
   }
-  sh_write(STDOUT_FILENO, s, sh_strlen(s));
+  sh_write(STDOUT_FILENO, s, strlen(s));
 }
 
 void sh_stdout_bytes(const void *buf, size_t len)

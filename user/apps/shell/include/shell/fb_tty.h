@@ -1,5 +1,5 @@
 /**
- * @file user/shell/include/vega/fb_tty.h
+ * @file shell/fb_tty.h
  * @brief Optional framebuffer text (FreeType + HarfBuzz) for the vega shell.
  *
  * When active, all shell stdout (and relayed child output) goes through a
