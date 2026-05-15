@@ -1,8 +1,12 @@
 /**
- * Dual 8×16 monospace atlases: CP437 VGA box-drawing (/font_8x16) and ISO
- * Latin-1 (kbd lat1-16.psfu, Unicode U+0000–U+00FF). Byte selects the glyph;
- * CP437 vs Latin-1 disagree on octets ≥0x80 (e.g. 0xc4). console.c selects the
- * atlas via SGR 50/51.
+ * @file src/drivers/console/font_bitmap.h
+ * @brief 8x16 monospace bitmap atlases used by the kernel boot logger.
+ *
+ * @c font_latin1 is the ISO Latin-1 atlas (kbd @c lat1-16.psfu, code points
+ * U+0000-U+00FF) and drives @c console.c. @c font_cp437 is the legacy VGA
+ * box-drawing atlas, kept around as a fallback option but unused now that
+ * the user-facing terminal (shell fb_tty) renders box drawing through Fira
+ * + Unicode.
  */
 #ifndef ALCOR2_CONSOLE_FONT_BITMAP_H
 #define ALCOR2_CONSOLE_FONT_BITMAP_H
@@ -12,14 +16,13 @@
 #define FONT_H_CELL 16u
 #define FONT_GLYPHS 256u
 
+/** @brief Each byte indexes directly into the atlas. */
 static inline int font_glyph_index(unsigned char uc)
 {
-  /* Byte is the atlas row (glyph index): choose atlas in console via SGR 50/51.
-   */
   return (int)uc;
 }
 
-static const u8 font_cp437[FONT_GLYPHS][FONT_H_CELL] = {
+__attribute__((unused)) static const u8 font_cp437[FONT_GLYPHS][FONT_H_CELL] = {
     {0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u,   0u  }, /* 0x00 */
     {0u,   0u,   126u, 129u, 165u, 129u, 129u, 189u, 153u, 129u, 129u, 126u, 0u,   0u,
      0u,                                                                                       0u  }, /* 0x01 */

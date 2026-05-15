@@ -35,13 +35,18 @@ static void
   tmp[sizeof tmp - 1] = '\0';
 
   if(buf && cap > 0) {
-    size_t avail = cap - 1;
-    strncpy(buf, tmp, avail);
-    buf[avail] = '\0';
-    if(strlen(tmp) > avail && avail > 3) {
-      buf[avail - 1] = '.';
-      buf[avail - 2] = '.';
-      buf[avail - 3] = '.';
+    size_t avail   = cap - 1;
+    size_t tmp_len = strlen(tmp);
+    if(tmp_len > avail) {
+      memcpy(buf, tmp, avail);
+      buf[avail] = '\0';
+      if(avail > 3) {
+        buf[avail - 1] = '.';
+        buf[avail - 2] = '.';
+        buf[avail - 3] = '.';
+      }
+    } else {
+      memcpy(buf, tmp, tmp_len + 1);
     }
   } else if(fallback) {
     fputs(tmp, fallback);
@@ -210,9 +215,9 @@ static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
 {
-  const char *p   = text;
-  double      acc = 0.0;
-  double      frac;
+  const char *p    = text;
+  double      acc  = 0.0;
+  double      frac = 0.0;
   int         sig  = 1;
   int         esig = 1;
   long        exp  = 0;
@@ -331,8 +336,7 @@ void gr_usage(const gr_spec *spec, FILE *stream)
 
   /* Pass 1: measure the left column width. */
   for(o = spec->options; o->kind != GR_KIND_END; o++) {
-    char tmp[64];
-    int  n = 0;
+    int n = 0;
     if(o->short_name)
       n += 2; /* -x  */
     if(o->short_name && o->long_name)
@@ -344,7 +348,6 @@ void gr_usage(const gr_spec *spec, FILE *stream)
           (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
       n += 1 + (int)strlen(hint);
     }
-    (void)tmp;
     w = (unsigned)n;
     if(w > col)
       col = w;
@@ -656,7 +659,7 @@ static void gr__print_cmd(
  */
 static int gr__help_walk(
     const char *prog, const gr_app *app, const gr_cmd *cmds, size_t n,
-    char *path, size_t cap, int argc, char **argv
+    char *path, int argc, char **argv
 )
 {
   const gr_cmd *cmd;
@@ -682,7 +685,7 @@ static int gr__help_walk(
     return 2;
   }
   return gr__help_walk(
-      prog, app, cmd->children, cmd->child_count, next, cap, argc - 1, argv + 1
+      prog, app, cmd->children, cmd->child_count, next, argc - 1, argv + 1
   );
 }
 
@@ -730,9 +733,7 @@ static int gr__dispatch(
       return 0;
     }
     char empty[256] = {0};
-    return gr__help_walk(
-        prog, app, cmds, n, empty, sizeof empty, argc - 1, argv + 1
-    );
+    return gr__help_walk(prog, app, cmds, n, empty, argc - 1, argv + 1);
   }
 
   cmd = gr__find_cmd(cmds, n, argv[0]);

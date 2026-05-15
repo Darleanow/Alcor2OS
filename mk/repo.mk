@@ -80,8 +80,13 @@ disk: $(DISK)
 $(DISK):
 	@mkdir -p $(BUILD)
 	@echo "ext2 $(DISK_SIZE) → $(DISK)"
+	@if mountpoint -q mnt 2>/dev/null; then \
+	  echo "[disk] stale mount on mnt — unmounting before format"; \
+	  fusermount -u mnt 2>/dev/null || umount mnt 2>/dev/null || true; \
+	  rmdir mnt 2>/dev/null || true; \
+	fi
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
-	@$(MKE2FS) -t ext2 -E root_owner=$$(id -u):$$(id -g) -L ALCOR2 -q $(DISK)
+	@$(MKE2FS) -F -t ext2 -E root_owner=$$(id -u):$$(id -g) -L ALCOR2 -q $(DISK)
 
 disk-mount: $(DISK)
 	@mkdir -p mnt
@@ -170,18 +175,22 @@ disk-populate: user
 	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
 	@$(MKE2FS) -t ext2 -E root_owner=$$(id -u):$$(id -g) -L ALCOR2 -d $(DISK_ROOT) -q $(DISK)
 else
-# Linux: single source of truth — scripts/disk-populate.sh installs
-# /bin/clang.real + cc wrapper (see user/bin/cc.c). Do not duplicate logic here.
-disk-populate: $(DISK) user
-	@set -e; mkdir -p mnt; \
-	if command -v fuse2fs >/dev/null 2>&1 && [ "$$(uname -s)" = Linux ]; then \
-	  fuse2fs "$(CURDIR)/$(DISK)" mnt; S=''; \
-	else \
-	  sudo mount -o loop "$(CURDIR)/$(DISK)" mnt; S=sudo; \
-	fi; \
-	trap 'fusermount -u mnt 2>/dev/null || sudo umount mnt 2>/dev/null; rmdir mnt 2>/dev/null' EXIT; \
-	sh scripts/disk-populate.sh mnt "$$S"; \
-	$$S sync
+# Linux: stage into build/disk-root, then mke2fs -d — no fuse2fs, no mount.
+DISK_ROOT := $(BUILD)/disk-root
+
+disk-populate: user
+	@echo "staging → $(DISK_ROOT)"
+	@rm -rf $(DISK_ROOT)
+	@mkdir -p \
+		$(DISK_ROOT)/bin          $(DISK_ROOT)/etc          $(DISK_ROOT)/tmp \
+		$(DISK_ROOT)/home         $(DISK_ROOT)/usr/bin      \
+		$(DISK_ROOT)/usr/include  $(DISK_ROOT)/usr/lib      \
+		$(DISK_ROOT)/usr/lib/clang
+	@sh scripts/disk-populate.sh "$(DISK_ROOT)" ""
+	@echo "ext2 $(DISK_SIZE) → $(DISK) (populated)"
+	@rm -f $(DISK)
+	@dd if=/dev/zero of=$(DISK) bs=1M count=$$(echo $(DISK_SIZE) | sed 's/M//') 2>/dev/null
+	@$(MKE2FS) -F -t ext2 -E root_owner=$$(id -u):$$(id -g) -L ALCOR2 -d $(DISK_ROOT) -q $(DISK)
 endif
 
 disk-resync: user disk-populate

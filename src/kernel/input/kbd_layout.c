@@ -1,7 +1,15 @@
 /**
  * @file src/kernel/input/kbd_layout.c
- * @brief PS/2 set 1 scancodes to bytes: US or FR AZERTY (+ AltGr) and CSI arrow
- * keys.
+ * @brief PS/2 set 1 scancodes to bytes: US or FR AZERTY (+ AltGr), CSI arrow
+ * keys, and UTF-8 emission for Latin-1 codepoints.
+ *
+ * AZERTY produces accents (é, à, ç, è, ù, î, …) and the §/°/¨/£/¤/µ family.
+ * Those codepoints live in U+0080..U+00FF, so the lookup tables store the
+ * raw Latin-1 byte; ::emit_user_cp transcodes anything above 0x7f into its
+ * 2-byte UTF-8 encoding before pushing it to the read queue. Apps and the
+ * shell see the exact same byte stream a real UTF-8 terminal would feed
+ * them, which keeps the FB tty decoder happy and stops ncurses' keyname()
+ * from reporting "M-i" for é.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -53,6 +61,36 @@ static void pend_csi(char tail)
   out_pend_push(0x1b);
   out_pend_push('[');
   out_pend_push((unsigned char)tail);
+}
+
+/**
+ * @brief Deliver one user-visible codepoint to the keyboard byte stream.
+ *
+ * ASCII bytes (< 0x80) flow straight into @p out so the common case stays a
+ * single-byte read. Latin-1 supplement codepoints (0x80..0xff, the AZERTY
+ * é/à/ç/è/ù/î and the dead-key punctuation) are transcoded to their 2-byte
+ * UTF-8 encoding and pushed to @c out_pend, matching what every modern
+ * terminal feeds to its TTY. The caller (@c kbd_pop_byte) drains the queue
+ * before re-entering @c process_raw_ctx, so the second UTF-8 byte surfaces
+ * on the very next read.
+ *
+ * Dry-run mode reports readability without touching state.
+ *
+ * @return @c true when @p out was set or at least one byte is now queued.
+ */
+static bool emit_user_cp(unsigned char cp, unsigned char *out, bool dry)
+{
+  if(dry)
+    return true;
+  if(cp < 0x80u) {
+    *out = cp;
+    return true;
+  }
+  /* Latin-1 → UTF-8: 0xC0|(cp>>6), 0x80|(cp&0x3F).  No need for the 3/4-byte
+   * cases — the layout tables only hold codepoints up to 0xff. */
+  out_pend_push((unsigned char)(0xc0u | (cp >> 6u)));
+  out_pend_push((unsigned char)(0x80u | (cp & 0x3fu)));
+  return false;
 }
 
 static const unsigned char us_pl[128] = {
@@ -366,9 +404,7 @@ static bool
   }
 
   if(layout == KBD_LAYOUT_FR && (s->lalt_dn || s->ralt_dn) && fr_alt[key]) {
-    if(!dry)
-      *out = fr_alt[key];
-    return true;
+    return emit_user_cp(fr_alt[key], out, dry);
   }
 
   bool eff_shift = s->mod.shift;
@@ -382,9 +418,7 @@ static bool
   unsigned char c = eff_shift ? sh[key] : pl[key];
   if(!c)
     return false;
-  if(!dry)
-    *out = c;
-  return true;
+  return emit_user_cp(c, out, dry);
 }
 
 static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
@@ -455,6 +489,26 @@ static void tty_echo_erase(bool echo_on)
   console_putchar('\b');
 }
 
+/**
+ * @brief Trim one UTF-8 codepoint from the tail of @p buf.
+ *
+ * The kbd line discipline appends incoming bytes one at a time, so a
+ * Latin-1 character like é lands as the pair 0xC3 0xA9. Plain backspace
+ * would erase a single byte and leave a dangling lead, corrupting the
+ * line. Walk backwards through any continuation bytes (10xxxxxx) and
+ * then over the lead byte itself.
+ *
+ * @return Updated length after the trim (0 when @p len was already 0).
+ */
+static u32 utf8_trim_one(const char *buf, u32 len)
+{
+  while(len > 0 && ((unsigned char)buf[len - 1] & 0xc0u) == 0x80u)
+    len--;
+  if(len > 0)
+    len--;
+  return len;
+}
+
 static u64 kbd_deliver_ready(proc_t *p, char *buf, u64 count)
 {
   u64 to_copy = count;
@@ -502,7 +556,7 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
 
       if(c == verase || c == '\b') {
         if(p->kbd_edit_len > 0) {
-          p->kbd_edit_len--;
+          p->kbd_edit_len = utf8_trim_one(p->kbd_edit, p->kbd_edit_len);
           tty_echo_erase(echo_on);
         }
         continue;
@@ -510,7 +564,7 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
 
       if(c == vkill) {
         while(p->kbd_edit_len > 0) {
-          p->kbd_edit_len--;
+          p->kbd_edit_len = utf8_trim_one(p->kbd_edit, p->kbd_edit_len);
           tty_echo_erase(echo_on);
         }
         continue;

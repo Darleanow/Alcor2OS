@@ -11,6 +11,7 @@
  */
 
 #include <fcntl.h>
+#include <poll.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -152,20 +153,32 @@ static int stage_redir_touches_stdout(const ast_t *stage)
   return redir_touches_stdout(stage->u.cmd.redirs);
 }
 
-/** Read pipe from child into the same FB terminal (Fira + CSI).
+/** Read pipe from child into the FB terminal, ticking A_BLINK on timeout.
  *
- * Blocking read: pipe_read_obj sets the process BLOCKED so proc_schedule()
- * correctly wakes this process when the child writes or exits. select()-based
- * relaying cannot be used here because sys_select keeps the process RUNNING
- * during its HLT loop, so pipe_oft_release never sees it as BLOCKED and the
- * parent hangs when the child exits.
+ * pipe_poll_read_ready returns true once the child closes the write end, so
+ * a poll-based loop naturally drops out at EOF. The 500ms timeout window
+ * gives sh_fb_tty_blink_tick a chance to flip the blink phase even while a
+ * child (e.g. ncurses-hello) holds the terminal.
  */
 static void relay_pipe_to_stdout(int rfd)
 {
   char buf[4096];
-  long n;
-  while((n = sh_read(rfd, buf, sizeof buf)) > 0)
+  for(;;) {
+    struct pollfd pfd = {.fd = rfd, .events = POLLIN};
+    int           r   = poll(&pfd, 1, 500);
+    if(r < 0)
+      break;
+    if(r == 0) {
+      sh_fb_tty_blink_tick();
+      continue;
+    }
+    if(!(pfd.revents & (POLLIN | POLLHUP)))
+      break;
+    long n = sh_read(rfd, buf, sizeof buf);
+    if(n <= 0)
+      break;
     sh_stdout_bytes(buf, (size_t)n);
+  }
   sh_close(rfd);
 }
 

@@ -33,7 +33,8 @@ void sh_stdout_bytes(const void *buf, size_t len);
 
 /**
  * @brief Read one byte from stdin; when FB TTY is active, uses @p idle_ms
- * select timeout so @c sh_fb_tty_cursor_poll() can run while waiting.
+ * select timeout so @c sh_fb_tty_cursor_poll() and @c sh_fb_tty_blink_tick()
+ * can run while waiting (text cursor and A_BLINK cells both animate).
  */
 int sh_getchar_blinking(int idle_ms);
 int sh_getchar(void);

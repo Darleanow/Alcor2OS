@@ -1,17 +1,15 @@
 /**
  * @file include/alcor2/drivers/console.h
- * @brief Framebuffer-based console output.
+ * @brief Kernel boot/panic logger on the linear framebuffer.
  *
- * Framebuffer bpp is taken into account (@a bpp / bytes per pixel). Latin-1 and
- * CP437 atlases disagree on octets ≥0x80; select with @c ESC [ 50 m (ISO
- * Latin-1, default) vs @c ESC [ 51 m (CP437 / box drawing). Xterm 256-colour
- * SGR @c ESC [ 38 ; 5 ; n m and @c ESC [ 48 ; 5 ; n m set foreground/background
- * from the fixed palette.
+ * Plain 8x16 ISO Latin-1 bitmap text with cursor advance, scroll, and the
+ * @c \\n / @c \\r / @c \\b / @c \\t controls. No escape sequences, no SGR,
+ * no charset switching, no UTF-8 multibyte — strictly for kernel messages
+ * before the user-space terminal takes over.
  *
- * UTF-8 input is decoded; code points U+0000–U+00FF map to the active 8×16
- * atlas. Other Unicode is shown as '?'. CSI cursor position @c ESC [ row ; col
- * H and moves @c A / @c B / @c C / @c D are supported for ncurses and similar
- * TUI libraries. Private sequences @c ESC [ ? … h / l are accepted and ignored.
+ * The user-facing terminal emulator (Fira via FreeType + HarfBuzz, full
+ * ANSI/CSI, DEC line drawing, 256-color SGR) lives in
+ * @c user/shell/platform/fb_tty.c.
  */
 
 #ifndef ALCOR2_CONSOLE_H
