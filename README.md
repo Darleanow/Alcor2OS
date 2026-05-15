@@ -49,24 +49,18 @@ Host: Linux with the following packages installed.
 ## Build
 
 ```sh
-# Kernel only (fast — no userland, no third-party)
-make iso-kernel
-
-# Full build: kernel + third-party + userland
-make kernel
-make clang ncurses freetype harfbuzz
-make user
-make iso
-
-# Create and populate the ext2 disk image
-make disk
-make disk-populate
-
-# Run in QEMU (ISO + disk image)
+# Local dev: bootstraps the full toolchain (musl-cross, FreeType, HarfBuzz,
+# ncurses, on-disk clang+lld), then builds kernel + userland + ISO + disk
+# and boots in QEMU. First run is ~1h on a clean tree (clang is the slow
+# part); subsequent runs are incremental.
 make run
 
+# CI / quick sanity check: kernel-only ISO, skips userland and toolchain.
+make iso-kernel
+
 # Clean
-make clean
+make clean         # build/ only, keeps thirdparty/
+make distclean     # also wipes thirdparty/ and disk.img
 ```
 
 CI accelerates builds with ccache. Pass `CCACHE=1` to enable it locally.

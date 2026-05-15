@@ -13,7 +13,13 @@ endif
 
 PKGCONFIG := $(shell command -v pkg-config 2>/dev/null)
 
-.PHONY: musl clang musl-cross ncurses ncurses-verify freetype harfbuzz
+.PHONY: musl clang musl-cross ncurses ncurses-verify freetype harfbuzz toolchain
+
+# Aggregator: everything `make run` needs for a full-feature local boot —
+# fb_tty rendering (FreeType+HarfBuzz), ncurses-based TUIs, and the on-disk
+# C/C++ compiler (clang+lld). First bootstrap is long (mostly clang: 30–90
+# min). Subsequent runs reuse the install sentinels.
+toolchain: musl-cross freetype harfbuzz ncurses clang
 
 musl:  thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 
