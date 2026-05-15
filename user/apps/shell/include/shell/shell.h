@@ -4,11 +4,11 @@
  *        <vega/host.h>, which this header pulls in for convenience.
  */
 
-#ifndef SHELL_SHELL_H
-#define SHELL_SHELL_H
+#ifndef SHELL_H
+#define SHELL_H
 
 #include <vega/host.h>
 
 #define MAX_CMD_LEN 256
 
-#endif /* SHELL_SHELL_H */
+#endif /* SHELL_H */
