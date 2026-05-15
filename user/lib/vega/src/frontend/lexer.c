@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include <vega/frontend/lexer.h>
-#include <vega/shell.h>
+#include <vega/host.h>
 
 static int is_hspace(char c)
 {

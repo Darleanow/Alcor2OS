@@ -5,8 +5,8 @@
 
 #include <sys/select.h>
 #include <unistd.h>
-#include <vega/fb_tty.h>
-#include <vega/shell.h>
+#include <shell/fb_tty.h>
+#include <shell/shell.h>
 
 /**
  * @brief Write a single character to stdout

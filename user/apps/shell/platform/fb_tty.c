@@ -27,7 +27,7 @@
 
 #include <alcor2/alcor_fb_user.h>
 #include <alcor2/types.h>
-#include <vega/fb_tty.h>
+#include <shell/fb_tty.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

@@ -5,8 +5,9 @@
  */
 
 #include <stdlib.h>
+#include <vega/host.h>
+#include <vega/runtime/builtin.h>
 #include <vega/runtime/expand.h>
-#include <vega/shell.h>
 #include <vega/vega.h>
 
 static const char *builtins[] = {"help", "version", "clear", "exit", "cd",

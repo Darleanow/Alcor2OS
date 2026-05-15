@@ -12,8 +12,8 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
-#include <vega/fb_tty.h>
-#include <vega/shell.h>
+#include <shell/fb_tty.h>
+#include <shell/shell.h>
 
 /** Process Control */
 

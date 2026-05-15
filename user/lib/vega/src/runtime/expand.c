@@ -11,7 +11,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vega/runtime/expand.h>
-#include <vega/shell.h>
+#include <vega/host.h>
 #include <vega/vega.h>
 
 #define MAX_VARS    32

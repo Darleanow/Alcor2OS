@@ -26,7 +26,8 @@ user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/crt
 	$(MAKE) -C user/lib
 	$(MAKE) -C user/init
-	$(MAKE) -C user/shell
+	$(MAKE) -C user/apps/shell
+	$(MAKE) -C user/apps/vega
 	$(MAKE) -C user/bin
 	@if [ -f thirdparty/musl-cross/bin/x86_64-linux-musl-g++ ]; then \
 		$(MAKE) -C user/apps; \
@@ -58,7 +59,7 @@ iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user
 	@rm -rf $(BUILD)/iso
 	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT $(BUILD)/iso/bin
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
-	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || true
+	@cp user/build/apps/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || true
 	@cp user/build/bin/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp user/build/apps/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
@@ -205,7 +206,8 @@ clean:
 	-$(MAKE) -C user/crt clean
 	-$(MAKE) -C user/lib clean
 	-$(MAKE) -C user/init clean
-	-$(MAKE) -C user/shell clean
+	-$(MAKE) -C user/apps/shell clean
+	-$(MAKE) -C user/apps/vega clean
 	-$(MAKE) -C user/bin clean
 	-$(MAKE) -C user/apps clean
 
@@ -224,7 +226,8 @@ lint:
 	  --header-filter='^(src|include|user)/.*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
-	     -Iuser/shell/include \
+	     -Iuser/lib/vega/include \
+	     -Iuser/apps/shell/include \
 	     -Iuser/include \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
 	     -Ithirdparty/freetype-install/usr/include/freetype2 \

@@ -4,7 +4,7 @@
  */
 
 #include <stddef.h>
-#include <vega/shell.h>
+#include <shell/shell.h>
 
 /**
  * @brief Calculate string length

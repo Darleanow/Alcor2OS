@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <vega/fb_tty.h>
-#include <vega/shell.h>
+#include <shell/fb_tty.h>
+#include <shell/shell.h>
 #include <vega/vega.h>
 
 #ifndef VEGA_VERSION

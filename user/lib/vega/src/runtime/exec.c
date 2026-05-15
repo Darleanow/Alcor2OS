@@ -17,11 +17,11 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <vega/fb_tty.h>
+#include <vega/host.h>
+#include <vega/runtime/builtin.h>
 #include <vega/runtime/exec.h>
 #include <vega/runtime/expand.h>
 #include <vega/runtime/fntab.h>
-#include <vega/shell.h>
 
 /* musl exposes this; must not pass NULL to execve — breaks getenv, setenv,
  * ncurses terminfo lookup, etc. (undefined environ → faults like CR2 ~0x45). */

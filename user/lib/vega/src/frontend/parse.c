@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <vega/frontend/lexer.h>
 #include <vega/frontend/parse.h>
-#include <vega/shell.h>
+#include <vega/host.h>
 
 static void diag_unexpected(tok_kind_t k)
 {

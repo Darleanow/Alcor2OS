@@ -1,11 +1,12 @@
 include ../common.mk
 
 OUT_LIBDIR := $(BUILD_DIR)/lib
-LIBA       := $(OUT_LIBDIR)/libgrendizer.a
+LIBGRENDIZER := $(OUT_LIBDIR)/libgrendizer.a
+LIBVEGA      := $(OUT_LIBDIR)/libvega.a
 
-.PHONY: all clean
+.PHONY: all clean grendizer vega
 
-all: $(LIBA)
+all: grendizer vega
 
 $(OUT_LIBDIR):
 	@mkdir -p $@
@@ -14,9 +15,15 @@ $(OUT_LIBDIR):
 $(OUT_LIBDIR)/grendizer.o: grendizer.c | $(OUT_LIBDIR)
 	$(CC) $(CFLAGS) -msse2 -I../include -c $< -o $@
 
-$(LIBA): $(OUT_LIBDIR)/grendizer.o
+grendizer: $(LIBGRENDIZER)
+
+$(LIBGRENDIZER): $(OUT_LIBDIR)/grendizer.o
 	$(AR) rcs $@ $^
 	@echo "Built $@"
 
+vega:
+	$(MAKE) -C vega
+
 clean:
-	rm -f $(OUT_LIBDIR)/grendizer.o $(LIBA)
+	rm -f $(OUT_LIBDIR)/grendizer.o $(LIBGRENDIZER)
+	-$(MAKE) -C vega clean

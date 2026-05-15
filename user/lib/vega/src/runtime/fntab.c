@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include <vega/runtime/fntab.h>
-#include <vega/shell.h>
+#include <vega/host.h>
 
 #define MAX_FUNCTIONS 16
 

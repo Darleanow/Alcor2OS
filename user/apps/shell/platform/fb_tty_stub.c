@@ -3,7 +3,7 @@
  * @brief No-op framebuffer TTY when FreeType/HarfBuzz/musl-g++ are not built.
  */
 
-#include <vega/fb_tty.h>
+#include <shell/fb_tty.h>
 
 bool sh_fb_tty_init(const char *font_path)
 {

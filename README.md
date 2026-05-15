@@ -87,9 +87,8 @@ Alcor2/
 ├── include/alcor2/             Kernel headers (UAPI + internal)
 ├── user/
 │   ├── bin/                    cat, echo, ls, mkdir, pwd, rm, touch, cc
-│   ├── shell/                  vega shell (lexer, parser, runtime)
-│   ├── lib/                    Grendizer option parser
-│   ├── apps/                   Demo apps (C++, ncurses, font rendering, edi)
+│   ├── apps/                   shell (vega REPL), vega (CLI), font-demo, fleed, ncurses-hello, ...
+│   ├── lib/                    libvega (language interpreter), libgrendizer (option parser)
 │   ├── crt/                    crt0, stdio TTY shim
 │   └── init/                   PID 1
 ├── mk/                         Makefile modules (config, kernel, thirdparty, repo)
@@ -141,4 +140,4 @@ if cd /work { echo ok } else { echo missing }
 cd! /work    # exits shell on failure
 ```
 
-Full language reference: [user/shell/README.md](user/shell/README.md)
+Full language reference: [user/lib/vega/README.md](user/lib/vega/README.md)
