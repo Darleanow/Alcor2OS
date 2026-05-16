@@ -1,9 +1,14 @@
 /**
  * @file apps/shell/main.c
  * @brief vega REPL: read a line, hand it to vega_run().
+ *
+ * Glyph rendering lives entirely in the kernel (fb_console). The shell at
+ * startup rasterises Fira into a glyph atlas and submits it via
+ * @c FB_CONSOLE_SET_ATLAS; from then on every @c write(1, ...) lands in the
+ * kernel's cell grid, parsed for UTF-8 + ANSI/CSI, blitted with Fira glyphs.
  */
 
-#include <shell/fb_tty.h>
+#include <shell/atlas.h>
 #include <shell/shell.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -12,27 +17,13 @@
 #include <vega/vega.h>
 
 static const vega_host_ops_t shell_host = {
-    .puts                 = sh_puts,
-    .stdout_bytes         = sh_stdout_bytes,
-    .close                = sh_close,
-    .read                 = sh_read,
-    .stat                 = sh_stat,
-    .fb_tty_active        = sh_fb_tty_active,
-    .fb_tty_on_fork_child = sh_fb_tty_on_fork_child,
-    .fb_tty_blink_tick    = sh_fb_tty_blink_tick,
-    .is_builtin           = sh_is_builtin,
-    .run_builtin          = sh_run_builtin,
+    .is_builtin  = sh_is_builtin,
+    .run_builtin = sh_run_builtin,
 };
 
 #ifndef VEGA_VERSION
   #define VEGA_VERSION "1.0.0"
 #endif
-
-static void fb_cursor_after_edit(void)
-{
-  if(sh_fb_tty_active())
-    sh_fb_tty_cursor_after_edit();
-}
 
 /* Per-call line-editor state for read_line(): ESC pushback + UTF-8 accumulator.
  */
@@ -108,10 +99,7 @@ static int read_line(char *buf, size_t size)
       c               = s_edit.pushback;
       s_edit.pushback = -1;
     } else {
-      if(sh_fb_tty_active())
-        c = sh_getchar_blinking(400);
-      else
-        c = sh_getchar();
+      c = sh_getchar();
     }
     if(c < 0)
       continue;
@@ -132,7 +120,6 @@ static int read_line(char *buf, size_t size)
         sh_puts("\b \b");
       }
       s_edit.utf8_rem = 0;
-      fb_cursor_after_edit();
       continue;
     }
 
@@ -154,7 +141,6 @@ static int read_line(char *buf, size_t size)
 
     if(c == 0x0C) {
       sh_clear();
-      fb_cursor_after_edit();
       line_edit_reset(&s_edit);
       return 0;
     }
@@ -188,7 +174,6 @@ static int read_line(char *buf, size_t size)
         pos = np;
         sh_puts("\b \b");
       }
-      fb_cursor_after_edit();
       continue;
     }
 
@@ -209,7 +194,6 @@ static int read_line(char *buf, size_t size)
          store_utf8_cp(buf, size, &pos, s_edit.utf8_partial) < 0) {
         s_edit.utf8_partial = 0;
       }
-      fb_cursor_after_edit();
       continue;
     }
 
@@ -218,7 +202,6 @@ static int read_line(char *buf, size_t size)
       if(u >= 32u && u < 127u && pos < size - 1) {
         buf[pos++] = (char)u;
         sh_putchar((char)u);
-        fb_cursor_after_edit();
       }
       continue;
     }
@@ -234,12 +217,10 @@ static int read_line(char *buf, size_t size)
       s_edit.utf8_partial = (uint32_t)(u & 0x07u);
       s_edit.utf8_rem     = 3;
     } else {
-      /* Stray high-bit byte that wasn't a UTF-8 lead — the kbd layer now
-       * emits UTF-8 for the whole Latin-1 supplement, so this only fires
-       * for malformed input streams (paste from a Latin-1 source, etc.).
-       * Transcode defensively so the line buffer stays valid UTF-8. */
+      /* Stray high-bit byte that wasn't a UTF-8 lead — kbd layer emits UTF-8
+       * for Latin-1, so this only fires on malformed pastes. Transcode
+       * defensively so the line buffer stays valid UTF-8. */
       (void)store_utf8_cp(buf, size, &pos, (uint32_t)u);
-      fb_cursor_after_edit();
     }
   }
 }
@@ -278,8 +259,8 @@ static int is_input_complete(const char *buf)
   int  in_squote   = 0;
   int  in_dquote   = 0;
   int  brace_depth = 0;
-  int  want_delim  = 0; /* saw `<<`, scanning for delim word */
-  int  in_hd_body  = 0; /* between `<<DELIM\n` and the closing line */
+  int  want_delim  = 0;
+  int  in_hd_body  = 0;
   char delim[MAX_HEREDOC_DELIM];
   int  dn = 0;
   char line_buf[MAX_HEREDOC_DELIM];
@@ -309,7 +290,6 @@ static int is_input_complete(const char *buf)
       } else if(ln < MAX_HEREDOC_DELIM - 1) {
         line_buf[ln++] = c;
       } else {
-        /* line longer than max delim — can't match */
         ln = MAX_HEREDOC_DELIM - 1;
       }
       continue;
@@ -317,10 +297,8 @@ static int is_input_complete(const char *buf)
 
     if(want_delim) {
       if(c == ' ' || c == '\t') {
-        if(dn > 0) {
-          /* delim ended */
+        if(dn > 0)
           want_delim = 0;
-        }
         continue;
       }
       if(c == '\n') {
@@ -329,12 +307,10 @@ static int is_input_complete(const char *buf)
           in_hd_body = 1;
           ln         = 0;
         }
-        /* if dn == 0, no delim yet — stay in want_delim, more input needed */
         continue;
       }
-      if(dn < MAX_HEREDOC_DELIM - 1) {
+      if(dn < MAX_HEREDOC_DELIM - 1)
         delim[dn++] = c;
-      }
       continue;
     }
 
@@ -362,19 +338,16 @@ static int is_input_complete(const char *buf)
     }
     if(c == '<' && p[1] == '<') {
       if(p[2] == '<') {
-        /* `<<<` — herestring, not a heredoc. Skip all three so we don't
-         * re-detect `<<` on the next iteration. */
         p += 2;
         continue;
       }
       want_delim = 1;
       dn         = 0;
-      p++; /* skip the second '<' */
+      p++;
       continue;
     }
     if(c == '\n') {
       if(dn > 0) {
-        /* a delim was captured earlier on this line; switch to body now */
         in_hd_body = 1;
         ln         = 0;
       }
@@ -389,14 +362,9 @@ static int is_input_complete(const char *buf)
          !in_hd_body;
 }
 
-/* Read input lines into @p buf until they form a complete statement. After
- * each newline we append '\n' so the lexer (which treats '\n' as SEMI) sees
- * a separator between stitched lines. PS2 ('> ') is shown for continuation
- * prompts.
- *
- * Returns total bytes accumulated, ::RL_EOF on Ctrl-D at an empty line, or
- * 0 when the user interrupts with Ctrl-C — in that case any pending
- * multiline buffer is discarded so the next call starts at PS1, not PS2. */
+/* Read input lines into @p buf until they form a complete statement.
+ * Returns total bytes accumulated, RL_EOF on Ctrl-D at empty line, or 0
+ * when interrupted with Ctrl-C. */
 static int read_complete_statement(char *buf, size_t size)
 {
   size_t pos = 0;
@@ -410,7 +378,7 @@ static int read_complete_statement(char *buf, size_t size)
       return 0;
 
     pos += (size_t)len;
-    if(pos >= size - 2) /* leave room for '\n' and '\0' */
+    if(pos >= size - 2)
       return (int)pos;
 
     buf[pos++] = '\n';
@@ -420,18 +388,12 @@ static int read_complete_statement(char *buf, size_t size)
       return (int)pos;
 
     sh_puts("> ");
-    fb_cursor_after_edit();
   }
 }
 
 /**
- * @brief Shell main entry point.
- *
- * Displays welcome message and enters the main read-eval-print loop.
- *
- * @param argc Argument count.
- * @param argv Argument vector.
- * @return Exit code (0 on normal exit).
+ * @brief Shell main entry point. Sets up libvega, submits the Fira atlas to
+ * the kernel console, then enters the read-eval-print loop.
  */
 int main(int argc, char *argv[])
 {
@@ -443,16 +405,17 @@ int main(int argc, char *argv[])
   /* No procfs on Alcor2; LLVM/musl fall back to PATH for argv-only lookups. */
   setenv("PATH", "/bin:/usr/bin", 0);
 
-  /* Raw mode: shell handles its own line editing and echo, character by
-   * character. */
+  /* Raw mode: shell handles line editing; the kernel renders. */
   sh_set_stdin_raw();
 
+  /* Rasterize Fira → kernel glyph atlas. Optional: ALCOR2_FB_TTY=0 to skip
+   * (kernel keeps the CP437 bitmap fallback). */
   const char *font = getenv("ALCOR2_FONT");
   if(!font || !*font)
     font = "/bin/FiraCode-Regular.ttf";
   const char *fb_off = getenv("ALCOR2_FB_TTY");
   if(!(fb_off && fb_off[0] == '0'))
-    (void)sh_fb_tty_init(font);
+    (void)atlas_submit(font);
 
   char line[MAX_CMD_LEN];
 
@@ -463,18 +426,14 @@ int main(int argc, char *argv[])
 
   while(1) {
     print_prompt();
-    fb_cursor_after_edit();
 
     int len = read_complete_statement(line, sizeof(line));
-
     if(len == RL_EOF) {
       sh_puts("exit\n");
       exit(0);
     }
-
-    if(len > 0) {
+    if(len > 0)
       vega_run(line);
-    }
   }
 
   return 0;

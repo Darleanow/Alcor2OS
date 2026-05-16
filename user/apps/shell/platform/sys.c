@@ -6,10 +6,10 @@
 
 #include <dirent.h>
 #include <fcntl.h>
-#include <shell/fb_tty.h>
 #include <shell/shell.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <termios.h>
@@ -74,14 +74,10 @@ int sh_ioctl(int fd, unsigned long request, void *arg)
  */
 
 /**
- * @brief Clear the terminal screen
+ * @brief Clear the terminal screen — kernel fb_console handles the CSI.
  */
 void sh_clear(void)
 {
-  if(sh_fb_tty_active()) {
-    sh_fb_tty_clear();
-    return;
-  }
   const char *clear = "\033[2J\033[H";
   write(STDOUT_FILENO, clear, strlen(clear));
 }

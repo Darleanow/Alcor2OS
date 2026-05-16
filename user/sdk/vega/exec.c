@@ -11,7 +11,6 @@
  */
 
 #include <fcntl.h>
-#include <poll.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -111,9 +110,11 @@ static int apply_one_redir(const redir_t *r)
 
   int fd = open(target, flags, 0644);
   if(fd < 0) {
-    vega_host->puts("vega: cannot open ");
-    vega_host->puts(target);
-    vega_host->puts("\n");
+    (void)write(
+        STDOUT_FILENO, ("vega: cannot open "), strlen(("vega: cannot open "))
+    );
+    (void)write(STDOUT_FILENO, (target), strlen((target)));
+    (void)write(STDOUT_FILENO, ("\n"), strlen(("\n")));
     free(target);
     return -1;
   }
@@ -135,52 +136,6 @@ static int apply_redirs(const redir_t *list)
       return -1;
   }
   return 0;
-}
-
-/** True if @p list redirects fd 1 (capturing child stdout would fight it). */
-static int redir_touches_stdout(const redir_t *list)
-{
-  for(const redir_t *r = list; r; r = r->next) {
-    if(r->kind == REDIR_OUT || r->kind == REDIR_APPEND)
-      return 1;
-  }
-  return 0;
-}
-
-static int stage_redir_touches_stdout(const ast_t *stage)
-{
-  if(!stage || stage->kind != AST_CMD)
-    return 0;
-  return redir_touches_stdout(stage->u.cmd.redirs);
-}
-
-/** Read pipe from child into the FB terminal, ticking A_BLINK on timeout.
- *
- * pipe_poll_read_ready returns true once the child closes the write end, so
- * a poll-based loop naturally drops out at EOF. The 500ms timeout window
- * gives the host's fb_tty_blink_tick a chance to flip the blink phase even
- * while a child (e.g. ncurses-hello) holds the terminal.
- */
-static void relay_pipe_to_stdout(int rfd)
-{
-  char buf[4096];
-  for(;;) {
-    struct pollfd pfd = {.fd = rfd, .events = POLLIN};
-    int           r   = poll(&pfd, 1, 500);
-    if(r < 0)
-      break;
-    if(r == 0) {
-      vega_host->fb_tty_blink_tick();
-      continue;
-    }
-    if(!(pfd.revents & (POLLIN | POLLHUP)))
-      break;
-    long n = vega_host->read(rfd, buf, sizeof buf);
-    if(n <= 0)
-      break;
-    vega_host->stdout_bytes(buf, (size_t)n);
-  }
-  vega_host->close(rfd);
 }
 
 /* Build a fresh, NULL-terminated argv with each word expanded. Returns a
@@ -237,7 +192,7 @@ static int resolve_path(const char *name, char *out_path)
       *p++ = *c++;
     *p = '\0';
     struct stat st;
-    if(vega_host->stat(out_path, &st) == 0 && S_ISREG(st.st_mode))
+    if(stat(out_path, &st) == 0 && S_ISREG(st.st_mode))
       return 1;
     return 0;
   }
@@ -254,7 +209,7 @@ static int resolve_path(const char *name, char *out_path)
     *p = '\0';
 
     struct stat st;
-    if(vega_host->stat(out_path, &st) == 0)
+    if(stat(out_path, &st) == 0)
       return 1;
   }
   return 0;
@@ -266,42 +221,16 @@ static int run_external(char **argv, const redir_t *redirs)
   if(!resolve_path(argv[0], path))
     return -1;
 
-  int capture = vega_host->fb_tty_active() && !redir_touches_stdout(redirs);
-  int relay[2];
-  if(capture && pipe(relay) < 0)
-    return -1;
-
   int pid = fork();
-  if(pid < 0) {
-    if(capture) {
-      vega_host->close(relay[0]);
-      vega_host->close(relay[1]);
-    }
+  if(pid < 0)
     return -1;
-  }
   if(pid == 0) {
-    vega_host->fb_tty_on_fork_child();
-    if(capture) {
-      if(dup2(relay[1], 1) < 0)
-        _exit(1);
-      /* Merge stderr into the relay so initscr()/linker errors reach the FB
-       * TTY. */
-      if(dup2(1, 2) < 0)
-        _exit(1);
-      vega_host->close(relay[0]);
-      if(relay[1] != 1)
-        vega_host->close(relay[1]);
-    }
     if(apply_redirs(redirs) < 0)
       _exit(1);
     if(child_argv0_to_resolved_path(argv, path) < 0)
       _exit(127);
     execve(path, argv, environ);
     _exit(127);
-  }
-  if(capture) {
-    vega_host->close(relay[1]);
-    relay_pipe_to_stdout(relay[0]);
   }
   int status = 0;
   if(waitpid(pid, &status, 0) < 0)
@@ -412,8 +341,11 @@ static int exec_cmd(ast_t *n)
     } else {
       ret = run_external(argv, redirs);
       if(ret < 0) {
-        vega_host->puts(argv[0]);
-        vega_host->puts(": command not found\n");
+        (void)write(STDOUT_FILENO, (argv[0]), strlen((argv[0])));
+        (void)write(
+            STDOUT_FILENO, (": command not found\n"),
+            strlen((": command not found\n"))
+        );
         ret = 127;
       }
     }
@@ -440,9 +372,12 @@ static int exec_cmd(ast_t *n)
   free_expanded_argv(argv, argc);
 
   if(fail_fast && ret != 0) {
-    vega_host->puts("vega: '");
-    vega_host->puts(name_for_msg ? name_for_msg : "?");
-    vega_host->puts("!' failed\n");
+    (void)write(STDOUT_FILENO, ("vega: '"), strlen(("vega: '")));
+    (void)write(
+        STDOUT_FILENO, (name_for_msg ? name_for_msg : "?"),
+        strlen((name_for_msg ? name_for_msg : "?"))
+    );
+    (void)write(STDOUT_FILENO, ("!' failed\n"), strlen(("!' failed\n")));
     free(name_for_msg);
     exit(ret);
   }
@@ -461,7 +396,6 @@ static int exec_cmd(ast_t *n)
 static void exec_stage_in_child(ast_t *stage) __attribute__((noreturn));
 static void exec_stage_in_child(ast_t *stage)
 {
-  vega_host->fb_tty_on_fork_child();
   if(stage->kind != AST_CMD) {
     int rc = vega_exec(stage);
     _exit(rc);
@@ -491,8 +425,11 @@ static void exec_stage_in_child(ast_t *stage)
 
   char path[MAX_EXEC_PATH];
   if(!resolve_path(argv[0], path)) {
-    vega_host->puts(argv[0]);
-    vega_host->puts(": command not found\n");
+    (void)write(STDOUT_FILENO, (argv[0]), strlen((argv[0])));
+    (void)write(
+        STDOUT_FILENO, (": command not found\n"),
+        strlen((": command not found\n"))
+    );
     _exit(127);
   }
   if(child_argv0_to_resolved_path(argv, path) < 0)
@@ -507,33 +444,29 @@ static int exec_pipeline(ast_t *n)
   ast_t **stages = n->u.pipeline.stages;
 
   if(N > MAX_PIPE_STAGES) {
-    vega_host->puts("vega: pipeline too long\n");
+    (void)write(
+        STDOUT_FILENO, ("vega: pipeline too long\n"),
+        strlen(("vega: pipeline too long\n"))
+    );
     return 1;
   }
 
   /* Expansion happens inside each child via exec_stage_in_child to avoid
-   * mutating the shared AST (loop bodies re-execute the same nodes). */
-
-  int cap =
-      vega_host->fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
-  int relay[2];
-  if(cap && pipe(relay) < 0) {
-    vega_host->puts("vega: pipe failed\n");
-    return 1;
-  }
+   * mutating the shared AST (loop bodies re-execute the same nodes). The
+   * last stage inherits fd 1 from the shell, which lands directly in the
+   * kernel fb_console — no host-side capture/relay needed. */
 
   int pipes[MAX_PIPE_STAGES - 1][2];
   for(int i = 0; i < N - 1; i++) {
     if(pipe(pipes[i]) < 0) {
-      if(cap) {
-        close(relay[0]);
-        close(relay[1]);
-      }
       for(int j = 0; j < i; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
       }
-      vega_host->puts("vega: pipe failed\n");
+      (void)write(
+          STDOUT_FILENO, ("vega: pipe failed\n"),
+          strlen(("vega: pipe failed\n"))
+      );
       return 1;
     }
   }
@@ -542,15 +475,14 @@ static int exec_pipeline(ast_t *n)
   for(int i = 0; i < N; i++) {
     pids[i] = fork();
     if(pids[i] < 0) {
-      if(cap) {
-        close(relay[0]);
-        close(relay[1]);
-      }
       for(int j = 0; j < N - 1; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
       }
-      vega_host->puts("vega: fork failed\n");
+      (void)write(
+          STDOUT_FILENO, ("vega: fork failed\n"),
+          strlen(("vega: fork failed\n"))
+      );
       return 1;
     }
     if(pids[i] == 0) {
@@ -558,20 +490,9 @@ static int exec_pipeline(ast_t *n)
         dup2(pipes[i - 1][0], 0);
       if(i < N - 1)
         dup2(pipes[i][1], 1);
-      else if(cap) {
-        if(dup2(relay[1], 1) < 0)
-          _exit(1);
-        if(dup2(1, 2) < 0)
-          _exit(1);
-      }
       for(int j = 0; j < N - 1; j++) {
         close(pipes[j][0]);
         close(pipes[j][1]);
-      }
-      if(cap) {
-        close(relay[0]);
-        if(relay[1] != 1)
-          close(relay[1]);
       }
       exec_stage_in_child(stages[i]);
     }
@@ -580,10 +501,6 @@ static int exec_pipeline(ast_t *n)
   for(int i = 0; i < N - 1; i++) {
     close(pipes[i][0]);
     close(pipes[i][1]);
-  }
-  if(cap) {
-    close(relay[1]);
-    relay_pipe_to_stdout(relay[0]);
   }
 
   int last_status = 0;
@@ -682,7 +599,10 @@ int vega_exec(ast_t *node)
         node->u.fn.body      = NULL;
         status               = 0;
       } else {
-        vega_host->puts("vega: function table full\n");
+        (void)write(
+            STDOUT_FILENO, ("vega: function table full\n"),
+            strlen(("vega: function table full\n"))
+        );
         status = 1;
       }
     } else {

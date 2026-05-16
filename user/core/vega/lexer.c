@@ -4,6 +4,8 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <vega/host.h>
 #include <vega/internal/host.h>
 #include <vega/internal/lexer.h>
@@ -45,7 +47,10 @@ static tok_t read_squote(lexer_t *L)
   while(*L->cur && *L->cur != '\'')
     L->cur++;
   if(*L->cur != '\'') {
-    vega_host->puts("vega: unterminated single quote\n");
+    (void)write(
+        STDOUT_FILENO, ("vega: unterminated single quote\n"),
+        strlen(("vega: unterminated single quote\n"))
+    );
     L->error = 1;
     t.kind   = TOK_EOF;
     return t;
@@ -83,7 +88,10 @@ static tok_t read_dquote(lexer_t *L)
     n++;
   }
   if(*scan != '"') {
-    vega_host->puts("vega: unterminated double quote\n");
+    (void)write(
+        STDOUT_FILENO, ("vega: unterminated double quote\n"),
+        strlen(("vega: unterminated double quote\n"))
+    );
     L->error = 1;
     t.kind   = TOK_EOF;
     return t;
@@ -250,7 +258,10 @@ static tok_t scan_one(lexer_t *L)
       L->cur++;
       t.kind = TOK_AND;
     } else {
-      vega_host->puts("vega: '&' (background) not yet supported\n");
+      (void)write(
+          STDOUT_FILENO, ("vega: '&' (background) not yet supported\n"),
+          strlen(("vega: '&' (background) not yet supported\n"))
+      );
       L->error = 1;
     }
     return t;
@@ -371,9 +382,12 @@ char *lex_read_heredoc_body(lexer_t *L, const char *delim)
     /* body_end is only read on the goto-done path above; no update needed */
   }
   /* Reached EOF without seeing the delimiter. */
-  vega_host->puts("vega: unterminated heredoc (missing '");
-  vega_host->puts(delim);
-  vega_host->puts("')\n");
+  (void)write(
+      STDOUT_FILENO, ("vega: unterminated heredoc (missing '"),
+      strlen(("vega: unterminated heredoc (missing '"))
+  );
+  (void)write(STDOUT_FILENO, (delim), strlen((delim)));
+  (void)write(STDOUT_FILENO, ("')\n"), strlen(("')\n")));
   L->error = 1;
   return NULL;
 

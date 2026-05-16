@@ -46,11 +46,6 @@ int            sh_chdir(const char *path);
 char          *sh_getcwd(char *buf, size_t size);
 int            sh_unlink(const char *path);
 
-/* FB TTY hooks libvega cares about (presence + lifecycle). */
-bool sh_fb_tty_active(void);
-void sh_fb_tty_on_fork_child(void);
-void sh_fb_tty_blink_tick(void);
-
 /* Shell-side builtin dispatch (registered with libvega's ops table). */
 bool sh_is_builtin(const char *name);
 int  sh_run_builtin(int argc, char *const argv[]);
