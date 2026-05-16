@@ -110,4 +110,11 @@ u8 keyboard_raw_pop(void);
  */
 u32 keyboard_raw_peek(u8 *dst, u32 cap);
 
+/**
+ * @brief Scancodes discarded since boot because the irq ring was full.
+ *
+ * Purely diagnostic; non-zero suggests burst typing exceeded buffer capacity.
+ */
+u32 keyboard_raw_drop_count(void);
+
 #endif

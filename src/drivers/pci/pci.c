@@ -91,24 +91,6 @@ void pci_write16(u8 bus, u8 slot, u8 func, u8 offset, u16 val)
 }
 
 /**
- * @brief Write 8-bit value to PCI config space (read-modify-write).
- * @param bus  Bus number.
- * @param slot Device slot.
- * @param func Function number.
- * @param offset Register offset.
- * @param val Value to write.
- */
-// cppcheck-suppress unusedFunction
-void pci_write8(u8 bus, u8 slot, u8 func, u8 offset, u8 val)
-{
-  u32 old     = pci_read32(bus, slot, func, offset);
-  int shift   = (offset & 3) * 8;
-  u32 mask    = 0xFF << shift;
-  u32 new_val = (old & ~mask) | ((u32)val << shift);
-  pci_write32(bus, slot, func, offset, new_val);
-}
-
-/**
  * @brief Populate device descriptor from config space.
  * @param bus  Bus number.
  * @param slot Device slot.

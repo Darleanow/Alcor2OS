@@ -36,44 +36,6 @@
 /** @brief Maximum supported block size (for cache). */
 #define EXT2_MAX_BLOCK_SIZE 4096
 
-/** @brief Direct-mapped disk block cache (512 x 4 KB = 2 MB). */
-#define EXT2_DSK_CACHE_SLOTS 512
-
-typedef struct
-{
-  const ext2_volume_t *vol; /**< NULL = slot unused */
-  u32                  block_num;
-  u8                   data[EXT2_MAX_BLOCK_SIZE];
-} dsk_cache_slot_t;
-
-static dsk_cache_slot_t g_dsk_cache[EXT2_DSK_CACHE_SLOTS];
-
-static inline u32       dsk_cache_idx(const ext2_volume_t *vol, u32 bn)
-{
-  return (u32)(((uintptr_t)vol >> 4) ^ (u64)bn * 2654435761ULL) &
-         (EXT2_DSK_CACHE_SLOTS - 1);
-}
-
-static void dsk_cache_insert(
-    const ext2_volume_t *vol, u32 bn, const void *data, u32 size
-)
-{
-  u32 idx                    = dsk_cache_idx(vol, bn);
-  g_dsk_cache[idx].vol       = vol;
-  g_dsk_cache[idx].block_num = bn;
-  if(size > EXT2_MAX_BLOCK_SIZE)
-    size = EXT2_MAX_BLOCK_SIZE;
-  kmemcpy(g_dsk_cache[idx].data, data, size);
-}
-
-static const u8 *dsk_cache_lookup(const ext2_volume_t *vol, u32 bn)
-{
-  u32 idx = dsk_cache_idx(vol, bn);
-  if(g_dsk_cache[idx].vol == vol && g_dsk_cache[idx].block_num == bn)
-    return g_dsk_cache[idx].data;
-  return NULL;
-}
-
 /** @brief Max contiguous blocks coalesced in a single read (16 x 4 KB). */
 #define EXT2_READ_RUN_MAX 16
 
@@ -83,29 +45,28 @@ static ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
 /** @brief Pool of open file handles. */
 static ext2_file_t g_files[EXT2_MAX_FILES];
 
-/** @brief Forward declaration for filesystem type descriptor. */
+/** Forward declaration; full initializer is near file end (needs static ops).
+ */
 static const fs_type_t g_ext2_fstype;
 
 /**
- * @brief Block buffer cache entry.
+ * @brief Pre-allocated single-block scratch buffer (not a block-content cache).
  *
- * Simple stack-based pool of pre-allocated block buffers to avoid repeated
- * kmalloc/kfree calls. Thread-safety note: not thread-safe, kernel is
- * single-threaded for now.
+ * Pool avoids kmalloc churn for one-off metadata reads; backing store is ATA +
+ * the driver-level sector cache only.
  */
 typedef struct
 {
-  u8   data[EXT2_MAX_BLOCK_SIZE]; /**< Block data buffer */
-  bool in_use;                    /**< Buffer is currently in use */
-} block_cache_entry_t;
+  u8   data[EXT2_MAX_BLOCK_SIZE];
+  bool in_use;
+} block_pool_entry_t;
 
-static block_cache_entry_t g_block_cache[EXT2_BLOCK_CACHE_SIZE];
+static block_pool_entry_t g_block_pool[EXT2_BLOCK_CACHE_SIZE];
 
 /**
- * @brief Acquire a block buffer from cache.
+ * @brief Acquire a single-block scratch buffer from the pool.
  * @param size Required buffer size (must be <= EXT2_MAX_BLOCK_SIZE).
- * @return Pointer to buffer, or NULL if cache exhausted (falls back to
- * kmalloc).
+ * @return Pointer to buffer, or NULL if pool exhausted (falls back to kmalloc).
  */
 static u8 *cache_get_block(u32 size)
 {
@@ -113,31 +74,30 @@ static u8 *cache_get_block(u32 size)
     return kmalloc(size);
 
   for(int i = 0; i < EXT2_BLOCK_CACHE_SIZE; i++) {
-    if(!g_block_cache[i].in_use) {
-      g_block_cache[i].in_use = true;
-      return g_block_cache[i].data;
+    if(!g_block_pool[i].in_use) {
+      g_block_pool[i].in_use = true;
+      return g_block_pool[i].data;
     }
   }
 
-  /* Cache exhausted, fall back to kmalloc */
+  /* Pool exhausted, fall back to kmalloc */
   return kmalloc(size);
 }
 
 /**
- * @brief Release a block buffer back to cache.
+ * @brief Release a buffer acquired via @ref cache_get_block.
  * @param buf Buffer to release.
  */
 static void cache_put_block(u8 *buf)
 {
-  /* Check if buffer is from cache */
   for(int i = 0; i < EXT2_BLOCK_CACHE_SIZE; i++) {
-    if(buf == g_block_cache[i].data) {
-      g_block_cache[i].in_use = false;
+    if(buf == g_block_pool[i].data) {
+      g_block_pool[i].in_use = false;
       return;
     }
   }
 
-  /* Not from cache, was dynamically allocated */
+  /* Not from pool, was dynamically allocated */
   kfree(buf);
 }
 
@@ -179,19 +139,10 @@ static inline i64 vol_write_sectors(
  */
 static i64 vol_read_block(const ext2_volume_t *vol, u32 block, void *buf)
 {
-  const u8 *cached = dsk_cache_lookup(vol, block);
-  if(cached) {
-    kmemcpy(buf, cached, vol->block_size);
-    return 0;
-  }
-
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
 
-  i64       ret = vol_read_sectors(vol, sector, sectors_per_block, buf);
-  if(ret >= 0)
-    dsk_cache_insert(vol, block, buf, vol->block_size);
-  return ret;
+  return vol_read_sectors(vol, sector, sectors_per_block, buf);
 }
 
 /**
@@ -206,13 +157,7 @@ static i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf)
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
 
-  i64       ret = vol_write_sectors(vol, sector, sectors_per_block, buf);
-  if(ret >= 0) {
-    /* Invalidate cache for this block */
-    u32 idx              = dsk_cache_idx(vol, block);
-    g_dsk_cache[idx].vol = NULL;
-  }
-  return ret;
+  return vol_write_sectors(vol, sector, sectors_per_block, buf);
 }
 
 /**
@@ -1838,30 +1783,6 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
 }
 
 /**
- * @brief Unmount an ext2 volume.
- *
- * Flushes metadata and frees group descriptor memory.
- *
- * @param vol Volume to unmount.
- */
-void ext2_unmount(ext2_volume_t *vol)
-{
-  if(!vol || !vol->mounted)
-    return;
-
-  /* Write back superblock and group descriptors */
-  write_superblock(vol);
-  write_group_descriptors(vol);
-
-  if(vol->groups) {
-    kfree(vol->groups);
-    vol->groups = NULL;
-  }
-
-  vol->mounted = false;
-}
-
-/**
  * @brief Open a file or directory on an ext2 volume.
  *
  * @param vol  Volume handle.
@@ -1892,14 +1813,12 @@ ext2_file_t *ext2_open(ext2_volume_t *vol, const char *path)
     return NULL;
 
   /* Fill file handle */
-  file->vol          = vol;
-  file->inode_num    = ino;
-  file->inode        = inode;
-  file->position     = 0;
-  file->block_offset = 0;
-  file->is_dir       = (inode.i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR;
-  file->in_use       = true;
-  file->dirty        = false;
+  file->vol       = vol;
+  file->inode_num = ino;
+  file->inode     = inode;
+  file->is_dir    = (inode.i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR;
+  file->in_use    = true;
+  file->dirty     = false;
 
   return file;
 }
@@ -2010,11 +1929,6 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count, u64 offset)
           cache_put_block(block_buf);
           return bytes_read > 0 ? (i64)bytes_read : -EIO;
         }
-        /* Populate cache with freshly read blocks. */
-        for(u32 i = 0; i < run; i++)
-          dsk_cache_insert(
-              vol, block_num + i, run_buf + (u64)i * block_size, block_size
-          );
 
         u64 avail   = (u64)run * block_size - block_offset;
         u64 to_read = remaining < avail ? remaining : avail;
@@ -2270,7 +2184,7 @@ i64 ext2_readlink(
   if(!vol || !vol->mounted || !path || !buf || cap == 0)
     return -EINVAL;
 
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char filename[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, filename);
 
@@ -2311,41 +2225,6 @@ i64 ext2_readlink(
 }
 
 /**
- * @brief Seek to a position in an ext2 file.
- *
- * @param file   Open file handle.
- * @param offset Seek offset.
- * @param whence Seek mode (0=SET, 1=CUR, 2=END).
- * @return New position, or negative errno on error.
- */
-i64 ext2_seek(ext2_file_t *file, i64 offset, i32 whence)
-{
-  if(!file || !file->in_use)
-    return -EINVAL;
-
-  i64 new_pos;
-  switch(whence) {
-  case 0: /* SEEK_SET */
-    new_pos = offset;
-    break;
-  case 1: /* SEEK_CUR */
-    new_pos = (i64)file->position + offset;
-    break;
-  case 2: /* SEEK_END */
-    new_pos = (i64)file->inode.i_size + offset;
-    break;
-  default:
-    return -EINVAL;
-  }
-
-  if(new_pos < 0)
-    return -EINVAL;
-
-  file->position = (u32)new_pos;
-  return (i64)file->position;
-}
-
-/**
  * @brief Create a new file on an ext2 volume.
  *
  * If the file already exists, opens it instead.
@@ -2380,7 +2259,7 @@ ext2_file_t *ext2_create(ext2_volume_t *vol, const char *path)
     return NULL;
 
   /* Split path into parent and name */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char filename[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, filename);
 
@@ -2428,14 +2307,12 @@ ext2_file_t *ext2_create(ext2_volume_t *vol, const char *path)
   flush_metadata(vol);
 
   /* Fill file handle */
-  file->vol          = vol;
-  file->inode_num    = new_ino;
-  file->inode        = new_inode;
-  file->position     = 0;
-  file->block_offset = 0;
-  file->is_dir       = false;
-  file->in_use       = true;
-  file->dirty        = false;
+  file->vol       = vol;
+  file->inode_num = new_ino;
+  file->inode     = new_inode;
+  file->is_dir    = false;
+  file->in_use    = true;
+  file->dirty     = false;
 
   return file;
 }
@@ -2459,7 +2336,7 @@ i64 ext2_mkdir(ext2_volume_t *vol, const char *path)
     return -EEXIST;
 
   /* Split path */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char dirname[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, dirname);
 
@@ -2586,9 +2463,7 @@ i64 ext2_truncate(ext2_file_t *file, u64 length)
   }
 
   file->inode.i_size = (u32)length;
-  if(file->position > length)
-    file->position = length;
-  file->dirty = false; /* Inode is written below. */
+  file->dirty        = false; /* Inode is written below. */
 
   if(write_inode(vol, file->inode_num, &file->inode) < 0)
     return -EIO;
@@ -2645,7 +2520,7 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
     return -EISDIR;
 
   /* Get parent directory */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char filename[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, filename);
 
@@ -2704,7 +2579,7 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
     return -ENOTEMPTY;
 
   /* Get parent directory */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char dirname[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, dirname);
 
@@ -2729,56 +2604,49 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
   return 0;
 }
 
-/* VFS operation wrappers */
+/* --- VFS glue: fs_ops_t adapters (single surface; no duplicate ext2_vfs_*
+ * layer)
+ * --- */
 
-/**
- * @name VFS filesystem operations
- *
- * Wrapper functions that adapt ext2 API to the VFS fs_ops interface.
- * @{
- */
-
-static fs_handle_t ext2_vfs_open(void *fs_data, const char *path, u32 flags)
+static fs_handle_t ext2_ops_open(void *fs_data, const char *path, u32 flags)
 {
-  ext2_volume_t *vol = (ext2_volume_t *)fs_data;
-  if(flags & O_CREAT) {
-    return (fs_handle_t)ext2_create(vol, path);
-  }
-  return (fs_handle_t)ext2_open(vol, path);
+  ext2_volume_t *v = fs_data;
+  return (fs_handle_t)((flags & O_CREAT) ? ext2_create(v, path)
+                                         : ext2_open(v, path));
 }
 
-static void ext2_vfs_close(fs_handle_t fh)
+static void ext2_ops_close(fs_handle_t fh)
 {
   ext2_close((ext2_file_t *)fh);
 }
 
-static i64 ext2_vfs_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
+static i64 ext2_ops_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
 {
   return ext2_read((ext2_file_t *)fh, buf, count, offset);
 }
 
 static i64
-    ext2_vfs_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
+    ext2_ops_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
 {
   return ext2_write((ext2_file_t *)fh, buf, count, offset);
 }
 
-static i64 ext2_vfs_mkdir(void *fs_data, const char *path)
+static i64 ext2_ops_mkdir(void *fs_data, const char *path)
 {
-  return ext2_mkdir((ext2_volume_t *)fs_data, path);
+  return ext2_mkdir(fs_data, path);
 }
 
-static i64 ext2_vfs_unlink(void *fs_data, const char *path)
+static i64 ext2_ops_unlink(void *fs_data, const char *path)
 {
-  return ext2_unlink((ext2_volume_t *)fs_data, path);
+  return ext2_unlink(fs_data, path);
 }
 
-static i64 ext2_vfs_rmdir(void *fs_data, const char *path)
+static i64 ext2_ops_rmdir(void *fs_data, const char *path)
 {
-  return ext2_rmdir((ext2_volume_t *)fs_data, path);
+  return ext2_rmdir(fs_data, path);
 }
 
-static i64 ext2_vfs_fstat(fs_handle_t fh, vfs_stat_t *st)
+static i64 ext2_ops_fstat(fs_handle_t fh, vfs_stat_t *st)
 {
   ext2_file_t *f = (ext2_file_t *)fh;
   if(!f || !f->in_use || !st)
@@ -2793,10 +2661,10 @@ static i64 ext2_vfs_fstat(fs_handle_t fh, vfs_stat_t *st)
   return 0;
 }
 
-static i64 ext2_vfs_stat(void *fs_data, const char *path, vfs_stat_t *st)
+static i64 ext2_ops_stat(void *fs_data, const char *path, vfs_stat_t *st)
 {
   ext2_entry_t entry;
-  i64          ret = ext2_stat((ext2_volume_t *)fs_data, path, &entry);
+  i64          ret = ext2_stat(fs_data, path, &entry);
   if(ret == 0) {
     st->size = entry.size;
     st->type = (entry.file_type == EXT2_FT_DIR) ? VFS_DIRECTORY : VFS_FILE;
@@ -2807,11 +2675,10 @@ static i64 ext2_vfs_stat(void *fs_data, const char *path, vfs_stat_t *st)
 }
 
 static i64
-    ext2_vfs_readdir(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st)
+    ext2_ops_readdir(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st)
 {
-  ext2_file_t *dir = (ext2_file_t *)fh;
   ext2_entry_t entry;
-  i64          ret = ext2_readdir(dir, index, &entry);
+  i64          ret = ext2_readdir((ext2_file_t *)fh, index, &entry);
   if(ret > 0) {
     kstrncpy(name, entry.name, VFS_NAME_MAX);
     if(st) {
@@ -2823,63 +2690,41 @@ static i64
   return ret;
 }
 
-static i64 ext2_vfs_truncate(fs_handle_t fh, u64 length)
+static i64 ext2_ops_truncate(fs_handle_t fh, u64 length)
 {
   return ext2_truncate((ext2_file_t *)fh, length);
 }
 
 static i64
-    ext2_vfs_readlink(void *fs_data, const char *path, char *buf, u64 cap)
+    ext2_ops_readlink(void *fs_data, const char *path, char *buf, u64 cap)
 {
-  return ext2_readlink((ext2_volume_t *)fs_data, path, buf, cap);
+  return ext2_readlink(fs_data, path, buf, cap);
 }
 
-/** @brief ext2 VFS operations table. */
-static const fs_ops_t g_ext2_vfs_ops = {
-    .open     = ext2_vfs_open,
-    .close    = ext2_vfs_close,
-    .read     = ext2_vfs_read,
-    .write    = ext2_vfs_write,
-    .mkdir    = ext2_vfs_mkdir,
-    .unlink   = ext2_vfs_unlink,
-    .rmdir    = ext2_vfs_rmdir,
-    .stat     = ext2_vfs_stat,
-    .fstat    = ext2_vfs_fstat,
-    .readdir  = ext2_vfs_readdir,
-    .truncate = ext2_vfs_truncate,
-    .readlink = ext2_vfs_readlink,
-};
-
-/** @brief ext2 mount wrapper for fs_type_t. */
-static void *ext2_vfs_mount(const char *source, u32 flags)
+static void *ext2_ops_mount(const char *source, u32 flags)
 {
   (void)source;
   (void)flags;
-  /* Hardcoded to ATA 0 sector 0 (no partition table) */
   return ext2_mount(0, 0);
 }
 
-/** @brief ext2 unmount wrapper for fs_type_t. */
-static void ext2_vfs_unmount(void *fs_data)
-{
-  ext2_unmount((ext2_volume_t *)fs_data);
-}
-
-/** @brief ext2 filesystem type descriptor. */
-static const fs_type_t g_ext2_fstype = {
-    .name    = "ext2",
-    .ops     = &g_ext2_vfs_ops,
-    .mount   = ext2_vfs_mount,
-    .unmount = ext2_vfs_unmount,
+static const fs_ops_t g_ext2_fs_ops = {
+    .open     = ext2_ops_open,
+    .close    = ext2_ops_close,
+    .read     = ext2_ops_read,
+    .write    = ext2_ops_write,
+    .mkdir    = ext2_ops_mkdir,
+    .unlink   = ext2_ops_unlink,
+    .rmdir    = ext2_ops_rmdir,
+    .stat     = ext2_ops_stat,
+    .fstat    = ext2_ops_fstat,
+    .readdir  = ext2_ops_readdir,
+    .truncate = ext2_ops_truncate,
+    .readlink = ext2_ops_readlink,
 };
-/** @} */
 
-/**
- * @brief Get ext2 VFS operations table.
- * @return Pointer to ext2 fs_ops_t structure.
- */
-// cppcheck-suppress unusedFunction
-const fs_ops_t *ext2_get_ops(void)
-{
-  return &g_ext2_vfs_ops;
-}
+static const fs_type_t g_ext2_fstype = {
+    .name  = "ext2",
+    .ops   = &g_ext2_fs_ops,
+    .mount = ext2_ops_mount,
+};

@@ -24,8 +24,6 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
-#include <alcor2/proc/sched.h>
-#include <alcor2/proc/user.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
 
@@ -120,8 +118,6 @@ static void init_early(
  */
 static void launch_init(void)
 {
-  proc_init();
-
   if(!module_request.response || module_request.response->module_count == 0) {
     console_print("[KERNEL] No modules found, halting.\n");
     return;
@@ -129,10 +125,10 @@ static void launch_init(void)
 
   struct limine_file *mod = module_request.response->modules[0];
   console_printf(
-      "[KERNEL] Loading: %s (%d bytes)\n", mod->path, (int)mod->size
+      "[KERNEL] Loading: %s (%lu bytes)\n", mod->path, (u64)mod->size
   );
 
-  /* Start first process - never returns */
+  /* proc_start_first jumps to ring 3 and never comes back. */
   const char *ep = (mod->path && mod->path[0]) ? mod->path : "/boot/shell.elf";
   proc_start_first(mod->address, mod->size, "shell", ep);
 }
@@ -142,7 +138,6 @@ typedef struct
 {
   const char *name;          /**< Display name for logging */
   void        (*init)(void); /**< Phase-specific initialization function */
-  bool        critical;      /**< Halt if this phase fails (not used yet) */
 } boot_phase_t;
 
 /**
@@ -166,7 +161,6 @@ static void init_interrupts(void)
 static void init_storage(void)
 {
   ata_init();
-  ramfs_init();
   ext2_init();
 
   /* Mount root filesystem */
@@ -194,17 +188,17 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"Core Scheduler",      sched_init,       true },
-    {"GDT Structure",       gdt_init,         true },
-    {"IDT Structure",       idt_init,         true },
-    {"SSE/FPU Support",     cpu_enable_sse,   true },
-    {"Syscall Interface",   syscall_init,     true },
-    {"PIC/PIT Timers",      pic_init,         true },
-    {"Hardware Interrupts", init_interrupts,  true },
-    {"VFS Orchestrator",    vfs_init,         true },
-    {"Storage & VFS",       init_storage,     true },
-    {"Global Interrupts",   init_enable_irqs, true },
-    {NULL,                  NULL,             false}
+    {"GDT Structure",       gdt_init        },
+    {"IDT Structure",       idt_init        },
+    {"SSE/FPU Support",     cpu_enable_sse  },
+    {"Syscall Interface",   syscall_init    },
+    {"PIC/PIT Timers",      pic_init        },
+    {"Hardware Interrupts", init_interrupts },
+    {"VFS Orchestrator",    vfs_init        },
+    {"Storage & VFS",       init_storage    },
+    {"Process Table",       proc_init       },
+    {"Global Interrupts",   init_enable_irqs},
+    {NULL,                  NULL            }
 };
 
 /**
@@ -232,7 +226,7 @@ void kmain(void)
       console_printf("[INIT] %s initialized.\n", p->name);
   }
 
-  /* Stage 5: Launch init process */
+  /* Launch the init process from boot module 0. */
   launch_init();
 
   /* Idle loop (fallback if no init) */

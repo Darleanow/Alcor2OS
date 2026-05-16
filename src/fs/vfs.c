@@ -172,7 +172,7 @@ static void vfs_make_absolute(const char *path, char *out)
       out[len++] = '/';
       out[len]   = '\0';
     }
-    kstrncat(out, path, VFS_PATH_MAX - len - 1);
+    (void)kstrlcat(out, path, VFS_PATH_MAX);
   }
   vfs_normalize(out);
 }
@@ -273,25 +273,12 @@ i64 vfs_register_fs(const fs_type_t *fstype)
 {
   if(fs_registry_count >= 8)
     return -ENOMEM;
+  for(u32 i = 0; i < fs_registry_count; i++) {
+    if(kstreq(fs_registry[i]->name, fstype->name))
+      return -EEXIST;
+  }
   fs_registry[fs_registry_count++] = fstype;
   return 0;
-}
-
-/** @brief Unmount the filesystem at @p target, calling the driver's unmount if
- * provided. */
-i64 vfs_umount(const char *target)
-{
-  char abs[VFS_PATH_MAX];
-  vfs_make_absolute(target, abs);
-  for(i32 i = 0; i < VFS_MAX_MOUNTS; i++) {
-    if(mounts[i].active && kstreq(mounts[i].target, abs)) {
-      if(mounts[i].type->unmount)
-        mounts[i].type->unmount(mounts[i].fs_data);
-      mounts[i].active = false;
-      return 0;
-    }
-  }
-  return -ENOENT;
 }
 
 /**

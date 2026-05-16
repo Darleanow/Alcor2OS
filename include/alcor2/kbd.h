@@ -13,6 +13,14 @@
 
 struct proc;
 
+/*
+ * Linux ioctl direction/size encoding (same as _IOW et al.):
+ * bits 31:30 — direction (01 = write, user → kernel)
+ * bits 23:16 — argument size in bytes
+ * bits 15:8  — type character ('K' = keyboard)
+ * bits  7:0  — command ordinal
+ */
+
 /**
  * ioctl(request) for stdin (fd 0): set layout by id.
  *

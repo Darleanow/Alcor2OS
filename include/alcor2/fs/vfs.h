@@ -200,11 +200,6 @@ typedef struct
    */
   void *(*mount)(const char *source, u32 flags);
 
-  /**
-   * @brief Unmount the volume and release all driver resources.
-   * @param fs_data  Pointer returned by @c mount.
-   */
-  void (*unmount)(void *fs_data);
 } fs_type_t;
 
 /** @name Open flags (POSIX-compatible subset)
@@ -310,16 +305,6 @@ i64 vfs_register_fs(const fs_type_t *fstype);
  * @retval -EINVAL  The driver's @c mount callback returned @c NULL.
  */
 i64 vfs_mount(const char *source, const char *target, const char *fstype);
-
-/**
- * @brief Unmount the filesystem mounted at @p target.
- *
- * Calls the driver's @c unmount callback if provided.
- *
- * @param target  Absolute mount-point path.
- * @return 0 on success, @c -ENOENT if no mount is found at @p target.
- */
-i64 vfs_umount(const char *target);
 
 /**
  * @brief Open or create a file and install a file descriptor.

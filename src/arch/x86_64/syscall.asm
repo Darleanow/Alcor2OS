@@ -17,57 +17,34 @@
 
 section .data
 
-;; User RSP saved during syscall
+;; User RSP saved during syscall (single-CPU shortcut).
 global syscall_user_rsp
 syscall_user_rsp: dq 0
-
-;; Per-process kernel stack pointer (set by proc_switch via TSS)
-;; We get it from the TSS RSP0 field
-extern tss_get_rsp0
 
 section .text
 global syscall_entry
 extern syscall_dispatch
 extern proc_check_signals
+extern current_kernel_rsp
 
 ;;
 ;; syscall_entry - Entry point for SYSCALL instruction
 ;;
-;; Builds syscall_frame_t on kernel stack, calls C dispatcher,
-;; restores registers, and returns to userspace via SYSRET.
+;; SYSCALL does NOT switch stacks the way INT does, so we land here with
+;; user RSP still in RSP. The kernel stack top for the current process is
+;; published by proc_switch into the C global `current_kernel_rsp` (kept in
+;; sync with TSS.RSP0). We park user RSP in a scratch global and load the
+;; kernel stack before doing anything else; once we have a kernel stack we
+;; build syscall_frame_t, call the C dispatcher, and SYSRET back.
+;;
+;; Single-CPU only: a multi-CPU port would use swapgs + per-cpu_data instead
+;; of two file-scope globals.
 ;;
 syscall_entry:
-    ;; Interrupts are disabled by SFMASK MSR
-    
-    ;; Save user RSP temporarily in a scratch location
+    ;; Interrupts are disabled by SFMASK MSR (IF cleared on entry).
+
+    ;; Park user RSP; load this proc's kernel stack.
     mov [rel syscall_user_rsp], rsp
-    
-    ;; Get kernel stack from TSS (set by proc_switch for current process)
-    ;; We need to call tss_get_rsp0() but we have no stack yet!
-    ;; Solution: use a small trampoline stack, then switch to real kernel stack
-    ;; Actually, we saved the per-process kernel stack top in TSS RSP0
-    ;; Let's read it directly from the TSS structure
-    
-    ;; For now, use a simple approach: each process kernel stack is set in TSS
-    ;; SYSCALL doesn't automatically switch stacks (unlike interrupts), so we 
-    ;; read RSP0 from TSS manually. But that's complex without a stack.
-    ;; 
-    ;; Simpler: keep using a global syscall stack, but save/restore user context
-    ;; properly through the process structure.
-    ;;
-    ;; For a minimal working solution, we'll use the process's kernel stack
-    ;; which was set in TSS RSP0. We read it via the gs segment (kernel gs base
-    ;; can point to per-CPU data, but we don't have that yet).
-    ;;
-    ;; SIMPLEST FIX: The current process's kernel stack top is in TSS RSP0.
-    ;; When an interrupt occurs, CPU loads RSP from TSS.RSP0 automatically.
-    ;; But SYSCALL does NOT do this! SYSCALL keeps userspace RSP.
-    ;; So we need to manually switch to kernel stack.
-    ;;
-    ;; We stored the kernel stack in proc_t->kernel_stack_top and set TSS RSP0.
-    ;; Let's use a global that proc_switch updates:
-    
-    extern current_kernel_rsp
     mov rsp, [rel current_kernel_rsp]
     
     ;; Build syscall_frame_t on stack (matches struct in syscall.h)

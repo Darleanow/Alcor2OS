@@ -136,24 +136,25 @@ proc_t *proc_current(void);
 int proc_table_index(const proc_t *p);
 
 /**
- * @brief Create a new process from ELF data.
- * @param name Process name.
- * @param elf_data Pointer to ELF file data.
- * @param elf_size Size of ELF file.
- * @param argv NULL-terminated array of arguments (argv[0] = program name).
- * @param envp NULL-terminated environment (name=value), or NULL for empty.
- * @return New process's PID, or 0 on failure.
+ * @brief Create a process from an ELF image held in kernel memory.
+ *
+ * Loading from an open file descriptor is internal (exec path uses
+ * @c proc_exec_replace_image).
  */
-/**
- * Pass ELF_FD_NONE as elf_fd to use an in-memory buffer instead of a
- * file descriptor.
- */
-#define ELF_FD_NONE ((i64) - 1)
-
-u64 proc_create(
-    const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
-    char *const argv[], char *const envp[]
+u64 proc_create_mem(
+    const char *name, const void *elf_data, u64 elf_size, char *const argv[],
+    char *const envp[]
 );
+
+/**
+ * @brief Timer IRQ hook: request reschedule at next syscall return.
+ */
+void proc_tick(void);
+
+/**
+ * @brief Syscall exit hook: run scheduler if @ref proc_tick flagged preemption.
+ */
+void proc_check_resched(void);
 
 /**
  * @brief Exit the current process with the given exit code.
@@ -208,6 +209,9 @@ void proc_notify_exec(const proc_t *p);
  * sysret return path lands in the new image. On catastrophic failure the
  * old image has already been destroyed and the process can no longer
  * continue — the caller should @c proc_exit.
+ *
+ * Does not @c vfs_close @p elf_fd; the syscall wrapper closes scratch fds after
+ * success when appropriate (see @c sys_execve).
  *
  * @return 0 on success, negative -errno on failure.
  */

@@ -24,6 +24,17 @@
 
 extern void gdt_load(gdt_ptr_t *gdtr);
 
+/*
+ * Table layout is constrained by SYSRET/STAR semantics on AMD64: the MSR holds
+ * a base segment selector such that STAR[63:48]+16 selects 64-bit user code,
+ * STAR[63:48]+8 selects user data/stack, and STAR[63:48]+0 is the 32-bit
+ * compat code slot. User data therefore sits immediately before user code in
+ * the GDT (see @c user_data / @c user_code below).
+ *
+ * @c null plus four zeroed @c reserved entries pad indices so @c kernel_code
+ * lands at selector @c GDT_KERNEL_CODE (0x28) expected elsewhere in the kernel.
+ */
+
 /** @brief GDT table with kernel/user segments and TSS. */
 static struct
 {

@@ -216,14 +216,18 @@ u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  if(!req)
-    return (u64)-EFAULT;
-
-  struct
+  struct timespec
   {
     i64 sec;
     i64 nsec;
-  }  *ts = (void *)req;
+  };
+
+  if(!user_rw_ok(req, sizeof(struct timespec)))
+    return (u64)-EFAULT;
+
+  const struct timespec *ts = (const struct timespec *)req;
+  if(ts->sec < 0 || ts->nsec < 0 || ts->nsec >= 1000000000)
+    return (u64)-EINVAL;
 
   u64 ms    = (u64)ts->sec * 1000 + (u64)ts->nsec / 1000000;
   u64 ticks = (ms + 9) / 10;

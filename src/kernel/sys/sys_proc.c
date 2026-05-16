@@ -48,11 +48,20 @@ static i64 copy_user_strvec(
 )
 {
   int n = 0;
-  if(user_vec && user_vec[0]) {
-    for(; n < MAX_EXEC_ARGS && user_vec[n]; n++) {
-      if(!user_cstr_ok((u64)user_vec[n]))
+  if(user_vec) {
+    for(; n < MAX_EXEC_ARGS; n++) {
+      /* Validate the pointer slot BEFORE dereferencing it. Without this the
+       * loop happily reads @c user_vec[n] from kernel memory once @c user_vec
+       * crosses USER_SPACE_END mid-array, leaking those bytes into the new
+       * process via @c store[n]. */
+      if(!user_buf_ok((u64)&user_vec[n], sizeof(char *)))
         return -EFAULT;
-      kstrncpy(store[n], user_vec[n], MAX_ARG_LEN);
+      char *p = user_vec[n];
+      if(!p)
+        break;
+      if(!user_cstr_ok((u64)p))
+        return -EFAULT;
+      kstrncpy(store[n], p, MAX_ARG_LEN);
       store[n][MAX_ARG_LEN - 1] = '\0';
       ptrs[n]                   = store[n];
     }
@@ -169,31 +178,28 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   if(st.type != VFS_FILE)
     return (u64)-EACCES;
 
+  /* All five scratch buffers are freed at the single @c out: label so the
+   * function has one cleanup path instead of five copies of five kfrees. */
   char(*arg_storage)[MAX_ARG_LEN] = kmalloc((u64)MAX_EXEC_ARGS * MAX_ARG_LEN);
   char **new_argv = kmalloc((u64)(MAX_EXEC_ARGS + 1) * sizeof(char *));
   char(*env_storage)[MAX_ARG_LEN] = kmalloc((u64)MAX_EXEC_ARGS * MAX_ARG_LEN);
   char **new_envp     = kmalloc((u64)(MAX_EXEC_ARGS + 1) * sizeof(char *));
   char  *name_storage = kmalloc(MAX_ARG_LEN);
 
+  u64    rc_u = 0;
+  i64    fd   = -1;
+
   if(!arg_storage || !new_argv || !env_storage || !new_envp || !name_storage) {
-    kfree(arg_storage);
-    kfree(new_argv);
-    kfree(env_storage);
-    kfree(new_envp);
-    kfree(name_storage);
-    return (u64)-ENOMEM;
+    rc_u = (u64)-ENOMEM;
+    goto out;
   }
 
   int argc = 0, envc = 0;
 
   i64 rc_argv = copy_user_strvec((char **)argv, arg_storage, new_argv, &argc);
   if(rc_argv < 0) {
-    kfree(arg_storage);
-    kfree(new_argv);
-    kfree(env_storage);
-    kfree(new_envp);
-    kfree(name_storage);
-    return (u64)rc_argv;
+    rc_u = (u64)rc_argv;
+    goto out;
   }
   if(argc == 0) {
     kstrncpy(arg_storage[0], path, MAX_ARG_LEN);
@@ -205,40 +211,28 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   i64 rc_envp = copy_user_strvec((char **)envp, env_storage, new_envp, &envc);
   if(rc_envp < 0) {
-    kfree(arg_storage);
-    kfree(new_argv);
-    kfree(env_storage);
-    kfree(new_envp);
-    kfree(name_storage);
-    return (u64)rc_envp;
+    rc_u = (u64)rc_envp;
+    goto out;
   }
 
   kstrncpy(name_storage, path, MAX_ARG_LEN);
   name_storage[MAX_ARG_LEN - 1] = '\0';
 
-  i64 fd = vfs_open(path, 0);
+  fd = vfs_open(path, 0);
   if(fd < 0) {
-    kfree(arg_storage);
-    kfree(new_argv);
-    kfree(env_storage);
-    kfree(new_envp);
-    kfree(name_storage);
-    return (u64)-ENOENT;
+    rc_u = (u64)-ENOENT;
+    goto out;
   }
 
   proc_t *p = proc_current();
   if(!p) {
-    vfs_close(fd);
-    kfree(arg_storage);
-    kfree(new_argv);
-    kfree(env_storage);
-    kfree(new_envp);
-    kfree(name_storage);
-    return (u64)-EINVAL;
+    rc_u = (u64)-EINVAL;
+    goto out;
   }
 
   i64 rc = proc_exec_replace_image(p, name_storage, fd, new_argv, new_envp);
   vfs_close(fd);
+  fd = -1;
   if(rc < 0)
     proc_exit(127);
 
@@ -254,13 +248,15 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
     frame->rflags = p->user_rflags;
   }
 
+out:
+  if(fd >= 0)
+    vfs_close(fd);
   kfree(arg_storage);
   kfree(new_argv);
   kfree(env_storage);
   kfree(new_envp);
   kfree(name_storage);
-
-  return 0;
+  return rc_u;
 }
 
 /** @brief Terminate the calling process with @p status. */

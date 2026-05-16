@@ -29,6 +29,8 @@
 static proc_t  proc_table[PROC_MAX];
 static proc_t *current_proc = NULL;
 static u64     next_pid     = 1;
+/** @brief Set by proc_tick; syscall exit runs proc_schedule when true. */
+static volatile bool need_resched = false;
 
 /** @brief Current kernel stack for syscall entry. */
 u64 current_kernel_rsp = 0;
@@ -100,20 +102,32 @@ proc_t *proc_get(u64 pid)
 
 /**
  * @brief Allocate a free process slot from the process table.
+ *
+ * The slot is fully zeroed before any non-zero defaults are installed.
+ * Going through @c kzero rather than field-by-field resets means a stale
+ * @c sig_actions handler, @c sig_pending bit, etc. from a previously
+ * reaped occupant cannot survive into the new process — and any future
+ * field added to @c proc_t inherits the right "blank" default for free.
+ *
  * @return Pointer to free process slot, or NULL if table is full.
  */
 static proc_t *proc_alloc(void)
 {
   for(int i = 0; i < PROC_MAX; i++) {
-    if(proc_table[i].state == PROC_STATE_FREE) {
-      vfs_proc_init_fds(proc_table[i].fds);
-      kzero(proc_table[i].fd_cloexec, sizeof(proc_table[i].fd_cloexec));
-      kstrncpy(proc_table[i].cwd, "/", 2);
-      ktermios_init_default(&proc_table[i].termios);
-      proc_table[i].kbd_edit_len  = 0;
-      proc_table[i].kbd_ready_len = 0;
-      return &proc_table[i];
-    }
+    proc_t *p = &proc_table[i];
+    if(p->state != PROC_STATE_FREE)
+      continue;
+
+    kzero(p, sizeof *p);
+
+    /* Re-establish the few fields that are not zero-valued in their fresh
+     * state. Everything else (signal actions / mask / pending, exit_code,
+     * fs_base, fd_cloexec, kbd_*_len, ...) is correctly zero from kzero. */
+    vfs_proc_init_fds(p->fds);
+    kstrncpy(p->cwd, "/", 2);
+    ktermios_init_default(&p->termios);
+
+    return p;
   }
   return NULL;
 }
@@ -362,7 +376,12 @@ static int proc_setup_image(
   return 0;
 }
 
-u64 proc_create(
+/**
+ * @brief Common path: allocate slot, load ELF from memory buffer or open fd.
+ *
+ * Memory image: @p elf_size > 0 and @p elf_fd < 0. File image: @p elf_fd >= 0.
+ */
+static u64 proc_create_inner(
     const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
     char *const argv[], char *const envp[]
 )
@@ -428,6 +447,14 @@ u64 proc_create(
   p->saved_rsp = (u64)ksp;
 
   return p->pid;
+}
+
+u64 proc_create_mem(
+    const char *name, const void *elf_data, u64 elf_size, char *const argv[],
+    char *const envp[]
+)
+{
+  return proc_create_inner(name, elf_data, elf_size, -1, argv, envp);
 }
 
 /**
@@ -593,6 +620,29 @@ i64 proc_wait(u64 pid)
 }
 
 /**
+ * @brief Timer hook: request a reschedule at the next syscall boundary.
+ *
+ * Called from the PIT IRQ when preemptive scheduling is enabled.
+ */
+void proc_tick(void)
+{
+  need_resched = true;
+}
+
+/**
+ * @brief If a timer tick requested preemption, run the process scheduler.
+ *
+ * Called from syscall_dispatch before returning to user mode.
+ */
+void proc_check_resched(void)
+{
+  if(need_resched) {
+    need_resched = false;
+    proc_schedule();
+  }
+}
+
+/**
  * @brief Schedule the next ready process to run.
  *
  * Performs simple round-robin scheduling. Searches for the next
@@ -734,7 +784,7 @@ void proc_start_first(
     const void *elf_data, u64 elf_size, const char *name, const char *exe_path
 )
 {
-  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL, NULL);
+  u64 pid = proc_create_mem(name, elf_data, elf_size, NULL, NULL);
   if(pid == 0) {
     console_print("[PROC] Failed to create first process\n");
     return;
@@ -780,13 +830,18 @@ void proc_start_first(
 /**
  * @brief Fork / clone (no threads): duplicate the calling task.
  *
- * If @p child_stack_arg is 0, the child uses the same user RSP as the parent
- * syscall frame (fork). Otherwise the child resumes at @p child_stack_arg
- * (musl `__clone` after syscall).
+ * @param frame        Saved syscall frame the child resumes from (RIP/RFLAGS,
+ *                     plus a copy of every general-purpose register so the
+ *                     child returns to the same user-mode RIP with @c rax = 0).
+ * @param child_stack  If non-zero, the child resumes with this user RSP
+ *                     (musl @c __clone). If zero, child uses the parent's
+ *                     user RSP from @p frame (plain @c fork).
+ * @param clone_flags  Bitmask: @c ALCOR_CLONE_VFORK makes the parent block
+ *                     in @c PROC_STATE_BLOCKED until the child execve's or
+ *                     exits (matches musl @c posix_spawn's wire usage).
  *
- * @param frame_ptr Saved syscall frame.
- * @param child_stack_arg User stack for child, or 0 for parent's RSP.
- * @return Child PID to parent, negative errno on failure.
+ * @return Child PID to the parent (the child returns 0 via @c rax in its
+ *         own syscall frame), or negative errno on failure.
  */
 static i64 proc_fork_impl(
     const syscall_frame_t *frame, u64 child_stack_arg, u32 clone_flags
@@ -794,9 +849,8 @@ static i64 proc_fork_impl(
 {
   u64     child_rsp = child_stack_arg ? child_stack_arg : frame->rsp;
   proc_t *parent    = current_proc;
-  if(!parent) {
-    return -1;
-  }
+  if(!parent)
+    return -ESRCH;
 
   /* Allocate child process slot */
   proc_t *child = proc_alloc();
@@ -857,44 +911,31 @@ static i64 proc_fork_impl(
   child->kbd_edit_len  = 0;
   child->kbd_ready_len = 0;
 
+  /* POSIX fork: child inherits parent's signal dispositions and mask, but
+   * starts with an empty pending set. Without this copy the child would
+   * see whatever sig_actions table proc_alloc left behind (zeroed, i.e.
+   * SIG_DFL across the board) instead of what the parent has registered. */
+  kmemcpy(child->sig_actions, parent->sig_actions, sizeof child->sig_actions);
+  child->sig_mask    = parent->sig_mask;
+  child->sig_pending = 0;
+
   /* Copy user context from syscall frame */
   child->user_rip    = frame->rip;
   child->user_rsp    = child_rsp;
   child->user_rflags = frame->rflags;
 
-  /* Build kernel stack for child (same as proc_create) */
-  u64 *ksp = (u64 *)child->kernel_stack_top;
-
-  /* iretq frame */
-  *(--ksp) = 0x3B;               /* SS (user data | RPL 3) */
-  *(--ksp) = child->user_rsp;    /* RSP */
-  *(--ksp) = child->user_rflags; /* RFLAGS */
-  *(--ksp) = 0x43;               /* CS (user code | RPL 3) */
-  *(--ksp) = child->user_rip;    /* RIP */
-
-  /* Return address for context_switch */
-  extern void proc_enter_first_time(void);
-  *(--ksp) = (u64)proc_enter_first_time;
-
-  /* Callee-saved registers (context_switch pops: r15, r14, r13, r12, rbx, rbp)
+  /* Build the child's kernel stack so that resuming it via context_switch
+   * lands in proc_fork_child_entry, which pops the saved syscall frame and
+   * SYSRETs back into the user code with rax = 0.
+   *
+   * Layout (top → bottom of stack):
+   *   syscall_frame_t   ← child_frame (copy of parent's, with rax = 0)
+   *   proc_fork_child_entry   ← context_switch's ret target
+   *   r15 r14 r13 r12 rbx rbp ← popped by context_switch
    */
-  *(--ksp) = 0; /* rbp */
-  *(--ksp) = 0; /* rbx */
-  *(--ksp) = 0; /* r12 */
-  *(--ksp) = 0; /* r13 */
-  *(--ksp) = 0; /* r14 */
-  *(--ksp) = 0; /* r15 */
-
-  child->saved_rsp = (u64)ksp;
-
-  /* Reset ksp and build a different stack layout */
-  ksp = (u64 *)child->kernel_stack_top;
-
-  /* Copy parent's syscall frame to child's kernel stack */
-  ksp                          = (u64 *)((u64)ksp - sizeof(syscall_frame_t));
+  u64 *ksp = (u64 *)((u64)child->kernel_stack_top - sizeof(syscall_frame_t));
   syscall_frame_t *child_frame = (syscall_frame_t *)ksp;
 
-  /* Copy all registers from parent */
   child_frame->r15    = frame->r15;
   child_frame->r14    = frame->r14;
   child_frame->r13    = frame->r13;
@@ -909,25 +950,17 @@ static i64 proc_fork_impl(
   child_frame->rdx    = frame->rdx;
   child_frame->rcx    = frame->rcx;
   child_frame->rbx    = frame->rbx;
-  child_frame->rax    = 0; /* Child returns 0 from fork! */
+  child_frame->rax    = 0; /* fork() returns 0 in the child */
   child_frame->rip    = frame->rip;
   child_frame->rflags = frame->rflags;
   child_frame->rsp    = child_rsp;
 
-  /* Now we need the child to return through syscall_return */
-  /* proc_fork_child_entry will pop the frame and do sysret */
   extern void proc_fork_child_entry(void);
+  *(--ksp) = (u64)proc_fork_child_entry; /* ret target after context_switch */
 
-  /* Return address after context_switch pops callee-saved regs */
-  *(--ksp) = (u64)proc_fork_child_entry;
-
-  /* Callee-saved registers */
-  *(--ksp) = 0; /* rbp */
-  *(--ksp) = 0; /* rbx */
-  *(--ksp) = 0; /* r12 */
-  *(--ksp) = 0; /* r13 */
-  *(--ksp) = 0; /* r14 */
-  *(--ksp) = 0; /* r15 */
+  /* Six zeroed callee-saved slots (context_switch pops r15..rbp in order). */
+  for(int i = 0; i < 6; i++)
+    *(--ksp) = 0;
 
   child->saved_rsp = (u64)ksp;
 

@@ -93,16 +93,6 @@ u16 pci_read16(u8 bus, u8 slot, u8 func, u8 offset);
 u32 pci_read32(u8 bus, u8 slot, u8 func, u8 offset);
 
 /**
- * @brief Write 8-bit value to PCI configuration space.
- * @param bus    Bus number.
- * @param slot   Device slot.
- * @param func   Function number.
- * @param offset Register offset.
- * @param val    Value to write.
- */
-void pci_write8(u8 bus, u8 slot, u8 func, u8 offset, u8 val);
-
-/**
  * @brief Write 16-bit value to PCI configuration space.
  * @param bus    Bus number.
  * @param slot   Device slot.

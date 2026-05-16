@@ -64,13 +64,6 @@ void vmm_unmap(u64 virt);
 u64 vmm_get_phys(u64 virt);
 
 /**
- * @brief Get the full page table entry for a virtual address (debug).
- * @param virt Virtual address.
- * @return PTE value.
- */
-u64 vmm_get_pte(u64 virt);
-
-/**
  * @brief Switch to a different page table.
  * @param pml4_phys Physical address of PML4.
  */
@@ -96,14 +89,6 @@ u64 vmm_create_address_space(void);
  * @param flags Page flags.
  */
 void vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags);
-
-/**
- * @brief Get physical address in a specific address space.
- * @param pml4_phys Physical address of PML4.
- * @param virt Virtual address.
- * @return Physical address or 0 if not mapped.
- */
-u64 vmm_get_phys_in(u64 pml4_phys, u64 virt);
 
 /**
  * @brief Clone user mappings for fork.
@@ -144,17 +129,6 @@ u64 vmm_get_current_pml4(void);
 static inline void *phys_to_virt(u64 phys)
 {
   return (void *)(phys + vmm_get_hhdm());
-}
-
-/**
- * @brief Convert virtual address to physical (HHDM).
- * @param virt Virtual address in HHDM region.
- * @return Physical address.
- */
-// cppcheck-suppress unusedFunction
-static inline u64 virt_to_phys(void *virt)
-{
-  return (u64)virt - vmm_get_hhdm();
 }
 
 /**

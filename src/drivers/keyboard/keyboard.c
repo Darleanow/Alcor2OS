@@ -15,14 +15,24 @@
 static u8           kb_buffer[KB_BUFFER_SIZE];
 static volatile u32 kb_read_pos  = 0;
 static volatile u32 kb_write_pos = 0;
+/** @brief Raw scancodes dropped because the ring buffer was full (burst input).
+ */
+static u32  kb_drop_count = 0;
 
-static void         kb_push(u8 b)
+static void kb_push(u8 b)
 {
   u32 next = (kb_write_pos + 1) % KB_BUFFER_SIZE;
   if(next != kb_read_pos) {
     kb_buffer[kb_write_pos] = b;
     kb_write_pos            = next;
+  } else {
+    kb_drop_count++;
   }
+}
+
+u32 keyboard_raw_drop_count(void)
+{
+  return kb_drop_count;
 }
 
 bool keyboard_raw_available(void)

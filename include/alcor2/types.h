@@ -38,9 +38,6 @@ typedef size_t usize;
 /** @brief Align structure to n-byte boundary. */
 #define ALIGNED(n) __attribute__((aligned(n)))
 
-/** @brief Mark as unused (suppress warnings). */
-#define UNUSED __attribute__((unused))
-
 /** @brief Function never returns. */
 #define NORETURN __attribute__((noreturn))
 
@@ -49,8 +46,5 @@ typedef size_t usize;
 
 /** @brief Force linker to keep symbol. */
 #define USED __attribute__((used))
-
-/** @brief Check pointer is not NULL. */
-#define NULL_CHECK(ptr) ((ptr) != NULL)
 
 #endif

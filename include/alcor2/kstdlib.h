@@ -40,15 +40,6 @@ void *kmemset(void *dst, int val, u64 n);
 void kzero(void *dst, u64 n);
 
 /**
- * @brief Compare memory regions.
- * @param s1 First region.
- * @param s2 Second region.
- * @param n Byte count.
- * @return 0 if equal, <0 if s1<s2, >0 if s1>s2.
- */
-int kmemcmp(const void *s1, const void *s2, u64 n);
-
-/**
  * @brief Get string length.
  * @param s String.
  * @return Length (not including null terminator).
@@ -61,6 +52,9 @@ u64 kstrlen(const char *s);
  * @param src Source.
  * @param max Maximum bytes including null terminator.
  * @return dst pointer.
+ *
+ * Always writes a NUL terminator at dst[max-1] if max > 0 (unlike POSIX @c
+ * strncpy, which may leave dst non-terminated when strlen(src) >= max).
  */
 char *kstrncpy(char *dst, const char *src, u64 max);
 
@@ -73,14 +67,6 @@ char *kstrncpy(char *dst, const char *src, u64 max);
 int kstrcmp(const char *a, const char *b);
 
 /**
- * @brief Compare two strings (case insensitive).
- * @param a First string.
- * @param b Second string.
- * @return 0 if equal.
- */
-int kstricmp(const char *a, const char *b);
-
-/**
  * @brief Compare two strings up to n characters.
  * @param a First string.
  * @param b Second string.
@@ -90,13 +76,18 @@ int kstricmp(const char *a, const char *b);
 int kstrncmp(const char *a, const char *b, u64 n);
 
 /**
- * @brief Concatenate strings with maximum length.
- * @param dst Destination.
- * @param src Source.
- * @param max Maximum bytes to add.
- * @return dst pointer.
+ * @brief Bounded strcat (BSD @c strlcat semantics).
+ *
+ * @p dst_cap is the total size of @p dst including the terminating NUL.
+ * Appends at most @c dst_cap - strlen(dst) - 1 bytes from @p src.
+ *
+ * @param dst      NUL-terminated destination; must fit within @p dst_cap.
+ * @param src      Source string.
+ * @param dst_cap  Total bytes allocated for @p dst.
+ * @return         Length the concatenated string would have if unlimited
+ *                 (may exceed @p dst_cap - 1 when truncated).
  */
-char *kstrncat(char *dst, const char *src, u64 max);
+u64 kstrlcat(char *dst, const char *src, u64 dst_cap);
 
 /**
  * @brief Check if strings are equal.
@@ -107,41 +98,11 @@ char *kstrncat(char *dst, const char *src, u64 max);
 bool kstreq(const char *a, const char *b);
 
 /**
- * @brief Find character in string.
- * @param s String to search.
- * @param c Character to find.
- * @return Pointer to character, or NULL if not found.
- */
-char *kstrchr(const char *s, int c);
-
-/**
  * @brief Find last occurrence of character in string.
  * @param s String to search.
  * @param c Character to find.
  * @return Pointer to character, or NULL if not found.
  */
 char *kstrrchr(const char *s, int c);
-
-/**
- * @brief Check if string starts with prefix.
- * @param str String to check.
- * @param prefix Prefix to look for.
- * @return true if str starts with prefix.
- */
-bool kstarts_with(const char *str, const char *prefix);
-
-/**
- * @brief Convert character to uppercase.
- * @param c Character.
- * @return Uppercase version.
- */
-int ktoupper(int c);
-
-/**
- * @brief Convert character to lowercase.
- * @param c Character.
- * @return Lowercase version.
- */
-int ktolower(int c);
 
 #endif /* ALCOR2_KSTDLIB_H */

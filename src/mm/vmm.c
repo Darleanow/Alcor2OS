@@ -195,7 +195,6 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
  *
  * @param virt Virtual address to unmap.
  */
-// cppcheck-suppress unusedFunction
 void vmm_unmap(u64 virt)
 {
   /* Get current PML4 (could be kernel or process PML4) */
@@ -263,42 +262,6 @@ u64 vmm_get_phys(u64 virt)
     return 0;
 
   return (pt[pt_idx] & PAGE_FRAME_MASK) | (virt & PAGE_OFFSET_MASK);
-}
-
-/**
- * @brief Get the full page table entry for a virtual address (debug).
- *
- * Returns the complete PTE value including flags, useful for debugging
- * page table issues.
- *
- * @param virt Virtual address.
- * @return Complete PTE value, or 0 if page tables don't exist.
- */
-// cppcheck-suppress unusedFunction
-u64 vmm_get_pte(u64 virt)
-{
-  u64 cr3;
-  __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
-  u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
-
-  u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
-  u64  pdpt_idx = (virt >> 30) & PAGE_TABLE_INDEX_MASK;
-  u64  pd_idx   = (virt >> 21) & PAGE_TABLE_INDEX_MASK;
-  u64  pt_idx   = (virt >> 12) & PAGE_TABLE_INDEX_MASK;
-
-  u64 *pdpt = get_next_level(pml4, pml4_idx, false, 0);
-  if(!pdpt)
-    return 0;
-
-  u64 *pd = get_next_level(pdpt, pdpt_idx, false, 0);
-  if(!pd)
-    return 0;
-
-  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
-  if(!pt)
-    return 0;
-
-  return pt[pt_idx];
 }
 
 /**
@@ -401,51 +364,17 @@ u64 vmm_get_current_pml4(void)
 }
 
 /**
- * @brief Get physical address for virtual address in a specific address space.
- *
- * Walks the page tables of the specified address space to find the physical
- * address mapped to the given virtual address.
- *
- * @param pml4_phys Physical address of PML4 to search.
- * @param virt Virtual address to resolve.
- * @return Physical address, or 0 if not mapped or not present.
- */
-// cppcheck-suppress unusedFunction
-u64 vmm_get_phys_in(u64 pml4_phys, u64 virt)
-{
-  u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);
-
-  u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
-  u64  pdpt_idx = (virt >> 30) & PAGE_TABLE_INDEX_MASK;
-  u64  pd_idx   = (virt >> 21) & PAGE_TABLE_INDEX_MASK;
-  u64  pt_idx   = (virt >> 12) & PAGE_TABLE_INDEX_MASK;
-
-  u64 *pdpt = get_next_level(pml4, pml4_idx, false, 0);
-  if(!pdpt)
-    return 0;
-
-  u64 *pd = get_next_level(pdpt, pdpt_idx, false, 0);
-  if(!pd)
-    return 0;
-
-  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
-  if(!pt)
-    return 0;
-
-  if(!(pt[pt_idx] & VMM_PRESENT))
-    return 0;
-
-  return pt[pt_idx] & PAGE_FRAME_MASK;
-}
-
-/**
  * @brief Clone an address space for fork().
  *
- * Creates a new address space and copies all user-space mappings (entries
- * 0-255) along with their page contents. Kernel mappings are shared, not
- * copied.
+ * Creates a new PML4, shares kernel-half entries (256..511) with the source,
+ * and eagerly duplicates every user-half leaf: each PT/PD/PDPT level is
+ * walked and a fresh physical page is allocated for each present leaf,
+ * with its content @c kmemcpy'd from the source. Walk levels themselves
+ * are also freshly allocated by @c vmm_map_in.
  *
- * This performs copy-on-write (COW) semantics by physically copying pages.
+ * NOT a copy-on-write implementation — every page is materialised at fork
+ * time. Adding COW would mark both sides read-only and fault-trap the
+ * first write; today's userland tolerates the eager cost.
  *
  * @param src_pml4_phys Physical address of source PML4 to clone.
  * @return Physical address of new PML4, or 0 on failure.
@@ -515,17 +444,16 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
 }
 
 /**
- * @brief Free user-space page tables and mapped pages.
+ * @brief Walk the user half (PML4 entries 0..255) of @p pml4_phys and free
+ *        every leaf page plus every PT/PD/PDPT level on the way up.
  *
- * Walks user-space entries (0-255) and frees page table pages.
- * Currently simplified - does not free mapped physical pages.
- *
- * @param pml4_phys Physical address of PML4 to clean up.
- * @todo Implement full cleanup including mapped physical pages.
+ * @param pml4_phys     PML4 physical address to recurse into.
+ * @param zero_entries  When @c true, also zeroes the PML4 entries after the
+ *                      walk. Required by @c vmm_clear_user_mappings (the
+ *                      PML4 stays in use); skipped by
+ *                      @c vmm_destroy_user_mappings (the PML4 page itself
+ *                      is freed afterwards, so its contents do not matter).
  */
-/* Walk and free everything below the PML4 in user space (entries 0-255).
- * Optionally also zero the PML4 entries — required for clear; for destroy the
- * PML4 page itself is freed afterwards so its contents do not matter. */
 static void user_mappings_walk_and_free(u64 pml4_phys, bool zero_entries)
 {
   u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);

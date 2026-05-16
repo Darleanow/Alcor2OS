@@ -163,7 +163,15 @@ static i64 ram_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
   if(node->type != VFS_FILE)
     return -EISDIR;
 
+  /* Guard offset + count and the subsequent round-up against u64 wrap-around.
+   * A wrapped @c new_cap would let @c kmemcpy run past the (smaller) buffer
+   * @c krealloc returned, corrupting the kernel heap. */
   u64 end = offset + count;
+  if(end < offset)
+    return -EFBIG;
+  if(end > (u64)-1 - 1023u)
+    return -EFBIG;
+
   if(end > node->capacity) {
     u64   new_cap  = (end + 1023) & ~1023ULL;
     void *new_data = krealloc(node->data, new_cap);
@@ -361,7 +369,14 @@ static const fs_type_t ram_fstype = {
 
 void ramfs_init(void)
 {
-  root         = ram__create_node("/", VFS_DIRECTORY);
+  /* Idempotent: callers (both early-init and init_storage) may invoke this
+   * more than once; only the first call constructs the tree and registers
+   * the driver. */
+  if(root)
+    return;
+  root = ram__create_node("/", VFS_DIRECTORY);
+  /* Self-loop so ram__resolve handles ".." at the root as a no-op without
+   * needing a "did we land on root?" special case in the walker. */
   root->parent = root;
   vfs_register_fs(&ram_fstype);
 }

@@ -25,12 +25,16 @@
 
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
 
-/** @brief Descriptor for a single syscall mapping. */
+/** @brief Descriptor for a single syscall mapping.
+ *
+ * Handler signature is invariant six u64-in / u64-out (System V order:
+ * RDI, RSI, RDX, R10, R8, R9). No nargs field — every entry accepts
+ * the full register window and ignores unused slots via (void)aN.
+ */
 typedef struct
 {
   u64          num;     /**< Syscall number (RAX) */
   const char  *name;    /**< Symbolic name for tracing */
-  int          nargs;   /**< Argument count (0-6) */
   syscall_fn_t handler; /**< Implementation function */
 } sys_def_t;
 
