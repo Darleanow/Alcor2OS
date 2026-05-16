@@ -171,7 +171,7 @@ void heap_init(void)
 
   console_printf(
       "[HEAP] %d KB at 0x%x\n", (int)(heap_size / 1024),
-      (unsigned int)KERNEL_HEAP_BASE_DISPLAY
+      (u64)KERNEL_HEAP_BASE_DISPLAY
   );
 }
 
@@ -244,40 +244,6 @@ void *kzalloc(u64 size)
 }
 
 /**
- * @brief Allocate aligned memory from kernel heap.
- *
- * Allocates memory with the specified alignment. The alignment must be a power
- * of 2. Stores the original pointer before the aligned address for proper
- * freeing.
- *
- * @param size Number of bytes to allocate.
- * @param alignment Alignment in bytes (minimum 16, rounded up if smaller).
- * @return Pointer to aligned memory, or NULL on failure.
- */
-// cppcheck-suppress unusedFunction
-void *kmalloc_aligned(u64 size, u64 alignment)
-{
-  if(alignment < 16) {
-    alignment = 16;
-  }
-
-  /* Allocate extra for alignment */
-  void *ptr = kmalloc(size + alignment + sizeof(void *));
-  if(ptr == NULL) {
-    return NULL;
-  }
-
-  /* Calculate aligned address */
-  u64 addr    = (u64)ptr + sizeof(void *);
-  u64 aligned = (addr + alignment - 1) & ~(alignment - 1);
-
-  /* Store original pointer */
-  *((void **)(aligned - sizeof(void *))) = ptr;
-
-  return (void *)aligned;
-}
-
-/**
  * @brief Free previously allocated memory.
  *
  * Returns memory to the free list and attempts to coalesce with adjacent free
@@ -322,7 +288,6 @@ void kfree(void *ptr)
  * @param new_size New size in bytes.
  * @return Pointer to reallocated memory, or NULL on failure.
  */
-// cppcheck-suppress unusedFunction
 void *krealloc(void *ptr, u64 new_size)
 {
   if(ptr == NULL) {
@@ -358,20 +323,3 @@ void *krealloc(void *ptr, u64 new_size)
   return new_ptr;
 }
 
-/**
- * @brief Get heap statistics.
- *
- * Fills the stats structure with total, used, and free heap sizes.
- *
- * @param stats Output structure for heap statistics (can be NULL).
- */
-// cppcheck-suppress unusedFunction
-void heap_stats(heap_stats_t *stats)
-{
-  if(!stats)
-    return;
-
-  stats->total_bytes = heap_size;
-  stats->used_bytes  = heap_used;
-  stats->free_bytes  = heap_size - heap_used;
-}

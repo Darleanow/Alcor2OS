@@ -273,6 +273,10 @@ i64 vfs_register_fs(const fs_type_t *fstype)
 {
   if(fs_registry_count >= 8)
     return -ENOMEM;
+  for(u32 i = 0; i < fs_registry_count; i++) {
+    if(kstreq(fs_registry[i]->name, fstype->name))
+      return -EEXIST;
+  }
   fs_registry[fs_registry_count++] = fstype;
   return 0;
 }

@@ -54,8 +54,6 @@ typedef struct task
   task_state_t   state;
   u64            time_slice;
   u64            ticks_remaining;
-  void           (*entry)(void *);
-  void          *arg;
   void          *stack_base;
   void          *stack_top;
   cpu_context_t *context;
@@ -64,24 +62,9 @@ typedef struct task
 } task_t;
 
 /**
- * @brief Task entry point function type.
- * @param arg Argument passed to the task.
- */
-typedef void (*task_entry_t)(void *arg);
-
-/**
  * @brief Initialize the scheduler.
  */
 void sched_init(void);
-
-/**
- * @brief Create a new kernel task.
- * @param name Task name (for debugging).
- * @param entry Entry point function.
- * @param arg Argument passed to entry function.
- * @return Task ID on success, 0 on failure.
- */
-u64 task_create(const char *name, task_entry_t entry, void *arg);
 
 /**
  * @brief Yield CPU to next ready task.
@@ -126,13 +109,6 @@ void sched_block(void);
  * @param task Task to unblock.
  */
 void sched_unblock(task_t *task);
-
-/**
- * @brief Get scheduler statistics.
- * @param task_count Output: number of tasks.
- * @param switches Output: number of context switches.
- */
-void sched_stats(u64 *task_count, u64 *switches);
 
 /**
  * @brief Switch CPU context from one task to another.

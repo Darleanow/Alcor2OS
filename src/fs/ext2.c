@@ -2244,7 +2244,7 @@ i64 ext2_readlink(
   if(!vol || !vol->mounted || !path || !buf || cap == 0)
     return -EINVAL;
 
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char filename[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, filename);
 
@@ -2319,7 +2319,7 @@ ext2_file_t *ext2_create(ext2_volume_t *vol, const char *path)
     return NULL;
 
   /* Split path into parent and name */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char filename[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, filename);
 
@@ -2396,7 +2396,7 @@ i64 ext2_mkdir(ext2_volume_t *vol, const char *path)
     return -EEXIST;
 
   /* Split path */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char dirname[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, dirname);
 
@@ -2580,7 +2580,7 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
     return -EISDIR;
 
   /* Get parent directory */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char filename[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, filename);
 
@@ -2639,7 +2639,7 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
     return -ENOTEMPTY;
 
   /* Get parent directory */
-  char parent_path[EXT2_NAME_MAX + 1];
+  char parent_path[VFS_PATH_MAX];
   char dirname[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, dirname);
 

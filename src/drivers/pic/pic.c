@@ -70,21 +70,6 @@ void pic_eoi(u8 irq)
 }
 
 /**
- * @brief Mask (disable) an IRQ line.
- *
- * Prevents the specified IRQ from triggering interrupts.
- *
- * @param irq IRQ number (0-15).
- */
-// cppcheck-suppress unusedFunction
-void pic_mask(u8 irq)
-{
-  u16 port = (irq < 8) ? PIC1_DATA : PIC2_DATA;
-  u8  line = (irq < 8) ? irq : irq - 8;
-  outb(port, inb(port) | (1 << line));
-}
-
-/**
  * @brief Unmask (enable) an IRQ line.
  *
  * Allows the specified IRQ to trigger interrupts.

@@ -78,7 +78,6 @@ void idt_set_gate(u8 vector, void *handler, u8 flags)
   idt[vector].reserved    = 0;
 }
 
-// cppcheck-suppress unusedFunction
 void exception_handler(interrupt_frame_t *frame)
 {
   int user_fault = (frame->cs & X86_SEGMENT_RPL_MASK) == X86_SEGMENT_RPL_MASK;
@@ -172,7 +171,6 @@ static const irq_def_t irq_table[] = {
 /* Set to 1 to trace hardware interrupts */
 #define IRQ_TRACE 0
 
-// cppcheck-suppress unusedFunction
 void irq_handler(u8 irq)
 {
   for(const irq_def_t *d = irq_table; d->name != NULL; d++) {

@@ -195,7 +195,6 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
  *
  * @param virt Virtual address to unmap.
  */
-// cppcheck-suppress unusedFunction
 void vmm_unmap(u64 virt)
 {
   /* Get current PML4 (could be kernel or process PML4) */
@@ -263,42 +262,6 @@ u64 vmm_get_phys(u64 virt)
     return 0;
 
   return (pt[pt_idx] & PAGE_FRAME_MASK) | (virt & PAGE_OFFSET_MASK);
-}
-
-/**
- * @brief Get the full page table entry for a virtual address (debug).
- *
- * Returns the complete PTE value including flags, useful for debugging
- * page table issues.
- *
- * @param virt Virtual address.
- * @return Complete PTE value, or 0 if page tables don't exist.
- */
-// cppcheck-suppress unusedFunction
-u64 vmm_get_pte(u64 virt)
-{
-  u64 cr3;
-  __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
-  u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
-
-  u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
-  u64  pdpt_idx = (virt >> 30) & PAGE_TABLE_INDEX_MASK;
-  u64  pd_idx   = (virt >> 21) & PAGE_TABLE_INDEX_MASK;
-  u64  pt_idx   = (virt >> 12) & PAGE_TABLE_INDEX_MASK;
-
-  u64 *pdpt = get_next_level(pml4, pml4_idx, false, 0);
-  if(!pdpt)
-    return 0;
-
-  u64 *pd = get_next_level(pdpt, pdpt_idx, false, 0);
-  if(!pd)
-    return 0;
-
-  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
-  if(!pt)
-    return 0;
-
-  return pt[pt_idx];
 }
 
 /**
@@ -398,44 +361,6 @@ u64 vmm_get_current_pml4(void)
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
   return cr3 & PAGE_FRAME_MASK;
-}
-
-/**
- * @brief Get physical address for virtual address in a specific address space.
- *
- * Walks the page tables of the specified address space to find the physical
- * address mapped to the given virtual address.
- *
- * @param pml4_phys Physical address of PML4 to search.
- * @param virt Virtual address to resolve.
- * @return Physical address, or 0 if not mapped or not present.
- */
-// cppcheck-suppress unusedFunction
-u64 vmm_get_phys_in(u64 pml4_phys, u64 virt)
-{
-  u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);
-
-  u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
-  u64  pdpt_idx = (virt >> 30) & PAGE_TABLE_INDEX_MASK;
-  u64  pd_idx   = (virt >> 21) & PAGE_TABLE_INDEX_MASK;
-  u64  pt_idx   = (virt >> 12) & PAGE_TABLE_INDEX_MASK;
-
-  u64 *pdpt = get_next_level(pml4, pml4_idx, false, 0);
-  if(!pdpt)
-    return 0;
-
-  u64 *pd = get_next_level(pdpt, pdpt_idx, false, 0);
-  if(!pd)
-    return 0;
-
-  const u64 *pt = get_next_level(pd, pd_idx, false, 0);
-  if(!pt)
-    return 0;
-
-  if(!(pt[pt_idx] & VMM_PRESENT))
-    return 0;
-
-  return pt[pt_idx] & PAGE_FRAME_MASK;
 }
 
 /**

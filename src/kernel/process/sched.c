@@ -90,26 +90,6 @@ static task_t *find_next_ready(void)
 }
 
 /**
- * @brief Task wrapper function.
- *
- * This is the initial entry point for all tasks. It enables interrupts,
- * calls the task's entry function with its argument, then calls task_exit().
- */
-static void task_wrapper(void)
-{
-  /* Enable interrupts for this task */
-  cpu_enable_interrupts();
-
-  /* Get current task and call its entry function */
-  task_t *self = sched_current();
-  if(self && self->entry) {
-    self->entry(self->arg);
-  }
-
-  task_exit();
-}
-
-/**
  * @brief Initialize the scheduler.
  *
  * Creates the idle task from the current boot context.
@@ -136,64 +116,6 @@ void sched_init(void)
   current_task = idle_task;
 
   console_print("[SCHED] Initialized\n");
-}
-
-/**
- * @brief Create a new kernel task.
- *
- * @param name  Task name.
- * @param entry Task entry function.
- * @param arg   Argument passed to entry function.
- * @return Task ID, or 0 on failure.
- */
-// cppcheck-suppress unusedFunction
-u64 task_create(const char *name, task_entry_t entry, void *arg)
-{
-  /* Allocate task structure */
-  task_t *task = kzalloc(sizeof(task_t));
-  if(task == NULL) {
-    return 0;
-  }
-
-  /* Allocate stack */
-  void *stack = kmalloc(TASK_STACK_SIZE);
-  if(stack == NULL) {
-    kfree(task);
-    return 0;
-  }
-
-  /* Initialize task */
-  task->tid = next_tid++;
-  kstrncpy(task->name, name, TASK_NAME_MAX);
-  task->state           = TASK_STATE_READY;
-  task->time_slice      = DEFAULT_TIME_SLICE;
-  task->ticks_remaining = DEFAULT_TIME_SLICE;
-  task->entry           = entry;
-  task->arg             = arg;
-  task->stack_base      = stack;
-  task->stack_top       = (void *)((u8 *)stack + TASK_STACK_SIZE);
-
-  /* Setup initial stack frame */
-  u64 *sp = (u64 *)task->stack_top;
-
-  /* Setup initial context (what context_switch expects) */
-  /* Return address - where task starts executing */
-  *(--sp) = (u64)task_wrapper; /* rip */
-  *(--sp) = 0;                 /* rbp */
-  *(--sp) = 0;                 /* rbx */
-  *(--sp) = 0;                 /* r12 */
-  *(--sp) = 0;                 /* r13 */
-  *(--sp) = 0;                 /* r14 */
-  *(--sp) = 0;                 /* r15 */
-
-  task->context = (cpu_context_t *)sp;
-
-  /* Add to task list */
-  task_list_add(task);
-
-  console_printf("[SCHED] Task '%s' created (tid=%d)\n", name, (int)task->tid);
-
-  return task->tid;
 }
 
 /**
@@ -270,7 +192,6 @@ void sched_tick(void)
  * Called at safe points such as syscall return to ensure preemptive
  * scheduling happens outside interrupt context.
  */
-// cppcheck-suppress unusedFunction
 void sched_check_resched(void)
 {
   if(need_resched) {
@@ -322,20 +243,6 @@ void task_exit(void)
 task_t *sched_current(void)
 {
   return current_task;
-}
-
-/**
- * @brief Get scheduler statistics.
- * @param count Output pointer for number of tasks (can be NULL).
- * @param switches Output pointer for number of context switches (can be NULL).
- */
-// cppcheck-suppress unusedFunction
-void sched_stats(u64 *task_count, u64 *switches)
-{
-  if(task_count)
-    *task_count = task_count_val;
-  if(switches)
-    *switches = context_switches;
 }
 
 /**

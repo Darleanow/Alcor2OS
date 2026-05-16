@@ -55,14 +55,6 @@ void *kmalloc(u64 size);
 void *kzalloc(u64 size);
 
 /**
- * @brief Allocate aligned memory.
- * @param size Bytes to allocate.
- * @param alignment Alignment in bytes (power of 2).
- * @return Pointer to aligned memory, or NULL on failure.
- */
-void *kmalloc_aligned(u64 size, u64 alignment);
-
-/**
  * @brief Free memory.
  * @param ptr Pointer previously returned by kmalloc/kzalloc.
  */
@@ -75,21 +67,5 @@ void kfree(void *ptr);
  * @return Pointer to reallocated memory, or NULL on failure.
  */
 void *krealloc(void *ptr, u64 new_size);
-
-/**
- * @brief Heap statistics.
- */
-typedef struct
-{
-  u64 total_bytes;
-  u64 used_bytes;
-  u64 free_bytes;
-} heap_stats_t;
-
-/**
- * @brief Get heap statistics.
- * @param stats Pointer to stats structure to fill.
- */
-void heap_stats(heap_stats_t *stats);
 
 #endif

@@ -119,8 +119,6 @@ static void init_early(
  */
 static void launch_init(void)
 {
-  proc_init();
-
   if(!module_request.response || module_request.response->module_count == 0) {
     console_print("[KERNEL] No modules found, halting.\n");
     return;
@@ -128,10 +126,10 @@ static void launch_init(void)
 
   struct limine_file *mod = module_request.response->modules[0];
   console_printf(
-      "[KERNEL] Loading: %s (%d bytes)\n", mod->path, (int)mod->size
+      "[KERNEL] Loading: %s (%lu bytes)\n", mod->path, (u64)mod->size
   );
 
-  /* Start first process - never returns */
+  /* proc_start_first jumps to ring 3 and never comes back. */
   const char *ep = (mod->path && mod->path[0]) ? mod->path : "/boot/shell.elf";
   proc_start_first(mod->address, mod->size, "shell", ep);
 }
@@ -200,6 +198,7 @@ static const boot_phase_t boot_sequence[] = {
     {"Hardware Interrupts", init_interrupts },
     {"VFS Orchestrator",    vfs_init        },
     {"Storage & VFS",       init_storage    },
+    {"Process Table",       proc_init       },
     {"Global Interrupts",   init_enable_irqs},
     {NULL,                  NULL            }
 };
@@ -229,7 +228,7 @@ void kmain(void)
       console_printf("[INIT] %s initialized.\n", p->name);
   }
 
-  /* Stage 5: Launch init process */
+  /* Launch the init process from boot module 0. */
   launch_init();
 
   /* Idle loop (fallback if no init) */

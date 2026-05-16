@@ -37,12 +37,6 @@ void pic_init(void);
 void pic_eoi(u8 irq);
 
 /**
- * @brief Mask (disable) an IRQ line.
- * @param irq IRQ number (0-15).
- */
-void pic_mask(u8 irq);
-
-/**
  * @brief Unmask (enable) an IRQ line.
  * @param irq IRQ number (0-15).
  */

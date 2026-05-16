@@ -52,6 +52,9 @@ u64 kstrlen(const char *s);
  * @param src Source.
  * @param max Maximum bytes including null terminator.
  * @return dst pointer.
+ *
+ * Always writes a NUL terminator at dst[max-1] if max > 0 (unlike POSIX @c
+ * strncpy, which may leave dst non-terminated when strlen(src) >= max).
  */
 char *kstrncpy(char *dst, const char *src, u64 max);
 
@@ -73,10 +76,12 @@ int kstrcmp(const char *a, const char *b);
 int kstrncmp(const char *a, const char *b, u64 n);
 
 /**
- * @brief Concatenate strings with maximum length.
- * @param dst Destination.
+ * @brief Concatenate strings with a bound on bytes copied from @p src.
+ * @param dst Destination (must already be NUL-terminated).
  * @param src Source.
- * @param max Maximum bytes to add.
+ * @param max Maximum non-NUL bytes to read from @p src and append — not the
+ *            total capacity of @p dst. Callers must choose @p max so the
+ *            result fits in the real buffer (see @c vfs_make_absolute).
  * @return dst pointer.
  */
 char *kstrncat(char *dst, const char *src, u64 max);

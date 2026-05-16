@@ -125,7 +125,6 @@ bool kstreq(const char *a, const char *b)
  * @param c Character to find.
  * @return Pointer to the last occurrence, or NULL if not found.
  */
-// cppcheck-suppress unusedFunction
 char *kstrrchr(const char *s, int c)
 {
   const char *last = NULL;

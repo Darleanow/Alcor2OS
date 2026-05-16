@@ -11,6 +11,8 @@
 #define PIT_CMD      0x43
 #define PIT_FREQ     1193182
 
+/* Plain u64 load/store is atomic on x86_64 (single MOV). An i386 port would
+ * need lock-prefixed 64-bit access or a seqcount for tear-free pit_get_ticks. */
 static volatile u64 ticks         = 0;
 static bool         sched_enabled = false;
 
