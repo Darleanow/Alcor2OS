@@ -22,6 +22,7 @@ permissions:
   contents: write   # needed to create / update GitHub Releases
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   MUSL_VER:       "1.2.5"
   LIMINE_REV:     "v8.x-binary"
   TCC_VER:        "0.9.27"
@@ -40,7 +41,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -71,7 +72,7 @@ jobs:
       # ── ccache ───────────────────────────────────────────────────────────
       - name: Restore ccache
         id: ccache-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.ccache
           key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
@@ -86,7 +87,7 @@ jobs:
 
       # ── Third-party caches ───────────────────────────────────────────────
       - name: Restore Limine cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: thirdparty/limine
           key: limine-${{ env.LIMINE_REV }}-${{ hashFiles('mk/versions.mk') }}
@@ -94,7 +95,7 @@ jobs:
             limine-${{ env.LIMINE_REV }}-
 
       - name: Restore musl cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: thirdparty/musl
           key: musl-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
@@ -102,7 +103,7 @@ jobs:
             musl-${{ env.MUSL_VER }}-
 
       - name: Restore heavy third-party cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             thirdparty/musl-cross
@@ -138,9 +139,10 @@ jobs:
             LD=ld.lld \
             -j$(nproc)
 
+      # Skip save when restore had an exact key hit — saving the same key fails on GH Cache.
       - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v4
+        if: always() && steps.ccache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
         with:
           path: ~/.ccache
           key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
@@ -191,7 +193,7 @@ jobs:
           EOF
 
       - name: Upload ISO artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: alcor2-iso-${{ github.sha }}
           path: release/alcor2.iso
@@ -199,7 +201,7 @@ jobs:
           compression-level: 0
 
       - name: Upload disk image artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: alcor2-disk-${{ github.sha }}
           path: release/disk.img
@@ -207,7 +209,7 @@ jobs:
           compression-level: 0
 
       - name: Upload build info artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: alcor2-build-info-${{ github.sha }}
           path: release/BUILD_INFO.txt
@@ -221,31 +223,46 @@ jobs:
 
     steps:
       - name: Download ISO
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: alcor2-iso-${{ github.sha }}
           path: release
 
       - name: Download disk image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: alcor2-disk-${{ github.sha }}
           path: release
 
       - name: Download build info
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: alcor2-build-info-${{ github.sha }}
           path: release
 
-      # Rolling nightly: force-push the nightly tag to HEAD so the release
-      # always points at the latest main commit. Versioned releases use the
-      # actual v* tag which is never force-pushed.
+      - name: Point nightly tag at this commit
+        if: ${{ needs.build-full.outputs.release_tag == 'nightly' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          SHA="${{ github.sha }}"
+          REF="repos/${REPO}/git/refs/tags/nightly"
+          if gh api "${REF}" >/dev/null 2>&1; then
+            gh api --method PATCH "${REF}" -f sha="${SHA}" -F force=true
+          else
+            gh api --method POST "repos/${REPO}/git/refs" \
+              -f ref='refs/tags/nightly' \
+              -f sha="${SHA}"
+          fi
+
       - name: Publish nightly release (rolling)
         if: ${{ needs.build-full.outputs.release_tag == 'nightly' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: nightly
+          target_commitish: ${{ github.sha }}
           name: "Alcor2 nightly — ${{ github.ref_name }}@${{ github.sha }}"
           prerelease: true
           draft: false

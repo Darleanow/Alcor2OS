@@ -22,6 +22,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   MUSL_VER:    "1.2.5"
   LIMINE_REV:  "v8.x-binary"
   LLVM_VER:    "18"
@@ -34,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install lint tools
         run: |
@@ -83,7 +84,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0   # limine clone inside Makefile needs history
 
@@ -114,7 +115,7 @@ jobs:
       # The restore-key falls back to the most recent partial cache.
       - name: Restore ccache
         id: ccache-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.ccache
           key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
@@ -131,7 +132,7 @@ jobs:
       # Key: version string + versions.mk hash (changes when LIMINE_REV changes)
       - name: Restore Limine cache
         id: cache-limine
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: thirdparty/limine
           key: limine-${{ env.LIMINE_REV }}-${{ hashFiles('mk/versions.mk') }}
@@ -141,7 +142,7 @@ jobs:
       # ── Third-party: musl ─────────────────────────────────────────────────
       - name: Restore musl cache
         id: cache-musl
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: thirdparty/musl
           key: musl-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
@@ -166,8 +167,8 @@ jobs:
       # ── Save ccache (only on success, only on default branch pushes) ──────
       # We always save so that a partial warm-up is reused next run.
       - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v4
+        if: always() && steps.ccache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
         with:
           path: ~/.ccache
           key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
@@ -188,7 +189,7 @@ jobs:
           EOF
 
       - name: Upload ISO artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: alcor2-iso-${{ github.sha }}
           path: |
