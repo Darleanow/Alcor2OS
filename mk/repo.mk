@@ -11,13 +11,14 @@ help:
 	@echo "  kernel            link $(BUILD)/$(KERNEL) only"
 	@echo "  iso-kernel        bootable ISO with kernel only (no user/ step) — fastest CI check"
 	@echo "  user              userland (crt, init, shell, bin, apps if g++ exists)"
-	@echo "  iso               Limine bootable CD image (+ kernel, shell on ISO)"
-	@echo "  run               QEMU: Limine ISO + $(DISK) (IDE)"
+	@echo "  iso               Limine bootable CD image (full: kernel + userland + toolchain)"
+	@echo "  run               QEMU: builds toolchain + ISO + disk, then boots (default for local dev)"
 	@echo "  disk-populate     fill $(DISK) (fuse2fs on Linux → no sudo when available); clang copy if built"
 	@echo "  disk-mount / disk-umount   manual inspect of $(DISK)"
 	@echo "  disk-resync       user + disk-populate"
 	@echo "  make run USE_KVM=0   slower CPU emu (TCG); KVM itself does not use sudo"
-	@echo "  musl | musl-cross | clang | ncurses | freetype | harfbuzz   bootstrap"
+	@echo "  toolchain         bootstrap fb_tty + ncurses + on-disk clang (long: ~1h on first run)"
+	@echo "  musl | musl-cross | clang | ncurses | freetype | harfbuzz   individual bootstrap targets"
 	@echo "  format lint check qa — static analysis / style"
 
 kernel: $(BUILD)/$(KERNEL)
@@ -25,8 +26,11 @@ kernel: $(BUILD)/$(KERNEL)
 user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/crt
 	$(MAKE) -C user/lib
+	$(MAKE) -C user/core/vega
+	$(MAKE) -C user/sdk/vega
 	$(MAKE) -C user/init
-	$(MAKE) -C user/shell
+	$(MAKE) -C user/apps/shell
+	$(MAKE) -C user/apps/vega
 	$(MAKE) -C user/bin
 	@if [ -f thirdparty/musl-cross/bin/x86_64-linux-musl-g++ ]; then \
 		$(MAKE) -C user/apps; \
@@ -54,11 +58,11 @@ iso-kernel: $(BUILD)/$(KERNEL) thirdparty/limine/limine
 	@thirdparty/limine/limine bios-install $(BUILD)/$(ISO) 2>/dev/null
 	@echo "$(BUILD)/$(ISO) [kernel-only]"
 
-iso: $(BUILD)/$(KERNEL) thirdparty/limine/limine user
+iso: toolchain $(BUILD)/$(KERNEL) thirdparty/limine/limine user
 	@rm -rf $(BUILD)/iso
 	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT $(BUILD)/iso/bin
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
-	@cp user/build/shell/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || true
+	@cp user/build/apps/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || true
 	@cp user/build/bin/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp user/build/apps/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
 	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
@@ -204,8 +208,11 @@ clean:
 	rm -rf $(BUILD)
 	-$(MAKE) -C user/crt clean
 	-$(MAKE) -C user/lib clean
+	-$(MAKE) -C user/core/vega clean
+	-$(MAKE) -C user/sdk/vega clean
 	-$(MAKE) -C user/init clean
-	-$(MAKE) -C user/shell clean
+	-$(MAKE) -C user/apps/shell clean
+	-$(MAKE) -C user/apps/vega clean
 	-$(MAKE) -C user/bin clean
 	-$(MAKE) -C user/apps clean
 
@@ -224,7 +231,9 @@ lint:
 	  --header-filter='^(src|include|user)/.*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
-	     -Iuser/shell/include \
+	     -Iuser/sdk/vega/include \
+	     -Iuser/core/vega/include \
+	     -Iuser/apps/shell/include \
 	     -Iuser/include \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
 	     -Ithirdparty/freetype-install/usr/include/freetype2 \

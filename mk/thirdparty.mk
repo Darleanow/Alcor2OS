@@ -13,7 +13,13 @@ endif
 
 PKGCONFIG := $(shell command -v pkg-config 2>/dev/null)
 
-.PHONY: musl clang musl-cross ncurses ncurses-verify freetype harfbuzz
+.PHONY: musl clang musl-cross ncurses ncurses-verify freetype harfbuzz toolchain
+
+# Aggregator: everything `make run` needs for a full-feature local boot —
+# fb_tty rendering (FreeType+HarfBuzz), ncurses-based TUIs, and the on-disk
+# C/C++ compiler (clang+lld). First bootstrap is long (mostly clang: 30–90
+# min). Subsequent runs reuse the install sentinels.
+toolchain: musl-cross freetype harfbuzz ncurses clang
 
 musl:  thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 
@@ -37,11 +43,17 @@ ncurses-verify:
 freetype: thirdparty/freetype-install/usr/lib/libfreetype.a
 harfbuzz: thirdparty/harfbuzz-install/usr/lib/libharfbuzz.a
 
-# limine is a binary-release repo — no build step needed.
-# We use the `limine` binary itself as the sentinel (already a real file).
+# Limine binary release. Older snapshots shipped a prebuilt `limine` install
+# tool; current branches (both v8.x-binary HEAD and v9.x-binary) ship only
+# limine.c and expect downstream to compile it. The bundled Makefile's `all`
+# target does that in ~2 s.
 thirdparty/limine/limine:
 	@echo "Limine $(LIMINE_REV) — cloning binary release"
 	git clone $(LIMINE_URL) --branch=$(LIMINE_REV) --depth=1 thirdparty/limine
+	@if [ ! -x thirdparty/limine/limine ]; then \
+	  echo "Limine $(LIMINE_REV) — compiling install tool from limine.c"; \
+	  $(MAKE) -C thirdparty/limine >/dev/null; \
+	fi
 
 thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a:
 	@echo "musl $(MUSL_VER) — download & build"
