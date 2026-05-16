@@ -24,7 +24,6 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
-#include <alcor2/proc/sched.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
 
@@ -189,7 +188,6 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"Core Scheduler",      sched_init      },
     {"GDT Structure",       gdt_init        },
     {"IDT Structure",       idt_init        },
     {"SSE/FPU Support",     cpu_enable_sse  },

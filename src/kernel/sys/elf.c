@@ -154,12 +154,7 @@ int elf_load(const void *data, u64 size, elf_info_t *info)
 
   const Elf64_Phdr *phdrs = (const Elf64_Phdr *)((u8 *)data + ehdr->e_phoff);
 
-  info->entry = ehdr->e_entry;
-  info->base  = ELF_BASE_SENTINEL;
-  info->end   = 0;
-  info->phdr  = 0;
-  info->phent = ehdr->e_phentsize;
-  info->phnum = ehdr->e_phnum;
+  elf_info_init(ehdr, info);
 
   /* Load each PT_LOAD segment */
   for(u16 i = 0; i < ehdr->e_phnum; i++) {

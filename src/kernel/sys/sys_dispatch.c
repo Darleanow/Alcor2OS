@@ -6,7 +6,6 @@
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/proc/proc.h>
-#include <alcor2/proc/sched.h>
 #include <alcor2/sys/internal.h>
 #include <alcor2/sys/syscall.h>
 
@@ -168,7 +167,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
     p->current_frame = old_frame;
 
   /* Check if we need to switch tasks before returning to user mode. */
-  sched_check_resched();
+  proc_check_resched();
 
   return ret;
 }

@@ -5,7 +5,8 @@
  * DMA via PCI Bus Master with per-channel bounce buffer.
  * The bounce buffer is 64 KB (16 contiguous pages) per channel, allowing
  * up to 128 sectors (64 KB) per single DMA command instead of 8 (4 KB).
- * Falls back to PIO when no scheduler context or DMA unsupported.
+ * Falls back to PIO when no current process (early boot), DMA unavailable,
+ * or the transfer is too large for the bounce buffer.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -19,7 +20,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>
-#include <alcor2/proc/sched.h>
+#include <alcor2/proc/proc.h>
 
 #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
 #define LBA28_LIMIT      0x10000000ULL
@@ -214,7 +215,7 @@ static void identify(ata_drive_t *d)
  */
 static i64 wait_irq(ata_channel_t *ch)
 {
-  const task_t *me = (const task_t *)ch->waiter;
+  proc_t *me = ch->waiter;
 
   if(!me) {
     cpu_enable_interrupts();
@@ -238,7 +239,8 @@ static i64 wait_irq(ata_channel_t *ch)
       cpu_enable_interrupts();
       return -ETIMEDOUT;
     }
-    sched_block();
+    me->state = PROC_STATE_BLOCKED;
+    proc_schedule();
     cpu_disable_interrupts();
   }
 
@@ -255,7 +257,7 @@ static void prepare_irq_wait(ata_channel_t *ch)
 {
   cpu_disable_interrupts();
   ch->state  = ATA_STATE_PENDING;
-  ch->waiter = sched_current();
+  ch->waiter = proc_current();
 }
 
 /**
@@ -549,7 +551,7 @@ static void cache_invalidate_range(u8 drive, u64 lba, u32 count)
 
 static i64 ata_read_raw(ata_drive_t *d, u64 lba, u32 count, void *buf)
 {
-  if(d->dma && d->channel->dma_ok && sched_current() &&
+  if(d->dma && d->channel->dma_ok && proc_current() &&
      count <= DMA_MAX_SECTORS)
     return dma_transfer(d, lba, count, buf, false);
   return pio_read(d, lba, count, buf);
@@ -641,7 +643,7 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
   cache_init_once();
   cache_invalidate_range(drive, lba, count);
 
-  if(d->dma && d->channel->dma_ok && sched_current() &&
+  if(d->dma && d->channel->dma_ok && proc_current() &&
      count <= DMA_MAX_SECTORS)
     return dma_transfer(d, lba, count, (void *)buf, true);
 
@@ -669,8 +671,11 @@ void ata_irq(u8 channel)
 
   ch->state = ATA_STATE_IDLE;
 
-  if(ch->waiter)
-    sched_unblock((task_t *)ch->waiter);
+  if(ch->waiter) {
+    if(ch->waiter->state == PROC_STATE_BLOCKED)
+      ch->waiter->state = PROC_STATE_READY;
+    ch->waiter = NULL;
+  }
 }
 
 /** @brief Detect and configure PCI IDE Bus Master for DMA. */

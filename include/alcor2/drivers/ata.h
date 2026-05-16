@@ -12,6 +12,8 @@
 
 #include <alcor2/types.h>
 
+struct proc;
+
 /* I/O port bases */
 #define ATA_PRIMARY_DATA   0x1F0
 #define ATA_PRIMARY_CTRL   0x3F6
@@ -101,7 +103,7 @@ typedef struct ata_channel
   u8          status;     /* Last status from IRQ */
   u8          bmi_status; /* Last BMI status */
   u8          error;      /* Last error register */
-  void       *waiter;     /* Blocked task waiting for IRQ */
+  struct proc *waiter; /* Blocked proc waiting for IRQ (NULL = poll / early boot) */
   ata_prd_t  *prdt;       /* PRD table (virtual) */
   u64         prdt_phys;  /* PRD table (physical) */
   bool        dma_ok;     /* DMA available */

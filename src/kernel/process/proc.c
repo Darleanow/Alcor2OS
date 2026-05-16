@@ -29,6 +29,8 @@
 static proc_t  proc_table[PROC_MAX];
 static proc_t *current_proc = NULL;
 static u64     next_pid     = 1;
+/** @brief Set by proc_tick; syscall exit runs proc_schedule when true. */
+static volatile bool need_resched = false;
 
 /** @brief Current kernel stack for syscall entry. */
 u64 current_kernel_rsp = 0;
@@ -374,7 +376,12 @@ static int proc_setup_image(
   return 0;
 }
 
-u64 proc_create(
+/**
+ * @brief Common path: allocate slot, load ELF from memory buffer or open fd.
+ *
+ * Memory image: @p elf_size > 0 and @p elf_fd < 0. File image: @p elf_fd >= 0.
+ */
+static u64 proc_create_inner(
     const char *name, const void *elf_data, u64 elf_size, i64 elf_fd,
     char *const argv[], char *const envp[]
 )
@@ -440,6 +447,21 @@ u64 proc_create(
   p->saved_rsp = (u64)ksp;
 
   return p->pid;
+}
+
+u64 proc_create_mem(
+    const char *name, const void *elf_data, u64 elf_size, char *const argv[],
+    char *const envp[]
+)
+{
+  return proc_create_inner(name, elf_data, elf_size, -1, argv, envp);
+}
+
+u64 proc_create_fd(
+    const char *name, i64 elf_fd, char *const argv[], char *const envp[]
+)
+{
+  return proc_create_inner(name, NULL, 0, elf_fd, argv, envp);
 }
 
 /**
@@ -605,6 +627,29 @@ i64 proc_wait(u64 pid)
 }
 
 /**
+ * @brief Timer hook: request a reschedule at the next syscall boundary.
+ *
+ * Called from the PIT IRQ when preemptive scheduling is enabled.
+ */
+void proc_tick(void)
+{
+  need_resched = true;
+}
+
+/**
+ * @brief If a timer tick requested preemption, run the process scheduler.
+ *
+ * Called from syscall_dispatch before returning to user mode.
+ */
+void proc_check_resched(void)
+{
+  if(need_resched) {
+    need_resched = false;
+    proc_schedule();
+  }
+}
+
+/**
  * @brief Schedule the next ready process to run.
  *
  * Performs simple round-robin scheduling. Searches for the next
@@ -746,7 +791,7 @@ void proc_start_first(
     const void *elf_data, u64 elf_size, const char *name, const char *exe_path
 )
 {
-  u64 pid = proc_create(name, elf_data, elf_size, ELF_FD_NONE, NULL, NULL);
+  u64 pid = proc_create_mem(name, elf_data, elf_size, NULL, NULL);
   if(pid == 0) {
     console_print("[PROC] Failed to create first process\n");
     return;

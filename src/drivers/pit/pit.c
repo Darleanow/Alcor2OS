@@ -5,7 +5,7 @@
 
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pit.h>
-#include <alcor2/proc/sched.h>
+#include <alcor2/proc/proc.h>
 
 #define PIT_CHANNEL0 0x40
 #define PIT_CMD      0x43
@@ -13,8 +13,8 @@
 
 /* Plain u64 load/store is atomic on x86_64 (single MOV). An i386 port would
  * need lock-prefixed 64-bit access or a seqcount for tear-free pit_get_ticks. */
-static volatile u64 ticks         = 0;
-static bool         sched_enabled = false;
+static volatile u64 ticks           = 0;
+static bool         preempt_enabled = false;
 
 /**
  * @brief Initialize the PIT to generate timer interrupts.
@@ -41,7 +41,7 @@ void pit_init(u32 frequency)
  */
 void pit_enable_sched(void)
 {
-  sched_enabled = true;
+  preempt_enabled = true;
 }
 
 /**
@@ -54,8 +54,8 @@ void pit_tick(void)
 {
   ticks++;
 
-  if(sched_enabled) {
-    sched_tick();
+  if(preempt_enabled) {
+    proc_tick();
   }
 }
 
