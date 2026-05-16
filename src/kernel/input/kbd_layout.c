@@ -14,6 +14,7 @@
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/drivers/console.h>
+#include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
@@ -60,6 +61,26 @@ static void pend_csi(char tail)
 {
   out_pend_push(0x1b);
   out_pend_push('[');
+  out_pend_push((unsigned char)tail);
+}
+
+/** xterm-style "ESC [ N ~" sequence — used for Home, End, Ins, PgUp, PgDn,
+ *  F5..F12 (each has its own well-known numeric code). */
+static void pend_csi_tilde(unsigned n)
+{
+  out_pend_push(0x1b);
+  out_pend_push('[');
+  if(n >= 10u)
+    out_pend_push((unsigned char)('0' + (n / 10u)));
+  out_pend_push((unsigned char)('0' + (n % 10u)));
+  out_pend_push('~');
+}
+
+/** SS3 sequence "ESC O X" — used by F1..F4 in xterm conventions. */
+static void pend_ss3(char tail)
+{
+  out_pend_push(0x1b);
+  out_pend_push('O');
   out_pend_push((unsigned char)tail);
 }
 
@@ -326,28 +347,68 @@ static bool
     if(released)
       return false;
 
+    /* Cursor keys: SS3 (\EOA) in DECCKM "application" mode (ncurses
+     * keypad(TRUE)), CSI (\E[A) in normal mode. fb_console tracks the bit. */
+    bool app = fb_console_app_cursor_keys();
     switch(ext) {
-    case 0x48:
+    case 0x48: /* Arrow up */
       if(dry)
         return true;
-      pend_csi('A');
+      if(app)
+        pend_ss3('A');
+      else
+        pend_csi('A');
       break;
-    case 0x50:
+    case 0x50: /* Arrow down */
       if(dry)
         return true;
-      pend_csi('B');
+      if(app)
+        pend_ss3('B');
+      else
+        pend_csi('B');
       break;
-    case 0x4b:
+    case 0x4b: /* Arrow left */
       if(dry)
         return true;
-      pend_csi('D');
+      if(app)
+        pend_ss3('D');
+      else
+        pend_csi('D');
       break;
-    case 0x4d:
+    case 0x4d: /* Arrow right */
       if(dry)
         return true;
-      pend_csi('C');
+      if(app)
+        pend_ss3('C');
+      else
+        pend_csi('C');
       break;
-    case 0x53:
+    case 0x47: /* Home */
+      if(dry)
+        return true;
+      pend_csi_tilde(1u);
+      break;
+    case 0x4f: /* End */
+      if(dry)
+        return true;
+      pend_csi_tilde(4u);
+      break;
+    case 0x49: /* Page Up */
+      if(dry)
+        return true;
+      pend_csi_tilde(5u);
+      break;
+    case 0x51: /* Page Down */
+      if(dry)
+        return true;
+      pend_csi_tilde(6u);
+      break;
+    case 0x52: /* Insert */
+      if(dry)
+        return true;
+      pend_csi_tilde(2u);
+      break;
+    case 0x53: /* Delete — kept as 0x7f for shell backspace parity. */
       if(!dry)
         *out = 0x7f;
       return true;
@@ -384,6 +445,74 @@ static bool
 
   if(released)
     return false;
+
+  /* Function keys F1..F12. F1..F4 use SS3 (xterm convention); F5..F12 use
+   * the numeric tilde form. All emitted before falling through to the
+   * layout table because their scancodes overlap nothing printable. */
+  switch(key) {
+  case 0x3b: /* F1 */
+    if(dry)
+      return true;
+    pend_ss3('P');
+    return false;
+  case 0x3c: /* F2 */
+    if(dry)
+      return true;
+    pend_ss3('Q');
+    return false;
+  case 0x3d: /* F3 */
+    if(dry)
+      return true;
+    pend_ss3('R');
+    return false;
+  case 0x3e: /* F4 */
+    if(dry)
+      return true;
+    pend_ss3('S');
+    return false;
+  case 0x3f: /* F5 */
+    if(dry)
+      return true;
+    pend_csi_tilde(15u);
+    return false;
+  case 0x40: /* F6 */
+    if(dry)
+      return true;
+    pend_csi_tilde(17u);
+    return false;
+  case 0x41: /* F7 */
+    if(dry)
+      return true;
+    pend_csi_tilde(18u);
+    return false;
+  case 0x42: /* F8 */
+    if(dry)
+      return true;
+    pend_csi_tilde(19u);
+    return false;
+  case 0x43: /* F9 */
+    if(dry)
+      return true;
+    pend_csi_tilde(20u);
+    return false;
+  case 0x44: /* F10 */
+    if(dry)
+      return true;
+    pend_csi_tilde(21u);
+    return false;
+  case 0x57: /* F11 */
+    if(dry)
+      return true;
+    pend_csi_tilde(23u);
+    return false;
+  case 0x58: /* F12 */
+    if(dry)
+      return true;
+    pend_csi_tilde(24u);
+    return false;
+  default:
+    break;
+  }
 
   const unsigned char *pl = pick_pl(layout);
   const unsigned char *sh = pick_sh(layout);
