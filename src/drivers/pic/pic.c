@@ -25,32 +25,31 @@
  */
 void pic_init(void)
 {
-  u8 mask1 = inb(PIC1_DATA);
-  u8 mask2 = inb(PIC2_DATA);
-
+  /* ICW1: start initialisation, expect ICW4. */
   outb(PIC1_CMD, ICW1_INIT | ICW1_ICW4);
   io_wait();
   outb(PIC2_CMD, ICW1_INIT | ICW1_ICW4);
   io_wait();
 
+  /* ICW2: remap to vectors 0x20–0x2F (avoid CPU exception range). */
   outb(PIC1_DATA, 0x20);
   io_wait();
   outb(PIC2_DATA, 0x28);
   io_wait();
 
+  /* ICW3: tell master about slave on IRQ2; tell slave its cascade identity. */
   outb(PIC1_DATA, 0x04);
   io_wait();
   outb(PIC2_DATA, 0x02);
   io_wait();
 
+  /* ICW4: 8086 mode. */
   outb(PIC1_DATA, ICW4_8086);
   io_wait();
   outb(PIC2_DATA, ICW4_8086);
   io_wait();
 
-  outb(PIC1_DATA, mask1);
-  outb(PIC2_DATA, mask2);
-
+  /* Mask everything; subsystems explicitly @c pic_unmask their IRQs. */
   outb(PIC1_DATA, 0xFF);
   outb(PIC2_DATA, 0xFF);
 }

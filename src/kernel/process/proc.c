@@ -862,39 +862,18 @@ static i64 proc_fork_impl(
   child->user_rsp    = child_rsp;
   child->user_rflags = frame->rflags;
 
-  /* Build kernel stack for child (same as proc_create) */
-  u64 *ksp = (u64 *)child->kernel_stack_top;
-
-  /* iretq frame */
-  *(--ksp) = 0x3B;               /* SS (user data | RPL 3) */
-  *(--ksp) = child->user_rsp;    /* RSP */
-  *(--ksp) = child->user_rflags; /* RFLAGS */
-  *(--ksp) = 0x43;               /* CS (user code | RPL 3) */
-  *(--ksp) = child->user_rip;    /* RIP */
-
-  /* Return address for context_switch */
-  extern void proc_enter_first_time(void);
-  *(--ksp) = (u64)proc_enter_first_time;
-
-  /* Callee-saved registers (context_switch pops: r15, r14, r13, r12, rbx, rbp)
+  /* Build the child's kernel stack so that resuming it via context_switch
+   * lands in proc_fork_child_entry, which pops the saved syscall frame and
+   * SYSRETs back into the user code with rax = 0.
+   *
+   * Layout (top → bottom of stack):
+   *   syscall_frame_t   ← child_frame (copy of parent's, with rax = 0)
+   *   proc_fork_child_entry   ← context_switch's ret target
+   *   r15 r14 r13 r12 rbx rbp ← popped by context_switch
    */
-  *(--ksp) = 0; /* rbp */
-  *(--ksp) = 0; /* rbx */
-  *(--ksp) = 0; /* r12 */
-  *(--ksp) = 0; /* r13 */
-  *(--ksp) = 0; /* r14 */
-  *(--ksp) = 0; /* r15 */
-
-  child->saved_rsp = (u64)ksp;
-
-  /* Reset ksp and build a different stack layout */
-  ksp = (u64 *)child->kernel_stack_top;
-
-  /* Copy parent's syscall frame to child's kernel stack */
-  ksp                          = (u64 *)((u64)ksp - sizeof(syscall_frame_t));
+  u64 *ksp = (u64 *)((u64)child->kernel_stack_top - sizeof(syscall_frame_t));
   syscall_frame_t *child_frame = (syscall_frame_t *)ksp;
 
-  /* Copy all registers from parent */
   child_frame->r15    = frame->r15;
   child_frame->r14    = frame->r14;
   child_frame->r13    = frame->r13;
@@ -909,25 +888,17 @@ static i64 proc_fork_impl(
   child_frame->rdx    = frame->rdx;
   child_frame->rcx    = frame->rcx;
   child_frame->rbx    = frame->rbx;
-  child_frame->rax    = 0; /* Child returns 0 from fork! */
+  child_frame->rax    = 0; /* fork() returns 0 in the child */
   child_frame->rip    = frame->rip;
   child_frame->rflags = frame->rflags;
   child_frame->rsp    = child_rsp;
 
-  /* Now we need the child to return through syscall_return */
-  /* proc_fork_child_entry will pop the frame and do sysret */
   extern void proc_fork_child_entry(void);
+  *(--ksp) = (u64)proc_fork_child_entry; /* ret target after context_switch */
 
-  /* Return address after context_switch pops callee-saved regs */
-  *(--ksp) = (u64)proc_fork_child_entry;
-
-  /* Callee-saved registers */
-  *(--ksp) = 0; /* rbp */
-  *(--ksp) = 0; /* rbx */
-  *(--ksp) = 0; /* r12 */
-  *(--ksp) = 0; /* r13 */
-  *(--ksp) = 0; /* r14 */
-  *(--ksp) = 0; /* r15 */
+  /* Six zeroed callee-saved slots (context_switch pops r15..rbp in order). */
+  for(int i = 0; i < 6; i++)
+    *(--ksp) = 0;
 
   child->saved_rsp = (u64)ksp;
 

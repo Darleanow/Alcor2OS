@@ -361,6 +361,11 @@ static const fs_type_t ram_fstype = {
 
 void ramfs_init(void)
 {
+  /* Idempotent: callers (both early-init and init_storage) may invoke this
+   * more than once; only the first call constructs the tree and registers
+   * the driver. */
+  if(root)
+    return;
   root         = ram__create_node("/", VFS_DIRECTORY);
   root->parent = root;
   vfs_register_fs(&ram_fstype);
