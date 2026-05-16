@@ -15,7 +15,6 @@
  */
 
 
-
 typedef struct {
   unsigned long long lines;
   unsigned long long words;
