@@ -2,15 +2,11 @@
  * @file src/kernel/drivers/fb_console.c
  * @brief Kernel framebuffer text console (runtime terminal).
  *
- * Replaces the userspace fb_tty.c. Cell grid + UTF-8 + ANSI/CSI parser live in
- * kernel; glyph rendering is either compiled-in CP437 bitmap (used at boot and
- * as fallback) or a userspace-supplied Fira atlas registered through
- * @c fb_console_set_atlas.
- *
- * Phasing: this file is being built up incrementally. The current state covers
- * cell grid + UTF-8 + plain bitmap blit. ANSI/CSI parser, atlas support, and
- * yield/reclaim are scaffolded (with TODO markers) and will land in follow-up
- * commits on the same branch.
+ * Replaces the userspace fb_tty.c. The cell grid, UTF-8 decoder, and ANSI/CSI
+ * parser live in the kernel; glyph rendering is either the compiled-in CP437
+ * bitmap (used at boot and as fallback) or a userspace-supplied glyph atlas
+ * registered through @c fb_console_set_atlas. The atlas also reflows the cell
+ * grid to its own pixel dimensions and adds a 20 px margin around it.
  */
 
 #include "../../drivers/console/font.h"
@@ -19,8 +15,6 @@
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/types.h>
-
-/* ---- Static state ------------------------------------------------------ */
 
 typedef struct
 {
@@ -44,6 +38,15 @@ static struct
   fb_cell_t *cells;
   int        rows, cols; /* in cells */
   int        cx, cy;     /* cursor in cell coords */
+
+  /* Cell pixel dimensions. Defaults to the compiled-in CP437 bitmap size;
+   * an atlas submission can replace them with its own cell_w / cell_h. */
+  int cell_w, cell_h;
+
+  /* Grid offset in pixels from the framebuffer origin (top-left padding).
+   * Zero at boot so the bitmap path fills the screen; bumped to
+   * FB_CONSOLE_MARGIN once an atlas takes over. */
+  int margin_x, margin_y;
 
   /* Default colors (used for SGR resets). */
   u32 default_fg, default_bg;
@@ -93,10 +96,12 @@ static struct
 
 #define ATLAS_NO_GLYPH 0xFFFFFFFFu
 
-/* ---- Pixel-level helpers (mirror of console.c, kept local) ------------- */
+/** Pixel padding around the cell grid when an atlas is loaded.
+ *  Matches the kMargin value the old userspace fb_tty used. */
+#define FB_CONSOLE_MARGIN 20
 
-#define FONT_W 8
-#define FONT_H 16
+#define FONT_W            8
+#define FONT_H            16
 
 static u8 bytes_pp_from_bpp(u16 bpp)
 {
@@ -140,8 +145,6 @@ static void fb_put_pixel(u32 x, u32 y, u32 color)
   }
 }
 
-/* ---- Glyph rendering --------------------------------------------------- */
-
 /** Resolve a codepoint to an atlas glyph index, or ATLAS_NO_GLYPH if absent. */
 static u32 atlas_lookup(u32 cp)
 {
@@ -160,22 +163,22 @@ static u32 atlas_lookup(u32 cp)
 static void blit_cell(int col, int row)
 {
   const fb_cell_t *c = &ctx.cells[(size_t)row * (size_t)ctx.cols + (size_t)col];
-  u32              px_x = (u32)col * (u32)FONT_W;
-  u32              px_y = (u32)row * (u32)FONT_H;
+  u32              px_x = (u32)ctx.margin_x + (u32)col * (u32)ctx.cell_w;
+  u32              px_y = (u32)ctx.margin_y + (u32)row * (u32)ctx.cell_h;
 
   if(ctx.atlas_active) {
     u32 idx = atlas_lookup(c->cp);
     if(idx != ATLAS_NO_GLYPH && idx < ctx.atlas_n_glyphs) {
-      /* Source pixels: atlas_pixels + idx * cell_h * stride.
-       * Render at FONT_W × FONT_H cells using the atlas's cell_w/cell_h
-       * (the userspace submitter is expected to match). */
+      /* Source pixels: atlas_pixels + idx * cell_h * stride. The atlas's
+       * cell_w/cell_h are the cell pixel dimensions; the kernel adopts them
+       * verbatim at submission time so this loop covers the whole cell. */
       const u8 *glyph = ctx.atlas_pixels + (size_t)idx *
                                                (size_t)ctx.atlas_cell_h *
                                                (size_t)ctx.atlas_stride;
       u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
-      for(u32 gy = 0; gy < ctx.atlas_cell_h && gy < (u32)FONT_H; gy++) {
+      for(u32 gy = 0; gy < ctx.atlas_cell_h && gy < (u32)ctx.cell_h; gy++) {
         const u8 *row_src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
-        for(u32 gx = 0; gx < ctx.atlas_cell_w && gx < (u32)FONT_W; gx++) {
+        for(u32 gx = 0; gx < ctx.atlas_cell_w && gx < (u32)ctx.cell_w; gx++) {
           const u8 *px = row_src + (size_t)gx * (size_t)atlas_bypp;
           /* Atlas convention: alpha-style grayscale in red channel — userspace
            * rasterises a single-channel coverage mask and packs it into bpp.
@@ -200,7 +203,13 @@ static void blit_cell(int col, int row)
     }
   }
 
-  /* Bitmap fallback. */
+  /* Bitmap fallback. Fill the full cell with bg first so a bigger
+   * (atlas-sized) cell does not leak old pixels around the 8×16 glyph; then
+   * centre the bitmap glyph inside it. */
+  for(int gy = 0; gy < ctx.cell_h; gy++)
+    for(int gx = 0; gx < ctx.cell_w; gx++)
+      fb_put_pixel(px_x + (u32)gx, px_y + (u32)gy, c->bg);
+
   u32 cp = c->cp;
   u8  glyph_idx;
   if(cp <= 0xffu)
@@ -214,12 +223,17 @@ static void blit_cell(int col, int row)
   if(gi < 0)
     return;
 
+  int       gx_off = (ctx.cell_w > FONT_W) ? (ctx.cell_w - FONT_W) / 2 : 0;
+  int       gy_off = (ctx.cell_h > FONT_H) ? (ctx.cell_h - FONT_H) / 2 : 0;
+
   const u8 *glyph = font_latin1[gi];
-  for(int gy = 0; gy < FONT_H; gy++) {
+  for(int gy = 0; gy < FONT_H && gy < ctx.cell_h; gy++) {
     u8 bits = glyph[gy];
-    for(int gx = 0; gx < FONT_W; gx++) {
-      u32 color = ((bits & (0x80u >> gx)) != 0) ? c->fg : c->bg;
-      fb_put_pixel(px_x + (u32)gx, px_y + (u32)gy, color);
+    for(int gx = 0; gx < FONT_W && gx < ctx.cell_w; gx++) {
+      if((bits & (0x80u >> gx)) != 0)
+        fb_put_pixel(
+            px_x + (u32)(gx_off + gx), px_y + (u32)(gy_off + gy), c->fg
+        );
     }
   }
 }
@@ -247,8 +261,6 @@ static void scroll_one(void)
       blit_cell(c, r);
 }
 
-/* ---- Codepoint emission ------------------------------------------------ */
-
 static void put_cp_at_cursor(u32 cp)
 {
   if(ctx.cx >= ctx.cols) {
@@ -268,8 +280,6 @@ static void put_cp_at_cursor(u32 cp)
   ctx.last_cp = cp;
   ctx.cx++;
 }
-
-/* ---- ANSI color palettes ---------------------------------------------- */
 
 /* 16-color palette (Nord-ish, matches userspace fb_tty for visual continuity).
  */
@@ -307,8 +317,6 @@ static u32 ansi256_to_rgb(unsigned idx)
   u32 v = 8u + 10u * (idx - 232u);
   return (v << 16) | (v << 8) | v;
 }
-
-/* ---- DEC Special Graphics → Unicode ----------------------------------- */
 
 /* Active while ESC ( 0 is in effect. Maps the printable ASCII range used by
  * DEC ACS to Unicode box-drawing / math glyphs. The kernel's CP437 bitmap
@@ -359,8 +367,6 @@ static u32 acs_to_unicode(u8 b)
   }
 }
 
-/* ---- CSI parameter parsing -------------------------------------------- */
-
 /* Parse N decimal params separated by `;` from esc_buf (everything before the
  * final byte). Empty fields default to 0. Returns count parsed. */
 static int csi_params(int *pv, int maxn)
@@ -391,8 +397,6 @@ static int csi_param1(void)
     return 1;
   return pv[0];
 }
-
-/* ---- CSI command implementations -------------------------------------- */
 
 static void erase_rect(int y0, int x0, int y1, int x1)
 {
@@ -656,8 +660,8 @@ static void handle_control(u8 b)
 }
 
 /* UTF-8 decoder, byte at a time. Emits a codepoint at the cursor when one
- * completes; ANSI/CSI sequences are picked off ahead of this in
- * fb_console_write (TODO — currently fed straight through). */
+ * completes; ANSI/CSI sequences are picked off ahead of this by feed_byte
+ * before they ever reach feed_utf8. */
 static void feed_utf8(u8 b)
 {
   if(ctx.utf8_rem == 0) {
@@ -711,19 +715,23 @@ static void feed_utf8(u8 b)
   }
 }
 
-/* ---- Public API -------------------------------------------------------- */
-
 bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
 {
-  ctx.base       = (volatile u8 *)fb;
-  ctx.width      = width;
-  ctx.height     = height;
-  ctx.pitch      = pitch;
-  ctx.bytes_pp   = bytes_pp_from_bpp(bpp);
-  ctx.cols       = (int)(width / FONT_W);
-  ctx.rows       = (int)(height / FONT_H);
-  ctx.default_fg = 0xFFFFFFu;
-  ctx.default_bg = 0x000000u;
+  ctx.base     = (volatile u8 *)fb;
+  ctx.width    = width;
+  ctx.height   = height;
+  ctx.pitch    = pitch;
+  ctx.bytes_pp = bytes_pp_from_bpp(bpp);
+  ctx.cell_w   = FONT_W;
+  ctx.cell_h   = FONT_H;
+  ctx.margin_x = 0;
+  ctx.margin_y = 0;
+  ctx.cols     = (int)(width / (u64)ctx.cell_w);
+  ctx.rows     = (int)(height / (u64)ctx.cell_h);
+  /* Nord defaults — fg = snow-storm-1, bg = polar-night-1. Match the look
+   * the old userspace fb_tty shipped (see commit 438a24b for the source). */
+  ctx.default_fg = 0xd8dee9u;
+  ctx.default_bg = 0x2e3440u;
   ctx.cur_fg     = ctx.default_fg;
   ctx.cur_bg     = ctx.default_bg;
   ctx.cx = ctx.cy    = 0;
@@ -854,23 +862,30 @@ void fb_console_tick(void)
   }
 }
 
-int fb_console_set_atlas(const fb_console_atlas_t *meta)
+/** Reject atlas metadata that would let a buggy/malicious shim convince the
+ *  kernel to allocate gigabytes or oversize the cell. Caps are deliberately
+ *  generous — they exist to bound damage, not to enforce policy. */
+static bool atlas_meta_is_sane(const fb_console_atlas_t *meta)
 {
-  if(!meta)
-    return -1;
-
-  /* Sanity-check sizes. We refuse anything that would let a buggy/malicious
-   * shim convince the kernel to allocate gigabytes or oversize the cell. */
   if(meta->cell_w == 0u || meta->cell_h == 0u || meta->cell_w > 64u ||
      meta->cell_h > 64u)
-    return -1;
+    return false;
   if(meta->n_glyphs == 0u || meta->n_glyphs > 8192u)
-    return -1;
+    return false;
   if(meta->n_cp == 0u || meta->n_cp > 0x4000u)
-    return -1;
+    return false;
   if(meta->pixels_size == 0u || meta->pixels_size > 16u * 1024u * 1024u)
-    return -1;
-  if(meta->stride_bytes == 0u || meta->stride_bytes > 4u * meta->cell_w * 4u)
+    return false;
+  /* Stride: one row of pixels must fit inside cell_w * max-bytes-per-pixel.
+   * Cap bypp at 4 (the widest fb format we render); 1-byte alpha is typical. */
+  if(meta->stride_bytes == 0u || meta->stride_bytes > 4u * meta->cell_w)
+    return false;
+  return true;
+}
+
+int fb_console_set_atlas(const fb_console_atlas_t *meta)
+{
+  if(!meta || !atlas_meta_is_sane(meta))
     return -1;
 
   if(!vmm_is_user_range((void *)(u64)meta->pixels_user, meta->pixels_size))
@@ -908,6 +923,51 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   ctx.atlas_n_cp     = meta->n_cp;
   ctx.atlas_fallback = meta->fallback_idx;
   ctx.atlas_active   = true;
+
+  /* Adopt the atlas's cell pixel size and reflow the grid. Cursor + saved
+   * cursor get clamped into the new geometry; existing content is discarded
+   * (cleared to a fresh grid) because cell coordinates don't survive a
+   * cols/rows change in any well-defined way. */
+  int new_cell_w = (int)meta->cell_w;
+  int new_cell_h = (int)meta->cell_h;
+  int new_marg_x = FB_CONSOLE_MARGIN;
+  int new_marg_y = FB_CONSOLE_MARGIN;
+  if(new_cell_w != ctx.cell_w || new_cell_h != ctx.cell_h ||
+     new_marg_x != ctx.margin_x || new_marg_y != ctx.margin_y) {
+    int new_cols = (int)((ctx.width - 2u * (u64)new_marg_x) / (u64)new_cell_w);
+    int new_rows = (int)((ctx.height - 2u * (u64)new_marg_y) / (u64)new_cell_h);
+    if(new_cols < 1)
+      new_cols = 1;
+    if(new_rows < 1)
+      new_rows = 1;
+    size_t     total = (size_t)new_cols * (size_t)new_rows;
+    fb_cell_t *nc    = (fb_cell_t *)kmalloc(total * sizeof(fb_cell_t));
+    if(nc) {
+      for(size_t i = 0; i < total; i++) {
+        nc[i].cp   = (u32)' ';
+        nc[i].fg   = ctx.default_fg;
+        nc[i].bg   = ctx.default_bg;
+        nc[i].attr = 0;
+      }
+      if(ctx.cells)
+        kfree(ctx.cells);
+      ctx.cells    = nc;
+      ctx.cols     = new_cols;
+      ctx.rows     = new_rows;
+      ctx.cell_w   = new_cell_w;
+      ctx.cell_h   = new_cell_h;
+      ctx.margin_x = new_marg_x;
+      ctx.margin_y = new_marg_y;
+      ctx.cx = ctx.cy = 0;
+      ctx.saved_cx = ctx.saved_cy = 0;
+      /* Wipe stale pixels left around the old grid. */
+      for(u32 y = 0; y < ctx.height; y++)
+        for(u32 x = 0; x < ctx.width; x++)
+          fb_put_pixel(x, y, ctx.default_bg);
+    }
+    /* If kmalloc fails, fall through and repaint with the existing grid;
+     * the atlas blit will just clip to ctx.cell_w/cell_h as before. */
+  }
 
   /* Repaint the whole grid through the new path. */
   for(int r = 0; r < ctx.rows; r++)

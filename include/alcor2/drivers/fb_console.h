@@ -19,11 +19,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* ---- ioctls on fd 1/2 ---------------------------------------------------
- *
- * Linux-style _IOC encoding so the userspace shim can use a normal ioctl(2)
- * call. Group byte is 'F' for "framebuffer console".
- */
+/* ioctls on fd 1/2 — Linux-style _IOC encoding so userspace can use a normal
+ * ioctl(2) call. Group byte is 'F' for "framebuffer console". */
 
 /** SET_ATLAS: userspace submits a glyph atlas. arg = fb_console_atlas_t*. */
 #define FB_CONSOLE_SET_ATLAS                                                   \
