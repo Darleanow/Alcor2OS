@@ -198,6 +198,25 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
+  /* Framebuffer console controls: SET_ATLAS uses the encoded request, while
+   * YIELD / RECLAIM are bare ('F'<<8 | nr) ioctls with no data. Routing
+   * through fd 1/2 is consistent with the rest of the TTY ioctls. */
+  if((fd == 1 || fd == 2) && request == FB_CONSOLE_SET_ATLAS) {
+    if(!user_rw_ok(arg, sizeof(fb_console_atlas_t)))
+      return (u64)-EFAULT;
+    fb_console_atlas_t meta;
+    kmemcpy(&meta, (void *)arg, sizeof(meta));
+    return (u64)(fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL);
+  }
+  if((fd == 1 || fd == 2) && request == FB_CONSOLE_YIELD) {
+    fb_console_yield();
+    return 0;
+  }
+  if((fd == 1 || fd == 2) && request == FB_CONSOLE_RECLAIM) {
+    fb_console_reclaim();
+    return 0;
+  }
+
   if(fd <= 2 || vfs_fd_is_pipe(fd))
     return ioctl_tty_emulated(proc_current(), request, arg);
 

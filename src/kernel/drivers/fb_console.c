@@ -17,6 +17,7 @@
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
+#include <alcor2/mm/vmm.h>
 #include <alcor2/types.h>
 
 /* ---- Static state ------------------------------------------------------ */
@@ -77,7 +78,20 @@ static struct
   /* Input ring (keyboard → reader). */
   u8           in_buf[INPUT_RING];
   unsigned int in_head, in_tail;
+
+  /* Userspace-submitted glyph atlas; bitmap font is the fallback. */
+  bool atlas_active;
+  u8  *atlas_pixels; /* kernel buffer copy. */
+  u32 *atlas_cp_map; /* kernel buffer copy: u32[atlas_n_cp]. */
+  u32  atlas_cell_w, atlas_cell_h;
+  u32  atlas_stride;
+  u32  atlas_bpp;
+  u32  atlas_n_glyphs;
+  u32  atlas_n_cp;
+  u32  atlas_fallback;
 } ctx;
+
+#define ATLAS_NO_GLYPH 0xFFFFFFFFu
 
 /* ---- Pixel-level helpers (mirror of console.c, kept local) ------------- */
 
@@ -128,14 +142,67 @@ static void fb_put_pixel(u32 x, u32 y, u32 color)
 
 /* ---- Glyph rendering --------------------------------------------------- */
 
-/** Blit one cell using the compiled-in CP437 bitmap font.
- *  Codepoints > 0xff fall back to '?'. Atlas path (Fira) will short-circuit
- *  here in a later commit. */
+/** Resolve a codepoint to an atlas glyph index, or ATLAS_NO_GLYPH if absent. */
+static u32 atlas_lookup(u32 cp)
+{
+  if(!ctx.atlas_active)
+    return ATLAS_NO_GLYPH;
+  if(cp < ctx.atlas_n_cp) {
+    u32 idx = ctx.atlas_cp_map[cp];
+    if(idx < ctx.atlas_n_glyphs)
+      return idx;
+  }
+  return ctx.atlas_fallback;
+}
+
+/** Blit one cell either from the atlas (Fira) or the compiled-in CP437 bitmap.
+ *  Atlas is preferred when active and the codepoint is mapped. */
 static void blit_cell(int col, int row)
 {
   const fb_cell_t *c = &ctx.cells[(size_t)row * (size_t)ctx.cols + (size_t)col];
-  u32              cp = c->cp;
-  u8               glyph_idx;
+  u32              px_x = (u32)col * (u32)FONT_W;
+  u32              px_y = (u32)row * (u32)FONT_H;
+
+  if(ctx.atlas_active) {
+    u32 idx = atlas_lookup(c->cp);
+    if(idx != ATLAS_NO_GLYPH && idx < ctx.atlas_n_glyphs) {
+      /* Source pixels: atlas_pixels + idx * cell_h * stride.
+       * Render at FONT_W × FONT_H cells using the atlas's cell_w/cell_h
+       * (the userspace submitter is expected to match). */
+      const u8 *glyph = ctx.atlas_pixels + (size_t)idx *
+                                               (size_t)ctx.atlas_cell_h *
+                                               (size_t)ctx.atlas_stride;
+      u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
+      for(u32 gy = 0; gy < ctx.atlas_cell_h && gy < (u32)FONT_H; gy++) {
+        const u8 *row_src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
+        for(u32 gx = 0; gx < ctx.atlas_cell_w && gx < (u32)FONT_W; gx++) {
+          const u8 *px = row_src + (size_t)gx * (size_t)atlas_bypp;
+          /* Atlas convention: alpha-style grayscale in red channel — userspace
+           * rasterises a single-channel coverage mask and packs it into bpp.
+           * Combine with the cell's fg/bg by 8-bit alpha blend. */
+          u32 a = (atlas_bypp >= 1u) ? (u32)px[0] : 0u;
+          if(atlas_bypp == 4u)
+            a = (u32)px[3]; /* alpha channel when 32bpp */
+          u32 inv = 255u - a;
+          u32 r   = ((((c->fg >> 16) & 0xffu) * a) +
+                   (((c->bg >> 16) & 0xffu) * inv) + 128u) /
+                  255u;
+          u32 g = ((((c->fg >> 8) & 0xffu) * a) +
+                   (((c->bg >> 8) & 0xffu) * inv) + 128u) /
+                  255u;
+          u32 b =
+              (((c->fg & 0xffu) * a) + ((c->bg & 0xffu) * inv) + 128u) / 255u;
+          fb_put_pixel(px_x + gx, px_y + gy, (r << 16) | (g << 8) | b);
+        }
+      }
+      /* Clear any trailing pixels (cell larger than atlas glyph). */
+      return;
+    }
+  }
+
+  /* Bitmap fallback. */
+  u32 cp = c->cp;
+  u8  glyph_idx;
   if(cp <= 0xffu)
     glyph_idx = (u8)cp;
   else
@@ -148,14 +215,11 @@ static void blit_cell(int col, int row)
     return;
 
   const u8 *glyph = font_latin1[gi];
-  u32       px    = (u32)col * (u32)FONT_W;
-  u32       py    = (u32)row * (u32)FONT_H;
-
   for(int gy = 0; gy < FONT_H; gy++) {
     u8 bits = glyph[gy];
     for(int gx = 0; gx < FONT_W; gx++) {
       u32 color = ((bits & (0x80u >> gx)) != 0) ? c->fg : c->bg;
-      fb_put_pixel(px + (u32)gx, py + (u32)gy, color);
+      fb_put_pixel(px_x + (u32)gx, px_y + (u32)gy, color);
     }
   }
 }
@@ -792,9 +856,64 @@ void fb_console_tick(void)
 
 int fb_console_set_atlas(const fb_console_atlas_t *meta)
 {
-  (void)meta;
-  /* TODO: map userspace pages, switch blit_cell to atlas path. */
-  return -1;
+  if(!meta)
+    return -1;
+
+  /* Sanity-check sizes. We refuse anything that would let a buggy/malicious
+   * shim convince the kernel to allocate gigabytes or oversize the cell. */
+  if(meta->cell_w == 0u || meta->cell_h == 0u || meta->cell_w > 64u ||
+     meta->cell_h > 64u)
+    return -1;
+  if(meta->n_glyphs == 0u || meta->n_glyphs > 8192u)
+    return -1;
+  if(meta->n_cp == 0u || meta->n_cp > 0x4000u)
+    return -1;
+  if(meta->pixels_size == 0u || meta->pixels_size > 16u * 1024u * 1024u)
+    return -1;
+  if(meta->stride_bytes == 0u || meta->stride_bytes > 4u * meta->cell_w * 4u)
+    return -1;
+
+  if(!vmm_is_user_range((void *)(u64)meta->pixels_user, meta->pixels_size))
+    return -1;
+  u64 cp_bytes = (u64)meta->n_cp * sizeof(u32);
+  if(!vmm_is_user_range((void *)(u64)meta->cp_map_user, cp_bytes))
+    return -1;
+
+  u8  *new_pixels = (u8 *)kmalloc(meta->pixels_size);
+  u32 *new_cp_map = (u32 *)kmalloc(cp_bytes);
+  if(!new_pixels || !new_cp_map) {
+    if(new_pixels)
+      kfree(new_pixels);
+    if(new_cp_map)
+      kfree(new_cp_map);
+    return -1;
+  }
+  /* Current proc's CR3 is active during the syscall: user VAs are mapped. */
+  kmemcpy(new_pixels, (const void *)(u64)meta->pixels_user, meta->pixels_size);
+  kmemcpy(new_cp_map, (const void *)(u64)meta->cp_map_user, cp_bytes);
+
+  /* Release any prior atlas. */
+  if(ctx.atlas_pixels)
+    kfree(ctx.atlas_pixels);
+  if(ctx.atlas_cp_map)
+    kfree(ctx.atlas_cp_map);
+
+  ctx.atlas_pixels   = new_pixels;
+  ctx.atlas_cp_map   = new_cp_map;
+  ctx.atlas_cell_w   = meta->cell_w;
+  ctx.atlas_cell_h   = meta->cell_h;
+  ctx.atlas_stride   = meta->stride_bytes;
+  ctx.atlas_bpp      = meta->bpp;
+  ctx.atlas_n_glyphs = meta->n_glyphs;
+  ctx.atlas_n_cp     = meta->n_cp;
+  ctx.atlas_fallback = meta->fallback_idx;
+  ctx.atlas_active   = true;
+
+  /* Repaint the whole grid through the new path. */
+  for(int r = 0; r < ctx.rows; r++)
+    for(int c = 0; c < ctx.cols; c++)
+      blit_cell(c, r);
+  return 0;
 }
 
 void fb_console_yield(void)

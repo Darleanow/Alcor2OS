@@ -17,6 +17,23 @@
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+
+/* ---- ioctls on fd 1/2 ---------------------------------------------------
+ *
+ * Linux-style _IOC encoding so the userspace shim can use a normal ioctl(2)
+ * call. Group byte is 'F' for "framebuffer console".
+ */
+
+/** SET_ATLAS: userspace submits a glyph atlas. arg = fb_console_atlas_t*. */
+#define FB_CONSOLE_SET_ATLAS                                                   \
+  ((1U << 30) | ((unsigned)'F' << 8) | 1U | (sizeof(fb_console_atlas_t) << 16))
+
+/** YIELD: release the framebuffer for raw mmap use (doom). arg ignored. */
+#define FB_CONSOLE_YIELD ((unsigned)('F' << 8) | 2U)
+
+/** RECLAIM: resume kernel rendering, repaint the grid. arg ignored. */
+#define FB_CONSOLE_RECLAIM ((unsigned)('F' << 8) | 3U)
 
 /**
  * @brief Initialise the runtime console using the same framebuffer the boot
@@ -70,16 +87,16 @@ void fb_console_tick(void);
  */
 typedef struct
 {
-  u64 pixels_user;  /**< userspace VA of the glyph atlas. */
-  u32 pixels_size;  /**< total atlas bytes. */
-  u32 cell_w;       /**< glyph cell width in pixels. */
-  u32 cell_h;       /**< glyph cell height in pixels. */
-  u32 stride_bytes; /**< bytes per row of a single cell. */
-  u32 bpp;          /**< atlas bpp — must match framebuffer. */
-  u32 n_glyphs;     /**< total glyph slots in the atlas. */
-  u64 cp_map_user;  /**< userspace VA of u32[n_cp] codepoint → glyph_idx. */
-  u32 n_cp;         /**< size of cp_map (covers codepoints 0..n_cp-1). */
-  u32 fallback_idx; /**< glyph for unmapped codepoints. */
+  uint64_t pixels_user;  /**< userspace VA of the glyph atlas pixel data. */
+  uint32_t pixels_size;  /**< total atlas bytes. */
+  uint32_t cell_w;       /**< glyph cell width in pixels. */
+  uint32_t cell_h;       /**< glyph cell height in pixels. */
+  uint32_t stride_bytes; /**< bytes per row of a single cell. */
+  uint32_t bpp;          /**< atlas bpp — must match framebuffer. */
+  uint32_t n_glyphs;     /**< total glyph slots in the atlas. */
+  uint64_t cp_map_user; /**< userspace VA of u32[n_cp] codepoint → glyph_idx. */
+  uint32_t n_cp;        /**< size of cp_map (covers codepoints 0..n_cp-1). */
+  uint32_t fallback_idx; /**< glyph for unmapped codepoints. */
 } fb_console_atlas_t;
 
 /** @brief Register a userspace glyph atlas; subsequent renders use Fira. */
