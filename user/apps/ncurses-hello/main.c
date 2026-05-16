@@ -411,9 +411,14 @@ int main(void)
   int cols;
   getmaxyx(stdscr, rows, cols);
 
-  WINDOW  *hdr  = newwin(1, cols, 0, 0);
-  WINDOW  *body = newwin(rows - 2, cols, 1, 0);
-  WINDOW  *ftr  = newwin(1, cols, rows - 1, 0);
+  WINDOW *hdr  = newwin(1, cols, 0, 0);
+  WINDOW *body = newwin(rows - 2, cols, 1, 0);
+  WINDOW *ftr  = newwin(1, cols, rows - 1, 0);
+
+  /* keypad() is per-window; wgetch on a window without it returns raw ESC
+   * sequences instead of KEY_UP / KEY_F(n). The screens read from `body`,
+   * so enable it there explicitly. */
+  keypad(body, TRUE);
 
   screen_t cur = SCR_MENU;
   while(cur != SCR_QUIT) {
