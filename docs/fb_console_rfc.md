@@ -84,13 +84,18 @@ Net delta: ~1500 lines added (kernel), ~1500 deleted (userspace fb_tty.c).
   we promote the atlas submitter to a dedicated `consoled` process).
 - Per-process controlling tty refinements.
 
-## Open questions
+## Decisions (resolved)
 
-- Should `fb_console_write` parse UTF-8, or do we expect callers to send
-  pre-decoded codepoints via an extension? **Proposal**: parse UTF-8 in
-  kernel — shell/apps already emit it.
-- Atlas glyph indirection: do we want a fixed grid (codepoint = index,
-  with sparse holes) or a lookup table? **Proposal**: lookup table —
-  flexible, only the kernel pays one indirection per glyph.
-- Cursor blink timer: piggyback on existing PIT 100Hz tick, or its own
-  timer slot?
+- **UTF-8 parsing**: in kernel. `fb_console_write` keeps a small partial-byte
+  buffer across calls.
+- **Glyph indirection** (ncurses-friendly): hybrid.
+  - ASCII (`0x00–0x7F`): direct array `glyph_idx[cp]`.
+  - Non-ASCII: sorted `cp_map[]` of `{codepoint, glyph_idx}`, binary search.
+    Naturally covers DEC line-drawing (`0x2500–0x257F`), block elements
+    (`0x2580–0x259F`), arrows (`0x2190–0x21FF`), Latin-1 supplement
+    (`0x00A0–0x00FF`).
+  - Unmapped codepoints fall back to atlas's `fallback_idx` (e.g. `?`).
+- **Blink timer**: piggyback on the existing PIT 100Hz IRQ. `fb_console_tick`
+  decrements a counter from 50; at zero, flip phase + repaint cursor cell
+  (~2Hz). Reset to "on" on any write or keystroke. Skipped while the fb is
+  yielded.
