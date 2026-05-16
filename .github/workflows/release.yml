@@ -22,7 +22,6 @@ permissions:
   contents: write   # needed to create / update GitHub Releases
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   MUSL_VER:       "1.2.5"
   LIMINE_REV:     "v8.x-binary"
   TCC_VER:        "0.9.27"
@@ -193,7 +192,7 @@ jobs:
           EOF
 
       - name: Upload ISO artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: alcor2-iso-${{ github.sha }}
           path: release/alcor2.iso
@@ -201,7 +200,7 @@ jobs:
           compression-level: 0
 
       - name: Upload disk image artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: alcor2-disk-${{ github.sha }}
           path: release/disk.img
@@ -209,7 +208,7 @@ jobs:
           compression-level: 0
 
       - name: Upload build info artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: alcor2-build-info-${{ github.sha }}
           path: release/BUILD_INFO.txt
@@ -223,19 +222,19 @@ jobs:
 
     steps:
       - name: Download ISO
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: alcor2-iso-${{ github.sha }}
           path: release
 
       - name: Download disk image
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: alcor2-disk-${{ github.sha }}
           path: release
 
       - name: Download build info
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: alcor2-build-info-${{ github.sha }}
           path: release
@@ -259,7 +258,7 @@ jobs:
 
       - name: Publish nightly release (rolling)
         if: ${{ needs.build-full.outputs.release_tag == 'nightly' }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: nightly
           target_commitish: ${{ github.sha }}
@@ -303,7 +302,7 @@ jobs:
 
       - name: Publish versioned release
         if: ${{ needs.build-full.outputs.release_tag != 'nightly' }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.build-full.outputs.release_tag }}
           name: "Alcor2 ${{ needs.build-full.outputs.release_tag }}"

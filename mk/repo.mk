@@ -221,7 +221,7 @@ distclean: clean
 
 format fmt:
 	@find src include user \
-	  \( -name '*.c' -o -name '*.h' \) \
+	  \( -name '*.c' -o -name '*.h' -o -name '*.cpp' \) \
 	  ! -path '*/thirdparty/*' \
 	  ! -path '*/.cache/*' \
 	  -print0 | xargs -0 clang-format -i
