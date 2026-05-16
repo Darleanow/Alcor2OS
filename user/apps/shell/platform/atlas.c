@@ -40,6 +40,69 @@ static const struct
 
 #define CP_MAP_SIZE 0x2600u
 
+/** Edge flags for the procedurally-drawn box-drawing glyphs below. */
+enum
+{
+  BX_N = 1,
+  BX_S = 2,
+  BX_E = 4,
+  BX_W = 8
+};
+
+/** Light single-line box-drawing chars from U+2500..U+253F.
+ *  Returns the edge bitmask, or -1 if @p cp isn't covered (FreeType handles
+ * it). Drawing them ourselves guarantees adjacent cells join without TTF-edge
+ * gaps. */
+static int box_edges_for(uint32_t cp)
+{
+  switch(cp) {
+  case 0x2500u:
+    return BX_E | BX_W; /* ─ */
+  case 0x2502u:
+    return BX_N | BX_S; /* │ */
+  case 0x250Cu:
+    return BX_E | BX_S; /* ┌ */
+  case 0x2510u:
+    return BX_W | BX_S; /* ┐ */
+  case 0x2514u:
+    return BX_E | BX_N; /* └ */
+  case 0x2518u:
+    return BX_W | BX_N; /* ┘ */
+  case 0x251Cu:
+    return BX_N | BX_S | BX_E; /* ├ */
+  case 0x2524u:
+    return BX_N | BX_S | BX_W; /* ┤ */
+  case 0x252Cu:
+    return BX_E | BX_W | BX_S; /* ┬ */
+  case 0x2534u:
+    return BX_E | BX_W | BX_N; /* ┴ */
+  case 0x253Cu:
+    return BX_N | BX_S | BX_E | BX_W; /* ┼ */
+  default:
+    return -1;
+  }
+}
+
+/** Paint a procedural box-drawing glyph: from each connecting edge, draw a
+ *  1-px stroke to the cell centre. Pixel value 0xff = full opacity. */
+static void rasterise_box(uint32_t idx, int edges, uint8_t *pixels)
+{
+  int cx = CELL_W / 2;
+  int cy = CELL_H / 2;
+  if(edges & BX_W)
+    for(int x = 0; x <= cx; x++)
+      pixels[(idx * CELL_H + cy) * CELL_W + x] = 0xff;
+  if(edges & BX_E)
+    for(int x = cx; x < CELL_W; x++)
+      pixels[(idx * CELL_H + cy) * CELL_W + x] = 0xff;
+  if(edges & BX_N)
+    for(int y = 0; y <= cy; y++)
+      pixels[(idx * CELL_H + y) * CELL_W + cx] = 0xff;
+  if(edges & BX_S)
+    for(int y = cy; y < CELL_H; y++)
+      pixels[(idx * CELL_H + y) * CELL_W + cx] = 0xff;
+}
+
 /** Copy the currently-loaded FreeType glyph into atlas slot @p idx,
  *  baseline-aligned to @p baseline_y and clipped to the cell box. */
 static void rasterise_into_slot(
@@ -159,13 +222,25 @@ int atlas_submit(const char *font_path)
     rasterise_into_slot(face->glyph, fallback_idx, baseline, pixels);
 
   /* All requested ranges. Codepoints FreeType can't load are skipped: their
-   * cp_map entries stay 0xFFFFFFFF and the kernel falls back to CP437. */
+   * cp_map entries stay 0xFFFFFFFF and the kernel falls back to CP437.
+   *
+   * Light box-drawing chars (U+2500..U+253F subset) are drawn procedurally:
+   * Fira's box glyphs don't span the full cell width, so adjacent cells
+   * leave visible gaps. Painting them ourselves guarantees a continuous line.
+   */
   for(size_t r = 0; r < sizeof kRanges / sizeof kRanges[0]; r++) {
     for(uint32_t cpi = kRanges[r].start; cpi <= kRanges[r].end; cpi++) {
-      if(FT_Load_Char(face, cpi, FT_LOAD_RENDER) != 0)
-        continue;
-      uint32_t idx = next_idx++;
-      rasterise_into_slot(face->glyph, idx, baseline, pixels);
+      uint32_t idx;
+      int      edges = box_edges_for(cpi);
+      if(edges >= 0) {
+        idx = next_idx++;
+        rasterise_box(idx, edges, pixels);
+      } else {
+        if(FT_Load_Char(face, cpi, FT_LOAD_RENDER) != 0)
+          continue;
+        idx = next_idx++;
+        rasterise_into_slot(face->glyph, idx, baseline, pixels);
+      }
       if(cpi < CP_MAP_SIZE)
         cp_map[cpi] = idx;
     }
