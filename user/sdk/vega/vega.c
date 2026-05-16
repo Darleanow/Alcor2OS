@@ -12,7 +12,7 @@
 
 const vega_host_ops_t *vega_host = NULL;
 
-void vega_init(const vega_host_ops_t *ops)
+void                   vega_init(const vega_host_ops_t *ops)
 {
   vega_host = ops;
 }

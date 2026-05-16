@@ -18,10 +18,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vega/host.h>
-#include <vega/internal/host.h>
 #include <vega/internal/exec.h>
 #include <vega/internal/expand.h>
 #include <vega/internal/fntab.h>
+#include <vega/internal/host.h>
 #include <vega/vega.h>
 
 /* musl exposes this; must not pass NULL to execve — breaks getenv, setenv,
@@ -158,8 +158,8 @@ static int stage_redir_touches_stdout(const ast_t *stage)
  *
  * pipe_poll_read_ready returns true once the child closes the write end, so
  * a poll-based loop naturally drops out at EOF. The 500ms timeout window
- * gives the host's fb_tty_blink_tick a chance to flip the blink phase even while a
- * child (e.g. ncurses-hello) holds the terminal.
+ * gives the host's fb_tty_blink_tick a chance to flip the blink phase even
+ * while a child (e.g. ncurses-hello) holds the terminal.
  */
 static void relay_pipe_to_stdout(int rfd)
 {
@@ -514,7 +514,8 @@ static int exec_pipeline(ast_t *n)
   /* Expansion happens inside each child via exec_stage_in_child to avoid
    * mutating the shared AST (loop bodies re-execute the same nodes). */
 
-  int cap = vega_host->fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
+  int cap =
+      vega_host->fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
   int relay[2];
   if(cap && pipe(relay) < 0) {
     vega_host->puts("vega: pipe failed\n");

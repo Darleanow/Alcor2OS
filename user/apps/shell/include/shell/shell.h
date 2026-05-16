@@ -23,8 +23,8 @@ void sh_puts(const char *s);
 void sh_putnum(long n);
 void sh_stdout_bytes(const void *buf, size_t len);
 
-int sh_getchar(void);
-int sh_getchar_blinking(int idle_ms);
+int  sh_getchar(void);
+int  sh_getchar_blinking(int idle_ms);
 
 /* Process / terminal */
 void sh_exit(int code);

@@ -17,7 +17,7 @@
 
 extern const vega_host_ops_t vega_cli_host;
 
-static char *slurp(int fd)
+static char                 *slurp(int fd)
 {
   size_t cap = 4096;
   size_t len = 0;
