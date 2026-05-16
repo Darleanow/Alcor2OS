@@ -1,7 +1,7 @@
 /**
  * @file apps/shell/platform/atlas.c
- * @brief Rasterise a TTF into a flat 8×16 glyph atlas and submit it to the
- * kernel framebuffer console via @c FB_CONSOLE_SET_ATLAS.
+ * @brief Rasterise a TTF into a flat CELL_W × CELL_H glyph atlas and submit
+ * it to the kernel framebuffer console via @c FB_CONSOLE_SET_ATLAS.
  *
  * Covers ASCII printable, Latin-1 supplement, box-drawing, block elements,
  * and arrows — enough for ncurses-style TUIs. Unmapped codepoints fall back
@@ -20,8 +20,11 @@
 #include <unistd.h>
 #include FT_FREETYPE_H
 
-#define CELL_W 8
-#define CELL_H 16
+/* Cell pixel size + Fira pixel height. Matches the old userspace fb_tty's
+ * look: a 12-px-wide, 22-px-tall cell with Fira rasterised at 20 px. */
+#define CELL_W  12
+#define CELL_H  22
+#define FIRA_PX 20
 
 /* Codepoint ranges to rasterise. Tuples (start, end_inclusive). */
 static const struct
@@ -36,6 +39,30 @@ static const struct
 };
 
 #define CP_MAP_SIZE 0x2600u
+
+/** Copy the currently-loaded FreeType glyph into atlas slot @p idx,
+ *  baseline-aligned to @p baseline_y and clipped to the cell box. */
+static void rasterise_into_slot(
+    FT_GlyphSlot s, uint32_t idx, int baseline_y, uint8_t *pixels
+)
+{
+  int x_off = (int)s->bitmap_left;
+  int y_off = baseline_y - (int)s->bitmap_top;
+  if(x_off < 0)
+    x_off = 0;
+  for(int by = 0; by < (int)s->bitmap.rows; by++) {
+    int dy = y_off + by;
+    if(dy < 0 || dy >= CELL_H)
+      continue;
+    for(int bx = 0; bx < (int)s->bitmap.width; bx++) {
+      int dx = x_off + bx;
+      if(dx < 0 || dx >= CELL_W)
+        continue;
+      pixels[(idx * CELL_H + dy) * CELL_W + dx] =
+          s->bitmap.buffer[by * s->bitmap.pitch + bx];
+    }
+  }
+}
 
 static int load_font_file(const char *path, uint8_t **out, size_t *osz)
 {
@@ -88,7 +115,7 @@ int atlas_submit(const char *font_path)
     free(font_data);
     return -1;
   }
-  if(FT_Set_Pixel_Sizes(face, 0, CELL_H) != 0) {
+  if(FT_Set_Pixel_Sizes(face, 0, FIRA_PX) != 0) {
     FT_Done_Face(face);
     FT_Done_FreeType(lib);
     free(font_data);
@@ -122,61 +149,25 @@ int atlas_submit(const char *font_path)
   uint32_t fallback_idx = 0;
   uint32_t next_idx     = 1;
 
-  /* Baseline: place glyph so its top-left lands at (0, CELL_H - bearing).
-   * Most Fira glyphs at 16 px high already have bearing == CELL_H × 0.8, so
-   * a small fixed baseline at row 12 gives consistent vertical alignment. */
+  /* Baseline at ~13/16 of the cell height leaves room for descenders below
+   * (Fira's descender at FIRA_PX ≈ 4–5 px). With CELL_H=22 → baseline=17,
+   * which matches Fira's ascender at 20 px almost exactly. */
   const int baseline = (int)(CELL_H * 13 / 16);
 
-  uint32_t  cp = (uint32_t)'?';
-  for(int pass = 0; pass < 2; pass++) {
-    /* Pass 0: rasterise fallback to slot 0. Pass 1: every range. */
-    if(pass == 0) {
-      if(FT_Load_Char(face, cp, FT_LOAD_RENDER) == 0) {
-        FT_GlyphSlot s     = face->glyph;
-        int          x_off = (int)s->bitmap_left;
-        int          y_off = baseline - (int)s->bitmap_top;
-        if(x_off < 0)
-          x_off = 0;
-        for(int by = 0; by < (int)s->bitmap.rows; by++) {
-          int dy = y_off + by;
-          if(dy < 0 || dy >= CELL_H)
-            continue;
-          for(int bx = 0; bx < (int)s->bitmap.width; bx++) {
-            int dx = x_off + bx;
-            if(dx < 0 || dx >= CELL_W)
-              continue;
-            uint8_t v = s->bitmap.buffer[by * s->bitmap.pitch + bx];
-            pixels[(fallback_idx * CELL_H + dy) * CELL_W + dx] = v;
-          }
-        }
-      }
-    } else {
-      for(size_t r = 0; r < sizeof kRanges / sizeof kRanges[0]; r++) {
-        for(uint32_t cpi = kRanges[r].start; cpi <= kRanges[r].end; cpi++) {
-          if(FT_Load_Char(face, cpi, FT_LOAD_RENDER) != 0)
-            continue;
-          FT_GlyphSlot s     = face->glyph;
-          uint32_t     idx   = next_idx++;
-          int          x_off = (int)s->bitmap_left;
-          int          y_off = baseline - (int)s->bitmap_top;
-          if(x_off < 0)
-            x_off = 0;
-          for(int by = 0; by < (int)s->bitmap.rows; by++) {
-            int dy = y_off + by;
-            if(dy < 0 || dy >= CELL_H)
-              continue;
-            for(int bx = 0; bx < (int)s->bitmap.width; bx++) {
-              int dx = x_off + bx;
-              if(dx < 0 || dx >= CELL_W)
-                continue;
-              uint8_t v = s->bitmap.buffer[by * s->bitmap.pitch + bx];
-              pixels[(idx * CELL_H + dy) * CELL_W + dx] = v;
-            }
-          }
-          if(cpi < CP_MAP_SIZE)
-            cp_map[cpi] = idx;
-        }
-      }
+  /* Slot 0: fallback glyph ('?'), used when a cell's codepoint isn't mapped. */
+  if(FT_Load_Char(face, (uint32_t)'?', FT_LOAD_RENDER) == 0)
+    rasterise_into_slot(face->glyph, fallback_idx, baseline, pixels);
+
+  /* All requested ranges. Codepoints FreeType can't load are skipped: their
+   * cp_map entries stay 0xFFFFFFFF and the kernel falls back to CP437. */
+  for(size_t r = 0; r < sizeof kRanges / sizeof kRanges[0]; r++) {
+    for(uint32_t cpi = kRanges[r].start; cpi <= kRanges[r].end; cpi++) {
+      if(FT_Load_Char(face, cpi, FT_LOAD_RENDER) != 0)
+        continue;
+      uint32_t idx = next_idx++;
+      rasterise_into_slot(face->glyph, idx, baseline, pixels);
+      if(cpi < CP_MAP_SIZE)
+        cp_map[cpi] = idx;
     }
   }
 
