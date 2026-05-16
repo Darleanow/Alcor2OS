@@ -1,3 +1,8 @@
+/**
+ * @file user/bin/wc.c
+ * @brief Count lines, words and bytes.
+ */
+
 #include <ctype.h>
 #include <fcntl.h>
 #include <grendizer.h>
@@ -5,7 +10,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#define WC_VERSION "1.0.0"
+/**
+ * @brief wc main entry point.
+ */
+
+
 
 typedef struct {
   unsigned long long lines;
