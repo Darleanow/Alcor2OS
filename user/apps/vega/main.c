@@ -12,7 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <vega/host.h>
 #include <vega/vega.h>
+
+extern const vega_host_ops_t vega_cli_host;
 
 static char *slurp(int fd)
 {
@@ -76,6 +79,8 @@ static int run_stdin(void)
 
 int main(int argc, char *argv[])
 {
+  vega_init(&vega_cli_host);
+
   const char *code    = NULL;
   int         version = 0;
 

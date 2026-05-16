@@ -18,6 +18,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vega/host.h>
+#include <vega/internal/host.h>
 #include <vega/internal/exec.h>
 #include <vega/internal/expand.h>
 #include <vega/internal/fntab.h>
@@ -110,9 +111,9 @@ static int apply_one_redir(const redir_t *r)
 
   int fd = open(target, flags, 0644);
   if(fd < 0) {
-    sh_puts("vega: cannot open ");
-    sh_puts(target);
-    sh_puts("\n");
+    vega_host->puts("vega: cannot open ");
+    vega_host->puts(target);
+    vega_host->puts("\n");
     free(target);
     return -1;
   }
@@ -157,7 +158,7 @@ static int stage_redir_touches_stdout(const ast_t *stage)
  *
  * pipe_poll_read_ready returns true once the child closes the write end, so
  * a poll-based loop naturally drops out at EOF. The 500ms timeout window
- * gives sh_fb_tty_blink_tick a chance to flip the blink phase even while a
+ * gives the host's fb_tty_blink_tick a chance to flip the blink phase even while a
  * child (e.g. ncurses-hello) holds the terminal.
  */
 static void relay_pipe_to_stdout(int rfd)
@@ -169,17 +170,17 @@ static void relay_pipe_to_stdout(int rfd)
     if(r < 0)
       break;
     if(r == 0) {
-      sh_fb_tty_blink_tick();
+      vega_host->fb_tty_blink_tick();
       continue;
     }
     if(!(pfd.revents & (POLLIN | POLLHUP)))
       break;
-    long n = sh_read(rfd, buf, sizeof buf);
+    long n = vega_host->read(rfd, buf, sizeof buf);
     if(n <= 0)
       break;
-    sh_stdout_bytes(buf, (size_t)n);
+    vega_host->stdout_bytes(buf, (size_t)n);
   }
-  sh_close(rfd);
+  vega_host->close(rfd);
 }
 
 /* Build a fresh, NULL-terminated argv with each word expanded. Returns a
@@ -236,7 +237,7 @@ static int resolve_path(const char *name, char *out_path)
       *p++ = *c++;
     *p = '\0';
     struct stat st;
-    if(sh_stat(out_path, &st) == 0 && S_ISREG(st.st_mode))
+    if(vega_host->stat(out_path, &st) == 0 && S_ISREG(st.st_mode))
       return 1;
     return 0;
   }
@@ -253,7 +254,7 @@ static int resolve_path(const char *name, char *out_path)
     *p = '\0';
 
     struct stat st;
-    if(sh_stat(out_path, &st) == 0)
+    if(vega_host->stat(out_path, &st) == 0)
       return 1;
   }
   return 0;
@@ -265,7 +266,7 @@ static int run_external(char **argv, const redir_t *redirs)
   if(!resolve_path(argv[0], path))
     return -1;
 
-  int capture = sh_fb_tty_active() && !redir_touches_stdout(redirs);
+  int capture = vega_host->fb_tty_active() && !redir_touches_stdout(redirs);
   int relay[2];
   if(capture && pipe(relay) < 0)
     return -1;
@@ -273,13 +274,13 @@ static int run_external(char **argv, const redir_t *redirs)
   int pid = fork();
   if(pid < 0) {
     if(capture) {
-      sh_close(relay[0]);
-      sh_close(relay[1]);
+      vega_host->close(relay[0]);
+      vega_host->close(relay[1]);
     }
     return -1;
   }
   if(pid == 0) {
-    sh_fb_tty_on_fork_child();
+    vega_host->fb_tty_on_fork_child();
     if(capture) {
       if(dup2(relay[1], 1) < 0)
         _exit(1);
@@ -287,9 +288,9 @@ static int run_external(char **argv, const redir_t *redirs)
        * TTY. */
       if(dup2(1, 2) < 0)
         _exit(1);
-      sh_close(relay[0]);
+      vega_host->close(relay[0]);
       if(relay[1] != 1)
-        sh_close(relay[1]);
+        vega_host->close(relay[1]);
     }
     if(apply_redirs(redirs) < 0)
       _exit(1);
@@ -299,7 +300,7 @@ static int run_external(char **argv, const redir_t *redirs)
     _exit(127);
   }
   if(capture) {
-    sh_close(relay[1]);
+    vega_host->close(relay[1]);
     relay_pipe_to_stdout(relay[0]);
   }
   int status = 0;
@@ -405,13 +406,14 @@ static int exec_cmd(ast_t *n)
     const fn_entry_t *fn = fntab_get(argv[0]);
     if(fn) {
       ret = call_function_redirected(fn, argc, argv, redirs);
-    } else if(sh_is_builtin(argv[0])) {
-      ret = run_in_process_redirected(sh_run_builtin, argc, argv, redirs);
+    } else if(vega_host->is_builtin(argv[0])) {
+      ret =
+          run_in_process_redirected(vega_host->run_builtin, argc, argv, redirs);
     } else {
       ret = run_external(argv, redirs);
       if(ret < 0) {
-        sh_puts(argv[0]);
-        sh_puts(": command not found\n");
+        vega_host->puts(argv[0]);
+        vega_host->puts(": command not found\n");
         ret = 127;
       }
     }
@@ -438,9 +440,9 @@ static int exec_cmd(ast_t *n)
   free_expanded_argv(argv, argc);
 
   if(fail_fast && ret != 0) {
-    sh_puts("vega: '");
-    sh_puts(name_for_msg ? name_for_msg : "?");
-    sh_puts("!' failed\n");
+    vega_host->puts("vega: '");
+    vega_host->puts(name_for_msg ? name_for_msg : "?");
+    vega_host->puts("!' failed\n");
     free(name_for_msg);
     exit(ret);
   }
@@ -459,7 +461,7 @@ static int exec_cmd(ast_t *n)
 static void exec_stage_in_child(ast_t *stage) __attribute__((noreturn));
 static void exec_stage_in_child(ast_t *stage)
 {
-  sh_fb_tty_on_fork_child();
+  vega_host->fb_tty_on_fork_child();
   if(stage->kind != AST_CMD) {
     int rc = vega_exec(stage);
     _exit(rc);
@@ -482,15 +484,15 @@ static void exec_stage_in_child(ast_t *stage)
     _exit(rc);
   }
 
-  if(sh_is_builtin(argv[0])) {
-    int rc = sh_run_builtin(argc, argv);
+  if(vega_host->is_builtin(argv[0])) {
+    int rc = vega_host->run_builtin(argc, argv);
     _exit(rc);
   }
 
   char path[MAX_EXEC_PATH];
   if(!resolve_path(argv[0], path)) {
-    sh_puts(argv[0]);
-    sh_puts(": command not found\n");
+    vega_host->puts(argv[0]);
+    vega_host->puts(": command not found\n");
     _exit(127);
   }
   if(child_argv0_to_resolved_path(argv, path) < 0)
@@ -505,17 +507,17 @@ static int exec_pipeline(ast_t *n)
   ast_t **stages = n->u.pipeline.stages;
 
   if(N > MAX_PIPE_STAGES) {
-    sh_puts("vega: pipeline too long\n");
+    vega_host->puts("vega: pipeline too long\n");
     return 1;
   }
 
   /* Expansion happens inside each child via exec_stage_in_child to avoid
    * mutating the shared AST (loop bodies re-execute the same nodes). */
 
-  int cap = sh_fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
+  int cap = vega_host->fb_tty_active() && !stage_redir_touches_stdout(stages[N - 1]);
   int relay[2];
   if(cap && pipe(relay) < 0) {
-    sh_puts("vega: pipe failed\n");
+    vega_host->puts("vega: pipe failed\n");
     return 1;
   }
 
@@ -530,7 +532,7 @@ static int exec_pipeline(ast_t *n)
         close(pipes[j][0]);
         close(pipes[j][1]);
       }
-      sh_puts("vega: pipe failed\n");
+      vega_host->puts("vega: pipe failed\n");
       return 1;
     }
   }
@@ -547,7 +549,7 @@ static int exec_pipeline(ast_t *n)
         close(pipes[j][0]);
         close(pipes[j][1]);
       }
-      sh_puts("vega: fork failed\n");
+      vega_host->puts("vega: fork failed\n");
       return 1;
     }
     if(pids[i] == 0) {
@@ -669,7 +671,7 @@ int vega_exec(ast_t *node)
         node->u.fn.body      = NULL;
         status               = 0;
       } else {
-        sh_puts("vega: function table full\n");
+        vega_host->puts("vega: function table full\n");
         status = 1;
       }
     } else {

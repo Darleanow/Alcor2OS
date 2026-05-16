@@ -32,21 +32,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vega/host.h>
+#include <vega/internal/host.h>
 #include <vega/internal/lexer.h>
 #include <vega/parse.h>
 
 static void diag_unexpected(tok_kind_t k)
 {
-  sh_puts("vega: syntax error near ");
-  sh_puts(tok_name(k));
-  sh_puts("\n");
+  vega_host->puts("vega: syntax error near ");
+  vega_host->puts(tok_name(k));
+  vega_host->puts("\n");
 }
 
 static void diag_expected_after(tok_kind_t after)
 {
-  sh_puts("vega: expected command after ");
-  sh_puts(tok_name(after));
-  sh_puts("\n");
+  vega_host->puts("vega: expected command after ");
+  vega_host->puts(tok_name(after));
+  vega_host->puts("\n");
 }
 
 static int redir_kind_from_token(tok_kind_t k, redir_kind_t *out)
@@ -270,7 +271,7 @@ static ast_t *parse_for(lexer_t *L)
   }
 
   if(!match_keyword(L, "in")) {
-    sh_puts("vega: expected 'in' after for variable\n");
+    vega_host->puts("vega: expected 'in' after for variable\n");
     free(name_tok.text);
     L->error = 1;
     return NULL;
@@ -315,7 +316,7 @@ static ast_t *parse_fn(lexer_t *L)
   }
 
   if(lex_peek(L).kind != TOK_LPAREN) {
-    sh_puts("vega: expected '(' after fn name\n");
+    vega_host->puts("vega: expected '(' after fn name\n");
     free(name_tok.text);
     L->error = 1;
     return NULL;

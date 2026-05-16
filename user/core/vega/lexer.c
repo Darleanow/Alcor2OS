@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <vega/host.h>
+#include <vega/internal/host.h>
 #include <vega/internal/lexer.h>
 
 static int is_hspace(char c)
@@ -44,7 +45,7 @@ static tok_t read_squote(lexer_t *L)
   while(*L->cur && *L->cur != '\'')
     L->cur++;
   if(*L->cur != '\'') {
-    sh_puts("vega: unterminated single quote\n");
+    vega_host->puts("vega: unterminated single quote\n");
     L->error = 1;
     t.kind   = TOK_EOF;
     return t;
@@ -82,7 +83,7 @@ static tok_t read_dquote(lexer_t *L)
     n++;
   }
   if(*scan != '"') {
-    sh_puts("vega: unterminated double quote\n");
+    vega_host->puts("vega: unterminated double quote\n");
     L->error = 1;
     t.kind   = TOK_EOF;
     return t;
@@ -249,7 +250,7 @@ static tok_t scan_one(lexer_t *L)
       L->cur++;
       t.kind = TOK_AND;
     } else {
-      sh_puts("vega: '&' (background) not yet supported\n");
+      vega_host->puts("vega: '&' (background) not yet supported\n");
       L->error = 1;
     }
     return t;
@@ -370,9 +371,9 @@ char *lex_read_heredoc_body(lexer_t *L, const char *delim)
     /* body_end is only read on the goto-done path above; no update needed */
   }
   /* Reached EOF without seeing the delimiter. */
-  sh_puts("vega: unterminated heredoc (missing '");
-  sh_puts(delim);
-  sh_puts("')\n");
+  vega_host->puts("vega: unterminated heredoc (missing '");
+  vega_host->puts(delim);
+  vega_host->puts("')\n");
   L->error = 1;
   return NULL;
 

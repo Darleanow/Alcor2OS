@@ -8,7 +8,21 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <vega/host.h>
 #include <vega/vega.h>
+
+static const vega_host_ops_t shell_host = {
+    .puts                 = sh_puts,
+    .stdout_bytes         = sh_stdout_bytes,
+    .close                = sh_close,
+    .read                 = sh_read,
+    .stat                 = sh_stat,
+    .fb_tty_active        = sh_fb_tty_active,
+    .fb_tty_on_fork_child = sh_fb_tty_on_fork_child,
+    .fb_tty_blink_tick    = sh_fb_tty_blink_tick,
+    .is_builtin           = sh_is_builtin,
+    .run_builtin          = sh_run_builtin,
+};
 
 #ifndef VEGA_VERSION
   #define VEGA_VERSION "1.0.0"
@@ -423,6 +437,8 @@ int main(int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
+
+  vega_init(&shell_host);
 
   /* No procfs on Alcor2; LLVM/musl fall back to PATH for argv-only lookups. */
   setenv("PATH", "/bin:/usr/bin", 0);
