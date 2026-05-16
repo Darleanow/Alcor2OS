@@ -28,6 +28,7 @@ typedef enum
   AST_WHILE, /* while cond { body } — loops while cond exits 0 */
   AST_FOR,   /* for var in words... { body } */
   AST_FN,    /* fn name(args) { body } — registers a function on exec */
+  AST_LET, /* let NAME VALUE — variable assignment (value expanded at exec) */
 } ast_kind_t;
 
 typedef enum
@@ -111,6 +112,11 @@ typedef struct ast_node
       int              n_args;
       struct ast_node *body;
     } fn;
+    struct
+    {
+      char *name;  /* variable name */
+      char *value; /* unexpanded source word; expand_word at exec time */
+    } let_;
   } u;
 } ast_t;
 
@@ -175,6 +181,13 @@ void ast_for_set_body(ast_t *n, ast_t *body);
  * the body and arg_names).
  */
 ast_t *ast_new_fn(char *name, char **arg_names, int n_args, ast_t *body);
+
+/**
+ * @brief Allocate an AST_LET node. Takes ownership of @p name and @p value
+ * (raw, unexpanded source word). exec evaluates @p value via expand_word
+ * at run time, then registers the binding with vega_setvar.
+ */
+ast_t *ast_new_let(char *name, char *value);
 
 /** @brief Allocate an empty AST_PIPE node. */
 ast_t *ast_new_pipeline(void);

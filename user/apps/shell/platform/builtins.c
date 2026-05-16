@@ -1,8 +1,9 @@
 /**
  * @file apps/shell/platform/builtins.c
- * @brief Shell-side builtins — implementations run in-process via libvega's
- * sh_is_builtin / sh_run_builtin host hooks. libvega itself has no builtin
- * commands; the language only knows expressions and control flow.
+ * @brief Shell-side builtins — run in-process via libvega's
+ * sh_is_builtin / sh_run_builtin host hooks. Language constructs (let, if,
+ * for, …) are vega keywords parsed natively in libvega — they don't appear
+ * here.
  */
 
 #include <shell/shell.h>
@@ -12,7 +13,7 @@
 #include <vega/vega.h>
 
 static const char *shell_builtins[] = {
-    "exit", "cd", "pwd", "let", "help", "version", "clear", NULL,
+    "exit", "cd", "pwd", "help", "version", "clear", NULL,
 };
 
 static void cmd_help(void)
@@ -22,7 +23,6 @@ static void cmd_help(void)
   sh_puts("    exit              quit the shell\n");
   sh_puts("    cd <dir>          change directory\n");
   sh_puts("    pwd               print working directory\n");
-  sh_puts("    let NAME VALUE    set a vega variable (read with $NAME)\n");
   sh_puts("    help              this message\n");
   sh_puts("    version           OS + vega version\n");
   sh_puts("    clear             clear the screen\n");
@@ -61,19 +61,6 @@ static int cmd_pwd(void)
   return 1;
 }
 
-static int cmd_let(int argc, char *const argv[])
-{
-  if(argc < 3) {
-    sh_puts("usage: let NAME VALUE\n");
-    return 1;
-  }
-  if(vega_setvar(argv[1], argv[2]) < 0) {
-    sh_puts("let: failed to set variable\n");
-    return 1;
-  }
-  return 0;
-}
-
 bool sh_is_builtin(const char *name)
 {
   for(int i = 0; shell_builtins[i]; i++) {
@@ -93,8 +80,6 @@ int sh_run_builtin(int argc, char *const argv[])
     return cmd_cd(argc, argv);
   if(strcmp(name, "pwd") == 0)
     return cmd_pwd();
-  if(strcmp(name, "let") == 0)
-    return cmd_let(argc, argv);
   if(strcmp(name, "help") == 0) {
     cmd_help();
     return 0;

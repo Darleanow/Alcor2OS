@@ -655,6 +655,16 @@ int vega_exec(ast_t *node)
     }
     break;
   }
+  case AST_LET: {
+    char *v = expand_word(node->u.let_.value);
+    if(!v) {
+      status = 1;
+    } else {
+      status = (vega_setvar(node->u.let_.name, v) < 0) ? 1 : 0;
+      free(v);
+    }
+    break;
+  }
   case AST_FN: {
     /* Register, transferring ownership to the table. After the steal,
      * ast_free finds NULL pointers and does nothing. If body is already

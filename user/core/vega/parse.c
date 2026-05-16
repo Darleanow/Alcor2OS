@@ -259,6 +259,32 @@ static ast_t *parse_while(lexer_t *L)
   return ast_new_while(cond, body);
 }
 
+/* `let` consumed by parse_unit; expects NAME VALUE as two word-ish tokens.
+ * The VALUE is captured raw — exec.c expand_word()s it at run time so $vars
+ * in the source resolve at the point of assignment, not at parse time. */
+static ast_t *parse_let(lexer_t *L)
+{
+  tok_t name = lex_next(L);
+  if(name.kind != TOK_WORD && name.kind != TOK_STRING) {
+    diag_unexpected(name.kind);
+    lex_token_free(&name);
+    L->error = 1;
+    return NULL;
+  }
+  tok_t value = lex_next(L);
+  if(value.kind != TOK_WORD && value.kind != TOK_STRING) {
+    diag_unexpected(value.kind);
+    free(name.text);
+    lex_token_free(&value);
+    L->error = 1;
+    return NULL;
+  }
+  ast_t *n = ast_new_let(name.text, value.text);
+  if(!n)
+    L->error = 1;
+  return n;
+}
+
 static ast_t *parse_for(lexer_t *L)
 {
   /* The opening `for` keyword has already been consumed by parse_unit. */
@@ -395,6 +421,11 @@ static ast_t *parse_unit(lexer_t *L)
     lex_next(L);
     lex_token_free(&t);
     return parse_fn(L);
+  }
+  if(t.kind == TOK_WORD && strcmp(t.text, "let") == 0) {
+    lex_next(L);
+    lex_token_free(&t);
+    return parse_let(L);
   }
   return parse_command(L);
 }

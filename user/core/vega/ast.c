@@ -167,6 +167,20 @@ ast_t *ast_new_fn(char *name, char **arg_names, int n_args, ast_t *body)
   return n;
 }
 
+ast_t *ast_new_let(char *name, char *value)
+{
+  ast_t *n = (ast_t *)malloc(sizeof(*n));
+  if(!n) {
+    free(name);
+    free(value);
+    return NULL;
+  }
+  n->kind         = AST_LET;
+  n->u.let_.name  = name;
+  n->u.let_.value = value;
+  return n;
+}
+
 #define INITIAL_PIPELINE_CAP 2
 
 ast_t *ast_new_pipeline(void)
@@ -254,6 +268,10 @@ void ast_free(ast_t *n)
       free(n->u.fn.arg_names);
     }
     ast_free(n->u.fn.body);
+    break;
+  case AST_LET:
+    free(n->u.let_.name);
+    free(n->u.let_.value);
     break;
   }
   free(n);
