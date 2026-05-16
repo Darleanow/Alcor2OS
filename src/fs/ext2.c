@@ -1838,30 +1838,6 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
 }
 
 /**
- * @brief Unmount an ext2 volume.
- *
- * Flushes metadata and frees group descriptor memory.
- *
- * @param vol Volume to unmount.
- */
-void ext2_unmount(ext2_volume_t *vol)
-{
-  if(!vol || !vol->mounted)
-    return;
-
-  /* Write back superblock and group descriptors */
-  write_superblock(vol);
-  write_group_descriptors(vol);
-
-  if(vol->groups) {
-    kfree(vol->groups);
-    vol->groups = NULL;
-  }
-
-  vol->mounted = false;
-}
-
-/**
  * @brief Open a file or directory on an ext2 volume.
  *
  * @param vol  Volume handle.
@@ -1892,14 +1868,12 @@ ext2_file_t *ext2_open(ext2_volume_t *vol, const char *path)
     return NULL;
 
   /* Fill file handle */
-  file->vol          = vol;
-  file->inode_num    = ino;
-  file->inode        = inode;
-  file->position     = 0;
-  file->block_offset = 0;
-  file->is_dir       = (inode.i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR;
-  file->in_use       = true;
-  file->dirty        = false;
+  file->vol       = vol;
+  file->inode_num = ino;
+  file->inode     = inode;
+  file->is_dir    = (inode.i_mode & EXT2_S_IFMT) == EXT2_S_IFDIR;
+  file->in_use    = true;
+  file->dirty     = false;
 
   return file;
 }
@@ -2311,41 +2285,6 @@ i64 ext2_readlink(
 }
 
 /**
- * @brief Seek to a position in an ext2 file.
- *
- * @param file   Open file handle.
- * @param offset Seek offset.
- * @param whence Seek mode (0=SET, 1=CUR, 2=END).
- * @return New position, or negative errno on error.
- */
-i64 ext2_seek(ext2_file_t *file, i64 offset, i32 whence)
-{
-  if(!file || !file->in_use)
-    return -EINVAL;
-
-  i64 new_pos;
-  switch(whence) {
-  case 0: /* SEEK_SET */
-    new_pos = offset;
-    break;
-  case 1: /* SEEK_CUR */
-    new_pos = (i64)file->position + offset;
-    break;
-  case 2: /* SEEK_END */
-    new_pos = (i64)file->inode.i_size + offset;
-    break;
-  default:
-    return -EINVAL;
-  }
-
-  if(new_pos < 0)
-    return -EINVAL;
-
-  file->position = (u32)new_pos;
-  return (i64)file->position;
-}
-
-/**
  * @brief Create a new file on an ext2 volume.
  *
  * If the file already exists, opens it instead.
@@ -2428,14 +2367,12 @@ ext2_file_t *ext2_create(ext2_volume_t *vol, const char *path)
   flush_metadata(vol);
 
   /* Fill file handle */
-  file->vol          = vol;
-  file->inode_num    = new_ino;
-  file->inode        = new_inode;
-  file->position     = 0;
-  file->block_offset = 0;
-  file->is_dir       = false;
-  file->in_use       = true;
-  file->dirty        = false;
+  file->vol       = vol;
+  file->inode_num = new_ino;
+  file->inode     = new_inode;
+  file->is_dir    = false;
+  file->in_use    = true;
+  file->dirty     = false;
 
   return file;
 }
@@ -2586,9 +2523,7 @@ i64 ext2_truncate(ext2_file_t *file, u64 length)
   }
 
   file->inode.i_size = (u32)length;
-  if(file->position > length)
-    file->position = length;
-  file->dirty = false; /* Inode is written below. */
+  file->dirty        = false; /* Inode is written below. */
 
   if(write_inode(vol, file->inode_num, &file->inode) < 0)
     return -EIO;
@@ -2859,27 +2794,10 @@ static void *ext2_vfs_mount(const char *source, u32 flags)
   return ext2_mount(0, 0);
 }
 
-/** @brief ext2 unmount wrapper for fs_type_t. */
-static void ext2_vfs_unmount(void *fs_data)
-{
-  ext2_unmount((ext2_volume_t *)fs_data);
-}
-
 /** @brief ext2 filesystem type descriptor. */
 static const fs_type_t g_ext2_fstype = {
-    .name    = "ext2",
-    .ops     = &g_ext2_vfs_ops,
-    .mount   = ext2_vfs_mount,
-    .unmount = ext2_vfs_unmount,
+    .name  = "ext2",
+    .ops   = &g_ext2_vfs_ops,
+    .mount = ext2_vfs_mount,
 };
 /** @} */
-
-/**
- * @brief Get ext2 VFS operations table.
- * @return Pointer to ext2 fs_ops_t structure.
- */
-// cppcheck-suppress unusedFunction
-const fs_ops_t *ext2_get_ops(void)
-{
-  return &g_ext2_vfs_ops;
-}

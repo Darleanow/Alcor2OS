@@ -277,23 +277,6 @@ i64 vfs_register_fs(const fs_type_t *fstype)
   return 0;
 }
 
-/** @brief Unmount the filesystem at @p target, calling the driver's unmount if
- * provided. */
-i64 vfs_umount(const char *target)
-{
-  char abs[VFS_PATH_MAX];
-  vfs_make_absolute(target, abs);
-  for(i32 i = 0; i < VFS_MAX_MOUNTS; i++) {
-    if(mounts[i].active && kstreq(mounts[i].target, abs)) {
-      if(mounts[i].type->unmount)
-        mounts[i].type->unmount(mounts[i].fs_data);
-      mounts[i].active = false;
-      return 0;
-    }
-  }
-  return -ENOENT;
-}
-
 /**
  * @brief Mount @p source at @p target using the named filesystem driver.
  *

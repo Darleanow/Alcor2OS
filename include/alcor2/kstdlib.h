@@ -40,15 +40,6 @@ void *kmemset(void *dst, int val, u64 n);
 void kzero(void *dst, u64 n);
 
 /**
- * @brief Compare memory regions.
- * @param s1 First region.
- * @param s2 Second region.
- * @param n Byte count.
- * @return 0 if equal, <0 if s1<s2, >0 if s1>s2.
- */
-int kmemcmp(const void *s1, const void *s2, u64 n);
-
-/**
  * @brief Get string length.
  * @param s String.
  * @return Length (not including null terminator).
@@ -71,14 +62,6 @@ char *kstrncpy(char *dst, const char *src, u64 max);
  * @return 0 if equal, <0 if a<b, >0 if a>b.
  */
 int kstrcmp(const char *a, const char *b);
-
-/**
- * @brief Compare two strings (case insensitive).
- * @param a First string.
- * @param b Second string.
- * @return 0 if equal.
- */
-int kstricmp(const char *a, const char *b);
 
 /**
  * @brief Compare two strings up to n characters.
@@ -107,41 +90,11 @@ char *kstrncat(char *dst, const char *src, u64 max);
 bool kstreq(const char *a, const char *b);
 
 /**
- * @brief Find character in string.
- * @param s String to search.
- * @param c Character to find.
- * @return Pointer to character, or NULL if not found.
- */
-char *kstrchr(const char *s, int c);
-
-/**
  * @brief Find last occurrence of character in string.
  * @param s String to search.
  * @param c Character to find.
  * @return Pointer to character, or NULL if not found.
  */
 char *kstrrchr(const char *s, int c);
-
-/**
- * @brief Check if string starts with prefix.
- * @param str String to check.
- * @param prefix Prefix to look for.
- * @return true if str starts with prefix.
- */
-bool kstarts_with(const char *str, const char *prefix);
-
-/**
- * @brief Convert character to uppercase.
- * @param c Character.
- * @return Uppercase version.
- */
-int ktoupper(int c);
-
-/**
- * @brief Convert character to lowercase.
- * @param c Character.
- * @return Lowercase version.
- */
-int ktolower(int c);
 
 #endif /* ALCOR2_KSTDLIB_H */

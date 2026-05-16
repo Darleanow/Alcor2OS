@@ -226,17 +226,19 @@ typedef struct
 
 /**
  * @brief ext2 file handle.
+ *
+ * Read/write position lives in the VFS open-file-table — drivers receive an
+ * explicit @c offset argument on every I/O call, so this struct does not
+ * carry a position field of its own.
  */
 typedef struct
 {
-  ext2_volume_t *vol;          /**< Volume reference */
-  u32            inode_num;    /**< Inode number */
-  ext2_inode_t   inode;        /**< Cached inode */
-  u32            position;     /**< Current read/write position */
-  u32            block_offset; /**< Offset within current block */
-  bool           is_dir;       /**< Is a directory */
-  bool           in_use;       /**< Handle is in use */
-  bool           dirty;        /**< Inode modified */
+  ext2_volume_t *vol;       /**< Volume reference */
+  u32            inode_num; /**< Inode number */
+  ext2_inode_t   inode;     /**< Cached inode */
+  bool           is_dir;    /**< Is a directory */
+  bool           in_use;    /**< Handle is in use */
+  bool           dirty;     /**< Inode modified */
 } ext2_file_t;
 
 /**
@@ -262,12 +264,6 @@ void ext2_init(void);
  * @return Volume pointer, or NULL on error.
  */
 ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba);
-
-/**
- * @brief Unmount an ext2 volume.
- * @param vol Volume to unmount.
- */
-void ext2_unmount(ext2_volume_t *vol);
 
 /**
  * @brief Open a file or directory.
@@ -334,7 +330,6 @@ i64 ext2_readlink(
  * @param whence SEEK_SET, SEEK_CUR, or SEEK_END.
  * @return New position, or negative on error.
  */
-i64 ext2_seek(ext2_file_t *file, i64 offset, i32 whence);
 
 /**
  * @brief Create a new file.
@@ -381,19 +376,6 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path);
  * @return 0 on success, negative on error.
  */
 i64 ext2_rmdir(ext2_volume_t *vol, const char *path);
-
-/* Forward declaration for VFS integration */
-struct fs_ops;
-
-/**
- * @brief Get ext2 VFS operations table.
- *
- * Returns a pointer to the static fs_ops_t structure that implements
- * ext2 filesystem operations for the VFS layer.
- *
- * @return Pointer to ext2 fs_ops_t structure.
- */
-const fs_ops_t *ext2_get_ops(void);
 
 /**
  * @brief Initialize and register ext2 filesystem with VFS.

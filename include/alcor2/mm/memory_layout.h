@@ -15,9 +15,6 @@
  * Higher-half kernel mapping (0xFFFF800000000000 and above)
  * @{ */
 
-/** @brief Start of kernel space */
-#define KERNEL_SPACE_START 0xFFFF800000000000ULL
-
 /** @brief Kernel heap base address */
 #define KERNEL_HEAP_BASE 0xFFFFFFFF90000000ULL
 
@@ -27,11 +24,9 @@
 /** @} */
 
 /** @name User Virtual Address Space
- * User space occupies 0x0000000000000000 to 0x00007FFFFFFFFFFF
+ * User space occupies 0x0000000000000000 to 0x00007FFFFFFFFFFF.
+ * Per-process user stack size lives in @c proc.h as @c PROC_USER_STACK.
  * @{ */
-
-/** @brief User space start (after NULL page) */
-#define USER_SPACE_START 0x0000000000400000ULL
 
 /** @brief User space end (canonical address limit) */
 #define USER_SPACE_END 0x00007FFFFFFFF000ULL
@@ -39,11 +34,8 @@
 /** @brief User stack top (grows downward) */
 #define USER_STACK_TOP 0x00007FFF00000000ULL
 
-/** @brief User stack size (8MB per process — matches Linux default) */
-#define USER_STACK_SIZE (8ULL * 1024 * 1024)
-
-/** @brief User stack base calculation */
-#define USER_STACK_BASE (USER_STACK_TOP - USER_STACK_SIZE)
+/** @brief User stack base (matches @c PROC_USER_STACK = 8 MiB). */
+#define USER_STACK_BASE (USER_STACK_TOP - (8ULL * 1024 * 1024))
 
 /** @brief User heap start for brk() allocations (1GB) */
 #define USER_HEAP_START 0x0000000040000000ULL

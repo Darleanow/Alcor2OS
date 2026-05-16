@@ -60,28 +60,6 @@ void kzero(void *dst, u64 n)
 }
 
 /**
- * @brief Compare two memory regions.
- *
- * @param s1 First buffer.
- * @param s2 Second buffer.
- * @param n  Number of bytes to compare.
- * @return 0 if equal, negative if s1 < s2, positive if s1 > s2.
- */
-// cppcheck-suppress unusedFunction
-int kmemcmp(const void *s1, const void *s2, u64 n)
-{
-  const u8 *p1 = (const u8 *)s1;
-  const u8 *p2 = (const u8 *)s2;
-  while(n--) {
-    if(*p1 != *p2)
-      return *p1 - *p2;
-    p1++;
-    p2++;
-  }
-  return 0;
-}
-
-/**
  * @brief Get the length of a null-terminated string.
  *
  * @param s String to measure.
@@ -129,27 +107,6 @@ int kstrcmp(const char *a, const char *b)
 }
 
 /**
- * @brief Case-insensitive string comparison.
- *
- * @param a First string.
- * @param b Second string.
- * @return 0 if equal (ignoring case), non-zero otherwise.
- */
-// cppcheck-suppress unusedFunction
-int kstricmp(const char *a, const char *b)
-{
-  while(*a && *b) {
-    int ca = ktolower((u8)*a);
-    int cb = ktolower((u8)*b);
-    if(ca != cb)
-      return ca - cb;
-    a++;
-    b++;
-  }
-  return ktolower((u8)*a) - ktolower((u8)*b);
-}
-
-/**
  * @brief Check if two strings are equal.
  *
  * @param a First string.
@@ -159,24 +116,6 @@ int kstricmp(const char *a, const char *b)
 bool kstreq(const char *a, const char *b)
 {
   return kstrcmp(a, b) == 0;
-}
-
-/**
- * @brief Find the first occurrence of a character in a string.
- *
- * @param s String to search.
- * @param c Character to find.
- * @return Pointer to the character, or NULL if not found.
- */
-// cppcheck-suppress unusedFunction
-char *kstrchr(const char *s, int c)
-{
-  while(*s) {
-    if(*s == (char)c)
-      return (char *)s;
-    s++;
-  }
-  return (c == '\0') ? (char *)s : NULL;
 }
 
 /**
@@ -196,52 +135,6 @@ char *kstrrchr(const char *s, int c)
     s++;
   }
   return (c == '\0') ? (char *)s : (char *)last;
-}
-
-/**
- * @brief Check if a string starts with a prefix.
- *
- * @param str    String to check.
- * @param prefix Prefix to test for.
- * @return true if str starts with prefix.
- */
-// cppcheck-suppress unusedFunction
-bool kstarts_with(const char *str, const char *prefix)
-{
-  while(*prefix) {
-    if(*str != *prefix)
-      return false;
-    str++;
-    prefix++;
-  }
-  return true;
-}
-
-/**
- * @brief Convert a character to uppercase.
- *
- * @param c Character to convert.
- * @return Uppercase character, or c if not a letter.
- */
-// cppcheck-suppress unusedFunction
-int ktoupper(int c)
-{
-  if(c >= 'a' && c <= 'z')
-    return c - 32;
-  return c;
-}
-
-/**
- * @brief Convert a character to lowercase.
- *
- * @param c Character to convert.
- * @return Lowercase character, or c if not a letter.
- */
-int ktolower(int c)
-{
-  if(c >= 'A' && c <= 'Z')
-    return c + 32;
-  return c;
 }
 
 /**

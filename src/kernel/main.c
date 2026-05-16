@@ -25,7 +25,6 @@
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/sched.h>
-#include <alcor2/proc/user.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
 
@@ -142,7 +141,6 @@ typedef struct
 {
   const char *name;          /**< Display name for logging */
   void        (*init)(void); /**< Phase-specific initialization function */
-  bool        critical;      /**< Halt if this phase fails (not used yet) */
 } boot_phase_t;
 
 /**
@@ -166,7 +164,6 @@ static void init_interrupts(void)
 static void init_storage(void)
 {
   ata_init();
-  ramfs_init();
   ext2_init();
 
   /* Mount root filesystem */
@@ -194,17 +191,17 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"Core Scheduler",      sched_init,       true },
-    {"GDT Structure",       gdt_init,         true },
-    {"IDT Structure",       idt_init,         true },
-    {"SSE/FPU Support",     cpu_enable_sse,   true },
-    {"Syscall Interface",   syscall_init,     true },
-    {"PIC/PIT Timers",      pic_init,         true },
-    {"Hardware Interrupts", init_interrupts,  true },
-    {"VFS Orchestrator",    vfs_init,         true },
-    {"Storage & VFS",       init_storage,     true },
-    {"Global Interrupts",   init_enable_irqs, true },
-    {NULL,                  NULL,             false}
+    {"Core Scheduler",      sched_init      },
+    {"GDT Structure",       gdt_init        },
+    {"IDT Structure",       idt_init        },
+    {"SSE/FPU Support",     cpu_enable_sse  },
+    {"Syscall Interface",   syscall_init    },
+    {"PIC/PIT Timers",      pic_init        },
+    {"Hardware Interrupts", init_interrupts },
+    {"VFS Orchestrator",    vfs_init        },
+    {"Storage & VFS",       init_storage    },
+    {"Global Interrupts",   init_enable_irqs},
+    {NULL,                  NULL            }
 };
 
 /**
