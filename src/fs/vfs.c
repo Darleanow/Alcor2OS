@@ -172,7 +172,7 @@ static void vfs_make_absolute(const char *path, char *out)
       out[len++] = '/';
       out[len]   = '\0';
     }
-    kstrncat(out, path, VFS_PATH_MAX - len - 1);
+    (void)kstrlcat(out, path, VFS_PATH_MAX);
   }
   vfs_normalize(out);
 }

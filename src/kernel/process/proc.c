@@ -457,13 +457,6 @@ u64 proc_create_mem(
   return proc_create_inner(name, elf_data, elf_size, -1, argv, envp);
 }
 
-u64 proc_create_fd(
-    const char *name, i64 elf_fd, char *const argv[], char *const envp[]
-)
-{
-  return proc_create_inner(name, NULL, 0, elf_fd, argv, envp);
-}
-
 /**
  * @brief External assembly entry point for new processes.
  *

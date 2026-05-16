@@ -137,24 +137,13 @@ int proc_table_index(const proc_t *p);
 
 /**
  * @brief Create a process from an ELF image held in kernel memory.
+ *
+ * Loading from an open file descriptor is internal (exec path uses
+ * @c proc_exec_replace_image).
  */
 u64 proc_create_mem(
     const char *name, const void *elf_data, u64 elf_size, char *const argv[],
     char *const envp[]
-);
-
-/**
- * @brief Create a process by loading an ELF from an already-open VFS @p elf_fd.
- *
- * Uses @c vfs_seek / @c vfs_read only (via @c elf_load_fd). Never calls
- * @c vfs_close on @p elf_fd — the caller keeps the fd slot until it closes it.
- *
- * Note: @c proc_exec_replace_image also leaves @p elf_fd open; @c sys_execve
- * closes its temporary @c vfs_open fd after a successful replace. Closing is
- * syscall policy, not part of @c proc_setup_image.
- */
-u64 proc_create_fd(
-    const char *name, i64 elf_fd, char *const argv[], char *const envp[]
 );
 
 /**
@@ -220,6 +209,9 @@ void proc_notify_exec(const proc_t *p);
  * sysret return path lands in the new image. On catastrophic failure the
  * old image has already been destroyed and the process can no longer
  * continue — the caller should @c proc_exit.
+ *
+ * Does not @c vfs_close @p elf_fd; the syscall wrapper closes scratch fds after
+ * success when appropriate (see @c sys_execve).
  *
  * @return 0 on success, negative -errno on failure.
  */

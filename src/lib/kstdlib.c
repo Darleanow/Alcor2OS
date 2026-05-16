@@ -157,19 +157,32 @@ int kstrncmp(const char *a, const char *b, u64 n)
 }
 
 /**
- * @brief Concatenate strings with maximum length.
- * @param dst Destination.
- * @param src Source.
- * @param max Maximum bytes to add.
- * @return dst pointer.
+ * @brief Bounded strcat (BSD @c strlcat semantics).
+ *
+ * Scans @p dst only up to @p dst_cap - 1 so callers need not pre-trust NUL
+ * placement when sizing is authoritative.
  */
-char *kstrncat(char *dst, const char *src, u64 max)
+u64 kstrlcat(char *dst, const char *src, u64 dst_cap)
 {
-  u64 len = kstrlen(dst);
-  u64 i;
-  for(i = 0; i < max && src[i] != '\0'; i++) {
-    dst[len + i] = src[i];
+  u64 dlen;
+
+  if(dst_cap == 0)
+    return kstrlen(src);
+
+  dlen = 0;
+  while(dlen < dst_cap && dst[dlen] != '\0')
+    dlen++;
+
+  if(dlen >= dst_cap)
+    return dst_cap + kstrlen(src);
+
+  u64 space = dst_cap - dlen - 1;
+  u64 i     = 0;
+  while(i < space && src[i] != '\0') {
+    dst[dlen + i] = src[i];
+    i++;
   }
-  dst[len + i] = '\0';
-  return dst;
+  dst[dlen + i] = '\0';
+
+  return dlen + kstrlen(src);
 }

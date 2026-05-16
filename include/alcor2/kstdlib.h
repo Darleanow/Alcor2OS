@@ -76,15 +76,18 @@ int kstrcmp(const char *a, const char *b);
 int kstrncmp(const char *a, const char *b, u64 n);
 
 /**
- * @brief Concatenate strings with a bound on bytes copied from @p src.
- * @param dst Destination (must already be NUL-terminated).
- * @param src Source.
- * @param max Maximum non-NUL bytes to read from @p src and append — not the
- *            total capacity of @p dst. Callers must choose @p max so the
- *            result fits in the real buffer (see @c vfs_make_absolute).
- * @return dst pointer.
+ * @brief Bounded strcat (BSD @c strlcat semantics).
+ *
+ * @p dst_cap is the total size of @p dst including the terminating NUL.
+ * Appends at most @c dst_cap - strlen(dst) - 1 bytes from @p src.
+ *
+ * @param dst      NUL-terminated destination; must fit within @p dst_cap.
+ * @param src      Source string.
+ * @param dst_cap  Total bytes allocated for @p dst.
+ * @return         Length the concatenated string would have if unlimited
+ *                 (may exceed @p dst_cap - 1 when truncated).
  */
-char *kstrncat(char *dst, const char *src, u64 max);
+u64 kstrlcat(char *dst, const char *src, u64 dst_cap);
 
 /**
  * @brief Check if strings are equal.
