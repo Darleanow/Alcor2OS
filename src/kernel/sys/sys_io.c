@@ -124,15 +124,22 @@ typedef struct
   u16 row, col, xpixel, ypixel;
 } k_winsize_t;
 
-/**
- * @brief Current terminal grid, published by the shell's fb_tty on startup.
- *
- * Children inherit it through @c TIOCGWINSZ so TUIs (ncurses, less, ...)
- * lay out against the real on-screen rows/cols instead of a hardcoded
- * default. The fallback below is only used before the shell has had a
- * chance to publish.
- */
-static k_winsize_t g_winsize = {25, 80, 0, 0};
+/** Fill @p w from the live fb_console grid. SIGWINCH is emitted whenever the
+ *  grid reflows, so userspace re-queries this on signal delivery. */
+static void winsize_from_console(k_winsize_t *w)
+{
+  int cols = 80;
+  int rows = 25;
+  fb_console_get_size(&cols, &rows);
+  if(cols <= 0)
+    cols = 80;
+  if(rows <= 0)
+    rows = 25;
+  w->row    = (u16)rows;
+  w->col    = (u16)cols;
+  w->xpixel = 0;
+  w->ypixel = 0;
+}
 
 /**
  * @brief Emulated TTY ioctls for stdio fds and pipe ends.
@@ -147,15 +154,19 @@ static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
     return (u64)-EINVAL;
 
   switch(request) {
-  case TIOCGWINSZ:
+  case TIOCGWINSZ: {
     if(!user_rw_ok(arg, sizeof(k_winsize_t)))
       return (u64)-EFAULT;
-    kmemcpy((void *)arg, &g_winsize, sizeof(g_winsize));
+    k_winsize_t w;
+    winsize_from_console(&w);
+    kmemcpy((void *)arg, &w, sizeof(w));
     return 0;
+  }
   case TIOCSWINSZ:
+    /* The grid is owned by fb_console, not userspace. Accept the call so
+     * `stty cols X rows Y` doesn't error, but ignore the values. */
     if(!user_rw_ok(arg, sizeof(k_winsize_t)))
       return (u64)-EFAULT;
-    kmemcpy(&g_winsize, (void *)arg, sizeof(g_winsize));
     return 0;
   case TCGETS:
     if(!user_rw_ok(arg, sizeof(k_termios_t)))

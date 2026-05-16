@@ -129,4 +129,12 @@ void proc_check_signals(void *frame);
  */
 void proc_signal(u64 pid, int signum);
 
+/**
+ * @brief Deliver @p signum to every live process.
+ *
+ * Used by kernel-side events that touch all processes — currently SIGWINCH
+ * when the framebuffer cell grid reflows. Skips FREE and ZOMBIE slots.
+ */
+void proc_signal_broadcast(int signum);
+
 #endif /* ALCOR2_SIGNAL_H */

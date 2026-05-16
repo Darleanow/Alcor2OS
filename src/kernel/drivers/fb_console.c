@@ -14,6 +14,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/proc/signal.h>
 #include <alcor2/types.h>
 
 typedef struct
@@ -74,6 +75,10 @@ static struct
   u8 blink_ticks;
   u8 blink_on;
   u8 cursor_visible;
+
+  /* DECCKM: when set, cursor keys send SS3 (\EOA) instead of CSI (\E[A).
+   * ncurses' keypad(TRUE) toggles this via the terminfo smkx string. */
+  bool app_cursor_keys;
 
   /* fb yielded to a userspace mmap-er (e.g. doom). */
   bool yielded;
@@ -508,6 +513,8 @@ static void csi_dec_private(char cmd)
   for(int k = 0; k < np; k++) {
     if(pv[k] == 25)
       ctx.cursor_visible = (u8)on;
+    else if(pv[k] == 1)
+      ctx.app_cursor_keys = (on != 0);
     /* ?1049 (alt screen) intentionally ignored — draw into the live grid. */
   }
 }
@@ -932,6 +939,8 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   int new_cell_h = (int)meta->cell_h;
   int new_marg_x = FB_CONSOLE_MARGIN;
   int new_marg_y = FB_CONSOLE_MARGIN;
+  int old_cols   = ctx.cols;
+  int old_rows   = ctx.rows;
   if(new_cell_w != ctx.cell_w || new_cell_h != ctx.cell_h ||
      new_marg_x != ctx.margin_x || new_marg_y != ctx.margin_y) {
     int new_cols = (int)((ctx.width - 2u * (u64)new_marg_x) / (u64)new_cell_w);
@@ -973,7 +982,26 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   for(int r = 0; r < ctx.rows; r++)
     for(int c = 0; c < ctx.cols; c++)
       blit_cell(c, r);
+
+  /* Wake every TUI so they re-query TIOCGWINSZ and redraw at the real grid
+   * size. Skipped when the grid stayed the same (e.g. atlas reloaded with
+   * identical metrics) — no point waking anyone in that case. */
+  if(ctx.cols != old_cols || ctx.rows != old_rows)
+    proc_signal_broadcast(SIGWINCH);
   return 0;
+}
+
+void fb_console_get_size(int *cols, int *rows)
+{
+  if(cols)
+    *cols = ctx.cols;
+  if(rows)
+    *rows = ctx.rows;
+}
+
+bool fb_console_app_cursor_keys(void)
+{
+  return ctx.app_cursor_keys;
 }
 
 void fb_console_yield(void)

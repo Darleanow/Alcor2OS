@@ -100,6 +100,16 @@ proc_t *proc_get(u64 pid)
   return NULL;
 }
 
+void proc_signal_broadcast(int signum)
+{
+  for(int i = 0; i < PROC_MAX; i++) {
+    proc_t *p = &proc_table[i];
+    if(p->state == PROC_STATE_FREE || p->state == PROC_STATE_ZOMBIE)
+      continue;
+    proc_signal(p->pid, signum);
+  }
+}
+
 /**
  * @brief Allocate a free process slot from the process table.
  *
