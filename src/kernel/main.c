@@ -14,6 +14,7 @@
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/ata.h>
 #include <alcor2/drivers/console.h>
+#include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/fs/ext2.h>
@@ -111,6 +112,12 @@ static void init_early(
 
   heap_init();
   ramfs_init();
+
+  /* fb_console takes over the framebuffer with cell-grid + ANSI/CSI parsing.
+   * Allocates via kmalloc, so it must run after heap_init. Falls back to the
+   * boot logger if allocation fails. */
+  if(!fb_console_init(fb->address, fb->width, fb->height, fb->pitch, fb->bpp))
+    console_print("[fb_console] init failed; staying on boot logger.\n");
 }
 
 /**

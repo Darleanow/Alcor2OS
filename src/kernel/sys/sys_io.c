@@ -10,6 +10,7 @@
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/drivers/console.h>
+#include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
@@ -35,9 +36,10 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
  */
 static u64 stdout_fallback(u64 buf, u64 count)
 {
-  const char *str = (const char *)buf;
-  for(u64 i = 0; i < count; i++)
-    console_putchar(str[i]);
+  /* fb_console handles cell grid + ANSI/CSI; falls through to a no-op when
+   * not initialised. The legacy console_putchar path is still hit during
+   * very early boot (pre-heap), which doesn't go through this fallback. */
+  fb_console_write((const void *)buf, (size_t)count);
   return count;
 }
 
