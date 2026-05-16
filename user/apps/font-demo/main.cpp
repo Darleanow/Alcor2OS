@@ -1,7 +1,9 @@
 /**
- * Userspace framebuffer: FreeType + HarfBuzz + mmap (Fira Code ligatures, etc.).
+ * Userspace framebuffer: FreeType + HarfBuzz + mmap (Fira Code ligatures,
+ * etc.).
  *
- * Default font on guest: /bin/FiraCode-Regular.ttf (SIL OFL). Any TTF/OTF works.
+ * Default font on guest: /bin/FiraCode-Regular.ttf (SIL OFL). Any TTF/OTF
+ * works.
  */
 #include <alcor2/alcor_fb_user.h>
 
@@ -45,20 +47,19 @@ static int load_file(const char *path, uint8_t **out, size_t *osz)
 }
 
 static void put_px(
-    uint8_t *fb, const alcor_fb_info_t *inf, int x, int y, uint32_t rgb,
-    int a
+    uint8_t *fb, const alcor_fb_info_t *inf, int x, int y, uint32_t rgb, int a
 )
 {
   if(x < 0 || y < 0 || (uint32_t)x >= inf->width || (uint32_t)y >= inf->height)
     return;
   if(inf->bpp != 32 || inf->pitch < 4)
     return;
-  size_t    o   = (size_t)y * inf->pitch + (size_t)x * 4;
-  uint8_t   nr  = (uint8_t)((rgb >> 16) & 0xffu);
-  uint8_t   ng  = (uint8_t)((rgb >> 8) & 0xffu);
-  uint8_t   nb  = (uint8_t)(rgb & 0xffu);
-  uint8_t  *p   = fb + o;
-  uint32_t  aa  = (uint32_t)a;
+  size_t   o  = (size_t)y * inf->pitch + (size_t)x * 4;
+  uint8_t  nr = (uint8_t)((rgb >> 16) & 0xffu);
+  uint8_t  ng = (uint8_t)((rgb >> 8) & 0xffu);
+  uint8_t  nb = (uint8_t)(rgb & 0xffu);
+  uint8_t *p  = fb + o;
+  uint32_t aa = (uint32_t)a;
   if(aa >= 255u) {
     p[0] = nb;
     p[1] = ng;
@@ -67,10 +68,10 @@ static void put_px(
     return;
   }
   uint32_t b0 = p[0], g0 = p[1], r0 = p[2];
-  p[0]        = (uint8_t)((nb * aa + b0 * (255u - aa)) / 255u);
-  p[1]        = (uint8_t)((ng * aa + g0 * (255u - aa)) / 255u);
-  p[2]        = (uint8_t)((nr * aa + r0 * (255u - aa)) / 255u);
-  p[3]        = 0xff;
+  p[0] = (uint8_t)((nb * aa + b0 * (255u - aa)) / 255u);
+  p[1] = (uint8_t)((ng * aa + g0 * (255u - aa)) / 255u);
+  p[2] = (uint8_t)((nr * aa + r0 * (255u - aa)) / 255u);
+  p[3] = 0xff;
 }
 
 static void fill_bg(uint8_t *fb, const alcor_fb_info_t *inf, uint32_t rgb)
@@ -96,8 +97,7 @@ static void blit_gray(
 
 static void shape_draw_line(
     uint8_t *fb, const alcor_fb_info_t *inf, FT_Face face, hb_font_t *hbfont,
-    unsigned pixel_h, int pen_x, int baseline_y, const char *utf8,
-    uint32_t fg
+    unsigned pixel_h, int pen_x, int baseline_y, const char *utf8, uint32_t fg
 )
 {
   if(FT_Set_Pixel_Sizes(face, 0, pixel_h) != 0)
@@ -109,12 +109,12 @@ static void shape_draw_line(
   hb_buffer_guess_segment_properties(buf);
   hb_shape(hbfont, buf, nullptr, 0);
 
-  unsigned              len  = 0;
-  hb_glyph_info_t      *info = hb_buffer_get_glyph_infos(buf, &len);
-  hb_glyph_position_t  *pos  = hb_buffer_get_glyph_positions(buf, &len);
+  unsigned             len  = 0;
+  hb_glyph_info_t     *info = hb_buffer_get_glyph_infos(buf, &len);
+  hb_glyph_position_t *pos  = hb_buffer_get_glyph_positions(buf, &len);
 
-  int  x = pen_x;
-  int  y = baseline_y;
+  int                  x = pen_x;
+  int                  y = baseline_y;
 
   for(unsigned i = 0; i < len; i++) {
     x += pos[i].x_offset >> 6;
@@ -167,8 +167,8 @@ int main(int argc, char **argv)
   uint8_t *font_data = nullptr;
   size_t   font_len  = 0;
   if(load_file(font_path, &font_data, &font_len) != 0) {
-    const char msg[] =
-        "font-demo: open font (default /bin/FiraCode-Regular.ttf, or pass path)\n";
+    const char msg[] = "font-demo: open font (default "
+                       "/bin/FiraCode-Regular.ttf, or pass path)\n";
     write(2, msg, sizeof(msg) - 1);
     return 1;
   }
@@ -199,18 +199,16 @@ int main(int argc, char **argv)
   int      y0  = (int)(inf.height / 5);
 
   /* Ligatures: => -> != are shaped as one glyph when the font provides them. */
-  const char *line1 =
-      "Fira Code + HarfBuzz + FreeType — =>  ->  !=  **  flamb"
-      "\xc3\xa9"
-      "";
+  const char *line1 = "Fira Code + HarfBuzz + FreeType — =>  ->  !=  **  flamb"
+                      "\xc3\xa9"
+                      "";
 
-  const char *line2 =
-      (argc > 2 && argv[2] && argv[2][0]) ? argv[2]
-                                          : "Alcor2 userspace draws the framebuffer.";
+  const char *line2 = (argc > 2 && argv[2] && argv[2][0])
+                          ? argv[2]
+                          : "Alcor2 userspace draws the framebuffer.";
 
   shape_draw_line(
-      fb, &inf, face, hbfont, pxy, 24, y0 + (int)pxy * 5 / 4, line1,
-      0x00a8e8ffu
+      fb, &inf, face, hbfont, pxy, 24, y0 + (int)pxy * 5 / 4, line1, 0x00a8e8ffu
   );
   shape_draw_line(
       fb, &inf, face, hbfont, pxy * 3 / 4u, 24,
