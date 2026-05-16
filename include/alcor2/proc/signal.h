@@ -54,14 +54,19 @@
 /** @} */
 
 /** @name sigaction sa_flags
+ *
+ * The full Linux x86_64 set is exposed so musl's @c rt_sigaction wire layout
+ * is preserved across the syscall boundary. Today the delivery path
+ * (@c proc_check_signals) only consults @c SA_NODEFER and @c SA_RESETHAND;
+ * the others are accepted into @c k_sigaction_t but otherwise inert.
  * @{ */
-#define SA_NOCLDSTOP 0x00000001u
-#define SA_NOCLDWAIT 0x00000002u
-#define SA_SIGINFO   0x00000004u
-#define SA_RESTORER  0x04000000u
-#define SA_RESTART   0x10000000u
-#define SA_NODEFER   0x40000000u
-#define SA_RESETHAND 0x80000000u
+#define SA_NOCLDSTOP 0x00000001u /* inert */
+#define SA_NOCLDWAIT 0x00000002u /* inert */
+#define SA_SIGINFO   0x00000004u /* inert */
+#define SA_RESTORER  0x04000000u /* inert */
+#define SA_RESTART   0x10000000u /* inert */
+#define SA_NODEFER   0x40000000u /* honored — see proc_check_signals */
+#define SA_RESETHAND 0x80000000u /* honored — see proc_check_signals */
 /** @} */
 
 /** @name rt_sigprocmask 'how' values
