@@ -100,20 +100,32 @@ proc_t *proc_get(u64 pid)
 
 /**
  * @brief Allocate a free process slot from the process table.
+ *
+ * The slot is fully zeroed before any non-zero defaults are installed.
+ * Going through @c kzero rather than field-by-field resets means a stale
+ * @c sig_actions handler, @c sig_pending bit, etc. from a previously
+ * reaped occupant cannot survive into the new process — and any future
+ * field added to @c proc_t inherits the right "blank" default for free.
+ *
  * @return Pointer to free process slot, or NULL if table is full.
  */
 static proc_t *proc_alloc(void)
 {
   for(int i = 0; i < PROC_MAX; i++) {
-    if(proc_table[i].state == PROC_STATE_FREE) {
-      vfs_proc_init_fds(proc_table[i].fds);
-      kzero(proc_table[i].fd_cloexec, sizeof(proc_table[i].fd_cloexec));
-      kstrncpy(proc_table[i].cwd, "/", 2);
-      ktermios_init_default(&proc_table[i].termios);
-      proc_table[i].kbd_edit_len  = 0;
-      proc_table[i].kbd_ready_len = 0;
-      return &proc_table[i];
-    }
+    proc_t *p = &proc_table[i];
+    if(p->state != PROC_STATE_FREE)
+      continue;
+
+    kzero(p, sizeof *p);
+
+    /* Re-establish the few fields that are not zero-valued in their fresh
+     * state. Everything else (signal actions / mask / pending, exit_code,
+     * fs_base, fd_cloexec, kbd_*_len, ...) is correctly zero from kzero. */
+    vfs_proc_init_fds(p->fds);
+    kstrncpy(p->cwd, "/", 2);
+    ktermios_init_default(&p->termios);
+
+    return p;
   }
   return NULL;
 }
@@ -780,13 +792,18 @@ void proc_start_first(
 /**
  * @brief Fork / clone (no threads): duplicate the calling task.
  *
- * If @p child_stack_arg is 0, the child uses the same user RSP as the parent
- * syscall frame (fork). Otherwise the child resumes at @p child_stack_arg
- * (musl `__clone` after syscall).
+ * @param frame        Saved syscall frame the child resumes from (RIP/RFLAGS,
+ *                     plus a copy of every general-purpose register so the
+ *                     child returns to the same user-mode RIP with @c rax = 0).
+ * @param child_stack  If non-zero, the child resumes with this user RSP
+ *                     (musl @c __clone). If zero, child uses the parent's
+ *                     user RSP from @p frame (plain @c fork).
+ * @param clone_flags  Bitmask: @c ALCOR_CLONE_VFORK makes the parent block
+ *                     in @c PROC_STATE_BLOCKED until the child execve's or
+ *                     exits (matches musl @c posix_spawn's wire usage).
  *
- * @param frame_ptr Saved syscall frame.
- * @param child_stack_arg User stack for child, or 0 for parent's RSP.
- * @return Child PID to parent, negative errno on failure.
+ * @return Child PID to the parent (the child returns 0 via @c rax in its
+ *         own syscall frame), or negative errno on failure.
  */
 static i64 proc_fork_impl(
     const syscall_frame_t *frame, u64 child_stack_arg, u32 clone_flags
@@ -794,9 +811,8 @@ static i64 proc_fork_impl(
 {
   u64     child_rsp = child_stack_arg ? child_stack_arg : frame->rsp;
   proc_t *parent    = current_proc;
-  if(!parent) {
-    return -1;
-  }
+  if(!parent)
+    return -ESRCH;
 
   /* Allocate child process slot */
   proc_t *child = proc_alloc();
@@ -856,6 +872,16 @@ static i64 proc_fork_impl(
   kmemcpy(&child->termios, &parent->termios, sizeof(child->termios));
   child->kbd_edit_len  = 0;
   child->kbd_ready_len = 0;
+
+  /* POSIX fork: child inherits parent's signal dispositions and mask, but
+   * starts with an empty pending set. Without this copy the child would
+   * see whatever sig_actions table proc_alloc left behind (zeroed, i.e.
+   * SIG_DFL across the board) instead of what the parent has registered. */
+  kmemcpy(
+      child->sig_actions, parent->sig_actions, sizeof child->sig_actions
+  );
+  child->sig_mask    = parent->sig_mask;
+  child->sig_pending = 0;
 
   /* Copy user context from syscall frame */
   child->user_rip    = frame->rip;
