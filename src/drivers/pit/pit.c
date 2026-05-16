@@ -5,6 +5,7 @@
 
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pit.h>
+#include <alcor2/drivers/fb_console.h>
 #include <alcor2/proc/proc.h>
 
 #define PIT_CHANNEL0 0x40
@@ -54,6 +55,10 @@ void pit_enable_sched(void)
 void pit_tick(void)
 {
   ticks++;
+
+  /* Cheap call into the framebuffer console — no-op until fb_console_init has
+   * run + cells are allocated. Drives the cursor blink phase. */
+  fb_console_tick();
 
   if(preempt_enabled) {
     proc_tick();
