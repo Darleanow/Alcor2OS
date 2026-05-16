@@ -45,7 +45,8 @@ static ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
 /** @brief Pool of open file handles. */
 static ext2_file_t g_files[EXT2_MAX_FILES];
 
-/** Forward declaration; full initializer is near file end (needs static ops). */
+/** Forward declaration; full initializer is near file end (needs static ops).
+ */
 static const fs_type_t g_ext2_fstype;
 
 /**
@@ -2603,13 +2604,15 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
   return 0;
 }
 
-/* --- VFS glue: fs_ops_t adapters (single surface; no duplicate ext2_vfs_* layer)
+/* --- VFS glue: fs_ops_t adapters (single surface; no duplicate ext2_vfs_*
+ * layer)
  * --- */
 
 static fs_handle_t ext2_ops_open(void *fs_data, const char *path, u32 flags)
 {
   ext2_volume_t *v = fs_data;
-  return (fs_handle_t)((flags & O_CREAT) ? ext2_create(v, path) : ext2_open(v, path));
+  return (fs_handle_t)((flags & O_CREAT) ? ext2_create(v, path)
+                                         : ext2_open(v, path));
 }
 
 static void ext2_ops_close(fs_handle_t fh)
@@ -2622,7 +2625,8 @@ static i64 ext2_ops_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
   return ext2_read((ext2_file_t *)fh, buf, count, offset);
 }
 
-static i64 ext2_ops_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
+static i64
+    ext2_ops_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
 {
   return ext2_write((ext2_file_t *)fh, buf, count, offset);
 }
@@ -2670,7 +2674,8 @@ static i64 ext2_ops_stat(void *fs_data, const char *path, vfs_stat_t *st)
   return ret;
 }
 
-static i64 ext2_ops_readdir(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st)
+static i64
+    ext2_ops_readdir(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st)
 {
   ext2_entry_t entry;
   i64          ret = ext2_readdir((ext2_file_t *)fh, index, &entry);
@@ -2690,7 +2695,8 @@ static i64 ext2_ops_truncate(fs_handle_t fh, u64 length)
   return ext2_truncate((ext2_file_t *)fh, length);
 }
 
-static i64 ext2_ops_readlink(void *fs_data, const char *path, char *buf, u64 cap)
+static i64
+    ext2_ops_readlink(void *fs_data, const char *path, char *buf, u64 cap)
 {
   return ext2_readlink(fs_data, path, buf, cap);
 }

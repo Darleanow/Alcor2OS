@@ -108,7 +108,9 @@ typedef struct
 
 _Static_assert(offsetof(syscall_frame_t, rax) == 14 * 8, "syscall_frame rax");
 _Static_assert(offsetof(syscall_frame_t, rip) == 15 * 8, "syscall_frame rip");
-_Static_assert(offsetof(syscall_frame_t, rflags) == 16 * 8, "syscall_frame rflags");
+_Static_assert(
+    offsetof(syscall_frame_t, rflags) == 16 * 8, "syscall_frame rflags"
+);
 _Static_assert(offsetof(syscall_frame_t, rsp) == 17 * 8, "syscall_frame rsp");
 
 /**

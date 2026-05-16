@@ -322,4 +322,3 @@ void *krealloc(void *ptr, u64 new_size)
   kfree(ptr);
   return new_ptr;
 }
-

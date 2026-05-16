@@ -551,8 +551,7 @@ static void cache_invalidate_range(u8 drive, u64 lba, u32 count)
 
 static i64 ata_read_raw(ata_drive_t *d, u64 lba, u32 count, void *buf)
 {
-  if(d->dma && d->channel->dma_ok && proc_current() &&
-     count <= DMA_MAX_SECTORS)
+  if(d->dma && d->channel->dma_ok && proc_current() && count <= DMA_MAX_SECTORS)
     return dma_transfer(d, lba, count, buf, false);
   return pio_read(d, lba, count, buf);
 }
@@ -643,8 +642,7 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
   cache_init_once();
   cache_invalidate_range(drive, lba, count);
 
-  if(d->dma && d->channel->dma_ok && proc_current() &&
-     count <= DMA_MAX_SECTORS)
+  if(d->dma && d->channel->dma_ok && proc_current() && count <= DMA_MAX_SECTORS)
     return dma_transfer(d, lba, count, (void *)buf, true);
 
   return pio_write(d, lba, count, buf);

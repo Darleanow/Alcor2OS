@@ -103,10 +103,11 @@ typedef struct ata_channel
   u8          status;     /* Last status from IRQ */
   u8          bmi_status; /* Last BMI status */
   u8          error;      /* Last error register */
-  struct proc *waiter; /* Blocked proc waiting for IRQ (NULL = poll / early boot) */
-  ata_prd_t  *prdt;       /* PRD table (virtual) */
-  u64         prdt_phys;  /* PRD table (physical) */
-  bool        dma_ok;     /* DMA available */
+  struct proc
+      *waiter;     /* Blocked proc waiting for IRQ (NULL = poll / early boot) */
+  ata_prd_t *prdt; /* PRD table (virtual) */
+  u64        prdt_phys; /* PRD table (physical) */
+  bool       dma_ok;    /* DMA available */
 } ata_channel_t;
 
 /**

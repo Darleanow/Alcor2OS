@@ -186,8 +186,8 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   char **new_envp     = kmalloc((u64)(MAX_EXEC_ARGS + 1) * sizeof(char *));
   char  *name_storage = kmalloc(MAX_ARG_LEN);
 
-  u64 rc_u = 0;
-  i64 fd   = -1;
+  u64    rc_u = 0;
+  i64    fd   = -1;
 
   if(!arg_storage || !new_argv || !env_storage || !new_envp || !name_storage) {
     rc_u = (u64)-ENOMEM;

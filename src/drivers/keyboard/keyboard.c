@@ -15,8 +15,9 @@
 static u8           kb_buffer[KB_BUFFER_SIZE];
 static volatile u32 kb_read_pos  = 0;
 static volatile u32 kb_write_pos = 0;
-/** @brief Raw scancodes dropped because the ring buffer was full (burst input). */
-static u32 kb_drop_count = 0;
+/** @brief Raw scancodes dropped because the ring buffer was full (burst input).
+ */
+static u32  kb_drop_count = 0;
 
 static void kb_push(u8 b)
 {

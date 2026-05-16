@@ -915,9 +915,7 @@ static i64 proc_fork_impl(
    * starts with an empty pending set. Without this copy the child would
    * see whatever sig_actions table proc_alloc left behind (zeroed, i.e.
    * SIG_DFL across the board) instead of what the parent has registered. */
-  kmemcpy(
-      child->sig_actions, parent->sig_actions, sizeof child->sig_actions
-  );
+  kmemcpy(child->sig_actions, parent->sig_actions, sizeof child->sig_actions);
   child->sig_mask    = parent->sig_mask;
   child->sig_pending = 0;
 
