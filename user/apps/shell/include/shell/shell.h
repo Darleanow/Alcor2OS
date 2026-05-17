@@ -23,12 +23,8 @@ void sh_puts(const char *s);
 void sh_putnum(long n);
 void sh_stdout_bytes(const void *buf, size_t len);
 
-int  sh_getchar(void);
-int  sh_getchar_blinking(int idle_ms);
-
 /* Process / terminal */
 void sh_exit(int code);
-void sh_set_stdin_raw(void);
 long sh_read(int fd, void *buf, size_t len);
 long sh_write(int fd, const void *buf, size_t len);
 int  sh_ioctl(int fd, unsigned long request, void *arg);
