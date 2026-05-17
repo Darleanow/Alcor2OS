@@ -12,7 +12,6 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <termios.h>
 #include <unistd.h>
 
 /** Process Control */
@@ -20,18 +19,6 @@
 void sh_exit(int code)
 {
   exit(code);
-}
-
-void sh_set_stdin_raw(void)
-{
-  struct termios t;
-  if(tcgetattr(STDIN_FILENO, &t) != 0)
-    return;
-  t.c_lflag &= ~(tcflag_t)(ICANON | ECHO | ISIG | IEXTEN);
-  t.c_iflag &= ~(tcflag_t)(ICRNL | IXON);
-  t.c_cc[VMIN]  = 1;
-  t.c_cc[VTIME] = 0;
-  tcsetattr(STDIN_FILENO, TCSANOW, &t);
 }
 
 /** I/O Functions */

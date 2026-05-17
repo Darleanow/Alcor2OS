@@ -12,8 +12,19 @@ FT_LIB := $(FT_PRE)/lib/libfreetype.a
 # atlas.c only.
 HAVE_ATLAS := $(if $(wildcard $(FT_LIB)),1,)
 
+# ncurses-driven line editor in main.c. Hard requirement: shell links libncurses
+# + libtinfo for getch/keypad/KEY_*. Build via `make ncurses` from repo root.
+NC_ROOT := $(USER_BASE)/../thirdparty/ncurses-install/usr
+NC_LIBS := $(NC_ROOT)/lib/libncurses.a $(NC_ROOT)/lib/libtinfo.a
+ifeq ($(wildcard $(NC_ROOT)/lib/libncurses.a),)
+$(error shell: missing ncurses libs — run `make ncurses` from repo root)
+endif
+NCURSES_SUB := $(wildcard $(NC_ROOT)/include/ncurses)
+NC_CFLAGS   := -I$(NC_ROOT)/include $(if $(NCURSES_SUB),-I$(NC_ROOT)/include/ncurses)
+
 CFLAGS += -I$(USER_BASE)/apps/shell/include \
-          -I$(USER_BASE)/sdk/vega/include
+          -I$(USER_BASE)/sdk/vega/include \
+          $(NC_CFLAGS)
 
 BASE_SRCS := \
   main.c \
@@ -54,13 +65,13 @@ $(ATLAS_OBJ): $(ATLAS_SRC) $(HEADERS) | $(OUT_DIR)
 	$(CC) $(if $(filter 1,$(HAVE_ATLAS)),$(ATLAS_CFLAGS),$(CFLAGS)) -c $< -o $@
 
 ifeq ($(HAVE_ATLAS),1)
-$(TARGET): $(OBJS) $(LIBVEGA) $(CRT0)
+$(TARGET): $(OBJS) $(LIBVEGA) $(CRT0) $(NC_LIBS)
 	$(LD) $(LDFLAGS) $(CRT0) $(OBJS) $(LIBVEGA) \
-	  -L$(FT_PRE)/lib -lfreetype $(LIBS) -o $@
+	  -L$(FT_PRE)/lib -lfreetype $(NC_LIBS) $(LIBS) -o $@
 	@echo "Built $@"
 else
-$(TARGET): $(OBJS) $(LIBVEGA) $(CRT0)
-	$(LD) $(LDFLAGS) $(CRT0) $(OBJS) $(LIBVEGA) $(LIBS) -o $@
+$(TARGET): $(OBJS) $(LIBVEGA) $(CRT0) $(NC_LIBS)
+	$(LD) $(LDFLAGS) $(CRT0) $(OBJS) $(LIBVEGA) $(NC_LIBS) $(LIBS) -o $@
 	@echo "Built $@"
 endif
 
