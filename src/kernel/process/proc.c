@@ -563,14 +563,9 @@ void proc_exit(i64 code)
   proc_vfork_wake_parent(p);
   p->exit_code = code;
 
-  /* Release per-process fd table; OFT entries close when refcount hits 0.
-   * Must run BEFORE setting state = ZOMBIE: close handlers may issue blocking
-   * disk I/O, and wait_irq toggles the current proc's state through
-   * BLOCKED -> (irq wake) -> READY. If we had set ZOMBIE first that pair
-   * would resurrect the dying proc, and the parent's waitpid loop would
-   * later observe state == READY instead of ZOMBIE and pick it back up. */
+  /* Release fds before flipping to ZOMBIE: close handlers may issue blocking
+   * disk I/O, and wait_irq would clobber the ZOMBIE state. */
   vfs_proc_release_fds(p->fds);
-
   p->state = PROC_STATE_ZOMBIE;
 
   /* Notify parent via SIGCHLD and wake it if blocked in waitpid */
