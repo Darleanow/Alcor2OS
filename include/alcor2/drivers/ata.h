@@ -104,10 +104,12 @@ typedef struct ata_channel
   u8          bmi_status; /* Last BMI status */
   u8          error;      /* Last error register */
   struct proc
-      *waiter;     /* Blocked proc waiting for IRQ (NULL = poll / early boot) */
-  ata_prd_t *prdt; /* PRD table (virtual) */
-  u64        prdt_phys; /* PRD table (physical) */
-  bool       dma_ok;    /* DMA available */
+      *waiter; /* Blocked proc waiting for IRQ (NULL = poll / early boot) */
+  struct proc *lock_queue; /* Head of procs waiting for the channel itself */
+  bool         busy;      /* Channel held by a caller between acquire/release */
+  ata_prd_t   *prdt;      /* PRD table (virtual) */
+  u64          prdt_phys; /* PRD table (physical) */
+  bool         dma_ok;    /* DMA available */
 } ata_channel_t;
 
 /**

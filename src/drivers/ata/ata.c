@@ -206,6 +206,57 @@ static void identify(ata_drive_t *d)
 }
 
 /**
+ * @brief Block until the channel is free, then mark it busy.
+ *
+ * Without this serialisation, two procs hitting the same channel back-to-back
+ * (e.g. echo+cat both execve'ing through the pipeline) race: the second
+ * @ref prepare_irq_wait overwrites @c ch->waiter and the first proc's IRQ
+ * wakes the wrong task — the first stays BLOCKED forever.
+ *
+ * Early boot has no scheduler: just claim the channel directly.
+ */
+static void channel_acquire(ata_channel_t *ch)
+{
+  proc_t *me = proc_current();
+  if(!me) {
+    /* No scheduler yet; we are the only caller. */
+    ch->busy = true;
+    return;
+  }
+
+  cpu_disable_interrupts();
+  while(ch->busy) {
+    me->ata_next   = ch->lock_queue;
+    ch->lock_queue = me;
+    me->state      = PROC_STATE_BLOCKED;
+    proc_schedule();
+    cpu_disable_interrupts();
+  }
+  ch->busy = true;
+  cpu_enable_interrupts();
+}
+
+/**
+ * @brief Mark the channel free and wake one queued acquirer.
+ *
+ * Called from the same proc that did @ref channel_acquire, after either
+ * @ref wait_irq returned or the operation aborted.
+ */
+static void channel_release(ata_channel_t *ch)
+{
+  cpu_disable_interrupts();
+  ch->busy       = false;
+  proc_t *waiter = ch->lock_queue;
+  if(waiter) {
+    ch->lock_queue   = waiter->ata_next;
+    waiter->ata_next = NULL;
+    if(waiter->state == PROC_STATE_BLOCKED)
+      waiter->state = PROC_STATE_READY;
+  }
+  cpu_enable_interrupts();
+}
+
+/**
  * @brief Wait for ATA command completion.
  *
  * With scheduler: block + wake from IRQ. Early boot: busy-poll.
@@ -551,9 +602,14 @@ static void cache_invalidate_range(u8 drive, u64 lba, u32 count)
 
 static i64 ata_read_raw(ata_drive_t *d, u64 lba, u32 count, void *buf)
 {
+  channel_acquire(d->channel);
+  i64 r;
   if(d->dma && d->channel->dma_ok && proc_current() && count <= DMA_MAX_SECTORS)
-    return dma_transfer(d, lba, count, buf, false);
-  return pio_read(d, lba, count, buf);
+    r = dma_transfer(d, lba, count, buf, false);
+  else
+    r = pio_read(d, lba, count, buf);
+  channel_release(d->channel);
+  return r;
 }
 
 /**
@@ -642,10 +698,14 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)
   cache_init_once();
   cache_invalidate_range(drive, lba, count);
 
+  channel_acquire(d->channel);
+  i64 r;
   if(d->dma && d->channel->dma_ok && proc_current() && count <= DMA_MAX_SECTORS)
-    return dma_transfer(d, lba, count, (void *)buf, true);
-
-  return pio_write(d, lba, count, buf);
+    r = dma_transfer(d, lba, count, (void *)buf, true);
+  else
+    r = pio_write(d, lba, count, buf);
+  channel_release(d->channel);
+  return r;
 }
 
 /**
