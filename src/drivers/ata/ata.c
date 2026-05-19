@@ -205,25 +205,15 @@ static void identify(ata_drive_t *d)
   trim_string(d->serial, 20);
 }
 
-/**
- * @brief Block until the channel is free, then mark it busy.
- *
- * Without this serialisation, two procs hitting the same channel back-to-back
- * (e.g. echo+cat both execve'ing through the pipeline) race: the second
- * @ref prepare_irq_wait overwrites @c ch->waiter and the first proc's IRQ
- * wakes the wrong task — the first stays BLOCKED forever.
- *
- * Early boot has no scheduler: just claim the channel directly.
- */
+/* Serialise per-channel access. Concurrent users would race on `ch->waiter`
+ * and lose IRQ wakes. */
 static void channel_acquire(ata_channel_t *ch)
 {
   proc_t *me = proc_current();
   if(!me) {
-    /* No scheduler yet; we are the only caller. */
     ch->busy = true;
     return;
   }
-
   cpu_disable_interrupts();
   while(ch->busy) {
     me->ata_next   = ch->lock_queue;
@@ -236,12 +226,6 @@ static void channel_acquire(ata_channel_t *ch)
   cpu_enable_interrupts();
 }
 
-/**
- * @brief Mark the channel free and wake one queued acquirer.
- *
- * Called from the same proc that did @ref channel_acquire, after either
- * @ref wait_irq returned or the operation aborted.
- */
 static void channel_release(ata_channel_t *ch)
 {
   cpu_disable_interrupts();
