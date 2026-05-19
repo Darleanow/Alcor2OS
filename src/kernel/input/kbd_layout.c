@@ -383,15 +383,15 @@ static bool
       else
         pend_csi('C');
       break;
-    case 0x47: /* Home */
+    case 0x47: /* Home → SS3 H (xterm-256color khome = \EOH). */
       if(dry)
         return true;
-      pend_csi_tilde(1u);
+      pend_ss3('H');
       break;
-    case 0x4f: /* End */
+    case 0x4f: /* End → SS3 F (xterm-256color kend = \EOF). */
       if(dry)
         return true;
-      pend_csi_tilde(4u);
+      pend_ss3('F');
       break;
     case 0x49: /* Page Up */
       if(dry)
@@ -408,10 +408,11 @@ static bool
         return true;
       pend_csi_tilde(2u);
       break;
-    case 0x53: /* Delete — kept as 0x7f for shell backspace parity. */
-      if(!dry)
-        *out = 0x7f;
-      return true;
+    case 0x53: /* Delete → ESC[3~ (KEY_DC in ncurses). */
+      if(dry)
+        return true;
+      pend_csi_tilde(3u);
+      break;
     default:
       break;
     }
@@ -595,17 +596,20 @@ static bool kbd_pop_byte(unsigned char *out, bool block)
   }
 }
 
+/* Canonical-mode echo. Goes through fb_console_write so output lands in the
+ * cell grid (with the Fira atlas if loaded) rather than the boot logger's
+ * raw bitmap path, and follows the same scroll / cursor rules as everything
+ * else. */
 static void tty_echo_byte(unsigned char c, bool echo_on)
 {
   if(!echo_on)
     return;
   if(c == '\n' || c == '\r') {
-    console_putchar('\r');
-    console_putchar('\n');
+    fb_console_write("\r\n", 2);
   } else if(c == '\t') {
-    console_putchar('\t');
+    fb_console_write("\t", 1);
   } else if(c >= 0x20 && c < 0x7f) {
-    console_putchar((char)c);
+    fb_console_write(&c, 1);
   }
 }
 
@@ -613,9 +617,7 @@ static void tty_echo_erase(bool echo_on)
 {
   if(!echo_on)
     return;
-  console_putchar('\b');
-  console_putchar(' ');
-  console_putchar('\b');
+  fb_console_write("\b \b", 3);
 }
 
 /**

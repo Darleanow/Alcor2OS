@@ -243,7 +243,66 @@ static void blit_cell(int col, int row)
   }
 }
 
-/* Scroll the cell grid up by one row; clear bottom row. */
+/* Last drawn cursor cell. -1 means "no cursor on screen right now", which
+ * cursor_erase treats as a no-op. Tracked so a moved cursor can wipe its
+ * previous block by re-blitting just that one cell. */
+static int s_cursor_drawn_x = -1;
+static int s_cursor_drawn_y = -1;
+
+/** Re-blit the cell that currently shows the cursor block, restoring the
+ *  glyph that was underneath. */
+static void cursor_erase(void)
+{
+  if(s_cursor_drawn_x < 0 || s_cursor_drawn_y < 0)
+    return;
+  if(ctx.cells && s_cursor_drawn_y < ctx.rows && s_cursor_drawn_x < ctx.cols)
+    blit_cell(s_cursor_drawn_x, s_cursor_drawn_y);
+  s_cursor_drawn_x = -1;
+  s_cursor_drawn_y = -1;
+}
+
+/** Paint a solid block cursor at the current logical position, using the
+ *  current fg colour. Skips when hidden, not blinking on, or yielded. */
+static void cursor_paint(void)
+{
+  if(ctx.yielded || !ctx.cells)
+    return;
+  if(!ctx.cursor_visible || !ctx.blink_on)
+    return;
+  int x = ctx.cx;
+  int y = ctx.cy;
+  if(x >= ctx.cols)
+    x = ctx.cols - 1;
+  if(y >= ctx.rows)
+    y = ctx.rows - 1;
+  if(x < 0 || y < 0)
+    return;
+  u32 px_x = (u32)ctx.margin_x + (u32)x * (u32)ctx.cell_w;
+  u32 px_y = (u32)ctx.margin_y + (u32)y * (u32)ctx.cell_h;
+  for(int gy = 0; gy < ctx.cell_h; gy++)
+    for(int gx = 0; gx < ctx.cell_w; gx++)
+      fb_put_pixel(px_x + (u32)gx, px_y + (u32)gy, ctx.cur_fg);
+  s_cursor_drawn_x = x;
+  s_cursor_drawn_y = y;
+}
+
+/** Erase + paint in one call. Cheap when the cursor hasn't moved. */
+static void cursor_refresh(void)
+{
+  cursor_erase();
+  cursor_paint();
+}
+
+/* Rows that need to be scrolled out at the next flush. Updated by scroll_one
+ * during a write; consumed by flush_pending_scroll at end-of-write. Batching
+ * matters because pixel writes hit MMIO — collapsing N scrolls into one move
+ * keeps `ls` of a long dir interactive instead of bandwidth-bound. */
+static int s_pending_scroll = 0;
+
+/* Logical scroll only — moves the cell array up by one row and queues a
+ * pixel move for the next flush. Cell blits done between now and flush land
+ * at their final logical row, so the visible result is the same once the
+ * pending pixel move catches up. */
 static void scroll_one(void)
 {
   size_t row_bytes = (size_t)ctx.cols * sizeof(fb_cell_t);
@@ -260,8 +319,37 @@ static void scroll_one(void)
     cell->bg   = ctx.cur_bg;
     cell->attr = 0;
   }
-  /* Repaint everything — full-screen redraw on scroll. */
-  for(int r = 0; r < ctx.rows; r++)
+  s_pending_scroll++;
+  s_cursor_drawn_x = -1;
+  s_cursor_drawn_y = -1;
+}
+
+/* Apply any queued scrolls in one pixel move + repaint just the new rows. */
+static void flush_pending_scroll(void)
+{
+  if(s_pending_scroll <= 0)
+    return;
+  int n            = s_pending_scroll;
+  s_pending_scroll = 0;
+  if(n >= ctx.rows) {
+    for(int r = 0; r < ctx.rows; r++)
+      for(int c = 0; c < ctx.cols; c++)
+        blit_cell(c, r);
+    return;
+  }
+  if(ctx.base) {
+    /* One contiguous rep movsb across all source rows instead of per-row
+     * setup. The framebuffer is linear, so src/dst differ by `shift_px *
+     * pitch` bytes — non-overlapping forward copy is safe because dst < src. */
+    u64 cell_h_px = (u64)ctx.cell_h;
+    u64 shift_px  = (u64)n * cell_h_px;
+    u64 n_rows    = (u64)(ctx.rows - n) * cell_h_px;
+    u64 bytes     = n_rows * ctx.pitch;
+    u8 *dst       = (u8 *)(ctx.base + (u64)ctx.margin_y * ctx.pitch);
+    u8 *src       = dst + shift_px * ctx.pitch;
+    kmemcpy(dst, src, bytes);
+  }
+  for(int r = ctx.rows - n; r < ctx.rows; r++)
     for(int c = 0; c < ctx.cols; c++)
       blit_cell(c, r);
 }
@@ -826,12 +914,17 @@ void fb_console_write(const void *buf, size_t len)
 {
   if(ctx.yielded || !ctx.cells)
     return;
+  /* Erase the old block before laying down new glyphs so the cursor doesn't
+   * leave a stamp where it used to be. */
+  cursor_erase();
   const u8 *p = (const u8 *)buf;
   for(size_t i = 0; i < len; i++)
     feed_byte(p[i]);
-  /* Activity → cursor blink "on". */
+  flush_pending_scroll();
+  /* Activity → cursor blink "on" and follows typing immediately. */
   ctx.blink_ticks = 50;
   ctx.blink_on    = 1;
+  cursor_paint();
 }
 
 void fb_console_push_input(u8 byte)
@@ -863,7 +956,7 @@ void fb_console_tick(void)
   if(ctx.blink_ticks == 0) {
     ctx.blink_on    = (u8)!ctx.blink_on;
     ctx.blink_ticks = 50;
-    /* TODO: repaint just the cursor cell with inverted fg/bg. */
+    cursor_refresh();
   } else {
     ctx.blink_ticks--;
   }
@@ -978,10 +1071,16 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
      * the atlas blit will just clip to ctx.cell_w/cell_h as before. */
   }
 
-  /* Repaint the whole grid through the new path. */
+  /* Repaint the whole grid through the new path. The cursor cell, if any,
+   * was overwritten by that loop so its tracked position is now stale; any
+   * pending scroll is moot because we just repainted everything. */
+  s_pending_scroll = 0;
   for(int r = 0; r < ctx.rows; r++)
     for(int c = 0; c < ctx.cols; c++)
       blit_cell(c, r);
+  s_cursor_drawn_x = -1;
+  s_cursor_drawn_y = -1;
+  cursor_paint();
 
   /* Wake every TUI so they re-query TIOCGWINSZ and redraw at the real grid
    * size. Skipped when the grid stayed the same (e.g. atlas reloaded with
@@ -1014,7 +1113,11 @@ void fb_console_reclaim(void)
   ctx.yielded = false;
   if(!ctx.cells)
     return;
+  s_pending_scroll = 0;
   for(int r = 0; r < ctx.rows; r++)
     for(int c = 0; c < ctx.cols; c++)
       blit_cell(c, r);
+  s_cursor_drawn_x = -1;
+  s_cursor_drawn_y = -1;
+  cursor_paint();
 }

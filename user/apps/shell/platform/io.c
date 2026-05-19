@@ -49,20 +49,3 @@ void sh_putnum(long n)
   while(i > 0)
     sh_putchar(buf[--i]);
 }
-
-int sh_getchar(void)
-{
-  char c;
-  if(sh_read(STDIN_FILENO, &c, 1) <= 0)
-    return -1;
-  return (unsigned char)c;
-}
-
-/* Blink coordination used to live here; the kernel now drives cursor blink
- * via the PIT tick, so getchar_blinking is just a plain getchar. Kept as a
- * separate name so existing callers don't need to change. */
-int sh_getchar_blinking(int idle_ms)
-{
-  (void)idle_ms;
-  return sh_getchar();
-}

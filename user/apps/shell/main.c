@@ -1,18 +1,25 @@
 /**
  * @file apps/shell/main.c
- * @brief vega REPL: read a line, hand it to vega_run().
+ * @brief vega REPL with an ncurses-backed line editor.
  *
- * Glyph rendering lives entirely in the kernel (fb_console). The shell at
- * startup rasterises Fira into a glyph atlas and submits it via
- * @c FB_CONSOLE_SET_ATLAS; from then on every @c write(1, ...) lands in the
- * kernel's cell grid, parsed for UTF-8 + ANSI/CSI, blitted with Fira glyphs.
+ * ncurses is used for input only: getch() with keypad mode gives us KEY_UP,
+ * KEY_LEFT, KEY_HOME, KEY_F(n)… without us having to parse escape sequences.
+ * Output is written straight to stdout (the kernel fb_console speaks ANSI
+ * cleanly) so child process stdout, prompts, and history redraws all share
+ * the same scrollable stream — ncurses' internal screen model never gets a
+ * chance to diverge from the real terminal.
  */
 
+#include <curses.h>
 #include <shell/atlas.h>
 #include <shell/shell.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <termios.h>
+#include <unistd.h>
 #include <vega/host.h>
 #include <vega/vega.h>
 
@@ -25,220 +32,263 @@ static const vega_host_ops_t shell_host = {
   #define VEGA_VERSION "1.0.0"
 #endif
 
-/* Per-call line-editor state for read_line(): ESC pushback + UTF-8 accumulator.
- */
-typedef struct
-{
-  int      pushback;
-  unsigned utf8_rem;
-  uint32_t utf8_partial;
-} LineEditState;
+#define HIST_MAX     128
+#define LINE_MAX_LEN MAX_CMD_LEN
 
-static LineEditState s_edit = {.pushback = -1};
-
-/** Special return codes for read_line(): negative values that don't clash
- *  with a byte-count. RL_EOF is the existing "user hit Ctrl-D on an empty
- *  line"; RL_INTERRUPT signals SIGINT-style Ctrl-C so the caller can drop
- *  any pending multiline buffer instead of treating it like a bare \n. */
+/** Special return codes for read_line(). Negative so they can't be confused
+ *  with a byte count. */
 #define RL_EOF       (-1)
 #define RL_INTERRUPT (-2)
+#define RL_CLEAR     (-3)
 
-static void line_edit_reset(LineEditState *s)
+/* History ring. Oldest entry is at index 0; newest at hist_count-1. UP/DOWN
+ * navigate a transient cursor (hist_view) into this list while editing. */
+static char history[HIST_MAX][LINE_MAX_LEN];
+static int  hist_count = 0;
+
+static void hist_push(const char *line)
 {
-  s->pushback     = -1;
-  s->utf8_rem     = 0;
-  s->utf8_partial = 0;
+  if(!line || !line[0])
+    return;
+  /* Skip if identical to the most recent entry. */
+  if(hist_count > 0 && strcmp(history[hist_count - 1], line) == 0)
+    return;
+  if(hist_count == HIST_MAX) {
+    memmove(history[0], history[1], sizeof(history[0]) * (HIST_MAX - 1));
+    hist_count--;
+  }
+  strncpy(history[hist_count], line, LINE_MAX_LEN - 1);
+  history[hist_count][LINE_MAX_LEN - 1] = '\0';
+  hist_count++;
 }
 
-/* Encode @p cp as UTF-8, append to @p buf, and echo each byte to the terminal.
- * Returns 0 on success, -1 if the buffer would overflow or cp is out of range.
- */
-static int store_utf8_cp(char *buf, size_t size, size_t *pos, uint32_t cp)
+static void write_str(const char *s)
 {
-  unsigned char enc[3];
-  int           n;
-
-  if(cp < 0x80u) {
-    enc[0] = (unsigned char)cp;
-    n      = 1;
-  } else if(cp < 0x800u) {
-    enc[0] = (unsigned char)(0xc0u | ((cp >> 6) & 0x1fu));
-    enc[1] = (unsigned char)(0x80u | (cp & 0x3fu));
-    n      = 2;
-  } else if(cp < 0x10000u) {
-    enc[0] = (unsigned char)(0xe0u | ((cp >> 12) & 0x0fu));
-    enc[1] = (unsigned char)(0x80u | ((cp >> 6) & 0x3fu));
-    enc[2] = (unsigned char)(0x80u | (cp & 0x3fu));
-    n      = 3;
-  } else {
-    return -1;
+  size_t n = strlen(s);
+  while(n > 0) {
+    ssize_t w = write(STDOUT_FILENO, s, n);
+    if(w <= 0)
+      return;
+    s += w;
+    n -= (size_t)w;
   }
-
-  if(*pos + (size_t)n >= size)
-    return -1;
-  for(int i = 0; i < n; i++) {
-    buf[(*pos)++] = (char)enc[i];
-    sh_putchar((char)enc[i]);
-  }
-  return 0;
 }
 
-/**
- * @brief Read a line of input from the user with basic line editing.
- * @param buf Buffer to store the line.
- * @param size Size of the buffer.
- * @return Number of characters read, or special value for EOF.
- */
-static int read_line(char *buf, size_t size)
+/** Erase the current input line and reprint @p prompt + @p buf; leave the
+ *  terminal cursor at logical column (prompt_cols + cur_cols). */
+static void redraw_line(
+    const char *prompt, int prompt_cols, const char *buf, int cur_cols
+)
 {
-  size_t pos = 0;
-  int    c;
+  char tail[16];
+  /* \r → col 0; \033[K → clear to end of line. */
+  write_str("\r\033[K");
+  write_str(prompt);
+  write_str(buf);
+  /* CHA — Cursor Horizontal Absolute (1-based). */
+  snprintf(tail, sizeof tail, "\r\033[%dC", prompt_cols + cur_cols);
+  if(cur_cols + prompt_cols > 0)
+    write_str(tail);
+  else
+    write_str("\r");
+}
 
-  while(1) {
-    if(s_edit.pushback >= 0) {
-      c               = s_edit.pushback;
-      s_edit.pushback = -1;
-    } else {
-      c = sh_getchar();
-    }
-    if(c < 0)
+/** Count visible columns in a UTF-8 byte string by ignoring continuation
+ *  bytes. Each non-continuation byte represents one logical character. */
+static int utf8_cols(const char *s)
+{
+  int n = 0;
+  for(; *s; s++)
+    if(((unsigned char)*s & 0xC0u) != 0x80u)
+      n++;
+  return n;
+}
+
+/** Step a byte index back/forward by one UTF-8 character boundary. */
+static int prev_char_boundary(const char *buf, int idx)
+{
+  if(idx <= 0)
+    return 0;
+  idx--;
+  while(idx > 0 && ((unsigned char)buf[idx] & 0xC0u) == 0x80u)
+    idx--;
+  return idx;
+}
+
+static int next_char_boundary(const char *buf, int len, int idx)
+{
+  if(idx >= len)
+    return len;
+  idx++;
+  while(idx < len && ((unsigned char)buf[idx] & 0xC0u) == 0x80u)
+    idx++;
+  return idx;
+}
+
+/* Off-screen pad used purely as a getch() source. Reading from a pad (rather
+ * than stdscr) avoids ncurses' implicit wrefresh on the visible screen — we
+ * don't want it overwriting our prompts and child stdout with blanks. */
+static WINDOW *s_input_pad;
+
+/* Termios states swapped around child execs. `raw_t` is what ncurses set up
+ * (non-canonical, no echo, no signals); `cooked_t` is the same with ICANON +
+ * ECHO + ISIG re-enabled so unredirected children like `cat` see line-buffered
+ * input and Ctrl-D triggers EOF. Set in main() right after ncurses init. */
+static struct termios s_raw_t;
+static struct termios s_cooked_t;
+
+/* Read a single line. @p buf is filled with bytes (no trailing newline) and
+ * null-terminated; the byte count is returned. RL_EOF on Ctrl-D at empty
+ * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
+static int read_line(char *buf, size_t cap, const char *prompt)
+{
+  int prompt_cols = utf8_cols(prompt);
+  int len         = 0; /* bytes in buf */
+  int cur_b       = 0; /* byte index of cursor */
+  int hist_view   = hist_count;
+  buf[0]          = '\0';
+
+  write_str(prompt);
+
+  for(;;) {
+    int c = wgetch(s_input_pad);
+    if(c == ERR)
       continue;
 
-    if(c == '\n' || c == '\r') {
-      sh_putchar('\n');
-      buf[pos] = '\0';
-      line_edit_reset(&s_edit);
-      return (int)pos;
+    switch(c) {
+    case '\n':
+    case '\r':
+    case KEY_ENTER:
+      write_str("\n");
+      buf[len] = '\0';
+      return len;
+
+    case 0x7f:
+    case '\b':
+    case KEY_BACKSPACE: {
+      if(cur_b == 0)
+        break;
+      int prev = prev_char_boundary(buf, cur_b);
+      memmove(buf + prev, buf + cur_b, (size_t)(len - cur_b + 1));
+      len -= (cur_b - prev);
+      cur_b = prev;
+      redraw_line(
+          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
+      );
+      break;
     }
 
-    if(c == '\b' || c == 127) {
-      if(pos > 0) {
-        size_t np = pos - 1;
-        while(np > 0 && ((unsigned char)buf[np] & 0xc0u) == 0x80u)
-          np--;
-        pos = np;
-        sh_puts("\b \b");
+    case KEY_DC: {
+      if(cur_b >= len)
+        break;
+      int nx = next_char_boundary(buf, len, cur_b);
+      memmove(buf + cur_b, buf + nx, (size_t)(len - nx + 1));
+      len -= (nx - cur_b);
+      redraw_line(
+          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
+      );
+      break;
+    }
+
+    case KEY_LEFT:
+      if(cur_b > 0) {
+        cur_b = prev_char_boundary(buf, cur_b);
+        redraw_line(
+            prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
+        );
       }
-      s_edit.utf8_rem = 0;
-      continue;
-    }
+      break;
 
-    if(c == 0x03) {
-      sh_puts("^C\n");
+    case KEY_RIGHT:
+      if(cur_b < len) {
+        cur_b = next_char_boundary(buf, len, cur_b);
+        redraw_line(
+            prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
+        );
+      }
+      break;
+
+    case KEY_HOME:
+      cur_b = 0;
+      redraw_line(prompt, prompt_cols, buf, 0);
+      break;
+
+    case KEY_END:
+      cur_b = len;
+      redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
+      break;
+
+    case KEY_UP:
+      if(hist_view > 0) {
+        hist_view--;
+        strncpy(buf, history[hist_view], cap - 1);
+        buf[cap - 1] = '\0';
+        len          = (int)strlen(buf);
+        cur_b        = len;
+        redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
+      }
+      break;
+
+    case KEY_DOWN:
+      if(hist_view < hist_count) {
+        hist_view++;
+        if(hist_view == hist_count) {
+          buf[0] = '\0';
+          len    = 0;
+          cur_b  = 0;
+        } else {
+          strncpy(buf, history[hist_view], cap - 1);
+          buf[cap - 1] = '\0';
+          len          = (int)strlen(buf);
+          cur_b        = len;
+        }
+        redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
+      }
+      break;
+
+    case 0x03: /* Ctrl-C */
+      write_str("^C\n");
       buf[0] = '\0';
-      line_edit_reset(&s_edit);
       return RL_INTERRUPT;
-    }
 
-    if(c == 0x04) {
-      if(pos == 0) {
-        s_edit.pushback = -1;
-        s_edit.utf8_rem = 0;
+    case 0x04: /* Ctrl-D */
+      if(len == 0)
         return RL_EOF;
-      }
-      continue;
-    }
+      break;
 
-    if(c == 0x0C) {
-      sh_clear();
-      line_edit_reset(&s_edit);
-      return 0;
-    }
+    case 0x0C: /* Ctrl-L */
+      return RL_CLEAR;
 
-    /* ESC: drain CSI/SS3 sequences so their bytes do not land in the buffer. */
-    if(c == 0x1b) {
-      s_edit.utf8_rem = 0;
-      int c2          = sh_getchar();
-      if(c2 < 0)
-        continue;
-      if(c2 == '[') {
-        /* CSI: param bytes are 0x30–0x3f; the first byte outside that range
-         * is the final byte (letter or '~'). Covers arrows, Delete, Home… */
-        int cp;
-        do {
-          cp = sh_getchar();
-        } while(cp >= 0x30 && cp <= 0x3f);
-        (void)cp;
-        continue;
+    default:
+      /* Insert byte at cur_b. ASCII printables (0x20..0x7E) and UTF-8 bytes
+       * (0x80..0xFF) are kept; everything else is ignored. KEY_* values are
+       * all >= KEY_MIN (0x101), which falls outside our printable range. */
+      if(c < 0x100 && (c == ' ' || (c >= 0x21 && c <= 0x7e) || c >= 0x80)) {
+        if(len + 1 >= (int)cap - 1)
+          break;
+        memmove(buf + cur_b + 1, buf + cur_b, (size_t)(len - cur_b + 1));
+        buf[cur_b++] = (char)c;
+        len++;
+        redraw_line(
+            prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
+        );
       }
-      if(c2 == 'O') {
-        /* SS3: exactly one final byte (F1–F4 on some terminals). */
-        (void)sh_getchar();
-        continue;
-      }
-      s_edit.pushback = c2;
-      while(pos > 0) {
-        size_t np = pos - 1;
-        while(np > 0 && ((unsigned char)buf[np] & 0xc0u) == 0x80u)
-          np--;
-        pos = np;
-        sh_puts("\b \b");
-      }
-      continue;
-    }
-
-    unsigned char u = (unsigned char)c;
-
-    if(s_edit.utf8_rem > 0) {
-      if((u & 0xc0u) != 0x80u) {
-        /* Bad continuation — restart with this byte. */
-        s_edit.utf8_rem = 0;
-        s_edit.pushback = (int)u;
-        continue;
-      }
-      s_edit.utf8_partial = (s_edit.utf8_partial << 6u) | (uint32_t)(u & 0x3fu);
-      s_edit.utf8_rem--;
-      if(s_edit.utf8_rem != 0)
-        continue;
-      if(s_edit.utf8_partial <= 0x10ffffu &&
-         store_utf8_cp(buf, size, &pos, s_edit.utf8_partial) < 0) {
-        s_edit.utf8_partial = 0;
-      }
-      continue;
-    }
-
-    /* ASCII printable */
-    if(u < 0x80u) {
-      if(u >= 32u && u < 127u && pos < size - 1) {
-        buf[pos++] = (char)u;
-        sh_putchar((char)u);
-      }
-      continue;
-    }
-
-    /* UTF-8 multibyte lead byte */
-    if((u & 0xe0u) == 0xc0u) {
-      s_edit.utf8_partial = (uint32_t)(u & 0x1fu);
-      s_edit.utf8_rem     = 1;
-    } else if((u & 0xf0u) == 0xe0u) {
-      s_edit.utf8_partial = (uint32_t)(u & 0x0fu);
-      s_edit.utf8_rem     = 2;
-    } else if((u & 0xf8u) == 0xf0u) {
-      s_edit.utf8_partial = (uint32_t)(u & 0x07u);
-      s_edit.utf8_rem     = 3;
-    } else {
-      /* Stray high-bit byte that wasn't a UTF-8 lead — kbd layer emits UTF-8
-       * for Latin-1, so this only fires on malformed pastes. Transcode
-       * defensively so the line buffer stays valid UTF-8. */
-      (void)store_utf8_cp(buf, size, &pos, (uint32_t)u);
+      break;
     }
   }
 }
 
 /**
- * @brief Print the shell prompt with current working directory.
+ * @brief Print the shell prompt into a buffer (instead of writing immediately
+ * so the prompt-length stays in sync with what read_line draws).
  */
-static void print_prompt(void)
+static void format_prompt(char *out, size_t cap)
 {
   char cwd[MAX_PATH];
-
-  if(sh_getcwd(cwd, sizeof(cwd)) != NULL) {
-    sh_puts("alcor2:");
-    sh_puts(cwd);
-    sh_puts("$ ");
-  } else {
-    sh_puts("alcor2> ");
-  }
+  if(sh_getcwd(cwd, sizeof cwd))
+    snprintf(out, cap, "alcor2:%s$ ", cwd);
+  else
+    snprintf(out, cap, "alcor2> ");
 }
 
 #define MAX_HEREDOC_DELIM 64
@@ -370,12 +420,21 @@ static int read_complete_statement(char *buf, size_t size)
   size_t pos = 0;
   buf[0]     = '\0';
 
+  char prompt[MAX_PATH + 16];
+  format_prompt(prompt, sizeof prompt);
+
   while(1) {
-    int len = read_line(buf + pos, size - pos);
+    int len = read_line(buf + pos, size - pos, prompt);
     if(len == RL_EOF)
       return RL_EOF;
     if(len == RL_INTERRUPT)
       return 0;
+    if(len == RL_CLEAR) {
+      sh_clear();
+      /* Re-prompt with whatever has already been accumulated on prior lines.
+       * Most often pos == 0 and the user just wanted a clean screen. */
+      continue;
+    }
 
     pos += (size_t)len;
     if(pos >= size - 2)
@@ -387,13 +446,15 @@ static int read_complete_statement(char *buf, size_t size)
     if(is_input_complete(buf))
       return (int)pos;
 
-    sh_puts("> ");
+    /* Continuation prompt — narrower than the primary prompt so it's
+     * visually distinct. */
+    snprintf(prompt, sizeof prompt, "> ");
   }
 }
 
 /**
- * @brief Shell main entry point. Sets up libvega, submits the Fira atlas to
- * the kernel console, then enters the read-eval-print loop.
+ * @brief Shell main entry point. Sets up libvega, submits the Fira atlas,
+ * initialises ncurses for input handling, then enters the REPL.
  */
 int main(int argc, char *argv[])
 {
@@ -401,15 +462,8 @@ int main(int argc, char *argv[])
   (void)argv;
 
   vega_init(&shell_host);
-
-  /* No procfs on Alcor2; LLVM/musl fall back to PATH for argv-only lookups. */
   setenv("PATH", "/bin:/usr/bin", 0);
 
-  /* Raw mode: shell handles line editing; the kernel renders. */
-  sh_set_stdin_raw();
-
-  /* Rasterize Fira → kernel glyph atlas. Optional: ALCOR2_FB_TTY=0 to skip
-   * (kernel keeps the CP437 bitmap fallback). */
   const char *font = getenv("ALCOR2_FONT");
   if(!font || !*font)
     font = "/bin/FiraCode-Regular.ttf";
@@ -417,24 +471,82 @@ int main(int argc, char *argv[])
   if(!(fb_off && fb_off[0] == '0'))
     (void)atlas_submit(font);
 
-  char line[MAX_CMD_LEN];
+  /* ncurses: input-only. We never call refresh/addstr — output goes through
+   * write(STDOUT_FILENO, …) so child stdout and prompt drawing share the
+   * same scrollable stream. */
+  const char *term = getenv("TERM");
+  if(!term || !*term)
+    term = "xterm-256color";
+  SCREEN *scr = newterm(term, stdout, stdin);
+  if(!scr) {
+    write_str("shell: newterm failed; falling back to raw stdio.\n");
+    return 1;
+  }
+  set_term(scr);
+  raw();
+  noecho();
+  nonl();
+  /* Off-screen pad: reading from it lets us use ncurses' keypad escape
+   * parsing without ever triggering a screen refresh that would clobber our
+   * write()-based output. */
+  s_input_pad = newpad(1, 256);
+  if(!s_input_pad) {
+    write_str("shell: newpad failed\n");
+    endwin();
+    delscreen(scr);
+    return 1;
+  }
+  keypad(s_input_pad, TRUE);
+  intrflush(s_input_pad, FALSE);
 
-  sh_puts("\n");
-  sh_puts("  vega " VEGA_VERSION " - Alcor2 shell\n");
-  sh_puts("  Type 'help' for available commands.\n");
-  sh_puts("\n");
-
-  while(1) {
-    print_prompt();
-
-    int len = read_complete_statement(line, sizeof(line));
-    if(len == RL_EOF) {
-      sh_puts("exit\n");
-      exit(0);
-    }
-    if(len > 0)
-      vega_run(line);
+  /* Snapshot the raw termios ncurses just configured, then build a cooked
+   * variant for handing off to child processes. */
+  if(tcgetattr(STDIN_FILENO, &s_raw_t) == 0) {
+    s_cooked_t = s_raw_t;
+    s_cooked_t.c_lflag |= (tcflag_t)(ICANON | ECHO | ISIG | IEXTEN);
+    s_cooked_t.c_iflag |= (tcflag_t)(ICRNL);
+    s_cooked_t.c_oflag |= (tcflag_t)(OPOST | ONLCR);
   }
 
+  char line[LINE_MAX_LEN];
+
+  write_str("\n  vega " VEGA_VERSION " - Alcor2 shell\n");
+  write_str("  Type 'help' for available commands.\n\n");
+
+  while(1) {
+    int len = read_complete_statement(line, sizeof line);
+    if(len == RL_EOF) {
+      write_str("exit\n");
+      break;
+    }
+    if(len > 0) {
+      /* Strip the trailing newline read_complete_statement appended so the
+       * history entry looks like what the user typed. */
+      size_t tlen = (size_t)len;
+      while(tlen > 0 && line[tlen - 1] == '\n')
+        line[--tlen] = '\0';
+      hist_push(line);
+
+      /* Restore canonical termios before forking children so things like
+       * `cat` with no args can be terminated with Ctrl-D (VEOF only fires
+       * in canonical mode). We bypass ncurses' endwin/reset_prog_mode pair
+       * because those re-emit terminfo init strings on every iteration,
+       * scrolling the screen and slowing things down. Direct tcsetattr is
+       * a no-op on the framebuffer — it just toggles input-side flags. */
+      tcsetattr(STDIN_FILENO, TCSANOW, &s_cooked_t);
+      vega_run(line);
+      tcsetattr(STDIN_FILENO, TCSANOW, &s_raw_t);
+      /* A child running its own ncurses session (ncurses-hello) calls
+       * endwin() on exit, which sends rmkx (`\E[?1l\E>`) and turns DECCKM
+       * off in the kernel. The shell's keypad mode is still on, so the
+       * next arrow press would arrive as CSI instead of SS3 — UP/DOWN/etc.
+       * would stop translating to KEY_*. Re-assert DECCKM-on here so the
+       * kernel emits SS3 again. */
+      (void)write(STDOUT_FILENO, "\033[?1h", 5);
+    }
+  }
+
+  endwin();
+  delscreen(scr);
   return 0;
 }
