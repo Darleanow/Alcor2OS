@@ -1,5 +1,8 @@
 include ../common.mk
 
+SPZ_INC := -I$(USER_BASE)/sdk/spazer/include
+CFLAGS  += $(SPZ_INC)
+
 OUT_DIR := $(BUILD_DIR)/bin
 BINS    := ls cat echo pwd mkdir touch rm cc kbd
 TARGETS := $(patsubst %,$(OUT_DIR)/%.elf,$(BINS))
