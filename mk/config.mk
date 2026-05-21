@@ -44,12 +44,19 @@ else
   CCACHE_PREFIX :=
 endif
 
+GIT_VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+DEBUG       ?= 0
+
 # Kernel compile / link
 CFLAGS := -std=gnu11 -Wall -Wextra -Werror \
-          -ffreestanding -fno-stack-protector -fno-stack-check \
+          -O2 -ffreestanding -fno-stack-protector -fno-stack-check \
           -fno-lto -fPIE -m64 -march=x86-64 \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
+          -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -I$(INCLUDE) -MMD -MP
+ifeq ($(DEBUG),1)
+  CFLAGS += -g
+endif
 
 LDFLAGS := -nostdlib -static -pie --no-dynamic-linker \
            -z text -z max-page-size=0x1000 -T scripts/linker.ld

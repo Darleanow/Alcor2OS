@@ -24,13 +24,20 @@ AS  := nasm
 
 ASFLAGS := -f elf64
 
+GIT_VERSION  := $(shell git -C $(USER_BASE)/.. describe --tags --always --dirty 2>/dev/null || echo dev)
+DEBUG        ?= 0
+
 CFLAGS := -std=gnu11 -Wall -Wextra -Os \
           -ffreestanding -fno-stack-protector -fno-stack-check \
           -fno-lto -fno-PIC -fno-PIE -m64 -march=x86-64 \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
+          -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -I$(MUSL_INC) \
           -I$(USER_BASE)/../include \
           -I$(USER_BASE)/include
+ifeq ($(DEBUG),1)
+  CFLAGS += -g -fsanitize=undefined
+endif
 
 LDFLAGS := -nostdlib -static -T $(USER_LD) --gc-sections
 
