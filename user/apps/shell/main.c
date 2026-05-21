@@ -1,18 +1,7 @@
-/**
- * @file apps/shell/main.c
- * @brief vega REPL with an ncurses-backed line editor.
- *
- * ncurses is used for input only: getch() with keypad mode gives us KEY_UP,
- * KEY_LEFT, KEY_HOME, KEY_F(n)… without us having to parse escape sequences.
- * Output is written straight to stdout (the kernel fb_console speaks ANSI
- * cleanly) so child process stdout, prompts, and history redraws all share
- * the same scrollable stream — ncurses' internal screen model never gets a
- * chance to diverge from the real terminal.
- */
-
 #include <curses.h>
 #include <shell/atlas.h>
 #include <shell/shell.h>
+#include <spazer/spazer.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -104,6 +93,33 @@ static int utf8_cols(const char *s)
   return n;
 }
 
+/** Like utf8_cols but skips ANSI ESC [ ... final-byte sequences so that
+ *  a coloured prompt string reports its true terminal width. */
+static int visible_cols(const char *s)
+{
+  int n = 0;
+  while(*s) {
+    if((unsigned char)*s == 0x1b) {
+      s++;
+      if(*s == '[') {
+        s++;
+        while(*s && !(*s >= '@' && *s <= '~'))
+          s++;
+        if(*s)
+          s++;
+      } else if(*s) {
+        s++;
+      }
+    } else if(((unsigned char)*s & 0xC0u) != 0x80u) {
+      n++;
+      s++;
+    } else {
+      s++;
+    }
+  }
+  return n;
+}
+
 /** Step a byte index back/forward by one UTF-8 character boundary. */
 static int prev_char_boundary(const char *buf, int idx)
 {
@@ -142,7 +158,7 @@ static struct termios s_cooked_t;
  * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
 static int read_line(char *buf, size_t cap, const char *prompt)
 {
-  int prompt_cols = utf8_cols(prompt);
+  int prompt_cols = visible_cols(prompt);
   int len         = 0; /* bytes in buf */
   int cur_b       = 0; /* byte index of cursor */
   int hist_view   = hist_count;
@@ -278,17 +294,49 @@ static int read_line(char *buf, size_t cap, const char *prompt)
   }
 }
 
+/* Prompt colours from the Spazer palette — change spazer.h to update here. */
+#define _PC_LINE SPZ_ANSI_OVERLAY1
+#define _PC_HOST SPZ_ANSI_MAUVE_B
+#define _PC_PATH SPZ_ANSI_SUBTEXT1
+#define _PC_DOLS SPZ_ANSI_GREEN_B
+#define _PC_RS   SPZ_ANSI_RESET
+
+/* Box chars — use spazer defines so prompts and widgets share the same
+ * glyph set.  Rounded corners are procedurally arc-rasterised in atlas.c. */
+#define _PC_TL   SPZ_TL_R   /* ╭ U+256D */
+#define _PC_BL   SPZ_BL_R   /* ╰ U+2570 */
+#define _PC_H    SPZ_H      /* ─ U+2500 */
+
 /**
- * @brief Print the shell prompt into a buffer (instead of writing immediately
- * so the prompt-length stays in sync with what read_line draws).
+ * Write the decorative top line of the two-line prompt to stdout.
+ * Example output:  ╭─ alcor2 ─ /home/user
+ * This line is written once and never redrawn; only the bottom interactive
+ * line is erased/reprinted on each keystroke.
+ */
+static void write_prompt_header(void)
+{
+  char cwd[MAX_PATH];
+  const char *path = sh_getcwd(cwd, sizeof cwd) ? cwd : "/";
+  write_str(_PC_LINE _PC_TL _PC_H " " _PC_RS); /* ╭─ space */
+  write_str(_PC_HOST "alcor2" _PC_RS);
+  write_str(_PC_LINE " " _PC_H " " _PC_RS);    /* space ─ space */
+  write_str(_PC_PATH);
+  write_str(path);
+  write_str(_PC_RS "\n");
+}
+
+/**
+ * Format the interactive bottom-line prompt into @p out.
+ * Visible width: 4 columns — ╰ ─ space $ space
+ *
+ *   ╭─ alcor2 ─ /home/user   ← decorative (write_prompt_header)
+ *   ╰─ $ ▌                   ← interactive (this function → read_line)
  */
 static void format_prompt(char *out, size_t cap)
 {
-  char cwd[MAX_PATH];
-  if(sh_getcwd(cwd, sizeof cwd))
-    snprintf(out, cap, "alcor2:%s$ ", cwd);
-  else
-    snprintf(out, cap, "alcor2> ");
+  snprintf(out, cap,
+           _PC_LINE _PC_BL _PC_H " " _PC_RS  /* ╰─ space */
+           _PC_DOLS "$" _PC_RS " ");          /* $ space  */
 }
 
 #define MAX_HEREDOC_DELIM 64
@@ -420,19 +468,31 @@ static int read_complete_statement(char *buf, size_t size)
   size_t pos = 0;
   buf[0]     = '\0';
 
-  char prompt[MAX_PATH + 16];
+  /* Static bottom-line prompt — same every time: ╰─ $  */
+  char prompt[128];
   format_prompt(prompt, sizeof prompt);
 
+  /* Continuation prompt for multi-line input: │ »  (indented) */
+  char cont_prompt[64];
+  snprintf(cont_prompt, sizeof cont_prompt,
+           _PC_LINE SPZ_V " " _PC_RS        /* │ space */
+           _PC_DOLS "\xc2\xbb" _PC_RS " "); /* »  (U+00BB Latin-1) */
+
+  const char *cur_prompt = prompt;
+
   while(1) {
-    int len = read_line(buf + pos, size - pos, prompt);
+    /* Top decorative line only for primary prompt, not continuation. */
+    if(cur_prompt == prompt)
+      write_prompt_header();
+
+    int len = read_line(buf + pos, size - pos, cur_prompt);
     if(len == RL_EOF)
       return RL_EOF;
     if(len == RL_INTERRUPT)
       return 0;
     if(len == RL_CLEAR) {
       sh_clear();
-      /* Re-prompt with whatever has already been accumulated on prior lines.
-       * Most often pos == 0 and the user just wanted a clean screen. */
+      cur_prompt = prompt; /* reset to primary so header is shown */
       continue;
     }
 
@@ -446,16 +506,10 @@ static int read_complete_statement(char *buf, size_t size)
     if(is_input_complete(buf))
       return (int)pos;
 
-    /* Continuation prompt — narrower than the primary prompt so it's
-     * visually distinct. */
-    snprintf(prompt, sizeof prompt, "> ");
+    cur_prompt = cont_prompt;
   }
 }
 
-/**
- * @brief Shell main entry point. Sets up libvega, submits the Fira atlas,
- * initialises ncurses for input handling, then enters the REPL.
- */
 int main(int argc, char *argv[])
 {
   (void)argc;
@@ -510,8 +564,39 @@ int main(int argc, char *argv[])
 
   char line[LINE_MAX_LEN];
 
-  write_str("\n  vega " VEGA_VERSION " - Alcor2 shell\n");
-  write_str("  Type 'help' for available commands.\n\n");
+/* Banner — 34-char inner width, rounded corners, ├┤ separator.
+ * All chars are procedurally rasterised in the atlas (no FreeType needed).
+ *
+ * ╭──────────────────────────────────╮   (34 dashes)
+ * │            ALCOR2  OS            │   12 + 10 + 12 = 34
+ * ├──────────────────────────────────┤
+ * │           vega v1.0.0            │   11 + 11 + 12 = 34
+ * ╰──────────────────────────────────╯
+ */
+#define _BNR_H34 \
+  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
+  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
+  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
+  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
+  SPZ_H SPZ_H
+  write_str(
+      "\n"
+      "  " _PC_LINE SPZ_TL_R _BNR_H34 SPZ_TR_R _PC_RS "\n"
+      "  " _PC_LINE SPZ_V _PC_RS
+        "            " _PC_HOST "ALCOR2  OS" _PC_RS "            "
+        _PC_LINE SPZ_V _PC_RS "\n"
+      "  " _PC_LINE SPZ_LT _BNR_H34 SPZ_RT _PC_RS "\n"
+      "  " _PC_LINE SPZ_V _PC_RS
+        "           " _PC_PATH "vega v" VEGA_VERSION _PC_RS "            "
+        _PC_LINE SPZ_V _PC_RS "\n"
+      "  " _PC_LINE SPZ_BL_R _BNR_H34 SPZ_BR_R _PC_RS "\n"
+      "\n"
+      "  " _PC_DOLS "help"
+        _PC_LINE " " SPZ_ARROW_R " " _PC_RS
+        _PC_PATH "list available commands" _PC_RS
+      "\n\n"
+  );
+#undef _BNR_H34
 
   while(1) {
     int len = read_complete_statement(line, sizeof line);
