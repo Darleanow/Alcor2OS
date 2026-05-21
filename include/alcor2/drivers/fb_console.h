@@ -54,6 +54,24 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp);
 void fb_console_write(const void *buf, size_t len);
 
 /**
+ * @brief Open a multi-buffer write batch. Call before feeding multiple
+ * discontiguous buffers (e.g. writev). Suppresses per-buffer pixel flushes.
+ */
+void fb_console_write_begin(void);
+
+/**
+ * @brief Feed @p len bytes in an open batch (no flush). Must be preceded by
+ * @ref fb_console_write_begin.
+ */
+void fb_console_write_raw(const void *buf, size_t len);
+
+/**
+ * @brief Close the batch opened by @ref fb_console_write_begin: flush dirty
+ * cells, scroll pixels, and repaint the cursor. One call per writev.
+ */
+void fb_console_write_end(void);
+
+/**
  * @brief Read one input byte from the keyboard layer into the console's
  * input ring. Called from the keyboard IRQ. Plain pass-through queueing — the
  * kernel keyboard already handles line discipline + layout translation.
@@ -93,7 +111,9 @@ typedef struct
   uint32_t n_glyphs;     /**< total glyph slots in the atlas. */
   uint64_t cp_map_user; /**< userspace VA of u32[n_cp] codepoint → glyph_idx. */
   uint32_t n_cp;        /**< size of cp_map (covers codepoints 0..n_cp-1). */
-  uint32_t fallback_idx; /**< glyph for unmapped codepoints. */
+  uint32_t fallback_idx;  /**< glyph for unmapped codepoints. */
+  uint32_t bold_offset;   /**< first bold glyph slot; 0 = no bold atlas. */
+  uint32_t italic_offset; /**< first italic glyph slot; 0 = no italic atlas. */
 } fb_console_atlas_t;
 
 /** @brief Register a userspace glyph atlas; subsequent renders use Fira. */
@@ -116,5 +136,11 @@ void fb_console_yield(void);
 
 /** @brief Resume kernel rendering; repaint the cell grid. */
 void fb_console_reclaim(void);
+
+/** @brief Scroll the scrollback view up by @p lines. No-op if no history. */
+void fb_console_scrollback_up(int lines);
+
+/** @brief Scroll the scrollback view down by @p lines; 0 = live view. */
+void fb_console_scrollback_down(int lines);
 
 #endif /* ALCOR2_FB_CONSOLE_H */
