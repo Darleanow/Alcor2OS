@@ -396,11 +396,19 @@ static bool
     case 0x49: /* Page Up */
       if(dry)
         return true;
+      if(s->mod.shift) {
+        fb_console_scrollback_up(10);
+        return false;
+      }
       pend_csi_tilde(5u);
       break;
     case 0x51: /* Page Down */
       if(dry)
         return true;
+      if(s->mod.shift) {
+        fb_console_scrollback_down(10);
+        return false;
+      }
       pend_csi_tilde(6u);
       break;
     case 0x52: /* Insert */
