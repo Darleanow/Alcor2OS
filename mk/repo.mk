@@ -1,25 +1,47 @@
 # Userland, images, disk, QA
 
-.PHONY: all help kernel user iso iso-kernel run disk disk-mount disk-umount \
-        disk-populate disk-resync clean distclean format fmt lint check qa
+.PHONY: all help kernel user iso iso-kernel run debug disk disk-mount disk-umount \
+        disk-populate disk-resync disk-quick clean clean-all distclean \
+        format fmt lint check qa
 
 all: kernel compile_commands
 
 help:
-	@echo "Alcor2 — useful targets"
-	@echo "  all (default)     kernel + compile_commands (clangd)"
-	@echo "  kernel            link $(BUILD)/$(KERNEL) only"
-	@echo "  iso-kernel        bootable ISO with kernel only (no user/ step) — fastest CI check"
-	@echo "  user              userland (crt, init, shell, bin, apps if g++ exists)"
-	@echo "  iso               Limine bootable CD image (full: kernel + userland + toolchain)"
-	@echo "  run               QEMU: builds toolchain + ISO + disk, then boots (default for local dev)"
-	@echo "  disk-populate     fill $(DISK) (fuse2fs on Linux → no sudo when available); clang copy if built"
-	@echo "  disk-mount / disk-umount   manual inspect of $(DISK)"
-	@echo "  disk-resync       user + disk-populate"
-	@echo "  make run USE_KVM=0   slower CPU emu (TCG); KVM itself does not use sudo"
-	@echo "  toolchain         bootstrap fb_tty + ncurses + on-disk clang (long: ~1h on first run)"
-	@echo "  musl | musl-cross | clang | ncurses | freetype | harfbuzz   individual bootstrap targets"
-	@echo "  format lint check qa — static analysis / style"
+	@echo "Alcor2 $(GIT_VERSION) — useful targets"
+	@echo ""
+	@echo "  Build"
+	@echo "    all (default)   kernel + compile_commands.json (clangd)"
+	@echo "    kernel          link $(BUILD)/$(KERNEL) only"
+	@echo "    iso-kernel      bootable ISO, kernel only — fastest CI check"
+	@echo "    user            userland: crt, init, shell, bin, apps"
+	@echo "    iso             full Limine ISO (kernel + userland)"
+	@echo ""
+	@echo "  Run"
+	@echo "    run             build + boot in QEMU  (KVM auto-detected)"
+	@echo "    run USE_KVM=0   force TCG (no acceleration)"
+	@echo "    run USE_KVM=1   force KVM"
+	@echo "    debug           build + boot with GDB server on :1234 (VM paused)"
+	@echo ""
+	@echo "  Disk"
+	@echo "    disk-populate   full disk rebuild (dd + mke2fs + stage)"
+	@echo "    disk-resync     user + disk-populate"
+	@echo "    disk-quick      fast sync of user binaries to existing disk (Linux, fuse2fs)"
+	@echo "    disk-mount / disk-umount   manual inspect of $(DISK)"
+	@echo ""
+	@echo "  Toolchain"
+	@echo "    toolchain       bootstrap ncurses + clang (~1 h first run)"
+	@echo "    musl | musl-cross | clang | ncurses | freetype | harfbuzz"
+	@echo ""
+	@echo "  Quality"
+	@echo "    format / fmt    clang-format all sources in-place"
+	@echo "    lint            clang-tidy"
+	@echo "    check           cppcheck"
+	@echo "    qa              lint + check"
+	@echo ""
+	@echo "  Clean"
+	@echo "    clean           remove build/"
+	@echo "    clean-all       clean + remove all thirdparty installs"
+	@echo "    distclean       clean-all + remove $(DISK)"
 
 kernel: $(BUILD)/$(KERNEL)
 
@@ -28,6 +50,7 @@ user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/lib
 	$(MAKE) -C user/core/vega
 	$(MAKE) -C user/sdk/vega
+	$(MAKE) -C user/sdk/spazer
 	$(MAKE) -C user/init
 	$(MAKE) -C user/apps/shell
 	$(MAKE) -C user/apps/vega
@@ -204,6 +227,35 @@ run: iso disk-populate
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM)
 
+debug: iso disk-populate
+	@echo ""
+	@echo "  QEMU GDB server → :1234  (VM paused at first instruction)"
+	@echo "  Connect: gdb -ex 'target remote :1234' -ex 'symbol-file $(BUILD)/$(KERNEL)'"
+	@echo ""
+	$(QEMU) -cdrom $(BUILD)/$(ISO) \
+		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
+		-s -S
+
+disk-quick: user
+ifeq ($(UNAME),Linux)
+	@if ! command -v fuse2fs >/dev/null 2>&1; then \
+		echo "disk-quick: fuse2fs not found — install e2fsprogs or use disk-resync"; exit 1; \
+	fi
+	@test -f $(DISK) || { echo "disk-quick: $(DISK) missing — run disk-populate first"; exit 1; }
+	@mkdir -p mnt
+	@fuse2fs $(DISK) mnt
+	@cp user/build/bin/*.elf  mnt/bin/ 2>/dev/null; \
+	 for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; true
+	@cp user/build/apps/*.elf mnt/bin/ 2>/dev/null; \
+	 for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; true
+	@fusermount -u mnt
+	@rmdir mnt 2>/dev/null || true
+	@echo "disk synced (fast)"
+else
+	@echo "disk-quick: Linux only (needs fuse2fs) — use disk-resync on $(UNAME)"
+endif
+
 clean:
 	rm -rf $(BUILD)
 	-$(MAKE) -C user/crt clean
@@ -216,7 +268,16 @@ clean:
 	-$(MAKE) -C user/bin clean
 	-$(MAKE) -C user/apps clean
 
-distclean: clean
+clean-all: clean
+	rm -rf thirdparty/musl/install thirdparty/musl/_install \
+	       thirdparty/musl-cross \
+	       thirdparty/limine \
+	       thirdparty/freetype-install \
+	       thirdparty/harfbuzz-install \
+	       thirdparty/ncurses-install \
+	       thirdparty/clang-install
+
+distclean: clean-all
 	rm -rf thirdparty $(DISK)
 
 format fmt:
