@@ -116,6 +116,9 @@ typedef struct proc
    * This is a per-descriptor attribute (not per open-file-description), so
    * dup/dup2 always clears it on the new fd. */
   u8 fd_cloexec[VFS_MAX_FD];
+
+  /** @brief Wait-queue link for ATA channel acquisition (NULL = not queued). */
+  struct proc *ata_next;
 } proc_t;
 
 /**
