@@ -5,8 +5,9 @@
 
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pit.h>
-#include <alcor2/drivers/fb_console.h>
 #include <alcor2/proc/sched.h>
+
+void fb_console_tick(void);
 
 #define PIT_CHANNEL0 0x40
 #define PIT_CMD      0x43
