@@ -184,13 +184,12 @@ static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
 {
-  const char *p    = text;
-  double      acc  = 0.0;
-  double      frac = 0.0;
-  int         sig  = 1;
-  int         esig = 1;
-  long        exp  = 0;
-  int         saw  = 0;
+  const char *p   = text;
+  double      acc = 0.0;
+  int         sig = 1;
+  int        esig = 1;
+  long        exp = 0;
+  int         saw = 0;
 
   if(!text || !*text) {
     gr__errf(buf, cap, stderr, "%s: missing floating-point value", label);
@@ -210,8 +209,8 @@ static int gr__parse_float(
   }
 
   if(*p == '.') {
+    double frac = 1.0;
     p++;
-    frac = 1.0;
     for(; *p >= '0' && *p <= '9'; p++) {
       saw = 1;
       frac *= 0.1;
@@ -606,7 +605,7 @@ static void gr__print_cmd(
  */
 static int gr__help_walk(
     const char *prog, const gr_app *app, const gr_cmd *cmds, size_t n,
-    char *path, int argc, char **argv
+    const char *path, int argc, char **argv
 )
 {
   const gr_cmd *cmd;

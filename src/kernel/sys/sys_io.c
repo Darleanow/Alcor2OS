@@ -398,7 +398,7 @@ static i32 sel_read_ready(u64 fd)
   if(fd >= VFS_MAX_FD)
     return -EBADF;
   if(fd == 0 && !fd_has_oft(fd)) {
-    proc_t *p = proc_current();
+    const proc_t *p = proc_current();
     if(!p)
       return kbd_raw_pending() ? 1 : 0;
     return kbd_select_read_ready(p) ? 1 : 0;

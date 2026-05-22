@@ -579,7 +579,7 @@ static void flush_pending_scroll(void)
     u32 copy_px   = total_px - scroll_px;
     if(copy_px > 0) {
       u8 *dst = (u8 *)ctx.base + (u64)ctx.margin_y * ctx.pitch;
-      u8 *src = dst + (u64)scroll_px * ctx.pitch;
+      const u8 *src = dst + (u64)scroll_px * ctx.pitch;
       kmemcpy(dst, src, (u64)copy_px * ctx.pitch);
     }
     int first_new = ctx.rows - n;
@@ -1163,7 +1163,7 @@ static void feed_utf8(u8 b)
     }
     if(b < 0x80u) {
       /* G0 DEC ACS in effect: map printable ASCII to box-drawing/math. */
-      if(ctx.g0_acs && b >= 0x60u && b <= 0x7eu) {
+      if(ctx.g0_acs && b >= 0x60u) {
         put_cp_at_cursor(acs_to_unicode(b));
         return;
       }

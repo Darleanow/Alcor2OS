@@ -106,7 +106,7 @@ proc_t *proc_get(u64 pid)
 void proc_signal_broadcast(int signum)
 {
   for(int i = 0; i < PROC_MAX; i++) {
-    proc_t *p = &proc_table[i];
+    const proc_t *p = &proc_table[i];
     if(p->state == PROC_STATE_FREE || p->state == PROC_STATE_ZOMBIE)
       continue;
     proc_signal(p->pid, signum);
