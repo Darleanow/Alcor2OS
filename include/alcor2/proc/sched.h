@@ -9,6 +9,8 @@
 #ifndef ALCOR2_PROC_SCHED_H
 #define ALCOR2_PROC_SCHED_H
 
+#include <alcor2/types.h>
+
 /* Forward declaration only — drivers must not dereference proc_t fields. */
 typedef struct proc proc_t;
 

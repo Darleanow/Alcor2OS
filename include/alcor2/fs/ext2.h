@@ -8,6 +8,7 @@
 #ifndef ALCOR2_EXT2_H
 #define ALCOR2_EXT2_H
 
+#include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/types.h>
 
@@ -209,7 +210,7 @@ typedef struct
  */
 typedef struct
 {
-  u8                 drive;            /**< ATA drive index */
+  const blockdev_t  *dev;             /**< Block device backend */
   u32                partition_lba;    /**< Partition start sector */
   u32                block_size;       /**< Block size in bytes */
   u32                blocks_per_group; /**< Blocks per group */
@@ -253,17 +254,18 @@ typedef struct
 } ext2_entry_t;
 
 /**
- * @brief Initialize ext2 driver.
+ * @brief Initialize ext2 driver with a default block device.
+ * @param dev Block device used for the root filesystem mount.
  */
-void ext2_init(void);
+void ext2_init(const blockdev_t *dev);
 
 /**
  * @brief Mount an ext2 volume.
- * @param drive ATA drive index.
+ * @param dev           Block device to read/write sectors from.
  * @param partition_lba Start of partition (0 for whole disk).
  * @return Volume pointer, or NULL on error.
  */
-ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba);
+ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba);
 
 /**
  * @brief Open a file or directory.
@@ -382,6 +384,6 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path);
  *
  * Must be called after vfs_init() but before vfs_mount() for ext2.
  */
-void ext2_init(void);
+void ext2_init(const blockdev_t *dev);
 
 #endif

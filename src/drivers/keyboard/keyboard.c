@@ -4,6 +4,7 @@
  */
 
 #include <alcor2/arch/cpu.h>
+#include <alcor2/arch/idt.h>
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/keyboard.h>
@@ -71,10 +72,17 @@ void keyboard_irq(void)
   kb_push(scancode);
 }
 
+static void keyboard_irq_handler(u8 irq)
+{
+  (void)irq;
+  keyboard_irq();
+}
+
 void keyboard_init(void)
 {
   while(inb(KB_CMD_PORT) & 0x01)
     inb(KB_DATA_PORT);
 
   pic_unmask(IRQ_KEYBOARD);
+  irq_register(IRQ_KEYBOARD, keyboard_irq_handler);
 }

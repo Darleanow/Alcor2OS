@@ -17,6 +17,7 @@
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/ext2.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/limine.h>
@@ -154,7 +155,6 @@ static void init_interrupts(void)
 {
   pic_init();
   pit_init(100);
-  pic_unmask(IRQ_TIMER);
   pit_enable_sched();
   console_print("PIC/PIT initialized (100Hz).\n");
 
@@ -165,10 +165,21 @@ static void init_interrupts(void)
 /**
  * @brief Initialize storage and filesystems.
  */
+static i64 ata0_bd_read(void *ctx, u64 lba, u32 count, void *buf)
+{
+  return ata_read((u8)(u64)ctx, lba, count, buf);
+}
+static i64 ata0_bd_write(void *ctx, u64 lba, u32 count, const void *buf)
+{
+  return ata_write((u8)(u64)ctx, lba, count, buf);
+}
+
 static void init_storage(void)
 {
   ata_init();
-  ext2_init();
+
+  static const blockdev_t ata0_dev = {ata0_bd_read, ata0_bd_write, (void *)0};
+  ext2_init(&ata0_dev);
 
   /* Mount root filesystem */
   const ata_drive_t *hda = ata_get_drive(0);

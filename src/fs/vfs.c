@@ -229,8 +229,12 @@ void vfs_oft_release(i32 idx)
   if(--oft[idx].refcount > 0)
     return;
 
-  if(oft[idx].pipe)
-    pipe_oft_release(oft[idx].kind, oft[idx].pipe);
+  if(oft[idx].pipe) {
+    if(oft[idx].kind == VFS_KIND_PIPE_RD)
+      pipe_rd_release(oft[idx].pipe);
+    else
+      pipe_wr_release(oft[idx].pipe);
+  }
 
   if(oft[idx].handle && oft[idx].ops && oft[idx].ops->close)
     oft[idx].ops->close(oft[idx].handle);

@@ -58,6 +58,9 @@ typedef struct PACKED
   u64 ss;
 } interrupt_frame_t;
 
+/** @brief IRQ handler callback — receives the raw IRQ number (0-15). */
+typedef void (*irq_handler_fn)(u8 irq);
+
 /**
  * @brief Initialize the IDT and install default handlers.
  */
@@ -70,5 +73,16 @@ void idt_init(void);
  * @param flags Gate type and DPL.
  */
 void idt_set_gate(u8 vector, void *handler, u8 flags);
+
+/**
+ * @brief Register a callback for a hardware IRQ line.
+ *
+ * Drivers call this during their init to own an IRQ without the IDT needing
+ * to know about any specific driver.  Overwrites any previous registration.
+ *
+ * @param irq     Hardware IRQ line (0-15).
+ * @param handler Function called from the IRQ dispatcher.
+ */
+void irq_register(u8 irq, irq_handler_fn handler);
 
 #endif

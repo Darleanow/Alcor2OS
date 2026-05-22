@@ -16,7 +16,6 @@
  * - No journal support
  */
 
-#include <alcor2/drivers/ata.h>
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/ext2.h>
@@ -40,7 +39,8 @@
 #define EXT2_READ_RUN_MAX 16
 
 /** @brief Pool of mounted volumes. */
-static ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
+static ext2_volume_t      g_volumes[EXT2_MAX_VOLUMES];
+static const blockdev_t  *g_default_dev;
 
 /** @brief Pool of open file handles. */
 static ext2_file_t g_files[EXT2_MAX_FILES];
@@ -112,7 +112,7 @@ static void cache_put_block(u8 *buf)
 static inline i64
     vol_read_sectors(const ext2_volume_t *vol, u32 sector, u32 count, void *buf)
 {
-  return ata_read(vol->drive, vol->partition_lba + sector, count, buf);
+  return vol->dev->read(vol->dev->ctx, vol->partition_lba + sector, count, buf);
 }
 
 /**
@@ -127,7 +127,7 @@ static inline i64 vol_write_sectors(
     const ext2_volume_t *vol, u32 sector, u32 count, const void *buf
 )
 {
-  return ata_write(vol->drive, vol->partition_lba + sector, count, buf);
+  return vol->dev->write(vol->dev->ctx, vol->partition_lba + sector, count, buf);
 }
 
 /**
@@ -1679,8 +1679,9 @@ static void path_split(const char *path, char *parent, char *name)
  *
  * Clears volume/file pools and registers ext2 with the VFS.
  */
-void ext2_init(void)
+void ext2_init(const blockdev_t *dev)
 {
+  g_default_dev = dev;
   kzero(g_volumes, sizeof(g_volumes));
   kzero(g_files, sizeof(g_files));
   vfs_register_fs(&g_ext2_fstype);
@@ -1695,7 +1696,7 @@ void ext2_init(void)
  * @param partition_lba LBA offset of the partition.
  * @return Volume handle, or NULL on failure.
  */
-ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
+ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)
 {
   /* Find free volume slot */
   ext2_volume_t *vol = NULL;
@@ -1713,7 +1714,7 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
 
   /* Read superblock (at byte 1024, sectors 2-3) */
   u8 sb_buf[EXT2_MIN_BLOCK_SIZE];
-  if(ata_read(drive, partition_lba + 2, 2, sb_buf) < 0) {
+  if(dev->read(dev->ctx, partition_lba + 2, 2, sb_buf) < 0) {
     console_print("[EXT2] Failed to read superblock\n");
     return NULL;
   }
@@ -1727,7 +1728,7 @@ ext2_volume_t *ext2_mount(u8 drive, u32 partition_lba)
   }
 
   /* Fill volume info */
-  vol->drive            = drive;
+  vol->dev              = dev;
   vol->partition_lba    = partition_lba;
   vol->block_size       = EXT2_MIN_BLOCK_SIZE << sb->s_log_block_size;
   vol->blocks_per_group = sb->s_blocks_per_group;
@@ -2705,7 +2706,7 @@ static void *ext2_ops_mount(const char *source, u32 flags)
 {
   (void)source;
   (void)flags;
-  return ext2_mount(0, 0);
+  return ext2_mount(g_default_dev, 0);
 }
 
 static const fs_ops_t g_ext2_fs_ops = {

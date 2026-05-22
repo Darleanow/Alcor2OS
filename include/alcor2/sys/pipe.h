@@ -26,7 +26,10 @@ i64 pipe_write_obj(void *pipe, const void *buf, u64 count);
 /** @brief Allocate a fresh pipe object. Returns opaque pointer or NULL. */
 void *pipe_alloc_obj(void);
 
-/** @brief Release a pipe endpoint when its last fd reference drops. */
-void pipe_oft_release(i32 kind, void *pipe);
+/** @brief Release the read end of a pipe (last fd reference dropped). */
+void pipe_rd_release(void *pipe);
+
+/** @brief Release the write end of a pipe (last fd reference dropped). */
+void pipe_wr_release(void *pipe);
 
 #endif /* ALCOR2_SYS_PIPE_H */

@@ -10,6 +10,7 @@
  */
 
 #include <alcor2/arch/cpu.h>
+#include <alcor2/arch/idt.h>
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/arch/pit.h>
@@ -675,6 +676,18 @@ void ata_irq(u8 channel)
   }
 }
 
+static void ata_irq_primary(u8 irq)
+{
+  (void)irq;
+  ata_irq(0);
+}
+
+static void ata_irq_secondary(u8 irq)
+{
+  (void)irq;
+  ata_irq(1);
+}
+
 /** @brief Detect and configure PCI IDE Bus Master for DMA. */
 static void init_dma(void)
 {
@@ -755,6 +768,9 @@ void ata_init(void)
 
   pic_unmask(IRQ_ATA_PRIMARY);
   pic_unmask(IRQ_ATA_SECONDARY);
+
+  irq_register(IRQ_ATA_PRIMARY,   ata_irq_primary);
+  irq_register(IRQ_ATA_SECONDARY, ata_irq_secondary);
 
   init_dma();
   console_print("[ATA] Ready\n");
