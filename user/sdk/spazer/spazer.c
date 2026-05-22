@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ACS_* expands to chtype; fb_console maps them to Unicode box-drawing via
- * acs_to_unicode(). No multi-byte encoding issues. */
-
 #define GLYPH_FILL  '#'
 #define GLYPH_EMPTY '-'
 #define GLYPH_ARROW '>'
@@ -24,49 +21,43 @@ void spz_init(void)
   init_pair(SPZ_PAIR_STATUS, -1,              SPZ_COL_MAUVE);
 }
 
+/* ACS_* values are populated at runtime by ncurses (not compile-time constants).
+ * waddch with ACS_* is the only portable way in standard non-wide ncurses —
+ * waddstr with UTF-8 box chars outputs each byte as a separate cell. */
 static void draw_border(
     WINDOW *win, int rows, int cols,
     const char *title, int border_style
 )
 {
-  chtype tl, tr, bl, br, h, v;
+  if(border_style < 0 || border_style > SPZ_BORDER_HEAVY)
+    border_style = SPZ_BORDER_SINGLE;
+  /* DOUBLE and HEAVY share ACS glyphs; A_BOLD gives them visual weight. */
+  chtype extra = (border_style != SPZ_BORDER_SINGLE) ? A_BOLD : 0;
 
-  switch(border_style) {
-  case SPZ_BORDER_HEAVY:
-    tl = ACS_ULCORNER; tr = ACS_URCORNER;
-    bl = ACS_LLCORNER; br = ACS_LRCORNER;
-    h  = ACS_HLINE;    v  = ACS_VLINE;
-    break;
-  case SPZ_BORDER_DOUBLE:
-  default:
-    tl = ACS_ULCORNER; tr = ACS_URCORNER;
-    bl = ACS_LLCORNER; br = ACS_LRCORNER;
-    h  = ACS_HLINE;    v  = ACS_VLINE;
-    break;
-  }
+  wattron(win, COLOR_PAIR(SPZ_PAIR_BORDER) | extra);
 
-  wattron(win, COLOR_PAIR(SPZ_PAIR_BORDER));
-
-  mvwaddch(win, 0, 0, tl);
+  mvwaddch(win, 0, 0, ACS_ULCORNER);
   for(int i = 1; i < cols - 1; i++)
-    waddch(win, h);
-  waddch(win, tr);
+    waddch(win, ACS_HLINE);
+  waddch(win, ACS_URCORNER);
 
   for(int r = 1; r < rows - 1; r++) {
-    mvwaddch(win, r, 0, v);
+    mvwaddch(win, r, 0, ACS_VLINE);
+    wattroff(win, COLOR_PAIR(SPZ_PAIR_BORDER) | extra);
     wattron(win, COLOR_PAIR(SPZ_PAIR_TEXT));
     for(int c = 1; c < cols - 1; c++)
       waddch(win, ' ');
-    wattron(win, COLOR_PAIR(SPZ_PAIR_BORDER));
-    mvwaddch(win, r, cols - 1, v);
+    wattroff(win, COLOR_PAIR(SPZ_PAIR_TEXT));
+    wattron(win, COLOR_PAIR(SPZ_PAIR_BORDER) | extra);
+    mvwaddch(win, r, cols - 1, ACS_VLINE);
   }
 
-  mvwaddch(win, rows - 1, 0, bl);
+  mvwaddch(win, rows - 1, 0, ACS_LLCORNER);
   for(int i = 1; i < cols - 1; i++)
-    waddch(win, h);
-  waddch(win, br);
+    waddch(win, ACS_HLINE);
+  waddch(win, ACS_LRCORNER);
 
-  wattroff(win, COLOR_PAIR(SPZ_PAIR_BORDER));
+  wattroff(win, COLOR_PAIR(SPZ_PAIR_BORDER) | extra);
 
   if(title && *title) {
     int tlen = (int)strlen(title);
