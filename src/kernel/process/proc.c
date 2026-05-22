@@ -639,6 +639,18 @@ void proc_tick(void)
   need_resched = true;
 }
 
+void proc_block(proc_t *p)
+{
+  if(p)
+    p->state = PROC_STATE_BLOCKED;
+}
+
+void proc_wake(proc_t *p)
+{
+  if(p && p->state == PROC_STATE_BLOCKED)
+    p->state = PROC_STATE_READY;
+}
+
 /**
  * @brief If a timer tick requested preemption, run the process scheduler.
  *

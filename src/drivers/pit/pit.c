@@ -6,7 +6,7 @@
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/fb_console.h>
-#include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
 
 #define PIT_CHANNEL0 0x40
 #define PIT_CMD      0x43

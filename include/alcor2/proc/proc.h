@@ -238,6 +238,16 @@ void proc_switch(proc_t *next);
 void proc_schedule(void);
 
 /**
+ * @brief Block @p p (set state to BLOCKED). Call before proc_schedule().
+ */
+void proc_block(proc_t *p);
+
+/**
+ * @brief Wake @p p if it is blocked (set state to READY). Safe from IRQ.
+ */
+void proc_wake(proc_t *p);
+
+/**
  * @brief Get process by PID.
  * @param pid Process ID.
  * @return Pointer to process or NULL.

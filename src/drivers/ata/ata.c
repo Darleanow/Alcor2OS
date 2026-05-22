@@ -20,7 +20,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>
-#include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
 
 #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
 #define LBA28_LIMIT      0x10000000ULL
@@ -239,7 +239,7 @@ static i64 wait_irq(ata_channel_t *ch)
       cpu_enable_interrupts();
       return -ETIMEDOUT;
     }
-    me->state = PROC_STATE_BLOCKED;
+    proc_block(me);
     proc_schedule();
     cpu_disable_interrupts();
   }
@@ -670,8 +670,7 @@ void ata_irq(u8 channel)
   ch->state = ATA_STATE_IDLE;
 
   if(ch->waiter) {
-    if(ch->waiter->state == PROC_STATE_BLOCKED)
-      ch->waiter->state = PROC_STATE_READY;
+    proc_wake(ch->waiter);
     ch->waiter = NULL;
   }
 }
