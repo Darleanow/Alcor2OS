@@ -32,7 +32,9 @@ int main(int argc, char *argv[])
   else if(strcmp(rest.argv[0], "fr") == 0)
     layout = KBD_LAYOUT_FR;
   else {
-    fprintf(stderr, "kbd: unknown layout '%s' (expected us|fr)\n", rest.argv[0]);
+    fprintf(
+        stderr, "kbd: unknown layout '%s' (expected us|fr)\n", rest.argv[0]
+    );
     return 1;
   }
 

@@ -17,11 +17,7 @@ typedef enum
 } screen_t;
 
 static const char *const g_menu[] = {
-    "Color pairs",
-    "Text attributes",
-    "Keyboard input",
-    "Blink demo",
-    "Quit",
+    "Color pairs", "Text attributes", "Keyboard input", "Blink demo", "Quit",
 };
 #define N_ITEMS 5
 
@@ -37,7 +33,8 @@ static screen_t screen_menu(spz_panel_t *p)
   spz_panel_refresh(p);
 
   int mx = (COLS - 21) / 2;
-  if(mx < 1) mx = 1;
+  if(mx < 1)
+    mx = 1;
 
   int sel = spz_menu(3, mx, g_menu, N_ITEMS, NULL);
   if(sel < 0 || sel == N_ITEMS - 1)
@@ -99,12 +96,12 @@ static void screen_attrs(spz_panel_t *p)
     attr_t      attr;
     const char *name;
   } attrs[] = {
-      {A_NORMAL,    "A_NORMAL    plain text"              },
-      {A_BOLD,      "A_BOLD      bold / bright"           },
-      {A_DIM,       "A_DIM       half-bright"             },
-      {A_UNDERLINE, "A_UNDERLINE underline"               },
-      {A_REVERSE,   "A_REVERSE   video reverse"           },
-      {A_STANDOUT,  "A_STANDOUT  best highlight"          },
+      {A_NORMAL,    "A_NORMAL    plain text"    },
+      {A_BOLD,      "A_BOLD      bold / bright" },
+      {A_DIM,       "A_DIM       half-bright"   },
+      {A_UNDERLINE, "A_UNDERLINE underline"     },
+      {A_REVERSE,   "A_REVERSE   video reverse" },
+      {A_STANDOUT,  "A_STANDOUT  best highlight"},
   };
   const int n = (int)(sizeof attrs / sizeof attrs[0]);
 
@@ -187,7 +184,7 @@ static void utf8_format_raw(const utf8_acc_t *acc, char *buf, size_t cap)
 
 static void screen_input(spz_panel_t *p)
 {
-  WINDOW *w     = p->body;
+  WINDOW *w = p->body;
   int     brows, bcols;
   getmaxyx(w, brows, bcols);
 
@@ -303,7 +300,8 @@ int main(void)
   int rows, cols;
   getmaxyx(stdscr, rows, cols);
 
-  spz_panel_t *p = spz_panel_new(0, 0, rows - 1, cols, "ALCOR2  DEMO", SPZ_BORDER_DOUBLE);
+  spz_panel_t *p =
+      spz_panel_new(0, 0, rows - 1, cols, "ALCOR2  DEMO", SPZ_BORDER_DOUBLE);
   if(!p) {
     endwin();
     delscreen(scr);

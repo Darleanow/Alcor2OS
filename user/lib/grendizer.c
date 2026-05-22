@@ -1,6 +1,7 @@
 /**
  * @file grendizer.c
- * @brief Grendizer argument-parsing library — flags, options, subcommands, and help generation.
+ * @brief Grendizer argument-parsing library — flags, options, subcommands, and
+ * help generation.
  */
 
 #include <grendizer.h>
@@ -76,7 +77,8 @@ static const gr_opt *gr__by_short(const gr_opt *opts, char key)
   return NULL;
 }
 
-/** @brief Find an option descriptor by long name, length-bounded (no NUL required). */
+/** @brief Find an option descriptor by long name, length-bounded (no NUL
+ * required). */
 static const gr_opt *
     gr__by_long(const gr_opt *opts, const char *name, size_t len)
 {
@@ -318,7 +320,8 @@ void gr_usage(const gr_spec *spec, FILE *stream)
   if(col > 32)
     col = 32;
 
-  /* Pass 2: print options — skip the section entirely when the table is empty. */
+  /* Pass 2: print options — skip the section entirely when the table is empty.
+   */
   if(spec->options->kind != GR_KIND_END) {
     fprintf(stream, "\nOptions:\n");
     for(o = spec->options; o->kind != GR_KIND_END; o++) {
@@ -599,7 +602,8 @@ static void gr__print_cmd(
   }
 }
 
-/** @brief Recursively resolve a command path for 'help <command> [subcommand]'. */
+/** @brief Recursively resolve a command path for 'help <command> [subcommand]'.
+ */
 static int gr__help_walk(
     const char *prog, const gr_app *app, const gr_cmd *cmds, size_t n,
     char *path, int argc, char **argv
@@ -632,7 +636,8 @@ static int gr__help_walk(
   );
 }
 
-/** @brief Core recursive command dispatcher: resolves tokens and calls the leaf handler. */
+/** @brief Core recursive command dispatcher: resolves tokens and calls the leaf
+ * handler. */
 static int gr__dispatch(
     const char *prog, const gr_app *app, const gr_cmd *parent,
     const gr_cmd *cmds, size_t n, const char *path, int argc, char **argv

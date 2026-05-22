@@ -294,17 +294,17 @@ static int read_line(char *buf, size_t cap, const char *prompt)
 #define PC_RS   THEME_ANSI_RESET
 
 /* Box-drawing; rounded corners are arc-rasterised in atlas.c. */
-#define PC_TL   BD_TL_R   /* ╭ */
-#define PC_BL   BD_BL_R   /* ╰ */
-#define PC_H    BD_H      /* ─ */
+#define PC_TL BD_TL_R /* ╭ */
+#define PC_BL BD_BL_R /* ╰ */
+#define PC_H  BD_H    /* ─ */
 
 static void write_prompt_header(void)
 {
-  char cwd[MAX_PATH];
+  char        cwd[MAX_PATH];
   const char *path = sh_getcwd(cwd, sizeof cwd) ? cwd : "/";
   write_str(PC_LINE PC_TL PC_H " " PC_RS); /* ╭─ space */
   write_str(PC_HOST "alcor2" PC_RS);
-  write_str(PC_LINE " " PC_H " " PC_RS);    /* space ─ space */
+  write_str(PC_LINE " " PC_H " " PC_RS); /* space ─ space */
   write_str(PC_PATH);
   write_str(path);
   write_str(PC_RS "\n");
@@ -312,9 +312,11 @@ static void write_prompt_header(void)
 
 static void format_prompt(char *out, size_t cap)
 {
-  snprintf(out, cap,
-           PC_LINE PC_BL PC_H " " PC_RS  /* ╰─ space */
-           PC_DOLS "$" PC_RS " ");          /* $ space  */
+  snprintf(
+      out, cap,
+      PC_LINE PC_BL PC_H " " PC_RS /* ╰─ space */
+      PC_DOLS "$" PC_RS " "
+  ); /* $ space  */
 }
 
 #define MAX_HEREDOC_DELIM 64
@@ -452,9 +454,11 @@ static int read_complete_statement(char *buf, size_t size)
 
   /* Continuation prompt for multi-line input: │ »  (indented) */
   char cont_prompt[64];
-  snprintf(cont_prompt, sizeof cont_prompt,
-           PC_LINE BD_V " " PC_RS         /* │ space */
-           PC_DOLS "\xc2\xbb" PC_RS " "); /* »  (U+00BB Latin-1) */
+  snprintf(
+      cont_prompt, sizeof cont_prompt,
+      PC_LINE BD_V " " PC_RS /* │ space */
+      PC_DOLS "\xc2\xbb" PC_RS " "
+  ); /* »  (U+00BB Latin-1) */
 
   const char *cur_prompt = prompt;
 
@@ -542,29 +546,21 @@ int main(int argc, char *argv[])
 
   char line[LINE_MAX_LEN];
 
-#define BNR_H34 \
-  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
-  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
-  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
-  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
-  BD_H BD_H
-  write_str(
-      "\n"
-      "  " PC_LINE BD_TL_R BNR_H34 BD_TR_R PC_RS "\n"
-      "  " PC_LINE BD_V PC_RS
-        "            " PC_HOST "ALCOR2  OS" PC_RS "            "
-        PC_LINE BD_V PC_RS "\n"
-      "  " PC_LINE BD_LT BNR_H34 BD_RT PC_RS "\n"
-      "  " PC_LINE BD_V PC_RS
-        "           " PC_PATH "vega v" VEGA_VERSION PC_RS "            "
-        PC_LINE BD_V PC_RS "\n"
-      "  " PC_LINE BD_BL_R BNR_H34 BD_BR_R PC_RS "\n"
-      "\n"
-      "  " PC_DOLS "help"
-        PC_LINE " " BD_ARROW_R " " PC_RS
-        PC_PATH "list available commands" PC_RS
-      "\n\n"
-  );
+#define BNR_H34                                                                \
+  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H   \
+      BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H    \
+          BD_H BD_H BD_H BD_H BD_H
+  write_str("\n"
+            "  " PC_LINE BD_TL_R BNR_H34 BD_TR_R PC_RS "\n"
+            "  " PC_LINE BD_V PC_RS "            " PC_HOST "ALCOR2  OS" PC_RS
+            "            " PC_LINE BD_V PC_RS "\n"
+            "  " PC_LINE BD_LT BNR_H34 BD_RT PC_RS "\n"
+            "  " PC_LINE BD_V PC_RS "           " PC_PATH
+            "vega v" VEGA_VERSION PC_RS "            " PC_LINE BD_V PC_RS "\n"
+            "  " PC_LINE BD_BL_R BNR_H34 BD_BR_R PC_RS "\n"
+            "\n"
+            "  " PC_DOLS "help" PC_LINE " " BD_ARROW_R " " PC_RS PC_PATH
+            "list available commands" PC_RS "\n\n");
 #undef BNR_H34
 
   while(1) {

@@ -22,7 +22,7 @@ static void cmd_help(void)
 }
 
 #ifndef ALCOR2_VERSION
-#define ALCOR2_VERSION "dev"
+  #define ALCOR2_VERSION "dev"
 #endif
 
 static void cmd_version(void)

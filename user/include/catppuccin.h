@@ -1,6 +1,7 @@
 /**
  * @file catppuccin.h
- * @brief Catppuccin Mocha palette — xterm-256 indices and true-colour ANSI escapes.
+ * @brief Catppuccin Mocha palette — xterm-256 indices and true-colour ANSI
+ * escapes.
  */
 
 #pragma once
@@ -17,12 +18,12 @@
  */
 
 /* xterm-256 colour indices (for ncurses init_pair) */
-#define CTPP_COL_MAUVE    183
-#define CTPP_COL_BLUE     111
-#define CTPP_COL_GREEN    151
-#define CTPP_COL_YELLOW   223
-#define CTPP_COL_TEXT     252
-#define CTPP_COL_OVERLAY  243
+#define CTPP_COL_MAUVE   183
+#define CTPP_COL_BLUE    111
+#define CTPP_COL_GREEN   151
+#define CTPP_COL_YELLOW  223
+#define CTPP_COL_TEXT    252
+#define CTPP_COL_OVERLAY 243
 
 /* True-colour ANSI escape sequences (for write()/printf() output) */
 #define CTPP_ANSI_RESET    "\033[0m"

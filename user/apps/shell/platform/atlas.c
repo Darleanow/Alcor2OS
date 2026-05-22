@@ -59,12 +59,13 @@ static int is_arc_corner(uint32_t cp)
 
 static void rasterise_arc_corner(uint32_t idx, uint32_t cp, uint8_t *pixels)
 {
-#define SET_PX(X, Y)                                                         \
-  do {                                                                       \
-    int _x = (X), _y = (Y);                                                 \
-    if(_x >= 0 && _x < CELL_W && _y >= 0 && _y < CELL_H)                   \
-      pixels[(idx * (size_t)CELL_H + (size_t)_y) * (size_t)CELL_W +        \
-             (size_t)_x] = 0xffu;                                           \
+#define SET_PX(X, Y)                                                           \
+  do {                                                                         \
+    int _x = (X), _y = (Y);                                                    \
+    if(_x >= 0 && _x < CELL_W && _y >= 0 && _y < CELL_H)                       \
+      pixels                                                                   \
+          [(idx * (size_t)CELL_H + (size_t)_y) * (size_t)CELL_W +              \
+           (size_t)_x] = 0xffu;                                                \
   } while(0)
 
   int cx  = CELL_W / 2;
@@ -82,25 +83,60 @@ static void rasterise_arc_corner(uint32_t idx, uint32_t cp, uint8_t *pixels)
 
   switch(cp) {
   case 0x256Du: /* ╭  right + down */
-    arc_cx = cx + r; arc_cy = cy + r; dx = -1; dy = -1;
-    hx0 = cx + r; hx1 = CELL_W - 1; vy0 = cy + r; vy1 = CELL_H - 1; break;
+    arc_cx = cx + r;
+    arc_cy = cy + r;
+    dx     = -1;
+    dy     = -1;
+    hx0    = cx + r;
+    hx1    = CELL_W - 1;
+    vy0    = cy + r;
+    vy1    = CELL_H - 1;
+    break;
   case 0x256Eu: /* ╮  left  + down */
-    arc_cx = cx - r; arc_cy = cy + r; dx =  1; dy = -1;
-    hx0 = 0;       hx1 = cx - r;    vy0 = cy + r; vy1 = CELL_H - 1; break;
+    arc_cx = cx - r;
+    arc_cy = cy + r;
+    dx     = 1;
+    dy     = -1;
+    hx0    = 0;
+    hx1    = cx - r;
+    vy0    = cy + r;
+    vy1    = CELL_H - 1;
+    break;
   case 0x256Fu: /* ╯  left  + up   */
-    arc_cx = cx - r; arc_cy = cy - r; dx =  1; dy =  1;
-    hx0 = 0;       hx1 = cx - r;    vy0 = 0;       vy1 = cy - r;    break;
+    arc_cx = cx - r;
+    arc_cy = cy - r;
+    dx     = 1;
+    dy     = 1;
+    hx0    = 0;
+    hx1    = cx - r;
+    vy0    = 0;
+    vy1    = cy - r;
+    break;
   case 0x2570u: /* ╰  right + up   */
-    arc_cx = cx + r; arc_cy = cy - r; dx = -1; dy =  1;
-    hx0 = cx + r; hx1 = CELL_W - 1; vy0 = 0;       vy1 = cy - r;    break;
-  default: return;
+    arc_cx = cx + r;
+    arc_cy = cy - r;
+    dx     = -1;
+    dy     = 1;
+    hx0    = cx + r;
+    hx1    = CELL_W - 1;
+    vy0    = 0;
+    vy1    = cy - r;
+    break;
+  default:
+    return;
   }
 
-  for(int x = hx0; x <= hx1; x++) { SET_PX(x, cy); SET_PX(x, cy1); }
-  for(int y = vy0; y <= vy1; y++) { SET_PX(cx, y); SET_PX(cx1, y); }
+  for(int x = hx0; x <= hx1; x++) {
+    SET_PX(x, cy);
+    SET_PX(x, cy1);
+  }
+  for(int y = vy0; y <= vy1; y++) {
+    SET_PX(cx, y);
+    SET_PX(cx1, y);
+  }
 
   SET_PX(arc_cx, cy1);
-  SET_PX(cx1,    arc_cy);
+  SET_PX(cx1, arc_cy);
 
   /* Bresenham arc: each point drawn as a 2×2 block toward (X-1, Y-1)
    * so the arc stays 2px thick and joins the 2px arms without a center
@@ -109,13 +145,21 @@ static void rasterise_arc_corner(uint32_t idx, uint32_t cp, uint8_t *pixels)
   while(ax >= ay) {
     int X0 = arc_cx + dx * ax, Y0 = arc_cy + dy * ay;
     int X1 = arc_cx + dx * ay, Y1 = arc_cy + dy * ax;
-    SET_PX(X0,   Y0  ); SET_PX(X0-1, Y0  );
-    SET_PX(X0,   Y0-1); SET_PX(X0-1, Y0-1);
-    SET_PX(X1,   Y1  ); SET_PX(X1-1, Y1  );
-    SET_PX(X1,   Y1-1); SET_PX(X1-1, Y1-1);
+    SET_PX(X0, Y0);
+    SET_PX(X0 - 1, Y0);
+    SET_PX(X0, Y0 - 1);
+    SET_PX(X0 - 1, Y0 - 1);
+    SET_PX(X1, Y1);
+    SET_PX(X1 - 1, Y1);
+    SET_PX(X1, Y1 - 1);
+    SET_PX(X1 - 1, Y1 - 1);
     ay++;
-    if(err < 0) { err += 2 * ay + 1; }
-    else        { ax--; err += 2 * ay - 2 * ax + 1; }
+    if(err < 0) {
+      err += 2 * ay + 1;
+    } else {
+      ax--;
+      err += 2 * ay - 2 * ax + 1;
+    }
   }
 #undef SET_PX
 }
@@ -165,19 +209,19 @@ static int box_edges_for(uint32_t cp)
  *  guaranteeing seamless joins between adjacent cells.                   */
 static void rasterise_box(uint32_t idx, int edges, uint8_t *pixels)
 {
-  int cx  = CELL_W / 2;       /* 6  */
-  int cy  = CELL_H / 2;       /* 11 */
-  int cx1 = cx - 1;            /* 5  — second vertical column   */
-  int cy1 = cy - 1;            /* 10 — second horizontal row    */
+  int cx  = CELL_W / 2; /* 6  */
+  int cy  = CELL_H / 2; /* 11 */
+  int cx1 = cx - 1;     /* 5  — second vertical column   */
+  int cy1 = cy - 1;     /* 10 — second horizontal row    */
 
   if(edges & BX_W)
     for(int x = 0; x <= cx; x++) {
-      pixels[(idx * CELL_H + cy)  * CELL_W + x] = 0xff;
+      pixels[(idx * CELL_H + cy) * CELL_W + x]  = 0xff;
       pixels[(idx * CELL_H + cy1) * CELL_W + x] = 0xff;
     }
   if(edges & BX_E)
     for(int x = cx; x < CELL_W; x++) {
-      pixels[(idx * CELL_H + cy)  * CELL_W + x] = 0xff;
+      pixels[(idx * CELL_H + cy) * CELL_W + x]  = 0xff;
       pixels[(idx * CELL_H + cy1) * CELL_W + x] = 0xff;
     }
   if(edges & BX_N)
@@ -324,7 +368,7 @@ int atlas_submit(const char *font_path)
   for(size_t r = 0; r < sizeof kRanges / sizeof kRanges[0]; r++) {
     for(uint32_t cpi = kRanges[r].start; cpi <= kRanges[r].end; cpi++) {
       uint32_t idx;
-      int edges = box_edges_for(cpi);
+      int      edges = box_edges_for(cpi);
       if(edges >= 0) {
         idx = next_idx++;
         rasterise_box(idx, edges, pixels);
@@ -349,30 +393,40 @@ int atlas_submit(const char *font_path)
 
   if(FT_Load_Char(face, (uint32_t)'?', FT_LOAD_RENDER) == 0) {
     FT_GlyphSlot_Embolden(face->glyph);
-    rasterise_into_slot(face->glyph, fallback_idx + n_regular, baseline, pixels);
+    rasterise_into_slot(
+        face->glyph, fallback_idx + n_regular, baseline, pixels
+    );
   } else {
-    memcpy(pixels + (fallback_idx + n_regular) * cell_bytes,
-           pixels + fallback_idx * cell_bytes, cell_bytes);
+    memcpy(
+        pixels + (fallback_idx + n_regular) * cell_bytes,
+        pixels + fallback_idx * cell_bytes, cell_bytes
+    );
   }
 
   for(size_t r = 0; r < sizeof kRanges / sizeof kRanges[0]; r++) {
     for(uint32_t cpi = kRanges[r].start; cpi <= kRanges[r].end; cpi++) {
-      if(cpi >= CP_MAP_SIZE) continue;
+      if(cpi >= CP_MAP_SIZE)
+        continue;
       uint32_t reg_idx = cp_map[cpi];
-      if(reg_idx == 0xFFFFFFFFu) continue;
+      if(reg_idx == 0xFFFFFFFFu)
+        continue;
       uint32_t bold_idx = reg_idx + n_regular;
 
-      int edges = box_edges_for(cpi);
+      int      edges = box_edges_for(cpi);
       if(edges >= 0 || is_arc_corner(cpi)) {
-        memcpy(pixels + bold_idx * cell_bytes,
-               pixels + reg_idx * cell_bytes, cell_bytes);
+        memcpy(
+            pixels + bold_idx * cell_bytes, pixels + reg_idx * cell_bytes,
+            cell_bytes
+        );
       } else {
         if(FT_Load_Char(face, cpi, FT_LOAD_RENDER) == 0) {
           FT_GlyphSlot_Embolden(face->glyph);
           rasterise_into_slot(face->glyph, bold_idx, baseline, pixels);
         } else {
-          memcpy(pixels + bold_idx * cell_bytes,
-                 pixels + reg_idx * cell_bytes, cell_bytes);
+          memcpy(
+              pixels + bold_idx * cell_bytes, pixels + reg_idx * cell_bytes,
+              cell_bytes
+          );
         }
       }
     }
@@ -384,30 +438,40 @@ int atlas_submit(const char *font_path)
 
   if(FT_Load_Char(face, (uint32_t)'?', FT_LOAD_RENDER) == 0) {
     FT_GlyphSlot_Oblique(face->glyph);
-    rasterise_into_slot(face->glyph, fallback_idx + italic_base, baseline, pixels);
+    rasterise_into_slot(
+        face->glyph, fallback_idx + italic_base, baseline, pixels
+    );
   } else {
-    memcpy(pixels + (fallback_idx + italic_base) * cell_bytes,
-           pixels + fallback_idx * cell_bytes, cell_bytes);
+    memcpy(
+        pixels + (fallback_idx + italic_base) * cell_bytes,
+        pixels + fallback_idx * cell_bytes, cell_bytes
+    );
   }
 
   for(size_t r = 0; r < sizeof kRanges / sizeof kRanges[0]; r++) {
     for(uint32_t cpi = kRanges[r].start; cpi <= kRanges[r].end; cpi++) {
-      if(cpi >= CP_MAP_SIZE) continue;
-      uint32_t reg_idx    = cp_map[cpi];
-      if(reg_idx == 0xFFFFFFFFu) continue;
+      if(cpi >= CP_MAP_SIZE)
+        continue;
+      uint32_t reg_idx = cp_map[cpi];
+      if(reg_idx == 0xFFFFFFFFu)
+        continue;
       uint32_t italic_idx = reg_idx + italic_base;
 
-      int edges = box_edges_for(cpi);
+      int      edges = box_edges_for(cpi);
       if(edges >= 0 || is_arc_corner(cpi)) {
-        memcpy(pixels + italic_idx * cell_bytes,
-               pixels + reg_idx * cell_bytes, cell_bytes);
+        memcpy(
+            pixels + italic_idx * cell_bytes, pixels + reg_idx * cell_bytes,
+            cell_bytes
+        );
       } else {
         if(FT_Load_Char(face, cpi, FT_LOAD_RENDER) == 0) {
           FT_GlyphSlot_Oblique(face->glyph);
           rasterise_into_slot(face->glyph, italic_idx, baseline, pixels);
         } else {
-          memcpy(pixels + italic_idx * cell_bytes,
-                 pixels + reg_idx * cell_bytes, cell_bytes);
+          memcpy(
+              pixels + italic_idx * cell_bytes, pixels + reg_idx * cell_bytes,
+              cell_bytes
+          );
         }
       }
     }

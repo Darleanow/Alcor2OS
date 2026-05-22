@@ -1,6 +1,7 @@
 /**
  * @file cc.c
- * @brief Compiler driver installed as /bin/cc, /bin/clang, /bin/c++ and /usr/bin/cxx.
+ * @brief Compiler driver installed as /bin/cc, /bin/clang, /bin/c++ and
+ * /usr/bin/cxx.
  *
  * Thin wrapper around /bin/clang.real. Derives C/C++ mode from argv[0] and
  * input file extensions; injects all include and link search paths explicitly

@@ -14,6 +14,6 @@
 /** @brief Maximum absolute path length, including the NUL byte. */
 #define VFS_PATH_MAX 256
 /** @brief Maximum open file descriptors per process. */
-#define VFS_MAX_FD   256
+#define VFS_MAX_FD 256
 
 #endif /* ALCOR2_FS_LIMITS_H */

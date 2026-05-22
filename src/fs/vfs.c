@@ -21,11 +21,11 @@
  */
 
 #include <alcor2/errno.h>
+#include <alcor2/fs/pipe.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/proc/proc.h>
-#include <alcor2/fs/pipe.h>
 
 #define VFS_MAX_MOUNTS 16
 #define VFS_MAX_OFT    256

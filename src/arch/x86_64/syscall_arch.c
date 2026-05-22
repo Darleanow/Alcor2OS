@@ -25,7 +25,7 @@ static inline void wrmsr(u32 msr, u64 value)
 
 extern void syscall_entry(void);
 
-void syscall_init(void)
+void        syscall_init(void)
 {
   u64 efer = rdmsr(MSR_EFER);
   efer |= EFER_SCE;

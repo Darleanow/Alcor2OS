@@ -1,6 +1,7 @@
 /**
  * @file src/kernel/input/kbd_layout.c
- * @brief PS/2 scancode translator: layout mapping, line discipline, and TTY I/O.
+ * @brief PS/2 scancode translator: layout mapping, line discipline, and TTY
+ * I/O.
  *
  * Translates set-1 scancodes to UTF-8 byte sequences for US QWERTY and FR
  * AZERTY layouts. Emits CSI/SS3 escape sequences for cursor and function keys.
@@ -770,7 +771,8 @@ u64 kbd_read_translated(char *buf, u64 count)
 
 /* True when fd-0 read() can return without blocking: checks for already-
  * translated bytes first, then peeks the raw queue and dry-runs the translator
- * so select(2) doesn't wake for key-up-only scancodes that produce no output. */
+ * so select(2) doesn't wake for key-up-only scancodes that produce no output.
+ */
 bool kbd_raw_pending(void)
 {
   if(out_pend_r != out_pend_w)

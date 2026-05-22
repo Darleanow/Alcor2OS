@@ -13,20 +13,20 @@ void spz_init(void)
   start_color();
   use_default_colors();
   init_pair(SPZ_PAIR_BORDER, THEME_COL_PRIMARY, -1);
-  init_pair(SPZ_PAIR_TITLE,  THEME_COL_ACCENT,  -1);
-  init_pair(SPZ_PAIR_TEXT,   THEME_COL_TEXT,    -1);
+  init_pair(SPZ_PAIR_TITLE, THEME_COL_ACCENT, -1);
+  init_pair(SPZ_PAIR_TEXT, THEME_COL_TEXT, -1);
   init_pair(SPZ_PAIR_ACCENT, THEME_COL_SUCCESS, -1);
-  init_pair(SPZ_PAIR_SELECT, -1,                THEME_COL_PRIMARY);
-  init_pair(SPZ_PAIR_DIM,    THEME_COL_DIM,     -1);
-  init_pair(SPZ_PAIR_STATUS, -1,                THEME_COL_ACCENT);
+  init_pair(SPZ_PAIR_SELECT, -1, THEME_COL_PRIMARY);
+  init_pair(SPZ_PAIR_DIM, THEME_COL_DIM, -1);
+  init_pair(SPZ_PAIR_STATUS, -1, THEME_COL_ACCENT);
 }
 
-/* ACS_* values are populated at runtime by ncurses (not compile-time constants).
- * waddch with ACS_* is the only portable way in standard non-wide ncurses —
- * waddstr with UTF-8 box chars outputs each byte as a separate cell. */
+/* ACS_* values are populated at runtime by ncurses (not compile-time
+ * constants). waddch with ACS_* is the only portable way in standard non-wide
+ * ncurses — waddstr with UTF-8 box chars outputs each byte as a separate cell.
+ */
 static void draw_border(
-    WINDOW *win, int rows, int cols,
-    const char *title, int border_style
+    WINDOW *win, int rows, int cols, const char *title, int border_style
 )
 {
   if(border_style < 0 || border_style > SPZ_BORDER_HEAVY)
@@ -77,8 +77,7 @@ static void draw_border(
 }
 
 spz_panel_t *spz_panel_new(
-    int y, int x, int rows, int cols,
-    const char *title, int border_style
+    int y, int x, int rows, int cols, const char *title, int border_style
 )
 {
   if(rows < 3 || cols < 4)
@@ -262,9 +261,9 @@ int spz_menu(int y, int x, const char **items, int n, const char *title)
     if(l > max_w)
       max_w = l;
   }
-  int inner_w = max_w + 4;
-  int cols    = inner_w + 2;
-  int rows    = n + 2;
+  int          inner_w = max_w + 4;
+  int          cols    = inner_w + 2;
+  int          rows    = n + 2;
 
   spz_panel_t *p = spz_panel_new(y, x, rows, cols, title, SPZ_BORDER_DOUBLE);
   if(!p)

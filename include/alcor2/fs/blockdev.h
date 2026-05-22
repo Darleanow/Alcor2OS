@@ -19,8 +19,8 @@
  */
 typedef struct
 {
-  i64 (*read)(void *ctx, u64 lba, u32 count, void *buf);
-  i64 (*write)(void *ctx, u64 lba, u32 count, const void *buf);
+  i64   (*read)(void *ctx, u64 lba, u32 count, void *buf);
+  i64   (*write)(void *ctx, u64 lba, u32 count, const void *buf);
   void *ctx;
 } blockdev_t;
 

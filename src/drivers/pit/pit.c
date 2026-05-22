@@ -21,7 +21,7 @@ void fb_console_tick(void);
 static volatile u64 ticks           = 0;
 static bool         preempt_enabled = false;
 
-static void pit_irq_handler(u8 irq)
+static void         pit_irq_handler(u8 irq)
 {
   (void)irq;
   ticks++;

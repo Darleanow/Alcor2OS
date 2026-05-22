@@ -44,9 +44,8 @@ static inline long alcor_fb_info(alcor_fb_info_t *info)
  * @param size_or_zero  Mapping size hint in bytes (0 = full framebuffer span).
  * @return Pointer to the first mapped byte, or @c (void*)-1 on error.
  */
-static inline void *alcor_fb_mmap_hint(
-    unsigned long addr_or_zero, unsigned long size_or_zero
-)
+static inline void *
+    alcor_fb_mmap_hint(unsigned long addr_or_zero, unsigned long size_or_zero)
 {
   long r = syscall(SYS_ALCOR_FB_MMAP, addr_or_zero, size_or_zero);
   if(r < 0)

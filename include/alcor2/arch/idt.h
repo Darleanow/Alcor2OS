@@ -70,8 +70,9 @@ typedef void (*irq_handler_fn)(u8 irq);
  */
 typedef struct
 {
-  const char *(*current_name)(void); /**< Returns current process name or NULL. */
-  void (*exit)(i64 code);            /**< Kill current process (noreturn). */
+  const char *(*current_name)(void
+  );                             /**< Returns current process name or NULL. */
+  void        (*exit)(i64 code); /**< Kill current process (noreturn). */
 } idt_proc_hooks_t;
 
 void idt_set_proc_hooks(idt_proc_hooks_t hooks);

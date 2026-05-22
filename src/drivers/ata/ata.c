@@ -769,7 +769,7 @@ void ata_init(void)
   pic_unmask(IRQ_ATA_PRIMARY);
   pic_unmask(IRQ_ATA_SECONDARY);
 
-  irq_register(IRQ_ATA_PRIMARY,   ata_irq_primary);
+  irq_register(IRQ_ATA_PRIMARY, ata_irq_primary);
   irq_register(IRQ_ATA_SECONDARY, ata_irq_secondary);
 
   init_dma();

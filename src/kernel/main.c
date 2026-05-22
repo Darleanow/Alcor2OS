@@ -209,7 +209,7 @@ static void idt_hook_proc_exit(i64 code)
 
 static void init_idt_proc_hooks(void)
 {
-  idt_set_proc_hooks((idt_proc_hooks_t){
+  idt_set_proc_hooks((idt_proc_hooks_t) {
       .current_name = idt_hook_proc_name,
       .exit         = idt_hook_proc_exit,
   });
@@ -226,18 +226,18 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"GDT Structure",       gdt_init        },
-    {"IDT Structure",       idt_init        },
-    {"SSE/FPU Support",     cpu_enable_sse  },
-    {"Syscall Interface",   syscall_init    },
-    {"PIC/PIT Timers",      pic_init        },
-    {"Hardware Interrupts", init_interrupts },
-    {"VFS Orchestrator",    vfs_init        },
-    {"Storage & VFS",       init_storage    },
-    {"Process Table",       proc_init           },
-    {NULL,                  init_idt_proc_hooks },
-    {"Global Interrupts",   init_enable_irqs    },
-    {NULL,                  NULL            }
+    {"GDT Structure",       gdt_init           },
+    {"IDT Structure",       idt_init           },
+    {"SSE/FPU Support",     cpu_enable_sse     },
+    {"Syscall Interface",   syscall_init       },
+    {"PIC/PIT Timers",      pic_init           },
+    {"Hardware Interrupts", init_interrupts    },
+    {"VFS Orchestrator",    vfs_init           },
+    {"Storage & VFS",       init_storage       },
+    {"Process Table",       proc_init          },
+    {NULL,                  init_idt_proc_hooks},
+    {"Global Interrupts",   init_enable_irqs   },
+    {NULL,                  NULL               }
 };
 
 /**

@@ -12,8 +12,8 @@
 static idt_entry_t idt[IDT_ENTRIES];
 static idt_ptr_t   idtr;
 
-extern void *isr_stub_table[];
-extern void *irq_stub_table[];
+extern void       *isr_stub_table[];
+extern void       *irq_stub_table[];
 
 enum
 {
@@ -23,27 +23,43 @@ enum
 };
 
 static const char *exception_names[] = {
-    "Division Error",       "Debug",
-    "NMI",                  "Breakpoint",
-    "Overflow",             "Bound Range Exceeded",
-    "Invalid Opcode",       "Device Not Available",
-    "Double Fault",         "Coprocessor Segment Overrun",
-    "Invalid TSS",          "Segment Not Present",
-    "Stack-Segment Fault",  "General Protection Fault",
-    "Page Fault",           "Reserved",
-    "x87 FPU Error",        "Alignment Check",
-    "Machine Check",        "SIMD Floating-Point",
-    "Virtualization",       "Control Protection",
-    "Reserved",             "Reserved",
-    "Reserved",             "Reserved",
-    "Reserved",             "Reserved",
-    "Hypervisor Injection", "VMM Communication",
-    "Security Exception",   "Reserved",
+    "Division Error",
+    "Debug",
+    "NMI",
+    "Breakpoint",
+    "Overflow",
+    "Bound Range Exceeded",
+    "Invalid Opcode",
+    "Device Not Available",
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+    "General Protection Fault",
+    "Page Fault",
+    "Reserved",
+    "x87 FPU Error",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point",
+    "Virtualization",
+    "Control Protection",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Hypervisor Injection",
+    "VMM Communication",
+    "Security Exception",
+    "Reserved",
 };
 
 static idt_proc_hooks_t g_proc_hooks;
 
-void idt_set_proc_hooks(idt_proc_hooks_t hooks)
+void                    idt_set_proc_hooks(idt_proc_hooks_t hooks)
 {
   g_proc_hooks = hooks;
 }
@@ -106,7 +122,7 @@ void exception_handler(interrupt_frame_t *frame)
 
 static irq_handler_fn irq_handlers[PIC_IRQ_LINE_COUNT];
 
-void irq_register(u8 irq, irq_handler_fn handler)
+void                  irq_register(u8 irq, irq_handler_fn handler)
 {
   if(irq < PIC_IRQ_LINE_COUNT)
     irq_handlers[irq] = handler;
@@ -133,7 +149,9 @@ void idt_init(void)
     idt_set_gate(i, isr_stub_table[i], IDT_GATE_INT);
 
   for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++)
-    idt_set_gate(X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT);
+    idt_set_gate(
+        X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT
+    );
 
   idtr.limit = sizeof(idt) - 1;
   idtr.base  = (u64)&idt;

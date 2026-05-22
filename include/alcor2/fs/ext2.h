@@ -210,7 +210,7 @@ typedef struct
  */
 typedef struct
 {
-  const blockdev_t  *dev;             /**< Block device backend */
+  const blockdev_t  *dev;              /**< Block device backend */
   u32                partition_lba;    /**< Partition start sector */
   u32                block_size;       /**< Block size in bytes */
   u32                blocks_per_group; /**< Blocks per group */

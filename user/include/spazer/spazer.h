@@ -28,9 +28,9 @@
 #define SPZ_STYLE_DIM     3
 #define SPZ_STYLE_SELECT  4
 
-#define SPZ_BORDER_SINGLE 0   /* ┌─┐│└┘ */
-#define SPZ_BORDER_DOUBLE 1   /* ╔═╗║╚╝ */
-#define SPZ_BORDER_HEAVY  2   /* ┏━┓┃┗┛ */
+#define SPZ_BORDER_SINGLE 0 /* ┌─┐│└┘ */
+#define SPZ_BORDER_DOUBLE 1 /* ╔═╗║╚╝ */
+#define SPZ_BORDER_HEAVY  2 /* ┏━┓┃┗┛ */
 
 typedef struct spz_panel
 {
@@ -40,11 +40,10 @@ typedef struct spz_panel
   int     border_style;
 } spz_panel_t;
 
-void spz_init(void);
+void         spz_init(void);
 
 spz_panel_t *spz_panel_new(
-    int y, int x, int rows, int cols,
-    const char *title, int border_style
+    int y, int x, int rows, int cols, const char *title, int border_style
 );
 
 void spz_panel_refresh(spz_panel_t *p);
@@ -55,11 +54,7 @@ void spz_progress(WINDOW *win, int y, int x, int width, int num, int den);
 
 void spz_statusbar(const char *left, const char *center, const char *right);
 
-int spz_menu(
-    int y, int x,
-    const char **items, int n,
-    const char *title
-);
+int  spz_menu(int y, int x, const char **items, int n, const char *title);
 
 void spz_label(WINDOW *win, int y, int x, const char *text, int style);
 

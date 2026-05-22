@@ -34,7 +34,9 @@ long sh_write(int fd, const void *buf, size_t len)
 /** @brief Issue an ioctl @p request on @p fd with @p arg. */
 int sh_ioctl(int fd, unsigned long request, void *arg)
 {
-  return ioctl(fd, (int)request, arg); /* request fits int; cast silences narrowing */
+  return ioctl(
+      fd, (int)request, arg
+  ); /* request fits int; cast silences narrowing */
 }
 
 /** @brief Clear the terminal screen with an ANSI erase-display sequence. */

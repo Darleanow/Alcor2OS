@@ -39,8 +39,8 @@
 #define EXT2_READ_RUN_MAX 16
 
 /** @brief Pool of mounted volumes. */
-static ext2_volume_t      g_volumes[EXT2_MAX_VOLUMES];
-static const blockdev_t  *g_default_dev;
+static ext2_volume_t     g_volumes[EXT2_MAX_VOLUMES];
+static const blockdev_t *g_default_dev;
 
 /** @brief Pool of open file handles. */
 static ext2_file_t g_files[EXT2_MAX_FILES];
@@ -127,7 +127,9 @@ static inline i64 vol_write_sectors(
     const ext2_volume_t *vol, u32 sector, u32 count, const void *buf
 )
 {
-  return vol->dev->write(vol->dev->ctx, vol->partition_lba + sector, count, buf);
+  return vol->dev->write(
+      vol->dev->ctx, vol->partition_lba + sector, count, buf
+  );
 }
 
 /**
