@@ -6,8 +6,9 @@
 #include <alcor2/arch/cpu.h>
 #include <alcor2/drivers/console.h>
 
-/** @brief MSR register for FS base (thread-local storage). */
+/** @brief MSR registers for FS/GS segment bases (thread-local storage). */
 #define MSR_FS_BASE 0xC0000100
+#define MSR_GS_BASE 0xC0000101
 
 /**
  * @brief Halt the CPU indefinitely.
@@ -81,6 +82,20 @@ u64 cpu_get_fs_base(void)
 {
   u32 lo, hi;
   __asm__ volatile("rdmsr" : "=a"(lo), "=d"(hi) : "c"(MSR_FS_BASE));
+  return ((u64)hi << 32) | lo;
+}
+
+void cpu_set_gs_base(u64 addr)
+{
+  u32 lo = (u32)addr;
+  u32 hi = (u32)(addr >> 32);
+  __asm__ volatile("wrmsr" ::"a"(lo), "d"(hi), "c"(MSR_GS_BASE));
+}
+
+u64 cpu_get_gs_base(void)
+{
+  u32 lo, hi;
+  __asm__ volatile("rdmsr" : "=a"(lo), "=d"(hi) : "c"(MSR_GS_BASE));
   return ((u64)hi << 32) | lo;
 }
 

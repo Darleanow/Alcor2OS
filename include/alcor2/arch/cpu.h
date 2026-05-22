@@ -73,4 +73,16 @@ void cpu_set_fs_base(u64 addr);
  */
 u64 cpu_get_fs_base(void);
 
+/**
+ * @brief Set the GS base MSR.
+ * @param addr Linear address for GS segment base.
+ */
+void cpu_set_gs_base(u64 addr);
+
+/**
+ * @brief Get the current GS base MSR value.
+ * @return GS base address.
+ */
+u64 cpu_get_gs_base(void);
+
 #endif
