@@ -286,12 +286,12 @@ static int read_line(char *buf, size_t cap, const char *prompt)
   }
 }
 
-/* Prompt colours — Catppuccin Mocha. */
-#define PC_LINE CTPP_ANSI_OVERLAY1
-#define PC_HOST CTPP_ANSI_MAUVE_B
-#define PC_PATH CTPP_ANSI_SUBTEXT1
-#define PC_DOLS CTPP_ANSI_GREEN_B
-#define PC_RS   CTPP_ANSI_RESET
+/* Prompt colours — semantic theme roles. */
+#define PC_LINE THEME_ANSI_DIM
+#define PC_HOST THEME_ANSI_ACCENT_B
+#define PC_PATH THEME_ANSI_SUBTEXT
+#define PC_DOLS THEME_ANSI_SUCCESS_B
+#define PC_RS   THEME_ANSI_RESET
 
 /* Box-drawing; rounded corners are arc-rasterised in atlas.c. */
 #define PC_TL   BD_TL_R   /* ╭ */

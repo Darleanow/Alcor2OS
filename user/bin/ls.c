@@ -5,7 +5,7 @@
 
 #include <dirent.h>
 #include <grendizer.h>
-#include <catppuccin.h>
+#include <theme.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,10 +16,10 @@
 #define NAME_MAX_LEN 256
 #define COL_GAP      2
 
-#define CLR_DIR   CTPP_ANSI_BLUE_B
-#define CLR_FILE  CTPP_ANSI_TEXT
-#define CLR_EXEC  CTPP_ANSI_GREEN_B
-#define CLR_RESET CTPP_ANSI_RESET
+#define CLR_DIR   THEME_ANSI_PRIMARY_B
+#define CLR_FILE  THEME_ANSI_TEXT
+#define CLR_EXEC  THEME_ANSI_SUCCESS_B
+#define CLR_RESET THEME_ANSI_RESET
 
 typedef struct
 {

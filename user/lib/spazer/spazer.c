@@ -12,13 +12,13 @@ void spz_init(void)
     return;
   start_color();
   use_default_colors();
-  init_pair(SPZ_PAIR_BORDER, CTPP_COL_BLUE,    -1);
-  init_pair(SPZ_PAIR_TITLE,  CTPP_COL_MAUVE,   -1);
-  init_pair(SPZ_PAIR_TEXT,   CTPP_COL_TEXT,    -1);
-  init_pair(SPZ_PAIR_ACCENT, CTPP_COL_GREEN,   -1);
-  init_pair(SPZ_PAIR_SELECT, -1,               CTPP_COL_BLUE);
-  init_pair(SPZ_PAIR_DIM,    CTPP_COL_OVERLAY, -1);
-  init_pair(SPZ_PAIR_STATUS, -1,               CTPP_COL_MAUVE);
+  init_pair(SPZ_PAIR_BORDER, THEME_COL_PRIMARY, -1);
+  init_pair(SPZ_PAIR_TITLE,  THEME_COL_ACCENT,  -1);
+  init_pair(SPZ_PAIR_TEXT,   THEME_COL_TEXT,    -1);
+  init_pair(SPZ_PAIR_ACCENT, THEME_COL_SUCCESS, -1);
+  init_pair(SPZ_PAIR_SELECT, -1,                THEME_COL_PRIMARY);
+  init_pair(SPZ_PAIR_DIM,    THEME_COL_DIM,     -1);
+  init_pair(SPZ_PAIR_STATUS, -1,                THEME_COL_ACCENT);
 }
 
 /* ACS_* values are populated at runtime by ncurses (not compile-time constants).
