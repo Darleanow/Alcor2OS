@@ -10,6 +10,7 @@
 #ifndef ALCOR2_SYSCALL_H
 #define ALCOR2_SYSCALL_H
 
+#include <alcor2/arch/cpu.h>
 #include <alcor2/types.h>
 
 /** @name Syscall numbers (Linux x86_64 compatible subset)
@@ -92,26 +93,6 @@
 #define SYS_MAX               512
 /* Unmapped syscall numbers in dispatcher intentionally return -ENOSYS. */
 /** @} */
-
-/**
- * @brief Saved registers on syscall entry.
- */
-typedef struct syscall_frame
-{
-  u64 r15, r14, r13, r12, r11, r10, r9, r8;
-  u64 rbp, rdi, rsi, rdx, rcx, rbx;
-  u64 rax;
-  u64 rip;
-  u64 rflags;
-  u64 rsp;
-} syscall_frame_t;
-
-_Static_assert(offsetof(syscall_frame_t, rax) == 14 * 8, "syscall_frame rax");
-_Static_assert(offsetof(syscall_frame_t, rip) == 15 * 8, "syscall_frame rip");
-_Static_assert(
-    offsetof(syscall_frame_t, rflags) == 16 * 8, "syscall_frame rflags"
-);
-_Static_assert(offsetof(syscall_frame_t, rsp) == 17 * 8, "syscall_frame rsp");
 
 /**
  * @brief Initialize syscall mechanism (set MSRs).

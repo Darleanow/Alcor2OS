@@ -17,7 +17,6 @@
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
-#include <alcor2/sys/syscall.h>
 
 /** @brief POSIX @c clone flag: parent blocks until child @c execve or @c _exit.
  * musl @c posix_spawn relies on this so the parent does not run concurrently
