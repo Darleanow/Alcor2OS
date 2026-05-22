@@ -578,7 +578,7 @@ static void flush_pending_scroll(void)
     u32 total_px  = (u32)ctx.rows * (u32)ctx.cell_h;
     u32 copy_px   = total_px - scroll_px;
     if(copy_px > 0) {
-      u8 *dst = (u8 *)ctx.base + (u64)ctx.margin_y * ctx.pitch;
+      u8       *dst = (u8 *)ctx.base + (u64)ctx.margin_y * ctx.pitch;
       const u8 *src = dst + (u64)scroll_px * ctx.pitch;
       kmemcpy(dst, src, (u64)copy_px * ctx.pitch);
     }

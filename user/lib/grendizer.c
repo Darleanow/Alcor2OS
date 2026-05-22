@@ -184,12 +184,12 @@ static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
 {
-  const char *p   = text;
-  double      acc = 0.0;
-  int         sig = 1;
-  int        esig = 1;
-  long        exp = 0;
-  int         saw = 0;
+  const char *p    = text;
+  double      acc  = 0.0;
+  int         sig  = 1;
+  int         esig = 1;
+  long        exp  = 0;
+  int         saw  = 0;
 
   if(!text || !*text) {
     gr__errf(buf, cap, stderr, "%s: missing floating-point value", label);
