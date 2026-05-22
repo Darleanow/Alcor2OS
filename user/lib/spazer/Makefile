@@ -15,13 +15,12 @@ OUT_LIBDIR := $(BUILD_DIR)/lib
 LIBA       := $(OUT_LIBDIR)/libspazer.a
 
 CFLAGS += \
-  -I$(USER_BASE)/lib/spazer/include \
   -I$(NC_INC) \
   $(if $(NC_SUBD),-I$(NC_SUBD))
 
 SRCS    := spazer.c
 OBJS    := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
-HEADERS := include/spazer/spazer.h
+HEADERS := $(USER_BASE)/include/spazer/spazer.h
 
 .PHONY: all clean
 

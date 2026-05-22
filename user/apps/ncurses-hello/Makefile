@@ -17,7 +17,6 @@ ifeq ($(wildcard $(NC_A)),)
 $(error ncurses-hello: missing ncurses libs — run from repo root: make ncurses)
 endif
 
-SPZ_INC := -I$(USER_BASE)/lib/spazer/include
 SPZ_SRC := $(USER_BASE)/lib/spazer/spazer.c
 
 APP     := ncurses-hello
@@ -32,10 +31,10 @@ $(OUT_DIR):
 	@mkdir -p $(OUT_DIR)
 
 $(OUT_DIR)/spazer.o: $(SPZ_SRC) | $(OUT_DIR)
-	$(CROSS) $(CFLAGS) $(NC_CFLAGS) $(SPZ_INC) -c $< -o $@
+	$(CROSS) $(CFLAGS) $(NC_CFLAGS) -c $< -o $@
 
 $(OUT_DIR)/main.o: main.c | $(OUT_DIR)
-	$(CROSS) $(CFLAGS) $(NC_CFLAGS) $(SPZ_INC) -c $< -o $@
+	$(CROSS) $(CFLAGS) $(NC_CFLAGS) -c $< -o $@
 
 $(TARGET): $(OUT_DIR)/main.o $(OUT_DIR)/spazer.o $(CRT0) $(NC_A)
 	$(CROSS) -nostdlib -static -T $(USER_LD) $(CRT0) \
