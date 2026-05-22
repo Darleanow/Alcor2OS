@@ -1,3 +1,8 @@
+/**
+ * @file ls.c
+ * @brief List directory contents with columnar layout and Catppuccin colors.
+ */
+
 #include <dirent.h>
 #include <grendizer.h>
 #include <spazer/palette.h>
@@ -83,7 +88,7 @@ int main(int argc, char *argv[])
 
   DIR *dir = opendir(path);
   if(!dir) {
-    fprintf(stderr, "ls: cannot access '%s': No such directory\n", path);
+    fprintf(stderr, "ls: cannot access '%s': No such file or directory\n", path);
     return 1;
   }
 
@@ -96,7 +101,7 @@ int main(int argc, char *argv[])
     strncpy(e->name, de->d_name, NAME_MAX_LEN - 1);
     e->name[NAME_MAX_LEN - 1] = '\0';
     e->is_dir  = (de->d_type == DT_DIR);
-    e->is_exec = (de->d_type == DT_REG && !e->is_dir);
+    e->is_exec = (de->d_type == DT_REG);
   }
   closedir(dir);
 

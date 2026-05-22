@@ -1,5 +1,6 @@
 /**
- * pwd - Print working directory
+ * @file pwd.c
+ * @brief Print the current working directory.
  */
 
 #include <stdio.h>

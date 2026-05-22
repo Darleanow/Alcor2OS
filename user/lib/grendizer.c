@@ -1,6 +1,6 @@
 /**
  * @file grendizer.c
- * @brief Grendizer CLI parsing library — implementation.
+ * @brief Grendizer argument-parsing library — flags, options, subcommands, and help generation.
  */
 
 #include <grendizer.h>
@@ -15,14 +15,9 @@
 /** Maximum positional arguments collected during a single ::gr_parse call. */
 #define GR_MAX_POSITIONAL 512
 
-/**
- * @brief Format a diagnostic message into @p buf or print to @p fallback.
- *
- * When @p buf is non-NULL and @p cap @> 0 the message is written there and
- * truncated to fit, with a trailing @c "..." inserted when truncation occurs.
- * Otherwise the message is written directly to @p fallback (which may be
- * @c NULL to suppress output).
- */
+/** @brief Write a formatted diagnostic to @p buf or @p fallback stream.
+ *         Truncates with "..." when @p buf is too small; falls back to
+ *         @p fallback (which may be NULL to suppress output entirely). */
 static void
     gr__errf(char *buf, size_t cap, FILE *fallback, const char *fmt, ...)
 {
@@ -54,9 +49,7 @@ static void
   }
 }
 
-/**
- * @brief Return the basename of @p path (the part after the last '/').
- */
+/** @brief Return the filename component of @p path (after the last '/'). */
 static const char *gr__basename(const char *path)
 {
   const char *slash;
@@ -66,9 +59,7 @@ static const char *gr__basename(const char *path)
   return slash ? slash + 1 : path;
 }
 
-/**
- * @brief Resolve the display program name from @p spec and @p argv0.
- */
+/** @brief Resolve the display program name from @p spec and @p argv0. */
 static const char *gr__progname(const gr_spec *spec, const char *argv0)
 {
   if(spec->program && *spec->program)
@@ -76,9 +67,7 @@ static const char *gr__progname(const gr_spec *spec, const char *argv0)
   return gr__basename(argv0);
 }
 
-/**
- * @brief Find the option with @p key as its short name, or @c NULL.
- */
+/** @brief Find an option descriptor by its short character key. */
 static const gr_opt *gr__by_short(const gr_opt *opts, char key)
 {
   for(; opts->kind != GR_KIND_END; opts++)
@@ -87,9 +76,7 @@ static const gr_opt *gr__by_short(const gr_opt *opts, char key)
   return NULL;
 }
 
-/**
- * @brief Find the option whose long name exactly matches @p name[0..len-1].
- */
+/** @brief Find an option descriptor by long name, length-bounded (no NUL required). */
 static const gr_opt *
     gr__by_long(const gr_opt *opts, const char *name, size_t len)
 {
@@ -101,18 +88,14 @@ static const gr_opt *
   return NULL;
 }
 
-/**
- * @brief Return non-zero when @p o expects an argument value.
- */
+/** @brief Return non-zero if the option kind requires a value token. */
 static int gr__needs_value(const gr_opt *o)
 {
   return o->kind == GR_KIND_STR || o->kind == GR_KIND_INT ||
          o->kind == GR_KIND_UINT || o->kind == GR_KIND_FLOAT;
 }
 
-/**
- * @brief Apply a ::GR_KIND_FLAG occurrence to its storage.
- */
+/** @brief Set the boolean flag storage to 1. */
 static int gr__apply_flag(const gr_opt *o, char *buf, size_t cap)
 {
   int *p = (int *)o->storage;
@@ -124,9 +107,7 @@ static int gr__apply_flag(const gr_opt *o, char *buf, size_t cap)
   return GR_OK;
 }
 
-/**
- * @brief Apply a ::GR_KIND_COUNT occurrence to its storage.
- */
+/** @brief Increment the accumulating counter storage. */
 static int gr__apply_count(const gr_opt *o, char *buf, size_t cap)
 {
   int *p = (int *)o->storage;
@@ -138,11 +119,7 @@ static int gr__apply_count(const gr_opt *o, char *buf, size_t cap)
   return GR_OK;
 }
 
-/**
- * @brief Parse a signed decimal integer from @p text into @p out.
- *
- * @param label  Option label for error messages (e.g. @c "--count").
- */
+/** @brief Parse a signed decimal integer from @p text into @p out. */
 static int gr__parse_int(
     const char *text, long *out, char *buf, size_t cap, const char *label
 )
@@ -168,11 +145,7 @@ static int gr__parse_int(
   return GR_OK;
 }
 
-/**
- * @brief Parse an unsigned decimal integer from @p text into @p out.
- *
- * @param label  Option label for error messages.
- */
+/** @brief Parse an unsigned decimal integer from @p text into @p out. */
 static int gr__parse_uint(
     const char *text, unsigned long *out, char *buf, size_t cap,
     const char *label
@@ -203,14 +176,8 @@ static int gr__parse_uint(
   return GR_OK;
 }
 
-/**
- * @brief Parse a floating-point value from @p text into @p out.
- *
- * Hand-rolled to avoid a @c strtod dependency (musl supplies one, but this
- * keeps the implementation self-contained for potential freestanding builds).
- *
- * @param label  Option label for error messages.
- */
+/** @brief Parse a floating-point value from @p text into @p out.
+ *         Hand-rolled to avoid a strtod dependency in freestanding builds. */
 static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
@@ -289,11 +256,7 @@ static int gr__parse_float(
   return GR_OK;
 }
 
-/**
- * @brief Apply a value-taking option @p o with string value @p val.
- *
- * @param label  Display label used in error messages.
- */
+/** @brief Dispatch value parsing to the correct typed handler for @p o. */
 static int gr__apply_value(
     const gr_opt *o, const char *val, char *buf, size_t cap, const char *label
 )
@@ -355,28 +318,31 @@ void gr_usage(const gr_spec *spec, FILE *stream)
   if(col > 32)
     col = 32;
 
-  fprintf(stream, "\nOptions:\n");
+  /* Pass 2: print options — skip the section entirely when the table is empty. */
+  if(spec->options->kind != GR_KIND_END) {
+    fprintf(stream, "\nOptions:\n");
+    for(o = spec->options; o->kind != GR_KIND_END; o++) {
+      char cell[80] = {0};
+      int  len      = 0;
 
-  /* Pass 2: print. */
-  for(o = spec->options; o->kind != GR_KIND_END; o++) {
-    char cell[80] = {0};
-    int  len      = 0;
+      if(o->short_name)
+        len += snprintf(
+            cell + len, sizeof cell - (size_t)len, "-%c", o->short_name
+        );
+      if(o->short_name && o->long_name)
+        len += snprintf(cell + len, sizeof cell - (size_t)len, ", ");
+      if(o->long_name)
+        len += snprintf(
+            cell + len, sizeof cell - (size_t)len, "--%s", o->long_name
+        );
+      if(gr__needs_value(o)) {
+        const char *hint =
+            (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
+        len += snprintf(cell + len, sizeof cell - (size_t)len, " %s", hint);
+      }
 
-    if(o->short_name)
-      len +=
-          snprintf(cell + len, sizeof cell - (size_t)len, "-%c", o->short_name);
-    if(o->short_name && o->long_name)
-      len += snprintf(cell + len, sizeof cell - (size_t)len, ", ");
-    if(o->long_name)
-      len +=
-          snprintf(cell + len, sizeof cell - (size_t)len, "--%s", o->long_name);
-    if(gr__needs_value(o)) {
-      const char *hint =
-          (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
-      len += snprintf(cell + len, sizeof cell - (size_t)len, " %s", hint);
+      fprintf(stream, "  %-*s  %s\n", (int)col, cell, o->help ? o->help : "");
     }
-
-    fprintf(stream, "  %-*s  %s\n", (int)col, cell, o->help ? o->help : "");
   }
 
   if(spec->epilog && *spec->epilog)
@@ -543,9 +509,7 @@ int gr_parse(
   return GR_OK;
 }
 
-/**
- * @brief Return the effective program name from @p app and original @p argv0.
- */
+/** @brief Resolve the display program name for a @ref gr_app. */
 static const char *gr__app_prog(const gr_app *app, const char *argv0)
 {
   if(app->program && *app->program)
@@ -553,9 +517,7 @@ static const char *gr__app_prog(const gr_app *app, const char *argv0)
   return gr__basename(argv0);
 }
 
-/**
- * @brief Look up @p name in a flat ::gr_cmd table of length @p n.
- */
+/** @brief Linear search for a subcommand by name in a table slice. */
 static const gr_cmd *
     gr__find_cmd(const gr_cmd *table, size_t n, const char *name)
 {
@@ -568,9 +530,7 @@ static const gr_cmd *
   return NULL;
 }
 
-/**
- * @brief Build @p dst = @p prefix + " " + @p seg into a fixed-size buffer.
- */
+/** @brief Build a space-joined "prefix seg" command path string into @p dst. */
 static void
     gr__path_join(char *dst, size_t cap, const char *prefix, const char *seg)
 {
@@ -582,9 +542,7 @@ static void
     snprintf(dst, cap, "%s %s", prefix, seg);
 }
 
-/**
- * @brief Print a group-level help listing for @p cmds to @p stream.
- */
+/** @brief Print a help listing of all commands in a group to @p stream. */
 static void gr__print_group(
     const gr_app *app, FILE *stream, const gr_cmd *cmds, size_t n,
     const char *path
@@ -618,9 +576,7 @@ static void gr__print_group(
   fprintf(stream, " help <command>' for details.\n");
 }
 
-/**
- * @brief Print help for a single command node @p cmd at @p path.
- */
+/** @brief Print detailed usage for a single command node to @p stream. */
 static void gr__print_cmd(
     const gr_app *app, FILE *stream, const gr_cmd *cmd, const char *path
 )
@@ -643,20 +599,7 @@ static void gr__print_cmd(
   }
 }
 
-/**
- * @brief Recursively resolve a help path starting from @p argv[0].
- *
- * @param prog      Display program name.
- * @param app       Application descriptor.
- * @param cmds      Current-level command table.
- * @param n         Length of @p cmds.
- * @param path      Accumulated path string (modified in place).
- * @param cap       Capacity of @p path buffer.
- * @param argc      Remaining argument count.
- * @param argv      Remaining argument vector.
- *
- * @return 0 on success, 2 on error.
- */
+/** @brief Recursively resolve a command path for 'help <command> [subcommand]'. */
 static int gr__help_walk(
     const char *prog, const gr_app *app, const gr_cmd *cmds, size_t n,
     char *path, int argc, char **argv
@@ -689,9 +632,7 @@ static int gr__help_walk(
   );
 }
 
-/**
- * @brief Recursive dispatch worker.
- */
+/** @brief Core recursive command dispatcher: resolves tokens and calls the leaf handler. */
 static int gr__dispatch(
     const char *prog, const gr_app *app, const gr_cmd *parent,
     const gr_cmd *cmds, size_t n, const char *path, int argc, char **argv

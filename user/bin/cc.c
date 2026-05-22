@@ -1,25 +1,11 @@
 /**
- * @file user/bin/cc.c
- * @brief Alcor2 C/C++ compiler driver.
+ * @file cc.c
+ * @brief Compiler driver installed as /bin/cc, /bin/clang, /bin/c++ and /usr/bin/cxx.
  *
- * Single binary installed on the guest as `/bin/clang`, `/bin/cc`, `/bin/c++`,
- * `/bin/g++`, and `/usr/bin/cxx`. Forwards to the real Clang at
- * `/bin/clang.real` with a fully explicit command line — no `clang.cfg`, no
- * toolchain auto-detection. Mode (C vs C++) is derived from argv[0] and the
- * input extensions, so:
- *
- *   $ clang  hello.c       → C   compile + link → ./a.out
- *   $ cc     hello.c       → C   compile + link → ./a.out
- *   $ c++    hello.cpp     → C++ compile + link → ./a.out
- *   $ g++    hello.cpp     → C++ compile + link → ./a.out
- *
- * All link inputs (crt1.o, crti.o, libc.a, libgcc.a, crtn.o, …) live under
- * /usr/lib and are passed by absolute path so Clang never has to guess.
- *
- * argv[0] forwarded to clang.real must be an absolute path: LLVM’s
- * getMainExecutable() reads /proc/self/exe (we have no procfs) then falls back
- * to PATH lookup on basename-only argv[0]. Without PATH, it returns "" and
- * posix_spawn fails with EACCES (“Permission denied”).
+ * Thin wrapper around /bin/clang.real. Derives C/C++ mode from argv[0] and
+ * input file extensions; injects all include and link search paths explicitly
+ * so Clang needs no auto-detection. argv[0] forwarded to clang.real must be
+ * an absolute path — LLVM’s getMainExecutable() has no procfs fallback.
  */
 
 #include <stdio.h>
@@ -39,13 +25,6 @@
 #define CXX_INC        "/usr/include/c++/9.4.0"
 #define CXX_INC_TARGET "/usr/include/c++/9.4.0/x86_64-linux-musl"
 
-/**
- * @brief Detect whether we should run in C++ mode.
- *
- * Triggered by argv[0] (c++, g++, cxx, clang++) or by any input file with a
- * C++ extension (.cpp, .cc, .cxx, .c++, .C). Plain `clang` / `cc` on `.c`
- * stays in C mode.
- */
 static int wants_cxx(int argc, char *argv[])
 {
   const char *prog = argv[0] ? argv[0] : "";
@@ -69,9 +48,6 @@ static int wants_cxx(int argc, char *argv[])
   return 0;
 }
 
-/**
- * @brief Append a single argument to the forwarded argv.
- */
 static void push(char **fwd, int *n, const char *a)
 {
   fwd[(*n)++] = (char *)a;
