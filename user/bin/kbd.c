@@ -1,8 +1,9 @@
 /**
- * kbd - Set the PS/2 keyboard layout via ioctl.
- *
- * Usage: kbd us|fr
+ * @file kbd.c
+ * @brief Set the active keyboard layout (us|fr) via ioctl.
  */
+
+#include <grendizer.h>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -13,18 +14,25 @@
 
 int main(int argc, char *argv[])
 {
-  if(argc != 2) {
+  gr_opt  opts[] = {GR_END};
+  gr_spec spec   = {.program = "kbd", .usage = "us|fr", .options = opts};
+  gr_rest rest;
+  int     rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
+  if(rc != GR_OK)
+    return (rc == GR_HELP) ? 0 : 1;
+
+  if(rest.argc != 1) {
     fprintf(stderr, "usage: kbd us|fr\n");
     return 1;
   }
 
   uint32_t layout;
-  if(strcmp(argv[1], "us") == 0)
+  if(strcmp(rest.argv[0], "us") == 0)
     layout = KBD_LAYOUT_US;
-  else if(strcmp(argv[1], "fr") == 0)
+  else if(strcmp(rest.argv[0], "fr") == 0)
     layout = KBD_LAYOUT_FR;
   else {
-    fprintf(stderr, "kbd: unknown layout '%s' (expected us|fr)\n", argv[1]);
+    fprintf(stderr, "kbd: unknown layout '%s' (expected us|fr)\n", rest.argv[0]);
     return 1;
   }
 
@@ -32,6 +40,6 @@ int main(int argc, char *argv[])
     perror("kbd: ioctl");
     return 1;
   }
-  printf("keyboard: layout %s\n", argv[1]);
+  printf("keyboard: layout %s\n", rest.argv[0]);
   return 0;
 }
