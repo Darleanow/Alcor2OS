@@ -1,4 +1,4 @@
-#include <alcor2/drivers/fb_console.h>
+#include <alcor2/fb_console_ioctl.h>
 #include <fcntl.h>
 #include <ft2build.h>
 #include <shell/atlas.h>

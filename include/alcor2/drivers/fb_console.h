@@ -14,23 +14,10 @@
 #ifndef ALCOR2_FB_CONSOLE_H
 #define ALCOR2_FB_CONSOLE_H
 
+#include <alcor2/fb_console_ioctl.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
-
-/* ioctls on fd 1/2 — Linux-style _IOC encoding so userspace can use a normal
- * ioctl(2) call. Group byte is 'F' for "framebuffer console". */
-
-/** SET_ATLAS: userspace submits a glyph atlas. arg = fb_console_atlas_t*. */
-#define FB_CONSOLE_SET_ATLAS                                                   \
-  ((1U << 30) | ((unsigned)'F' << 8) | 1U | (sizeof(fb_console_atlas_t) << 16))
-
-/** YIELD: release the framebuffer for raw mmap use (doom). arg ignored. */
-#define FB_CONSOLE_YIELD ((unsigned)('F' << 8) | 2U)
-
-/** RECLAIM: resume kernel rendering, repaint the grid. arg ignored. */
-#define FB_CONSOLE_RECLAIM ((unsigned)('F' << 8) | 3U)
 
 /**
  * @brief Initialise the runtime console using the same framebuffer the boot
@@ -93,28 +80,7 @@ size_t fb_console_read(void *buf, size_t max);
  */
 void fb_console_tick(void);
 
-/**
- * @brief Atlas descriptor submitted by userspace.
- *
- * The kernel maps @c pixels_user and @c cp_map_user read-only into kernel
- * space (so it sees what userspace put there) and keeps the mapping alive
- * for the atlas's lifetime.
- */
-typedef struct
-{
-  uint64_t pixels_user;  /**< userspace VA of the glyph atlas pixel data. */
-  uint32_t pixels_size;  /**< total atlas bytes. */
-  uint32_t cell_w;       /**< glyph cell width in pixels. */
-  uint32_t cell_h;       /**< glyph cell height in pixels. */
-  uint32_t stride_bytes; /**< bytes per row of a single cell. */
-  uint32_t bpp;          /**< atlas bpp — must match framebuffer. */
-  uint32_t n_glyphs;     /**< total glyph slots in the atlas. */
-  uint64_t cp_map_user; /**< userspace VA of u32[n_cp] codepoint → glyph_idx. */
-  uint32_t n_cp;        /**< size of cp_map (covers codepoints 0..n_cp-1). */
-  uint32_t fallback_idx;  /**< glyph for unmapped codepoints. */
-  uint32_t bold_offset;   /**< first bold glyph slot; 0 = no bold atlas. */
-  uint32_t italic_offset; /**< first italic glyph slot; 0 = no italic atlas. */
-} fb_console_atlas_t;
+/* fb_console_atlas_t and ioctl constants are in <alcor2/fb_console_ioctl.h>. */
 
 /** @brief Register a userspace glyph atlas; subsequent renders use Fira. */
 int fb_console_set_atlas(const fb_console_atlas_t *meta);
