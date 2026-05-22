@@ -50,7 +50,7 @@ user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	$(MAKE) -C user/lib
 	$(MAKE) -C user/core/vega
 	$(MAKE) -C user/sdk/vega
-	$(MAKE) -C user/sdk/spazer
+	$(MAKE) -C user/lib/spazer
 	$(MAKE) -C user/init
 	$(MAKE) -C user/apps/shell
 	$(MAKE) -C user/apps/vega
@@ -267,7 +267,7 @@ clean:
 	-$(MAKE) -C user/apps/vega clean
 	-$(MAKE) -C user/bin clean
 	-$(MAKE) -C user/apps clean
-	-$(MAKE) -C user/sdk/spazer clean
+	-$(MAKE) -C user/lib/spazer clean
 
 clean-all: clean
 	rm -rf thirdparty/musl/install thirdparty/musl/_install \

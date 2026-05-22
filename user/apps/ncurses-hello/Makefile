@@ -17,8 +17,8 @@ ifeq ($(wildcard $(NC_A)),)
 $(error ncurses-hello: missing ncurses libs — run from repo root: make ncurses)
 endif
 
-SPZ_INC := -I$(USER_BASE)/sdk/spazer/include
-SPZ_SRC := $(USER_BASE)/sdk/spazer/spazer.c
+SPZ_INC := -I$(USER_BASE)/lib/spazer/include
+SPZ_SRC := $(USER_BASE)/lib/spazer/spazer.c
 
 APP     := ncurses-hello
 OUT_DIR := $(BUILD_DIR)/apps/$(APP)

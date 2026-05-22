@@ -5,7 +5,7 @@
 
 #include <dirent.h>
 #include <grendizer.h>
-#include <spazer/palette.h>
+#include <catppuccin.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,10 +16,10 @@
 #define NAME_MAX_LEN 256
 #define COL_GAP      2
 
-#define CLR_DIR   SPZ_ANSI_BLUE_B
-#define CLR_FILE  SPZ_ANSI_TEXT
-#define CLR_EXEC  SPZ_ANSI_GREEN_B
-#define CLR_RESET SPZ_ANSI_RESET
+#define CLR_DIR   CTPP_ANSI_BLUE_B
+#define CLR_FILE  CTPP_ANSI_TEXT
+#define CLR_EXEC  CTPP_ANSI_GREEN_B
+#define CLR_RESET CTPP_ANSI_RESET
 
 typedef struct
 {

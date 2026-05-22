@@ -286,17 +286,17 @@ static int read_line(char *buf, size_t cap, const char *prompt)
   }
 }
 
-/* Prompt colours — Catppuccin Mocha via spazer palette. */
-#define PC_LINE SPZ_ANSI_OVERLAY1
-#define PC_HOST SPZ_ANSI_MAUVE_B
-#define PC_PATH SPZ_ANSI_SUBTEXT1
-#define PC_DOLS SPZ_ANSI_GREEN_B
-#define PC_RS   SPZ_ANSI_RESET
+/* Prompt colours — Catppuccin Mocha. */
+#define PC_LINE CTPP_ANSI_OVERLAY1
+#define PC_HOST CTPP_ANSI_MAUVE_B
+#define PC_PATH CTPP_ANSI_SUBTEXT1
+#define PC_DOLS CTPP_ANSI_GREEN_B
+#define PC_RS   CTPP_ANSI_RESET
 
-/* Box-drawing via spazer; rounded corners are arc-rasterised in atlas.c. */
-#define PC_TL   SPZ_TL_R   /* ╭ */
-#define PC_BL   SPZ_BL_R   /* ╰ */
-#define PC_H    SPZ_H      /* ─ */
+/* Box-drawing; rounded corners are arc-rasterised in atlas.c. */
+#define PC_TL   BD_TL_R   /* ╭ */
+#define PC_BL   BD_BL_R   /* ╰ */
+#define PC_H    BD_H      /* ─ */
 
 static void write_prompt_header(void)
 {
@@ -453,7 +453,7 @@ static int read_complete_statement(char *buf, size_t size)
   /* Continuation prompt for multi-line input: │ »  (indented) */
   char cont_prompt[64];
   snprintf(cont_prompt, sizeof cont_prompt,
-           PC_LINE SPZ_V " " PC_RS        /* │ space */
+           PC_LINE BD_V " " PC_RS         /* │ space */
            PC_DOLS "\xc2\xbb" PC_RS " "); /* »  (U+00BB Latin-1) */
 
   const char *cur_prompt = prompt;
@@ -543,25 +543,25 @@ int main(int argc, char *argv[])
   char line[LINE_MAX_LEN];
 
 #define BNR_H34 \
-  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
-  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
-  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
-  SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
-  SPZ_H SPZ_H
+  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
+  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
+  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
+  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H \
+  BD_H BD_H
   write_str(
       "\n"
-      "  " PC_LINE SPZ_TL_R BNR_H34 SPZ_TR_R PC_RS "\n"
-      "  " PC_LINE SPZ_V PC_RS
+      "  " PC_LINE BD_TL_R BNR_H34 BD_TR_R PC_RS "\n"
+      "  " PC_LINE BD_V PC_RS
         "            " PC_HOST "ALCOR2  OS" PC_RS "            "
-        PC_LINE SPZ_V PC_RS "\n"
-      "  " PC_LINE SPZ_LT BNR_H34 SPZ_RT PC_RS "\n"
-      "  " PC_LINE SPZ_V PC_RS
+        PC_LINE BD_V PC_RS "\n"
+      "  " PC_LINE BD_LT BNR_H34 BD_RT PC_RS "\n"
+      "  " PC_LINE BD_V PC_RS
         "           " PC_PATH "vega v" VEGA_VERSION PC_RS "            "
-        PC_LINE SPZ_V PC_RS "\n"
-      "  " PC_LINE SPZ_BL_R BNR_H34 SPZ_BR_R PC_RS "\n"
+        PC_LINE BD_V PC_RS "\n"
+      "  " PC_LINE BD_BL_R BNR_H34 BD_BR_R PC_RS "\n"
       "\n"
       "  " PC_DOLS "help"
-        PC_LINE " " SPZ_ARROW_R " " PC_RS
+        PC_LINE " " BD_ARROW_R " " PC_RS
         PC_PATH "list available commands" PC_RS
       "\n\n"
   );

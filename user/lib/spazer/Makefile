@@ -10,12 +10,12 @@ all clean:
 	@true
 else
 
-OUT_DIR    := $(BUILD_DIR)/sdk/spazer
+OUT_DIR    := $(BUILD_DIR)/lib/spazer
 OUT_LIBDIR := $(BUILD_DIR)/lib
 LIBA       := $(OUT_LIBDIR)/libspazer.a
 
 CFLAGS += \
-  -I$(USER_BASE)/sdk/spazer/include \
+  -I$(USER_BASE)/lib/spazer/include \
   -I$(NC_INC) \
   $(if $(NC_SUBD),-I$(NC_SUBD))
 

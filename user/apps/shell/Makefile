@@ -24,7 +24,7 @@ NC_CFLAGS   := -I$(NC_ROOT)/include $(if $(NCURSES_SUB),-I$(NC_ROOT)/include/ncu
 
 CFLAGS += -I$(USER_BASE)/apps/shell/include \
           -I$(USER_BASE)/sdk/vega/include \
-          -I$(USER_BASE)/sdk/spazer/include \
+          -I$(USER_BASE)/lib/spazer/include \
           $(NC_CFLAGS)
 
 BASE_SRCS := \
