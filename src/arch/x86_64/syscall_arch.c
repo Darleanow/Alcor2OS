@@ -8,7 +8,6 @@
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/drivers/console.h>
-#include <alcor2/sys/syscall.h>
 
 static inline u64 rdmsr(u32 msr)
 {

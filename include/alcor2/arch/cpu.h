@@ -34,6 +34,14 @@ _Static_assert(
 );
 _Static_assert(offsetof(syscall_frame_t, rsp) == 17 * 8, "syscall_frame rsp");
 
+/** @name MSR indices and flags for the x86_64 SYSCALL/SYSRET mechanism. */
+#define MSR_EFER    0xC0000080
+#define MSR_STAR    0xC0000081
+#define MSR_LSTAR   0xC0000082
+#define MSR_SFMASK  0xC0000084
+#define EFER_SCE    (1 << 0)
+/** @} */
+
 /**
  * @brief Halt the CPU indefinitely.
  *
