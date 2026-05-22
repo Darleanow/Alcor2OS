@@ -9,7 +9,7 @@
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/ata.h>
 #include <alcor2/drivers/console.h>
-#include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
 
 extern void        pit_tick(void);
 extern void        keyboard_irq(void);
@@ -96,7 +96,7 @@ void exception_handler(interrupt_frame_t *frame)
   const proc_t *p = proc_current();
   if(p) {
     console_print(" [");
-    console_print(p->name);
+    console_print(proc_name(p));
     console_print("]");
   }
   console_print("\n");

@@ -639,6 +639,11 @@ void proc_tick(void)
   need_resched = true;
 }
 
+const char *proc_name(const proc_t *p)
+{
+  return p ? p->name : "(none)";
+}
+
 void proc_block(proc_t *p)
 {
   if(p)

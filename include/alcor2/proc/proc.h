@@ -9,7 +9,7 @@
 #ifndef ALCOR2_PROC_H
 #define ALCOR2_PROC_H
 
-#include <alcor2/fs/vfs.h>
+#include <alcor2/fs/limits.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/proc/signal.h>
 #include <alcor2/types.h>

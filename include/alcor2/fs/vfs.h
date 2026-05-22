@@ -36,14 +36,8 @@
 #ifndef ALCOR2_VFS_H
 #define ALCOR2_VFS_H
 
+#include <alcor2/fs/limits.h>
 #include <alcor2/types.h>
-
-/** @brief Maximum filename component length, not including the NUL byte. */
-#define VFS_NAME_MAX 64
-/** @brief Maximum absolute path length, including the NUL byte. */
-#define VFS_PATH_MAX 256
-/** @brief Maximum open file descriptors per process. */
-#define VFS_MAX_FD 256
 
 /** @name Node types
  *

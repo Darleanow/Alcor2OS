@@ -4,7 +4,9 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/vmm.h>
-#include <alcor2/proc/signal.h>
+/* Forward declaration — avoids pulling in proc/signal.h for one call. */
+#define SIGWINCH 28
+void proc_signal_broadcast(int signum);
 #include <alcor2/types.h>
 
 typedef struct
