@@ -190,6 +190,42 @@ static inline void fill32(volatile u32 *dst, u32 val, u32 n)
   __asm__ volatile("rep stosl" : "+D"(d), "+c"(n) : "a"(val) : "memory");
 }
 
+/* Blend one row of glyph pixels into the framebuffer.  bypp==1: alpha-only
+ * atlas (typical FreeType grayscale).  bypp==4: RGBA atlas (px[3] = alpha).
+ * The fast-paths for a=0 and a=255 avoid the multiply for solid/transparent
+ * pixels, which covers the majority of glyph coverage maps. */
+static inline void blend_glyph_row(
+    volatile u32 *dst, const u8 *src, u32 n, u32 bypp,
+    u32 fg_r, u32 fg_g, u32 fg_b,
+    u32 bg_r, u32 bg_g, u32 bg_b,
+    u32 fg_pk, u32 bg_pk)
+{
+  if(bypp == 1u) {
+    for(u32 gx = 0; gx < n; gx++) {
+      u32 a = src[gx];
+      if(!a)      { dst[gx] = bg_pk; continue; }
+      if(a==255u) { dst[gx] = fg_pk; continue; }
+      u32 inv = 255u - a;
+      dst[gx] = 0xFF000000u
+              | ((fg_r*a + bg_r*inv + 128u) >> 8) << 16
+              | ((fg_g*a + bg_g*inv + 128u) >> 8) << 8
+              |  (fg_b*a + bg_b*inv + 128u) >> 8;
+    }
+  } else {
+    for(u32 gx = 0; gx < n; gx++) {
+      const u8 *px = src + gx * bypp;
+      u32 a = (bypp == 4u) ? (u32)px[3] : (u32)px[0];
+      if(!a)      { dst[gx] = bg_pk; continue; }
+      if(a==255u) { dst[gx] = fg_pk; continue; }
+      u32 inv = 255u - a;
+      dst[gx] = 0xFF000000u
+              | ((fg_r*a + bg_r*inv + 128u) >> 8) << 16
+              | ((fg_g*a + bg_g*inv + 128u) >> 8) << 8
+              |  (fg_b*a + bg_b*inv + 128u) >> 8;
+    }
+  }
+}
+
 static void blit_cell_data(const fb_cell_t *c, int col, int row)
 {
   u32 eff_fg = (c->attr & FB_ATTR_REVERSE) ? c->bg : c->fg;
@@ -222,39 +258,12 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
         u32       cell_h     = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h : (u32)ctx.cell_h;
         u32       cell_w     = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w : (u32)ctx.cell_w;
 
-        if(atlas_bypp == 1u) {
-          for(u32 gy = 0; gy < cell_h; gy++) {
-            const u8     *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
-            volatile u32 *dst = (volatile u32 *)(ctx.base
-                               + (u64)(px_y + gy) * ctx.pitch + (u64)px_x * 4u);
-            for(u32 gx = 0; gx < cell_w; gx++) {
-              u32 a = src[gx];
-              if(!a)      { dst[gx] = bg_pk; continue; }
-              if(a==255u) { dst[gx] = fg_pk; continue; }
-              u32 inv = 255u - a;
-              dst[gx] = 0xFF000000u
-                      | ((fg_r*a + bg_r*inv + 128u) >> 8) << 16
-                      | ((fg_g*a + bg_g*inv + 128u) >> 8) << 8
-                      |  (fg_b*a + bg_b*inv + 128u) >> 8;
-            }
-          }
-        } else {
-          for(u32 gy = 0; gy < cell_h; gy++) {
-            const u8     *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
-            volatile u32 *dst = (volatile u32 *)(ctx.base
-                               + (u64)(px_y + gy) * ctx.pitch + (u64)px_x * 4u);
-            for(u32 gx = 0; gx < cell_w; gx++) {
-              const u8 *px = src + gx * atlas_bypp;
-              u32 a = (atlas_bypp == 4u) ? (u32)px[3] : (u32)px[0];
-              if(!a)      { dst[gx] = bg_pk; continue; }
-              if(a==255u) { dst[gx] = fg_pk; continue; }
-              u32 inv = 255u - a;
-              dst[gx] = 0xFF000000u
-                      | ((fg_r*a + bg_r*inv + 128u) >> 8) << 16
-                      | ((fg_g*a + bg_g*inv + 128u) >> 8) << 8
-                      |  (fg_b*a + bg_b*inv + 128u) >> 8;
-            }
-          }
+        for(u32 gy = 0; gy < cell_h; gy++) {
+          const u8     *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
+          volatile u32 *dst = (volatile u32 *)(ctx.base
+                             + (u64)(px_y + gy) * ctx.pitch + (u64)px_x * 4u);
+          blend_glyph_row(dst, src, cell_w, atlas_bypp,
+                          fg_r, fg_g, fg_b, bg_r, bg_g, bg_b, fg_pk, bg_pk);
         }
         goto post;
       }
@@ -599,7 +608,7 @@ static void flush_batch(void)
                               * (size_t)ctx.atlas_stride;
         }
       }
-      if(bg_only) ci[cc].glyph_base = (const u8 *)0;
+      if(bg_only) ci[cc].glyph_base = NULL;
     }
 
     for(u32 spy = 0; spy < (u32)ctx.cell_h; spy++) {
@@ -620,34 +629,10 @@ static void flush_batch(void)
         }
 
         const u8 *src = ci[cc].glyph_base + (size_t)spy * (size_t)ctx.atlas_stride;
-        u32 bg_pk = ci[cc].bg_pk, fg_pk = ci[cc].fg_pk;
-        u32 fg_r  = ci[cc].fg_r,  fg_g  = ci[cc].fg_g,  fg_b = ci[cc].fg_b;
-        u32 bg_r  = ci[cc].bg_r,  bg_g  = ci[cc].bg_g,  bg_b = ci[cc].bg_b;
-
-        if(atlas_bypp == 1u) {
-          for(u32 gx = 0; gx < acw; gx++) {
-            u32 a = src[gx];
-            if(!a)     { dst[gx] = bg_pk; continue; }
-            if(a==255u){ dst[gx] = fg_pk; continue; }
-            u32 inv = 255u - a;
-            dst[gx] = 0xFF000000u
-                    | ((fg_r * a + bg_r * inv + 128u) >> 8) << 16
-                    | ((fg_g * a + bg_g * inv + 128u) >> 8) << 8
-                    |  (fg_b * a + bg_b * inv + 128u) >> 8;
-          }
-        } else {
-          for(u32 gx = 0; gx < acw; gx++) {
-            const u8 *px = src + gx * atlas_bypp;
-            u32 a = (atlas_bypp == 4u) ? (u32)px[3] : (u32)px[0];
-            if(!a)     { dst[gx] = bg_pk; continue; }
-            if(a==255u){ dst[gx] = fg_pk; continue; }
-            u32 inv = 255u - a;
-            dst[gx] = 0xFF000000u
-                    | ((fg_r * a + bg_r * inv + 128u) >> 8) << 16
-                    | ((fg_g * a + bg_g * inv + 128u) >> 8) << 8
-                    |  (fg_b * a + bg_b * inv + 128u) >> 8;
-          }
-        }
+        blend_glyph_row(dst, src, acw, atlas_bypp,
+                        ci[cc].fg_r, ci[cc].fg_g, ci[cc].fg_b,
+                        ci[cc].bg_r, ci[cc].bg_g, ci[cc].bg_b,
+                        ci[cc].fg_pk, ci[cc].bg_pk);
       }
     }
     for(int cc = 0; cc < ctx.cols; cc++) row[cc].dirty = 0;
@@ -684,19 +669,18 @@ static void put_cp_at_cursor(u32 cp)
   ctx.cx++;
 }
 
-/* 16-color palette (Nord-ish, matches userspace fb_tty for visual continuity).
- */
+/* Catppuccin Mocha 16-color palette.  Indices match ANSI SGR 30-37 / 90-97. */
 static const u32 ansi16_fg[8] = {
-    0x3b4252u, 0xbf616au, 0xa3be8cu, 0xebcb8bu,
-    0x5e81acu, 0xb48eadu, 0x88c0d0u, 0xeceff4u,
+    0x45475au, 0xf38ba8u, 0xa6e3a1u, 0xf9e2afu,
+    0x89b4fau, 0xf5c2e7u, 0x94e2d5u, 0xbac2deu,
 };
 static const u32 ansi16_fg_bright[8] = {
-    0x4c566au, 0xd08770u, 0xb8d99bu, 0xf2e9c4u,
-    0x81a1c1u, 0xc89fc8u, 0x8fbcbbu, 0xe5e9f0u,
+    0x585b70u, 0xf38ba8u, 0xa6e3a1u, 0xf9e2afu,
+    0x89b4fau, 0xcba6f7u, 0x89dcebu, 0xa6adc8u,
 };
 static const u32 ansi16_bg[8] = {
-    0x2e3440u, 0x6a4a4eu, 0x3b5348u, 0x57564eu,
-    0x3d4f66u, 0x403d52u, 0x3b5254u, 0xe5e9f0u,
+    0x45475au, 0xf38ba8u, 0xa6e3a1u, 0xf9e2afu,
+    0x89b4fau, 0xf5c2e7u, 0x94e2d5u, 0xbac2deu,
 };
 
 /* xterm-256 → RGB. ANSI 16..231 are a 6×6×6 cube; 232..255 are 24 grays. */
@@ -1161,10 +1145,8 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
   ctx.margin_y = 0;
   ctx.cols     = (int)(width / (u64)ctx.cell_w);
   ctx.rows     = (int)(height / (u64)ctx.cell_h);
-  /* Nord defaults — fg = snow-storm-1, bg = polar-night-1. Match the look
-   * the old userspace fb_tty shipped (see commit 438a24b for the source). */
-  ctx.default_fg = 0xd8dee9u;
-  ctx.default_bg = 0x2e3440u;
+  ctx.default_fg = 0xcdd6f4u; /* Catppuccin Mocha Text */
+  ctx.default_bg = 0x1e1e2eu; /* Catppuccin Mocha Base */
   ctx.cur_fg     = ctx.default_fg;
   ctx.cur_bg     = ctx.default_bg;
   ctx.cx = ctx.cy    = 0;
@@ -1354,9 +1336,7 @@ void fb_console_tick(void)
   }
 }
 
-/** Reject atlas metadata that would let a buggy/malicious shim convince the
- *  kernel to allocate gigabytes or oversize the cell. Caps are deliberately
- *  generous — they exist to bound damage, not to enforce policy. */
+/* Caps are generous — they bound damage from a buggy shim, not enforce policy. */
 static bool atlas_meta_is_sane(const fb_console_atlas_t *meta)
 {
   if(meta->cell_w == 0u || meta->cell_h == 0u || meta->cell_w > 64u ||
