@@ -1,25 +1,10 @@
-/**
- * @file user/apps/ncurses-hello/main.c
- * @brief Interactive ncurses demo for Alcor2.
- *
- * Exercises the shell's framebuffer terminal: color pairs, attribute flags,
- * box borders (DEC line drawing), and the keyname/keycode mapping. Useful as
- * a smoke test for the relayed-stdout path between user apps and fb_tty.
- *
- * Navigation: arrow keys or hjkl in the menu, Enter to open a sub-screen, q
- * to go back or quit.
- */
-
 #include <curses.h>
+#include <locale.h>
+#include <spazer/spazer.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define CP_NORMAL 1
-#define CP_HEADER 2
-#define CP_HILITE 3
-#define CP_WARN   4
 
 typedef enum
 {
@@ -27,98 +12,42 @@ typedef enum
   SCR_COLORS,
   SCR_ATTRS,
   SCR_INPUT,
+  SCR_BLINK,
   SCR_QUIT
 } screen_t;
 
-static const char *const menu_labels[] = {
-    "Color pairs",
-    "Text attributes",
-    "Keyboard input",
-    "Quit",
+static const char *const g_menu[] = {
+    "Color pairs", "Text attributes", "Keyboard input", "Blink demo", "Quit",
 };
+#define N_ITEMS 5
 
-#define N_MENU_ITEMS ((int)(sizeof menu_labels / sizeof menu_labels[0]))
-
-/**
- * @brief Fill the header bar with @p title and the app name.
- */
-static void draw_header(WINDOW *w, int cols, const char *title)
+static void draw_statusbar(const char *hint)
 {
-  wattron(w, COLOR_PAIR(CP_HEADER) | A_BOLD);
-  mvwhline(w, 0, 0, ' ', cols);
-  mvwprintw(w, 0, 2, " Alcor2 ncurses  |  %s", title);
-  wattroff(w, COLOR_PAIR(CP_HEADER) | A_BOLD);
-  wrefresh(w);
+  spz_statusbar("Alcor2 v1.0", "ncurses-hello", hint);
 }
 
-/**
- * @brief Fill the footer bar with @p hint.
- */
-static void draw_footer(WINDOW *w, int cols, const char *hint)
+static screen_t screen_menu(spz_panel_t *p)
 {
-  wattron(w, COLOR_PAIR(CP_HEADER));
-  mvwhline(w, 0, 0, ' ', cols);
-  mvwprintw(w, 0, 2, " %s", hint);
-  wattroff(w, COLOR_PAIR(CP_HEADER));
-  wrefresh(w);
+  spz_panel_redraw(p, "ALCOR2  DEMO");
+  draw_statusbar("Enter  open     q  quit");
+  spz_panel_refresh(p);
+
+  int mx = (COLS - 21) / 2;
+  if(mx < 1)
+    mx = 1;
+
+  int sel = spz_menu(3, mx, g_menu, N_ITEMS, NULL);
+  if(sel < 0 || sel == N_ITEMS - 1)
+    return SCR_QUIT;
+  return (screen_t)(SCR_COLORS + sel);
 }
 
-/**
- * @brief Show the main menu and return the screen the user picked.
- */
-static screen_t
-    screen_menu(WINDOW *hdr, WINDOW *body, WINDOW *ftr, int rows, int cols)
+static void screen_colors(spz_panel_t *p)
 {
-  int brows = rows - 2;
-  int sel   = 0;
+  WINDOW *w = p->body;
+  spz_panel_redraw(p, "Color Pairs");
+  draw_statusbar("any key  back");
 
-  draw_header(hdr, cols, "Main Menu");
-  draw_footer(ftr, cols, "^/v  j/k  move     Enter  open     q  quit");
-
-  for(;;) {
-    werase(body);
-    box(body, 0, 0);
-
-    int item_w = 26;
-    int item_x = (cols - item_w) / 2;
-    int item_y = (brows - N_MENU_ITEMS * 2) / 2;
-
-    for(int i = 0; i < N_MENU_ITEMS; i++) {
-      attr_t a = (i == sel) ? (COLOR_PAIR(CP_HILITE) | A_BOLD)
-                            : (attr_t)COLOR_PAIR(CP_NORMAL);
-      wattron(body, a);
-      mvwprintw(body, item_y + i * 2, item_x, "  %-22s  ", menu_labels[i]);
-      wattroff(body, a);
-    }
-    wrefresh(body);
-
-    switch(wgetch(body)) {
-    case KEY_UP:
-    case 'k':
-      if(sel > 0)
-        sel--;
-      break;
-    case KEY_DOWN:
-    case 'j':
-      if(sel < N_MENU_ITEMS - 1)
-        sel++;
-      break;
-    case '\n':
-    case KEY_ENTER:
-      return (screen_t)(SCR_COLORS + sel);
-    case 'q':
-    case 'Q':
-      return SCR_QUIT;
-    }
-  }
-}
-
-/**
- * @brief Render every foreground color on black and white backgrounds.
- */
-static void
-    screen_colors(WINDOW *hdr, WINDOW *body, WINDOW *ftr, int rows, int cols)
-{
   static const struct
   {
     short       fg;
@@ -132,106 +61,75 @@ static void
       {COLOR_MAGENTA, "MAGENTA"},
       {COLOR_CYAN,    "CYAN   "},
   };
-  const int n = (int)(sizeof colors / sizeof colors[0]);
 
-  (void)rows;
-  draw_header(hdr, cols, "Color Pairs");
-  draw_footer(ftr, cols, "any key  back");
-
-  werase(body);
-  box(body, 0, 0);
-
-  mvwprintw(body, 2, 4, "Foreground on BLACK:");
-  for(int i = 0; i < n; i++) {
+  spz_label(w, 1, 2, "Foreground on black:", SPZ_STYLE_DIM);
+  for(int i = 0; i < 7; i++) {
     short id = (short)(10 + i);
     init_pair(id, colors[i].fg, COLOR_BLACK);
-    wattron(body, COLOR_PAIR(id));
-    mvwprintw(body, 4 + i, 6, "  %s  Hello, Alcor2!", colors[i].name);
-    wattroff(body, COLOR_PAIR(id));
+    wattron(w, COLOR_PAIR(id));
+    mvwprintw(w, 3 + i, 4, "  %s  Hello, Alcor2!", colors[i].name);
+    wattroff(w, COLOR_PAIR(id));
   }
 
-  mvwprintw(body, 4 + n + 1, 4, "Foreground on WHITE:");
-  for(int i = 0; i < n; i++) {
+  spz_label(w, 11, 2, "Foreground on white:", SPZ_STYLE_DIM);
+  for(int i = 0; i < 7; i++) {
     short id = (short)(20 + i);
     init_pair(id, colors[i].fg, COLOR_WHITE);
-    wattron(body, COLOR_PAIR(id));
-    mvwprintw(body, 4 + n + 3 + i, 6, "  %s  Hello, Alcor2!", colors[i].name);
-    wattroff(body, COLOR_PAIR(id));
+    wattron(w, COLOR_PAIR(id));
+    mvwprintw(w, 13 + i, 4, "  %s  Hello, Alcor2!", colors[i].name);
+    wattroff(w, COLOR_PAIR(id));
   }
 
-  wrefresh(body);
-  wgetch(body);
+  spz_panel_refresh(p);
+  keypad(w, TRUE);
+  wgetch(w);
 }
 
-/**
- * @brief Render each ncurses attribute flag on its own row.
- */
-static void
-    screen_attrs(WINDOW *hdr, WINDOW *body, WINDOW *ftr, int rows, int cols)
+static void screen_attrs(spz_panel_t *p)
 {
+  WINDOW *w = p->body;
+  spz_panel_redraw(p, "Text Attributes");
+  draw_statusbar("any key  back");
+
   static const struct
   {
     attr_t      attr;
     const char *name;
   } attrs[] = {
-      {A_NORMAL,    "A_NORMAL    - plain text"             },
-      {A_BOLD,      "A_BOLD      - bold / bright"          },
-      {A_DIM,       "A_DIM       - half-bright"            },
-      {A_UNDERLINE, "A_UNDERLINE - underline"              },
-      {A_REVERSE,   "A_REVERSE   - video reverse"          },
-      {A_BLINK,     "A_BLINK     - blinking"               },
-      {A_STANDOUT,  "A_STANDOUT  - terminal best highlight"},
+      {A_NORMAL,    "A_NORMAL    plain text"    },
+      {A_BOLD,      "A_BOLD      bold / bright" },
+      {A_DIM,       "A_DIM       half-bright"   },
+      {A_UNDERLINE, "A_UNDERLINE underline"     },
+      {A_REVERSE,   "A_REVERSE   video reverse" },
+      {A_STANDOUT,  "A_STANDOUT  best highlight"},
   };
   const int n = (int)(sizeof attrs / sizeof attrs[0]);
 
-  (void)rows;
-  draw_header(hdr, cols, "Text Attributes");
-  draw_footer(ftr, cols, "any key  back");
-
-  werase(body);
-  box(body, 0, 0);
-
-  mvwprintw(
-      body, 2, 4, "ncurses attribute flags (rendering depends on terminal):"
-  );
+  spz_label(w, 1, 2, "Standard ncurses attribute flags:", SPZ_STYLE_DIM);
 
   for(int i = 0; i < n; i++) {
-    wattron(body, attrs[i].attr);
-    mvwprintw(body, 4 + i * 2, 6, "  %s  ", attrs[i].name);
-    wattroff(body, attrs[i].attr);
+    wattron(w, COLOR_PAIR(SPZ_PAIR_TEXT) | attrs[i].attr);
+    mvwprintw(w, 3 + i * 2, 4, "  %s  ", attrs[i].name);
+    wattroff(w, COLOR_PAIR(SPZ_PAIR_TEXT) | attrs[i].attr);
   }
 
-  wattron(body, A_BOLD | A_REVERSE);
-  mvwprintw(body, 4 + n * 2 + 1, 6, "  A_BOLD | A_REVERSE  combined  ");
-  wattroff(body, A_BOLD | A_REVERSE);
+  wattron(w, A_BOLD | A_REVERSE | COLOR_PAIR(SPZ_PAIR_ACCENT));
+  mvwprintw(w, 3 + n * 2 + 1, 4, "  A_BOLD | A_REVERSE combined  ");
+  wattroff(w, A_BOLD | A_REVERSE | COLOR_PAIR(SPZ_PAIR_ACCENT));
 
-  wrefresh(body);
-  wgetch(body);
+  spz_panel_refresh(p);
+  keypad(w, TRUE);
+  wgetch(w);
 }
 
-/**
- * @brief Running UTF-8 byte assembler for ::screen_input.
- *
- * The kernel keyboard layer emits UTF-8 (so é arrives as 0xC3 0xA9, à as
- * 0xC3 0xA0, …). Narrow ncurses returns one byte at a time and labels every
- * high-bit byte as @c "M-x", which is useless for the demo. We keep our own
- * UTF-8 state machine: lead byte starts a sequence, continuation bytes feed
- * into it, and on completion we surface the codepoint plus its raw bytes.
- */
 typedef struct
 {
-  unsigned      remaining; /**< Continuation bytes still expected (1..3). */
-  uint32_t      codepoint; /**< Partial codepoint accumulated so far. */
-  unsigned char raw[4];    /**< Bytes of the in-flight sequence, for display. */
+  unsigned      remaining;
+  uint32_t      codepoint;
+  unsigned char raw[4];
   unsigned      n_raw;
 } utf8_acc_t;
 
-/**
- * @brief Feed one byte to @p acc; return decoded codepoint when complete.
- *
- * @return Codepoint on completion, @c 0 while a sequence is still in flight,
- *         or @c (uint32_t)-1 when @p byte is an invalid continuation.
- */
 static uint32_t utf8_feed(utf8_acc_t *acc, unsigned char byte)
 {
   if(acc->remaining == 0) {
@@ -258,7 +156,6 @@ static uint32_t utf8_feed(utf8_acc_t *acc, unsigned char byte)
     }
     return (uint32_t)-1;
   }
-
   if((byte & 0xc0u) != 0x80u) {
     acc->remaining = 0;
     return (uint32_t)-1;
@@ -270,9 +167,6 @@ static uint32_t utf8_feed(utf8_acc_t *acc, unsigned char byte)
   return acc->remaining ? 0 : acc->codepoint;
 }
 
-/**
- * @brief Format the raw bytes of @p acc as @c "0xAA 0xBB ..." into @p buf.
- */
 static void utf8_format_raw(const utf8_acc_t *acc, char *buf, size_t cap)
 {
   static const char hex[] = "0123456789abcdef";
@@ -288,42 +182,27 @@ static void utf8_format_raw(const utf8_acc_t *acc, char *buf, size_t cap)
   buf[w] = '\0';
 }
 
-/**
- * @brief Log every key press as keycode + name (UTF-8 aware) until 'q' is hit.
- *
- * ASCII and ncurses key codes (>= 0x100, e.g. KEY_UP) print straight away.
- * Bytes in a UTF-8 multi-byte sequence are buffered and only logged once the
- * whole codepoint is in hand, so é shows up as "é (U+00E9, 0xc3 0xa9)" rather
- * than two consecutive @c "M-X" lines.
- */
-static void
-    screen_input(WINDOW *hdr, WINDOW *body, WINDOW *ftr, int rows, int cols)
+static void screen_input(spz_panel_t *p)
 {
-  int        brows = rows - 2;
+  WINDOW *w = p->body;
+  int     brows, bcols;
+  getmaxyx(w, brows, bcols);
+
   int        log_y = 4;
   int        max_y = brows - 2;
   utf8_acc_t acc   = {0};
 
-  draw_header(hdr, cols, "Keyboard Input");
-  draw_footer(ftr, cols, "press keys to see their names   q  back");
-
-  werase(body);
-  box(body, 0, 0);
-  mvwprintw(body, 2, 4, "Key log (codepoint / raw bytes):");
-  wrefresh(body);
+  spz_panel_redraw(p, "Keyboard Input");
+  draw_statusbar("press keys to log them   q  back");
+  spz_label(w, 2, 2, "Key log (codepoint / raw bytes):", SPZ_STYLE_DIM);
+  spz_panel_refresh(p);
+  keypad(w, TRUE);
 
   for(;;) {
-    int ch = wgetch(body);
-
+    int ch = wgetch(w);
     if(ch == 'q' || ch == 'Q')
       return;
 
-    /* Routing:
-     *   - bytes >= 0x100 are ncurses KEY_* codes (arrows, function keys);
-     *   - bytes < 0x80 are plain ASCII/control — keyname() already prints
-     *     them nicely as "a" / "^C" / "^[";
-     *   - bytes 0x80..0xff are UTF-8 fragments — assemble them ourselves
-     *     so an é shows up as one line, not two anonymous M-X codes. */
     char line[64];
     if(ch >= 0x100) {
       const char *name = keyname(ch);
@@ -351,33 +230,46 @@ static void
     }
 
     if(log_y >= max_y) {
-      for(int y = 4; y < max_y; y++)
-        mvwhline(body, y, 1, ' ', cols - 2);
-      box(body, 0, 0);
-      mvwprintw(body, 2, 4, "Key log (codepoint / raw bytes):");
+      spz_clear_region(w, 4, 1, max_y - 4, bcols - 2);
       log_y = 4;
     }
 
-    wattron(body, COLOR_PAIR(CP_HILITE) | A_BOLD);
-    mvwprintw(body, log_y, 6, "  %-*s", cols - 12, line);
-    wattroff(body, COLOR_PAIR(CP_HILITE) | A_BOLD);
+    wattron(w, COLOR_PAIR(SPZ_PAIR_ACCENT) | A_BOLD);
+    mvwprintw(w, log_y, 4, "  %-*s", bcols - 8, line);
+    wattroff(w, COLOR_PAIR(SPZ_PAIR_ACCENT) | A_BOLD);
     log_y++;
-    wrefresh(body);
+    spz_panel_refresh(p);
   }
 }
 
-/**
- * @brief Initialize the color pairs used by the demo.
- */
-static void init_color_pairs(void)
+static void screen_blink(spz_panel_t *p)
 {
-  if(!has_colors())
-    return;
-  start_color();
-  init_pair(CP_NORMAL, COLOR_WHITE, COLOR_BLACK);
-  init_pair(CP_HEADER, COLOR_BLACK, COLOR_CYAN);
-  init_pair(CP_HILITE, COLOR_BLACK, COLOR_GREEN);
-  init_pair(CP_WARN, COLOR_RED, COLOR_BLACK);
+  WINDOW *w = p->body;
+  spz_panel_redraw(p, "Blink Demo");
+  draw_statusbar("any key  back");
+
+  spz_label(w, 1, 2, "Cell blink via A_BLINK (SGR 5):", SPZ_STYLE_DIM);
+
+  spz_label(w, 3, 4, "Static text  -  never blinks.", SPZ_STYLE_NORMAL);
+
+  wattron(w, A_BLINK | COLOR_PAIR(SPZ_PAIR_ACCENT) | A_BOLD);
+  mvwaddstr(w, 5, 4, "  Neon yellow - blinking!  ");
+  wattroff(w, A_BLINK | COLOR_PAIR(SPZ_PAIR_ACCENT) | A_BOLD);
+
+  wattron(w, A_BLINK | COLOR_PAIR(SPZ_PAIR_TITLE) | A_BOLD);
+  mvwaddstr(w, 7, 4, "  Mauve title - blinking!  ");
+  wattroff(w, A_BLINK | COLOR_PAIR(SPZ_PAIR_TITLE) | A_BOLD);
+
+  wattron(w, A_BLINK | COLOR_PAIR(SPZ_PAIR_SELECT));
+  mvwaddstr(w, 9, 4, "  Inverted select row - blinking!  ");
+  wattroff(w, A_BLINK | COLOR_PAIR(SPZ_PAIR_SELECT));
+
+  spz_label(w, 12, 2, "Blink rate: ~0.5 Hz (1 s period)", SPZ_STYLE_DIM);
+  spz_label(w, 13, 2, "SGR sequence: ESC[5m ... ESC[25m", SPZ_STYLE_DIM);
+
+  spz_panel_refresh(p);
+  keypad(w, TRUE);
+  wgetch(w);
 }
 
 int main(void)
@@ -386,14 +278,13 @@ int main(void)
   if(!term || !term[0])
     term = "xterm-256color";
 
+  setlocale(LC_ALL, "C.UTF-8");
   (void)setvbuf(stdout, NULL, _IONBF, 0);
 
   SCREEN *scr = newterm(term, stdout, stdin);
   if(!scr) {
     (void)fputs(
-        "newterm() failed - set TERM and ensure /usr/share/terminfo exists\n"
-        "  guest: . /etc/profile\n"
-        "  host:  make ncurses && make disk-populate\n",
+        "newterm() failed — set TERM and ensure /usr/share/terminfo exists\n",
         stderr
     );
     return 1;
@@ -402,40 +293,42 @@ int main(void)
   typeahead(-1);
 
   raw();
-  keypad(stdscr, TRUE);
   noecho();
   curs_set(0);
-  init_color_pairs();
+  spz_init();
 
-  int rows;
-  int cols;
+  int rows, cols;
   getmaxyx(stdscr, rows, cols);
 
-  WINDOW *hdr  = newwin(1, cols, 0, 0);
-  WINDOW *body = newwin(rows - 2, cols, 1, 0);
-  WINDOW *ftr  = newwin(1, cols, rows - 1, 0);
-
-  /* keypad() is per-window; wgetch on a window without it returns raw ESC
-   * sequences instead of KEY_UP / KEY_F(n). The screens read from `body`,
-   * so enable it there explicitly. */
-  keypad(body, TRUE);
+  spz_panel_t *p =
+      spz_panel_new(0, 0, rows - 1, cols, "ALCOR2  DEMO", SPZ_BORDER_DOUBLE);
+  if(!p) {
+    endwin();
+    delscreen(scr);
+    return 1;
+  }
+  keypad(p->body, TRUE);
 
   screen_t cur = SCR_MENU;
   while(cur != SCR_QUIT) {
     switch(cur) {
     case SCR_MENU:
-      cur = screen_menu(hdr, body, ftr, rows, cols);
+      cur = screen_menu(p);
       break;
     case SCR_COLORS:
-      screen_colors(hdr, body, ftr, rows, cols);
+      screen_colors(p);
       cur = SCR_MENU;
       break;
     case SCR_ATTRS:
-      screen_attrs(hdr, body, ftr, rows, cols);
+      screen_attrs(p);
       cur = SCR_MENU;
       break;
     case SCR_INPUT:
-      screen_input(hdr, body, ftr, rows, cols);
+      screen_input(p);
+      cur = SCR_MENU;
+      break;
+    case SCR_BLINK:
+      screen_blink(p);
       cur = SCR_MENU;
       break;
     case SCR_QUIT:
@@ -443,9 +336,7 @@ int main(void)
     }
   }
 
-  delwin(ftr);
-  delwin(body);
-  delwin(hdr);
+  spz_panel_del(p);
   endwin();
   delscreen(scr);
   return 0;

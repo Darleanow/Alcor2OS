@@ -1,18 +1,7 @@
-/**
- * @file apps/shell/main.c
- * @brief vega REPL with an ncurses-backed line editor.
- *
- * ncurses is used for input only: getch() with keypad mode gives us KEY_UP,
- * KEY_LEFT, KEY_HOME, KEY_F(n)… without us having to parse escape sequences.
- * Output is written straight to stdout (the kernel fb_console speaks ANSI
- * cleanly) so child process stdout, prompts, and history redraws all share
- * the same scrollable stream — ncurses' internal screen model never gets a
- * chance to diverge from the real terminal.
- */
-
 #include <curses.h>
 #include <shell/atlas.h>
 #include <shell/shell.h>
+#include <spazer/spazer.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -35,8 +24,6 @@ static const vega_host_ops_t shell_host = {
 #define HIST_MAX     128
 #define LINE_MAX_LEN MAX_CMD_LEN
 
-/** Special return codes for read_line(). Negative so they can't be confused
- *  with a byte count. */
 #define RL_EOF       (-1)
 #define RL_INTERRUPT (-2)
 #define RL_CLEAR     (-3)
@@ -74,8 +61,6 @@ static void write_str(const char *s)
   }
 }
 
-/** Erase the current input line and reprint @p prompt + @p buf; leave the
- *  terminal cursor at logical column (prompt_cols + cur_cols). */
 static void redraw_line(
     const char *prompt, int prompt_cols, const char *buf, int cur_cols
 )
@@ -93,8 +78,6 @@ static void redraw_line(
     write_str("\r");
 }
 
-/** Count visible columns in a UTF-8 byte string by ignoring continuation
- *  bytes. Each non-continuation byte represents one logical character. */
 static int utf8_cols(const char *s)
 {
   int n = 0;
@@ -104,7 +87,32 @@ static int utf8_cols(const char *s)
   return n;
 }
 
-/** Step a byte index back/forward by one UTF-8 character boundary. */
+/* Counts visible columns in a string, skipping ANSI ESC[...m sequences. */
+static int visible_cols(const char *s)
+{
+  int n = 0;
+  while(*s) {
+    if((unsigned char)*s == 0x1b) {
+      s++;
+      if(*s == '[') {
+        s++;
+        while(*s && !(*s >= '@' && *s <= '~'))
+          s++;
+        if(*s)
+          s++;
+      } else if(*s) {
+        s++;
+      }
+    } else if(((unsigned char)*s & 0xC0u) != 0x80u) {
+      n++;
+      s++;
+    } else {
+      s++;
+    }
+  }
+  return n;
+}
+
 static int prev_char_boundary(const char *buf, int idx)
 {
   if(idx <= 0)
@@ -142,7 +150,7 @@ static struct termios s_cooked_t;
  * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
 static int read_line(char *buf, size_t cap, const char *prompt)
 {
-  int prompt_cols = utf8_cols(prompt);
+  int prompt_cols = visible_cols(prompt);
   int len         = 0; /* bytes in buf */
   int cur_b       = 0; /* byte index of cursor */
   int hist_view   = hist_count;
@@ -278,17 +286,37 @@ static int read_line(char *buf, size_t cap, const char *prompt)
   }
 }
 
-/**
- * @brief Print the shell prompt into a buffer (instead of writing immediately
- * so the prompt-length stays in sync with what read_line draws).
- */
+/* Prompt colours — semantic theme roles. */
+#define PC_LINE THEME_ANSI_DIM
+#define PC_HOST THEME_ANSI_ACCENT_B
+#define PC_PATH THEME_ANSI_SUBTEXT
+#define PC_DOLS THEME_ANSI_SUCCESS_B
+#define PC_RS   THEME_ANSI_RESET
+
+/* Box-drawing; rounded corners are arc-rasterised in atlas.c. */
+#define PC_TL BD_TL_R /* ╭ */
+#define PC_BL BD_BL_R /* ╰ */
+#define PC_H  BD_H    /* ─ */
+
+static void write_prompt_header(void)
+{
+  char        cwd[MAX_PATH];
+  const char *path = sh_getcwd(cwd, sizeof cwd) ? cwd : "/";
+  write_str(PC_LINE PC_TL PC_H " " PC_RS); /* ╭─ space */
+  write_str(PC_HOST "alcor2" PC_RS);
+  write_str(PC_LINE " " PC_H " " PC_RS); /* space ─ space */
+  write_str(PC_PATH);
+  write_str(path);
+  write_str(PC_RS "\n");
+}
+
 static void format_prompt(char *out, size_t cap)
 {
-  char cwd[MAX_PATH];
-  if(sh_getcwd(cwd, sizeof cwd))
-    snprintf(out, cap, "alcor2:%s$ ", cwd);
-  else
-    snprintf(out, cap, "alcor2> ");
+  snprintf(
+      out, cap,
+      PC_LINE PC_BL PC_H " " PC_RS /* ╰─ space */
+      PC_DOLS "$" PC_RS " "
+  ); /* $ space  */
 }
 
 #define MAX_HEREDOC_DELIM 64
@@ -420,19 +448,33 @@ static int read_complete_statement(char *buf, size_t size)
   size_t pos = 0;
   buf[0]     = '\0';
 
-  char prompt[MAX_PATH + 16];
+  /* Static bottom-line prompt — same every time: ╰─ $  */
+  char prompt[128];
   format_prompt(prompt, sizeof prompt);
 
+  /* Continuation prompt for multi-line input: │ »  (indented) */
+  char cont_prompt[64];
+  snprintf(
+      cont_prompt, sizeof cont_prompt,
+      PC_LINE BD_V " " PC_RS /* │ space */
+      PC_DOLS "\xc2\xbb" PC_RS " "
+  ); /* »  (U+00BB Latin-1) */
+
+  const char *cur_prompt = prompt;
+
   while(1) {
-    int len = read_line(buf + pos, size - pos, prompt);
+    /* Top decorative line only for primary prompt, not continuation. */
+    if(cur_prompt == prompt)
+      write_prompt_header();
+
+    int len = read_line(buf + pos, size - pos, cur_prompt);
     if(len == RL_EOF)
       return RL_EOF;
     if(len == RL_INTERRUPT)
       return 0;
     if(len == RL_CLEAR) {
       sh_clear();
-      /* Re-prompt with whatever has already been accumulated on prior lines.
-       * Most often pos == 0 and the user just wanted a clean screen. */
+      cur_prompt = prompt; /* reset to primary so header is shown */
       continue;
     }
 
@@ -446,16 +488,10 @@ static int read_complete_statement(char *buf, size_t size)
     if(is_input_complete(buf))
       return (int)pos;
 
-    /* Continuation prompt — narrower than the primary prompt so it's
-     * visually distinct. */
-    snprintf(prompt, sizeof prompt, "> ");
+    cur_prompt = cont_prompt;
   }
 }
 
-/**
- * @brief Shell main entry point. Sets up libvega, submits the Fira atlas,
- * initialises ncurses for input handling, then enters the REPL.
- */
 int main(int argc, char *argv[])
 {
   (void)argc;
@@ -510,8 +546,22 @@ int main(int argc, char *argv[])
 
   char line[LINE_MAX_LEN];
 
-  write_str("\n  vega " VEGA_VERSION " - Alcor2 shell\n");
-  write_str("  Type 'help' for available commands.\n\n");
+#define BNR_H34                                                                \
+  BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H   \
+      BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H    \
+          BD_H BD_H BD_H BD_H BD_H
+  write_str("\n"
+            "  " PC_LINE BD_TL_R BNR_H34 BD_TR_R PC_RS "\n"
+            "  " PC_LINE BD_V PC_RS "            " PC_HOST "ALCOR2  OS" PC_RS
+            "            " PC_LINE BD_V PC_RS "\n"
+            "  " PC_LINE BD_LT BNR_H34 BD_RT PC_RS "\n"
+            "  " PC_LINE BD_V PC_RS "           " PC_PATH
+            "vega v" VEGA_VERSION PC_RS "            " PC_LINE BD_V PC_RS "\n"
+            "  " PC_LINE BD_BL_R BNR_H34 BD_BR_R PC_RS "\n"
+            "\n"
+            "  " PC_DOLS "help" PC_LINE " " BD_ARROW_R " " PC_RS PC_PATH
+            "list available commands" PC_RS "\n\n");
+#undef BNR_H34
 
   while(1) {
     int len = read_complete_statement(line, sizeof line);

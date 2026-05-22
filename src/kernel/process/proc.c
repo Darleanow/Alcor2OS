@@ -1,6 +1,10 @@
 /**
- * @file src/kernel/proc.c
- * @brief Process management with per-process kernel stacks.
+ * @file src/kernel/process/proc.c
+ * @brief Process lifecycle, scheduling, fork/exec/exit, and context switching.
+ *
+ * Each process owns a kernel stack, a user address space (cr3), and a saved
+ * user context. The round-robin scheduler runs at syscall boundaries; the PIT
+ * timer sets a preemption flag that is checked on every syscall return.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -17,7 +21,6 @@
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/proc/signal.h>
-#include <alcor2/sys/syscall.h>
 
 /** @brief POSIX @c clone flag: parent blocks until child @c execve or @c _exit.
  * musl @c posix_spawn relies on this so the parent does not run concurrently
@@ -103,7 +106,7 @@ proc_t *proc_get(u64 pid)
 void proc_signal_broadcast(int signum)
 {
   for(int i = 0; i < PROC_MAX; i++) {
-    proc_t *p = &proc_table[i];
+    const proc_t *p = &proc_table[i];
     if(p->state == PROC_STATE_FREE || p->state == PROC_STATE_ZOMBIE)
       continue;
     proc_signal(p->pid, signum);
@@ -638,6 +641,23 @@ i64 proc_wait(u64 pid)
 void proc_tick(void)
 {
   need_resched = true;
+}
+
+const char *proc_name(const proc_t *p)
+{
+  return p ? p->name : "(none)";
+}
+
+void proc_block(proc_t *p)
+{
+  if(p)
+    p->state = PROC_STATE_BLOCKED;
+}
+
+void proc_wake(proc_t *p)
+{
+  if(p && p->state == PROC_STATE_BLOCKED)
+    p->state = PROC_STATE_READY;
 }
 
 /**

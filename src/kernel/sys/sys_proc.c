@@ -6,6 +6,7 @@
  * are validated through the VMM before any kernel-side access.
  */
 
+#include <alcor2/arch/cpu.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
@@ -362,4 +363,42 @@ u64 sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
   proc_t *p = proc_current();
   return p ? p->pid : 1;
+}
+
+#define ARCH_SET_GS 0x1001
+#define ARCH_SET_FS 0x1002
+#define ARCH_GET_FS 0x1003
+#define ARCH_GET_GS 0x1004
+
+u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
+
+  proc_t *p = proc_current();
+
+  switch(code) {
+  case ARCH_SET_FS:
+    cpu_set_fs_base(addr);
+    if(p)
+      p->fs_base = addr;
+    return 0;
+  case ARCH_SET_GS:
+    cpu_set_gs_base(addr);
+    return 0;
+  case ARCH_GET_FS:
+    if(!addr)
+      return (u64)-EFAULT;
+    *(u64 *)addr = cpu_get_fs_base();
+    return 0;
+  case ARCH_GET_GS:
+    if(!addr)
+      return (u64)-EFAULT;
+    *(u64 *)addr = cpu_get_gs_base();
+    return 0;
+  default:
+    return (u64)-EINVAL;
+  }
 }

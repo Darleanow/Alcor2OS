@@ -26,7 +26,17 @@ $(BUILD)/$(KERNEL): $(OBJS)
 	@mkdir -p $(@D)
 	$(LD) $(LDFLAGS) $^ -o $@
 
-# Regenerate IDE DB after compiling sources.
+USER_CC_FLAGS := -std=gnu11 -Wall -Wextra -Os -ffreestanding \
+                 -fno-stack-protector -fno-stack-check -fno-lto \
+                 -fno-PIC -fno-PIE -m64 -march=x86-64 -mno-red-zone \
+                 -Ithirdparty/musl/$(MUSL_PREFIX)/include \
+                 -Iuser/include -I$(INCLUDE) \
+                 -Iuser/sdk/spazer/include \
+                 -Iuser/sdk/vega/include \
+                 -Iuser/core/vega/include \
+                 -Iuser/apps/shell/include \
+                 -DALCOR2_VERSION=\"$(GIT_VERSION)\"
+
 compile_commands: $(OBJS)
 	@echo '[' > compile_commands.json
 	@for src in $(KERNEL_SRCS_C); do \
@@ -46,6 +56,22 @@ compile_commands: $(OBJS)
 		echo '    "file": "'"$$src"'"' >> compile_commands.json; \
 		echo '  },' >> compile_commands.json; \
 	done
+	@if [ -n "$(strip $(USER_SRCS_C))" ]; then \
+		for src in $(USER_SRCS_C); do \
+			echo '  {' >> compile_commands.json; \
+			echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \
+			echo '    "arguments": [' >> compile_commands.json; \
+			echo '      "$(CC)",' >> compile_commands.json; \
+			for flag in $(USER_CC_FLAGS); do \
+				echo '      "'"$$flag"'",' >> compile_commands.json; \
+			done; \
+			echo '      "-c",' >> compile_commands.json; \
+			echo '      "'"$$src"'"' >> compile_commands.json; \
+			echo '    ],' >> compile_commands.json; \
+			echo '    "file": "'"$$src"'"' >> compile_commands.json; \
+			echo '  },' >> compile_commands.json; \
+		done; \
+	fi
 	@if [ -n "$(strip $(USER_APPS_CPPS))" ]; then \
 		for cpp in $(USER_APPS_CPPS); do \
 			echo '  {' >> compile_commands.json; \
@@ -67,7 +93,7 @@ compile_commands: $(OBJS)
 			echo '      "'"$(INCLUDE)"'",' >> compile_commands.json; \
 			echo '      "-Wall",' >> compile_commands.json; \
 			echo '      "-Wextra",' >> compile_commands.json; \
-			echo '      "-Os",' >> compile_commands.json; \
+			echo '      "-O2",' >> compile_commands.json; \
 			echo '      "-fno-stack-protector",' >> compile_commands.json; \
 			echo '      "-fno-stack-check",' >> compile_commands.json; \
 			echo '      "-fno-lto",' >> compile_commands.json; \

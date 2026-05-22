@@ -10,6 +10,7 @@
  */
 
 #include <alcor2/arch/cpu.h>
+#include <alcor2/arch/idt.h>
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/arch/pit.h>
@@ -20,7 +21,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>
-#include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
 
 #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
 #define LBA28_LIMIT      0x10000000ULL
@@ -205,8 +206,7 @@ static void identify(ata_drive_t *d)
   trim_string(d->serial, 20);
 }
 
-/* Serialise per-channel access. Concurrent users would race on `ch->waiter`
- * and lose IRQ wakes. */
+/** @brief Acquire exclusive access to a channel (blocks if busy). */
 static void channel_acquire(ata_channel_t *ch)
 {
   proc_t *me = proc_current();
@@ -216,28 +216,27 @@ static void channel_acquire(ata_channel_t *ch)
   }
   cpu_disable_interrupts();
   while(ch->busy) {
-    me->ata_next   = ch->lock_queue;
-    ch->lock_queue = me;
-    me->state      = PROC_STATE_BLOCKED;
+    ch->lock_waiter = me;
+    proc_block(me);
     proc_schedule();
     cpu_disable_interrupts();
   }
-  ch->busy = true;
+  ch->busy        = true;
+  ch->lock_waiter = NULL;
   cpu_enable_interrupts();
 }
 
+/** @brief Release exclusive access and wake any waiting caller. */
 static void channel_release(ata_channel_t *ch)
 {
+  proc_t *waiter;
   cpu_disable_interrupts();
-  ch->busy       = false;
-  proc_t *waiter = ch->lock_queue;
-  if(waiter) {
-    ch->lock_queue   = waiter->ata_next;
-    waiter->ata_next = NULL;
-    if(waiter->state == PROC_STATE_BLOCKED)
-      waiter->state = PROC_STATE_READY;
-  }
+  ch->busy        = false;
+  waiter          = ch->lock_waiter;
+  ch->lock_waiter = NULL;
   cpu_enable_interrupts();
+  if(waiter)
+    proc_wake(waiter);
 }
 
 /**
@@ -274,7 +273,7 @@ static i64 wait_irq(ata_channel_t *ch)
       cpu_enable_interrupts();
       return -ETIMEDOUT;
     }
-    me->state = PROC_STATE_BLOCKED;
+    proc_block(me);
     proc_schedule();
     cpu_disable_interrupts();
   }
@@ -714,10 +713,21 @@ void ata_irq(u8 channel)
   ch->state = ATA_STATE_IDLE;
 
   if(ch->waiter) {
-    if(ch->waiter->state == PROC_STATE_BLOCKED)
-      ch->waiter->state = PROC_STATE_READY;
+    proc_wake(ch->waiter);
     ch->waiter = NULL;
   }
+}
+
+static void ata_irq_primary(u8 irq)
+{
+  (void)irq;
+  ata_irq(0);
+}
+
+static void ata_irq_secondary(u8 irq)
+{
+  (void)irq;
+  ata_irq(1);
 }
 
 /** @brief Detect and configure PCI IDE Bus Master for DMA. */
@@ -800,6 +810,9 @@ void ata_init(void)
 
   pic_unmask(IRQ_ATA_PRIMARY);
   pic_unmask(IRQ_ATA_SECONDARY);
+
+  irq_register(IRQ_ATA_PRIMARY, ata_irq_primary);
+  irq_register(IRQ_ATA_SECONDARY, ata_irq_secondary);
 
   init_dma();
   console_print("[ATA] Ready\n");

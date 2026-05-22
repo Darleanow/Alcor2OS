@@ -8,6 +8,7 @@
  */
 
 #include <alcor2/errno.h>
+#include <alcor2/fs/pipe.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>
@@ -631,4 +632,80 @@ u64 sys_readlink(u64 path, u64 buf, u64 bufsiz, u64 a4, u64 a5, u64 a6)
     return (u64)-ERANGE;
   kmemcpy((void *)buf, ktarget, (u64)tlen);
   return (u64)tlen;
+}
+
+u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
+
+  if(!pipefd)
+    return (u64)-EFAULT;
+  if(!vmm_is_user_range((void *)pipefd, sizeof(int) * 2))
+    return (u64)-EFAULT;
+  if(!proc_current())
+    return (u64)-EINVAL;
+
+  void *pipe = pipe_alloc_obj();
+  if(!pipe)
+    return (u64)-ENOMEM;
+
+  i32 read_oft = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, pipe);
+  if(read_oft < 0) {
+    pipe_rd_release(pipe);
+    pipe_wr_release(pipe);
+    return (u64)-ENFILE;
+  }
+  i32 write_oft = vfs_oft_alloc_pipe(VFS_KIND_PIPE_WR, pipe);
+  if(write_oft < 0) {
+    vfs_oft_release(read_oft);
+    return (u64)-ENFILE;
+  }
+
+  i64 read_fd = vfs_install_fd(read_oft);
+  if(read_fd < 0) {
+    vfs_oft_release(read_oft);
+    vfs_oft_release(write_oft);
+    return (u64)read_fd;
+  }
+  i64 write_fd = vfs_install_fd(write_oft);
+  if(write_fd < 0) {
+    vfs_oft_release(write_oft);
+    proc_current()->fds[read_fd] = -1;
+    vfs_oft_release(read_oft);
+    return (u64)write_fd;
+  }
+
+  int *fds = (int *)pipefd;
+  fds[0]   = (int)read_fd;
+  fds[1]   = (int)write_fd;
+  return 0;
+}
+
+u64 sys_pipe2(u64 pipefd, u64 flags, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
+
+  u64 rc = sys_pipe(pipefd, 0, 0, 0, 0, 0);
+  if(rc != 0)
+    return rc;
+
+  /* Apply O_CLOEXEC per-fd so exec auto-closes these ends (musl posix_spawn
+   * relies on this for its error-reporting pipe).  FD_CLOEXEC is a per-fd
+   * attribute — it must NOT be stored in the shared OFT entry. */
+  if((u32)flags & O_CLOEXEC) {
+    const int *fds = (const int *)pipefd;
+    proc_t    *p   = proc_current();
+    if(p) {
+      p->fd_cloexec[fds[0]] = 1;
+      p->fd_cloexec[fds[1]] = 1;
+    }
+  }
+  return 0;
 }

@@ -17,6 +17,8 @@ ifeq ($(wildcard $(NC_A)),)
 $(error ncurses-hello: missing ncurses libs — run from repo root: make ncurses)
 endif
 
+SPZ_SRC := $(USER_BASE)/lib/spazer/spazer.c
+
 APP     := ncurses-hello
 OUT_DIR := $(BUILD_DIR)/apps/$(APP)
 TARGET  := $(BUILD_DIR)/apps/$(APP).elf
@@ -28,10 +30,15 @@ all: $(TARGET)
 $(OUT_DIR):
 	@mkdir -p $(OUT_DIR)
 
-# Match user/bin freestanding flags + ncurses headers (libc via CRT0 + musl libc.a).
-$(TARGET): main.c $(CRT0) $(NC_A) | $(OUT_DIR)
-	$(CROSS) $(CFLAGS) $(NC_CFLAGS) -c main.c -o $(OUT_DIR)/main.o
-	$(CROSS) -nostdlib -static -T $(USER_LD) $(CRT0) $(OUT_DIR)/main.o \
+$(OUT_DIR)/spazer.o: $(SPZ_SRC) | $(OUT_DIR)
+	$(CROSS) $(CFLAGS) $(NC_CFLAGS) -c $< -o $@
+
+$(OUT_DIR)/main.o: main.c | $(OUT_DIR)
+	$(CROSS) $(CFLAGS) $(NC_CFLAGS) -c $< -o $@
+
+$(TARGET): $(OUT_DIR)/main.o $(OUT_DIR)/spazer.o $(CRT0) $(NC_A)
+	$(CROSS) -nostdlib -static -T $(USER_LD) $(CRT0) \
+	  $(OUT_DIR)/main.o $(OUT_DIR)/spazer.o \
 	  $(NC_A) $(MUSL_LIB)/libc.a -lgcc -o $@
 	@echo "Built $@"
 

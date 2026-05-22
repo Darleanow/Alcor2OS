@@ -1,15 +1,13 @@
 /**
  * @file src/kernel/input/kbd_layout.c
- * @brief PS/2 set 1 scancodes to bytes: US or FR AZERTY (+ AltGr), CSI arrow
- * keys, and UTF-8 emission for Latin-1 codepoints.
+ * @brief PS/2 scancode translator: layout mapping, line discipline, and TTY
+ * I/O.
  *
- * AZERTY produces accents (é, à, ç, è, ù, î, …) and the §/°/¨/£/¤/µ family.
- * Those codepoints live in U+0080..U+00FF, so the lookup tables store the
- * raw Latin-1 byte; ::emit_user_cp transcodes anything above 0x7f into its
- * 2-byte UTF-8 encoding before pushing it to the read queue. Apps and the
- * shell see the exact same byte stream a real UTF-8 terminal would feed
- * them, which keeps the FB tty decoder happy and stops ncurses' keyname()
- * from reporting "M-i" for é.
+ * Translates set-1 scancodes to UTF-8 byte sequences for US QWERTY and FR
+ * AZERTY layouts. Emits CSI/SS3 escape sequences for cursor and function keys.
+ * Implements the ICANON line discipline (VMIN/VTIME, VERASE, VEOF) and feeds
+ * the per-process keyboard ready buffer used by read(2) on fd 0.
+ * Apps see the same byte stream a real xterm-256color terminal would emit.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -64,8 +62,7 @@ static void pend_csi(char tail)
   out_pend_push((unsigned char)tail);
 }
 
-/** xterm-style "ESC [ N ~" sequence — used for Home, End, Ins, PgUp, PgDn,
- *  F5..F12 (each has its own well-known numeric code). */
+/* ESC [ N ~ — Home/End/Ins/PgUp/PgDn/F5-F12 (each has a distinct N). */
 static void pend_csi_tilde(unsigned n)
 {
   out_pend_push(0x1b);
@@ -76,7 +73,7 @@ static void pend_csi_tilde(unsigned n)
   out_pend_push('~');
 }
 
-/** SS3 sequence "ESC O X" — used by F1..F4 in xterm conventions. */
+/* ESC O X — F1..F4 in xterm convention. */
 static void pend_ss3(char tail)
 {
   out_pend_push(0x1b);
@@ -84,21 +81,11 @@ static void pend_ss3(char tail)
   out_pend_push((unsigned char)tail);
 }
 
-/**
- * @brief Deliver one user-visible codepoint to the keyboard byte stream.
- *
- * ASCII bytes (< 0x80) flow straight into @p out so the common case stays a
- * single-byte read. Latin-1 supplement codepoints (0x80..0xff, the AZERTY
- * é/à/ç/è/ù/î and the dead-key punctuation) are transcoded to their 2-byte
- * UTF-8 encoding and pushed to @c out_pend, matching what every modern
- * terminal feeds to its TTY. The caller (@c kbd_pop_byte) drains the queue
- * before re-entering @c process_raw_ctx, so the second UTF-8 byte surfaces
- * on the very next read.
- *
- * Dry-run mode reports readability without touching state.
- *
- * @return @c true when @p out was set or at least one byte is now queued.
- */
+/* Deliver one codepoint.  ASCII (<0x80) is written to *out directly.
+ * Latin-1 (0x80..0xFF, AZERTY accents) is transcoded to 2-byte UTF-8 and
+ * pushed to out_pend; kbd_pop_byte drains the queue so the second byte
+ * surfaces on the very next read.  dry=true reports readability without
+ * touching any state. */
 static bool emit_user_cp(unsigned char cp, unsigned char *out, bool dry)
 {
   if(dry)
@@ -320,11 +307,8 @@ kbd_layout_t kbd_get_layout(void)
   return layout;
 }
 
-/**
- * @param dry If true, do not push CSI or set @a *out; only report if read would
- *            produce a user-visible byte (for select(2) readability).
- * @return true when @a *out should be delivered (dry) or out_pend was fed.
- */
+/* dry=true: report whether the scancode would emit without touching state
+ * (used by kbd_raw_pending for select(2) readability). */
 static bool
     process_raw_ctx(u8 raw, kbd_ev_ctx_t *s, unsigned char *out, bool dry)
 {
@@ -396,11 +380,19 @@ static bool
     case 0x49: /* Page Up */
       if(dry)
         return true;
+      if(s->mod.shift) {
+        fb_console_scrollback_up(10);
+        return false;
+      }
       pend_csi_tilde(5u);
       break;
     case 0x51: /* Page Down */
       if(dry)
         return true;
+      if(s->mod.shift) {
+        fb_console_scrollback_down(10);
+        return false;
+      }
       pend_csi_tilde(6u);
       break;
     case 0x52: /* Insert */
@@ -561,10 +553,6 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
   return false;
 }
 
-/**
- * Pop one translated byte from the keyboard path. When @a block is false,
- * drains the raw queue once without sleeping.
- */
 static bool kbd_pop_byte(unsigned char *out, bool block)
 {
   for(;;) {
@@ -620,17 +608,9 @@ static void tty_echo_erase(bool echo_on)
   fb_console_write("\b \b", 3);
 }
 
-/**
- * @brief Trim one UTF-8 codepoint from the tail of @p buf.
- *
- * The kbd line discipline appends incoming bytes one at a time, so a
- * Latin-1 character like é lands as the pair 0xC3 0xA9. Plain backspace
- * would erase a single byte and leave a dangling lead, corrupting the
- * line. Walk backwards through any continuation bytes (10xxxxxx) and
- * then over the lead byte itself.
- *
- * @return Updated length after the trim (0 when @p len was already 0).
- */
+/* Walk back past any UTF-8 continuation bytes (10xxxxxx) then the lead byte
+ * so that backspace erases a whole codepoint rather than a single byte.
+ * Needed because Latin-1 AZERTY chars (é = 0xC3 0xA9) land byte-by-byte. */
 static u32 utf8_trim_one(const char *buf, u32 len)
 {
   while(len > 0 && ((unsigned char)buf[len - 1] & 0xc0u) == 0x80u)
@@ -789,10 +769,9 @@ u64 kbd_read_translated(char *buf, u64 count)
   return kbd_read_for_process(&boot_stub, buf, count);
 }
 
-/**
- * @brief True when fd 0 read(2) can return without blocking for a new IRQ
- *        (pending CSI/user byte), not merely when key-up scancodes sit in the
- *        raw queue — otherwise select(2) would wake and read would block.
+/* True when fd-0 read() can return without blocking: checks for already-
+ * translated bytes first, then peeks the raw queue and dry-runs the translator
+ * so select(2) doesn't wake for key-up-only scancodes that produce no output.
  */
 bool kbd_raw_pending(void)
 {

@@ -1,9 +1,6 @@
 /**
- * @file apps/shell/platform/io.c
- * @brief Shell I/O — thin musl wrappers around fd 0/1.
- *
- * Output goes through the kernel's fb_console (cell grid + ANSI/CSI parser
- * + atlas rendering), so userspace doesn't intercept or render anything.
+ * @file io.c
+ * @brief Shell I/O helpers: character output and string writing.
  */
 
 #include <shell/shell.h>

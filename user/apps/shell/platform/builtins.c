@@ -1,11 +1,3 @@
-/**
- * @file apps/shell/platform/builtins.c
- * @brief Shell-side builtins — run in-process via libvega's
- * sh_is_builtin / sh_run_builtin host hooks. Language constructs (let, if,
- * for, …) are vega keywords parsed natively in libvega — they don't appear
- * here.
- */
-
 #include <shell/shell.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,12 +21,14 @@ static void cmd_help(void)
   sh_puts("\n");
 }
 
+#ifndef ALCOR2_VERSION
+  #define ALCOR2_VERSION "dev"
+#endif
+
 static void cmd_version(void)
 {
-  sh_puts("Alcor2 Operating System v0.1.0\n");
-  sh_puts("vega ");
-  sh_puts(VEGA_VERSION);
-  sh_puts("\n");
+  sh_puts("Alcor2 OS  " ALCOR2_VERSION "\n");
+  sh_puts("vega       " VEGA_VERSION "\n");
 }
 
 static int cmd_cd(int argc, char *const argv[])

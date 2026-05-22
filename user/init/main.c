@@ -1,7 +1,6 @@
 /**
- * @file user/init/main.c
- * @brief Minimal init process (demo message); the kernel starts the shell
- * separately.
+ * @file main.c
+ * @brief Userland init process — first Ring 3 program launched by the kernel.
  */
 
 #include <stdio.h>

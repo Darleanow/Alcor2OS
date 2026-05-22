@@ -1,12 +1,12 @@
 /**
- * cat - Display file contents
- *
- * Usage: cat <file>
+ * @file cat.c
+ * @brief Concatenate files and print to standard output.
  */
+
+#include <grendizer.h>
 
 #include <fcntl.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 static int copy_to_stdout(int fd)
@@ -20,16 +20,27 @@ static int copy_to_stdout(int fd)
 
 int main(int argc, char *argv[])
 {
-  if(argc < 2)
+  gr_opt  opts[] = {GR_END};
+  gr_spec spec   = {.program = "cat", .usage = "[file ...]", .options = opts};
+  gr_rest rest;
+  int     rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
+  if(rc != GR_OK)
+    return (rc == GR_HELP) ? 0 : 1;
+
+  if(rest.argc == 0)
     return copy_to_stdout(STDIN_FILENO);
 
-  const char *path = argv[1];
-  int         fd   = open(path, O_RDONLY);
-  if(fd < 0) {
-    printf("cat: cannot open '%s'\n", path);
-    return 1;
+  int exit_code = 0;
+  for(int i = 0; i < rest.argc; i++) {
+    int fd = open(rest.argv[i], O_RDONLY);
+    if(fd < 0) {
+      fprintf(stderr, "cat: cannot open '%s'\n", rest.argv[i]);
+      exit_code = 1;
+      continue;
+    }
+    if(copy_to_stdout(fd))
+      exit_code = 1;
+    close(fd);
   }
-  int rc = copy_to_stdout(fd);
-  close(fd);
-  return rc;
+  return exit_code;
 }

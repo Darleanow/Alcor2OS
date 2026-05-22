@@ -9,11 +9,14 @@
 #ifndef ALCOR2_PROC_H
 #define ALCOR2_PROC_H
 
-#include <alcor2/fs/vfs.h>
+#include <alcor2/fs/limits.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/proc/signal.h>
-#include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
+
+/* Forward declaration — callers that dereference syscall_frame_t fields must
+ * include <alcor2/arch/cpu.h> directly. */
+typedef struct syscall_frame syscall_frame_t;
 
 /** @brief Maximum number of processes. */
 #define PROC_MAX 64
@@ -236,6 +239,16 @@ void proc_switch(proc_t *next);
  * @brief Schedule the next process to run.
  */
 void proc_schedule(void);
+
+/**
+ * @brief Block @p p (set state to BLOCKED). Call before proc_schedule().
+ */
+void proc_block(proc_t *p);
+
+/**
+ * @brief Wake @p p if it is blocked (set state to READY). Safe from IRQ.
+ */
+void proc_wake(proc_t *p);
 
 /**
  * @brief Get process by PID.

@@ -21,11 +21,11 @@
  */
 
 #include <alcor2/errno.h>
+#include <alcor2/fs/pipe.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/proc/proc.h>
-#include <alcor2/sys/internal.h>
 
 #define VFS_MAX_MOUNTS 16
 #define VFS_MAX_OFT    256
@@ -229,8 +229,12 @@ void vfs_oft_release(i32 idx)
   if(--oft[idx].refcount > 0)
     return;
 
-  if(oft[idx].pipe)
-    pipe_oft_release(oft[idx].kind, oft[idx].pipe);
+  if(oft[idx].pipe) {
+    if(oft[idx].kind == VFS_KIND_PIPE_RD)
+      pipe_rd_release(oft[idx].pipe);
+    else
+      pipe_wr_release(oft[idx].pipe);
+  }
 
   if(oft[idx].handle && oft[idx].ops && oft[idx].ops->close)
     oft[idx].ops->close(oft[idx].handle);

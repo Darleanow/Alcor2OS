@@ -1,5 +1,13 @@
 include ../../common.mk
 
+NC_ROOT := $(USER_BASE)/../thirdparty/ncurses-install/usr
+
+ifeq ($(wildcard $(NC_ROOT)/lib/libncurses.a),)
+$(warning shell: ncurses not found — run `make ncurses` from repo root; skipping)
+all clean:
+	@true
+else
+
 OUT_DIR := $(BUILD_DIR)/apps/shell
 TARGET  := $(BUILD_DIR)/apps/shell.elf
 LIBVEGA := $(BUILD_DIR)/lib/libvega.a
@@ -7,18 +15,9 @@ LIBVEGA := $(BUILD_DIR)/lib/libvega.a
 FT_PRE := $(USER_BASE)/../thirdparty/freetype-install/usr
 FT_LIB := $(FT_PRE)/lib/libfreetype.a
 
-# Atlas submitter needs FreeType (rasterise Fira → kernel atlas). FreeType
-# uses SSE2 scalar doubles, so we drop the freestanding `-mno-sse2` flag for
-# atlas.c only.
 HAVE_ATLAS := $(if $(wildcard $(FT_LIB)),1,)
 
-# ncurses-driven line editor in main.c. Hard requirement: shell links libncurses
-# + libtinfo for getch/keypad/KEY_*. Build via `make ncurses` from repo root.
-NC_ROOT := $(USER_BASE)/../thirdparty/ncurses-install/usr
-NC_LIBS := $(NC_ROOT)/lib/libncurses.a $(NC_ROOT)/lib/libtinfo.a
-ifeq ($(wildcard $(NC_ROOT)/lib/libncurses.a),)
-$(error shell: missing ncurses libs — run `make ncurses` from repo root)
-endif
+NC_LIBS     := $(NC_ROOT)/lib/libncurses.a $(NC_ROOT)/lib/libtinfo.a
 NCURSES_SUB := $(wildcard $(NC_ROOT)/include/ncurses)
 NC_CFLAGS   := -I$(NC_ROOT)/include $(if $(NCURSES_SUB),-I$(NC_ROOT)/include/ncurses)
 
@@ -33,8 +32,8 @@ BASE_SRCS := \
   platform/builtins.c
 
 ifeq ($(HAVE_ATLAS),1)
-ATLAS_SRC := platform/atlas.c
-ATLAS_OBJ := $(OUT_DIR)/platform/atlas.o
+ATLAS_SRC    := platform/atlas.c
+ATLAS_OBJ    := $(OUT_DIR)/platform/atlas.o
 ATLAS_CFLAGS := $(filter-out -mno-sse -mno-sse2,$(CFLAGS)) -msse2 \
   -I$(FT_PRE)/include/freetype2
 else
@@ -77,3 +76,5 @@ endif
 
 clean:
 	rm -rf $(OUT_DIR) $(TARGET)
+
+endif

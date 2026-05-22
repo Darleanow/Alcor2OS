@@ -73,6 +73,7 @@ jobs:
             -ithirdparty \
             -I include \
             -I user/include \
+            -I user/sdk/vega/include \
             src/ user/ \
           2>&1 | tee cppcheck.log
           # Pipeline ignores cppcheck exit status unless pipefail; fail only on real `: error:` lines.

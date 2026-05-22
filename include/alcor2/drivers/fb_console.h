@@ -14,23 +14,10 @@
 #ifndef ALCOR2_FB_CONSOLE_H
 #define ALCOR2_FB_CONSOLE_H
 
+#include <alcor2/fb_console_ioctl.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
-
-/* ioctls on fd 1/2 — Linux-style _IOC encoding so userspace can use a normal
- * ioctl(2) call. Group byte is 'F' for "framebuffer console". */
-
-/** SET_ATLAS: userspace submits a glyph atlas. arg = fb_console_atlas_t*. */
-#define FB_CONSOLE_SET_ATLAS                                                   \
-  ((1U << 30) | ((unsigned)'F' << 8) | 1U | (sizeof(fb_console_atlas_t) << 16))
-
-/** YIELD: release the framebuffer for raw mmap use (doom). arg ignored. */
-#define FB_CONSOLE_YIELD ((unsigned)('F' << 8) | 2U)
-
-/** RECLAIM: resume kernel rendering, repaint the grid. arg ignored. */
-#define FB_CONSOLE_RECLAIM ((unsigned)('F' << 8) | 3U)
 
 /**
  * @brief Initialise the runtime console using the same framebuffer the boot
@@ -54,6 +41,24 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp);
 void fb_console_write(const void *buf, size_t len);
 
 /**
+ * @brief Open a multi-buffer write batch. Call before feeding multiple
+ * discontiguous buffers (e.g. writev). Suppresses per-buffer pixel flushes.
+ */
+void fb_console_write_begin(void);
+
+/**
+ * @brief Feed @p len bytes in an open batch (no flush). Must be preceded by
+ * @ref fb_console_write_begin.
+ */
+void fb_console_write_raw(const void *buf, size_t len);
+
+/**
+ * @brief Close the batch opened by @ref fb_console_write_begin: flush dirty
+ * cells, scroll pixels, and repaint the cursor. One call per writev.
+ */
+void fb_console_write_end(void);
+
+/**
  * @brief Read one input byte from the keyboard layer into the console's
  * input ring. Called from the keyboard IRQ. Plain pass-through queueing — the
  * kernel keyboard already handles line discipline + layout translation.
@@ -75,46 +80,34 @@ size_t fb_console_read(void *buf, size_t max);
  */
 void fb_console_tick(void);
 
-/**
- * @brief Atlas descriptor submitted by userspace.
- *
- * The kernel maps @c pixels_user and @c cp_map_user read-only into kernel
- * space (so it sees what userspace put there) and keeps the mapping alive
- * for the atlas's lifetime.
- */
-typedef struct
-{
-  uint64_t pixels_user;  /**< userspace VA of the glyph atlas pixel data. */
-  uint32_t pixels_size;  /**< total atlas bytes. */
-  uint32_t cell_w;       /**< glyph cell width in pixels. */
-  uint32_t cell_h;       /**< glyph cell height in pixels. */
-  uint32_t stride_bytes; /**< bytes per row of a single cell. */
-  uint32_t bpp;          /**< atlas bpp — must match framebuffer. */
-  uint32_t n_glyphs;     /**< total glyph slots in the atlas. */
-  uint64_t cp_map_user; /**< userspace VA of u32[n_cp] codepoint → glyph_idx. */
-  uint32_t n_cp;        /**< size of cp_map (covers codepoints 0..n_cp-1). */
-  uint32_t fallback_idx; /**< glyph for unmapped codepoints. */
-} fb_console_atlas_t;
+/* fb_console_atlas_t and ioctl constants are in <alcor2/fb_console_ioctl.h>. */
 
 /** @brief Register a userspace glyph atlas; subsequent renders use Fira. */
 int fb_console_set_atlas(const fb_console_atlas_t *meta);
 
 /**
- * @brief Release the framebuffer so a userspace process can mmap it raw
- * (doom, graphics demos). The kernel stops rendering until @ref
+ * @brief Yield the framebuffer to a userspace process for raw pixel access
+ * (games, graphics demos). The kernel stops rendering until @ref
  * fb_console_reclaim is called.
  */
-/** Cell grid dimensions in cells (not pixels). Both pointers may be NULL.
- *  Used by TIOCGWINSZ so userspace TUIs lay out against the real grid. */
-void fb_console_get_size(int *cols, int *rows);
-
-/** DECCKM state. When true, the keyboard layer should emit SS3 (`\EOA`)
- *  for cursor keys instead of CSI (`\E[A`). Toggled by ncurses keypad mode. */
-bool fb_console_app_cursor_keys(void);
-
 void fb_console_yield(void);
 
-/** @brief Resume kernel rendering; repaint the cell grid. */
+/** @brief Resume kernel rendering after @ref fb_console_yield; repaints the
+ * full cell grid. */
 void fb_console_reclaim(void);
+
+/** @brief Cell grid dimensions in cells (not pixels). Both pointers may be
+ * NULL. Used by TIOCGWINSZ so userspace TUIs lay out against the real grid. */
+void fb_console_get_size(int *cols, int *rows);
+
+/** @brief DECCKM state. When true the keyboard layer emits SS3 (@c \\EOA)
+ * for cursor keys instead of CSI (@c \\E[A). Toggled by ncurses keypad(). */
+bool fb_console_app_cursor_keys(void);
+
+/** @brief Scroll the scrollback view up by @p lines. No-op if no history. */
+void fb_console_scrollback_up(int lines);
+
+/** @brief Scroll the scrollback view down by @p lines; 0 = live view. */
+void fb_console_scrollback_down(int lines);
 
 #endif /* ALCOR2_FB_CONSOLE_H */

@@ -11,7 +11,7 @@ HEADERS := \
   include/vega/ast.h \
   include/vega/parse.h \
   include/vega/internal/lexer.h \
-  include/vega/internal/host.h
+  $(USER_BASE)/include/vega/internal/host.h
 
 .PHONY: all clean
 

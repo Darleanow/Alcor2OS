@@ -314,7 +314,8 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   return total;
 }
 
-/** @brief Gather-write: write @p iovcnt buffers to @p fd in order. */
+/* Coalesce all iovecs into a single fb_console batch so ncurses refresh()
+ * (typically 5–20 iovecs) triggers only one flush_batch() + cursor_paint(). */
 u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -324,8 +325,26 @@ u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   if(!iov)
     return (u64)-EFAULT;
 
-  const struct iovec *vec   = (const struct iovec *)iov;
-  u64                 total = 0;
+  const struct iovec *vec = (const struct iovec *)iov;
+
+  if((fd == 1 || fd == 2) && !fd_has_oft(fd)) {
+    u64 total = 0;
+    fb_console_write_begin();
+    for(u64 i = 0; i < iovcnt; i++) {
+      if(!vec[i].iov_base || vec[i].iov_len == 0)
+        continue;
+      if(!user_rw_ok((u64)vec[i].iov_base, vec[i].iov_len)) {
+        fb_console_write_end();
+        return (u64)-EFAULT;
+      }
+      fb_console_write_raw(vec[i].iov_base, vec[i].iov_len);
+      total += vec[i].iov_len;
+    }
+    fb_console_write_end();
+    return total;
+  }
+
+  u64 total = 0;
   for(u64 i = 0; i < iovcnt; i++) {
     if(vec[i].iov_base && vec[i].iov_len > 0) {
       u64 written =
@@ -379,7 +398,7 @@ static i32 sel_read_ready(u64 fd)
   if(fd >= VFS_MAX_FD)
     return -EBADF;
   if(fd == 0 && !fd_has_oft(fd)) {
-    proc_t *p = proc_current();
+    const proc_t *p = proc_current();
     if(!p)
       return kbd_raw_pending() ? 1 : 0;
     return kbd_select_read_ready(p) ? 1 : 0;

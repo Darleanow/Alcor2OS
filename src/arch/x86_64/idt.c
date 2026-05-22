@@ -7,12 +7,7 @@
 #include <alcor2/arch/gdt.h>
 #include <alcor2/arch/idt.h>
 #include <alcor2/arch/pic.h>
-#include <alcor2/drivers/ata.h>
 #include <alcor2/drivers/console.h>
-#include <alcor2/proc/proc.h>
-
-extern void        pit_tick(void);
-extern void        keyboard_irq(void);
 
 static idt_entry_t idt[IDT_ENTRIES];
 static idt_ptr_t   idtr;
@@ -20,8 +15,6 @@ static idt_ptr_t   idtr;
 extern void       *isr_stub_table[];
 extern void       *irq_stub_table[];
 
-/** Vector layout: CPU exceptions, then PIC IRQs at 32..47.
- *  @c X86_SEGMENT_RPL_MASK masks the CS/SS RPL; user ring is 3. */
 enum
 {
   X86_EXCEPTION_VECTOR_COUNT = 32,
@@ -29,7 +22,6 @@ enum
   X86_SEGMENT_RPL_MASK       = 3,
 };
 
-/** @brief CPU exception names (vectors 0-31). */
 static const char *exception_names[] = {
     "Division Error",
     "Debug",
@@ -62,8 +54,15 @@ static const char *exception_names[] = {
     "Hypervisor Injection",
     "VMM Communication",
     "Security Exception",
-    "Reserved"
+    "Reserved",
 };
+
+static idt_proc_hooks_t g_proc_hooks;
+
+void                    idt_set_proc_hooks(idt_proc_hooks_t hooks)
+{
+  g_proc_hooks = hooks;
+}
 
 void idt_set_gate(u8 vector, void *handler, u8 flags)
 {
@@ -93,11 +92,13 @@ void exception_handler(interrupt_frame_t *frame)
     console_printf("%d", (int)frame->vector);
   }
 
-  const proc_t *p = proc_current();
-  if(p) {
-    console_print(" [");
-    console_print(p->name);
-    console_print("]");
+  if(g_proc_hooks.current_name) {
+    const char *name = g_proc_hooks.current_name();
+    if(name) {
+      console_print(" [");
+      console_print(name);
+      console_print("]");
+    }
   }
   console_print("\n");
 
@@ -111,77 +112,32 @@ void exception_handler(interrupt_frame_t *frame)
     console_printf("CR2: 0x%lx\n", cr2);
   }
 
-  if(user_fault) {
+  if(user_fault && g_proc_hooks.exit) {
     console_print("Killing faulting process.\n");
-    proc_exit(-11);
+    g_proc_hooks.exit(-11);
   }
 
   cpu_halt();
 }
 
-/** @brief IRQ handler callback signature. */
-typedef void (*irq_handler_fn)(u8 irq);
+static irq_handler_fn irq_handlers[PIC_IRQ_LINE_COUNT];
 
-/** @brief Descriptor for a hardware IRQ routing entry. */
-typedef struct
+void                  irq_register(u8 irq, irq_handler_fn handler)
 {
-  u8             irq;     /**< Hardware IRQ number (0-15) */
-  const char    *name;    /**< Symbolic name for tracing */
-  irq_handler_fn handler; /**< Implementation callback */
-} irq_def_t;
-
-static void irq__pit_wrapper(u8 i)
-{
-  (void)i;
-  pit_tick();
-}
-static void irq__kbd_wrapper(u8 i)
-{
-  (void)i;
-  keyboard_irq();
-}
-static void irq__ata0_wrapper(u8 i)
-{
-  (void)i;
-  ata_irq(0);
-}
-static void irq__ata1_wrapper(u8 i)
-{
-  (void)i;
-  ata_irq(1);
+  if(irq < PIC_IRQ_LINE_COUNT)
+    irq_handlers[irq] = handler;
 }
 
-#define IRQ_DEF(v, n, h)                                                       \
-  {                                                                            \
-    (v), (n), (h)                                                              \
-  }
-#define IRQ_END                                                                \
-  {                                                                            \
-    0, NULL, NULL                                                              \
-  }
-
-/** @brief IRQ routing table, sentinel-terminated. */
-static const irq_def_t irq_table[] = {
-    IRQ_DEF(IRQ_TIMER, "pit", irq__pit_wrapper),
-    IRQ_DEF(IRQ_KEYBOARD, "keyboard", irq__kbd_wrapper),
-    IRQ_DEF(IRQ_ATA_PRIMARY, "ata0", irq__ata0_wrapper),
-    IRQ_DEF(IRQ_ATA_SECONDARY, "ata1", irq__ata1_wrapper), IRQ_END
-};
-
-/* Set to 1 to trace hardware interrupts */
 #define IRQ_TRACE 0
 
 void irq_handler(u8 irq)
 {
-  for(const irq_def_t *d = irq_table; d->name != NULL; d++) {
-    if(d->irq == irq) {
+  if(irq < PIC_IRQ_LINE_COUNT && irq_handlers[irq]) {
 #if IRQ_TRACE
-      if(irq != IRQ_TIMER)
-        console_printf("[irq] %d (%s)\n", (int)irq, d->name);
+    if(irq != IRQ_TIMER)
+      console_printf("[irq] %d\n", (int)irq);
 #endif
-      d->handler(irq);
-      break;
-    }
+    irq_handlers[irq](irq);
   }
 
   pic_eoi(irq);
@@ -189,15 +145,13 @@ void irq_handler(u8 irq)
 
 void idt_init(void)
 {
-  for(u16 i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++) {
+  for(u16 i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++)
     idt_set_gate(i, isr_stub_table[i], IDT_GATE_INT);
-  }
 
-  for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++) {
+  for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++)
     idt_set_gate(
         X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT
     );
-  }
 
   idtr.limit = sizeof(idt) - 1;
   idtr.base  = (u64)&idt;

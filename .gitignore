@@ -7,3 +7,5 @@ thirdparty/
 *.img
 user/apps/**/.cache/
 mnt
+# Doxygen generated output
+docs/doxygen/

@@ -10,6 +10,7 @@
 #ifndef ALCOR2_SYSCALL_H
 #define ALCOR2_SYSCALL_H
 
+#include <alcor2/arch/cpu.h>
 #include <alcor2/types.h>
 
 /** @name Syscall numbers (Linux x86_64 compatible subset)
@@ -94,26 +95,6 @@
 /** @} */
 
 /**
- * @brief Saved registers on syscall entry.
- */
-typedef struct
-{
-  u64 r15, r14, r13, r12, r11, r10, r9, r8;
-  u64 rbp, rdi, rsi, rdx, rcx, rbx;
-  u64 rax;
-  u64 rip;
-  u64 rflags;
-  u64 rsp;
-} syscall_frame_t;
-
-_Static_assert(offsetof(syscall_frame_t, rax) == 14 * 8, "syscall_frame rax");
-_Static_assert(offsetof(syscall_frame_t, rip) == 15 * 8, "syscall_frame rip");
-_Static_assert(
-    offsetof(syscall_frame_t, rflags) == 16 * 8, "syscall_frame rflags"
-);
-_Static_assert(offsetof(syscall_frame_t, rsp) == 17 * 8, "syscall_frame rsp");
-
-/**
  * @brief Initialize syscall mechanism (set MSRs).
  */
 void syscall_init(void);
@@ -132,16 +113,5 @@ u64 syscall_dispatch(syscall_frame_t *frame);
  * Used by signal.c's rt_sigreturn implementation.
  */
 syscall_frame_t *syscall_get_current_frame(void);
-
-/** @name MSR definitions for SYSCALL/SYSRET
- * @{ */
-#define MSR_EFER    0xC0000080
-#define MSR_STAR    0xC0000081
-#define MSR_LSTAR   0xC0000082
-#define MSR_SFMASK  0xC0000084
-#define MSR_FS_BASE 0xC0000100
-#define MSR_GS_BASE 0xC0000101
-#define EFER_SCE    (1 << 0)
-/** @} */
 
 #endif

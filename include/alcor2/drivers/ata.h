@@ -95,21 +95,20 @@ typedef enum
  */
 typedef struct ata_channel
 {
-  u16         base;       /* Data port base (0x1F0 or 0x170) */
-  u16         ctrl;       /* Control port (0x3F6 or 0x376) */
-  u16         bmi;        /* Bus Master IDE base */
-  u8          irq;        /* IRQ number (14 or 15) */
-  ata_state_t state;      /* Current I/O state */
-  u8          status;     /* Last status from IRQ */
-  u8          bmi_status; /* Last BMI status */
-  u8          error;      /* Last error register */
-  struct proc
-      *waiter; /* Blocked proc waiting for IRQ (NULL = poll / early boot) */
-  struct proc *lock_queue; /* Head of procs waiting for the channel itself */
-  bool         busy;      /* Channel held by a caller between acquire/release */
-  ata_prd_t   *prdt;      /* PRD table (virtual) */
-  u64          prdt_phys; /* PRD table (physical) */
-  bool         dma_ok;    /* DMA available */
+  u16          base;        /* Data port base (0x1F0 or 0x170) */
+  u16          ctrl;        /* Control port (0x3F6 or 0x376) */
+  u16          bmi;         /* Bus Master IDE base */
+  u8           irq;         /* IRQ number (14 or 15) */
+  ata_state_t  state;       /* Current I/O state */
+  u8           status;      /* Last status from IRQ */
+  u8           bmi_status;  /* Last BMI status */
+  u8           error;       /* Last error register */
+  struct proc *waiter;      /* Blocked proc waiting for IRQ (NULL = poll) */
+  struct proc *lock_waiter; /* Proc waiting to acquire the channel mutex */
+  bool         busy;        /* Channel held between acquire/release */
+  ata_prd_t   *prdt;        /* PRD table (virtual) */
+  u64          prdt_phys;   /* PRD table (physical) */
+  bool         dma_ok;      /* DMA available */
 } ata_channel_t;
 
 /**

@@ -103,9 +103,9 @@ static fs_handle_t ram_open(void *fs_data, const char *path, u32 flags)
   if(!node) {
     if(flags & O_CREAT) {
       /* Need to find parent */
-      char  parent_path[VFS_PATH_MAX];
-      char  name[VFS_NAME_MAX];
-      char *last_slash = kstrrchr(path, '/');
+      char        parent_path[VFS_PATH_MAX];
+      char        name[VFS_NAME_MAX];
+      const char *last_slash = kstrrchr(path, '/');
       if(!last_slash)
         return NULL;
 
@@ -144,7 +144,7 @@ static void ram_close(fs_handle_t fh)
 
 static i64 ram_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
 {
-  ram_node_t *node = (ram_node_t *)fh;
+  const ram_node_t *node = (const ram_node_t *)fh;
   if(node->type != VFS_FILE)
     return -EISDIR;
   if(offset >= node->size)
@@ -217,9 +217,9 @@ static i64 ram_mkdir(void *fs_data, const char *path)
   if(ram__resolve(path))
     return -EEXIST;
 
-  char  parent_path[VFS_PATH_MAX];
-  char  name[VFS_NAME_MAX];
-  char *last_slash = kstrrchr(path, '/');
+  char        parent_path[VFS_PATH_MAX];
+  char        name[VFS_NAME_MAX];
+  const char *last_slash = kstrrchr(path, '/');
   if(!last_slash)
     return -EINVAL;
 

@@ -116,6 +116,7 @@ thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_6
 	    --disable-shared \
 	    --enable-static \
 	    --enable-overwrite \
+	    --enable-widec \
 	    --enable-pc-files=no \
 	    CC=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-gcc \
 	    CXX=$(CURDIR)/thirdparty/musl-cross/bin/x86_64-linux-musl-g++ \
@@ -131,8 +132,10 @@ thirdparty/ncurses-install/usr/lib/libncurses.a: thirdparty/musl-cross/bin/x86_6
 	@$(MAKE) -C thirdparty/ncurses-src install DESTDIR=$(CURDIR)/thirdparty/ncurses-install \
 	  >$(CURDIR)/thirdparty/ncurses-install.log 2>&1 || \
 	  { tail -40 $(CURDIR)/thirdparty/ncurses-install.log; echo >&2 "ncurses install failed"; exit 1; }
-	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/lib/libncurses.a || \
-	  { echo >&2 "expected libncurses.a"; exit 1; }
+	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/lib/libncursesw.a || \
+	  { echo >&2 "expected libncursesw.a (widec build)"; exit 1; }
+	@ln -sf libncursesw.a $(CURDIR)/thirdparty/ncurses-install/usr/lib/libncurses.a
+	@ln -sf libtinfow.a   $(CURDIR)/thirdparty/ncurses-install/usr/lib/libtinfo.a 2>/dev/null || true
 	@test -f $(CURDIR)/thirdparty/ncurses-install/usr/include/curses.h || \
 	  test -f $(CURDIR)/thirdparty/ncurses-install/usr/include/ncurses/curses.h || \
 	  { echo >&2 "ncurses headers missing — see thirdparty/ncurses-install.log"; exit 1; }

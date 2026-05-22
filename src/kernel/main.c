@@ -17,6 +17,7 @@
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/ext2.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/limine.h>
@@ -25,6 +26,7 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
 
@@ -154,7 +156,6 @@ static void init_interrupts(void)
 {
   pic_init();
   pit_init(100);
-  pic_unmask(IRQ_TIMER);
   pit_enable_sched();
   console_print("PIC/PIT initialized (100Hz).\n");
 
@@ -165,10 +166,21 @@ static void init_interrupts(void)
 /**
  * @brief Initialize storage and filesystems.
  */
+static i64 ata0_bd_read(void *ctx, u64 lba, u32 count, void *buf)
+{
+  return ata_read((u8)(u64)ctx, lba, count, buf);
+}
+static i64 ata0_bd_write(void *ctx, u64 lba, u32 count, const void *buf)
+{
+  return ata_write((u8)(u64)ctx, lba, count, buf);
+}
+
 static void init_storage(void)
 {
   ata_init();
-  ext2_init();
+
+  static const blockdev_t ata0_dev = {ata0_bd_read, ata0_bd_write, (void *)0};
+  ext2_init(&ata0_dev);
 
   /* Mount root filesystem */
   const ata_drive_t *hda = ata_get_drive(0);
@@ -184,6 +196,25 @@ static void init_storage(void)
   }
 }
 
+static const char *idt_hook_proc_name(void)
+{
+  const proc_t *p = proc_current();
+  return p ? proc_name(p) : NULL;
+}
+
+static void idt_hook_proc_exit(i64 code)
+{
+  proc_exit(code);
+}
+
+static void init_idt_proc_hooks(void)
+{
+  idt_set_proc_hooks((idt_proc_hooks_t) {
+      .current_name = idt_hook_proc_name,
+      .exit         = idt_hook_proc_exit,
+  });
+}
+
 /**
  * @brief Enable interrupts and log the event.
  */
@@ -195,17 +226,18 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"GDT Structure",       gdt_init        },
-    {"IDT Structure",       idt_init        },
-    {"SSE/FPU Support",     cpu_enable_sse  },
-    {"Syscall Interface",   syscall_init    },
-    {"PIC/PIT Timers",      pic_init        },
-    {"Hardware Interrupts", init_interrupts },
-    {"VFS Orchestrator",    vfs_init        },
-    {"Storage & VFS",       init_storage    },
-    {"Process Table",       proc_init       },
-    {"Global Interrupts",   init_enable_irqs},
-    {NULL,                  NULL            }
+    {"GDT Structure",       gdt_init           },
+    {"IDT Structure",       idt_init           },
+    {"SSE/FPU Support",     cpu_enable_sse     },
+    {"Syscall Interface",   syscall_init       },
+    {"PIC/PIT Timers",      pic_init           },
+    {"Hardware Interrupts", init_interrupts    },
+    {"VFS Orchestrator",    vfs_init           },
+    {"Storage & VFS",       init_storage       },
+    {"Process Table",       proc_init          },
+    {NULL,                  init_idt_proc_hooks},
+    {"Global Interrupts",   init_enable_irqs   },
+    {NULL,                  NULL               }
 };
 
 /**

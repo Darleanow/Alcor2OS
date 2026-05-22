@@ -21,6 +21,7 @@
 #ifndef ALCOR2_SYS_INTERNAL_H
 #define ALCOR2_SYS_INTERNAL_H
 
+#include <alcor2/fs/pipe.h>
 #include <alcor2/sys/syscall.h>
 
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
@@ -129,47 +130,7 @@ SYSCALL_DECL(sys_exit_group);
 SYSCALL_DECL(sys_alcor_fb_info);
 SYSCALL_DECL(sys_alcor_fb_mmap);
 
-/**
- * @brief True if @c pipe_read would not block (data in buffer or EOF).
- */
-bool pipe_poll_read_ready(const void *pipe);
-
-/**
- * @brief Check if a pipe can be written to without blocking.
- * @param pipe Opaque pointer to the pipe.
- * @return true if space is available or read end is closed.
- */
-bool pipe_poll_write_ready(const void *pipe);
-
-/**
- * @brief Read up to @p count bytes from the read end of a pipe object.
- * @return Bytes read (0 on EOF when write end is closed), or negative -errno.
- */
-i64 pipe_read_obj(void *pipe, void *buf, u64 count);
-
-/**
- * @brief Write up to @p count bytes to the write end of a pipe object.
- * @return Bytes written, or negative -errno.
- */
-i64 pipe_write_obj(void *pipe, const void *buf, u64 count);
-
-/**
- * @brief Allocate a fresh pipe object. Both ends start refcount=1; the caller
- * is expected to wrap it in two OFT entries via @c vfs_oft_alloc_pipe and
- * release one of them if any setup step fails.
- *
- * @return Opaque pipe pointer, or NULL on exhaustion.
- */
-void *pipe_alloc_obj(void);
-
-/**
- * @brief Decrement read_open or write_open when an OFT entry's refcount hits
- * zero. Called only from vfs_oft_release after the last fd reference drops.
- *
- * @param kind  VFS_KIND_PIPE_RD or VFS_KIND_PIPE_WR.
- * @param pipe  Pipe pointer.
- */
-void pipe_oft_release(i32 kind, void *pipe);
+/* Pipe interface: see <alcor2/fs/pipe.h> (included above). */
 
 #undef SYSCALL_DECL
 
