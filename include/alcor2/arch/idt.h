@@ -62,6 +62,21 @@ typedef struct PACKED
 typedef void (*irq_handler_fn)(u8 irq);
 
 /**
+ * @brief Hooks into the process layer for use by the exception handler.
+ *
+ * Call once during kernel init (after proc is ready) so that the arch
+ * exception handler can print the faulting process name and kill it
+ * without the arch layer depending on proc headers.
+ */
+typedef struct
+{
+  const char *(*current_name)(void); /**< Returns current process name or NULL. */
+  void (*exit)(i64 code);            /**< Kill current process (noreturn). */
+} idt_proc_hooks_t;
+
+void idt_set_proc_hooks(idt_proc_hooks_t hooks);
+
+/**
  * @brief Initialize the IDT and install default handlers.
  */
 void idt_init(void);

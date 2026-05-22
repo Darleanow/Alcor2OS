@@ -13,7 +13,7 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
-#include <alcor2/sys/pipe.h>
+#include <alcor2/fs/pipe.h>
 
 /**
  * @brief POSIX @c stat buffer layout for the x86-64 syscall ABI.

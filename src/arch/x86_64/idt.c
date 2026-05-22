@@ -8,7 +8,6 @@
 #include <alcor2/arch/idt.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/console.h>
-#include <alcor2/proc/sched.h>
 
 static idt_entry_t idt[IDT_ENTRIES];
 static idt_ptr_t   idtr;
@@ -16,8 +15,6 @@ static idt_ptr_t   idtr;
 extern void *isr_stub_table[];
 extern void *irq_stub_table[];
 
-/** Vector layout: CPU exceptions, then PIC IRQs at 32..47.
- *  @c X86_SEGMENT_RPL_MASK masks the CS/SS RPL; user ring is 3. */
 enum
 {
   X86_EXCEPTION_VECTOR_COUNT = 32,
@@ -25,41 +22,31 @@ enum
   X86_SEGMENT_RPL_MASK       = 3,
 };
 
-/** @brief CPU exception names (vectors 0-31). */
 static const char *exception_names[] = {
-    "Division Error",
-    "Debug",
-    "NMI",
-    "Breakpoint",
-    "Overflow",
-    "Bound Range Exceeded",
-    "Invalid Opcode",
-    "Device Not Available",
-    "Double Fault",
-    "Coprocessor Segment Overrun",
-    "Invalid TSS",
-    "Segment Not Present",
-    "Stack-Segment Fault",
-    "General Protection Fault",
-    "Page Fault",
-    "Reserved",
-    "x87 FPU Error",
-    "Alignment Check",
-    "Machine Check",
-    "SIMD Floating-Point",
-    "Virtualization",
-    "Control Protection",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Hypervisor Injection",
-    "VMM Communication",
-    "Security Exception",
-    "Reserved"
+    "Division Error",       "Debug",
+    "NMI",                  "Breakpoint",
+    "Overflow",             "Bound Range Exceeded",
+    "Invalid Opcode",       "Device Not Available",
+    "Double Fault",         "Coprocessor Segment Overrun",
+    "Invalid TSS",          "Segment Not Present",
+    "Stack-Segment Fault",  "General Protection Fault",
+    "Page Fault",           "Reserved",
+    "x87 FPU Error",        "Alignment Check",
+    "Machine Check",        "SIMD Floating-Point",
+    "Virtualization",       "Control Protection",
+    "Reserved",             "Reserved",
+    "Reserved",             "Reserved",
+    "Reserved",             "Reserved",
+    "Hypervisor Injection", "VMM Communication",
+    "Security Exception",   "Reserved",
 };
+
+static idt_proc_hooks_t g_proc_hooks;
+
+void idt_set_proc_hooks(idt_proc_hooks_t hooks)
+{
+  g_proc_hooks = hooks;
+}
 
 void idt_set_gate(u8 vector, void *handler, u8 flags)
 {
@@ -89,11 +76,13 @@ void exception_handler(interrupt_frame_t *frame)
     console_printf("%d", (int)frame->vector);
   }
 
-  const proc_t *p = proc_current();
-  if(p) {
-    console_print(" [");
-    console_print(proc_name(p));
-    console_print("]");
+  if(g_proc_hooks.current_name) {
+    const char *name = g_proc_hooks.current_name();
+    if(name) {
+      console_print(" [");
+      console_print(name);
+      console_print("]");
+    }
   }
   console_print("\n");
 
@@ -107,15 +96,14 @@ void exception_handler(interrupt_frame_t *frame)
     console_printf("CR2: 0x%lx\n", cr2);
   }
 
-  if(user_fault) {
+  if(user_fault && g_proc_hooks.exit) {
     console_print("Killing faulting process.\n");
-    proc_exit(-11);
+    g_proc_hooks.exit(-11);
   }
 
   cpu_halt();
 }
 
-/** @brief Per-line IRQ handler table; NULL entries are silently ignored. */
 static irq_handler_fn irq_handlers[PIC_IRQ_LINE_COUNT];
 
 void irq_register(u8 irq, irq_handler_fn handler)
@@ -124,7 +112,6 @@ void irq_register(u8 irq, irq_handler_fn handler)
     irq_handlers[irq] = handler;
 }
 
-/* Set to 1 to trace hardware interrupts */
 #define IRQ_TRACE 0
 
 void irq_handler(u8 irq)
@@ -142,15 +129,11 @@ void irq_handler(u8 irq)
 
 void idt_init(void)
 {
-  for(u16 i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++) {
+  for(u16 i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++)
     idt_set_gate(i, isr_stub_table[i], IDT_GATE_INT);
-  }
 
-  for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++) {
-    idt_set_gate(
-        X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT
-    );
-  }
+  for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++)
+    idt_set_gate(X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT);
 
   idtr.limit = sizeof(idt) - 1;
   idtr.base  = (u64)&idt;

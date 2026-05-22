@@ -21,7 +21,7 @@
 #ifndef ALCOR2_SYS_INTERNAL_H
 #define ALCOR2_SYS_INTERNAL_H
 
-#include <alcor2/sys/pipe.h>
+#include <alcor2/fs/pipe.h>
 #include <alcor2/sys/syscall.h>
 
 typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
@@ -130,7 +130,7 @@ SYSCALL_DECL(sys_exit_group);
 SYSCALL_DECL(sys_alcor_fb_info);
 SYSCALL_DECL(sys_alcor_fb_mmap);
 
-/* Pipe interface: see <alcor2/sys/pipe.h> (included above). */
+/* Pipe interface: see <alcor2/fs/pipe.h> (included above). */
 
 #undef SYSCALL_DECL
 

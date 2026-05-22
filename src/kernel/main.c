@@ -26,6 +26,7 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/elf.h>
 #include <alcor2/proc/proc.h>
+#include <alcor2/proc/sched.h>
 #include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
 
@@ -195,6 +196,25 @@ static void init_storage(void)
   }
 }
 
+static const char *idt_hook_proc_name(void)
+{
+  const proc_t *p = proc_current();
+  return p ? proc_name(p) : NULL;
+}
+
+static void idt_hook_proc_exit(i64 code)
+{
+  proc_exit(code);
+}
+
+static void init_idt_proc_hooks(void)
+{
+  idt_set_proc_hooks((idt_proc_hooks_t){
+      .current_name = idt_hook_proc_name,
+      .exit         = idt_hook_proc_exit,
+  });
+}
+
 /**
  * @brief Enable interrupts and log the event.
  */
@@ -214,8 +234,9 @@ static const boot_phase_t boot_sequence[] = {
     {"Hardware Interrupts", init_interrupts },
     {"VFS Orchestrator",    vfs_init        },
     {"Storage & VFS",       init_storage    },
-    {"Process Table",       proc_init       },
-    {"Global Interrupts",   init_enable_irqs},
+    {"Process Table",       proc_init           },
+    {NULL,                  init_idt_proc_hooks },
+    {"Global Interrupts",   init_enable_irqs    },
     {NULL,                  NULL            }
 };
 
