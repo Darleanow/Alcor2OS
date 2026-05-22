@@ -24,8 +24,6 @@ static const vega_host_ops_t shell_host = {
 #define HIST_MAX     128
 #define LINE_MAX_LEN MAX_CMD_LEN
 
-/** Special return codes for read_line(). Negative so they can't be confused
- *  with a byte count. */
 #define RL_EOF       (-1)
 #define RL_INTERRUPT (-2)
 #define RL_CLEAR     (-3)
@@ -63,8 +61,6 @@ static void write_str(const char *s)
   }
 }
 
-/** Erase the current input line and reprint @p prompt + @p buf; leave the
- *  terminal cursor at logical column (prompt_cols + cur_cols). */
 static void redraw_line(
     const char *prompt, int prompt_cols, const char *buf, int cur_cols
 )
@@ -82,8 +78,6 @@ static void redraw_line(
     write_str("\r");
 }
 
-/** Count visible columns in a UTF-8 byte string by ignoring continuation
- *  bytes. Each non-continuation byte represents one logical character. */
 static int utf8_cols(const char *s)
 {
   int n = 0;
@@ -93,8 +87,7 @@ static int utf8_cols(const char *s)
   return n;
 }
 
-/** Like utf8_cols but skips ANSI ESC [ ... final-byte sequences so that
- *  a coloured prompt string reports its true terminal width. */
+/* Counts visible columns in a string, skipping ANSI ESC[...m sequences. */
 static int visible_cols(const char *s)
 {
   int n = 0;
@@ -120,7 +113,6 @@ static int visible_cols(const char *s)
   return n;
 }
 
-/** Step a byte index back/forward by one UTF-8 character boundary. */
 static int prev_char_boundary(const char *buf, int idx)
 {
   if(idx <= 0)
@@ -294,49 +286,35 @@ static int read_line(char *buf, size_t cap, const char *prompt)
   }
 }
 
-/* Prompt colours from the Spazer palette — change spazer.h to update here. */
-#define _PC_LINE SPZ_ANSI_OVERLAY1
-#define _PC_HOST SPZ_ANSI_MAUVE_B
-#define _PC_PATH SPZ_ANSI_SUBTEXT1
-#define _PC_DOLS SPZ_ANSI_GREEN_B
-#define _PC_RS   SPZ_ANSI_RESET
+/* Prompt colours — Catppuccin Mocha via spazer palette. */
+#define PC_LINE SPZ_ANSI_OVERLAY1
+#define PC_HOST SPZ_ANSI_MAUVE_B
+#define PC_PATH SPZ_ANSI_SUBTEXT1
+#define PC_DOLS SPZ_ANSI_GREEN_B
+#define PC_RS   SPZ_ANSI_RESET
 
-/* Box chars — use spazer defines so prompts and widgets share the same
- * glyph set.  Rounded corners are procedurally arc-rasterised in atlas.c. */
-#define _PC_TL   SPZ_TL_R   /* ╭ U+256D */
-#define _PC_BL   SPZ_BL_R   /* ╰ U+2570 */
-#define _PC_H    SPZ_H      /* ─ U+2500 */
+/* Box-drawing via spazer; rounded corners are arc-rasterised in atlas.c. */
+#define PC_TL   SPZ_TL_R   /* ╭ */
+#define PC_BL   SPZ_BL_R   /* ╰ */
+#define PC_H    SPZ_H      /* ─ */
 
-/**
- * Write the decorative top line of the two-line prompt to stdout.
- * Example output:  ╭─ alcor2 ─ /home/user
- * This line is written once and never redrawn; only the bottom interactive
- * line is erased/reprinted on each keystroke.
- */
 static void write_prompt_header(void)
 {
   char cwd[MAX_PATH];
   const char *path = sh_getcwd(cwd, sizeof cwd) ? cwd : "/";
-  write_str(_PC_LINE _PC_TL _PC_H " " _PC_RS); /* ╭─ space */
-  write_str(_PC_HOST "alcor2" _PC_RS);
-  write_str(_PC_LINE " " _PC_H " " _PC_RS);    /* space ─ space */
-  write_str(_PC_PATH);
+  write_str(PC_LINE PC_TL PC_H " " PC_RS); /* ╭─ space */
+  write_str(PC_HOST "alcor2" PC_RS);
+  write_str(PC_LINE " " PC_H " " PC_RS);    /* space ─ space */
+  write_str(PC_PATH);
   write_str(path);
-  write_str(_PC_RS "\n");
+  write_str(PC_RS "\n");
 }
 
-/**
- * Format the interactive bottom-line prompt into @p out.
- * Visible width: 4 columns — ╰ ─ space $ space
- *
- *   ╭─ alcor2 ─ /home/user   ← decorative (write_prompt_header)
- *   ╰─ $ ▌                   ← interactive (this function → read_line)
- */
 static void format_prompt(char *out, size_t cap)
 {
   snprintf(out, cap,
-           _PC_LINE _PC_BL _PC_H " " _PC_RS  /* ╰─ space */
-           _PC_DOLS "$" _PC_RS " ");          /* $ space  */
+           PC_LINE PC_BL PC_H " " PC_RS  /* ╰─ space */
+           PC_DOLS "$" PC_RS " ");          /* $ space  */
 }
 
 #define MAX_HEREDOC_DELIM 64
@@ -475,8 +453,8 @@ static int read_complete_statement(char *buf, size_t size)
   /* Continuation prompt for multi-line input: │ »  (indented) */
   char cont_prompt[64];
   snprintf(cont_prompt, sizeof cont_prompt,
-           _PC_LINE SPZ_V " " _PC_RS        /* │ space */
-           _PC_DOLS "\xc2\xbb" _PC_RS " "); /* »  (U+00BB Latin-1) */
+           PC_LINE SPZ_V " " PC_RS        /* │ space */
+           PC_DOLS "\xc2\xbb" PC_RS " "); /* »  (U+00BB Latin-1) */
 
   const char *cur_prompt = prompt;
 
@@ -564,16 +542,7 @@ int main(int argc, char *argv[])
 
   char line[LINE_MAX_LEN];
 
-/* Banner — 34-char inner width, rounded corners, ├┤ separator.
- * All chars are procedurally rasterised in the atlas (no FreeType needed).
- *
- * ╭──────────────────────────────────╮   (34 dashes)
- * │            ALCOR2  OS            │   12 + 10 + 12 = 34
- * ├──────────────────────────────────┤
- * │           vega v1.0.0            │   11 + 11 + 12 = 34
- * ╰──────────────────────────────────╯
- */
-#define _BNR_H34 \
+#define BNR_H34 \
   SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
   SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
   SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H SPZ_H \
@@ -581,22 +550,22 @@ int main(int argc, char *argv[])
   SPZ_H SPZ_H
   write_str(
       "\n"
-      "  " _PC_LINE SPZ_TL_R _BNR_H34 SPZ_TR_R _PC_RS "\n"
-      "  " _PC_LINE SPZ_V _PC_RS
-        "            " _PC_HOST "ALCOR2  OS" _PC_RS "            "
-        _PC_LINE SPZ_V _PC_RS "\n"
-      "  " _PC_LINE SPZ_LT _BNR_H34 SPZ_RT _PC_RS "\n"
-      "  " _PC_LINE SPZ_V _PC_RS
-        "           " _PC_PATH "vega v" VEGA_VERSION _PC_RS "            "
-        _PC_LINE SPZ_V _PC_RS "\n"
-      "  " _PC_LINE SPZ_BL_R _BNR_H34 SPZ_BR_R _PC_RS "\n"
+      "  " PC_LINE SPZ_TL_R BNR_H34 SPZ_TR_R PC_RS "\n"
+      "  " PC_LINE SPZ_V PC_RS
+        "            " PC_HOST "ALCOR2  OS" PC_RS "            "
+        PC_LINE SPZ_V PC_RS "\n"
+      "  " PC_LINE SPZ_LT BNR_H34 SPZ_RT PC_RS "\n"
+      "  " PC_LINE SPZ_V PC_RS
+        "           " PC_PATH "vega v" VEGA_VERSION PC_RS "            "
+        PC_LINE SPZ_V PC_RS "\n"
+      "  " PC_LINE SPZ_BL_R BNR_H34 SPZ_BR_R PC_RS "\n"
       "\n"
-      "  " _PC_DOLS "help"
-        _PC_LINE " " SPZ_ARROW_R " " _PC_RS
-        _PC_PATH "list available commands" _PC_RS
+      "  " PC_DOLS "help"
+        PC_LINE " " SPZ_ARROW_R " " PC_RS
+        PC_PATH "list available commands" PC_RS
       "\n\n"
   );
-#undef _BNR_H34
+#undef BNR_H34
 
   while(1) {
     int len = read_complete_statement(line, sizeof line);
