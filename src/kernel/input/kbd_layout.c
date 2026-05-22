@@ -1,6 +1,13 @@
-/* PS/2 set-1 scancode translator: US and FR AZERTY layouts, CSI/SS3 escape
- * sequences, and UTF-8 emission for Latin-1 AZERTY codepoints (U+0080..00FF).
- * Apps see the same byte stream a real xterm-256color terminal would emit. */
+/**
+ * @file src/kernel/input/kbd_layout.c
+ * @brief PS/2 scancode translator: layout mapping, line discipline, and TTY I/O.
+ *
+ * Translates set-1 scancodes to UTF-8 byte sequences for US QWERTY and FR
+ * AZERTY layouts. Emits CSI/SS3 escape sequences for cursor and function keys.
+ * Implements the ICANON line discipline (VMIN/VTIME, VERASE, VEOF) and feeds
+ * the per-process keyboard ready buffer used by read(2) on fd 0.
+ * Apps see the same byte stream a real xterm-256color terminal would emit.
+ */
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/drivers/console.h>

@@ -86,22 +86,23 @@ void fb_console_tick(void);
 int fb_console_set_atlas(const fb_console_atlas_t *meta);
 
 /**
- * @brief Release the framebuffer so a userspace process can mmap it raw
- * (doom, graphics demos). The kernel stops rendering until @ref
+ * @brief Yield the framebuffer to a userspace process for raw pixel access
+ * (games, graphics demos). The kernel stops rendering until @ref
  * fb_console_reclaim is called.
  */
-/** Cell grid dimensions in cells (not pixels). Both pointers may be NULL.
- *  Used by TIOCGWINSZ so userspace TUIs lay out against the real grid. */
-void fb_console_get_size(int *cols, int *rows);
-
-/** DECCKM state. When true, the keyboard layer should emit SS3 (`\EOA`)
- *  for cursor keys instead of CSI (`\E[A`). Toggled by ncurses keypad mode. */
-bool fb_console_app_cursor_keys(void);
-
 void fb_console_yield(void);
 
-/** @brief Resume kernel rendering; repaint the cell grid. */
+/** @brief Resume kernel rendering after @ref fb_console_yield; repaints the
+ * full cell grid. */
 void fb_console_reclaim(void);
+
+/** @brief Cell grid dimensions in cells (not pixels). Both pointers may be
+ * NULL. Used by TIOCGWINSZ so userspace TUIs lay out against the real grid. */
+void fb_console_get_size(int *cols, int *rows);
+
+/** @brief DECCKM state. When true the keyboard layer emits SS3 (@c \\EOA)
+ * for cursor keys instead of CSI (@c \\E[A). Toggled by ncurses keypad(). */
+bool fb_console_app_cursor_keys(void);
 
 /** @brief Scroll the scrollback view up by @p lines. No-op if no history. */
 void fb_console_scrollback_up(int lines);

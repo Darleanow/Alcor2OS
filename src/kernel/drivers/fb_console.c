@@ -1,5 +1,13 @@
+/**
+ * @file src/kernel/drivers/fb_console.c
+ * @brief Runtime framebuffer text console with UTF-8 and ANSI/CSI support.
+ *
+ * Maintains an in-RAM cell grid, blits glyphs via the compiled-in CP437 bitmap
+ * or a userspace-supplied Fira atlas, and renders scrollback history.
+ * Takes over the framebuffer from the early boot logger once kmalloc is up.
+ */
 
-#include "../../drivers/console/font.h"
+#include <drivers/console/font.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>

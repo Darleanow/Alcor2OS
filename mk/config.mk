@@ -53,7 +53,7 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Werror \
           -fno-lto -fPIE -m64 -march=x86-64 \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
-          -I$(INCLUDE) -MMD -MP
+          -I$(INCLUDE) -Isrc -MMD -MP
 ifeq ($(DEBUG),1)
   CFLAGS += -g
 endif

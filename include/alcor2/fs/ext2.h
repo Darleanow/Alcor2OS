@@ -254,12 +254,6 @@ typedef struct
 } ext2_entry_t;
 
 /**
- * @brief Initialize ext2 driver with a default block device.
- * @param dev Block device used for the root filesystem mount.
- */
-void ext2_init(const blockdev_t *dev);
-
-/**
  * @brief Mount an ext2 volume.
  * @param dev           Block device to read/write sectors from.
  * @param partition_lba Start of partition (0 for whole disk).
@@ -326,14 +320,6 @@ i64 ext2_readlink(
 );
 
 /**
- * @brief Seek in a file.
- * @param file File handle.
- * @param offset Seek offset.
- * @param whence SEEK_SET, SEEK_CUR, or SEEK_END.
- * @return New position, or negative on error.
- */
-
-/**
  * @brief Create a new file.
  * @param vol Volume to create file on.
  * @param path Path to the new file.
@@ -380,9 +366,13 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path);
 i64 ext2_rmdir(ext2_volume_t *vol, const char *path);
 
 /**
- * @brief Initialize and register ext2 filesystem with VFS.
+ * @brief Initialize the ext2 driver and register it with the VFS.
  *
- * Must be called after vfs_init() but before vfs_mount() for ext2.
+ * Sets @p dev as the default block device for subsequent @c ext2_ops_mount
+ * calls (the ones triggered by @c vfs_mount("ext2", ...)). Must be called
+ * after @c vfs_init but before any @c vfs_mount for the ext2 filesystem type.
+ *
+ * @param dev Block device used for the root filesystem mount.
  */
 void ext2_init(const blockdev_t *dev);
 

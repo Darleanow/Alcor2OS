@@ -1,6 +1,10 @@
 /**
- * @file src/kernel/proc.c
- * @brief Process management with per-process kernel stacks.
+ * @file src/kernel/process/proc.c
+ * @brief Process lifecycle, scheduling, fork/exec/exit, and context switching.
+ *
+ * Each process owns a kernel stack, a user address space (cr3), and a saved
+ * user context. The round-robin scheduler runs at syscall boundaries; the PIT
+ * timer sets a preemption flag that is checked on every syscall return.
  */
 
 #include <alcor2/arch/cpu.h>

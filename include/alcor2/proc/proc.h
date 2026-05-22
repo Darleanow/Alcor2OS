@@ -15,7 +15,7 @@
 #include <alcor2/types.h>
 
 /* Forward declaration — callers that dereference syscall_frame_t fields must
- * include <alcor2/sys/syscall.h> directly. */
+ * include <alcor2/arch/cpu.h> directly. */
 typedef struct syscall_frame syscall_frame_t;
 
 /** @brief Maximum number of processes. */
