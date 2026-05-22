@@ -12,8 +12,11 @@
 #include <alcor2/fs/vfs.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/proc/signal.h>
-#include <alcor2/sys/syscall.h>
 #include <alcor2/types.h>
+
+/* Forward declaration — callers that dereference syscall_frame_t fields must
+ * include <alcor2/sys/syscall.h> directly. */
+typedef struct syscall_frame syscall_frame_t;
 
 /** @brief Maximum number of processes. */
 #define PROC_MAX 64

@@ -96,7 +96,7 @@
 /**
  * @brief Saved registers on syscall entry.
  */
-typedef struct
+typedef struct syscall_frame
 {
   u64 r15, r14, r13, r12, r11, r10, r9, r8;
   u64 rbp, rdi, rsi, rdx, rcx, rbx;
