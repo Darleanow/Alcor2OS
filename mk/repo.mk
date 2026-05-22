@@ -267,6 +267,7 @@ clean:
 	-$(MAKE) -C user/apps/vega clean
 	-$(MAKE) -C user/bin clean
 	-$(MAKE) -C user/apps clean
+	-$(MAKE) -C user/sdk/spazer clean
 
 clean-all: clean
 	rm -rf thirdparty/musl/install thirdparty/musl/_install \
