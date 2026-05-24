@@ -56,14 +56,12 @@ bool virtio_vq_init(virtio_dev_t *vd, virtio_vq_t *vq, u16 index)
   vq->used_phys     = (u64)page + off_used;
   vq->backing_page  = page;
 
-  /* Build the free list: each descriptor points to the next. */
   for(u16 i = 0; i < size - 1; i++)
     vq->desc[i].next = i + 1;
   vq->desc[size - 1].next = 0xFFFF;
   vq->free_head           = 0;
   vq->num_free            = size;
 
-  /* Program queue physical addresses, capture notify offset, enable. */
   c->queue_desc        = vq->desc_phys;
   c->queue_driver      = vq->avail_phys;
   c->queue_device      = vq->used_phys;

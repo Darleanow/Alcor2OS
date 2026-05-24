@@ -211,7 +211,6 @@ bool virtio_input_init(void)
   for(u32 i = 0; i < EVENT_BUFFERS; i++)
     event_buf_phys[i] = vmm_get_phys((u64)&event_buf[i]);
 
-  /* Allocate one descriptor per event buffer and post them all. */
   for(u32 i = 0; i < EVENT_BUFFERS; i++) {
     i16 d = virtio_vq_alloc_desc(&evq);
     if(d < 0)
