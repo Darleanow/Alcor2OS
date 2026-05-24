@@ -45,11 +45,11 @@ static u16                  desc_to_slot[256];
 static u8                   button_state;
 
 /* Accumulator across one report. Flushed on EV_SYN. */
-static i32 acc_dx;
-static i32 acc_dy;
-static i16 acc_dwheel;
+static i32  acc_dx;
+static i32  acc_dy;
+static i16  acc_dwheel;
 
-static u64 event_buf_phys[EVENT_BUFFERS];
+static u64  event_buf_phys[EVENT_BUFFERS];
 
 static void refill_descriptor(u16 desc_id)
 {
