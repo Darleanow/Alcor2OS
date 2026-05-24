@@ -31,7 +31,7 @@
 #define BTN_RIGHT  0x111
 #define BTN_MIDDLE 0x112
 
-/* Hardcoded for QEMU. TODO: query VIRTIO_INPUT_CFG_ABS_INFO. */
+/* QEMU virtio-tablet always reports 0..32767. */
 #define ABS_AXIS_MAX 32767
 
 typedef struct PACKED
