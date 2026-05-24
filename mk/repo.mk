@@ -222,9 +222,12 @@ endif
 
 disk-resync: user disk-populate
 
+# GDK_BACKEND=x11 forces GTK to XWayland so pointer grab actually works.
 run: iso disk-populate
-	$(QEMU) -cdrom $(BUILD)/$(ISO) \
+	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-device virtio-mouse-pci \
+		-display gtk \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM)
 
 debug: iso disk-populate
@@ -232,8 +235,10 @@ debug: iso disk-populate
 	@echo "  QEMU GDB server → :1234  (VM paused at first instruction)"
 	@echo "  Connect: gdb -ex 'target remote :1234' -ex 'symbol-file $(BUILD)/$(KERNEL)'"
 	@echo ""
-	$(QEMU) -cdrom $(BUILD)/$(ISO) \
+	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-device virtio-mouse-pci \
+		-display gtk \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
 		-s -S
 
@@ -293,6 +298,7 @@ lint:
 	  --header-filter='^(src|include|user)/.*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
+	     -I$(SRC) \
 	     -Iuser/sdk/vega/include \
 	     -Iuser/core/vega/include \
 	     -Iuser/apps/shell/include \
@@ -310,7 +316,6 @@ check:
 	  --inconclusive \
 	  --quiet \
 	  -I$(INCLUDE) \
-	  --exclude=thirdparty \
 	  $(SRC) user
 
 qa: lint check

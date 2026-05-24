@@ -17,6 +17,8 @@
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/drivers/mouse.h>
+#include <alcor2/drivers/virtio.h>
 #include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/ext2.h>
 #include <alcor2/fs/vfs.h>
@@ -163,6 +165,17 @@ static void init_interrupts(void)
   console_print("Keyboard initialized.\n");
 }
 
+static void init_input(void)
+{
+  mouse_init();
+  if(fb_request.response && fb_request.response->framebuffer_count > 0) {
+    struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
+    mouse_set_screen((u32)fb->width, (u32)fb->height);
+  }
+  if(!virtio_input_init())
+    console_print("[INIT] No virtio mouse — /dev/mouse will be quiet.\n");
+}
+
 /**
  * @brief Initialize storage and filesystems.
  */
@@ -226,18 +239,19 @@ static void init_enable_irqs(void)
 
 /** @brief Table-driven bring-up sequence. */
 static const boot_phase_t boot_sequence[] = {
-    {"GDT Structure",       gdt_init           },
-    {"IDT Structure",       idt_init           },
-    {"SSE/FPU Support",     cpu_enable_sse     },
-    {"Syscall Interface",   syscall_init       },
-    {"PIC/PIT Timers",      pic_init           },
-    {"Hardware Interrupts", init_interrupts    },
-    {"VFS Orchestrator",    vfs_init           },
-    {"Storage & VFS",       init_storage       },
-    {"Process Table",       proc_init          },
-    {NULL,                  init_idt_proc_hooks},
-    {"Global Interrupts",   init_enable_irqs   },
-    {NULL,                  NULL               }
+    {"GDT Structure",        gdt_init           },
+    {"IDT Structure",        idt_init           },
+    {"SSE/FPU Support",      cpu_enable_sse     },
+    {"Syscall Interface",    syscall_init       },
+    {"PIC/PIT Timers",       pic_init           },
+    {"Hardware Interrupts",  init_interrupts    },
+    {"VFS Orchestrator",     vfs_init           },
+    {"Storage & VFS",        init_storage       },
+    {"Mouse / virtio-input", init_input         },
+    {"Process Table",        proc_init          },
+    {NULL,                   init_idt_proc_hooks},
+    {"Global Interrupts",    init_enable_irqs   },
+    {NULL,                   NULL               }
 };
 
 /**

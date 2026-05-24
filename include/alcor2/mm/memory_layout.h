@@ -21,6 +21,9 @@
 /** @brief Kernel heap initial address for debug display */
 #define KERNEL_HEAP_BASE_DISPLAY 0x90000000
 
+/** @brief Kernel MMIO arena base (PCI BAR remap targets live here). */
+#define KERNEL_MMIO_BASE 0xFFFFFFFFB0000000ULL
+
 /** @} */
 
 /** @name User Virtual Address Space

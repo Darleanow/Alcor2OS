@@ -706,6 +706,19 @@ i64 vfs_ftruncate(i64 fd, u64 length)
   return oft[idx].ops->truncate(oft[idx].handle, length);
 }
 
+/** @brief Dispatch ioctl through the filesystem driver behind @p fd. */
+i64 vfs_ioctl(i64 fd, u64 request, u64 arg)
+{
+  i32 idx = fd_to_oft(fd);
+  if(idx < 0)
+    return -EBADF;
+  if(oft[idx].pipe)
+    return -ENOTTY;
+  if(!oft[idx].ops || !oft[idx].ops->ioctl)
+    return -ENOTTY;
+  return oft[idx].ops->ioctl(oft[idx].handle, request, arg);
+}
+
 /** @brief Return the open flags stored in the OFT for @p fd. */
 i64 vfs_get_flags(i64 fd)
 {

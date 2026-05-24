@@ -8,6 +8,7 @@
  */
 
 #include <alcor2/drivers/fb_console.h>
+#include <alcor2/drivers/mouse.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/vmm.h>
@@ -443,6 +444,9 @@ static void cursor_refresh(void)
  * keeps `ls` of a long dir interactive instead of bandwidth-bound. */
 static int s_pending_scroll = 0;
 
+/* Implemented below alongside the rest of the mouse-cursor block. */
+static void mouse_cursor_invalidate_for_scroll(void);
+
 /* Scrollback ring ------------------------------------------------------- */
 static fb_cell_t *s_sb_buf  = NULL; /* kmalloc'd: SCROLLBACK_ROWS * cols    */
 static int        s_sb_cols = 0;    /* ctx.cols when buf was allocated       */
@@ -572,6 +576,11 @@ static void flush_pending_scroll(void)
   s_pending_scroll = 0;
   if(n > ctx.rows)
     n = ctx.rows;
+
+  /* The pixel-memcpy below carries any painted cursor pixels along with the
+   * scrolled rows, leaving ghost cursors. Erase first, mark un-drawn so the
+   * next tick re-paints fresh at the current position. */
+  mouse_cursor_invalidate_for_scroll();
 
   if(ctx.base && ctx.bytes_pp == 4) {
     u32 scroll_px = (u32)n * (u32)ctx.cell_h;
@@ -1386,6 +1395,144 @@ size_t fb_console_read(void *buf, size_t max)
   return n;
 }
 
+/* Opaque arrow cursor, 12 wide × 19 tall. Painted as a filled white shape
+ * with an automatic 1-pixel black halo: any pixel adjacent to a "1" bit gets
+ * black first, then the "1" pixels themselves are overpainted white. Visible
+ * on any background. Old cursor is removed by re-blitting the cells it
+ * covered — that way terminal writes between ticks don't leave artefacts. */
+static const u16 mouse_cursor_bits[19] = {
+    0x8000, /* 1............... */
+    0xC000, /* 11.............. */
+    0xE000, /* 111............. */
+    0xF000, /* 1111............ */
+    0xF800, /* 11111........... */
+    0xFC00, /* 111111.......... */
+    0xFE00, /* 1111111......... */
+    0xFF00, /* 11111111........ */
+    0xFF80, /* 111111111....... */
+    0xFFC0, /* 1111111111...... */
+    0xFFE0, /* 11111111111..... */
+    0xFE00, /* 1111111......... */
+    0xEE00, /* 111.111......... */
+    0xCE00, /* 11..111......... */
+    0x8700, /* 1....111........ */
+    0x0700, /* .....111........ */
+    0x0380, /* ......111....... */
+    0x0380, /* ......111....... */
+    0x0100, /* .......1........ */
+};
+
+#define CURSOR_W 12
+#define CURSOR_H 19
+
+static struct
+{
+  bool drawn;
+  i32  x;
+  i32  y;
+} mouse_cur;
+
+static inline bool cursor_bit(int row, int col)
+{
+  if(row < 0 || row >= CURSOR_H || col < 0 || col >= CURSOR_W)
+    return false;
+  return (mouse_cursor_bits[row] & (0x8000u >> col)) != 0;
+}
+
+static void mouse_cursor_paint(i32 cx, i32 cy)
+{
+  /* Halo pass: paint black at every neighbour of a "1" pixel that is not
+   * itself a "1". One pixel wide outline. */
+  for(int row = -1; row <= CURSOR_H; row++) {
+    for(int col = -1; col <= CURSOR_W; col++) {
+      if(cursor_bit(row, col))
+        continue;
+      bool border = false;
+      for(int dy = -1; dy <= 1 && !border; dy++)
+        for(int dx = -1; dx <= 1 && !border; dx++)
+          if((dx || dy) && cursor_bit(row + dy, col + dx))
+            border = true;
+      if(border)
+        fb_put_pixel((u32)(cx + col), (u32)(cy + row), 0x000000u);
+    }
+  }
+  /* Fill pass: white where the bitmap is set. */
+  for(int row = 0; row < CURSOR_H; row++) {
+    for(int col = 0; col < CURSOR_W; col++) {
+      if(cursor_bit(row, col))
+        fb_put_pixel((u32)(cx + col), (u32)(cy + row), 0xFFFFFFu);
+    }
+  }
+}
+
+/* bg-fill first so margin pixels (outside the cell grid) get cleaned, then
+ * re-blit cells to restore glyphs. */
+static void mouse_cursor_erase(i32 cx, i32 cy)
+{
+  int x0 = cx - 1;
+  int y0 = cy - 1;
+  int x1 = cx + CURSOR_W;
+  int y1 = cy + CURSOR_H;
+
+  if(x0 < 0)
+    x0 = 0;
+  if(y0 < 0)
+    y0 = 0;
+  if(x1 >= (int)ctx.width)
+    x1 = (int)ctx.width - 1;
+  if(y1 >= (int)ctx.height)
+    y1 = (int)ctx.height - 1;
+  for(int y = y0; y <= y1; y++)
+    for(int x = x0; x <= x1; x++)
+      fb_put_pixel((u32)x, (u32)y, ctx.default_bg);
+
+  int cw = ctx.cell_w ? ctx.cell_w : 1;
+  int ch = ctx.cell_h ? ctx.cell_h : 1;
+  int c0 = (x0 - ctx.margin_x) / cw;
+  int c1 = (x1 - ctx.margin_x) / cw;
+  int r0 = (y0 - ctx.margin_y) / ch;
+  int r1 = (y1 - ctx.margin_y) / ch;
+  if(c0 < 0)
+    c0 = 0;
+  if(r0 < 0)
+    r0 = 0;
+  if(c1 >= ctx.cols)
+    c1 = ctx.cols - 1;
+  if(r1 >= ctx.rows)
+    r1 = ctx.rows - 1;
+  for(int r = r0; r <= r1; r++)
+    for(int c = c0; c <= c1; c++)
+      blit_cell(c, r);
+}
+
+static void mouse_cursor_render(void)
+{
+  if(ctx.yielded || !ctx.cells)
+    return;
+  i32 nx, ny;
+  mouse_get_cursor(&nx, &ny);
+  if(mouse_cur.drawn)
+    mouse_cursor_erase(mouse_cur.x, mouse_cur.y);
+  /* Also pre-clean the destination cells. Defends against stale cursor
+   * pixels left at the new position by mid-tick scroll races or by paints
+   * that happened during scrollback / reclaim transitions. */
+  mouse_cursor_erase(nx, ny);
+  mouse_cursor_paint(nx, ny);
+  mouse_cur.drawn = true;
+  mouse_cur.x     = nx;
+  mouse_cur.y     = ny;
+}
+
+/* Called by flush_pending_scroll just before its kmemcpy: if a cursor is
+ * painted, restore the cells under it so the scroll moves clean cells. */
+static void mouse_cursor_invalidate_for_scroll(void)
+{
+  if(!mouse_cur.drawn)
+    return;
+  mouse_cursor_erase(mouse_cur.x, mouse_cur.y);
+  mouse_cur.drawn = false;
+}
+
 void fb_console_tick(void)
 {
   if(ctx.yielded || !ctx.cells)
@@ -1416,6 +1563,7 @@ void fb_console_tick(void)
   } else {
     ctx.blink_ticks--;
   }
+  mouse_cursor_render();
 }
 
 /* Caps are generous — they bound damage from a buggy shim, not enforce policy.
@@ -1571,11 +1719,14 @@ bool fb_console_app_cursor_keys(void)
 void fb_console_yield(void)
 {
   ctx.yielded = true;
+  mouse_cur.drawn =
+      false; /* user owns the pixels; don't XOR-erase a stale pos. */
 }
 
 void fb_console_reclaim(void)
 {
-  ctx.yielded = false;
+  ctx.yielded     = false;
+  mouse_cur.drawn = false;
   if(!ctx.cells)
     return;
   s_pending_scroll = 0;

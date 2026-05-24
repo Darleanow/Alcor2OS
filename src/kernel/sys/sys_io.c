@@ -231,7 +231,7 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
   if(fd <= 2 || vfs_fd_is_pipe(fd))
     return ioctl_tty_emulated(proc_current(), request, arg);
 
-  return (u64)-ENOTTY;
+  return (u64)vfs_ioctl((i64)fd, request, arg);
 }
 
 /**
