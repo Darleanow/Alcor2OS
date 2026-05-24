@@ -298,6 +298,7 @@ lint:
 	  --header-filter='^(src|include|user)/.*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
+	     -I$(SRC) \
 	     -Iuser/sdk/vega/include \
 	     -Iuser/core/vega/include \
 	     -Iuser/apps/shell/include \

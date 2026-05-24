@@ -71,7 +71,7 @@ static void handle_event(const virtio_input_event_t *e)
     else if(e->code == REL_Y)
       acc_dy += (i32)e->value;
     else if(e->code == REL_WHEEL)
-      acc_dwheel += (i16)(i32)e->value;
+      acc_dwheel = (i16)((i32)acc_dwheel + (i32)e->value);
     break;
   case EV_KEY: {
     u8 mask = 0;
