@@ -222,9 +222,16 @@ endif
 
 disk-resync: user disk-populate
 
+# GDK_BACKEND=x11 forces GTK to use XWayland's X11 instead of native Wayland.
+# Without this, QEMU's GTK pointer grab silently fails on Wayland compositors
+# (incl. WSLg) because Wayland only delivers motion events while the pointer
+# is over the window — incompatible with QEMU's X11-style grab model.
+# See qemu-project/qemu#2225 and the KDE XWayland-grabs discussion.
 run: iso disk-populate
-	$(QEMU) -cdrom $(BUILD)/$(ISO) \
+	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-device virtio-mouse-pci \
+		-display gtk \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM)
 
 debug: iso disk-populate
@@ -232,8 +239,10 @@ debug: iso disk-populate
 	@echo "  QEMU GDB server → :1234  (VM paused at first instruction)"
 	@echo "  Connect: gdb -ex 'target remote :1234' -ex 'symbol-file $(BUILD)/$(KERNEL)'"
 	@echo ""
-	$(QEMU) -cdrom $(BUILD)/$(ISO) \
+	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-device virtio-mouse-pci \
+		-display gtk \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
 		-s -S
 
