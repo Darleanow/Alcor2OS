@@ -36,16 +36,10 @@ static void *mmio_map(u64 phys, u32 length)
   return (void *)(vbase + page_off);
 }
 
-typedef struct
-{
-  u16           target;
-  virtio_dev_t *out;
-} probe_ctx_t;
-
 static bool match_virtio(const pci_device_t *d, void *ctx)
 {
-  probe_ctx_t *c = ctx;
-  return d->vendor_id == VIRTIO_VENDOR_ID && d->device_id == c->target;
+  const u16 *target = ctx;
+  return d->vendor_id == VIRTIO_VENDOR_ID && d->device_id == *target;
 }
 
 /** Read one virtio_pci_cap field at offset @p f within the cap at @p cap. */
@@ -63,8 +57,7 @@ bool virtio_probe(virtio_dev_t *vd, u16 device_id)
   if(!vd)
     return false;
 
-  probe_ctx_t ctx = {device_id, vd};
-  if(!pci_for_each(match_virtio, &ctx, &vd->pci))
+  if(!pci_for_each(match_virtio, &device_id, &vd->pci))
     return false;
 
   pci_enable_bus_master(&vd->pci);

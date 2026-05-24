@@ -25,10 +25,6 @@ void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons);
 /** @brief Tell the broker the framebuffer geometry (for cursor clamping). */
 void mouse_set_screen(u32 width, u32 height);
 
-/** @brief Pop one event packet. @return @c 0 on success, @c -EAGAIN if empty.
- */
-i64 mouse_read_nonblock(alcor2_mouse_event_t *out);
-
 /** @brief Block until an event is available or a signal is pending. */
 i64 mouse_read_block(alcor2_mouse_event_t *out);
 

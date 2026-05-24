@@ -166,9 +166,6 @@ bool virtio_vq_init(virtio_dev_t *vd, virtio_vq_t *vq, u16 index);
 /** @brief Allocate a descriptor; returns -1 on exhaustion. */
 i16 virtio_vq_alloc_desc(virtio_vq_t *vq);
 
-/** @brief Return @p head (and any chained descriptors) to the free list. */
-void virtio_vq_free_chain(virtio_vq_t *vq, u16 head);
-
 /** @brief Submit chain head @p head into the avail ring (no kick). */
 void virtio_vq_submit(virtio_vq_t *vq, u16 head);
 

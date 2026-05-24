@@ -316,7 +316,6 @@ check:
 	  --inconclusive \
 	  --quiet \
 	  -I$(INCLUDE) \
-	  --exclude=thirdparty \
 	  $(SRC) user
 
 qa: lint check

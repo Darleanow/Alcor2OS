@@ -4,7 +4,7 @@
  *
  * Owns the cursor position and the event ring served via /dev/mouse. Producer
  * is the IRQ-driven virtio-input driver; consumers are syscalls that drain
- * via @ref mouse_read_block / @ref mouse_read_nonblock. Single-waiter model:
+ * via @ref mouse_read_block. Single-waiter model:
  * one process can sleep on the ring; additional pollers get -EAGAIN.
  */
 
@@ -177,19 +177,6 @@ void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons)
     g.waiter  = NULL;
     proc_wake(w);
   }
-}
-
-i64 mouse_read_nonblock(alcor2_mouse_event_t *out)
-{
-  cpu_disable_interrupts();
-  if(ring_empty()) {
-    cpu_enable_interrupts();
-    return -EAGAIN;
-  }
-  *out   = g.ring[g.tail & (RING_CAP - 1)];
-  g.tail = (u16)(g.tail + 1);
-  cpu_enable_interrupts();
-  return 0;
 }
 
 i64 mouse_read_block(alcor2_mouse_event_t *out)

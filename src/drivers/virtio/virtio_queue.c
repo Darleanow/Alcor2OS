@@ -83,21 +83,6 @@ i16 virtio_vq_alloc_desc(virtio_vq_t *vq)
   return (i16)d;
 }
 
-void virtio_vq_free_chain(virtio_vq_t *vq, u16 head)
-{
-  u16 cur = head;
-  while(1) {
-    u16 next           = vq->desc[cur].next;
-    u16 has_next       = vq->desc[cur].flags & VIRTQ_DESC_F_NEXT;
-    vq->desc[cur].next = vq->free_head;
-    vq->free_head      = cur;
-    vq->num_free++;
-    if(!has_next)
-      break;
-    cur = next;
-  }
-}
-
 void virtio_vq_submit(virtio_vq_t *vq, u16 head)
 {
   u16 slot              = vq->avail->idx % vq->size;
