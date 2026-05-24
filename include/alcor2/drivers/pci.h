@@ -1,9 +1,6 @@
 /**
  * @file pci.h
- * @brief PCI bus driver.
- *
- * Provides PCI configuration space access and device enumeration.
- * Used primarily to locate the IDE controller for DMA support.
+ * @brief PCI bus driver: config-space access, enumeration, capability list.
  */
 
 #ifndef ALCOR2_PCI_H
@@ -30,20 +27,32 @@
 #define PCI_BAR5 0x24
 
 /* Configuration space register offsets */
-#define PCI_VENDOR_ID   0x00
-#define PCI_DEVICE_ID   0x02
-#define PCI_COMMAND     0x04
-#define PCI_STATUS      0x06
-#define PCI_CLASS       0x0B
-#define PCI_SUBCLASS    0x0A
-#define PCI_PROG_IF     0x09
-#define PCI_HEADER_TYPE 0x0E
-#define PCI_INTERRUPT   0x3C
+#define PCI_VENDOR_ID     0x00
+#define PCI_DEVICE_ID     0x02
+#define PCI_COMMAND       0x04
+#define PCI_STATUS        0x06
+#define PCI_CLASS         0x0B
+#define PCI_SUBCLASS      0x0A
+#define PCI_PROG_IF       0x09
+#define PCI_HEADER_TYPE   0x0E
+#define PCI_CAP_PTR       0x34
+#define PCI_INTERRUPT     0x3C
+#define PCI_INTERRUPT_PIN 0x3D
+#define PCI_SUBSYSTEM_VID 0x2C
+#define PCI_SUBSYSTEM_ID  0x2E
+
+/** Status[4] = capabilities list present. */
+#define PCI_STATUS_CAP_LIST 0x10
 
 /* Command register bits */
 #define PCI_CMD_IO     0x0001
 #define PCI_CMD_MEMORY 0x0002
 #define PCI_CMD_MASTER 0x0004
+
+/** Standard PCI capability IDs (subset). */
+#define PCI_CAP_ID_MSI    0x05
+#define PCI_CAP_ID_VENDOR 0x09
+#define PCI_CAP_ID_MSIX   0x11
 
 /**
  * @brief PCI device descriptor.
@@ -120,6 +129,53 @@ void pci_write32(u8 bus, u8 slot, u8 func, u8 offset, u32 val);
  * @return true if found.
  */
 bool pci_find_device(u8 class_code, u8 subclass, pci_device_t *dev);
+
+/**
+ * @brief Iterate all PCI devices and invoke @p cb until it returns true.
+ * @param cb  Callback; return @c true to stop and report the device via @p out.
+ * @param ctx Opaque callback context.
+ * @param out Optional output of the matched device.
+ * @return @c true if a callback returned true (stopping iteration).
+ */
+bool pci_for_each(
+    bool (*cb)(const pci_device_t *, void *), void *ctx, pci_device_t *out
+);
+
+/**
+ * @brief Resolve the physical base of a BAR, handling 64-bit pairs.
+ *
+ * For 64-bit memory BARs, this consumes BAR @p idx and BAR @p idx+1.
+ * For I/O BARs, returns the I/O port base. Returns 0 if @p idx is invalid
+ * or the BAR is unimplemented.
+ */
+u64 pci_bar_base64(const pci_device_t *dev, int idx);
+
+/** @brief @c true if BAR @p idx is a memory-mapped region. */
+bool pci_bar_is_mmio(const pci_device_t *dev, int idx);
+
+/** @brief @c true if BAR @p idx (with bar[idx+1]) is a 64-bit memory BAR. */
+bool pci_bar_is_64(const pci_device_t *dev, int idx);
+
+/**
+ * @brief Walk the capability list looking for @p cap_id.
+ * @param dev    Device.
+ * @param cap_id Capability ID (e.g. @ref PCI_CAP_ID_VENDOR).
+ * @param out    Filled with the byte offset of the matching cap header.
+ * @return @c true if found.
+ */
+bool pci_find_capability(const pci_device_t *dev, u8 cap_id, u8 *out);
+
+/**
+ * @brief Continue walking the capability list from @p current.
+ * @param dev     Device.
+ * @param current Offset returned by a prior @ref pci_find_capability call.
+ * @param cap_id  Capability ID to match.
+ * @param out     Filled with the next matching cap offset.
+ * @return @c true if another match was found after @p current.
+ */
+bool pci_find_capability_next(
+    const pci_device_t *dev, u8 current, u8 cap_id, u8 *out
+);
 
 /**
  * @brief Enable bus mastering for a PCI device.
