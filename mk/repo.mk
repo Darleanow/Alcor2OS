@@ -222,11 +222,7 @@ endif
 
 disk-resync: user disk-populate
 
-# GDK_BACKEND=x11 forces GTK to use XWayland's X11 instead of native Wayland.
-# Without this, QEMU's GTK pointer grab silently fails on Wayland compositors
-# (incl. WSLg) because Wayland only delivers motion events while the pointer
-# is over the window — incompatible with QEMU's X11-style grab model.
-# See qemu-project/qemu#2225 and the KDE XWayland-grabs discussion.
+# GDK_BACKEND=x11 forces GTK to XWayland so pointer grab actually works.
 run: iso disk-populate
 	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \

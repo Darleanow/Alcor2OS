@@ -31,9 +31,7 @@
 #define BTN_RIGHT  0x111
 #define BTN_MIDDLE 0x112
 
-/* Default QEMU virtio-tablet ABS_X / ABS_Y range. The device exposes the
- * real maxima via VIRTIO_INPUT_CFG_ABS_INFO, but QEMU consistently uses
- * 0..32767 so we skip the config-space read for now. */
+/* Hardcoded for QEMU. TODO: query VIRTIO_INPUT_CFG_ABS_INFO. */
 #define ABS_AXIS_MAX 32767
 
 typedef struct PACKED

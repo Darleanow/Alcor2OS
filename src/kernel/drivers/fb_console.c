@@ -1465,12 +1465,8 @@ static void mouse_cursor_paint(i32 cx, i32 cy)
   }
 }
 
-/* Restore the screen under the previous cursor position. Two passes: first
- * fill the bounding box with the default background colour (covers any pixels
- * that fall in the framebuffer margin area where no cell exists), then re-blit
- * every cell the box touched (restores text). Without the bg-fill pass,
- * cursor pixels landing in the margin would stick forever — blit_cell only
- * paints inside (margin_x, margin_y) + cell grid. */
+/* bg-fill first so margin pixels (outside the cell grid) get cleaned, then
+ * re-blit cells to restore glyphs. */
 static void mouse_cursor_erase(i32 cx, i32 cy)
 {
   int x0 = cx - 1;

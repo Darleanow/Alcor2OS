@@ -228,9 +228,7 @@ void mouse_set_relative(bool enabled)
   if(enabled) {
     g.cursor_x = (i32)(g.screen_w / 2);
     g.cursor_y = (i32)(g.screen_h / 2);
-    /* Discard any pending events: a queued click from before the mode toggle
-     * (e.g. the "click to capture" that the user did to enter the QEMU window)
-     * would otherwise be the first thing the relative-mode reader sees. */
+    /* Drop pending events so a queued click doesn't fire on the first read. */
     g.head = g.tail;
   }
   cpu_enable_interrupts();
