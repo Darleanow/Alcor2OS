@@ -1,11 +1,11 @@
 /**
  * @file mouse.c
- * @brief Read events from /dev/mouse and optionally toggle relative mode.
+ * @brief Read events from /dev/mouse, optionally pinning the cursor.
  *
  * Usage:
- *   mouse           — stream events to stdout
- *   mouse rel       — enable relative mode, then stream
- *   mouse norel     — disable relative mode and exit
+ *   mouse       — stream events to stdout
+ *   mouse rel   — pin cursor to centre, stream events; left-click restores
+ *                 normal mode and exits
  */
 
 #include <grendizer.h>
@@ -32,7 +32,7 @@ static int set_relative(int fd, uint32_t v)
 int main(int argc, char *argv[])
 {
   gr_opt  opts[] = {GR_END};
-  gr_spec spec = {.program = "mouse", .usage = "[rel|norel]", .options = opts};
+  gr_spec spec   = {.program = "mouse", .usage = "[rel]", .options = opts};
   gr_rest rest;
   int     rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
   if(rc != GR_OK)
@@ -42,14 +42,6 @@ int main(int argc, char *argv[])
   if(fd < 0) {
     fprintf(stderr, "mouse: open /dev/mouse: %s\n", strerror(errno));
     return 1;
-  }
-
-  if(rest.argc >= 1 && strcmp(rest.argv[0], "norel") == 0) {
-    int rv = set_relative(fd, 0);
-    if(rv == 0)
-      printf("relative mode OFF\n");
-    close(fd);
-    return rv;
   }
 
   int was_rel = 0;
