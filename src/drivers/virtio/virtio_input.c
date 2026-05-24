@@ -16,23 +16,17 @@
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>
 
-/* evdev event codes (linux/input-event-codes.h, mouse/tablet subset). */
+/* evdev event codes (linux/input-event-codes.h, mouse subset). */
 #define EV_SYN     0x00
 #define EV_KEY     0x01
 #define EV_REL     0x02
-#define EV_ABS     0x03
 #define SYN_REPORT 0x00
 #define REL_X      0x00
 #define REL_Y      0x01
 #define REL_WHEEL  0x08
-#define ABS_X      0x00
-#define ABS_Y      0x01
 #define BTN_LEFT   0x110
 #define BTN_RIGHT  0x111
 #define BTN_MIDDLE 0x112
-
-/* QEMU virtio-tablet always reports 0..32767. */
-#define ABS_AXIS_MAX 32767
 
 typedef struct PACKED
 {
@@ -47,7 +41,7 @@ static virtio_dev_t         vd;
 static virtio_vq_t          evq;
 static virtio_vq_t          statusq;
 static virtio_input_event_t event_buf[EVENT_BUFFERS];
-static u16                  desc_to_slot[256]; /* indexed by descriptor id */
+static u16                  desc_to_slot[256];
 static u8                   button_state;
 
 /* Accumulator across one report. Flushed on EV_SYN. */
@@ -55,19 +49,7 @@ static i32 acc_dx;
 static i32 acc_dy;
 static i16 acc_dwheel;
 
-/* Absolute-coord tracking. On a tablet, every motion arrives as an absolute
- * (ABS_X, ABS_Y) pair; we synthesise relative deltas so the rest of the
- * pipeline (acc_dx/acc_dy → mouse_post_event) stays unchanged. */
-static i32  abs_x_pending;
-static i32  abs_y_pending;
-static i32  abs_x_last;
-static i32  abs_y_last;
-static bool abs_x_in_frame;
-static bool abs_y_in_frame;
-static bool abs_x_init;
-static bool abs_y_init;
-
-static u64  event_buf_phys[EVENT_BUFFERS];
+static u64 event_buf_phys[EVENT_BUFFERS];
 
 static void refill_descriptor(u16 desc_id)
 {
@@ -78,17 +60,6 @@ static void refill_descriptor(u16 desc_id)
   d->flags           = VIRTQ_DESC_F_WRITE;
   d->next            = 0;
   virtio_vq_submit(&evq, desc_id);
-}
-
-static i32 scale_abs(i32 value, u32 screen_extent)
-{
-  if(value < 0)
-    value = 0;
-  if(value > ABS_AXIS_MAX)
-    value = ABS_AXIS_MAX;
-  if(screen_extent == 0)
-    return 0;
-  return (i32)(((u64)(u32)value * (screen_extent - 1u)) / (u32)ABS_AXIS_MAX);
 }
 
 static void handle_event(const virtio_input_event_t *e)
@@ -102,18 +73,6 @@ static void handle_event(const virtio_input_event_t *e)
     else if(e->code == REL_WHEEL)
       acc_dwheel += (i16)(i32)e->value;
     break;
-  case EV_ABS: {
-    u32 sw, sh;
-    mouse_get_screen(&sw, &sh);
-    if(e->code == ABS_X) {
-      abs_x_pending  = scale_abs((i32)e->value, sw);
-      abs_x_in_frame = true;
-    } else if(e->code == ABS_Y) {
-      abs_y_pending  = scale_abs((i32)e->value, sh);
-      abs_y_in_frame = true;
-    }
-    break;
-  }
   case EV_KEY: {
     u8 mask = 0;
     if(e->code == BTN_LEFT)
@@ -132,22 +91,6 @@ static void handle_event(const virtio_input_event_t *e)
   }
   case EV_SYN:
     if(e->code == SYN_REPORT) {
-      /* Convert any absolute updates this frame into deltas so the rest of
-       * the pipeline (mouse_post_event → cursor_x += dx) stays unchanged. */
-      if(abs_x_in_frame) {
-        if(abs_x_init)
-          acc_dx += abs_x_pending - abs_x_last;
-        abs_x_last     = abs_x_pending;
-        abs_x_init     = true;
-        abs_x_in_frame = false;
-      }
-      if(abs_y_in_frame) {
-        if(abs_y_init)
-          acc_dy += abs_y_pending - abs_y_last;
-        abs_y_last     = abs_y_pending;
-        abs_y_init     = true;
-        abs_y_in_frame = false;
-      }
       mouse_post_event(acc_dx, acc_dy, acc_dwheel, button_state);
       acc_dx     = 0;
       acc_dy     = 0;

@@ -246,11 +246,3 @@ void mouse_get_cursor(i32 *out_x, i32 *out_y)
   if(out_y)
     *out_y = g.cursor_y;
 }
-
-void mouse_get_screen(u32 *out_w, u32 *out_h)
-{
-  if(out_w)
-    *out_w = g.screen_w;
-  if(out_h)
-    *out_h = g.screen_h;
-}

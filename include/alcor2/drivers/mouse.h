@@ -41,7 +41,4 @@ bool mouse_is_relative(void);
 /** @brief Rendered cursor position. In relative mode, returns the centre. */
 void mouse_get_cursor(i32 *out_x, i32 *out_y);
 
-/** @brief Current framebuffer geometry (used by absolute-pointing drivers). */
-void mouse_get_screen(u32 *out_w, u32 *out_h);
-
 #endif
