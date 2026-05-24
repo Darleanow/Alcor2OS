@@ -172,6 +172,17 @@ typedef struct
    * @return Target length on success, negative @c -errno on failure.
    */
   i64 (*readlink)(void *fs_data, const char *path, char *buf, u64 cap);
+
+  /**
+   * @brief Device control on an open handle.
+   *
+   * Filesystem drivers without device semantics may leave this @c NULL — the
+   * VFS reports @c -ENOTTY in that case.  Used by ramfs to surface character-
+   * device callbacks (e.g. @c /dev/mouse).
+   *
+   * @return 0 (or driver-defined positive) on success, negative @c -errno.
+   */
+  i64 (*ioctl)(fs_handle_t fh, u64 request, u64 arg);
 } fs_ops_t;
 
 /**
@@ -436,6 +447,13 @@ i64 vfs_readlink(const char *path, char *buf, u64 cap);
  * @return 0 on success, or negative @c -errno.
  */
 i64 vfs_rename(const char *oldpath, const char *newpath);
+
+/**
+ * @brief Dispatch an ioctl to the filesystem behind @p fd.
+ * @return Driver's return value, @c -ENOTTY if the driver lacks an @c ioctl
+ *         hook, or @c -EBADF if @p fd is not open.
+ */
+i64 vfs_ioctl(i64 fd, u64 request, u64 arg);
 
 /**
  * @brief Return the open flags stored in the OFT for @p fd.

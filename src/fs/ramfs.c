@@ -6,6 +6,7 @@
  */
 
 #include <alcor2/errno.h>
+#include <alcor2/fs/ramfs.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
@@ -13,14 +14,16 @@
 /** @brief Internal ramfs node. */
 typedef struct ram_node
 {
-  char             name[VFS_NAME_MAX];
-  u8               type;
-  u64              size;
-  u8              *data;
-  u64              capacity;
-  struct ram_node *parent;
-  struct ram_node *children;
-  struct ram_node *next;
+  char                       name[VFS_NAME_MAX];
+  u8                         type;
+  u64                        size;
+  u8                        *data;
+  u64                        capacity;
+  struct ram_node           *parent;
+  struct ram_node           *children;
+  struct ram_node           *next;
+  const ramfs_chardev_ops_t *cops; /* non-NULL → character device */
+  void                      *cctx;
 } ram_node_t;
 
 static ram_node_t *root = NULL;
@@ -144,7 +147,12 @@ static void ram_close(fs_handle_t fh)
 
 static i64 ram_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
 {
-  const ram_node_t *node = (const ram_node_t *)fh;
+  ram_node_t *node = (ram_node_t *)fh;
+  if(node->cops) {
+    if(!node->cops->read)
+      return -EINVAL;
+    return node->cops->read(node->cctx, buf, count, offset);
+  }
   if(node->type != VFS_FILE)
     return -EISDIR;
   if(offset >= node->size)
@@ -160,6 +168,11 @@ static i64 ram_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
 static i64 ram_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
 {
   ram_node_t *node = (ram_node_t *)fh;
+  if(node->cops) {
+    if(!node->cops->write)
+      return -EINVAL;
+    return node->cops->write(node->cctx, buf, count, offset);
+  }
   if(node->type != VFS_FILE)
     return -EISDIR;
 
@@ -265,12 +278,22 @@ static i64 ram_readdir(fs_handle_t fh, u64 index, char *name, vfs_stat_t *st)
   return 1;
 }
 
+static i64 ram_ioctl(fs_handle_t fh, u64 request, u64 arg)
+{
+  ram_node_t *node = (ram_node_t *)fh;
+  if(node->cops && node->cops->ioctl)
+    return node->cops->ioctl(node->cctx, request, arg);
+  return -ENOTTY;
+}
+
 static i64 ram_unlink(void *fs_data, const char *path)
 {
   (void)fs_data;
   ram_node_t *node = ram__resolve(path);
   if(!node || node->type == VFS_DIRECTORY)
     return -EISDIR;
+  if(node->cops)
+    return -EBUSY;
 
   /* Remove from parent's list */
   ram_node_t *parent = node->parent;
@@ -351,6 +374,7 @@ static const fs_ops_t ram_ops = {
     .fstat    = ram_fstat,
     .readdir  = ram_readdir,
     .truncate = ram_truncate,
+    .ioctl    = ram_ioctl,
 };
 
 static void *ram_mount_cb(const char *source, u32 flags)
@@ -379,4 +403,41 @@ void ramfs_init(void)
    * needing a "did we land on root?" special case in the walker. */
   root->parent = root;
   vfs_register_fs(&ram_fstype);
+}
+
+i64 ramfs_chardev_register(
+    const char *path, const ramfs_chardev_ops_t *ops, void *ctx
+)
+{
+  if(!root || !path || path[0] != '/' || !ops)
+    return -EINVAL;
+  if(ram__resolve(path))
+    return -EEXIST;
+
+  char        parent_path[VFS_PATH_MAX];
+  char        name[VFS_NAME_MAX];
+  const char *last_slash = kstrrchr(path, '/');
+  if(!last_slash)
+    return -EINVAL;
+
+  if(last_slash == path) {
+    kstrncpy(parent_path, "/", 2);
+  } else {
+    u64 len = (u64)(last_slash - path);
+    kmemcpy(parent_path, path, len);
+    parent_path[len] = '\0';
+  }
+  kstrncpy(name, last_slash + 1, VFS_NAME_MAX);
+
+  ram_node_t *parent = ram__resolve(parent_path);
+  if(!parent || parent->type != VFS_DIRECTORY)
+    return -ENOENT;
+
+  ram_node_t *node = ram__create_node(name, VFS_FILE);
+  if(!node)
+    return -ENOMEM;
+  node->cops = ops;
+  node->cctx = ctx;
+  ram__add_child(parent, node);
+  return 0;
 }
