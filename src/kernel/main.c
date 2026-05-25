@@ -156,9 +156,9 @@ typedef struct
 static void init_interrupts(void)
 {
   pic_init();
-  pit_init(100);
+  pit_init(PIT_TICK_HZ);
   pit_enable_sched();
-  console_print("PIC/PIT initialized (100Hz).\n");
+  console_print("PIC/PIT initialized.\n");
 
   keyboard_init();
   console_print("Keyboard initialized.\n");
@@ -242,12 +242,13 @@ static const boot_phase_t boot_sequence[] = {
     {"GDT Structure",        gdt_init           },
     {"IDT Structure",        idt_init           },
     {"SSE/FPU Support",      cpu_enable_sse     },
+    {"PAT (WC memory type)", cpu_init_pat       },
     {"Syscall Interface",    syscall_init       },
     {"PIC/PIT Timers",       pic_init           },
     {"Hardware Interrupts",  init_interrupts    },
     {"VFS Orchestrator",     vfs_init           },
     {"Storage & VFS",        init_storage       },
-    {"Mouse / virtio-input", init_input         },
+    {"PS/2 Mouse",           init_input         },
     {"Process Table",        proc_init          },
     {NULL,                   init_idt_proc_hooks},
     {"Global Interrupts",    init_enable_irqs   },
