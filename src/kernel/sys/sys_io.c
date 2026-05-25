@@ -9,6 +9,7 @@
  */
 
 #include <alcor2/arch/cpu.h>
+#include <alcor2/arch/pit.h>
 #include <alcor2/drivers/console.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/keyboard.h>
@@ -206,6 +207,27 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
     if(lid >= KBD_LAYOUT_COUNT)
       return (u64)-EINVAL;
     kbd_set_layout((kbd_layout_t)lid);
+    return 0;
+  }
+
+  if(fd == 0 && request == ALCOR2_IOC_KBD_RELEASE_EVENTS) {
+    u32 on;
+    if(!user_rw_ok(arg, sizeof(on)))
+      return (u64)-EFAULT;
+    kmemcpy(&on, (void *)arg, sizeof(on));
+    kbd_set_release_events(on != 0);
+    return 0;
+  }
+
+  if(fd == 0 && request == ALCOR2_IOC_TIMER_FAST) {
+    u32 on;
+    if(!user_rw_ok(arg, sizeof(on)))
+      return (u64)-EFAULT;
+    kmemcpy(&on, (void *)arg, sizeof(on));
+    if(on)
+      pit_request_fast();
+    else
+      pit_release_fast();
     return 0;
   }
 

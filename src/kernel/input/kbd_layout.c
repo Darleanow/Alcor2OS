@@ -281,6 +281,10 @@ static bool us_caps_scan(u8 key)
 
 static kbd_layout_t layout = KBD_LAYOUT_US;
 
+/* When set, a printable key-up emits a \x00<char> sentinel so apps can track
+ * releases precisely (typematic only repeats the last key, breaking Z+D). */
+static bool release_events = false;
+
 typedef struct
 {
   bool        pend_e0;
@@ -305,6 +309,16 @@ void                kbd_set_layout(kbd_layout_t lay)
 kbd_layout_t kbd_get_layout(void)
 {
   return layout;
+}
+
+void kbd_set_release_events(bool enabled)
+{
+  release_events = enabled;
+}
+
+bool kbd_get_release_events(void)
+{
+  return release_events;
 }
 
 /* dry=true: report whether the scancode would emit without touching state
@@ -436,8 +450,20 @@ static bool
     break;
   }
 
-  if(released)
+  if(released) {
+    /* Key-up sentinel: \x00 then the unshifted char, so the app matches the
+     * same code it saw on key-down. */
+    if(release_events) {
+      unsigned char base = pick_pl(layout)[key];
+      if(base != 0) {
+        if(dry)
+          return true;
+        out_pend_push(0x00u);
+        out_pend_push(base);
+      }
+    }
     return false;
+  }
 
   /* Function keys F1..F12. F1..F4 use SS3 (xterm convention); F5..F12 use
    * the numeric tilde form. All emitted before falling through to the
