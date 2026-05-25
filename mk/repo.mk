@@ -227,8 +227,8 @@ endif
 
 disk-resync: user disk-populate
 
-# The mouse uses the emulated i8042 PS/2 controller, which QEMU always provides
-# — no -device needed. Grab the pointer with Ctrl+Alt+G (or fullscreen).
+# Mouse is the emulated i8042 PS/2 controller (always present). Grab with
+# Ctrl+Alt+G or fullscreen.
 
 run: iso disk-populate
 	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \

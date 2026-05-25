@@ -65,8 +65,7 @@ LDFLAGS := -nostdlib -static -pie --no-dynamic-linker \
 
 ASFLAGS := -f elf64
 
-# Lint: userland .c handled here (KERNEL_SRCS_* live in mk/kernel.mk).
-# doomgeneric is a third-party submodule and is excluded from lint/format.
+# Userland .c for lint (excludes .cache and the doomgeneric submodule).
 USER_SRCS_C := $(shell find user \( -path '*/.cache/*' -o -path '*/doomgeneric/*' \) -prune -o -name '*.c' -print 2>/dev/null | LC_ALL=C sort)
 
 # QEMU — hardware acceleration is optional (KVM on Linux, HVF on Intel Mac).
@@ -76,12 +75,12 @@ QEMU       ?= qemu-system-x86_64
 QEMU_RAM   ?= 2048M
 USE_KVM    ?=
 
-# Default display (Linux/GTK): grab-on-hover confines the pointer so relative
-# mouse deltas stay clean at the screen edge; zoom-to-fit=off shows the guest
-# 1:1 instead of bilinear-stretching it (which blurs text in fullscreen).
-# Override with QEMU_DISPLAY= on other hosts or to pick another UI.
+# GTK display: grab-on-hover confines the pointer, zoom-to-fit=off keeps 1:1.
+# XWayland (GDK_BACKEND=x11, no Wayland socket) confines the grab; native
+# Wayland does not.
 ifeq ($(UNAME),Linux)
   QEMU_DISPLAY ?= gtk,grab-on-hover=on,zoom-to-fit=off
+  QEMU_ENV     ?= env -u WAYLAND_DISPLAY GDK_BACKEND=x11
 endif
 
 QEMU_KVM := -cpu max
