@@ -37,7 +37,7 @@ u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   kzero(u, sizeof(*u));
   kstrncpy(u->sysname, "Alcor2", 65);
   kstrncpy(u->nodename, "alcor2", 65);
-  kstrncpy(u->release, "0.1.0", 65);
+  kstrncpy(u->release, ALCOR2_VERSION, 65);
   kstrncpy(u->version, "Alcor2 OS", 65);
   kstrncpy(u->machine, "x86_64", 65);
   return 0;
