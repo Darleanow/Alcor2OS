@@ -12,12 +12,7 @@
 
 #define MSR_PAT 0x00000277
 
-/**
- * @brief Halt the CPU indefinitely.
- *
- * Disables interrupts and enters an infinite HLT loop. Used for
- * unrecoverable errors or system shutdown. Never returns.
- */
+/** @brief Write a 64-bit value to model-specific register @p msr. */
 static void wrmsr_cpu(u32 msr, u64 value)
 {
   __asm__ volatile(
@@ -26,34 +21,23 @@ static void wrmsr_cpu(u32 msr, u64 value)
 }
 
 /**
- * @brief Initialize the Page Attribute Table (PAT) MSR.
+ * @brief Program IA32_PAT so PAT index 1 (PWT=1, PCD=0) selects Write-Combining.
  *
- * Sets up the 8 PAT entries so that PWT=1,PCD=0 (index 1) selects
- * Write-Combining — used for framebuffer mappings.  Other entries keep the
- * x86 architectural defaults.
- *
- * PAT layout (one byte per entry, IA32_PAT MSR 0x277):
- *   [0] WB  PWT=0 PCD=0 PAT=0  (default read/write)
- *   [1] WC  PWT=1 PCD=0 PAT=0  ← override: WC for framebuffer
- *   [2] UC- PWT=0 PCD=1 PAT=0
- *   [3] UC  PWT=1 PCD=1 PAT=0
- *   [4] WB  PWT=0 PCD=0 PAT=1
- *   [5] WP  PWT=1 PCD=0 PAT=1
- *   [6] UC- PWT=0 PCD=1 PAT=1
- *   [7] UC  PWT=1 PCD=1 PAT=1
+ * Only entry 1 deviates from the x86 reset defaults; the framebuffer mapping
+ * uses it (via VMM_WC) for fast, coalesced stores. Entries are encoded one
+ * memory type per byte: WB=6, WC=1, WP=5, UC-=7, UC=0.
  */
 void cpu_init_pat(void)
 {
-  /* Memory type encodings: WB=6, WC=1, UC_MINUS=7, UC=0, WP=5 */
   u64 pat = 0;
-  pat |= (u64)6 << (0 * 8); /* PA0: WB  */
-  pat |= (u64)1 << (1 * 8); /* PA1: WC  ← PWT=1 selects this */
-  pat |= (u64)7 << (2 * 8); /* PA2: UC- */
-  pat |= (u64)0 << (3 * 8); /* PA3: UC  */
-  pat |= (u64)6 << (4 * 8); /* PA4: WB  */
-  pat |= (u64)5 << (5 * 8); /* PA5: WP  */
-  pat |= (u64)7 << (6 * 8); /* PA6: UC- */
-  pat |= (u64)0 << (7 * 8); /* PA7: UC  */
+  pat |= (u64)6 << (0 * 8); /* WB  */
+  pat |= (u64)1 << (1 * 8); /* WC  */
+  pat |= (u64)7 << (2 * 8); /* UC- */
+  pat |= (u64)0 << (3 * 8); /* UC  */
+  pat |= (u64)6 << (4 * 8); /* WB  */
+  pat |= (u64)5 << (5 * 8); /* WP  */
+  pat |= (u64)7 << (6 * 8); /* UC- */
+  pat |= (u64)0 << (7 * 8); /* UC  */
   wrmsr_cpu(MSR_PAT, pat);
 }
 
