@@ -10,31 +10,71 @@
 #include <alcor2/mouse.h>
 #include <alcor2/types.h>
 
-/** @brief Initialise the broker (ring buffer + waiter slot). */
+/** @brief Initialise the broker: clear the ring, cursor, and waiter slot. */
 void mouse_init(void);
 
 /**
- * @brief Post one accumulated EV_SYN report.
+ * @brief Initialise the PS/2 mouse on the i8042 second port.
  *
- * Called from the virtio-input IRQ handler once per @c EV_SYN. Updates the
- * cursor position (clamped in free mode, pinned at centre in relative mode),
- * pushes the packet into the ring, and wakes any blocked reader.
+ * Enables the AUX port and IRQ 12 and starts data reporting; decoded packets
+ * reach the broker via ::mouse_post_event.
+ * @return @c true if a mouse acknowledged, @c false otherwise.
+ */
+bool mouse_ps2_init(void);
+
+/**
+ * @brief Post one movement/button report into the broker.
+ *
+ * Called from the mouse IRQ handler (interrupts already off). Updates the
+ * cursor (clamped to the screen in free mode, pinned to centre in relative
+ * mode), enqueues the event, and wakes any blocked reader.
+ * @param dx      X delta (right positive).
+ * @param dy      Y delta (down positive).
+ * @param dwheel  Wheel delta (up positive).
+ * @param buttons Button bitmask (see ALCOR2_MOUSE_BTN_*).
  */
 void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons);
 
-/** @brief Tell the broker the framebuffer geometry (for cursor clamping). */
+/**
+ * @brief Set the screen geometry used to clamp the cursor.
+ * @param width  Screen width in pixels.
+ * @param height Screen height in pixels.
+ */
 void mouse_set_screen(u32 width, u32 height);
 
-/** @brief Block until an event is available or a signal is pending. */
+/**
+ * @brief Block until one event is available, then dequeue it.
+ * @param out Destination event.
+ * @return 0 on success, or a negative errno.
+ */
 i64 mouse_read_block(alcor2_mouse_event_t *out);
 
-/** @brief Toggle relative mode (cursor pinned to centre). */
+/**
+ * @brief Enable or disable relative mode (cursor pinned to centre, raw deltas
+ *        passed through). Drains the ring on every mode change.
+ * @param enabled Non-zero for relative mode.
+ */
 void mouse_set_relative(bool enabled);
 
-/** @brief Current mode. */
+/**
+ * @brief Query the current mode.
+ * @return @c true if relative mode is active.
+ */
 bool mouse_is_relative(void);
 
-/** @brief Rendered cursor position. In relative mode, returns the centre. */
+/**
+ * @brief Get the rendered cursor position (the centre in relative mode).
+ * @param out_x Receives the X coordinate (may be NULL).
+ * @param out_y Receives the Y coordinate (may be NULL).
+ */
 void mouse_get_cursor(i32 *out_x, i32 *out_y);
+
+/**
+ * @brief Whether the pointer has moved at least once since boot.
+ *
+ * Lets the console keep the cursor hidden until first use.
+ * @return @c true once any non-zero motion has been seen.
+ */
+bool mouse_has_moved(void);
 
 #endif
