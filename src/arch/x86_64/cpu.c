@@ -10,7 +10,7 @@
 #define MSR_FS_BASE 0xC0000100
 #define MSR_GS_BASE 0xC0000101
 
-#define MSR_PAT 0x00000277
+#define MSR_PAT     0x00000277
 
 /** @brief Write a 64-bit value to model-specific register @p msr. */
 static void wrmsr_cpu(u32 msr, u64 value)
@@ -21,9 +21,10 @@ static void wrmsr_cpu(u32 msr, u64 value)
 }
 
 /**
- * @brief Program IA32_PAT so PAT index 1 (PWT=1, PCD=0) selects Write-Combining.
+ * @brief Program IA32_PAT so entry 4 (PAT=1, PCD=0, PWT=0) selects
+ * Write-Combining.
  *
- * Only entry 1 deviates from the x86 reset defaults; the framebuffer mapping
+ * Only entry 4 deviates from the x86 reset defaults; the framebuffer mapping
  * uses it (via VMM_WC) for fast, coalesced stores. Entries are encoded one
  * memory type per byte: WB=6, WC=1, WP=5, UC-=7, UC=0.
  */
