@@ -31,7 +31,11 @@ void        syscall_init(void)
   efer |= EFER_SCE;
   wrmsr(MSR_EFER, efer);
 
-  u64 star = ((u64)0x28 << 32) | ((u64)0x30 << 48);
+  /* STAR[47:32]=0x28: SYSCALL → kernel CS 0x28, SS 0x30.
+   * STAR[63:48]=0x33: SYSRET → user CS base+16, SS base+8. The base carries
+   * RPL 3 because SYSRET does not OR it into the selector — a base of 0x30
+   * would yield SS 0x38 (RPL 0), faulting the next iretq that revalidates it. */
+  u64 star = ((u64)0x28 << 32) | ((u64)0x33 << 48);
   wrmsr(MSR_STAR, star);
 
   wrmsr(MSR_LSTAR, (u64)syscall_entry);
