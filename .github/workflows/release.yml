@@ -1,9 +1,7 @@
-# release.yml — Full build triggered on:
-#   • push to main   → rolling "nightly" GitHub Release (tag force-pushed)
-#   • push of v* tag → versioned GitHub Release
-#
-# Produces: bootable ISO + populated 1 GiB ext2 disk image.
-# Both ccache and thirdparty deps are cached for fast subsequent runs.
+# release.yml: full build (ISO + 1 GiB ext2 disk image).
+#   push to main    rolling "nightly" release (tag force-pushed)
+#   push of v* tag  versioned release
+# ccache and thirdparty deps are cached across runs.
 
 name: Release
 
@@ -28,9 +26,9 @@ env:
   LLVM_VER:       "18"
 
 jobs:
-  # ── Full build: ISO + disk image ─────────────────────────────────────────
+  # Full build (ISO + disk image)
   build-full:
-    name: Full build — ISO + disk image
+    name: Full build (ISO + disk image)
     runs-on: ubuntu-24.04
 
     outputs:
@@ -45,7 +43,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      # ── System packages ──────────────────────────────────────────────────
+      # System packages
       - name: Install build dependencies
         run: |
           sudo apt-get update -qq
@@ -69,7 +67,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-18   100
           sudo update-alternatives --install /usr/bin/ld.lld  ld.lld  /usr/bin/ld.lld-18  100
 
-      # ── ccache ───────────────────────────────────────────────────────────
+      # ccache
       - name: Restore ccache
         id: ccache-restore
         uses: actions/cache/restore@v5
@@ -85,7 +83,7 @@ jobs:
           ccache --zero-stats
           echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
-      # ── Third-party caches ───────────────────────────────────────────────
+      # Third-party caches
       - name: Restore Limine cache
         uses: actions/cache@v5
         with:
@@ -113,7 +111,7 @@ jobs:
             thirdparty/ncurses-install
           key: thirdparty-heavy-${{ env.LLVM_VER }}-${{ env.MUSL_VER }}-${{ hashFiles('mk/thirdparty.mk', 'mk/versions.mk') }}
 
-      # ── Build kernel + full ISO (with user/) ─────────────────────────────
+      # Build kernel + full ISO (with user/)
       - name: Build kernel
         run: |
           make kernel \
@@ -139,7 +137,7 @@ jobs:
             LD=ld.lld \
             -j$(nproc)
 
-      # Skip save when restore had an exact key hit — saving the same key fails on GH Cache.
+      # Skip save when restore had an exact key hit; saving the same key fails on GH Cache.
       - name: Save ccache
         if: always() && steps.ccache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
@@ -151,16 +149,16 @@ jobs:
         if: always()
         run: ccache --show-stats
 
-      # ── Build disk image ──────────────────────────────────────────────────
+      # Build disk image
       - name: Create ext2 disk image
         run: make disk
 
       - name: Populate disk image
         run: |
-          # fuse2fs is installed → no sudo required in the runner
+          # fuse2fs is installed, no sudo needed
           make disk-populate
 
-      # ── Prepare release assets ────────────────────────────────────────────
+      # Prepare release assets
       - name: Determine release tag
         id: tag
         run: |
@@ -181,7 +179,7 @@ jobs:
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
 
           cat > release/BUILD_INFO.txt <<EOF
-          Alcor2 OS — Release build
+          Alcor2 OS - Release build
           =========================
           Commit  : ${{ github.sha }}
           Short   : ${SHORT_SHA}
@@ -215,7 +213,7 @@ jobs:
           path: release/BUILD_INFO.txt
           retention-days: 30
 
-  # ── Publish GitHub Release ────────────────────────────────────────────────
+  # Publish GitHub Release
   publish:
     name: Publish GitHub Release
     runs-on: ubuntu-24.04
@@ -263,38 +261,28 @@ jobs:
         with:
           tag_name: nightly
           target_commitish: ${{ github.sha }}
-          name: "Alcor2 nightly — ${{ github.ref_name }}@${{ github.sha }}"
+          name: "Alcor2 nightly"
           prerelease: true
           draft: false
           make_latest: false
           body: |
-            ## Alcor2 — nightly build
+            Rolling build of `main`, replaced on every push. Pin a commit if you
+            need a stable reference; for a versioned build see the tagged releases.
 
-            > **This release is automatically updated on every push to `main`.**
-            > Previous assets are replaced. Pin a commit SHA if you need stability.
+            Commit [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) · clang-${{ env.LLVM_VER }}
 
-            Built from [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) on `${{ github.ref_name }}`.
-
-            Compiler: **clang-${{ env.LLVM_VER }}** · Runner: `ubuntu-24.04`
-
-            ---
-
-            ### Assets
-
+            ## Assets
             | File | Description |
             |------|-------------|
-            | `alcor2.iso` | Bootable ISO (BIOS + UEFI) — burn or boot with QEMU |
-            | `disk.img`   | Pre-populated ext2 disk image (userland binaries) |
+            | `alcor2.iso` | Bootable ISO (BIOS + UEFI) |
+            | `disk.img` | Pre-populated ext2 disk (userland) |
             | `BUILD_INFO.txt` | Build metadata |
 
-            ### Quick boot
-
+            ## Boot
             ```bash
-            qemu-system-x86_64 \
-              -cdrom alcor2.iso \
+            qemu-system-x86_64 -cdrom alcor2.iso \
               -drive file=disk.img,format=raw,if=ide,cache=writeback \
-              -boot order=d \
-              -m 2048M
+              -boot order=d -m 2048M -enable-kvm
             ```
           files: |
             release/alcor2.iso
@@ -312,30 +300,21 @@ jobs:
           make_latest: true
           generate_release_notes: true
           body: |
-            ## Alcor2 ${{ needs.build-full.outputs.release_tag }}
+            Alcor2 ${{ needs.build-full.outputs.release_tag }}, built from
+            [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) with clang-${{ env.LLVM_VER }}.
 
-            Built from [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}).
-
-            Compiler: **clang-${{ env.LLVM_VER }}** · Runner: `ubuntu-24.04`
-
-            ---
-
-            ### Assets
-
+            ## Assets
             | File | Description |
             |------|-------------|
-            | `alcor2.iso` | Bootable ISO (BIOS + UEFI) — burn or boot with QEMU |
-            | `disk.img`   | Pre-populated ext2 disk image (userland binaries) |
+            | `alcor2.iso` | Bootable ISO (BIOS + UEFI) |
+            | `disk.img` | Pre-populated ext2 disk (userland) |
             | `BUILD_INFO.txt` | Build metadata |
 
-            ### Quick boot
-
+            ## Boot
             ```bash
-            qemu-system-x86_64 \
-              -cdrom alcor2.iso \
+            qemu-system-x86_64 -cdrom alcor2.iso \
               -drive file=disk.img,format=raw,if=ide,cache=writeback \
-              -boot order=d \
-              -m 2048M
+              -boot order=d -m 2048M -enable-kvm
             ```
           files: |
             release/alcor2.iso
