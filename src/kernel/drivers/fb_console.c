@@ -7,6 +7,7 @@
  * Takes over the framebuffer from the early boot logger once kmalloc is up.
  */
 
+#include <alcor2/arch/pit.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/mouse.h>
 #include <alcor2/kstdlib.h>
@@ -17,6 +18,9 @@
 #define SIGWINCH 28
 void proc_signal_broadcast(int signum);
 #include <alcor2/types.h>
+
+/* Cursor blink period (~2 Hz) in PIT ticks, so the rate tracks PIT_TICK_HZ. */
+#define FB_BLINK_PERIOD_TICKS (PIT_TICK_HZ / 2u)
 
 typedef struct
 {
@@ -80,10 +84,11 @@ static struct
   /* Saved cursor for ESC 7/8 + CSI s/u. */
   int saved_cx, saved_cy;
 
-  /* Cursor blink: tick counter (decrements from 50 at 100 Hz → ~2 Hz). */
-  u8 blink_ticks;
-  u8 blink_on;
-  u8 cursor_visible;
+  /* Cursor blink: counts down one PIT tick at a time; reloaded with
+   * FB_BLINK_PERIOD_TICKS so the ~2 Hz rate holds regardless of PIT_TICK_HZ. */
+  u16 blink_ticks;
+  u8  blink_on;
+  u8  cursor_visible;
 
   /* DECCKM: when set, cursor keys send SS3 (\EOA) instead of CSI (\E[A).
    * ncurses' keypad(TRUE) toggles this via the terminfo smkx string. */
@@ -285,6 +290,18 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
                                                             : (u32)ctx.cell_h;
         u32 cell_w     = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
                                                             : (u32)ctx.cell_w;
+
+        /* Fill the whole cell with bg first: when the atlas glyph is smaller
+         * than the cell, the unblended margin would otherwise keep stale pixels
+         * (e.g. the inverted cursor block), showing as artefacts. */
+        if(cell_w < (u32)ctx.cell_w || cell_h < (u32)ctx.cell_h) {
+          for(u32 gy = 0; gy < (u32)ctx.cell_h; gy++) {
+            volatile u32 *row =
+                (volatile u32 *)(ctx.base + (u64)(px_y + gy) * ctx.pitch +
+                                 (u64)px_x * 4u);
+            fill32(row, bg_pk, (u32)ctx.cell_w);
+          }
+        }
 
         for(u32 gy = 0; gy < cell_h; gy++) {
           const u8     *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
@@ -577,9 +594,7 @@ static void flush_pending_scroll(void)
   if(n > ctx.rows)
     n = ctx.rows;
 
-  /* The pixel-memcpy below carries any painted cursor pixels along with the
-   * scrolled rows, leaving ghost cursors. Erase first, mark un-drawn so the
-   * next tick re-paints fresh at the current position. */
+  /* Drop any painted cursor so it isn't carried along as a ghost. */
   mouse_cursor_invalidate_for_scroll();
 
   if(ctx.base && ctx.bytes_pp == 4) {
@@ -1235,7 +1250,7 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
   ctx.cur_bg     = ctx.default_bg;
   ctx.cx = ctx.cy    = 0;
   ctx.utf8_rem       = 0;
-  ctx.blink_ticks    = 50;
+  ctx.blink_ticks    = FB_BLINK_PERIOD_TICKS;
   ctx.blink_on       = 1;
   ctx.cell_blink_on  = 1;
   ctx.cur_attr       = 0;
@@ -1361,7 +1376,7 @@ void fb_console_write_end(void)
   ctx.in_batch = false;
   flush_pending_scroll();
   flush_batch();
-  ctx.blink_ticks = 50;
+  ctx.blink_ticks = FB_BLINK_PERIOD_TICKS;
   ctx.blink_on    = 1;
   cursor_paint();
 }
@@ -1380,7 +1395,7 @@ void fb_console_push_input(u8 byte)
     return; /* drop on overflow */
   ctx.in_buf[ctx.in_tail] = byte;
   ctx.in_tail             = next;
-  ctx.blink_ticks         = 50;
+  ctx.blink_ticks         = FB_BLINK_PERIOD_TICKS;
   ctx.blink_on            = 1;
 }
 
@@ -1509,13 +1524,22 @@ static void mouse_cursor_render(void)
 {
   if(ctx.yielded || !ctx.cells)
     return;
+  /* Keep the pointer hidden until the user actually moves it, so a fresh boot
+   * doesn't show a stray cursor pinned at screen centre. */
+  if(!mouse_has_moved())
+    return;
   i32 nx, ny;
   mouse_get_cursor(&nx, &ny);
+
+  /* Nothing to do if the pointer is already drawn where it belongs. Repainting
+   * an unmoved cursor every tick is what makes it flicker. */
+  if(mouse_cur.drawn && nx == mouse_cur.x && ny == mouse_cur.y)
+    return;
+
   if(mouse_cur.drawn)
     mouse_cursor_erase(mouse_cur.x, mouse_cur.y);
-  /* Also pre-clean the destination cells. Defends against stale cursor
-   * pixels left at the new position by mid-tick scroll races or by paints
-   * that happened during scrollback / reclaim transitions. */
+  /* Also clear the destination, removing stale pixels from scroll races or
+   * scrollback/reclaim transitions. */
   mouse_cursor_erase(nx, ny);
   mouse_cursor_paint(nx, ny);
   mouse_cur.drawn = true;
@@ -1540,7 +1564,7 @@ void fb_console_tick(void)
   if(ctx.blink_ticks == 0) {
     ctx.blink_on      = (u8)!ctx.blink_on;
     ctx.cell_blink_on = ctx.blink_on;
-    ctx.blink_ticks   = 50;
+    ctx.blink_ticks   = FB_BLINK_PERIOD_TICKS;
 
     ctx.batch_r0 = ctx.rows;
     ctx.batch_r1 = -1;
@@ -1556,13 +1580,19 @@ void fb_console_tick(void)
         }
       }
     }
-    if(ctx.batch_r0 <= ctx.batch_r1)
+    if(ctx.batch_r0 <= ctx.batch_r1) {
       flush_batch();
+      /* The re-blit may have painted over the pointer; force a full redraw. */
+      mouse_cur.drawn = false;
+    }
 
     cursor_refresh();
   } else {
     ctx.blink_ticks--;
   }
+
+  /* Redraw every tick: mouse_cursor_render() early-outs when the pointer hasn't
+   * moved, so this is free at rest and as smooth as the tick rate in motion. */
   mouse_cursor_render();
 }
 
