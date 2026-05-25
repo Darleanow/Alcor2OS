@@ -29,13 +29,17 @@ static void wrmsr_cpu(u32 msr, u64 value)
  */
 void cpu_init_pat(void)
 {
+  /* Entries 0-3 keep their x86 reset values; only entry 4 is repurposed to WC.
+   * Limine maps the HHDM (framebuffer included) through the low entries, so
+   * redefining those would change the FB's memory type and make console scroll
+   * reads uncached. Entry 4 is reached only by VMM_PAT on a 4 KiB PTE. */
   u64 pat = 0;
   pat |= (u64)6 << (0 * 8); /* WB  */
-  pat |= (u64)1 << (1 * 8); /* WC  */
+  pat |= (u64)4 << (1 * 8); /* WT  */
   pat |= (u64)7 << (2 * 8); /* UC- */
   pat |= (u64)0 << (3 * 8); /* UC  */
-  pat |= (u64)6 << (4 * 8); /* WB  */
-  pat |= (u64)5 << (5 * 8); /* WP  */
+  pat |= (u64)1 << (4 * 8); /* WC  */
+  pat |= (u64)6 << (5 * 8); /* WB  */
   pat |= (u64)7 << (6 * 8); /* UC- */
   pat |= (u64)0 << (7 * 8); /* UC  */
   wrmsr_cpu(MSR_PAT, pat);
