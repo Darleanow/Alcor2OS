@@ -9,9 +9,12 @@
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/arch/gdt.h>
+#include <alcor2/arch/pit.h>
 #include <alcor2/drivers/console.h>
+#include <alcor2/drivers/mouse.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
+#include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/mm/heap.h>
@@ -565,6 +568,12 @@ void proc_exit(i64 code)
 
   proc_vfork_wake_parent(p);
   p->exit_code = code;
+
+  /* Reset transient input modes so a crashed app can't leave them on for the
+   * shell. Layout is left as-is (the user may have set it on purpose). */
+  kbd_set_release_events(false);
+  mouse_set_relative(false);
+  pit_reset_fast();
 
   /* Release fds before flipping to ZOMBIE: close handlers may issue blocking
    * disk I/O, and wait_irq would clobber the ZOMBIE state. */
