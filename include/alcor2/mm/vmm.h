@@ -15,8 +15,20 @@
 #define VMM_PRESENT (1ULL << 0)
 #define VMM_WRITE   (1ULL << 1)
 #define VMM_USER    (1ULL << 2)
-#define VMM_NX      (1ULL << 63)
+#define VMM_PWT     (1ULL << 3) /* Page Write-Through; PAT index bit 0 */
+#define VMM_PCD     (1ULL << 4) /* Page Cache Disable; PAT index bit 1 */
+/* CAUTION: bit 7 is the PAT index high bit only on a 4 KiB PTE. On a PDE/PDPTE
+ * the same bit is PS (page size), so VMM_PAT must never be set on those levels.
+ * Only VMM_WC below is used today; VMM_PCD/VMM_PAT are provided for
+ * completeness and are currently unused. */
+#define VMM_PAT (1ULL << 7)
+#define VMM_NX  (1ULL << 63)
 /** @} */
+
+/* Write-Combining: selects PAT entry 4 (PAT=1, PCD=0, PWT=0) on a 4 KiB PTE,
+ * which cpu_init_pat() programs to WC. Keeping PWT/PCD clear avoids touching
+ * the low PAT entries Limine uses for the HHDM. */
+#define VMM_WC (VMM_PAT)
 
 /** @brief Kernel higher-half base address. */
 #define KERNEL_BASE 0xFFFFFFFF80000000ULL

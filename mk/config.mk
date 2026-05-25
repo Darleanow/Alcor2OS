@@ -44,7 +44,9 @@ else
   CCACHE_PREFIX :=
 endif
 
-GIT_VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+# Version string from the nearest v* milestone tag (the rolling nightly tag is
+# excluded so it never masks the real version). Falls back to the short SHA.
+GIT_VERSION := $(shell git describe --tags --match 'v*' --always --dirty 2>/dev/null || echo dev)
 DEBUG       ?= 0
 
 # Kernel compile / link
@@ -63,8 +65,9 @@ LDFLAGS := -nostdlib -static -pie --no-dynamic-linker \
 
 ASFLAGS := -f elf64
 
-# Lint: userland .c handled here (KERNEL_SRCS_* live in mk/kernel.mk)
-USER_SRCS_C := $(shell find user \( -path '*/.cache/*' \) -prune -o -name '*.c' -print 2>/dev/null | LC_ALL=C sort)
+# Lint: userland .c handled here (KERNEL_SRCS_* live in mk/kernel.mk).
+# doomgeneric is a third-party submodule and is excluded from lint/format.
+USER_SRCS_C := $(shell find user \( -path '*/.cache/*' -o -path '*/doomgeneric/*' \) -prune -o -name '*.c' -print 2>/dev/null | LC_ALL=C sort)
 
 # QEMU — hardware acceleration is optional (KVM on Linux, HVF on Intel Mac).
 # Apple Silicon hosts can't accelerate an x86_64 guest, so they stay on TCG.
@@ -72,6 +75,14 @@ USER_SRCS_C := $(shell find user \( -path '*/.cache/*' \) -prune -o -name '*.c' 
 QEMU       ?= qemu-system-x86_64
 QEMU_RAM   ?= 2048M
 USE_KVM    ?=
+
+# Default display (Linux/GTK): grab-on-hover confines the pointer so relative
+# mouse deltas stay clean at the screen edge; zoom-to-fit=off shows the guest
+# 1:1 instead of bilinear-stretching it (which blurs text in fullscreen).
+# Override with QEMU_DISPLAY= on other hosts or to pick another UI.
+ifeq ($(UNAME),Linux)
+  QEMU_DISPLAY ?= gtk,grab-on-hover=on,zoom-to-fit=off
+endif
 
 QEMU_KVM := -cpu max
 ifeq ($(UNAME),Linux)

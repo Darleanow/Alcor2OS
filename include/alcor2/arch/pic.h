@@ -16,6 +16,9 @@
 /** @brief IRQ number for PS/2 keyboard. */
 #define IRQ_KEYBOARD 1
 
+/** @brief IRQ number for PS/2 mouse (i8042 second port). */
+#define IRQ_MOUSE 12
+
 /** @brief IRQ number for ATA primary channel. */
 #define IRQ_ATA_PRIMARY 14
 

@@ -2,10 +2,10 @@
  * @file src/kernel/drivers/mouse.c
  * @brief Kernel mouse broker.
  *
- * Owns the cursor position and the event ring served via /dev/mouse. Producer
- * is the IRQ-driven virtio-input driver; consumers are syscalls that drain
- * via @ref mouse_read_block. Single-waiter model:
- * one process can sleep on the ring; additional pollers get -EAGAIN.
+ * Owns the cursor position and the event ring served via /dev/mouse. The
+ * producer is the PS/2 mouse IRQ handler (via @ref mouse_post_event); consumers
+ * are syscalls that drain via @ref mouse_read_block. Single-waiter model: one
+ * process can sleep on the ring; additional pollers get -EAGAIN.
  */
 
 #include <alcor2/arch/cpu.h>
@@ -25,6 +25,7 @@ static struct
   u16                  head; /* producer (IRQ) */
   u16                  tail; /* consumer (syscall) */
   bool                 relative;
+  bool                 moved; /* set on first real motion; gates the cursor */
   i32                  cursor_x;
   i32                  cursor_y;
   u32                  screen_w;
@@ -55,10 +56,18 @@ static i64 mouse_dev_read(void *ctx, void *buf, u64 count, u64 offset)
     return -EINVAL;
   if(!vmm_is_user_range(buf, sizeof(alcor2_mouse_event_t)))
     return -EFAULT;
-  alcor2_mouse_event_t ev;
-  i64                  rc = mouse_read_block(&ev);
-  if(rc < 0)
-    return rc;
+
+  /* Non-blocking: return EAGAIN immediately if the ring is empty.
+   * Callers that need blocking reads should use poll()/select() first. */
+  cpu_disable_interrupts();
+  if(ring_empty()) {
+    cpu_enable_interrupts();
+    return -EAGAIN;
+  }
+  alcor2_mouse_event_t ev = g.ring[g.tail & (RING_CAP - 1)];
+  g.tail                  = (u16)(g.tail + 1);
+  cpu_enable_interrupts();
+
   kmemcpy(buf, &ev, sizeof(ev));
   return (i64)sizeof(ev);
 }
@@ -144,6 +153,9 @@ void mouse_set_screen(u32 width, u32 height)
 void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons)
 {
   /* Producer is the IRQ handler (interrupts already off). Update cursor. */
+  if(dx != 0 || dy != 0)
+    g.moved = true;
+
   if(!g.relative) {
     i64 nx = (i64)g.cursor_x + dx;
     i64 ny = (i64)g.cursor_y + dy;
@@ -212,12 +224,11 @@ void mouse_set_relative(bool enabled)
 {
   cpu_disable_interrupts();
   g.relative = enabled;
-  if(enabled) {
-    g.cursor_x = (i32)(g.screen_w / 2);
-    g.cursor_y = (i32)(g.screen_h / 2);
-    /* Drop pending events so a queued click doesn't fire on the first read. */
-    g.head = g.tail;
-  }
+  g.cursor_x = (i32)(g.screen_w / 2);
+  g.cursor_y = (i32)(g.screen_h / 2);
+  /* Drain the ring on every mode change: stale deltas/clicks must not replay
+   * into the next session (e.g. a stuck camera when doom is relaunched). */
+  g.head = g.tail;
   cpu_enable_interrupts();
 }
 
@@ -232,4 +243,9 @@ void mouse_get_cursor(i32 *out_x, i32 *out_y)
     *out_x = g.cursor_x;
   if(out_y)
     *out_y = g.cursor_y;
+}
+
+bool mouse_has_moved(void)
+{
+  return g.moved;
 }

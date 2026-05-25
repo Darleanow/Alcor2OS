@@ -18,7 +18,6 @@
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/drivers/mouse.h>
-#include <alcor2/drivers/virtio.h>
 #include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/ext2.h>
 #include <alcor2/fs/vfs.h>
@@ -73,7 +72,7 @@ static void print_banner(void)
   console_print(" / ___ |/ / /__/ /_/ / /   / __/\n");
   console_print("/_/  |_/_/\\___/\\____/_/   /____/\n");
   console_print("\n");
-  console_print("Alcor2 OS v0.1.0\n");
+  console_printf("Alcor2 OS %s\n", ALCOR2_VERSION);
 }
 
 /**
@@ -157,9 +156,9 @@ typedef struct
 static void init_interrupts(void)
 {
   pic_init();
-  pit_init(100);
+  pit_init(PIT_TICK_HZ);
   pit_enable_sched();
-  console_print("PIC/PIT initialized (100Hz).\n");
+  console_print("PIC/PIT initialized.\n");
 
   keyboard_init();
   console_print("Keyboard initialized.\n");
@@ -172,8 +171,9 @@ static void init_input(void)
     struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
     mouse_set_screen((u32)fb->width, (u32)fb->height);
   }
-  if(!virtio_input_init())
-    console_print("[INIT] No virtio mouse — /dev/mouse will be quiet.\n");
+
+  if(!mouse_ps2_init())
+    console_print("[INIT] No PS/2 mouse — /dev/mouse will be quiet.\n");
 }
 
 /**
@@ -242,12 +242,13 @@ static const boot_phase_t boot_sequence[] = {
     {"GDT Structure",        gdt_init           },
     {"IDT Structure",        idt_init           },
     {"SSE/FPU Support",      cpu_enable_sse     },
+    {"PAT (WC memory type)", cpu_init_pat       },
     {"Syscall Interface",    syscall_init       },
     {"PIC/PIT Timers",       pic_init           },
     {"Hardware Interrupts",  init_interrupts    },
     {"VFS Orchestrator",     vfs_init           },
     {"Storage & VFS",        init_storage       },
-    {"Mouse / virtio-input", init_input         },
+    {"PS/2 Mouse",           init_input         },
     {"Process Table",        proc_init          },
     {NULL,                   init_idt_proc_hooks},
     {"Global Interrupts",    init_enable_irqs   },

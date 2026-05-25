@@ -10,12 +10,42 @@
 #define MSR_FS_BASE 0xC0000100
 #define MSR_GS_BASE 0xC0000101
 
+#define MSR_PAT     0x00000277
+
+/** @brief Write a 64-bit value to model-specific register @p msr. */
+static void wrmsr_cpu(u32 msr, u64 value)
+{
+  __asm__ volatile(
+      "wrmsr" ::"a"((u32)value), "d"((u32)(value >> 32)), "c"(msr)
+  );
+}
+
 /**
- * @brief Halt the CPU indefinitely.
+ * @brief Program IA32_PAT so entry 4 (PAT=1, PCD=0, PWT=0) selects
+ * Write-Combining.
  *
- * Disables interrupts and enters an infinite HLT loop. Used for
- * unrecoverable errors or system shutdown. Never returns.
+ * Only entry 4 deviates from the x86 reset defaults; the framebuffer mapping
+ * uses it (via VMM_WC) for fast, coalesced stores. Entries are encoded one
+ * memory type per byte: WB=6, WC=1, WP=5, UC-=7, UC=0.
  */
+void cpu_init_pat(void)
+{
+  /* Entries 0-3 keep their x86 reset values; only entry 4 is repurposed to WC.
+   * Limine maps the HHDM (framebuffer included) through the low entries, so
+   * redefining those would change the FB's memory type and make console scroll
+   * reads uncached. Entry 4 is reached only by VMM_PAT on a 4 KiB PTE. */
+  u64 pat = 0;
+  pat |= (u64)6 << (0 * 8); /* WB  */
+  pat |= (u64)4 << (1 * 8); /* WT  */
+  pat |= (u64)7 << (2 * 8); /* UC- */
+  pat |= (u64)0 << (3 * 8); /* UC  */
+  pat |= (u64)1 << (4 * 8); /* WC  */
+  pat |= (u64)6 << (5 * 8); /* WB  */
+  pat |= (u64)7 << (6 * 8); /* UC- */
+  pat |= (u64)0 << (7 * 8); /* UC  */
+  wrmsr_cpu(MSR_PAT, pat);
+}
+
 NORETURN void cpu_halt(void)
 {
   cpu_disable_interrupts();

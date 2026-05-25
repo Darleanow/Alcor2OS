@@ -68,7 +68,9 @@ u64 sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
   if(hint == 0)
     p->mmap_base = end;
 
-  u64 flags = VMM_PRESENT | VMM_WRITE | VMM_USER;
+  /* Write-Combining coalesces adjacent stores into burst writes (see VMM_WC,
+   * set up by cpu_init_pat()). */
+  u64 flags = VMM_PRESENT | VMM_WRITE | VMM_USER | VMM_WC;
 
   for(u64 i = 0; i < n_pages; i++) {
     vmm_map_in(p->cr3, base + i * PAGE_SIZE, phys0 + i * PAGE_SIZE, flags);

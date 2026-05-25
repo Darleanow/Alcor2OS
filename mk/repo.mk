@@ -60,6 +60,11 @@ user: thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a
 	else \
 		echo "[user] skipping user/apps (no musl-cross g++)"; \
 	fi
+	@if [ -f thirdparty/musl-cross/bin/x86_64-linux-musl-gcc ]; then \
+		$(MAKE) -C user/games; \
+	else \
+		echo "[user] skipping user/games (no musl-cross gcc)"; \
+	fi
 
 # iso-kernel: fastest path used by CI on every push/PR.
 # Produces a bootable ISO with the kernel only — no user/ binaries required.
@@ -222,24 +227,26 @@ endif
 
 disk-resync: user disk-populate
 
-# GDK_BACKEND=x11 forces GTK to XWayland so pointer grab actually works.
+# The mouse uses the emulated i8042 PS/2 controller, which QEMU always provides
+# — no -device needed. Grab the pointer with Ctrl+Alt+G (or fullscreen).
+
 run: iso disk-populate
-	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
+	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
-		-device virtio-mouse-pci \
-		-display gtk \
-		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM)
+		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
+		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
+		$(QEMU_EXTRA)
 
 debug: iso disk-populate
 	@echo ""
 	@echo "  QEMU GDB server → :1234  (VM paused at first instruction)"
 	@echo "  Connect: gdb -ex 'target remote :1234' -ex 'symbol-file $(BUILD)/$(KERNEL)'"
 	@echo ""
-	GDK_BACKEND=x11 $(QEMU) -cdrom $(BUILD)/$(ISO) \
+	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
-		-device virtio-mouse-pci \
-		-display gtk \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
+		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
+		$(QEMU_EXTRA) \
 		-s -S
 
 disk-quick: user
@@ -272,6 +279,7 @@ clean:
 	-$(MAKE) -C user/apps/vega clean
 	-$(MAKE) -C user/bin clean
 	-$(MAKE) -C user/apps clean
+	-$(MAKE) -C user/games clean
 	-$(MAKE) -C user/lib/spazer clean
 
 clean-all: clean
@@ -291,6 +299,7 @@ format fmt:
 	  \( -name '*.c' -o -name '*.h' -o -name '*.cpp' \) \
 	  ! -path '*/thirdparty/*' \
 	  ! -path '*/.cache/*' \
+	  ! -path '*/doomgeneric/*' \
 	  -print0 | xargs -0 clang-format -i
 
 lint:
@@ -315,6 +324,7 @@ check:
 	  --inline-suppr \
 	  --inconclusive \
 	  --quiet \
+	  -i user/games/doom/doomgeneric \
 	  -I$(INCLUDE) \
 	  $(SRC) user
 

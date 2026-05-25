@@ -226,9 +226,52 @@ $S tee "$MNT/etc/profile" >/dev/null <<'EOF'
 # Alcor2 login environment — use: . /etc/profile
 export TERM="${TERM:-xterm-256color}"
 export TERMINFO="${TERMINFO:-/usr/share/terminfo}"
+export DOOMWADDIR=/games/doom
 EOF
 
-# ----- 5. Welcome banner -----------------------------------------------------
+# ----- 5. Games (/games/) ----------------------------------------------------
+# Each game lives in its own subdirectory alongside any required data files.
+#
+# WAD staging: drop doom1.wad (shareware) or doom.wad (commercial) into
+# user/games/doom/wads/ on the host; disk-populate will copy it automatically.
+# That directory is .gitignore-d — no accidental commits of copyrighted data.
+DOOM_BIN=$ROOT/user/build/games/doom/doom
+DOOM_ON_DISK=0
+if [ -f "$DOOM_BIN" ]; then
+  echo "[disk] doom → /games/doom/"
+  $S mkdir -p "$MNT/games/doom"
+  $S cp "$DOOM_BIN" "$MNT/games/doom/doom"
+
+  # Copy the first WAD found in the host wads directory (Freedoom or id).
+  WADS_DIR=$ROOT/user/games/doom/wads
+  DOOM_WAD=
+  for _wad in "$WADS_DIR/freedoom1.wad" "$WADS_DIR/freedoom2.wad" \
+               "$WADS_DIR/doom1.wad"    "$WADS_DIR/doom.wad"      \
+               "$WADS_DIR/doom2.wad"    "$WADS_DIR/DOOM1.WAD"     \
+               "$WADS_DIR/DOOM.WAD"; do
+    if [ -f "$_wad" ]; then
+      DOOM_WAD=$_wad
+      break
+    fi
+  done
+  if [ -n "$DOOM_WAD" ]; then
+    $S cp "$DOOM_WAD" "$MNT/games/doom/$(basename "$DOOM_WAD" | tr '[:upper:]' '[:lower:]')"
+    echo "[disk] WAD → /games/doom/$(basename "$DOOM_WAD" | tr '[:upper:]' '[:lower:]')"
+  else
+    echo "[disk] WARN: no WAD in $WADS_DIR — copy doom1.wad there, then re-run disk-populate"
+  fi
+
+  # Seed the key-binding config (ZQSD / keyboard-only).  Doom cannot overwrite
+  # this at runtime because ext2 is read-only; the seed is re-read every launch.
+  $S cp "$ROOT/user/games/doom/src/default.cfg" "$MNT/games/doom/default.cfg"
+  echo "[disk] doom default.cfg → /games/doom/default.cfg"
+
+  DOOM_ON_DISK=1
+else
+  echo "[disk] doom binary not found (run: make user, then disk-resync)"
+fi
+
+# ----- 6. Welcome banner -----------------------------------------------------
 NC_ON_DISK=0
 [ -f "$MNT/usr/lib/libncurses.a" ] && NC_ON_DISK=1
 
@@ -240,5 +283,8 @@ NC_ON_DISK=0
   echo "  tip : . /etc/profile   # TERM for ncurses"
   if [ "$NC_ON_DISK" = 1 ]; then
     echo "  TUI : cc ui.c -lncurses -ltinfo   (sample: /home/ncurses-demo.c)"
+  fi
+  if [ "$DOOM_ON_DISK" = 1 ]; then
+    echo "  Doom: cp doom1.wad /games/doom/ && cd /games/doom && ./doom"
   fi
 } | $S tee "$MNT/etc/motd" >/dev/null

@@ -70,6 +70,14 @@ void cpu_enable_interrupts(void);
 void cpu_enable_sse(void);
 
 /**
+ * @brief Initialize the Page Attribute Table MSR.
+ *
+ * Programs IA32_PAT so that PWT=1 (VMM_PWT / VMM_WC) selects Write-Combining.
+ * Must be called before any WC framebuffer mapping is established.
+ */
+void cpu_init_pat(void);
+
+/**
  * @brief Set the FS base MSR for thread-local storage.
  * @param addr Linear address for FS segment base.
  */
