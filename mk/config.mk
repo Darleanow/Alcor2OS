@@ -44,7 +44,9 @@ else
   CCACHE_PREFIX :=
 endif
 
-GIT_VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+# Version string from the nearest v* milestone tag (the rolling nightly tag is
+# excluded so it never masks the real version). Falls back to the short SHA.
+GIT_VERSION := $(shell git describe --tags --match 'v*' --always --dirty 2>/dev/null || echo dev)
 DEBUG       ?= 0
 
 # Kernel compile / link
