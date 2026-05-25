@@ -5,7 +5,7 @@
  * Implements the five DG_* hooks. The framebuffer is 32bpp 0xAARRGGBB, matching
  * DG_ScreenBuffer, so a pixel blit is one OR with 0xFF000000 (no swizzle).
  * stdin runs raw with the FR layout (ZQSD → z/q/s/d); key-up uses the kernel's
- * \x00<ch> release sentinels, with a HOLD_RELEASE_MS timeout as fallback.
+ * \x00<ch> release sentinels, so a key is held until its precise break code.
  */
 
 #include "d_event.h"
@@ -26,10 +26,6 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-
-/** @brief Fallback key-up timeout, covering the typematic delay (~250ms) +
- * margin. */
-#define HOLD_RELEASE_MS 300u
 
 /** @brief Maximum number of simultaneously held keys tracked. */
 #define MAX_HELD 8
@@ -137,8 +133,7 @@ static int            s_mouse_fd = -1;
 
 struct held_entry
 {
-  unsigned char dk;      /* Doom key value; 0 = free slot */
-  uint32_t      last_ms; /* DG_GetTicksMs() at last observed repeat */
+  unsigned char dk; /* Doom key value; 0 = free slot */
 };
 
 static struct held_entry s_held[MAX_HELD];
@@ -176,29 +171,22 @@ static int evq_pop(unsigned char *dk, int *pressed)
   return 1;
 }
 
-/* Held-key tracking */
+/* Held-key tracking. The kernel emits a precise \x00<ch> break code on every
+ * key-up (ALCOR2_IOC_KBD_RELEASE_EVENTS), so a key is held from its make code
+ * until its break code — no repeat-timeout heuristic, which would otherwise
+ * kill a held key once PS/2 stops repeating it (it only repeats the last key,
+ * breaking Z then D). */
 
-/** Press a key: add to held table on first occurrence; refresh on repeat. */
+/** First make code for a key pushes a press; later repeats are ignored. */
 static void hold_press(unsigned char dk)
 {
-  uint32_t now = DG_GetTicksMs();
+  for(int i = 0; i < MAX_HELD; i++)
+    if(s_held[i].dk == dk)
+      return; /* already held; PS/2 repeat, nothing to do */
 
   for(int i = 0; i < MAX_HELD; i++) {
-    if(s_held[i].dk == dk) {
-      /* PS/2 only auto-repeats one key at a time (the last pressed).  Any
-       * other held keys stop receiving repeat bytes even though the user is
-       * still holding them.  Refresh ALL held slots so their timeouts don't
-       * fire while another key is being repeated. */
-      for(int j = 0; j < MAX_HELD; j++)
-        if(s_held[j].dk != 0)
-          s_held[j].last_ms = now;
-      return;
-    }
-  }
-  for(int i = 0; i < MAX_HELD; i++) {
     if(s_held[i].dk == 0) {
-      s_held[i].dk      = dk;
-      s_held[i].last_ms = now;
+      s_held[i].dk = dk;
       evq_push(dk, 1);
       return;
     }
@@ -206,32 +194,14 @@ static void hold_press(unsigned char dk)
   /* All slots occupied (>8 keys held simultaneously) — drop. */
 }
 
-/** Explicit release: immediately clear a held key and push a release event. */
+/** Break code: clear the held key and push a release. */
 static void hold_release(unsigned char dk)
 {
-  uint32_t now = DG_GetTicksMs();
   for(int i = 0; i < MAX_HELD; i++) {
     if(s_held[i].dk == dk) {
       evq_push(dk, 0);
       s_held[i].dk = 0;
-    } else if(s_held[i].dk != 0) {
-      /* Keyboard is still active — refresh other held keys so their timeouts
-       * don't expire during the brief gap before PS/2 resumes repeating them
-       * (PS/2 restarts the typematic delay for the remaining held key after
-       * the released key's break code). */
-      s_held[i].last_ms = now;
-    }
-  }
-}
-
-/** Synthesise release events for keys that have not repeated recently. */
-static void hold_expire(void)
-{
-  uint32_t now = DG_GetTicksMs();
-  for(int i = 0; i < MAX_HELD; i++) {
-    if(s_held[i].dk != 0 && (now - s_held[i].last_ms) > HOLD_RELEASE_MS) {
-      evq_push(s_held[i].dk, 0);
-      s_held[i].dk = 0;
+      return;
     }
   }
 }
@@ -389,15 +359,8 @@ static void parse_input(const uint8_t *buf, int n)
 
 static void restore_terminal(void)
 {
-  /* Wipe the whole framebuffer while we still own it, so the borders left
-   * black around the centred game image don't linger as artefacts once the
-   * console repaints only its own (smaller) region. */
-  if(s_fb32 && s_fb32 != (void *)-1) {
-    uint64_t pixels = (uint64_t)s_pitch32 * s_fbinfo.height;
-    memset(s_fb32, 0, pixels * sizeof(uint32_t));
-  }
-
-  /* Give the framebuffer back to the kernel console before we exit. */
+  /* Hand the framebuffer back; fb_console repaints the whole screen (margins
+   * included) with the console theme, clearing the game image. */
   ioctl(STDOUT_FILENO, FB_CONSOLE_RECLAIM, 0);
 
   /* Drop the elevated timer rate. */
@@ -424,7 +387,7 @@ static void restore_terminal(void)
 }
 
 /** Turn-speed multiplier applied to the summed per-tick X delta. */
-#define MOUSE_TURN_GAIN 3
+#define MOUSE_TURN_GAIN 6
 
 /**
  * Hard ceiling on the per-tick X delta, in raw mouse units before gain.
@@ -432,12 +395,13 @@ static void restore_terminal(void)
  * several packets during a fast flick; this caps any residual spike (e.g. the
  * burst QEMU emits on grab acquisition) without throttling normal aiming.
  */
-#define MOUSE_DX_CLAMP 60
+#define MOUSE_DX_CLAMP 200
 
-/* Last button bitmask seen, retained across ticks. PS/2 only emits a packet on
- * change, so a held button produces no packets while the mouse is still — we
- * must keep re-posting the state or Doom would stop firing mid-hold. */
+/* Current and last-posted button bitmask. PS/2 only emits a packet on change,
+ * so the held state is retained; the last-posted copy lets feed_mouse_events
+ * skip redundant posts (see there) without dropping a press or release. */
 static int s_mouse_buttons;
+static int s_mouse_last_buttons;
 
 /**
  * @brief Drain all pending mouse packets and post one ev_mouse to Doom.
@@ -454,19 +418,27 @@ static void feed_mouse_events(void)
 
   alcor2_mouse_event_t pkt;
   int                  accum_dx = 0;
+  int                  got      = 0;
 
   while((int)read(s_mouse_fd, &pkt, sizeof(pkt)) == (int)sizeof(pkt)) {
     accum_dx += (int)pkt.dx;
     s_mouse_buttons = (int)pkt.buttons;
+    got             = 1;
   }
+
+  /* Post only when something actually happened (motion or a button change).
+   * The game loop spins this many times per tic, so posting unconditionally
+   * floods Doom's 64-slot event queue and evicts the real motion events,
+   * which makes the view jerky and laggy. */
+  if(!got && s_mouse_buttons == s_mouse_last_buttons)
+    return;
+  s_mouse_last_buttons = s_mouse_buttons;
 
   if(accum_dx > MOUSE_DX_CLAMP)
     accum_dx = MOUSE_DX_CLAMP;
   if(accum_dx < -MOUSE_DX_CLAMP)
     accum_dx = -MOUSE_DX_CLAMP;
 
-  /* Post every tick, even with no motion and no new packets, so a held button
-   * keeps firing and a released one is seen promptly. */
   event_t ev;
   ev.type  = ev_mouse;
   ev.data1 = s_mouse_buttons;            /* bit 0=left, 1=right, 2=middle */
@@ -634,7 +606,6 @@ int DG_GetKey(int *pressed, unsigned char *key)
       parse_input(buf, n);
   }
 
-  hold_expire(); /* fallback release for any key whose break code was missed */
   return evq_pop(key, pressed);
 }
 
