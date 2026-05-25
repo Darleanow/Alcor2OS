@@ -122,7 +122,8 @@ static u8 mouse_cmd(u8 cmd)
  *
  * Reads a single byte and only if the controller tags it AUX. Consuming a
  * keyboard byte here would desync the keyboard stream (dropped make/break codes
- * stick keys). The i8042 raises one IRQ per byte, so one read per call is right.
+ * stick keys). The i8042 raises one IRQ per byte, so one read per call is
+ * right.
  */
 static void mouse_ps2_irq(u8 irq)
 {
@@ -188,7 +189,7 @@ bool mouse_ps2_init(void)
    * keyboard. */
   ps2_cmd(PS2_CMD_READ_CONFIG);
   u8 cfg = ps2_read_data();
-  cfg |= PS2_CFG_KBD_IRQ | PS2_CFG_AUX_IRQ; /* IRQ 1 + IRQ 12 */
+  cfg |= PS2_CFG_KBD_IRQ | PS2_CFG_AUX_IRQ;    /* IRQ 1 + IRQ 12 */
   cfg &= ~(PS2_CFG_KBD_CLK | PS2_CFG_AUX_CLK); /* both clocks on */
   ps2_cmd(PS2_CMD_WRITE_CONFIG);
   ps2_write_data(cfg);

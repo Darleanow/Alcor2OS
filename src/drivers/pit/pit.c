@@ -38,7 +38,8 @@ static void         pit_irq_handler(u8 irq)
     proc_tick();
 }
 
-/** @brief Program PIT channel 0 for @p frequency Hz (clamped to a sane range). */
+/** @brief Program PIT channel 0 for @p frequency Hz (clamped to a sane range).
+ */
 static void pit_program(u32 frequency)
 {
   if(frequency < 19u)

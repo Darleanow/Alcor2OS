@@ -65,7 +65,7 @@ static i64 mouse_dev_read(void *ctx, void *buf, u64 count, u64 offset)
     return -EAGAIN;
   }
   alcor2_mouse_event_t ev = g.ring[g.tail & (RING_CAP - 1)];
-  g.tail = (u16)(g.tail + 1);
+  g.tail                  = (u16)(g.tail + 1);
   cpu_enable_interrupts();
 
   kmemcpy(buf, &ev, sizeof(ev));

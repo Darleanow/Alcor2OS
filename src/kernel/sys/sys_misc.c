@@ -58,7 +58,7 @@ u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
   {
     i64 tv_sec;
     i64 tv_usec;
-  } *t = (void *)tv;
+  }  *t = (void *)tv;
 
   u64 ns     = pit_get_ns();
   t->tv_sec  = (i64)(ns / 1000000000ULL);

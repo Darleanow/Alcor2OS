@@ -11,16 +11,16 @@
  * sensible defaults so they satisfy the linker without side-effects.
  */
 
-#include <stddef.h>
 #include "i_sound.h"
+#include <stddef.h>
 
 /* Variables declared extern in i_sound.h — must be defined exactly once. */
-int   snd_sfxdevice      = SNDDEVICE_NONE;
-int   snd_musicdevice    = SNDDEVICE_NONE;
-int   snd_samplerate     = 44100;
-int   snd_cachesize      = 0;
+int   snd_sfxdevice       = SNDDEVICE_NONE;
+int   snd_musicdevice     = SNDDEVICE_NONE;
+int   snd_samplerate      = 44100;
+int   snd_cachesize       = 0;
 int   snd_maxslicetime_ms = 0;
-char *snd_musiccmd       = (char *)"";
+char *snd_musiccmd        = (char *)"";
 
 /* Sound effects */
 
@@ -31,7 +31,7 @@ void I_InitSound(boolean use_sfx_prefix)
 
 void I_ShutdownSound(void) {}
 
-int I_GetSfxLumpNum(sfxinfo_t *sfx)
+int  I_GetSfxLumpNum(sfxinfo_t *sfx)
 {
   return sfx->lumpnum;
 }
@@ -82,9 +82,9 @@ void I_SetMusicVolume(int volume)
   (void)volume;
 }
 
-void I_PauseSong(void) {}
+void  I_PauseSong(void) {}
 
-void I_ResumeSong(void) {}
+void  I_ResumeSong(void) {}
 
 void *I_RegisterSong(void *data, int len)
 {
@@ -104,7 +104,7 @@ void I_PlaySong(void *handle, boolean looping)
   (void)looping;
 }
 
-void I_StopSong(void) {}
+void    I_StopSong(void) {}
 
 boolean I_MusicIsPlaying(void)
 {

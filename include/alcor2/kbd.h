@@ -42,14 +42,15 @@ struct proc;
  *
  * Usage (user): uint32_t on = 1; ioctl(0, ALCOR2_IOC_KBD_RELEASE_EVENTS, &on);
  */
-#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                         \
+#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                          \
   ((1U << 30) | (0x4BU << 8) | 2U | (sizeof(uint32_t) << 16))
 
 /** @brief Selectable keyboard layouts. */
 typedef enum
 {
   KBD_LAYOUT_US = 0, /**< US QWERTY. */
-  KBD_LAYOUT_FR = 1, /**< AZERTY lettering on a US scan map; US-ASCII digit row. */
+  KBD_LAYOUT_FR =
+      1, /**< AZERTY lettering on a US scan map; US-ASCII digit row. */
   KBD_LAYOUT_COUNT
 } kbd_layout_t;
 

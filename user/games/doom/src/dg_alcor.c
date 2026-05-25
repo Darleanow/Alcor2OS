@@ -27,7 +27,8 @@
 #include <time.h>
 #include <unistd.h>
 
-/** @brief Fallback key-up timeout, covering the typematic delay (~250ms) + margin. */
+/** @brief Fallback key-up timeout, covering the typematic delay (~250ms) +
+ * margin. */
 #define HOLD_RELEASE_MS 300u
 
 /** @brief Maximum number of simultaneously held keys tracked. */
@@ -52,7 +53,7 @@
  * does not depend on kernel headers.
  */
 
-#define ALCOR2_IOC_KBD_SET_LAYOUT \
+#define ALCOR2_IOC_KBD_SET_LAYOUT                                              \
   ((1u << 30) | (0x4bu << 8) | 1u | (sizeof(uint32_t) << 16))
 
 /* Enable \x00<ch> release events from the keyboard driver.  When active, each
@@ -60,7 +61,7 @@
  * table immediately rather than waiting for a repeat timeout.  This fixes
  * diagonal movement (Z+D) where PS/2 stops repeating the first key once a
  * second key is pressed. */
-#define ALCOR2_IOC_KBD_RELEASE_EVENTS \
+#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                          \
   ((1u << 30) | (0x4bu << 8) | 2u | (sizeof(uint32_t) << 16))
 
 #define KBD_LAYOUT_US 0u
@@ -80,7 +81,7 @@ extern int key_fire, key_use, key_strafe, key_speed;
 extern int key_menu_up, key_menu_down, key_menu_left, key_menu_right;
 
 /* Mouse button indices (defined in m_controls.c). */
-extern int mousebfire, mousebstrafe, mousebforward, mousebuse;
+extern int  mousebfire, mousebstrafe, mousebforward, mousebuse;
 
 static void apply_alcor_key_bindings(void)
 {
@@ -93,16 +94,17 @@ static void apply_alcor_key_bindings(void)
    *   Space — use (secondary)
    *   Shift — run
    */
-  key_up    = 'z';   key_down  = 's';
+  key_up    = 'z';
+  key_down  = 's';
   key_left  = KEY_LEFTARROW;
   key_right = KEY_RIGHTARROW;
 
   key_strafeleft  = 'q';
   key_straferight = 'd';
-  key_fire  = 'a';
-  key_use   = 'e';
-  key_speed = KEY_RSHIFT;
-  key_strafe= KEY_RALT;
+  key_fire        = 'a';
+  key_use         = 'e';
+  key_speed       = KEY_RSHIFT;
+  key_strafe      = KEY_RALT;
 
   /* Mouse buttons: left=fire (default), right=use, middle=nothing. */
   mousebfire    = 0;
@@ -119,7 +121,7 @@ static void apply_alcor_key_bindings(void)
 
 /* Framebuffer state */
 
-static uint32_t       *s_fb32;    /* mapped framebuffer (u32 pixels)   */
+static uint32_t       *s_fb32; /* mapped framebuffer (u32 pixels)   */
 static alcor_fb_info_t s_fbinfo;
 static uint32_t        s_pitch32; /* framebuffer pitch in u32 units    */
 static uint32_t        s_scale;   /* Doom pixels → native pixels       */
@@ -135,8 +137,8 @@ static int            s_mouse_fd = -1;
 
 struct held_entry
 {
-  unsigned char dk;          /* Doom key value; 0 = free slot */
-  uint32_t      last_ms;     /* DG_GetTicksMs() at last observed repeat */
+  unsigned char dk;      /* Doom key value; 0 = free slot */
+  uint32_t      last_ms; /* DG_GetTicksMs() at last observed repeat */
 };
 
 static struct held_entry s_held[MAX_HELD];
@@ -160,7 +162,7 @@ static int evq_push(unsigned char dk, int pressed)
     return 0; /* queue full — drop */
   s_evq[s_evq_w].dk      = dk;
   s_evq[s_evq_w].pressed = pressed;
-  s_evq_w                 = next;
+  s_evq_w                = next;
   return 1;
 }
 
@@ -181,10 +183,8 @@ static void hold_press(unsigned char dk)
 {
   uint32_t now = DG_GetTicksMs();
 
-  for(int i = 0; i < MAX_HELD; i++)
-  {
-    if(s_held[i].dk == dk)
-    {
+  for(int i = 0; i < MAX_HELD; i++) {
+    if(s_held[i].dk == dk) {
       /* PS/2 only auto-repeats one key at a time (the last pressed).  Any
        * other held keys stop receiving repeat bytes even though the user is
        * still holding them.  Refresh ALL held slots so their timeouts don't
@@ -195,10 +195,8 @@ static void hold_press(unsigned char dk)
       return;
     }
   }
-  for(int i = 0; i < MAX_HELD; i++)
-  {
-    if(s_held[i].dk == 0)
-    {
+  for(int i = 0; i < MAX_HELD; i++) {
+    if(s_held[i].dk == 0) {
       s_held[i].dk      = dk;
       s_held[i].last_ms = now;
       evq_push(dk, 1);
@@ -212,15 +210,11 @@ static void hold_press(unsigned char dk)
 static void hold_release(unsigned char dk)
 {
   uint32_t now = DG_GetTicksMs();
-  for(int i = 0; i < MAX_HELD; i++)
-  {
-    if(s_held[i].dk == dk)
-    {
+  for(int i = 0; i < MAX_HELD; i++) {
+    if(s_held[i].dk == dk) {
       evq_push(dk, 0);
       s_held[i].dk = 0;
-    }
-    else if(s_held[i].dk != 0)
-    {
+    } else if(s_held[i].dk != 0) {
       /* Keyboard is still active — refresh other held keys so their timeouts
        * don't expire during the brief gap before PS/2 resumes repeating them
        * (PS/2 restarts the typematic delay for the remaining held key after
@@ -234,10 +228,8 @@ static void hold_release(unsigned char dk)
 static void hold_expire(void)
 {
   uint32_t now = DG_GetTicksMs();
-  for(int i = 0; i < MAX_HELD; i++)
-  {
-    if(s_held[i].dk != 0 && (now - s_held[i].last_ms) > HOLD_RELEASE_MS)
-    {
+  for(int i = 0; i < MAX_HELD; i++) {
+    if(s_held[i].dk != 0 && (now - s_held[i].last_ms) > HOLD_RELEASE_MS) {
       evq_push(s_held[i].dk, 0);
       s_held[i].dk = 0;
     }
@@ -275,93 +267,115 @@ static unsigned char translate_byte(unsigned char b)
  */
 static void parse_input(const uint8_t *buf, int n)
 {
-  for(int i = 0; i < n;)
-  {
+  for(int i = 0; i < n;) {
     unsigned char dk;
 
     /* \x00<ch> — key-release sentinel emitted by the kernel when
      * ALCOR2_IOC_KBD_RELEASE_EVENTS is enabled.  Process immediately without
      * going through hold_press. */
-    if(buf[i] == 0x00u)
-    {
-      if(i + 1 < n)
-      {
+    if(buf[i] == 0x00u) {
+      if(i + 1 < n) {
         dk = translate_byte(buf[i + 1]);
         if(dk != 0)
           hold_release(dk);
         i += 2;
-      }
-      else
+      } else
         i++; /* lone \x00 — skip */
       continue;
     }
 
-    if(buf[i] == 0x1Bu)
-    {
-      if(i + 2 < n && buf[i + 1] == '[')
-      {
+    if(buf[i] == 0x1Bu) {
+      if(i + 2 < n && buf[i + 1] == '[') {
         /* CSI sequence: \x1b [ <suffix> */
-        switch(buf[i + 2])
-        {
-        case 'A': dk = KEY_UPARROW;    i += 3; break;
-        case 'B': dk = KEY_DOWNARROW;  i += 3; break;
-        case 'C': dk = KEY_RIGHTARROW; i += 3; break;
-        case 'D': dk = KEY_LEFTARROW;  i += 3; break;
+        switch(buf[i + 2]) {
+        case 'A':
+          dk = KEY_UPARROW;
+          i += 3;
+          break;
+        case 'B':
+          dk = KEY_DOWNARROW;
+          i += 3;
+          break;
+        case 'C':
+          dk = KEY_RIGHTARROW;
+          i += 3;
+          break;
+        case 'D':
+          dk = KEY_LEFTARROW;
+          i += 3;
+          break;
 
-        /* VT220 function key: \x1b [ <n> ~ (n = 11-15 = F1-F5, 17-21 = F6-F10) */
-        default:
-        {
+        /* VT220 function key: \x1b [ <n> ~ (n = 11-15 = F1-F5, 17-21 = F6-F10)
+         */
+        default: {
           int code = 0, j = i + 2;
           while(j < n && buf[j] >= '0' && buf[j] <= '9')
             code = code * 10 + (buf[j++] - '0');
-          if(j < n && buf[j] == '~')
-          {
+          if(j < n && buf[j] == '~') {
             j++;
             int fk = -1;
-            if(code >= 11 && code <= 15) fk = code - 11;
-            else if(code >= 17 && code <= 21) fk = code - 12;
+            if(code >= 11 && code <= 15)
+              fk = code - 11;
+            else if(code >= 17 && code <= 21)
+              fk = code - 12;
             dk = (fk >= 0) ? (unsigned char)(KEY_F1 + fk) : 0;
             i  = j;
-          }
-          else
-          {
+          } else {
             i++; /* unrecognised — consume ESC and retry */
             continue;
           }
           break;
         }
         }
-      }
-      else if(i + 2 < n && buf[i + 1] == 'O')
-      {
+      } else if(i + 2 < n && buf[i + 1] == 'O') {
         /* SS3 sequence: \x1b O <suffix> — emitted by the kernel in DECCKM
          * mode (app_cursor_keys=true) and for F1-F4 unconditionally. */
-        switch(buf[i + 2])
-        {
-        case 'A': dk = KEY_UPARROW;              i += 3; break;
-        case 'B': dk = KEY_DOWNARROW;             i += 3; break;
-        case 'C': dk = KEY_RIGHTARROW;            i += 3; break;
-        case 'D': dk = KEY_LEFTARROW;             i += 3; break;
-        case 'P': dk = KEY_F1;                    i += 3; break;
-        case 'Q': dk = (unsigned char)(KEY_F1+1); i += 3; break;
-        case 'R': dk = (unsigned char)(KEY_F1+2); i += 3; break;
-        case 'S': dk = (unsigned char)(KEY_F1+3); i += 3; break;
-        default:  dk = KEY_ESCAPE;                i++;    break;
+        switch(buf[i + 2]) {
+        case 'A':
+          dk = KEY_UPARROW;
+          i += 3;
+          break;
+        case 'B':
+          dk = KEY_DOWNARROW;
+          i += 3;
+          break;
+        case 'C':
+          dk = KEY_RIGHTARROW;
+          i += 3;
+          break;
+        case 'D':
+          dk = KEY_LEFTARROW;
+          i += 3;
+          break;
+        case 'P':
+          dk = KEY_F1;
+          i += 3;
+          break;
+        case 'Q':
+          dk = (unsigned char)(KEY_F1 + 1);
+          i += 3;
+          break;
+        case 'R':
+          dk = (unsigned char)(KEY_F1 + 2);
+          i += 3;
+          break;
+        case 'S':
+          dk = (unsigned char)(KEY_F1 + 3);
+          i += 3;
+          break;
+        default:
+          dk = KEY_ESCAPE;
+          i++;
+          break;
         }
-      }
-      else
-      {
+      } else {
         dk = KEY_ESCAPE;
         i++;
       }
-    }
-    else if(buf[i] == 0x0Du || buf[i] == 0x0Au)
-    {
+    } else if(buf[i] == 0x0Du || buf[i] == 0x0Au) {
       dk = KEY_ENTER;
       i++;
-    }
-    else
-    {
+    } else {
       dk = translate_byte(buf[i]);
       i++;
     }
@@ -378,8 +392,7 @@ static void restore_terminal(void)
   /* Wipe the whole framebuffer while we still own it, so the borders left
    * black around the centred game image don't linger as artefacts once the
    * console repaints only its own (smaller) region. */
-  if(s_fb32 && s_fb32 != (void *)-1)
-  {
+  if(s_fb32 && s_fb32 != (void *)-1) {
     uint64_t pixels = (uint64_t)s_pitch32 * s_fbinfo.height;
     memset(s_fb32, 0, pixels * sizeof(uint32_t));
   }
@@ -396,15 +409,13 @@ static void restore_terminal(void)
   uint32_t rel = 0u;
   ioctl(STDIN_FILENO, ALCOR2_IOC_KBD_RELEASE_EVENTS, &rel);
 
-  if(s_layout_changed)
-  {
+  if(s_layout_changed) {
     uint32_t us = KBD_LAYOUT_US;
     ioctl(STDIN_FILENO, ALCOR2_IOC_KBD_SET_LAYOUT, &us);
   }
   if(s_raw_mode_active)
     tcsetattr(STDIN_FILENO, TCSANOW, &s_saved_tio);
-  if(s_mouse_fd >= 0)
-  {
+  if(s_mouse_fd >= 0) {
     uint32_t rel_off = 0u;
     ioctl(s_mouse_fd, ALCOR2_IOC_MOUSE_SET_RELATIVE, &rel_off);
     close(s_mouse_fd);
@@ -442,24 +453,25 @@ static void feed_mouse_events(void)
     return;
 
   alcor2_mouse_event_t pkt;
-  int accum_dx = 0;
+  int                  accum_dx = 0;
 
-  while((int)read(s_mouse_fd, &pkt, sizeof(pkt)) == (int)sizeof(pkt))
-  {
-    accum_dx       += (int)pkt.dx;
+  while((int)read(s_mouse_fd, &pkt, sizeof(pkt)) == (int)sizeof(pkt)) {
+    accum_dx += (int)pkt.dx;
     s_mouse_buttons = (int)pkt.buttons;
   }
 
-  if(accum_dx >  MOUSE_DX_CLAMP) accum_dx =  MOUSE_DX_CLAMP;
-  if(accum_dx < -MOUSE_DX_CLAMP) accum_dx = -MOUSE_DX_CLAMP;
+  if(accum_dx > MOUSE_DX_CLAMP)
+    accum_dx = MOUSE_DX_CLAMP;
+  if(accum_dx < -MOUSE_DX_CLAMP)
+    accum_dx = -MOUSE_DX_CLAMP;
 
   /* Post every tick, even with no motion and no new packets, so a held button
    * keeps firing and a released one is seen promptly. */
   event_t ev;
   ev.type  = ev_mouse;
-  ev.data1 = s_mouse_buttons;        /* bit 0=left, 1=right, 2=middle */
+  ev.data1 = s_mouse_buttons;            /* bit 0=left, 1=right, 2=middle */
   ev.data2 = accum_dx * MOUSE_TURN_GAIN; /* +dx = right = Doom turn right */
-  ev.data3 = 0;                      /* no vertical look in classic Doom */
+  ev.data3 = 0;                          /* no vertical look in classic Doom */
   ev.data4 = 0;
   D_PostEvent(&ev);
 }
@@ -477,15 +489,13 @@ static void sig_handler(int sig)
 
 void DG_Init(void)
 {
-  if(alcor_fb_info(&s_fbinfo) < 0)
-  {
+  if(alcor_fb_info(&s_fbinfo) < 0) {
     const char msg[] = "doom: SYS_ALCOR_FB_INFO failed\n";
     write(STDERR_FILENO, msg, sizeof(msg) - 1);
     _exit(1);
   }
   s_fb32 = alcor_fb_mmap();
-  if(s_fb32 == (void *)-1)
-  {
+  if(s_fb32 == (void *)-1) {
     const char msg[] = "doom: SYS_ALCOR_FB_MMAP failed\n";
     write(STDERR_FILENO, msg, sizeof(msg) - 1);
     _exit(1);
@@ -505,8 +515,8 @@ void DG_Init(void)
   /* Centre the scaled image in the framebuffer. */
   uint32_t out_w = DOOMGENERIC_RESX * s_scale;
   uint32_t out_h = DOOMGENERIC_RESY * s_scale;
-  s_off_x        = (s_fbinfo.width  > out_w) ? (s_fbinfo.width  - out_w) / 2u : 0u;
-  s_off_y        = (s_fbinfo.height > out_h) ? (s_fbinfo.height - out_h) / 2u : 0u;
+  s_off_x = (s_fbinfo.width > out_w) ? (s_fbinfo.width - out_w) / 2u : 0u;
+  s_off_y = (s_fbinfo.height > out_h) ? (s_fbinfo.height - out_h) / 2u : 0u;
 
   /* Stop the fb_console from painting its cursor and text over our pixels. */
   ioctl(STDOUT_FILENO, FB_CONSOLE_YIELD, 0);
@@ -519,10 +529,10 @@ void DG_Init(void)
   /* Switch stdin to raw, non-blocking mode. */
   struct termios raw;
   tcgetattr(STDIN_FILENO, &s_saved_tio);
-  raw            = s_saved_tio;
-  raw.c_lflag   &= (tcflag_t) ~(ICANON | ECHO);
-  raw.c_cc[VMIN] = 0;
-  raw.c_cc[VTIME]= 0;
+  raw = s_saved_tio;
+  raw.c_lflag &= (tcflag_t) ~(ICANON | ECHO);
+  raw.c_cc[VMIN]  = 0;
+  raw.c_cc[VTIME] = 0;
   tcsetattr(STDIN_FILENO, TCSANOW, &raw);
   s_raw_mode_active = 1;
 
@@ -540,8 +550,7 @@ void DG_Init(void)
   /* Open the mouse device in non-blocking mode.  Failure is silently
    * tolerated — the game runs keyboard-only if the mouse is unavailable. */
   s_mouse_fd = open("/dev/mouse", O_RDONLY | O_NONBLOCK);
-  if(s_mouse_fd >= 0)
-  {
+  if(s_mouse_fd >= 0) {
     /* Pin the cursor to the screen centre and let deltas flow freely. */
     uint32_t rel_on = 1u;
     ioctl(s_mouse_fd, ALCOR2_IOC_MOUSE_SET_RELATIVE, &rel_on);
@@ -551,7 +560,7 @@ void DG_Init(void)
   signal(SIGSEGV, sig_handler);
   signal(SIGABRT, sig_handler);
   signal(SIGTERM, sig_handler);
-  signal(SIGINT,  sig_handler);
+  signal(SIGINT, sig_handler);
 }
 
 void DG_DrawFrame(void)
@@ -563,10 +572,8 @@ void DG_DrawFrame(void)
   uint32_t *fb_base = s_fb32 + s_off_y * s_pitch32 + s_off_x;
 
   /* Fast path for scale==1: blit with alpha fill, one row at a time. */
-  if(scale == 1)
-  {
-    for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++)
-    {
+  if(scale == 1) {
+    for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++) {
       const uint32_t *src_row = src + sy * DOOMGENERIC_RESX;
       uint32_t       *dst     = fb_base + sy * s_pitch32;
       for(uint32_t sx = 0; sx < DOOMGENERIC_RESX; sx++)
@@ -581,14 +588,12 @@ void DG_DrawFrame(void)
   uint32_t row_buf[DOOMGENERIC_RESX * MAX_SCALE];
   uint32_t row_bytes = DOOMGENERIC_RESX * scale * sizeof(uint32_t);
 
-  for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++)
-  {
+  for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++) {
     const uint32_t *src_row = src + sy * DOOMGENERIC_RESX;
 
     /* Expand one source row into row_buf. */
     uint32_t *out = row_buf;
-    for(uint32_t sx = 0; sx < DOOMGENERIC_RESX; sx++)
-    {
+    for(uint32_t sx = 0; sx < DOOMGENERIC_RESX; sx++) {
       uint32_t px = src_row[sx] | 0xFF000000u;
       for(uint32_t rx = 0; rx < scale; rx++)
         *out++ = px;
@@ -605,8 +610,8 @@ void DG_DrawFrame(void)
 void DG_SleepMs(uint32_t ms)
 {
   struct timespec ts = {
-    .tv_sec  = (time_t)(ms / 1000u),
-    .tv_nsec = (long)((ms % 1000u) * 1000000L),
+      .tv_sec  = (time_t)(ms / 1000u),
+      .tv_nsec = (long)((ms % 1000u) * 1000000L),
   };
   nanosleep(&ts, NULL);
 }
@@ -615,14 +620,14 @@ uint32_t DG_GetTicksMs(void)
 {
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
-  return (uint32_t)((uint64_t)ts.tv_sec * 1000u + (uint64_t)ts.tv_nsec / 1000000u);
+  return (uint32_t)((uint64_t)ts.tv_sec * 1000u +
+                    (uint64_t)ts.tv_nsec / 1000000u);
 }
 
 int DG_GetKey(int *pressed, unsigned char *key)
 {
   struct pollfd pfd = {.fd = STDIN_FILENO, .events = POLLIN};
-  if(poll(&pfd, 1, 0) > 0)
-  {
+  if(poll(&pfd, 1, 0) > 0) {
     uint8_t buf[16];
     int     n = (int)read(STDIN_FILENO, buf, sizeof(buf));
     if(n > 0)
@@ -642,14 +647,12 @@ void DG_SetWindowTitle(const char *title)
 
 /* WAD candidates searched in order when the user does not pass -iwad. */
 static const char *s_wad_candidates[] = {
-  "/games/doom/freedoom1.wad", /* Freedoom phase 1 — free IWAD replacement  */
-  "/games/doom/freedoom2.wad", /* Freedoom phase 2                           */
-  "/games/doom/doom1.wad",     /* id shareware                               */
-  "/games/doom/doom.wad",      /* id registered / Ultimate Doom              */
-  "/games/doom/doom2.wad",
-  "/games/doom/plutonia.wad",
-  "/games/doom/tnt.wad",
-  NULL,
+    "/games/doom/freedoom1.wad", /* Freedoom phase 1 — free IWAD replacement  */
+    "/games/doom/freedoom2.wad", /* Freedoom phase 2 */
+    "/games/doom/doom1.wad", /* id shareware                               */
+    "/games/doom/doom.wad",  /* id registered / Ultimate Doom              */
+    "/games/doom/doom2.wad",     "/games/doom/plutonia.wad",
+    "/games/doom/tnt.wad",       NULL,
 };
 
 static const char *find_default_wad(void)
@@ -676,8 +679,7 @@ int main(int argc, char **argv)
   for(int i = 0; i < argc; i++)
     patched_argv[patched_argc++] = argv[i];
 
-  if(!has_iwad && patched_argc + 2 < 68)
-  {
+  if(!has_iwad && patched_argc + 2 < 68) {
     patched_argv[patched_argc++] = (char *)"-iwad";
     patched_argv[patched_argc++] = (char *)find_default_wad();
   }
@@ -690,15 +692,13 @@ int main(int argc, char **argv)
   /* Send Doom's periodic printf to /dev/null: otherwise it repaints the console
    * over our framebuffer. */
   int devnull = open("/dev/null", O_WRONLY);
-  if(devnull >= 0)
-  {
+  if(devnull >= 0) {
     dup2(devnull, STDOUT_FILENO);
     dup2(devnull, STDERR_FILENO);
     close(devnull);
   }
 
-  for(;;)
-  {
+  for(;;) {
     feed_mouse_events();
     doomgeneric_Tick();
   }

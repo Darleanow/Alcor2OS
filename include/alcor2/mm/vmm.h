@@ -19,8 +19,8 @@
 #define VMM_PCD     (1ULL << 4) /* Page Cache Disable; PAT index bit 1 */
 /* CAUTION: bit 7 is the PAT index high bit only on a 4 KiB PTE. On a PDE/PDPTE
  * the same bit is PS (page size), so VMM_PAT must never be set on those levels.
- * Only VMM_WC below is used today; VMM_PCD/VMM_PAT are provided for completeness
- * and are currently unused. */
+ * Only VMM_WC below is used today; VMM_PCD/VMM_PAT are provided for
+ * completeness and are currently unused. */
 #define VMM_PAT (1ULL << 7)
 #define VMM_NX  (1ULL << 63)
 /** @} */
