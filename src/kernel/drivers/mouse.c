@@ -17,7 +17,7 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/sched.h>
 
-#define RING_CAP 64
+#define RING_CAP 256
 
 static struct
 {

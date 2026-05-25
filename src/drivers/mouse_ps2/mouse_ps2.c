@@ -36,8 +36,13 @@
 
 /* Mouse device commands (sent through the AUX port). */
 #define MOUSE_CMD_SET_DEFAULTS 0xF6
+#define MOUSE_CMD_SET_SAMPLE   0xF3 /* followed by a rate byte */
 #define MOUSE_CMD_ENABLE       0xF4
 #define MOUSE_ACK              0xFA
+
+/* Report rate in packets/sec. 200 (the PS/2 max) gives smooth motion; the
+ * default 100 is too coarse for a 35 fps game loop draining once per tic. */
+#define MOUSE_SAMPLE_RATE 200
 
 /* Packet byte 0 flag bits. */
 #define PKT_BTN_LEFT   0x01
@@ -194,11 +199,13 @@ bool mouse_ps2_init(void)
   ps2_cmd(PS2_CMD_WRITE_CONFIG);
   ps2_write_data(cfg);
 
-  /* Initialise the mouse: defaults then enable data reporting. */
+  /* Initialise the mouse: defaults, raise the report rate, enable reporting. */
   if(mouse_cmd(MOUSE_CMD_SET_DEFAULTS) != MOUSE_ACK) {
     console_print("[mouse-ps2] no ACK to SET_DEFAULTS — absent?\n");
     return false;
   }
+  if(mouse_cmd(MOUSE_CMD_SET_SAMPLE) == MOUSE_ACK)
+    mouse_cmd(MOUSE_SAMPLE_RATE);
   if(mouse_cmd(MOUSE_CMD_ENABLE) != MOUSE_ACK) {
     console_print("[mouse-ps2] no ACK to ENABLE\n");
     return false;
