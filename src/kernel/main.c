@@ -18,7 +18,6 @@
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/drivers/mouse.h>
-#include <alcor2/drivers/virtio.h>
 #include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/ext2.h>
 #include <alcor2/fs/vfs.h>
@@ -172,8 +171,9 @@ static void init_input(void)
     struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
     mouse_set_screen((u32)fb->width, (u32)fb->height);
   }
-  if(!virtio_input_init())
-    console_print("[INIT] No virtio mouse — /dev/mouse will be quiet.\n");
+
+  if(!mouse_ps2_init())
+    console_print("[INIT] No PS/2 mouse — /dev/mouse will be quiet.\n");
 }
 
 /**
