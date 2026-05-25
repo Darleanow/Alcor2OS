@@ -1,0 +1,6 @@
+# Commercial Doom IWADs are copyrighted — never commit them.
+*.wad
+*.WAD
+
+# Freedoom is BSD-licensed and freely redistributable, so it may be committed.
+!freedoom1.wad
