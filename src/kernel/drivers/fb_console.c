@@ -1759,6 +1759,15 @@ void fb_console_reclaim(void)
   mouse_cur.drawn = false;
   if(!ctx.cells)
     return;
+  /* Fill the whole framebuffer with the theme background first: a yielding app
+   * (e.g. doom) may have left arbitrary pixels in the margins outside the cell
+   * grid, which re-blitting cells alone would not cover. */
+  if(ctx.base && ctx.bytes_pp == 4)
+    for(u32 y = 0; y < ctx.height; y++)
+      fill32(
+          (volatile u32 *)(ctx.base + (u64)y * ctx.pitch),
+          0xFF000000u | ctx.default_bg, ctx.width
+      );
   s_pending_scroll = 0;
   for(int r = 0; r < ctx.rows; r++)
     for(int c = 0; c < ctx.cols; c++)
