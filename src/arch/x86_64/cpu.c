@@ -10,12 +10,53 @@
 #define MSR_FS_BASE 0xC0000100
 #define MSR_GS_BASE 0xC0000101
 
+#define MSR_PAT 0x00000277
+
 /**
  * @brief Halt the CPU indefinitely.
  *
  * Disables interrupts and enters an infinite HLT loop. Used for
  * unrecoverable errors or system shutdown. Never returns.
  */
+static void wrmsr_cpu(u32 msr, u64 value)
+{
+  __asm__ volatile(
+      "wrmsr" ::"a"((u32)value), "d"((u32)(value >> 32)), "c"(msr)
+  );
+}
+
+/**
+ * @brief Initialize the Page Attribute Table (PAT) MSR.
+ *
+ * Sets up the 8 PAT entries so that PWT=1,PCD=0 (index 1) selects
+ * Write-Combining — used for framebuffer mappings.  Other entries keep the
+ * x86 architectural defaults.
+ *
+ * PAT layout (one byte per entry, IA32_PAT MSR 0x277):
+ *   [0] WB  PWT=0 PCD=0 PAT=0  (default read/write)
+ *   [1] WC  PWT=1 PCD=0 PAT=0  ← override: WC for framebuffer
+ *   [2] UC- PWT=0 PCD=1 PAT=0
+ *   [3] UC  PWT=1 PCD=1 PAT=0
+ *   [4] WB  PWT=0 PCD=0 PAT=1
+ *   [5] WP  PWT=1 PCD=0 PAT=1
+ *   [6] UC- PWT=0 PCD=1 PAT=1
+ *   [7] UC  PWT=1 PCD=1 PAT=1
+ */
+void cpu_init_pat(void)
+{
+  /* Memory type encodings: WB=6, WC=1, UC_MINUS=7, UC=0, WP=5 */
+  u64 pat = 0;
+  pat |= (u64)6 << (0 * 8); /* PA0: WB  */
+  pat |= (u64)1 << (1 * 8); /* PA1: WC  ← PWT=1 selects this */
+  pat |= (u64)7 << (2 * 8); /* PA2: UC- */
+  pat |= (u64)0 << (3 * 8); /* PA3: UC  */
+  pat |= (u64)6 << (4 * 8); /* PA4: WB  */
+  pat |= (u64)5 << (5 * 8); /* PA5: WP  */
+  pat |= (u64)7 << (6 * 8); /* PA6: UC- */
+  pat |= (u64)0 << (7 * 8); /* PA7: UC  */
+  wrmsr_cpu(MSR_PAT, pat);
+}
+
 NORETURN void cpu_halt(void)
 {
   cpu_disable_interrupts();
