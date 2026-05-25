@@ -63,8 +63,9 @@ LDFLAGS := -nostdlib -static -pie --no-dynamic-linker \
 
 ASFLAGS := -f elf64
 
-# Lint: userland .c handled here (KERNEL_SRCS_* live in mk/kernel.mk)
-USER_SRCS_C := $(shell find user \( -path '*/.cache/*' \) -prune -o -name '*.c' -print 2>/dev/null | LC_ALL=C sort)
+# Lint: userland .c handled here (KERNEL_SRCS_* live in mk/kernel.mk).
+# doomgeneric is a third-party submodule and is excluded from lint/format.
+USER_SRCS_C := $(shell find user \( -path '*/.cache/*' -o -path '*/doomgeneric/*' \) -prune -o -name '*.c' -print 2>/dev/null | LC_ALL=C sort)
 
 # QEMU — hardware acceleration is optional (KVM on Linux, HVF on Intel Mac).
 # Apple Silicon hosts can't accelerate an x86_64 guest, so they stay on TCG.

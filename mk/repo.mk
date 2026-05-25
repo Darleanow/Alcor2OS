@@ -299,6 +299,7 @@ format fmt:
 	  \( -name '*.c' -o -name '*.h' -o -name '*.cpp' \) \
 	  ! -path '*/thirdparty/*' \
 	  ! -path '*/.cache/*' \
+	  ! -path '*/doomgeneric/*' \
 	  -print0 | xargs -0 clang-format -i
 
 lint:
@@ -323,6 +324,7 @@ check:
 	  --inline-suppr \
 	  --inconclusive \
 	  --quiet \
+	  -i user/games/doom/doomgeneric \
 	  -I$(INCLUDE) \
 	  $(SRC) user
 
