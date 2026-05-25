@@ -43,6 +43,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          submodules: recursive
 
       # ── System packages ──────────────────────────────────────────────────
       - name: Install build dependencies
@@ -309,6 +310,7 @@ jobs:
           prerelease: false
           draft: false
           make_latest: true
+          generate_release_notes: true
           body: |
             ## Alcor2 ${{ needs.build-full.outputs.release_tag }}
 
