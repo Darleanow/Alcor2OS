@@ -3,6 +3,7 @@
  * @brief Misc syscalls: `uname`, time, minimal `futex`, `sched_yield`.
  */
 
+#include <alcor2/arch/pit.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>
@@ -59,8 +60,9 @@ u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
     i64 tv_usec;
   } *t = (void *)tv;
 
-  t->tv_sec  = 0;
-  t->tv_usec = 0;
+  u64 ns     = pit_get_ns();
+  t->tv_sec  = (i64)(ns / 1000000000ULL);
+  t->tv_usec = (i64)((ns % 1000000000ULL) / 1000ULL);
   return 0;
 }
 
@@ -267,8 +269,10 @@ u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
   } *ts = (void *)tp;
   if(!user_buf_ok(tp, sizeof(*ts)))
     return (u64)-EFAULT;
-  ts->s  = 0;
-  ts->ns = 0;
+
+  u64 ns = pit_get_ns();
+  ts->s  = (i64)(ns / 1000000000ULL);
+  ts->ns = (i64)(ns % 1000000000ULL);
   return 0;
 }
 
