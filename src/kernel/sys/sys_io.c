@@ -283,12 +283,12 @@ u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
   if(ts->sec < 0 || ts->nsec < 0 || ts->nsec >= 1000000000)
     return (u64)-EINVAL;
 
-  u64 ms    = (u64)ts->sec * 1000 + (u64)ts->nsec / 1000000;
-  u64 ticks = (ms + 9) / 10;
-  if(ticks == 0)
-    ticks = 1;
-
-  for(u64 i = 0; i < ticks; i++) {
+  /* Sleep against the monotonic ns clock so the duration holds regardless of
+   * the PIT rate. HLT wakes on each tick; the loop re-checks until the deadline
+   * (so the actual sleep is at least one tick). */
+  u64 want_ns  = (u64)ts->sec * 1000000000ULL + (u64)ts->nsec;
+  u64 deadline = pit_get_ns() + want_ns;
+  while(pit_get_ns() < deadline) {
     cpu_enable_interrupts();
     __asm__ volatile("hlt");
     cpu_disable_interrupts();
@@ -443,10 +443,15 @@ static i32 sel_write_ready(u64 fd)
   return vfs_select_write_ready((i64)fd);
 }
 
-/** @brief ~10 ms of wall time per tick (matches ::sys_nanosleep heuristics). */
+/** @brief Convert a millisecond timeout to whole HLT ticks at the current PIT
+ * rate, rounding up to at least one. */
 static u64 io__ms_to_hlt_ticks(u64 ms)
 {
-  u64 t = (ms + 9) / 10;
+  u64 hz      = pit_get_frequency();
+  u64 ms_tick = 1000u / hz;
+  if(ms_tick == 0)
+    ms_tick = 1;
+  u64 t = (ms + ms_tick - 1) / ms_tick;
   return t ? t : 1;
 }
 
