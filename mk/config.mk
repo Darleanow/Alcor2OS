@@ -73,6 +73,14 @@ QEMU       ?= qemu-system-x86_64
 QEMU_RAM   ?= 2048M
 USE_KVM    ?=
 
+# Default display (Linux/GTK): grab-on-hover confines the pointer so relative
+# mouse deltas stay clean at the screen edge; zoom-to-fit=off shows the guest
+# 1:1 instead of bilinear-stretching it (which blurs text in fullscreen).
+# Override with QEMU_DISPLAY= on other hosts or to pick another UI.
+ifeq ($(UNAME),Linux)
+  QEMU_DISPLAY ?= gtk,grab-on-hover=on,zoom-to-fit=off
+endif
+
 QEMU_KVM := -cpu max
 ifeq ($(UNAME),Linux)
   ifeq ($(USE_KVM),0)
