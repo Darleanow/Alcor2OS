@@ -72,7 +72,7 @@ static void print_banner(void)
   console_print(" / ___ |/ / /__/ /_/ / /   / __/\n");
   console_print("/_/  |_/_/\\___/\\____/_/   /____/\n");
   console_print("\n");
-  console_print("Alcor2 OS v0.1.0\n");
+  console_printf("Alcor2 OS %s\n", ALCOR2_VERSION);
 }
 
 /**
