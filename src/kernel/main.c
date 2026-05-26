@@ -20,7 +20,9 @@
 #include <alcor2/drivers/mouse.h>
 #include <alcor2/fs/blockdev.h>
 #include <alcor2/fs/ext2.h>
+#include <alcor2/fs/initfs.h>
 #include <alcor2/fs/vfs.h>
+#include <alcor2/kstdlib.h>
 #include <alcor2/limine.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/pmm.h>
@@ -115,6 +117,7 @@ static void init_early(
 
   heap_init();
   ramfs_init();
+  initfs_init();
 
   /* fb_console takes over the framebuffer with cell-grid + ANSI/CSI parsing.
    * Allocates via kmalloc, so it must run after heap_init. Falls back to the
@@ -123,24 +126,129 @@ static void init_early(
     console_print("[fb_console] init failed; staying on boot logger.\n");
 }
 
+/** @brief Shell module pointer set by ::init_bin_overlay, consumed by
+ * ::launch_init when starting PID 1. */
+static struct limine_file *g_shell_module = NULL;
+
 /**
- * @brief Launch first user process from boot modules.
+ * @brief Return @c true when @p path starts with @p prefix.
+ *
+ * @param path    NUL-terminated path to test.
+ * @param prefix  NUL-terminated prefix.
+ * @return @c true if every byte of @p prefix matches the head of @p path.
  */
-static void launch_init(void)
+static bool path_has_prefix(const char *path, const char *prefix)
 {
+  while(*prefix) {
+    if(*path++ != *prefix++)
+      return false;
+  }
+  return true;
+}
+
+/**
+ * @brief Return @c true when @p path ends with @p suffix (case-sensitive).
+ *
+ * @param path    NUL-terminated path to test.
+ * @param suffix  NUL-terminated suffix.
+ * @return @c true if the tail of @p path equals @p suffix.
+ */
+static bool path_has_suffix(const char *path, const char *suffix)
+{
+  u64 lp = kstrlen(path);
+  u64 ls = kstrlen(suffix);
+  if(ls > lp)
+    return false;
+  return kstreq(path + (lp - ls), suffix);
+}
+
+/**
+ * @brief Strip a trailing @c .elf extension in-place.
+ *
+ * @c "ls.elf" becomes @c "ls" so initfs lookups can use unsuffixed names.
+ *
+ * @param name  NUL-terminated string mutated in place; no-op when it does
+ *              not end in @c .elf.
+ */
+static void strip_elf_suffix(char *name)
+{
+  u64 n = kstrlen(name);
+  if(n > 4 && kstreq(name + n - 4, ".elf"))
+    name[n - 4] = '\0';
+}
+
+/**
+ * @brief Classify boot modules into initfs entries (the /init overlay) and
+ * the shell module (PID 1). After this phase, /init is a mounted initfs
+ * backed by Limine-loaded buffers (vega searches it before /bin and
+ * /usr/bin), and @c g_shell_module is ready for launch_init.
+ */
+static void init_bin_overlay(void)
+{
+  static const char bin_prefix[] = "/boot/bin/";
+  static const char shell_path[] = "/boot/shell.elf";
+  const u64         bin_prefix_n = sizeof(bin_prefix) - 1;
+
   if(!module_request.response || module_request.response->module_count == 0) {
-    console_print("[KERNEL] No modules found, halting.\n");
+    console_print("[INIT] No boot modules — /init overlay disabled.\n");
     return;
   }
 
-  struct limine_file *mod = module_request.response->modules[0];
+  u64 bin_count = 0;
+  for(u64 i = 0; i < module_request.response->module_count; i++) {
+    struct limine_file *mod = module_request.response->modules[i];
+    if(!mod->path || mod->path[0] != '/')
+      continue;
+
+    if(kstreq(mod->path, shell_path)) {
+      g_shell_module = mod;
+      continue;
+    }
+
+    if(path_has_prefix(mod->path, bin_prefix) &&
+       path_has_suffix(mod->path, ".elf")) {
+      char name[VFS_NAME_MAX];
+      kstrncpy(name, mod->path + bin_prefix_n, VFS_NAME_MAX);
+      strip_elf_suffix(name);
+      if(initfs_register(name, mod->address, mod->size) == 0) {
+        bin_count++;
+      } else {
+        console_printf("[INIT] /init overlay: failed to add %s\n", name);
+      }
+    }
+  }
+
+  if(bin_count > 0) {
+    if(vfs_mount(NULL, "/init", "initfs") == 0)
+      console_printf(
+          "[INIT] /init overlay: %d files mounted.\n", (int)bin_count
+      );
+    else
+      console_print("[INIT] /init overlay: mount failed.\n");
+  }
+}
+
+/**
+ * @brief Launch first user process from the shell module identified by
+ * init_bin_overlay.
+ */
+static void launch_init(void)
+{
+  if(!g_shell_module) {
+    console_print("[KERNEL] No shell module (/boot/shell.elf) — halting.\n");
+    return;
+  }
+
   console_printf(
-      "[KERNEL] Loading: %s (%lu bytes)\n", mod->path, (u64)mod->size
+      "[KERNEL] Loading: %s (%lu bytes)\n", g_shell_module->path,
+      (u64)g_shell_module->size
   );
 
   /* proc_start_first jumps to ring 3 and never comes back. */
-  const char *ep = (mod->path && mod->path[0]) ? mod->path : "/boot/shell.elf";
-  proc_start_first(mod->address, mod->size, "shell", ep);
+  proc_start_first(
+      g_shell_module->address, g_shell_module->size, "shell",
+      g_shell_module->path
+  );
 }
 
 /** @brief Represents a single phase of the kernel boot process. */
@@ -248,6 +356,7 @@ static const boot_phase_t boot_sequence[] = {
     {"Hardware Interrupts",  init_interrupts    },
     {"VFS Orchestrator",     vfs_init           },
     {"Storage & VFS",        init_storage       },
+    {"/init Overlay",        init_bin_overlay   },
     {"PS/2 Mouse",           init_input         },
     {"Process Table",        proc_init          },
     {NULL,                   init_idt_proc_hooks},

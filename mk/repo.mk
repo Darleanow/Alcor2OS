@@ -88,12 +88,17 @@ iso-kernel: $(BUILD)/$(KERNEL) thirdparty/limine/limine
 
 iso: toolchain $(BUILD)/$(KERNEL) thirdparty/limine/limine user
 	@rm -rf $(BUILD)/iso
-	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/EFI/BOOT $(BUILD)/iso/bin
+	@mkdir -p $(BUILD)/iso/boot/limine $(BUILD)/iso/boot/bin $(BUILD)/iso/EFI/BOOT
 	@cp $(BUILD)/$(KERNEL) $(BUILD)/iso/boot/
 	@cp user/build/apps/shell.elf $(BUILD)/iso/boot/ 2>/dev/null || true
-	@cp user/build/bin/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
-	@cp user/build/apps/*.elf $(BUILD)/iso/bin/ 2>/dev/null || true
+	@cp user/build/bin/*.elf $(BUILD)/iso/boot/bin/ 2>/dev/null || true
 	@cp scripts/limine.conf $(BUILD)/iso/boot/limine/
+	@printf '\n' >> $(BUILD)/iso/boot/limine/limine.conf
+	@for f in $(BUILD)/iso/boot/bin/*.elf; do \
+		[ -f "$$f" ] || continue; \
+		echo "    module_path: boot():/boot/bin/$$(basename $$f)" \
+			>> $(BUILD)/iso/boot/limine/limine.conf; \
+	done
 	@cp thirdparty/limine/limine-bios.sys      $(BUILD)/iso/boot/limine/
 	@cp thirdparty/limine/limine-bios-cd.bin   $(BUILD)/iso/boot/limine/
 	@cp thirdparty/limine/limine-uefi-cd.bin   $(BUILD)/iso/boot/limine/
@@ -148,7 +153,8 @@ disk-populate: user
 		$(DISK_ROOT)/usr/bin \
 		$(DISK_ROOT)/usr/include $(DISK_ROOT)/usr/lib
 	@sh scripts/macos-disk-preserve.sh $(DISK) $(DISK_ROOT) || true
-	@cp user/build/bin/*.elf  $(DISK_ROOT)/bin/ 2>/dev/null || true
+	@# user/build/bin/*.elf ride along in the ISO as Limine modules → /init
+	@# overlay. Only the heavier apps live on the persistent disk.
 	@cp user/build/apps/*.elf $(DISK_ROOT)/bin/ 2>/dev/null || true
 	@for f in $(DISK_ROOT)/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done
 
@@ -230,14 +236,19 @@ disk-resync: user disk-populate
 # Mouse is the emulated i8042 PS/2 controller (always present). Grab with
 # Ctrl+Alt+G or fullscreen.
 
-run: iso disk-populate
+run: iso
+	@if [ ! -f $(DISK) ]; then \
+		echo "[run] $(DISK) missing — staging first-run disk."; \
+		$(MAKE) disk-populate; \
+	fi
 	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
 		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
 		$(QEMU_EXTRA)
 
-debug: iso disk-populate
+debug: iso
+	@if [ ! -f $(DISK) ]; then $(MAKE) disk-populate; fi
 	@echo ""
 	@echo "  QEMU GDB server → :1234  (VM paused at first instruction)"
 	@echo "  Connect: gdb -ex 'target remote :1234' -ex 'symbol-file $(BUILD)/$(KERNEL)'"
@@ -257,8 +268,7 @@ ifeq ($(UNAME),Linux)
 	@test -f $(DISK) || { echo "disk-quick: $(DISK) missing — run disk-populate first"; exit 1; }
 	@mkdir -p mnt
 	@fuse2fs $(DISK) mnt
-	@cp user/build/bin/*.elf  mnt/bin/ 2>/dev/null; \
-	 for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; true
+	@# user/build/bin/*.elf live in the ISO (initfs /init overlay); only sync apps.
 	@cp user/build/apps/*.elf mnt/bin/ 2>/dev/null; \
 	 for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; true
 	@fusermount -u mnt
