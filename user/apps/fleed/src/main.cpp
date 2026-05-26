@@ -7,7 +7,9 @@
  */
 
 #include <curses.h>
+#include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <grendizer.h>
 #include <spazer/spazer.h>
 #include <stdlib.h>
@@ -62,8 +64,19 @@ int main(int argc, char **argv)
   int          rows, cols;
   getmaxyx(stdscr, rows, cols);
 
-  std::string  header = std::string("Fleed ") + path;
+  std::filesystem::path p(path);
+  f.open(p, std::ios::in | std::ios::out);
+  if(!f.is_open()) {
+    (void)fputs("fleed: failed to open file for writing\n", stderr);
+    return 1;
+  }
 
+  std::stringstream ss;
+  ss << f.rdbuf();
+  f.close();
+  std::string  buf {ss.str()};
+
+  std::string  header = std::string("Fleed ") + p.filename().c_str();
   spz_panel_t *editor =
       spz_panel_new(0, 0, rows - 1, cols, header.c_str(), SPZ_BORDER_SINGLE);
   if(!editor) {
@@ -72,10 +85,12 @@ int main(int argc, char **argv)
     (void)fputs("fleed: failed to create editor panel\n", stderr);
     return 1;
   }
-  std::string buf;
+
   keypad(editor->body, TRUE);
   spz_statusbar("fleed", nullptr, "F1 quit F2 save");
   spz_panel_refresh(editor);
+  waddstr(editor->body, buf.c_str());
+  wrefresh(editor->body);
 
   for(;;) {
     wint_t ch;
@@ -85,24 +100,19 @@ int main(int argc, char **argv)
       break;
 
     if(kind == KEY_CODE_YES && ch == (wint_t)KEY_F(2)) {
-      f.open(path, std::ios::out | std::ios::trunc);
-      if(!f.is_open())
-        (void)fputs("fleed: failed to open file for writing\n", stderr);
-      else
-        f.write(buf.c_str(), (std::streamsize)buf.size());
-      f.close();
+      FILE *out = fopen(path, "w");
+      if(out) {
+        (void)fwrite(buf.c_str(), 1, buf.size(), out);
+        (void)fclose(out);
+      }
       continue;
     }
 
     if(kind == KEY_CODE_YES && ch == (wint_t)KEY_BACKSPACE) {
       if(!buf.empty()) {
         buf.pop_back();
-        int y, x;
-        getyx(editor->body, y, x);
-        if(x > 0) {
-          mvwaddch(editor->body, y, x - 1, ' ');
-          wmove(editor->body, y, x - 1);
-        }
+        wclear(editor->body);
+        waddstr(editor->body, buf.c_str());
         wrefresh(editor->body);
       }
       continue;

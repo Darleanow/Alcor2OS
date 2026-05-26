@@ -50,7 +50,8 @@ compile_commands: $(OBJS)
 		echo '    "arguments": [' >> compile_commands.json; \
 		echo '      "$(CC)",' >> compile_commands.json; \
 		for flag in $(CFLAGS); do \
-			echo '      "'"$$flag"'",' >> compile_commands.json; \
+			escaped=$$(printf '%s' "$$flag" | sed 's/"/\\"/g'); \
+			echo '      "'"$$escaped"'",' >> compile_commands.json; \
 		done; \
 		echo '      "-c",' >> compile_commands.json; \
 		echo '      "'"$$src"'",' >> compile_commands.json; \
@@ -68,7 +69,8 @@ compile_commands: $(OBJS)
 			echo '    "arguments": [' >> compile_commands.json; \
 			echo '      "$(CC)",' >> compile_commands.json; \
 			for flag in $(USER_CC_FLAGS); do \
-				echo '      "'"$$flag"'",' >> compile_commands.json; \
+				escaped=$$(printf '%s' "$$flag" | sed 's/"/\\"/g'); \
+				echo '      "'"$$escaped"'",' >> compile_commands.json; \
 			done; \
 			echo '      "-c",' >> compile_commands.json; \
 			echo '      "'"$$src"'"' >> compile_commands.json; \
@@ -96,6 +98,13 @@ compile_commands: $(OBJS)
 			echo '      "'"thirdparty/musl/$(MUSL_PREFIX)/include"'",' >> compile_commands.json; \
 			echo '      "-isystem",' >> compile_commands.json; \
 			echo '      "'"$(INCLUDE)"'",' >> compile_commands.json; \
+			echo '      "-Iuser/include",' >> compile_commands.json; \
+			echo '      "-Ithirdparty/ncurses-install/usr/include",' >> compile_commands.json; \
+			echo '      "-Ithirdparty/ncurses-install/usr/include/ncurses",' >> compile_commands.json; \
+			echo '      "-Iuser/sdk/spazer/include",' >> compile_commands.json; \
+			echo '      "-Iuser/sdk/vega/include",' >> compile_commands.json; \
+			echo '      "-Iuser/core/vega/include",' >> compile_commands.json; \
+			echo '      "-Iuser/apps/shell/include",' >> compile_commands.json; \
 			echo '      "-Wall",' >> compile_commands.json; \
 			echo '      "-Wextra",' >> compile_commands.json; \
 			echo '      "-O2",' >> compile_commands.json; \
