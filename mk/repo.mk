@@ -1,6 +1,6 @@
 # Userland, images, disk, QA
 
-.PHONY: all help kernel user iso iso-kernel run debug disk disk-mount disk-umount \
+.PHONY: all help kernel user iso iso-kernel run run-log run-trace debug disk disk-mount disk-umount \
         disk-populate disk-resync disk-quick clean clean-all distclean \
         format fmt lint check qa
 
@@ -20,6 +20,8 @@ help:
 	@echo "    run             build + boot in QEMU  (KVM auto-detected)"
 	@echo "    run USE_KVM=0   force TCG (no acceleration)"
 	@echo "    run USE_KVM=1   force KVM"
+	@echo "    run-log         build + boot, mirror kernel log to host stdio"
+	@echo "    run-trace       run-log + QEMU -d guest_errors/int/cpu_reset trace"
 	@echo "    debug           build + boot with GDB server on :1234 (VM paused)"
 	@echo ""
 	@echo "  Disk"
@@ -245,6 +247,40 @@ run: iso
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
 		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
 		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
+		$(QEMU_EXTRA)
+
+# Same as `run`, but mirrors the kernel boot log (everything that goes through
+# console_print) to host stdio via QEMU's debugcon. Useful for diagnosing init
+# failures without a serial setup.
+#
+# `run-trace` goes a step further: kernel log to stdio AND QEMU's own
+# interrupt / guest-error / CPU-reset trace into $(BUILD)/qemu-trace.log,
+# with -no-reboot so a triple fault stays visible instead of looping.
+run-log: iso
+	@if [ ! -f $(DISK) ]; then \
+		echo "[run-log] $(DISK) missing — staging first-run disk."; \
+		$(MAKE) disk-populate; \
+	fi
+	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
+		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
+		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
+		-debugcon stdio \
+		$(QEMU_EXTRA)
+
+run-trace: iso
+	@if [ ! -f $(DISK) ]; then \
+		echo "[run-trace] $(DISK) missing — staging first-run disk."; \
+		$(MAKE) disk-populate; \
+	fi
+	@echo "[run-trace] QEMU trace → $(BUILD)/qemu-trace.log"
+	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
+		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
+		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
+		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
+		-debugcon stdio \
+		-d guest_errors,int,cpu_reset -D $(BUILD)/qemu-trace.log \
+		-no-reboot \
 		$(QEMU_EXTRA)
 
 debug: iso
