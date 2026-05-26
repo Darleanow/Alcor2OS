@@ -245,8 +245,13 @@ void mouse_set_relative(bool enabled)
 {
   cpu_disable_interrupts();
   g.relative = enabled;
-  g.cursor_x = (i32)(g.screen_w / 2);
-  g.cursor_y = (i32)(g.screen_h / 2);
+  /* Pin to centre only when entering relative mode; leaving it must preserve
+   * the free cursor position (otherwise it jumps to centre after every command
+   * that resets input modes on exit). */
+  if(enabled) {
+    g.cursor_x = (i32)(g.screen_w / 2);
+    g.cursor_y = (i32)(g.screen_h / 2);
+  }
   /* Drain the ring on every mode change: stale deltas/clicks must not replay
    * into the next session (e.g. a stuck camera when doom is relaunched). */
   g.head = g.tail;
