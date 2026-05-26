@@ -3,6 +3,10 @@
 #include <curses.h>
 #include <spazer/palette.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ncurses colour-pair IDs registered by spz_init().
  *
  *  Pair    Foreground         Background
@@ -59,3 +63,7 @@ int  spz_menu(int y, int x, const char *const *items, int n, const char *title);
 void spz_label(WINDOW *win, int y, int x, const char *text, int style);
 
 void spz_clear_region(WINDOW *win, int y, int x, int rows, int cols);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
