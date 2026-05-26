@@ -3,7 +3,7 @@
  * @brief Numbered syscall lookup and dispatch.
  */
 
-#include <alcor2/drivers/console.h>
+#include <alcor2/drivers/klog.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/proc/proc.h>
@@ -146,7 +146,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
 
   if(!d || !d->handler) {
 #if SYS_TRACE
-    console_printf("[sys] unknown syscall %d\n", (int)num);
+    klogf("[sys] unknown syscall %d\n", (int)num);
 #endif
     if(p)
       p->current_frame = old_frame;
@@ -154,7 +154,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   }
 
 #if SYS_TRACE
-  console_printf(
+  klogf(
       "[sys] %s(%lx, %lx, %lx, %lx, %lx, %lx)", d->name, frame->rdi, frame->rsi,
       frame->rdx, frame->r10, frame->r8, frame->r9
   );
@@ -165,7 +165,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   );
 
 #if SYS_TRACE
-  console_printf(" = %lx\n", ret);
+  klogf(" = %lx\n", ret);
 #endif
 
   if(p)

@@ -1,6 +1,6 @@
 # Userland, images, disk, QA
 
-.PHONY: all help kernel user iso iso-kernel run run-log run-trace debug disk disk-mount disk-umount \
+.PHONY: all help kernel user iso iso-kernel run run-trace debug disk disk-mount disk-umount \
         disk-populate disk-resync disk-quick clean clean-all distclean \
         format fmt lint check qa
 
@@ -20,8 +20,7 @@ help:
 	@echo "    run             build + boot in QEMU  (KVM auto-detected)"
 	@echo "    run USE_KVM=0   force TCG (no acceleration)"
 	@echo "    run USE_KVM=1   force KVM"
-	@echo "    run-log         build + boot, mirror kernel log to host stdio"
-	@echo "    run-trace       run-log + per-syscall log (kernel rebuilt SYS_TRACE=1)"
+	@echo "    run-trace       build + boot with kernel log + syscall trace to host stdio"
 	@echo "    debug           build + boot with GDB server on :1234 (VM paused)"
 	@echo ""
 	@echo "  Disk"
@@ -249,26 +248,11 @@ run: iso
 		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
 		$(QEMU_EXTRA)
 
-# Same as `run`, but mirrors the kernel boot log (everything that goes through
-# console_print) to host stdio via QEMU's debugcon. Useful for diagnosing init
-# failures without a serial setup.
-#
-# `run-trace` additionally rebuilds the kernel with SYS_TRACE=1, so every
-# syscall is logged with name + args + return value alongside the normal
-# kernel log. All output stays in the terminal — chatty but the right thing
-# when diagnosing userland integration issues.
-run-log: iso
-	@if [ ! -f $(DISK) ]; then \
-		echo "[run-log] $(DISK) missing — staging first-run disk."; \
-		$(MAKE) disk-populate; \
-	fi
-	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
-		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
-		-boot order=d -m $(QEMU_RAM) $(QEMU_KVM) \
-		$(if $(QEMU_DISPLAY),-display $(QEMU_DISPLAY)) \
-		-debugcon stdio \
-		$(QEMU_EXTRA)
-
+# Rebuilds the kernel with SYS_TRACE=1 and boots with QEMU's debugcon backend
+# wired to host stdio. The host terminal gets both the boot logger (kernel's
+# [INIT] / [ELF] / [PROC] lines via console_print mirroring) AND a per-syscall
+# trace (name, args, return value via klogf). The framebuffer stays clean for
+# the shell — syscall traces never touch it.
 run-trace:
 	@$(MAKE) iso SYS_TRACE=1
 	@if [ ! -f $(DISK) ]; then \
