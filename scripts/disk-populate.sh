@@ -58,16 +58,16 @@ printf 'int main(void){return 0;}\n' \
 printf '#include <stdio.h>\nint main(void){printf("hi\\n");return 0;}\n' \
   | $S tee "$MNT/home/hi.c" >/dev/null
 
-# ----- 2. Builtins (ls/cat/echo/...) and shell apps --------------------------
+# ----- 2. Shell apps (heavier, persistent) -----------------------------------
 # Wipe everything in /bin except heavy toolchain binaries we may keep cached.
+# Small POSIX utilities (user/bin/) are shipped via the kernel's /init overlay
+# (Limine boot modules → initfs), so they no longer live on disk at all.
 $S find "$MNT/bin" -mindepth 1 -maxdepth 1 \
   ! -name clang.real ! -name lld -exec rm -f {} +
 
-for f in "$USER_BUILD/bin"/*.elf "$USER_BUILD/apps"/*.elf; do
+for f in "$USER_BUILD/apps"/*.elf; do
   [ -f "$f" ] || continue
   bn=$(basename "$f" .elf)
-  # `cc` is our explicit compiler-driver wrapper — installed under multiple names below.
-  [ "$bn" = cc ] && continue
   $S cp "$f" "$MNT/bin/$bn"
 done
 

@@ -14,10 +14,29 @@
  */
 
 #include "font.h"
+#include <alcor2/arch/io.h>
 #include <alcor2/drivers/console.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/types.h>
 #include <stdarg.h>
+
+/** @brief Sideband debug-console port.
+ *
+ * Every byte written here lands in whatever backend the host has wired
+ * up (a developer terminal during emulation, nothing when nobody is
+ * listening). Always safe to enable — unattached hosts silently discard
+ * the writes. */
+#define DEBUGCON_PORT 0xE9
+
+/**
+ * @brief Mirror a byte to the debug-console port.
+ *
+ * @param c  Byte to emit; written verbatim to the @c outb port.
+ */
+static inline void debugcon_putc(char c)
+{
+  outb(DEBUGCON_PORT, (u8)c);
+}
 
 #define FONT_W 8
 #define FONT_H 16
@@ -198,6 +217,8 @@ static void scroll(void)
 
 void console_putchar(char c)
 {
+  debugcon_putc(c);
+
   switch(c) {
   case '\n':
     ctx.cursor_x = 0;

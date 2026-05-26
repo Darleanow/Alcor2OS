@@ -48,6 +48,9 @@ endif
 # excluded so it never masks the real version). Falls back to the short SHA.
 GIT_VERSION := $(shell git describe --tags --match 'v*' --always --dirty 2>/dev/null || echo dev)
 DEBUG       ?= 0
+# SYS_TRACE=1 turns on per-syscall logging in the dispatcher (name, args,
+# return). Used by the `run-trace` target; default 0 for normal builds.
+SYS_TRACE   ?= 0
 
 # Kernel compile / link
 CFLAGS := -std=gnu11 -Wall -Wextra -Werror \
@@ -55,6 +58,7 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Werror \
           -fno-lto -fPIE -m64 -march=x86-64 \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
+          -DSYS_TRACE=$(SYS_TRACE) \
           -I$(INCLUDE) -Isrc -MMD -MP
 ifeq ($(DEBUG),1)
   CFLAGS += -g

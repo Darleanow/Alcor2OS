@@ -197,7 +197,10 @@ static int resolve_path(const char *name, char *out_path)
     return 0;
   }
 
-  static const char *const dirs[] = {"/bin/", "/usr/bin/", NULL};
+  /* Search /init first so the ISO-shipped POSIX utilities take precedence
+   * over any stale copies on disk. /bin keeps the on-disk toolchain
+   * (cc, clang.real, lld). */
+  static const char *const dirs[] = {"/init/", "/bin/", "/usr/bin/", NULL};
   for(int i = 0; dirs[i]; i++) {
     char       *p      = out_path;
     const char *prefix = dirs[i];

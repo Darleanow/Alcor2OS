@@ -3,6 +3,7 @@
  * @brief Numbered syscall lookup and dispatch.
  */
 
+#include <alcor2/drivers/klog.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/proc/proc.h>
@@ -10,7 +11,11 @@
 #include <alcor2/sys/syscall.h>
 
 /* Set to 1 to trace every syscall with its arguments */
-#define SYS_TRACE 0
+/* Build-time toggle: pass SYS_TRACE=1 via CFLAGS (e.g. `make run-trace`)
+ * to log every syscall with name, args, and return value to debugcon. */
+#ifndef SYS_TRACE
+  #define SYS_TRACE 0
+#endif
 
 #define SYS_DEF(n, nm, fn)                                                     \
   {                                                                            \
@@ -141,7 +146,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
 
   if(!d || !d->handler) {
 #if SYS_TRACE
-    console_printf("[sys] unknown syscall %d\n", (int)num);
+    klogf("[sys] unknown syscall %d\n", (int)num);
 #endif
     if(p)
       p->current_frame = old_frame;
@@ -149,7 +154,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   }
 
 #if SYS_TRACE
-  console_printf(
+  klogf(
       "[sys] %s(%lx, %lx, %lx, %lx, %lx, %lx)", d->name, frame->rdi, frame->rsi,
       frame->rdx, frame->r10, frame->r8, frame->r9
   );
@@ -160,7 +165,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   );
 
 #if SYS_TRACE
-  console_printf(" = %lx\n", ret);
+  klogf(" = %lx\n", ret);
 #endif
 
   if(p)
