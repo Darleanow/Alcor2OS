@@ -348,9 +348,12 @@ lint:
 	     -Iuser/core/vega/include \
 	     -Iuser/apps/shell/include \
 	     -Iuser/include \
+	     -Iuser/games/doom/doomgeneric/doomgeneric \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
 	     -Ithirdparty/freetype-install/usr/include/freetype2 \
 	     -Ithirdparty/harfbuzz-install/usr/include/harfbuzz \
+	     -DALCOR2_VERSION=\"qa\" \
+	     -DSYS_TRACE=0 \
 	     -std=gnu11
 
 check:
