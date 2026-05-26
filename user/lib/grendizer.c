@@ -184,12 +184,11 @@ static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
 {
-  const char *p    = text;
-  double      acc  = 0.0;
-  int         sig  = 1;
-  int         esig = 1;
-  long        exp  = 0;
-  int         saw  = 0;
+  const char *p   = text;
+  double      acc = 0.0;
+  int         sig = 1;
+  long        exp = 0;
+  int         saw = 0;
 
   if(!text || !*text) {
     gr__errf(buf, cap, stderr, "%s: missing floating-point value", label);
@@ -223,6 +222,7 @@ static int gr__parse_float(
   }
 
   if(*p == 'e' || *p == 'E') {
+    int esig = 1;
     p++;
     if(*p == '-') {
       esig = -1;
@@ -287,7 +287,7 @@ static int gr__apply_value(
 void gr_usage(const gr_spec *spec, FILE *stream)
 {
   const gr_opt *o;
-  unsigned      col = 0, w;
+  unsigned      col = 0;
 
   if(!stream)
     stream = stdout;
@@ -312,7 +312,7 @@ void gr_usage(const gr_spec *spec, FILE *stream)
           (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
       n += 1 + (int)strlen(hint);
     }
-    w = (unsigned)n;
+    unsigned w = (unsigned)n;
     if(w > col)
       col = w;
   }
@@ -678,7 +678,7 @@ static int gr__dispatch(
       }
       return 0;
     }
-    char empty[256] = {0};
+    static const char empty[256] = {0};
     return gr__help_walk(prog, app, cmds, n, empty, argc - 1, argv + 1);
   }
 

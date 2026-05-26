@@ -204,6 +204,8 @@ static u32 atlas_lookup_attr(u32 cp, u16 attr)
 
 static inline void fill32(volatile u32 *dst, u32 val, u32 n)
 {
+  /* cppcheck-suppress constVariablePointer ; clobbered by the "+D" asm
+   * operand below — not actually const-eligible. */
   u32 *d = (u32 *)(uintptr_t)dst;
   __asm__ volatile("rep stosl" : "+D"(d), "+c"(n) : "a"(val) : "memory");
 }
@@ -298,10 +300,10 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
          * (e.g. the inverted cursor block), showing as artefacts. */
         if(cell_w < (u32)ctx.cell_w || cell_h < (u32)ctx.cell_h) {
           for(u32 gy = 0; gy < (u32)ctx.cell_h; gy++) {
-            volatile u32 *row =
+            volatile u32 *cell_row =
                 (volatile u32 *)(ctx.base + (u64)(px_y + gy) * ctx.pitch +
                                  (u64)px_x * 4u);
-            fill32(row, bg_pk, (u32)ctx.cell_w);
+            fill32(cell_row, bg_pk, (u32)ctx.cell_w);
           }
         }
 

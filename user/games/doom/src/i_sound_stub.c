@@ -31,7 +31,9 @@ void I_InitSound(boolean use_sfx_prefix)
 
 void I_ShutdownSound(void) {}
 
-int  I_GetSfxLumpNum(sfxinfo_t *sfx)
+/* cppcheck-suppress constParameterPointer ; doomgeneric's vtable expects a
+ * non-const sfxinfo_t* even though this stub only reads from it. */
+int I_GetSfxLumpNum(sfxinfo_t *sfx)
 {
   return sfx->lumpnum;
 }

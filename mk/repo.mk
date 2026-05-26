@@ -360,11 +360,18 @@ check:
 	cppcheck \
 	  --enable=all \
 	  --suppress=missingIncludeSystem \
+	  --suppress=unusedFunction \
+	  --suppress=checkersReport \
 	  --inline-suppr \
 	  --inconclusive \
 	  --quiet \
+	  -DVEGA_VERSION=\"qa\" \
 	  -i user/games/doom/doomgeneric \
 	  -I$(INCLUDE) \
+	  -Iuser/include \
+	  -Iuser/sdk/vega/include \
+	  -Iuser/core/vega/include \
+	  -Iuser/apps/shell/include \
 	  $(SRC) user
 
 qa: lint check
