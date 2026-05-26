@@ -14,7 +14,7 @@ static int copy_to_stdout(int fd)
   char    buf[512];
   ssize_t n;
   while((n = read(fd, buf, sizeof(buf))) > 0)
-    write(STDOUT_FILENO, buf, (size_t)n);
+    (void)write(STDOUT_FILENO, buf, (size_t)n);
   return n < 0 ? 1 : 0;
 }
 
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   for(int i = 0; i < rest.argc; i++) {
     int fd = open(rest.argv[i], O_RDONLY);
     if(fd < 0) {
-      fprintf(stderr, "cat: cannot open '%s'\n", rest.argv[i]);
+      (void)fprintf(stderr, "cat: cannot open '%s'\n", rest.argv[i]);
       exit_code = 1;
       continue;
     }

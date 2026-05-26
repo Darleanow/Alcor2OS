@@ -47,9 +47,10 @@ static int term_cols(void)
     return (int)ws.ws_col;
   const char *e = getenv("COLUMNS");
   if(e && *e) {
-    int v = atoi(e);
-    if(v > 0)
-      return v;
+    char *end;
+    long  v = strtol(e, &end, 10);
+    if(end != e && v > 0 && v < 1024)
+      return (int)v;
   }
   return 80;
 }
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
 
   DIR        *dir = opendir(path);
   if(!dir) {
-    fprintf(
+    (void)fprintf(
         stderr, "ls: cannot access '%s': No such file or directory\n", path
     );
     return 1;
@@ -165,7 +166,7 @@ int main(int argc, char *argv[])
   }
 
   if(out && pos > 0)
-    write(STDOUT_FILENO, out, pos);
+    (void)write(STDOUT_FILENO, out, pos);
 
   free(out);
   return 0;

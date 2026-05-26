@@ -340,7 +340,7 @@ format fmt:
 
 lint:
 	clang-tidy \
-	  --header-filter='^(src|include|user)/.*' \
+	  --header-filter='^(src|include|user)/(?!games/doom/doomgeneric/).*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
 	     -I$(SRC) \

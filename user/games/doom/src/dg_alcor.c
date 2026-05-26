@@ -452,9 +452,9 @@ static void sig_handler(int sig)
 {
   restore_terminal();
   const char msg[] = "doom: terminated by signal\n";
-  write(STDERR_FILENO, msg, sizeof(msg) - 1);
-  signal(sig, SIG_DFL);
-  raise(sig);
+  (void)write(STDERR_FILENO, msg, sizeof(msg) - 1);
+  (void)signal(sig, SIG_DFL);
+  (void)raise(sig);
 }
 
 /* doomgeneric hooks */
@@ -463,13 +463,13 @@ void DG_Init(void)
 {
   if(alcor_fb_info(&s_fbinfo) < 0) {
     const char msg[] = "doom: SYS_ALCOR_FB_INFO failed\n";
-    write(STDERR_FILENO, msg, sizeof(msg) - 1);
+    (void)write(STDERR_FILENO, msg, sizeof(msg) - 1);
     _exit(1);
   }
   s_fb32 = alcor_fb_mmap();
   if(s_fb32 == (void *)-1) {
     const char msg[] = "doom: SYS_ALCOR_FB_MMAP failed\n";
-    write(STDERR_FILENO, msg, sizeof(msg) - 1);
+    (void)write(STDERR_FILENO, msg, sizeof(msg) - 1);
     _exit(1);
   }
   s_pitch32 = s_fbinfo.pitch / 4u;
@@ -528,11 +528,11 @@ void DG_Init(void)
     ioctl(s_mouse_fd, ALCOR2_IOC_MOUSE_SET_RELATIVE, &rel_on);
   }
 
-  atexit(restore_terminal);
-  signal(SIGSEGV, sig_handler);
-  signal(SIGABRT, sig_handler);
-  signal(SIGTERM, sig_handler);
-  signal(SIGINT, sig_handler);
+  (void)atexit(restore_terminal);
+  (void)signal(SIGSEGV, sig_handler);
+  (void)signal(SIGABRT, sig_handler);
+  (void)signal(SIGTERM, sig_handler);
+  (void)signal(SIGINT, sig_handler);
 }
 
 void DG_DrawFrame(void)
@@ -541,13 +541,13 @@ void DG_DrawFrame(void)
   const uint32_t  scale = s_scale;
 
   /* Base of the centred output region. */
-  uint32_t *fb_base = s_fb32 + s_off_y * s_pitch32 + s_off_x;
+  uint32_t *fb_base = s_fb32 + (size_t)s_off_y * s_pitch32 + s_off_x;
 
   /* Fast path for scale==1: blit with alpha fill, one row at a time. */
   if(scale == 1) {
     for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++) {
-      const uint32_t *src_row = src + sy * DOOMGENERIC_RESX;
-      uint32_t       *dst     = fb_base + sy * s_pitch32;
+      const uint32_t *src_row = src + (size_t)sy * DOOMGENERIC_RESX;
+      uint32_t       *dst     = fb_base + (size_t)sy * s_pitch32;
       for(uint32_t sx = 0; sx < DOOMGENERIC_RESX; sx++)
         dst[sx] = src_row[sx] | 0xFF000000u;
     }
@@ -558,10 +558,10 @@ void DG_DrawFrame(void)
    * each duplicate scanline.  This replaces N scatter-writes per pixel with
    * one sequential fill + (scale-1) memcpys.  Sized for MAX_SCALE. */
   uint32_t row_buf[DOOMGENERIC_RESX * MAX_SCALE];
-  uint32_t row_bytes = DOOMGENERIC_RESX * scale * sizeof(uint32_t);
+  size_t   row_bytes = (size_t)DOOMGENERIC_RESX * scale * sizeof(uint32_t);
 
   for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++) {
-    const uint32_t *src_row = src + sy * DOOMGENERIC_RESX;
+    const uint32_t *src_row = src + (size_t)sy * DOOMGENERIC_RESX;
 
     /* Expand one source row into row_buf. */
     uint32_t *out = row_buf;
@@ -572,10 +572,10 @@ void DG_DrawFrame(void)
     }
 
     /* Copy the expanded row into each duplicate scanline. */
-    uint32_t *dst0 = fb_base + sy * scale * s_pitch32;
+    uint32_t *dst0 = fb_base + (size_t)sy * scale * s_pitch32;
     memcpy(dst0, row_buf, row_bytes);
     for(uint32_t ry = 1; ry < scale; ry++)
-      memcpy(dst0 + ry * s_pitch32, row_buf, row_bytes);
+      memcpy(dst0 + (size_t)ry * s_pitch32, row_buf, row_bytes);
   }
 }
 
