@@ -237,7 +237,13 @@ disk-resync: user disk-populate
 # Mouse is the emulated i8042 PS/2 controller (always present). Grab with
 # Ctrl+Alt+G or fullscreen.
 
-run: iso
+# Flipping SYS_TRACE only changes a -D in CFLAGS, which make's timestamp
+# logic doesn't notice. Force sys_dispatch.c to be reconsidered on every
+# run/run-trace so the build matches the requested mode.
+SYS_TRACE_FORCE := -W $(SRC)/kernel/sys/sys_dispatch.c
+
+run:
+	@$(MAKE) $(SYS_TRACE_FORCE) iso SYS_TRACE=0
 	@if [ ! -f $(DISK) ]; then \
 		echo "[run] $(DISK) missing — staging first-run disk."; \
 		$(MAKE) disk-populate; \
@@ -254,7 +260,7 @@ run: iso
 # trace (name, args, return value via klogf). The framebuffer stays clean for
 # the shell — syscall traces never touch it.
 run-trace:
-	@$(MAKE) iso SYS_TRACE=1
+	@$(MAKE) $(SYS_TRACE_FORCE) iso SYS_TRACE=1
 	@if [ ! -f $(DISK) ]; then \
 		echo "[run-trace] $(DISK) missing — staging first-run disk."; \
 		$(MAKE) disk-populate; \
