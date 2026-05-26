@@ -27,12 +27,18 @@ typedef struct syscall_frame
   u64 rsp;
 } syscall_frame_t;
 
-_Static_assert(offsetof(syscall_frame_t, rax) == 14 * 8, "syscall_frame rax");
-_Static_assert(offsetof(syscall_frame_t, rip) == 15 * 8, "syscall_frame rip");
 _Static_assert(
-    offsetof(syscall_frame_t, rflags) == 16 * 8, "syscall_frame rflags"
+    offsetof(syscall_frame_t, rax) == (size_t)14 * 8, "syscall_frame rax"
 );
-_Static_assert(offsetof(syscall_frame_t, rsp) == 17 * 8, "syscall_frame rsp");
+_Static_assert(
+    offsetof(syscall_frame_t, rip) == (size_t)15 * 8, "syscall_frame rip"
+);
+_Static_assert(
+    offsetof(syscall_frame_t, rflags) == (size_t)16 * 8, "syscall_frame rflags"
+);
+_Static_assert(
+    offsetof(syscall_frame_t, rsp) == (size_t)17 * 8, "syscall_frame rsp"
+);
 
 /** @name MSR indices and flags for the x86_64 SYSCALL/SYSRET mechanism. */
 #define MSR_EFER   0xC0000080

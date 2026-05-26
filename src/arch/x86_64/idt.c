@@ -145,12 +145,12 @@ void irq_handler(u8 irq)
 
 void idt_init(void)
 {
-  for(u16 i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++)
-    idt_set_gate(i, isr_stub_table[i], IDT_GATE_INT);
+  for(unsigned i = 0; i < X86_EXCEPTION_VECTOR_COUNT; i++)
+    idt_set_gate((u8)i, isr_stub_table[i], IDT_GATE_INT);
 
-  for(u16 i = 0; i < PIC_IRQ_LINE_COUNT; i++)
+  for(unsigned i = 0; i < PIC_IRQ_LINE_COUNT; i++)
     idt_set_gate(
-        X86_EXCEPTION_VECTOR_COUNT + i, irq_stub_table[i], IDT_GATE_INT
+        (u8)(X86_EXCEPTION_VECTOR_COUNT + i), irq_stub_table[i], IDT_GATE_INT
     );
 
   idtr.limit = sizeof(idt) - 1;
