@@ -3,6 +3,7 @@
  * @brief Numbered syscall lookup and dispatch.
  */
 
+#include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/proc/proc.h>
@@ -10,7 +11,11 @@
 #include <alcor2/sys/syscall.h>
 
 /* Set to 1 to trace every syscall with its arguments */
-#define SYS_TRACE 0
+/* Build-time toggle: pass SYS_TRACE=1 via CFLAGS (e.g. `make run-trace`)
+ * to log every syscall with name, args, and return value to debugcon. */
+#ifndef SYS_TRACE
+  #define SYS_TRACE 0
+#endif
 
 #define SYS_DEF(n, nm, fn)                                                     \
   {                                                                            \
