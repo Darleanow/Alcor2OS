@@ -4,7 +4,8 @@
 #include <spazer/palette.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* ncurses colour-pair IDs registered by spz_init().
@@ -36,33 +37,33 @@ extern "C" {
 #define SPZ_BORDER_DOUBLE 1 /* ╔═╗║╚╝ */
 #define SPZ_BORDER_HEAVY  2 /* ┏━┓┃┗┛ */
 
-typedef struct spz_panel
-{
-  WINDOW *frame;
-  WINDOW *body;
-  int     y, x, rows, cols;
-  int     border_style;
-} spz_panel_t;
+  typedef struct spz_panel
+  {
+    WINDOW *frame;
+    WINDOW *body;
+    int     y, x, rows, cols;
+    int     border_style;
+  } spz_panel_t;
 
-void         spz_init(void);
+  void         spz_init(void);
 
-spz_panel_t *spz_panel_new(
-    int y, int x, int rows, int cols, const char *title, int border_style
-);
+  spz_panel_t *spz_panel_new(
+      int y, int x, int rows, int cols, const char *title, int border_style
+  );
 
-void spz_panel_refresh(spz_panel_t *p);
-void spz_panel_redraw(spz_panel_t *p, const char *title);
-void spz_panel_del(spz_panel_t *p);
+  void spz_panel_refresh(spz_panel_t *p);
+  void spz_panel_redraw(spz_panel_t *p, const char *title);
+  void spz_panel_del(spz_panel_t *p);
 
-void spz_progress(WINDOW *win, int y, int x, int width, int num, int den);
+  void spz_progress(WINDOW *win, int y, int x, int width, int num, int den);
 
-void spz_statusbar(const char *left, const char *center, const char *right);
+  void spz_statusbar(const char *left, const char *center, const char *right);
 
 int  spz_menu(int y, int x, const char *const *items, int n, const char *title);
 
-void spz_label(WINDOW *win, int y, int x, const char *text, int style);
+  void spz_label(WINDOW *win, int y, int x, const char *text, int style);
 
-void spz_clear_region(WINDOW *win, int y, int x, int rows, int cols);
+  void spz_clear_region(WINDOW *win, int y, int x, int rows, int cols);
 
 #ifdef __cplusplus
 } /* extern "C" */

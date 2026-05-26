@@ -5,8 +5,8 @@
 
 #include <fleed/Editor.hpp>
 
-#include <grendizer.h>
 #include <cstdio>
+#include <grendizer.h>
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   gr_rest rest;
   char    errbuf[128];
 
-  int rc = gr_parse(&spec, argc, argv, &rest, errbuf, sizeof errbuf);
+  int     rc = gr_parse(&spec, argc, argv, &rest, errbuf, sizeof errbuf);
   if(rc == GR_HELP)
     return 0;
   if(rc != GR_OK) {

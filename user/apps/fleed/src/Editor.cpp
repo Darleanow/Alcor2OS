@@ -53,8 +53,8 @@ int Editor::run()
 
 void Editor::insertChar(wchar_t ch)
 {
-  std::array<char, MB_LEN_MAX> mb{};
-  std::mbstate_t               st{};
+  std::array<char, MB_LEN_MAX> mb {};
+  std::mbstate_t               st {};
   std::size_t                  n = std::wcrtomb(mb.data(), ch, &st);
   if(n == static_cast<std::size_t>(-1))
     return;
