@@ -10,12 +10,12 @@ NCURSES_SUB := $(wildcard $(NC_ROOT)/include/ncurses)
 NC_CFLAGS := -I$(NC_ROOT)/include $(if $(NCURSES_SUB),-I$(NC_ROOT)/include/ncurses)
 
 ifeq ($(wildcard $(NC_A)),)
-$(error fleed: missing ncurses libs — run from repo root: make ncurses)
+$(error fleed: missing ncurses libs - run from repo root: make ncurses)
 endif
 
 APP     := fleed
 OUT_DIR := $(BUILD_DIR)/apps/$(APP)
-SRCS    := src/main.cpp
+SRCS    := $(wildcard src/*.cpp)
 OBJS    := $(SRCS:%.cpp=$(OUT_DIR)/%.o)
 TARGET  := $(BUILD_DIR)/apps/$(APP).elf
 
@@ -31,7 +31,7 @@ $(OUT_DIR):
 
 $(OUT_DIR)/%.o: %.cpp | $(OUT_DIR)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(NC_CFLAGS) -D_XOPEN_SOURCE_EXTENDED -c $< -o $@
+	$(CXX) $(CXXFLAGS) -Iinclude $(NC_CFLAGS) -D_XOPEN_SOURCE_EXTENDED -c $< -o $@
 
 $(TARGET): $(OBJS) $(CRT0) $(GR_A) $(SPZ_A) $(NC_A)
 	$(CXX) -nostdlib -static -T $(USER_LD) $(CRT0) $(OBJS) \
