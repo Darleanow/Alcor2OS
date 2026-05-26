@@ -20,16 +20,16 @@
 #include <alcor2/types.h>
 #include <stdarg.h>
 
-/** @brief QEMU Bochs-style debug console port.
+/** @brief Sideband debug-console port.
  *
- * Every byte written here lands in QEMU's @c -debugcon backend (typically
- * the host terminal via @c -debugcon stdio). On real hardware nobody is
- * listening on @c 0xE9 and the write is silently discarded, so this is
- * always safe to enable. */
+ * Every byte written here lands in whatever backend the host has wired
+ * up (a developer terminal during emulation, nothing when nobody is
+ * listening). Always safe to enable — unattached hosts silently discard
+ * the writes. */
 #define DEBUGCON_PORT 0xE9
 
 /**
- * @brief Mirror a byte to the QEMU debug console.
+ * @brief Mirror a byte to the debug-console port.
  *
  * @param c  Byte to emit; written verbatim to the @c outb port.
  */

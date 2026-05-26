@@ -8,7 +8,8 @@
 #include <alcor2/types.h>
 #include <stdarg.h>
 
-/** @brief QEMU Bochs-style debug console port — discarded on real HW. */
+/** @brief Sideband debug-console port — sinks bytes to the host backend
+ * when one is attached, discards them otherwise. */
 #define DEBUGCON_PORT 0xE9
 
 /**

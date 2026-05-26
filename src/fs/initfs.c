@@ -102,14 +102,9 @@ static fs_handle_t init_open(void *fs_data, const char *path, u32 flags)
   return f ? (fs_handle_t)f : NULL;
 }
 
-/**
- * @brief No-op close.
- *
- * Handles are either the root sentinel or a node pointer whose lifetime is
- * tied to the kernel — nothing to release.
- *
- * @param fh  Handle returned by ::init_open.
- */
+/** @brief Nothing to release — handles are sentinels or kernel-lifetime
+ * node pointers. Kept non-NULL because not every VFS close path is
+ * NULL-guarded. */
 static void init_close(fs_handle_t fh)
 {
   (void)fh;
