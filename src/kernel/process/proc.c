@@ -846,6 +846,21 @@ void proc_start_first(
   p->state     = PROC_STATE_RUNNING;
   current_proc = p;
 
+  /* Install /dev/tty as fds 0 (stdin), 1 (stdout), 2 (stderr) so the first
+   * process — and all its fork children — have real VFS-backed stdio instead
+   * of relying on the sys_io.c fd-fallback paths. */
+  {
+    i64 tty = vfs_open("/dev/tty", 0x0002 /* O_RDWR */);
+    if(tty >= 0) {
+      if(tty != 0)
+        vfs_dup2(tty, 0);
+      vfs_dup2(0, 1);
+      vfs_dup2(0, 2);
+      if(tty > 2)
+        vfs_close(tty);
+    }
+  }
+
   /* Set kernel stack for this process */
   tss_set_rsp0((u64)p->kernel_stack_top);
   current_kernel_rsp = (u64)p->kernel_stack_top;
