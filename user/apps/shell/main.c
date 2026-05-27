@@ -763,11 +763,16 @@ int main(int argc, char *argv[])
           len += (size_t)n;
         }
         src[len] = '\0';
-        /* Silence stdout so .vconf commands don't print to the console. */
-        int null_fd   = open("/dev/null", O_WRONLY);
-        int saved_out = dup(STDOUT_FILENO);
-        if(null_fd >= 0)
-          dup2(null_fd, STDOUT_FILENO);
+        /* Silence stdout so .vconf commands don't print to the console.
+         * No /dev/null on this OS — use a pipe as a disposable sink. */
+        int sink[2];
+        int saved_out = -1;
+        if(pipe(sink) == 0) {
+          saved_out = dup(STDOUT_FILENO);
+          dup2(sink[1], STDOUT_FILENO);
+          close(sink[0]);
+          close(sink[1]);
+        }
         tcsetattr(STDIN_FILENO, TCSANOW, &s_cooked_t);
         vega_run(src);
         tcsetattr(STDIN_FILENO, TCSANOW, &s_raw_t);
@@ -775,8 +780,6 @@ int main(int argc, char *argv[])
           dup2(saved_out, STDOUT_FILENO);
           close(saved_out);
         }
-        if(null_fd >= 0)
-          close(null_fd);
         free(src);
       }
       close(cfd);
