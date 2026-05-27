@@ -64,6 +64,11 @@ bool sh_is_builtin(const char *name)
   return false;
 }
 
+const char *const *sh_builtin_list(void)
+{
+  return shell_builtins;
+}
+
 int sh_run_builtin(int argc, char *const argv[])
 {
   const char *name = argv[0];

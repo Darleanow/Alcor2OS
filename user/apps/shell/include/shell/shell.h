@@ -43,7 +43,29 @@ char          *sh_getcwd(char *buf, size_t size);
 int            sh_unlink(const char *path);
 
 /* Shell-side builtin dispatch (registered with libvega's ops table). */
-bool sh_is_builtin(const char *name);
-int  sh_run_builtin(int argc, char *const argv[]);
+bool               sh_is_builtin(const char *name);
+int                sh_run_builtin(int argc, char *const argv[]);
+const char *const *sh_builtin_list(void);
+
+/* Tab completion */
+#define COMP_MAX      64
+#define COMP_NAME_MAX 64
+
+typedef struct
+{
+  char entries[COMP_MAX][COMP_NAME_MAX];
+  int  count;
+  char common[COMP_NAME_MAX];
+} comp_result_t;
+
+/**
+ * @brief Compute completions for @p prefix.
+ *
+ * @param prefix     The partial word to complete.
+ * @param is_command true if completing a command name (first word), false for
+ *                   path completion.
+ * @param out        Filled with matching entries and the longest common prefix.
+ */
+void sh_complete(const char *prefix, bool is_command, comp_result_t *out);
 
 #endif /* SHELL_H */

@@ -150,11 +150,12 @@ static struct termios s_cooked_t;
  * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
 static int read_line(char *buf, size_t cap, const char *prompt)
 {
-  int prompt_cols = visible_cols(prompt);
-  int len         = 0; /* bytes in buf */
-  int cur_b       = 0; /* byte index of cursor */
-  int hist_view   = hist_count;
-  buf[0]          = '\0';
+  int prompt_cols  = visible_cols(prompt);
+  int len          = 0; /* bytes in buf */
+  int cur_b        = 0; /* byte index of cursor */
+  int hist_view    = hist_count;
+  int last_was_tab = 0;
+  buf[0]           = '\0';
 
   write_str(prompt);
 
@@ -162,6 +163,8 @@ static int read_line(char *buf, size_t cap, const char *prompt)
     int c = wgetch(s_input_pad);
     if(c == ERR)
       continue;
+    if(c != '\t')
+      last_was_tab = 0;
 
     switch(c) {
     case '\n':
@@ -253,6 +256,86 @@ static int read_line(char *buf, size_t cap, const char *prompt)
         redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
       }
       break;
+
+    case '\t': {
+      /* Extract the word under the cursor. */
+      int word_start = cur_b;
+      while(word_start > 0 && buf[word_start - 1] != ' ')
+        word_start--;
+      char prefix[MAX_CMD_LEN];
+      int  wlen = cur_b - word_start;
+      if(wlen > 0)
+        memcpy(prefix, buf + word_start, wlen);
+      prefix[wlen] = '\0';
+
+      /* First word = command, otherwise path. */
+      bool is_cmd = true;
+      for(int i = 0; i < word_start; i++) {
+        if(buf[i] != ' ') {
+          is_cmd = false;
+          break;
+        }
+      }
+
+      comp_result_t comp;
+      sh_complete(prefix, is_cmd, &comp);
+
+      if(comp.count == 0) {
+        last_was_tab = 0;
+        break;
+      }
+
+      if(last_was_tab && comp.count > 1) {
+        /* Double-tab: list candidates. */
+        write_str("\n");
+        for(int i = 0; i < comp.count; i++) {
+          write_str("  ");
+          write_str(comp.entries[i]);
+          write_str("\n");
+        }
+        write_str(prompt);
+        write_str(buf);
+        /* Reposition cursor. */
+        int  total_cols = prompt_cols + utf8_cols(buf);
+        int  cur_cols   = utf8_cols(buf) - utf8_cols(buf + cur_b);
+        char seq[32];
+        (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
+        if(prompt_cols + cur_cols > 0)
+          write_str(seq);
+        else
+          write_str("\r");
+        (void)total_cols;
+        last_was_tab = 0;
+        break;
+      }
+
+      /* Single tab: insert the common prefix beyond what's typed. */
+      int clen = (int)strlen(comp.common);
+      if(clen > wlen) {
+        const char *suffix     = comp.common + wlen;
+        int         suffix_len = clen - wlen;
+        /* Append trailing space for a unique match. */
+        int need_space =
+            (comp.count == 1 && comp.common[clen - 1] != '/') ? 1 : 0;
+        if(len + suffix_len + need_space < (int)cap - 1) {
+          (void)memmove(
+              buf + cur_b + suffix_len + need_space, buf + cur_b,
+              (size_t)len - (size_t)cur_b + 1
+          );
+          memcpy(buf + cur_b, suffix, suffix_len);
+          if(need_space)
+            buf[cur_b + suffix_len] = ' ';
+          len += suffix_len + need_space;
+          cur_b += suffix_len + need_space;
+          buf[len] = '\0';
+          redraw_line(
+              prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
+          );
+        }
+      }
+      last_was_tab = (comp.count > 1) ? 1 : 0;
+      break;
+    }
 
     case 0x03: /* Ctrl-C */
       write_str("^C\n");
