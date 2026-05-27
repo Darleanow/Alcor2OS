@@ -300,21 +300,20 @@ void gr_usage(const gr_spec *spec, FILE *stream)
 
   /* Pass 1: measure the left column width. */
   for(o = spec->options; o->kind != GR_KIND_END; o++) {
-    int n = 0;
+    unsigned n = 0;
     if(o->short_name)
       n += 2; /* -x  */
     if(o->short_name && o->long_name)
       n += 2; /* ", " */
     if(o->long_name)
-      n += 2 + (int)strlen(o->long_name); /* --name */
+      n += 2 + strlen(o->long_name); /* --name */
     if(gr__needs_value(o)) {
       const char *hint =
           (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
-      n += 1 + (int)strlen(hint);
+      n += 1 + strlen(hint);
     }
-    unsigned w = (unsigned)n;
-    if(w > col)
-      col = w;
+    if(n > col)
+      col = n;
   }
   if(col > 32)
     col = 32;
@@ -558,7 +557,7 @@ static void gr__print_group(
   for(i = 0; i < n; i++) {
     if(!cmds[i].name)
       continue;
-    w = (unsigned)strlen(cmds[i].name);
+    w = strlen(cmds[i].name);
     if(w > col)
       col = w;
   }
