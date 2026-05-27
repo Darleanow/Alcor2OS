@@ -311,12 +311,11 @@ static int read_line(char *buf, size_t cap, const char *prompt)
             max_w = name_lens[i];
         }
 
-        int col_w  = max_w + 2;
-        int n_cols = 80 / col_w;
+        int col_w      = max_w + 2;
+        int cols_avail = COLS > 0 ? COLS : 80;
+        int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
         if(n_cols < 1)
           n_cols = 1;
-        if(n_cols > 3)
-          n_cols = 3;
         int n_rows = (comp.count + n_cols - 1) / n_cols;
 
         write_str("\n");
