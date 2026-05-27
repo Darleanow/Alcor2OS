@@ -741,7 +741,9 @@ int main(int argc, char *argv[])
 #undef BNR_H34
 
   /* Source /home/.vconf if it exists — the shell's equivalent of .bashrc.
-   * Runs as a vega script so any language feature (let, if, fn, …) works. */
+   * Runs as a vega script so any language feature (let, if, fn, …) works.
+   * Lines starting with '#' (after optional whitespace) are stripped here
+   * because vega's lexer does not have comment support. */
   {
     int cfd = open("/home/.vconf", O_RDONLY);
     if(cfd >= 0) {
@@ -763,6 +765,15 @@ int main(int argc, char *argv[])
           len += (size_t)n;
         }
         src[len] = '\0';
+        /* Strip comment lines: replace '#' to end-of-line with blanks. */
+        for(char *p = src; *p; p++) {
+          if(*p == '#') {
+            while(*p && *p != '\n')
+              *p++ = ' ';
+            if(!*p)
+              break;
+          }
+        }
         tcsetattr(STDIN_FILENO, TCSANOW, &s_cooked_t);
         vega_run(src);
         tcsetattr(STDIN_FILENO, TCSANOW, &s_raw_t);
