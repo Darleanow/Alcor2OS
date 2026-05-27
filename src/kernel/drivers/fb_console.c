@@ -1005,8 +1005,8 @@ static void csi_dec_private(char cmd)
   while(i < ctx.esc_len - 1 && np < 4) {
     unsigned acc = 0u;
     int      dig = 0;
-    while(i < ctx.esc_len - 1 && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9'
-    ) {
+    while(i < ctx.esc_len - 1 && ctx.esc_buf[i] >= '0' &&
+          ctx.esc_buf[i] <= '9') {
       acc = acc * 10u + (unsigned)(ctx.esc_buf[i] - '0');
       i++;
       dig++;

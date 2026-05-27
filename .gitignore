@@ -7,5 +7,6 @@ thirdparty/
 *.img
 user/apps/**/.cache/
 mnt
+.vscode
 # Doxygen generated output
 docs/doxygen/

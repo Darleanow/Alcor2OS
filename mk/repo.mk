@@ -331,6 +331,7 @@ distclean: clean-all
 
 format fmt:
 	@find src include user \
+	  -type f \
 	  \( -name '*.c' -o -name '*.h' -o -name '*.cpp' \) \
 	  ! -path '*/thirdparty/*' \
 	  ! -path '*/.cache/*' \

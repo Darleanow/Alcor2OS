@@ -181,9 +181,9 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   /* All five scratch buffers are freed at the single @c out: label so the
    * function has one cleanup path instead of five copies of five kfrees. */
-  char(*arg_storage)[MAX_ARG_LEN] = kmalloc((u64)MAX_EXEC_ARGS * MAX_ARG_LEN);
+  char (*arg_storage)[MAX_ARG_LEN] = kmalloc((u64)MAX_EXEC_ARGS * MAX_ARG_LEN);
   char **new_argv = kmalloc((u64)(MAX_EXEC_ARGS + 1) * sizeof(char *));
-  char(*env_storage)[MAX_ARG_LEN] = kmalloc((u64)MAX_EXEC_ARGS * MAX_ARG_LEN);
+  char (*env_storage)[MAX_ARG_LEN] = kmalloc((u64)MAX_EXEC_ARGS * MAX_ARG_LEN);
   char **new_envp     = kmalloc((u64)(MAX_EXEC_ARGS + 1) * sizeof(char *));
   char  *name_storage = kmalloc(MAX_ARG_LEN);
 

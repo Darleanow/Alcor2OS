@@ -187,45 +187,30 @@ extern "C"
 
 /** @brief Declare a ::GR_KIND_FLAG option. */
 #define GR_FLAG(short, long, storage, help)                                    \
-  {                                                                            \
-    (short), (long), (storage), NULL, (help), GR_KIND_FLAG                     \
-  }
+  {(short), (long), (storage), NULL, (help), GR_KIND_FLAG}
 
 /** @brief Declare a ::GR_KIND_COUNT option. */
 #define GR_COUNT(short, long, storage, help)                                   \
-  {                                                                            \
-    (short), (long), (storage), NULL, (help), GR_KIND_COUNT                    \
-  }
+  {(short), (long), (storage), NULL, (help), GR_KIND_COUNT}
 
 /** @brief Declare a ::GR_KIND_STR option. */
 #define GR_STR(short, long, storage, hint, help)                               \
-  {                                                                            \
-    (short), (long), (storage), (hint), (help), GR_KIND_STR                    \
-  }
+  {(short), (long), (storage), (hint), (help), GR_KIND_STR}
 
 /** @brief Declare a ::GR_KIND_INT option. */
 #define GR_INT(short, long, storage, hint, help)                               \
-  {                                                                            \
-    (short), (long), (storage), (hint), (help), GR_KIND_INT                    \
-  }
+  {(short), (long), (storage), (hint), (help), GR_KIND_INT}
 
 /** @brief Declare a ::GR_KIND_UINT option. */
 #define GR_UINT(short, long, storage, hint, help)                              \
-  {                                                                            \
-    (short), (long), (storage), (hint), (help), GR_KIND_UINT                   \
-  }
+  {(short), (long), (storage), (hint), (help), GR_KIND_UINT}
 
 /** @brief Declare a ::GR_KIND_FLOAT option. */
 #define GR_FLOAT(short, long, storage, hint, help)                             \
-  {                                                                            \
-    (short), (long), (storage), (hint), (help), GR_KIND_FLOAT                  \
-  }
+  {(short), (long), (storage), (hint), (help), GR_KIND_FLOAT}
 
 /** @brief Sentinel that terminates a ::gr_opt array. */
-#define GR_END                                                                 \
-  {                                                                            \
-    0, NULL, NULL, NULL, NULL, GR_KIND_END                                     \
-  }
+#define GR_END {0, NULL, NULL, NULL, NULL, GR_KIND_END}
 
   /** @} */
 
@@ -360,10 +345,7 @@ extern "C"
   } gr_cmd;
 
 /** @brief Sentinel that terminates a ::gr_cmd array. */
-#define GR_CMD_END                                                             \
-  {                                                                            \
-    NULL, NULL, NULL, NULL, NULL, 0                                            \
-  }
+#define GR_CMD_END {NULL, NULL, NULL, NULL, NULL, 0}
 
   /**
    * @brief Application root descriptor passed to ::gr_dispatch.
