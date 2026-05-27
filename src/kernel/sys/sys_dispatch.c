@@ -6,6 +6,7 @@
 #include <alcor2/drivers/klog.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/mm/heap.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
 #include <alcor2/sys/syscall.h>
@@ -149,10 +150,11 @@ u64 syscall_dispatch(syscall_frame_t *frame)
 
 #if SYS_TRACE
   klogf(
-      "[sys pid=%d cr3=%lx rsp_k=%lx] %s(%lx, %lx, %lx, %lx, %lx, %lx)",
-      (int)(p ? p->pid : 0), p ? p->cr3 : 0, (u64)frame, d->name, frame->rdi,
-      frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
+      "[sys pid=%d] %s(%lx, %lx, %lx, %lx, %lx, %lx)", (int)(p ? p->pid : 0),
+      d->name, frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8,
+      frame->r9
   );
+  heap_check_panic_if_corrupt(d->name);
 #endif
 
   u64 ret = d->handler(

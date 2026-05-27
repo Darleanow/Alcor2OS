@@ -762,13 +762,6 @@ void proc_switch(proc_t *next)
   }
 
   proc_t *prev = current_proc;
-  {
-    extern void klogf(const char *fmt, ...);
-    klogf(
-        "[psw] %d->%d kst=%lx cr3=%lx\n", (int)(prev ? prev->pid : 0),
-        (int)next->pid, (u64)next->kernel_stack_top, next->cr3
-    );
-  }
 
   /* Save current FS base (TLS) before switching */
   if(prev) {
