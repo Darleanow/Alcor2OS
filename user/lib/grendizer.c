@@ -26,7 +26,7 @@ static void
   va_list args;
 
   va_start(args, fmt);
-  vsnprintf(tmp, sizeof tmp, fmt, args);
+  (void)vsnprintf(tmp, sizeof tmp, fmt, args);
   va_end(args);
   tmp[sizeof tmp - 1] = '\0';
 
@@ -45,8 +45,8 @@ static void
       memcpy(buf, tmp, tmp_len + 1);
     }
   } else if(fallback) {
-    fputs(tmp, fallback);
-    fputc('\n', fallback);
+    (void)fputs(tmp, fallback);
+    (void)fputc('\n', fallback);
   }
 }
 
@@ -184,12 +184,11 @@ static int gr__parse_float(
     const char *text, double *out, char *buf, size_t cap, const char *label
 )
 {
-  const char *p    = text;
-  double      acc  = 0.0;
-  int         sig  = 1;
-  int         esig = 1;
-  long        exp  = 0;
-  int         saw  = 0;
+  const char *p   = text;
+  double      acc = 0.0;
+  int         sig = 1;
+  long        exp = 0;
+  int         saw = 0;
 
   if(!text || !*text) {
     gr__errf(buf, cap, stderr, "%s: missing floating-point value", label);
@@ -223,6 +222,7 @@ static int gr__parse_float(
   }
 
   if(*p == 'e' || *p == 'E') {
+    int esig = 1;
     p++;
     if(*p == '-') {
       esig = -1;
@@ -287,12 +287,12 @@ static int gr__apply_value(
 void gr_usage(const gr_spec *spec, FILE *stream)
 {
   const gr_opt *o;
-  unsigned      col = 0, w;
+  unsigned      col = 0;
 
   if(!stream)
     stream = stdout;
 
-  fprintf(
+  (void)fprintf(
       stream, "Usage: %s %s\n",
       (spec->program && *spec->program) ? spec->program : "PROGRAM",
       (spec->usage && *spec->usage) ? spec->usage : "[options]"
@@ -300,21 +300,20 @@ void gr_usage(const gr_spec *spec, FILE *stream)
 
   /* Pass 1: measure the left column width. */
   for(o = spec->options; o->kind != GR_KIND_END; o++) {
-    int n = 0;
+    unsigned n = 0;
     if(o->short_name)
       n += 2; /* -x  */
     if(o->short_name && o->long_name)
       n += 2; /* ", " */
     if(o->long_name)
-      n += 2 + (int)strlen(o->long_name); /* --name */
+      n += 2 + strlen(o->long_name); /* --name */
     if(gr__needs_value(o)) {
       const char *hint =
           (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
-      n += 1 + (int)strlen(hint);
+      n += 1 + strlen(hint);
     }
-    w = (unsigned)n;
-    if(w > col)
-      col = w;
+    if(n > col)
+      col = n;
   }
   if(col > 32)
     col = 32;
@@ -322,7 +321,7 @@ void gr_usage(const gr_spec *spec, FILE *stream)
   /* Pass 2: print options — skip the section entirely when the table is empty.
    */
   if(spec->options->kind != GR_KIND_END) {
-    fprintf(stream, "\nOptions:\n");
+    (void)fprintf(stream, "\nOptions:\n");
     for(o = spec->options; o->kind != GR_KIND_END; o++) {
       char cell[80] = {0};
       int  len      = 0;
@@ -340,15 +339,17 @@ void gr_usage(const gr_spec *spec, FILE *stream)
       if(gr__needs_value(o)) {
         const char *hint =
             (o->value_hint && *o->value_hint) ? o->value_hint : "VALUE";
-        len += snprintf(cell + len, sizeof cell - (size_t)len, " %s", hint);
+        (void)snprintf(cell + len, sizeof cell - (size_t)len, " %s", hint);
       }
 
-      fprintf(stream, "  %-*s  %s\n", (int)col, cell, o->help ? o->help : "");
+      (void)fprintf(
+          stream, "  %-*s  %s\n", (int)col, cell, o->help ? o->help : ""
+      );
     }
   }
 
   if(spec->epilog && *spec->epilog)
-    fprintf(stream, "\n%s\n", spec->epilog);
+    (void)fprintf(stream, "\n%s\n", spec->epilog);
 }
 
 int gr_parse(
@@ -447,7 +448,7 @@ int gr_parse(
         }
         val = argv[++i];
       }
-      snprintf(lbl, sizeof lbl, "--%s", o->long_name);
+      (void)snprintf(lbl, sizeof lbl, "--%s", o->long_name);
       int rc = gr__apply_value(o, val, errbuf, errcap, lbl);
       if(rc != GR_OK)
         return rc;
@@ -491,7 +492,7 @@ int gr_parse(
         }
         val = argv[++i];
       }
-      snprintf(lbl, sizeof lbl, "-%c", key);
+      (void)snprintf(lbl, sizeof lbl, "-%c", key);
       int rc = gr__apply_value(o, val, errbuf, errcap, lbl);
       if(rc != GR_OK)
         return rc;
@@ -539,9 +540,9 @@ static void
   if(!seg || !*seg)
     return;
   if(!prefix || !*prefix)
-    snprintf(dst, cap, "%s", seg);
+    (void)snprintf(dst, cap, "%s", seg);
   else
-    snprintf(dst, cap, "%s %s", prefix, seg);
+    (void)snprintf(dst, cap, "%s %s", prefix, seg);
 }
 
 /** @brief Print a help listing of all commands in a group to @p stream. */
@@ -556,26 +557,26 @@ static void gr__print_group(
   for(i = 0; i < n; i++) {
     if(!cmds[i].name)
       continue;
-    w = (unsigned)strlen(cmds[i].name);
+    w = strlen(cmds[i].name);
     if(w > col)
       col = w;
   }
   if(col > 24)
     col = 24;
 
-  fprintf(stream, "Commands:\n");
+  (void)fprintf(stream, "Commands:\n");
   for(i = 0; i < n; i++) {
     if(!cmds[i].name)
       continue;
-    fprintf(
+    (void)fprintf(
         stream, "  %-*s  %s\n", (int)col, cmds[i].name,
         cmds[i].summary ? cmds[i].summary : ""
     );
   }
-  fprintf(stream, "\nRun '%s", app->program ? app->program : "program");
+  (void)fprintf(stream, "\nRun '%s", app->program ? app->program : "program");
   if(path && *path)
-    fprintf(stream, " %s", path);
-  fprintf(stream, " help <command>' for details.\n");
+    (void)fprintf(stream, " %s", path);
+  (void)fprintf(stream, " help <command>' for details.\n");
 }
 
 /** @brief Print detailed usage for a single command node to @p stream. */
@@ -586,18 +587,18 @@ static void gr__print_cmd(
   const char *prog = app->program ? app->program : "program";
 
   if(cmd->child_count > 0) {
-    fprintf(stream, "Usage: %s %s <command> [...]\n\n", prog, path);
+    (void)fprintf(stream, "Usage: %s %s <command> [...]\n\n", prog, path);
     if(cmd->summary)
-      fprintf(stream, "%s\n\n", cmd->summary);
+      (void)fprintf(stream, "%s\n\n", cmd->summary);
     if(cmd->details)
-      fprintf(stream, "%s\n\n", cmd->details);
+      (void)fprintf(stream, "%s\n\n", cmd->details);
     gr__print_group(app, stream, cmd->children, cmd->child_count, path);
   } else {
-    fprintf(stream, "Usage: %s %s [arguments]\n\n", prog, path);
+    (void)fprintf(stream, "Usage: %s %s [arguments]\n\n", prog, path);
     if(cmd->summary)
-      fprintf(stream, "%s\n", cmd->summary);
+      (void)fprintf(stream, "%s\n", cmd->summary);
     if(cmd->details)
-      fprintf(stream, "\n%s\n", cmd->details);
+      (void)fprintf(stream, "\n%s\n", cmd->details);
   }
 }
 
@@ -609,15 +610,15 @@ static int gr__help_walk(
 )
 {
   const gr_cmd *cmd;
-  char          next[256];
+  char          next[256] = {0};
 
   if(argc == 0) {
-    fprintf(stderr, "%s: 'help' requires a command name\n", prog);
+    (void)fprintf(stderr, "%s: 'help' requires a command name\n", prog);
     return 2;
   }
   cmd = gr__find_cmd(cmds, n, argv[0]);
   if(!cmd) {
-    fprintf(stderr, "%s: no such command: %s\n", prog, argv[0]);
+    (void)fprintf(stderr, "%s: no such command: %s\n", prog, argv[0]);
     return 2;
   }
   gr__path_join(next, sizeof next, path, cmd->name);
@@ -627,7 +628,7 @@ static int gr__help_walk(
     return 0;
   }
   if(cmd->child_count == 0) {
-    fprintf(stderr, "%s: '%s' has no subcommands\n", prog, next);
+    (void)fprintf(stderr, "%s: '%s' has no subcommands\n", prog, next);
     return 2;
   }
   return gr__help_walk(
@@ -643,19 +644,19 @@ static int gr__dispatch(
 )
 {
   const gr_cmd *cmd;
-  char          next[256];
+  char          next[256] = {0};
 
   /* No tokens left: show help at this level. */
   if(argc == 0) {
     if(parent)
       gr__print_cmd(app, stdout, parent, path);
     else {
-      fprintf(
+      (void)fprintf(
           stdout, "Usage: %s <command> [...]\n\n",
           app->program ? app->program : "program"
       );
       if(app->blurb)
-        fprintf(stdout, "%s\n\n", app->blurb);
+        (void)fprintf(stdout, "%s\n\n", app->blurb);
       gr__print_group(app, stdout, cmds, n, "");
     }
     return 0;
@@ -667,24 +668,24 @@ static int gr__dispatch(
       if(parent)
         gr__print_cmd(app, stdout, parent, path);
       else {
-        fprintf(
+        (void)fprintf(
             stdout, "Usage: %s <command> [...]\n\n",
             app->program ? app->program : "program"
         );
         if(app->blurb)
-          fprintf(stdout, "%s\n\n", app->blurb);
+          (void)fprintf(stdout, "%s\n\n", app->blurb);
         gr__print_group(app, stdout, cmds, n, "");
       }
       return 0;
     }
-    char empty[256] = {0};
+    static const char empty[256] = {0};
     return gr__help_walk(prog, app, cmds, n, empty, argc - 1, argv + 1);
   }
 
   cmd = gr__find_cmd(cmds, n, argv[0]);
   if(!cmd) {
-    fprintf(stderr, "%s: unknown command '%s'\n", prog, argv[0]);
-    fprintf(stderr, "Run '%s help' for usage.\n", prog);
+    (void)fprintf(stderr, "%s: unknown command '%s'\n", prog, argv[0]);
+    (void)fprintf(stderr, "Run '%s help' for usage.\n", prog);
     return 2;
   }
 
@@ -705,7 +706,9 @@ static int gr__dispatch(
   }
 
   if(!cmd->run) {
-    fprintf(stderr, "%s: internal: no handler for '%s'\n", prog, cmd->name);
+    (void)fprintf(
+        stderr, "%s: internal: no handler for '%s'\n", prog, cmd->name
+    );
     return 2;
   }
 
@@ -717,11 +720,11 @@ int gr_dispatch(const gr_app *app, int argc, char **argv)
   const char *prog;
 
   if(!app || !argv) {
-    fputs("gr_dispatch: null argument\n", stderr);
+    (void)fputs("gr_dispatch: null argument\n", stderr);
     return 2;
   }
   if(!app->commands || app->command_count == 0) {
-    fputs("gr_dispatch: no commands registered\n", stderr);
+    (void)fputs("gr_dispatch: no commands registered\n", stderr);
     return 2;
   }
 

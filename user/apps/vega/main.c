@@ -51,13 +51,13 @@ static int run_file(const char *path)
 {
   int fd = open(path, O_RDONLY);
   if(fd < 0) {
-    fprintf(stderr, "vega: cannot open %s\n", path);
+    (void)fprintf(stderr, "vega: cannot open %s\n", path);
     return 1;
   }
   char *src = slurp(fd);
   close(fd);
   if(!src) {
-    fprintf(stderr, "vega: read failed for %s\n", path);
+    (void)fprintf(stderr, "vega: read failed for %s\n", path);
     return 1;
   }
   int rc = vega_run(src);
@@ -69,7 +69,7 @@ static int run_stdin(void)
 {
   char *src = slurp(STDIN_FILENO);
   if(!src) {
-    fprintf(stderr, "vega: read failed\n");
+    (void)fprintf(stderr, "vega: read failed\n");
     return 1;
   }
   int rc = vega_run(src);
@@ -102,12 +102,12 @@ int main(int argc, char *argv[])
   if(rc == GR_HELP)
     return 0;
   if(rc == GR_ERR) {
-    fprintf(stderr, "vega: %s\n", errbuf);
+    (void)fprintf(stderr, "vega: %s\n", errbuf);
     return 2;
   }
 
   if(version) {
-    printf("vega %s\n", VEGA_VERSION);
+    (void)printf("vega %s\n", VEGA_VERSION);
     return 0;
   }
   if(code)

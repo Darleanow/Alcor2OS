@@ -311,9 +311,9 @@ void proc_signal(u64 pid, int signum)
  *   [new RSP + 8]    → sig_ucontext_t       (saved context for rt_sigreturn)
  * @endcode
  *
- * @param frame_ptr Pointer to the syscall_frame_t on the kernel stack.
+ * @param frame Pointer to the syscall_frame_t on the kernel stack.
  */
-void proc_check_signals(void *frame_ptr)
+void proc_check_signals(void *frame)
 {
   proc_t *p = proc_current();
   if(!p)
@@ -356,17 +356,17 @@ void proc_check_signals(void *frame_ptr)
     proc_exit(-(i64)signum);
 
   /* Deliver to user handler: build signal frame on user stack. */
-  syscall_frame_t *frame = (syscall_frame_t *)frame_ptr;
+  syscall_frame_t *syscall_frame = (syscall_frame_t *)frame;
 
   /*
    * Stack layout we construct (addresses decrease downward):
    *
-   *   frame->rsp (original user RSP)
+   *   syscall_frame->rsp (original user RSP)
    *     − 128        red zone (ABI requirement)
    *     − sizeof(sig_ucontext_t)  aligned down to 16
    *     − 8          sa_restorer address  ← new RSP
    */
-  u64 user_rsp = frame->rsp;
+  u64 user_rsp = syscall_frame->rsp;
   user_rsp -= 128; /* skip System V x86-64 red zone */
   user_rsp -= sizeof(sig_ucontext_t);
   user_rsp &= ~0xFULL; /* 16-byte align */
@@ -378,24 +378,24 @@ void proc_check_signals(void *frame_ptr)
     return;
 
   /* Save all current registers into the user-space context */
-  ctx->r15      = frame->r15;
-  ctx->r14      = frame->r14;
-  ctx->r13      = frame->r13;
-  ctx->r12      = frame->r12;
-  ctx->r11      = frame->r11;
-  ctx->r10      = frame->r10;
-  ctx->r9       = frame->r9;
-  ctx->r8       = frame->r8;
-  ctx->rbp      = frame->rbp;
-  ctx->rdi      = frame->rdi;
-  ctx->rsi      = frame->rsi;
-  ctx->rdx      = frame->rdx;
-  ctx->rcx      = frame->rcx;
-  ctx->rbx      = frame->rbx;
-  ctx->rax      = frame->rax; /* already set to syscall return value */
-  ctx->rip      = frame->rip;
-  ctx->rflags   = frame->rflags;
-  ctx->rsp      = frame->rsp;
+  ctx->r15      = syscall_frame->r15;
+  ctx->r14      = syscall_frame->r14;
+  ctx->r13      = syscall_frame->r13;
+  ctx->r12      = syscall_frame->r12;
+  ctx->r11      = syscall_frame->r11;
+  ctx->r10      = syscall_frame->r10;
+  ctx->r9       = syscall_frame->r9;
+  ctx->r8       = syscall_frame->r8;
+  ctx->rbp      = syscall_frame->rbp;
+  ctx->rdi      = syscall_frame->rdi;
+  ctx->rsi      = syscall_frame->rsi;
+  ctx->rdx      = syscall_frame->rdx;
+  ctx->rcx      = syscall_frame->rcx;
+  ctx->rbx      = syscall_frame->rbx;
+  ctx->rax      = syscall_frame->rax; /* already set to syscall return value */
+  ctx->rip      = syscall_frame->rip;
+  ctx->rflags   = syscall_frame->rflags;
+  ctx->rsp      = syscall_frame->rsp;
   ctx->sig_mask = p->sig_mask;
   ctx->signum   = (u32)signum;
   ctx->_pad     = 0;
@@ -414,10 +414,10 @@ void proc_check_signals(void *frame_ptr)
     act->sa_handler = SIG_DFL;
 
   /* Redirect the syscall return to the signal handler */
-  frame->rip    = act->sa_handler; /* jump to handler */
-  frame->rdi    = (u64)signum;     /* arg1: signal number */
-  frame->rsi    = 0;               /* arg2: siginfo_t* (NULL) */
-  frame->rdx    = (u64)ctx;        /* arg3: ucontext_t* */
-  frame->rsp    = user_rsp;        /* new user stack */
-  frame->rflags = 0x202;           /* IF=1, reserved bit */
+  syscall_frame->rip    = act->sa_handler; /* jump to handler */
+  syscall_frame->rdi    = (u64)signum;     /* arg1: signal number */
+  syscall_frame->rsi    = 0;               /* arg2: siginfo_t* (NULL) */
+  syscall_frame->rdx    = (u64)ctx;        /* arg3: ucontext_t* */
+  syscall_frame->rsp    = user_rsp;        /* new user stack */
+  syscall_frame->rflags = 0x202;           /* IF=1, reserved bit */
 }

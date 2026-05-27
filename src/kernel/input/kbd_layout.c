@@ -279,7 +279,7 @@ static bool us_caps_scan(u8 key)
 
 #define KBD_RAW_PEEK_MAX 256
 
-static kbd_layout_t layout = KBD_LAYOUT_US;
+static kbd_layout_t g_layout = KBD_LAYOUT_US;
 
 /* When set, a printable key-up emits a \x00<char> sentinel so apps can track
  * releases precisely (typematic only repeats the last key, breaking Z+D). */
@@ -295,11 +295,11 @@ typedef struct
 
 static kbd_ev_ctx_t g_kbd = {0};
 
-void                kbd_set_layout(kbd_layout_t lay)
+void                kbd_set_layout(kbd_layout_t layout)
 {
-  if((unsigned)lay >= KBD_LAYOUT_COUNT)
-    lay = KBD_LAYOUT_US;
-  layout     = lay;
+  if((unsigned)layout >= KBD_LAYOUT_COUNT)
+    layout = KBD_LAYOUT_US;
+  g_layout   = layout;
   out_pend_w = out_pend_r = 0;
   g_kbd.pend_e0           = false;
   g_kbd.lalt_dn           = false;
@@ -308,7 +308,7 @@ void                kbd_set_layout(kbd_layout_t lay)
 
 kbd_layout_t kbd_get_layout(void)
 {
-  return layout;
+  return g_layout;
 }
 
 void kbd_set_release_events(bool enabled)
@@ -454,7 +454,7 @@ static bool
     /* Key-up sentinel: \x00 then the unshifted char, so the app matches the
      * same code it saw on key-down. */
     if(release_events) {
-      unsigned char base = pick_pl(layout)[key];
+      unsigned char base = pick_pl(g_layout)[key];
       if(base != 0) {
         if(dry)
           return true;
@@ -533,8 +533,8 @@ static bool
     break;
   }
 
-  const unsigned char *pl = pick_pl(layout);
-  const unsigned char *sh = pick_sh(layout);
+  const unsigned char *pl = pick_pl(g_layout);
+  const unsigned char *sh = pick_sh(g_layout);
 
   if(s->mod.ctrl) {
     unsigned char b = pl[key];
@@ -551,12 +551,12 @@ static bool
     return false;
   }
 
-  if(layout == KBD_LAYOUT_FR && (s->lalt_dn || s->ralt_dn) && fr_alt[key]) {
+  if(g_layout == KBD_LAYOUT_FR && (s->lalt_dn || s->ralt_dn) && fr_alt[key]) {
     return emit_user_cp(fr_alt[key], out, dry);
   }
 
   bool eff_shift = s->mod.shift;
-  if(layout == KBD_LAYOUT_FR) {
+  if(g_layout == KBD_LAYOUT_FR) {
     if(fr_caps_scan(key))
       eff_shift ^= s->mod.capslock;
   } else if(us_caps_scan(key)) {

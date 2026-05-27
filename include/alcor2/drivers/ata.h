@@ -161,8 +161,8 @@ i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf);
 
 /**
  * @brief IRQ handler (called from IDT stub).
- * @param irq IRQ number (14 or 15).
+ * @param channel ATA channel index (0 = primary, 1 = secondary).
  */
-void ata_irq(u8 irq);
+void ata_irq(u8 channel);
 
 #endif

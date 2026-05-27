@@ -119,8 +119,9 @@ static int buf_append(
     return -1;
   char  *dst = *buf;
   size_t pos = *len_out;
-  for(size_t i = 0; i < n; i++)
-    dst[pos++] = src[i];
+  if(n > 0 && src)
+    memcpy(dst + pos, src, n);
+  pos += n;
   dst[pos] = '\0';
   *len_out = pos;
   return 0;

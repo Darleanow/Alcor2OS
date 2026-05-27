@@ -31,9 +31,10 @@ void I_InitSound(boolean use_sfx_prefix)
 
 void I_ShutdownSound(void) {}
 
-int  I_GetSfxLumpNum(sfxinfo_t *sfx)
+/* cppcheck-suppress constParameterPointer */
+int I_GetSfxLumpNum(sfxinfo_t *sfxinfo)
 {
-  return sfx->lumpnum;
+  return sfxinfo->lumpnum;
 }
 
 void I_UpdateSound(void) {}
@@ -45,9 +46,9 @@ void I_UpdateSoundParams(int channel, int vol, int sep)
   (void)sep;
 }
 
-int I_StartSound(sfxinfo_t *sfx, int channel, int vol, int sep)
+int I_StartSound(sfxinfo_t *sfxinfo, int channel, int vol, int sep)
 {
-  (void)sfx;
+  (void)sfxinfo;
   (void)channel;
   (void)vol;
   (void)sep;

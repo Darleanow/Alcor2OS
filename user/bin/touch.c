@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     return (rc == GR_HELP) ? 0 : 1;
 
   if(rest.argc == 0) {
-    fprintf(stderr, "touch: missing operand\n");
+    (void)fprintf(stderr, "touch: missing operand\n");
     return 1;
   }
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   for(int i = 0; i < rest.argc; i++) {
     int fd = open(rest.argv[i], O_CREAT | O_WRONLY, 0644);
     if(fd < 0) {
-      fprintf(stderr, "touch: cannot create '%s'\n", rest.argv[i]);
+      (void)fprintf(stderr, "touch: cannot create '%s'\n", rest.argv[i]);
       exit_code = 1;
       continue;
     }

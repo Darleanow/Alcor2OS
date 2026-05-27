@@ -27,12 +27,12 @@ static u64 page_align_up_u64(u64 x)
 }
 
 void fb_user_boot_init(
-    struct limine_framebuffer *lfb, struct limine_memmap_response *memmap,
+    struct limine_framebuffer *fb, struct limine_memmap_response *memmap,
     u64 hhdm_off
 )
 {
   kzero(&g_fb, sizeof(g_fb));
-  if(!lfb || lfb->pitch == 0 || lfb->height == 0)
+  if(!fb || fb->pitch == 0 || fb->height == 0)
     return;
 
   u64 fb_phys = 0;
@@ -47,8 +47,8 @@ void fb_user_boot_init(
     }
   }
 
-  if(fb_phys == 0 && lfb->address) {
-    u64 va = (u64)lfb->address;
+  if(fb_phys == 0 && fb->address) {
+    u64 va = (u64)fb->address;
     if(va >= hhdm_off)
       fb_phys = va - hhdm_off;
     else
@@ -58,7 +58,7 @@ void fb_user_boot_init(
   if(fb_phys == 0)
     return;
 
-  u64 active = lfb->pitch * lfb->height;
+  u64 active = fb->pitch * fb->height;
   if(active == 0)
     return;
 
@@ -69,10 +69,10 @@ void fb_user_boot_init(
   g_fb.phys_base    = map_lo;
   g_fb.map_size     = map_sz;
   g_fb.pixel_offset = rel0;
-  g_fb.width        = lfb->width;
-  g_fb.height       = lfb->height;
-  g_fb.pitch        = lfb->pitch;
-  g_fb.bpp          = lfb->bpp;
+  g_fb.width        = fb->width;
+  g_fb.height       = fb->height;
+  g_fb.pitch        = fb->pitch;
+  g_fb.bpp          = fb->bpp;
   g_fb.valid        = 1;
 }
 

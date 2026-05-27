@@ -280,7 +280,7 @@ static void init_input(void)
 {
   mouse_init();
   if(fb_request.response && fb_request.response->framebuffer_count > 0) {
-    struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
+    const struct limine_framebuffer *fb = fb_request.response->framebuffers[0];
     mouse_set_screen((u32)fb->width, (u32)fb->height);
   }
 

@@ -250,7 +250,7 @@ void spz_statusbar(const char *left, const char *center, const char *right)
   delwin(bar);
 }
 
-int spz_menu(int y, int x, const char **items, int n, const char *title)
+int spz_menu(int y, int x, const char *const *items, int n, const char *title)
 {
   if(!items || n <= 0)
     return -1;
@@ -321,6 +321,8 @@ int spz_menu(int y, int x, const char **items, int n, const char *title)
     case 'q':
       spz_panel_del(p);
       return -1;
+    default:
+      break;
     }
   }
 }

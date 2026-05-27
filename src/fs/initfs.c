@@ -123,7 +123,7 @@ static i64 init_read(fs_handle_t fh, void *buf, u64 count, u64 offset)
 {
   if(fh == INITFS_ROOT_HANDLE)
     return -EISDIR;
-  init_file_t *f = (init_file_t *)fh;
+  const init_file_t *f = (const init_file_t *)fh;
   if(offset >= f->size)
     return 0;
   u64 avail = f->size - offset;
@@ -182,7 +182,7 @@ static void fill_stat(vfs_stat_t *st, const init_file_t *f)
  * @param st       Destination stat buffer.
  * @return 0 on success, @c -ENOENT if the path does not exist.
  */
-static i64 init_stat(void *fs_data, const char *path, vfs_stat_t *st)
+static i64 init_stat(const void *fs_data, const char *path, vfs_stat_t *st)
 {
   (void)fs_data;
   const char *name = strip_slash(path);
@@ -190,7 +190,7 @@ static i64 init_stat(void *fs_data, const char *path, vfs_stat_t *st)
     fill_stat(st, NULL);
     return 0;
   }
-  init_file_t *f = lookup(name);
+  const init_file_t *f = lookup(name);
   if(!f)
     return -ENOENT;
   fill_stat(st, f);

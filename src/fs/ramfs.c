@@ -200,7 +200,7 @@ static i64 ram_write(fs_handle_t fh, const void *buf, u64 count, u64 offset)
   return (i64)count;
 }
 
-static i64 ram_stat(void *fs_data, const char *path, vfs_stat_t *st)
+static i64 ram_stat(const void *fs_data, const char *path, vfs_stat_t *st)
 {
   (void)fs_data;
   ram_node_t *node = ram__resolve(path);

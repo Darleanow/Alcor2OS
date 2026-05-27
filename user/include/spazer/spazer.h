@@ -54,7 +54,7 @@ void spz_progress(WINDOW *win, int y, int x, int width, int num, int den);
 
 void spz_statusbar(const char *left, const char *center, const char *right);
 
-int  spz_menu(int y, int x, const char **items, int n, const char *title);
+int  spz_menu(int y, int x, const char *const *items, int n, const char *title);
 
 void spz_label(WINDOW *win, int y, int x, const char *text, int style);
 

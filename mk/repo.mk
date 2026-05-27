@@ -336,11 +336,11 @@ format fmt:
 	  ! -path '*/thirdparty/*' \
 	  ! -path '*/.cache/*' \
 	  ! -path '*/doomgeneric/*' \
-	  -print0 | xargs -0 clang-format -i
+	  -print0 | xargs -0 clang-format-21 -i
 
 lint:
 	clang-tidy \
-	  --header-filter='^(src|include|user)/.*' \
+	  --header-filter='^(src|include|user)/(?!games/doom/doomgeneric/).*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
 	     -I$(SRC) \
@@ -348,20 +348,31 @@ lint:
 	     -Iuser/core/vega/include \
 	     -Iuser/apps/shell/include \
 	     -Iuser/include \
+	     -Iuser/games/doom/doomgeneric/doomgeneric \
 	     -Ithirdparty/musl/$(MUSL_PREFIX)/include \
 	     -Ithirdparty/freetype-install/usr/include/freetype2 \
 	     -Ithirdparty/harfbuzz-install/usr/include/harfbuzz \
+	     -DALCOR2_VERSION=\"qa\" \
+	     -DSYS_TRACE=0 \
 	     -std=gnu11
 
 check:
 	cppcheck \
 	  --enable=all \
 	  --suppress=missingIncludeSystem \
+	  --suppress=unusedFunction \
+	  --suppress=checkersReport \
 	  --inline-suppr \
 	  --inconclusive \
 	  --quiet \
+	  -DVEGA_VERSION=\"qa\" \
 	  -i user/games/doom/doomgeneric \
 	  -I$(INCLUDE) \
+	  -Iuser/include \
+	  -Iuser/sdk/vega/include \
+	  -Iuser/core/vega/include \
+	  -Iuser/apps/shell/include \
+	  -Iuser/games/doom/doomgeneric/doomgeneric \
 	  $(SRC) user
 
 qa: lint check

@@ -18,11 +18,10 @@
  */
 void *kmemcpy(void *dst, const void *src, u64 n)
 {
-  // cppcheck-suppress constVariablePointer
-  void       *d = dst;
-  const void *s = src;
-  __asm__ volatile("rep movsb" : "+D"(d), "+S"(s), "+c"(n)::"memory");
-  return dst;
+  void       *ret = dst;
+  const void *s   = src;
+  __asm__ volatile("rep movsb" : "+D"(dst), "+S"(s), "+c"(n)::"memory");
+  return ret;
 }
 
 /**
@@ -37,10 +36,9 @@ void *kmemcpy(void *dst, const void *src, u64 n)
  */
 void *kmemset(void *dst, int val, u64 n)
 {
-  // cppcheck-suppress constVariablePointer
-  void *d = dst;
-  __asm__ volatile("rep stosb" : "+D"(d), "+c"(n) : "a"((u8)val) : "memory");
-  return dst;
+  void *ret = dst;
+  __asm__ volatile("rep stosb" : "+D"(dst), "+c"(n) : "a"((u8)val) : "memory");
+  return ret;
 }
 
 /**
@@ -54,9 +52,7 @@ void *kmemset(void *dst, int val, u64 n)
  */
 void kzero(void *dst, u64 n)
 {
-  // cppcheck-suppress constVariablePointer
-  void *d = dst;
-  __asm__ volatile("rep stosb" : "+D"(d), "+c"(n) : "a"((u8)0) : "memory");
+  __asm__ volatile("rep stosb" : "+D"(dst), "+c"(n) : "a"((u8)0) : "memory");
 }
 
 /**

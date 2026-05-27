@@ -206,17 +206,19 @@ static void screen_input(spz_panel_t *p)
     char line[64];
     if(ch >= 0x100) {
       const char *name = keyname(ch);
-      snprintf(line, sizeof line, "%-12s  code %d", name ? name : "?", ch);
+      (void)snprintf(
+          line, sizeof line, "%-12s  code %d", name ? name : "?", ch
+      );
     } else if(ch < 0x80) {
       const char *name = keyname(ch);
-      snprintf(line, sizeof line, "%-12s  0x%02x", name ? name : "?", ch);
+      (void)snprintf(line, sizeof line, "%-12s  0x%02x", name ? name : "?", ch);
       acc.remaining = 0;
     } else {
       uint32_t cp = utf8_feed(&acc, (unsigned char)ch);
       if(cp == 0)
         continue;
       if(cp == (uint32_t)-1) {
-        snprintf(line, sizeof line, "invalid UTF-8 byte 0x%02x", ch);
+        (void)snprintf(line, sizeof line, "invalid UTF-8 byte 0x%02x", ch);
       } else {
         char     raw[24];
         char     ch_buf[5];
@@ -225,7 +227,7 @@ static void screen_input(spz_panel_t *p)
         for(unsigned i = 0; i < acc.n_raw && cn < sizeof ch_buf - 1; i++)
           ch_buf[cn++] = (char)acc.raw[i];
         ch_buf[cn] = '\0';
-        snprintf(line, sizeof line, "%-4s U+%04X  %s", ch_buf, cp, raw);
+        (void)snprintf(line, sizeof line, "%-4s U+%04X  %s", ch_buf, cp, raw);
       }
     }
 
@@ -278,7 +280,7 @@ int main(void)
   if(!term || !term[0])
     term = "xterm-256color";
 
-  setlocale(LC_ALL, "C.UTF-8");
+  (void)setlocale(LC_ALL, "C.UTF-8");
   (void)setvbuf(stdout, NULL, _IONBF, 0);
 
   SCREEN *scr = newterm(term, stdout, stdin);

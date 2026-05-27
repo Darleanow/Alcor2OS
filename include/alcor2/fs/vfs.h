@@ -136,7 +136,7 @@ typedef struct
    * @brief Stat the node at @p path.
    * @return 0 and populates @p st on success, negative @c -errno on failure.
    */
-  i64 (*stat)(void *fs_data, const char *path, vfs_stat_t *st);
+  i64 (*stat)(const void *fs_data, const char *path, vfs_stat_t *st);
 
   /**
    * @brief Stat an already-open handle.
@@ -171,7 +171,7 @@ typedef struct
    * @param cap  Capacity of @p buf in bytes.
    * @return Target length on success, negative @c -errno on failure.
    */
-  i64 (*readlink)(void *fs_data, const char *path, char *buf, u64 cap);
+  i64 (*readlink)(const void *fs_data, const char *path, char *buf, u64 cap);
 
   /**
    * @brief Device control on an open handle.

@@ -146,7 +146,7 @@ static u8 bytes_pp_from_bpp(u16 bpp)
 
 static void fb_put_pixel(u32 x, u32 y, u32 color)
 {
-  if(x >= ctx.width || y >= ctx.height)
+  if(!ctx.base || x >= ctx.width || y >= ctx.height)
     return;
   volatile u8 *p = ctx.base + (u64)y * ctx.pitch + (u64)x * ctx.bytes_pp;
   switch(ctx.bytes_pp) {
@@ -204,8 +204,7 @@ static u32 atlas_lookup_attr(u32 cp, u16 attr)
 
 static inline void fill32(volatile u32 *dst, u32 val, u32 n)
 {
-  u32 *d = (u32 *)(uintptr_t)dst;
-  __asm__ volatile("rep stosl" : "+D"(d), "+c"(n) : "a"(val) : "memory");
+  __asm__ volatile("rep stosl" : "+D"(dst), "+c"(n) : "a"(val) : "memory");
 }
 
 /* Blend one row of glyph pixels into the framebuffer.  bypp==1: alpha-only
@@ -217,6 +216,8 @@ static inline void blend_glyph_row(
     u32 fg_b, u32 bg_r, u32 bg_g, u32 bg_b, u32 fg_pk, u32 bg_pk
 )
 {
+  if(!dst || !src)
+    return;
   if(bypp == 1u) {
     for(u32 gx = 0; gx < n; gx++) {
       u32 a = src[gx];
@@ -235,7 +236,7 @@ static inline void blend_glyph_row(
     }
   } else {
     for(u32 gx = 0; gx < n; gx++) {
-      const u8 *px = src + gx * bypp;
+      const u8 *px = src + (size_t)gx * bypp;
       u32       a  = (bypp == 4u) ? (u32)px[3] : (u32)px[0];
       if(!a) {
         dst[gx] = bg_pk;
@@ -296,10 +297,10 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
          * (e.g. the inverted cursor block), showing as artefacts. */
         if(cell_w < (u32)ctx.cell_w || cell_h < (u32)ctx.cell_h) {
           for(u32 gy = 0; gy < (u32)ctx.cell_h; gy++) {
-            volatile u32 *row =
+            volatile u32 *cell_row =
                 (volatile u32 *)(ctx.base + (u64)(px_y + gy) * ctx.pitch +
                                  (u64)px_x * 4u);
-            fill32(row, bg_pk, (u32)ctx.cell_w);
+            fill32(cell_row, bg_pk, (u32)ctx.cell_w);
           }
         }
 
@@ -333,7 +334,7 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
         for(u32 gy = 0; gy < cell_h; gy++) {
           const u8 *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
           for(u32 gx = 0; gx < cell_w; gx++) {
-            const u8 *px = src + gx * atlas_bypp;
+            const u8 *px = src + (size_t)gx * atlas_bypp;
             u32       a  = (atlas_bypp == 4u) ? (u32)px[3] : (u32)px[0];
             if(!a) {
               fb_put_pixel(px_x + gx, px_y + gy, eff_bg);
@@ -658,7 +659,7 @@ static void flush_batch(void)
   u32 acw =
       (ctx.atlas_cell_w < (u32)ctx.cell_w) ? ctx.atlas_cell_w : (u32)ctx.cell_w;
 
-  struct flush_cell_cache ci[160];
+  struct flush_cell_cache ci[160] = {0};
 
   for(int cr = r0; cr <= r1; cr++) {
     fb_cell_t *row = &ctx.cells[(size_t)cr * (size_t)ctx.cols];
@@ -708,7 +709,7 @@ static void flush_batch(void)
       for(int cc = 0; cc < ctx.cols; cc++) {
         if(!ci[cc].active)
           continue;
-        volatile u32 *dst = fb_line + (u32)cc * (u32)ctx.cell_w;
+        volatile u32 *dst = fb_line + (size_t)cc * (size_t)ctx.cell_w;
 
         if(ci[cc].underline && spy >= (u32)ctx.cell_h - 2u) {
           fill32(dst, ci[cc].fg_pk, (u32)ctx.cell_w);

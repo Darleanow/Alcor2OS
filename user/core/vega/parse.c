@@ -384,6 +384,17 @@ static ast_t *parse_fn(lexer_t *L)
       arg_names = new_arr;
       cap       = new_cap;
     }
+    /* arg_names is non-NULL here: the realloc-then-grow branch above
+     * either returned NULL on OOM or assigned a non-NULL pointer, and any
+     * iteration that skipped the grow branch had n_args < cap which only
+     * happens after at least one grow. The explicit guard helps the
+     * static analyser see that. */
+    if(!arg_names) {
+      free(t.text);
+      free(name_tok.text);
+      L->error = 1;
+      return NULL;
+    }
     arg_names[n_args++] = t.text;
   }
 

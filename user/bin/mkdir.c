@@ -18,14 +18,14 @@ int main(int argc, char *argv[])
     return (rc == GR_HELP) ? 0 : 1;
 
   if(rest.argc == 0) {
-    fprintf(stderr, "mkdir: missing operand\n");
+    (void)fprintf(stderr, "mkdir: missing operand\n");
     return 1;
   }
 
   int exit_code = 0;
   for(int i = 0; i < rest.argc; i++) {
     if(mkdir(rest.argv[i], 0755) < 0) {
-      fprintf(stderr, "mkdir: cannot create '%s'\n", rest.argv[i]);
+      (void)fprintf(stderr, "mkdir: cannot create '%s'\n", rest.argv[i]);
       exit_code = 1;
     }
   }

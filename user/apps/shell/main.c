@@ -41,7 +41,7 @@ static void hist_push(const char *line)
   if(hist_count > 0 && strcmp(history[hist_count - 1], line) == 0)
     return;
   if(hist_count == HIST_MAX) {
-    memmove(history[0], history[1], sizeof(history[0]) * (HIST_MAX - 1));
+    (void)memmove(history[0], history[1], sizeof(history[0]) * (HIST_MAX - 1));
     hist_count--;
   }
   strncpy(history[hist_count], line, LINE_MAX_LEN - 1);
@@ -71,7 +71,7 @@ static void redraw_line(
   write_str(prompt);
   write_str(buf);
   /* CHA — Cursor Horizontal Absolute (1-based). */
-  snprintf(tail, sizeof tail, "\r\033[%dC", prompt_cols + cur_cols);
+  (void)snprintf(tail, sizeof tail, "\r\033[%dC", prompt_cols + cur_cols);
   if(cur_cols + prompt_cols > 0)
     write_str(tail);
   else
@@ -177,7 +177,7 @@ static int read_line(char *buf, size_t cap, const char *prompt)
       if(cur_b == 0)
         break;
       int prev = prev_char_boundary(buf, cur_b);
-      memmove(buf + prev, buf + cur_b, (size_t)(len - cur_b + 1));
+      (void)memmove(buf + prev, buf + cur_b, (size_t)len - (size_t)cur_b + 1);
       len -= (cur_b - prev);
       cur_b = prev;
       redraw_line(
@@ -190,7 +190,7 @@ static int read_line(char *buf, size_t cap, const char *prompt)
       if(cur_b >= len)
         break;
       int nx = next_char_boundary(buf, len, cur_b);
-      memmove(buf + cur_b, buf + nx, (size_t)(len - nx + 1));
+      (void)memmove(buf + cur_b, buf + nx, (size_t)len - (size_t)nx + 1);
       len -= (nx - cur_b);
       redraw_line(
           prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
@@ -274,7 +274,9 @@ static int read_line(char *buf, size_t cap, const char *prompt)
       if(c < 0x100 && (c == ' ' || (c >= 0x21 && c <= 0x7e) || c >= 0x80)) {
         if(len + 1 >= (int)cap - 1)
           break;
-        memmove(buf + cur_b + 1, buf + cur_b, (size_t)(len - cur_b + 1));
+        (void)memmove(
+            buf + cur_b + 1, buf + cur_b, (size_t)len - (size_t)cur_b + 1
+        );
         buf[cur_b++] = (char)c;
         len++;
         redraw_line(
@@ -312,7 +314,7 @@ static void write_prompt_header(void)
 
 static void format_prompt(char *out, size_t cap)
 {
-  snprintf(
+  (void)snprintf(
       out, cap,
       PC_LINE PC_BL PC_H " " PC_RS /* ╰─ space */
       PC_DOLS "$" PC_RS " "
@@ -454,7 +456,7 @@ static int read_complete_statement(char *buf, size_t size)
 
   /* Continuation prompt for multi-line input: │ »  (indented) */
   char cont_prompt[64];
-  snprintf(
+  (void)snprintf(
       cont_prompt, sizeof cont_prompt,
       PC_LINE BD_V " " PC_RS /* │ space */
       PC_DOLS "\xc2\xbb" PC_RS " "

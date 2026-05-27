@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     return (rc == GR_HELP) ? 0 : 1;
 
   if(rest.argc != 1) {
-    fprintf(stderr, "usage: kbd us|fr\n");
+    (void)fprintf(stderr, "usage: kbd us|fr\n");
     return 1;
   }
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   else if(strcmp(rest.argv[0], "fr") == 0)
     layout = KBD_LAYOUT_FR;
   else {
-    fprintf(
+    (void)fprintf(
         stderr, "kbd: unknown layout '%s' (expected us|fr)\n", rest.argv[0]
     );
     return 1;
@@ -42,6 +42,6 @@ int main(int argc, char *argv[])
     perror("kbd: ioctl");
     return 1;
   }
-  printf("keyboard: layout %s\n", rest.argv[0]);
+  (void)printf("keyboard: layout %s\n", rest.argv[0]);
   return 0;
 }
