@@ -223,9 +223,17 @@ void lex_init(lexer_t *L, const char *src)
 
 static tok_t scan_one(lexer_t *L)
 {
-  /* skip horizontal whitespace */
-  while(is_hspace(*L->cur))
-    L->cur++;
+  /* Skip horizontal whitespace and # comments (to end of line). */
+  for(;;) {
+    while(is_hspace(*L->cur))
+      L->cur++;
+    if(*L->cur == '#') {
+      while(*L->cur && *L->cur != '\n')
+        L->cur++;
+      continue;
+    }
+    break;
+  }
 
   tok_t t = {TOK_EOF, NULL};
   char  c = *L->cur;
