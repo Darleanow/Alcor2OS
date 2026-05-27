@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <theme.h>
 #include <unistd.h>
 #include <vega/host.h>
 #include <vega/vega.h>
@@ -294,14 +295,17 @@ static int read_line(char *buf, size_t cap, const char *prompt)
           if(sl && sl[1] != '\0')
             display = sl + 1;
           else if(sl && sl[1] == '\0' && sl != display) {
-            /* Entry ends with '/' (directory) — show "name/" only. */
             const char *prev = sl - 1;
             while(prev > display && prev[-1] != '/')
               prev--;
             display = prev;
           }
+          size_t dlen   = strlen(display);
+          int    is_dir = (dlen > 0 && display[dlen - 1] == '/');
           write_str("  ");
+          write_str(is_dir ? THEME_ANSI_PRIMARY_B : THEME_ANSI_TEXT);
           write_str(display);
+          write_str(THEME_ANSI_RESET);
           write_str("\n");
         }
         write_str(prompt);
