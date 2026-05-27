@@ -82,6 +82,20 @@ static void compute_common(comp_result_t *out)
   }
 }
 
+/**
+ * @brief Compute tab-completion candidates for @p prefix.
+ *
+ * When @p is_command is true, matches against shell builtins and executables
+ * in @c /init, @c /bin, @c /usr/bin. Otherwise matches filesystem entries
+ * under the directory implied by @p prefix (or CWD when @p prefix has no
+ * slash). Directories get a trailing @c / in their entry name.
+ *
+ * @param prefix      Partial word typed so far.
+ * @param is_command  true for command-position completion (first word on
+ *                    the line), false for path completion.
+ * @param out         Result accumulator; zeroed on entry, filled with
+ *                    candidates and the longest common prefix on return.
+ */
 void sh_complete(const char *prefix, bool is_command, comp_result_t *out)
 {
   memset(out, 0, sizeof(*out));
