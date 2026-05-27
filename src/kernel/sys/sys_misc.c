@@ -110,9 +110,8 @@ static bool futex_read_u32(u64 uaddr, u32 *out)
   u64 pa = vmm_get_phys(uaddr);
   if(!pa)
     return false;
-  const volatile u32 *kv =
-      (const volatile u32 *)((u8 *)phys_to_virt(pa) + 0); /* NOLINT */
-  *out = *kv;
+  const volatile u32 *kv = (const volatile u32 *)phys_to_virt(pa);
+  *out                   = *kv;
   return true;
 }
 
