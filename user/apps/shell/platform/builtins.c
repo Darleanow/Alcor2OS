@@ -55,7 +55,12 @@ static int cmd_pwd(void)
   return 1;
 }
 
-/** @brief Check whether @p name matches a registered shell builtin. */
+/**
+ * @brief Check whether @p name matches a registered shell builtin.
+ *
+ * @param name  Command name to look up.
+ * @return true if @p name is a builtin, false otherwise.
+ */
 bool sh_is_builtin(const char *name)
 {
   for(int i = 0; shell_builtins[i]; i++) {
@@ -65,13 +70,24 @@ bool sh_is_builtin(const char *name)
   return false;
 }
 
-/** @brief Return the NULL-terminated builtin name array. */
+/**
+ * @brief Return the NULL-terminated builtin name array.
+ *
+ * @return Pointer to an internal static array; valid for the lifetime of the
+ *         process.
+ */
 const char *const *sh_builtin_list(void)
 {
   return shell_builtins;
 }
 
-/** @brief Dispatch @p argv[0] to the matching builtin handler. */
+/**
+ * @brief Dispatch @p argv[0] to the matching builtin handler.
+ *
+ * @param argc  Argument count (including the command name).
+ * @param argv  NULL-terminated argument vector.
+ * @return Exit status (0 = success).
+ */
 int sh_run_builtin(int argc, char *const argv[])
 {
   const char *name = argv[0];
