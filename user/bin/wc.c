@@ -10,9 +10,6 @@
 #include <string.h>
 #include <unistd.h>
 
-/**
- * @brief wc main entry point.
- */
 
 
 typedef struct {
