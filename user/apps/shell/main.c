@@ -287,8 +287,12 @@ static int read_line(char *buf, size_t cap, const char *prompt)
       }
 
       if(last_was_tab && comp.count > 1) {
-        /* Double-tab: list candidates. */
-        write_str("\n");
+        /* Double-tab: list candidates in columns matching ls layout. */
+        const char *names[COMP_MAX];
+        int         name_lens[COMP_MAX];
+        int         dir_flags[COMP_MAX];
+        int         max_w = 0;
+
         for(int i = 0; i < comp.count; i++) {
           const char *display = comp.entries[i];
           const char *sl      = strrchr(display, '/');
@@ -300,12 +304,40 @@ static int read_line(char *buf, size_t cap, const char *prompt)
               prev--;
             display = prev;
           }
-          size_t dlen   = strlen(display);
-          int    is_dir = (dlen > 0 && display[dlen - 1] == '/');
-          write_str("  ");
-          write_str(is_dir ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
-          write_str(display);
-          write_str(THEME_ANSI_RESET);
+          names[i]     = display;
+          name_lens[i] = (int)strlen(display);
+          dir_flags[i] = (name_lens[i] > 0 && display[name_lens[i] - 1] == '/');
+          if(name_lens[i] > max_w)
+            max_w = name_lens[i];
+        }
+
+        int col_w  = max_w + 2;
+        int n_cols = 80 / col_w;
+        if(n_cols < 1)
+          n_cols = 1;
+        if(n_cols > 3)
+          n_cols = 3;
+        int n_rows = (comp.count + n_cols - 1) / n_cols;
+
+        write_str("\n");
+        for(int row = 0; row < n_rows; row++) {
+          for(int col = 0; col < n_cols; col++) {
+            int idx = col * n_rows + row;
+            if(idx >= comp.count)
+              continue;
+            int last =
+                (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp.count);
+            write_str(
+                dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B
+            );
+            write_str(names[idx]);
+            write_str(THEME_ANSI_RESET);
+            if(!last) {
+              int padding = col_w - name_lens[idx];
+              for(int p = 0; p < padding; p++)
+                write_str(" ");
+            }
+          }
           write_str("\n");
         }
         write_str(prompt);
