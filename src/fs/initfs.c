@@ -182,7 +182,7 @@ static void fill_stat(vfs_stat_t *st, const init_file_t *f)
  * @param st       Destination stat buffer.
  * @return 0 on success, @c -ENOENT if the path does not exist.
  */
-static i64 init_stat(void *fs_data, const char *path, vfs_stat_t *st)
+static i64 init_stat(const void *fs_data, const char *path, vfs_stat_t *st)
 {
   (void)fs_data;
   const char *name = strip_slash(path);

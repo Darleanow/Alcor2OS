@@ -2664,9 +2664,7 @@ static i64 ext2_ops_fstat(fs_handle_t fh, vfs_stat_t *st)
   return 0;
 }
 
-/* cppcheck-suppress constParameterCallback ; fs_ops_t.stat is a vtable
- * entry and must match the function-pointer type. */
-static i64 ext2_ops_stat(void *fs_data, const char *path, vfs_stat_t *st)
+static i64 ext2_ops_stat(const void *fs_data, const char *path, vfs_stat_t *st)
 {
   ext2_entry_t entry;
   i64          ret = ext2_stat(fs_data, path, &entry);
@@ -2701,8 +2699,7 @@ static i64 ext2_ops_truncate(fs_handle_t fh, u64 length)
 }
 
 static i64
-    /* cppcheck-suppress constParameterCallback */
-    ext2_ops_readlink(void *fs_data, const char *path, char *buf, u64 cap)
+    ext2_ops_readlink(const void *fs_data, const char *path, char *buf, u64 cap)
 {
   return ext2_readlink(fs_data, path, buf, cap);
 }

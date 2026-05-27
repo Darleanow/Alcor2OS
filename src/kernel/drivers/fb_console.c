@@ -204,10 +204,7 @@ static u32 atlas_lookup_attr(u32 cp, u16 attr)
 
 static inline void fill32(volatile u32 *dst, u32 val, u32 n)
 {
-  /* cppcheck-suppress constVariablePointer ; clobbered by the "+D" asm
-   * operand below — not actually const-eligible. */
-  u32 *d = (u32 *)(uintptr_t)dst;
-  __asm__ volatile("rep stosl" : "+D"(d), "+c"(n) : "a"(val) : "memory");
+  __asm__ volatile("rep stosl" : "+D"(dst), "+c"(n) : "a"(val) : "memory");
 }
 
 /* Blend one row of glyph pixels into the framebuffer.  bypp==1: alpha-only

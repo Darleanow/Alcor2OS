@@ -522,9 +522,7 @@ typedef struct
   u64 block_lba; /* aligned, CACHE_INVALID_LBA = free slot */
   u64 last_used;
   u8  drive;
-  /* cppcheck-suppress unusedStructMember ; alignment padding */
-  u8 pad[7];
-  u8 data[CACHE_BLOCK_BYTES];
+  u8  data[CACHE_BLOCK_BYTES] __attribute__((aligned(8)));
 } ata_cache_entry_t;
 
 static ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];

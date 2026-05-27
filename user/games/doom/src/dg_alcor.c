@@ -557,24 +557,21 @@ void DG_DrawFrame(void)
   /* Scaled path: build one scaled row in a stack buffer then memcpy it for
    * each duplicate scanline.  This replaces N scatter-writes per pixel with
    * one sequential fill + (scale-1) memcpys.  Sized for MAX_SCALE. */
-  uint32_t row_buf[DOOMGENERIC_RESX * MAX_SCALE];
+  uint32_t row_buf[DOOMGENERIC_RESX * MAX_SCALE] = {0};
   size_t   row_bytes = (size_t)DOOMGENERIC_RESX * scale * sizeof(uint32_t);
 
   for(uint32_t sy = 0; sy < DOOMGENERIC_RESY; sy++) {
     const uint32_t *src_row = src + (size_t)sy * DOOMGENERIC_RESX;
 
     /* Expand one source row into row_buf. */
-    uint32_t *out = row_buf;
     for(uint32_t sx = 0; sx < DOOMGENERIC_RESX; sx++) {
       uint32_t px = src_row[sx] | 0xFF000000u;
       for(uint32_t rx = 0; rx < scale; rx++)
-        *out++ = px;
+        row_buf[(size_t)sx * scale + rx] = px;
     }
 
     /* Copy the expanded row into each duplicate scanline. */
     uint32_t *dst0 = fb_base + (size_t)sy * scale * s_pitch32;
-    /* cppcheck-suppress uninitvar ; row_buf was filled by the loop above
-     * via *out++ but cppcheck doesn't track pointer-increment writes. */
     memcpy(dst0, row_buf, row_bytes);
     for(uint32_t ry = 1; ry < scale; ry++)
       memcpy(dst0 + (size_t)ry * s_pitch32, row_buf, row_bytes);
