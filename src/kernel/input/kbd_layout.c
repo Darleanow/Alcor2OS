@@ -672,9 +672,14 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   if(!p || count == 0)
     return 0;
 
+  console_printf(
+      "[krfp] enter p=%x t=%x cnt=%d ", (u64)p, (u64)&p->termios, (int)count
+  );
   k_termios_t  *t       = &p->termios;
   u32           lflag   = t->c_lflag;
+  console_printf("lflag=%x ", (u64)lflag);
   bool          icanon  = (lflag & KTERM_ICANON) != 0;
+  console_printf("canon=%d\n", (int)icanon);
   bool          echo_on = (lflag & KTERM_ECHO) != 0;
   u8            vmin    = t->c_cc[KTERM_VMIN];
   u8            vtime   = t->c_cc[KTERM_VTIME];
