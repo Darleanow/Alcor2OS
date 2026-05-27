@@ -124,12 +124,14 @@ static i64 tty_read(void *ctx, void *buf, u64 count, u64 offset)
   (void)ctx;
   (void)offset;
   proc_t *p = proc_current();
-  console_printf(
-      "[ttyR] p=%p buf=%p cnt=%lu\n", (void *)p, buf, (unsigned long)count
-  );
+  console_printf("[ttyR] p=%x cnt=%d ", (u64)p, (int)count);
+  i64 r;
   if(p)
-    return (i64)kbd_read_for_process(p, (char *)buf, count);
-  return (i64)kbd_read_translated((char *)buf, count);
+    r = (i64)kbd_read_for_process(p, (char *)buf, count);
+  else
+    r = (i64)kbd_read_translated((char *)buf, count);
+  console_printf("ret=%d\n", (int)r);
+  return r;
 }
 
 /**
