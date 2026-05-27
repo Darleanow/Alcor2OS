@@ -414,12 +414,14 @@ static inline void sel_mask_high_bits(
 }
 
 /** @brief Return positive if @p fd has data available, 0 if not, negative on
- * error. */
+ * error. fd 0 is unconditionally routed through the kbd line discipline —
+ * it is always the keyboard TTY in this kernel, whether or not the OFT entry
+ * from the /dev/tty stdio install is in place. */
 static i32 sel_read_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
     return -EBADF;
-  if(fd == 0 && !fd_has_oft(fd)) {
+  if(fd == 0) {
     const proc_t *p = proc_current();
     if(!p)
       return kbd_raw_pending() ? 1 : 0;
