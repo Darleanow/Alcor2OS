@@ -55,7 +55,7 @@ static void scan_cmd_dir(
   DIR *d = sh_opendir(dir);
   if(!d)
     return;
-  struct dirent *ent;
+  const struct dirent *ent;
   while((ent = sh_readdir(d)) != NULL) {
     if(ent->d_name[0] == '.' && prefix[0] != '.')
       continue;
@@ -87,7 +87,7 @@ static void scan_path_dir(
   DIR *d = sh_opendir(dir);
   if(!d)
     return;
-  struct dirent *ent;
+  const struct dirent *ent;
   while((ent = sh_readdir(d)) != NULL) {
     if(ent->d_name[0] == '.' && name_prefix[0] != '.')
       continue;

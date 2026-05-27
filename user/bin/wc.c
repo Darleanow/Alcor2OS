@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
     wc_counts_t c;
 
     if(count_fd(STDIN_FILENO, &c) < 0) {
-      fprintf(stderr, "wc: read error\n");
+      (void)fprintf(stderr, "wc: read error\n");
       return 1;
     }
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
     int         fd = strcmp(path, "-") ? open(path, O_RDONLY) : STDIN_FILENO;
 
     if(fd < 0) {
-      fprintf(stderr, "wc: cannot open '%s'\n", path);
+      (void)fprintf(stderr, "wc: cannot open '%s'\n", path);
       status = 1;
       continue;
     }
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
     wc_counts_t c;
 
     if(count_fd(fd, &c) < 0) {
-      fprintf(stderr, "wc: read error on '%s'\n", path);
+      (void)fprintf(stderr, "wc: read error on '%s'\n", path);
 
       if(fd != STDIN_FILENO)
         close(fd);
