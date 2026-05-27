@@ -26,7 +26,7 @@ bool Ui::init(const std::string &header)
   if(!term || !term[0])
     term = "xterm-256color";
 
-  std::setvbuf(stdout, nullptr, _IONBF, 0);
+  (void)std::setvbuf(stdout, nullptr, _IONBF, 0);
 
   m_scr = newterm(term, stdout, stdin);
   if(!m_scr)
