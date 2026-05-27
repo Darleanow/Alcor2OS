@@ -286,6 +286,16 @@ static i64 ram_ioctl(fs_handle_t fh, u64 request, u64 arg)
   return -ENOTTY;
 }
 
+/* Regular files are always ready; chardevs delegate to their poll callback
+ * (or default to "ready" if the driver didn't supply one). */
+static u32 ram_poll(fs_handle_t fh, u32 events)
+{
+  ram_node_t *node = (ram_node_t *)fh;
+  if(node->cops && node->cops->poll)
+    return node->cops->poll(node->cctx, events);
+  return events & (POLL_IN | POLL_OUT);
+}
+
 static i64 ram_unlink(void *fs_data, const char *path)
 {
   (void)fs_data;
@@ -375,6 +385,7 @@ static const fs_ops_t ram_ops = {
     .readdir  = ram_readdir,
     .truncate = ram_truncate,
     .ioctl    = ram_ioctl,
+    .poll     = ram_poll,
 };
 
 static void *ram_mount_cb(const char *source, u32 flags)

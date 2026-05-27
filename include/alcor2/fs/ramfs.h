@@ -13,12 +13,20 @@
 
 #include <alcor2/types.h>
 
-/** @brief Driver-supplied callback table for a character device. */
+/** @brief Driver-supplied callback table for a character device.
+ *
+ * Any callback left @c NULL gets a sensible default from ramfs:
+ * read/write fail with @c -EINVAL, ioctl returns @c -ENOTTY, and poll reports
+ * "always ready" (so apps that don't care about backpressure aren't penalised).
+ */
 typedef struct ramfs_chardev_ops
 {
   i64 (*read)(void *ctx, void *buf, u64 count, u64 offset);
   i64 (*write)(void *ctx, const void *buf, u64 count, u64 offset);
   i64 (*ioctl)(void *ctx, u64 request, u64 arg);
+  /** @brief Return subset of @p events (@c POLL_IN / @c POLL_OUT) that are
+   *         actionable now. */
+  u32 (*poll)(void *ctx, u32 events);
 } ramfs_chardev_ops_t;
 
 /** @brief Initialise ramfs (idempotent). */

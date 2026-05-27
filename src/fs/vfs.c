@@ -775,7 +775,8 @@ i64 vfs_dup2(i64 oldfd, i64 newfd)
 }
 
 /** @brief Return positive if @p fd has data available without blocking, 0 if
- * not ready. */
+ * not ready. Pipes are handled directly; everything else goes through the
+ * driver's @c poll op (regular files fall back to "always ready"). */
 i32 vfs_select_read_ready(i64 fd)
 {
   i32 idx = fd_to_oft(fd);
@@ -785,11 +786,14 @@ i32 vfs_select_read_ready(i64 fd)
     return -EBADF;
   if(oft[idx].kind == VFS_KIND_PIPE_RD)
     return pipe_poll_read_ready(oft[idx].pipe) ? 1 : 0;
+  if(oft[idx].ops && oft[idx].ops->poll)
+    return (oft[idx].ops->poll(oft[idx].handle, POLL_IN) & POLL_IN) ? 1 : 0;
   return 1;
 }
 
 /** @brief Return positive if @p fd can accept a write without blocking, 0 if
- * not ready. */
+ * not ready. Pipes are handled directly; everything else delegates to the
+ * driver's @c poll op (regular files default to "always writable"). */
 i32 vfs_select_write_ready(i64 fd)
 {
   i32 idx = fd_to_oft(fd);
@@ -799,6 +803,8 @@ i32 vfs_select_write_ready(i64 fd)
     return -EBADF;
   if(oft[idx].kind == VFS_KIND_PIPE_WR)
     return pipe_poll_write_ready(oft[idx].pipe) ? 1 : 0;
+  if(oft[idx].ops && oft[idx].ops->poll)
+    return (oft[idx].ops->poll(oft[idx].handle, POLL_OUT) & POLL_OUT) ? 1 : 0;
   return 1;
 }
 

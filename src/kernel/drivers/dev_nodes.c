@@ -17,6 +17,7 @@
 #include <alcor2/errno.h>
 #include <alcor2/fb_console_ioctl.h>
 #include <alcor2/fs/ramfs.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/ktermios.h>
@@ -330,10 +331,37 @@ static const ramfs_chardev_ops_t zero_ops = {
     .write = null_write,
 };
 
+/**
+ * @brief Report read/write readiness for @c /dev/tty.
+ *
+ * POLL_IN consults the keyboard line discipline against the calling process's
+ * termios (canonical mode reports ready only once a full line is buffered).
+ * POLL_OUT is always available — fb_console writes never block.
+ *
+ * @param ctx     Unused.
+ * @param events  Requested events.
+ * @return Subset of @p events that are actionable now.
+ */
+static u32 tty_poll(void *ctx, u32 events)
+{
+  (void)ctx;
+  u32 ready = 0;
+  if(events & POLL_IN) {
+    const proc_t *p        = proc_current();
+    bool          in_ready = p ? kbd_select_read_ready(p) : kbd_raw_pending();
+    if(in_ready)
+      ready |= POLL_IN;
+  }
+  if(events & POLL_OUT)
+    ready |= POLL_OUT;
+  return ready;
+}
+
 static const ramfs_chardev_ops_t tty_ops = {
     .read  = tty_read,
     .write = tty_write,
     .ioctl = tty_ioctl,
+    .poll  = tty_poll,
 };
 
 static const ramfs_chardev_ops_t fb_ops = {
