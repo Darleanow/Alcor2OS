@@ -179,6 +179,38 @@ static i64 copy_from_user(void *dst, u64 uptr, u64 n)
 }
 
 /**
+ * @brief Forward an ioctl request to fb_console.
+ *
+ * Handles @c FB_CONSOLE_SET_ATLAS, @c FB_CONSOLE_YIELD, @c FB_CONSOLE_RECLAIM.
+ * Used by both @c tty_ioctl and @c fb_ioctl to keep the two surfaces in sync.
+ *
+ * @param request  ioctl request code.
+ * @param arg      User-space pointer to the ioctl argument (only used for
+ *                 @c FB_CONSOLE_SET_ATLAS).
+ * @return 0 on success, @c -ENOTTY if @p request is not an fb_console control,
+ *         negative @c -errno on validation failure.
+ */
+static i64 fb_console_ioctl_forward(u64 request, u64 arg)
+{
+  if(request == FB_CONSOLE_SET_ATLAS) {
+    if(!vmm_is_user_range((void *)arg, sizeof(fb_console_atlas_t)))
+      return -EFAULT;
+    fb_console_atlas_t meta;
+    kmemcpy(&meta, (void *)arg, sizeof(meta));
+    return fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL;
+  }
+  if(request == FB_CONSOLE_YIELD) {
+    fb_console_yield();
+    return 0;
+  }
+  if(request == FB_CONSOLE_RECLAIM) {
+    fb_console_reclaim();
+    return 0;
+  }
+  return -ENOTTY;
+}
+
+/**
  * @brief ioctl on /dev/tty — handles termios, winsize, keyboard layout, and
  * fb_console controls.
  *
@@ -242,23 +274,7 @@ static i64 tty_ioctl(void *ctx, u64 request, u64 arg)
     break;
   }
 
-  if(request == FB_CONSOLE_SET_ATLAS) {
-    if(!vmm_is_user_range((void *)arg, sizeof(fb_console_atlas_t)))
-      return -EFAULT;
-    fb_console_atlas_t meta;
-    kmemcpy(&meta, (void *)arg, sizeof(meta));
-    return fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL;
-  }
-  if(request == FB_CONSOLE_YIELD) {
-    fb_console_yield();
-    return 0;
-  }
-  if(request == FB_CONSOLE_RECLAIM) {
-    fb_console_reclaim();
-    return 0;
-  }
-
-  return -ENOTTY;
+  return fb_console_ioctl_forward(request, arg);
 }
 
 /**
@@ -301,22 +317,7 @@ static i64 fb_read(void *ctx, void *buf, u64 count, u64 offset)
 static i64 fb_ioctl(void *ctx, u64 request, u64 arg)
 {
   (void)ctx;
-  if(request == FB_CONSOLE_SET_ATLAS) {
-    if(!vmm_is_user_range((void *)arg, sizeof(fb_console_atlas_t)))
-      return -EFAULT;
-    fb_console_atlas_t meta;
-    kmemcpy(&meta, (void *)arg, sizeof(meta));
-    return fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL;
-  }
-  if(request == FB_CONSOLE_YIELD) {
-    fb_console_yield();
-    return 0;
-  }
-  if(request == FB_CONSOLE_RECLAIM) {
-    fb_console_reclaim();
-    return 0;
-  }
-  return -ENOTTY;
+  return fb_console_ioctl_forward(request, arg);
 }
 
 static const ramfs_chardev_ops_t null_ops = {
