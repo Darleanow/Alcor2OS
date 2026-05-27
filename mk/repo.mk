@@ -2,16 +2,17 @@
 
 .PHONY: all help kernel user iso iso-kernel run run-trace debug disk disk-mount disk-umount \
         disk-populate disk-resync disk-quick clean clean-all distclean \
-        format fmt lint check qa
+        format fmt lint check qa compile_commands
 
-all: kernel compile_commands
+all: kernel
 
 help:
-	@echo "Alcor2 $(GIT_VERSION) — useful targets"
+	@echo "Alcor2 $(GIT_VERSION) - useful targets"
 	@echo ""
 	@echo "  Build"
-	@echo "    all (default)   kernel + compile_commands.json (clangd)"
-	@echo "    kernel          link $(BUILD)/$(KERNEL) only"
+	@echo "    all (default)        kernel"
+	@echo "    kernel               link $(BUILD)/$(KERNEL) only"
+	@echo "    compile_commands     refresh compile_commands.json (clangd) via bear"
 	@echo "    iso-kernel      bootable ISO, kernel only — fastest CI check"
 	@echo "    user            userland: crt, init, shell, bin, apps"
 	@echo "    iso             full Limine ISO (kernel + userland)"
