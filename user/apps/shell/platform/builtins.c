@@ -55,6 +55,7 @@ static int cmd_pwd(void)
   return 1;
 }
 
+/** @brief Check whether @p name matches a registered shell builtin. */
 bool sh_is_builtin(const char *name)
 {
   for(int i = 0; shell_builtins[i]; i++) {
@@ -64,11 +65,13 @@ bool sh_is_builtin(const char *name)
   return false;
 }
 
+/** @brief Return the NULL-terminated builtin name array. */
 const char *const *sh_builtin_list(void)
 {
   return shell_builtins;
 }
 
+/** @brief Dispatch @p argv[0] to the matching builtin handler. */
 int sh_run_builtin(int argc, char *const argv[])
 {
   const char *name = argv[0];

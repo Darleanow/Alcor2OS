@@ -42,20 +42,47 @@ int            sh_chdir(const char *path);
 char          *sh_getcwd(char *buf, size_t size);
 int            sh_unlink(const char *path);
 
-/* Shell-side builtin dispatch (registered with libvega's ops table). */
-bool               sh_is_builtin(const char *name);
-int                sh_run_builtin(int argc, char *const argv[]);
+/**
+ * @brief Check whether @p name is a shell builtin command.
+ *
+ * @param name  Command name to look up.
+ * @return true if @p name matches a registered builtin, false otherwise.
+ */
+bool sh_is_builtin(const char *name);
+
+/**
+ * @brief Execute a shell builtin.
+ *
+ * @param argc  Argument count (including the command name at @c argv[0]).
+ * @param argv  NULL-terminated argument vector.
+ * @return Exit status (0 = success).
+ */
+int sh_run_builtin(int argc, char *const argv[]);
+
+/**
+ * @brief Return the NULL-terminated array of builtin command names.
+ *
+ * @return Pointer to an internal static array; valid for the lifetime of the
+ *         shell process.
+ */
 const char *const *sh_builtin_list(void);
 
 /* Tab completion */
 #define COMP_MAX      64
 #define COMP_NAME_MAX 64
 
+/**
+ * @brief Accumulator for tab-completion candidates.
+ *
+ * Filled by ::sh_complete. @c entries holds up to ::COMP_MAX candidate
+ * strings, @c count is the number actually populated, and @c common holds the
+ * longest common prefix across all candidates (used for single-tab insertion).
+ */
 typedef struct
 {
-  char entries[COMP_MAX][COMP_NAME_MAX];
-  int  count;
-  char common[COMP_NAME_MAX];
+  char entries[COMP_MAX][COMP_NAME_MAX]; /**< Candidate strings. */
+  int  count;                            /**< Number of valid entries. */
+  char common[COMP_NAME_MAX];            /**< Longest common prefix. */
 } comp_result_t;
 
 /**

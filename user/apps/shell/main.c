@@ -146,6 +146,138 @@ static WINDOW *s_input_pad;
 static struct termios s_raw_t;
 static struct termios s_cooked_t;
 
+/**
+ * @brief Handle a Tab keypress: complete or list candidates.
+ *
+ * On single Tab, inserts the longest common prefix of matching candidates
+ * (with a trailing space when there is exactly one match). On double Tab
+ * (last_was_tab already set), prints all candidates in coloured columns.
+ *
+ * @param buf           Line buffer (modified in place on completion).
+ * @param len           Pointer to byte length of @p buf content.
+ * @param cur_b         Pointer to cursor byte-index within @p buf.
+ * @param cap           Total capacity of @p buf.
+ * @param last_was_tab  Pointer to the double-tab flag; updated on return.
+ * @param prompt        Current prompt string (for redrawing after listing).
+ * @param prompt_cols   Visible column width of @p prompt.
+ */
+static void handle_tab(
+    char *buf, int *len, int *cur_b, size_t cap, int *last_was_tab,
+    const char *prompt, int prompt_cols
+)
+{
+  int word_start = *cur_b;
+  while(word_start > 0 && buf[word_start - 1] != ' ')
+    word_start--;
+  char prefix[MAX_CMD_LEN];
+  int  wlen = *cur_b - word_start;
+  if(wlen > 0)
+    memcpy(prefix, buf + word_start, wlen);
+  prefix[wlen] = '\0';
+
+  bool is_cmd = true;
+  for(int i = 0; i < word_start; i++) {
+    if(buf[i] != ' ') {
+      is_cmd = false;
+      break;
+    }
+  }
+
+  comp_result_t comp;
+  sh_complete(prefix, is_cmd, &comp);
+
+  if(comp.count == 0) {
+    *last_was_tab = 0;
+    return;
+  }
+
+  if(*last_was_tab && comp.count > 1) {
+    const char *names[COMP_MAX];
+    int         name_lens[COMP_MAX];
+    int         dir_flags[COMP_MAX];
+    int         max_w = 0;
+
+    for(int i = 0; i < comp.count; i++) {
+      const char *display = comp.entries[i];
+      const char *sl      = strrchr(display, '/');
+      if(sl && sl[1] != '\0')
+        display = sl + 1;
+      else if(sl && sl[1] == '\0' && sl != display) {
+        const char *prev = sl - 1;
+        while(prev > display && prev[-1] != '/')
+          prev--;
+        display = prev;
+      }
+      names[i]     = display;
+      name_lens[i] = (int)strlen(display);
+      dir_flags[i] = (name_lens[i] > 0 && display[name_lens[i] - 1] == '/');
+      if(name_lens[i] > max_w)
+        max_w = name_lens[i];
+    }
+
+    int col_w      = max_w + 2;
+    int cols_avail = COLS > 0 ? COLS : 80;
+    int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
+    if(n_cols < 1)
+      n_cols = 1;
+    int n_rows = (comp.count + n_cols - 1) / n_cols;
+
+    write_str("\n");
+    for(int row = 0; row < n_rows; row++) {
+      for(int col = 0; col < n_cols; col++) {
+        int idx = col * n_rows + row;
+        if(idx >= comp.count)
+          continue;
+        int last =
+            (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp.count);
+        write_str(dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
+        write_str(names[idx]);
+        write_str(THEME_ANSI_RESET);
+        if(!last) {
+          int padding = col_w - name_lens[idx];
+          for(int p = 0; p < padding; p++)
+            write_str(" ");
+        }
+      }
+      write_str("\n");
+    }
+    write_str(prompt);
+    write_str(buf);
+    int  cur_cols = utf8_cols(buf) - utf8_cols(buf + *cur_b);
+    char seq[32];
+    (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
+    if(prompt_cols + cur_cols > 0)
+      write_str(seq);
+    else
+      write_str("\r");
+    *last_was_tab = 0;
+    return;
+  }
+
+  int clen = (int)strlen(comp.common);
+  if(clen > wlen) {
+    const char *suffix     = comp.common + wlen;
+    int         suffix_len = clen - wlen;
+    int need_space = (comp.count == 1 && comp.common[clen - 1] != '/') ? 1 : 0;
+    if(*len + suffix_len + need_space < (int)cap - 1) {
+      (void)memmove(
+          buf + *cur_b + suffix_len + need_space, buf + *cur_b,
+          (size_t)*len - (size_t)*cur_b + 1
+      );
+      memcpy(buf + *cur_b, suffix, suffix_len);
+      if(need_space)
+        buf[*cur_b + suffix_len] = ' ';
+      *len += suffix_len + need_space;
+      *cur_b += suffix_len + need_space;
+      buf[*len] = '\0';
+      redraw_line(
+          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + *cur_b)
+      );
+    }
+  }
+  *last_was_tab = (comp.count > 1) ? 1 : 0;
+}
+
 /* Read a single line. @p buf is filled with bytes (no trailing newline) and
  * null-terminated; the byte count is returned. RL_EOF on Ctrl-D at empty
  * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
@@ -258,130 +390,9 @@ static int read_line(char *buf, size_t cap, const char *prompt)
       }
       break;
 
-    case '\t': {
-      /* Extract the word under the cursor. */
-      int word_start = cur_b;
-      while(word_start > 0 && buf[word_start - 1] != ' ')
-        word_start--;
-      char prefix[MAX_CMD_LEN];
-      int  wlen = cur_b - word_start;
-      if(wlen > 0)
-        memcpy(prefix, buf + word_start, wlen);
-      prefix[wlen] = '\0';
-
-      /* First word = command, otherwise path. */
-      bool is_cmd = true;
-      for(int i = 0; i < word_start; i++) {
-        if(buf[i] != ' ') {
-          is_cmd = false;
-          break;
-        }
-      }
-
-      comp_result_t comp;
-      sh_complete(prefix, is_cmd, &comp);
-
-      if(comp.count == 0) {
-        last_was_tab = 0;
-        break;
-      }
-
-      if(last_was_tab && comp.count > 1) {
-        /* Double-tab: list candidates in columns matching ls layout. */
-        const char *names[COMP_MAX];
-        int         name_lens[COMP_MAX];
-        int         dir_flags[COMP_MAX];
-        int         max_w = 0;
-
-        for(int i = 0; i < comp.count; i++) {
-          const char *display = comp.entries[i];
-          const char *sl      = strrchr(display, '/');
-          if(sl && sl[1] != '\0')
-            display = sl + 1;
-          else if(sl && sl[1] == '\0' && sl != display) {
-            const char *prev = sl - 1;
-            while(prev > display && prev[-1] != '/')
-              prev--;
-            display = prev;
-          }
-          names[i]     = display;
-          name_lens[i] = (int)strlen(display);
-          dir_flags[i] = (name_lens[i] > 0 && display[name_lens[i] - 1] == '/');
-          if(name_lens[i] > max_w)
-            max_w = name_lens[i];
-        }
-
-        int col_w      = max_w + 2;
-        int cols_avail = COLS > 0 ? COLS : 80;
-        int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
-        if(n_cols < 1)
-          n_cols = 1;
-        int n_rows = (comp.count + n_cols - 1) / n_cols;
-
-        write_str("\n");
-        for(int row = 0; row < n_rows; row++) {
-          for(int col = 0; col < n_cols; col++) {
-            int idx = col * n_rows + row;
-            if(idx >= comp.count)
-              continue;
-            int last =
-                (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp.count);
-            write_str(
-                dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B
-            );
-            write_str(names[idx]);
-            write_str(THEME_ANSI_RESET);
-            if(!last) {
-              int padding = col_w - name_lens[idx];
-              for(int p = 0; p < padding; p++)
-                write_str(" ");
-            }
-          }
-          write_str("\n");
-        }
-        write_str(prompt);
-        write_str(buf);
-        /* Reposition cursor. */
-        int  total_cols = prompt_cols + utf8_cols(buf);
-        int  cur_cols   = utf8_cols(buf) - utf8_cols(buf + cur_b);
-        char seq[32];
-        (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
-        if(prompt_cols + cur_cols > 0)
-          write_str(seq);
-        else
-          write_str("\r");
-        (void)total_cols;
-        last_was_tab = 0;
-        break;
-      }
-
-      /* Single tab: insert the common prefix beyond what's typed. */
-      int clen = (int)strlen(comp.common);
-      if(clen > wlen) {
-        const char *suffix     = comp.common + wlen;
-        int         suffix_len = clen - wlen;
-        /* Append trailing space for a unique match. */
-        int need_space =
-            (comp.count == 1 && comp.common[clen - 1] != '/') ? 1 : 0;
-        if(len + suffix_len + need_space < (int)cap - 1) {
-          (void)memmove(
-              buf + cur_b + suffix_len + need_space, buf + cur_b,
-              (size_t)len - (size_t)cur_b + 1
-          );
-          memcpy(buf + cur_b, suffix, suffix_len);
-          if(need_space)
-            buf[cur_b + suffix_len] = ' ';
-          len += suffix_len + need_space;
-          cur_b += suffix_len + need_space;
-          buf[len] = '\0';
-          redraw_line(
-              prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
-          );
-        }
-      }
-      last_was_tab = (comp.count > 1) ? 1 : 0;
+    case '\t':
+      handle_tab(buf, &len, &cur_b, cap, &last_was_tab, prompt, prompt_cols);
       break;
-    }
 
     case 0x03: /* Ctrl-C */
       write_str("^C\n");
