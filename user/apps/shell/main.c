@@ -1,4 +1,5 @@
 #include <curses.h>
+#include <fcntl.h>
 #include <shell/atlas.h>
 #include <shell/shell.h>
 #include <spazer/spazer.h>
@@ -738,6 +739,38 @@ int main(int argc, char *argv[])
       "list available commands" PC_RS "\n\n"
   );
 #undef BNR_H34
+
+  /* Source /home/.vconf if it exists — the shell's equivalent of .bashrc.
+   * Runs as a vega script so any language feature (let, if, fn, …) works. */
+  {
+    int cfd = open("/home/.vconf", O_RDONLY);
+    if(cfd >= 0) {
+      size_t cap = 4096;
+      size_t len = 0;
+      char  *src = (char *)malloc(cap);
+      if(src) {
+        for(;;) {
+          if(len + 1 >= cap) {
+            cap *= 2;
+            char *nb = (char *)realloc(src, cap);
+            if(!nb)
+              break;
+            src = nb;
+          }
+          ssize_t n = read(cfd, src + len, cap - len - 1);
+          if(n <= 0)
+            break;
+          len += (size_t)n;
+        }
+        src[len] = '\0';
+        tcsetattr(STDIN_FILENO, TCSANOW, &s_cooked_t);
+        vega_run(src);
+        tcsetattr(STDIN_FILENO, TCSANOW, &s_raw_t);
+        free(src);
+      }
+      close(cfd);
+    }
+  }
 
   while(1) {
     int len = read_complete_statement(line, sizeof line);
