@@ -636,17 +636,22 @@ struct flush_cell_cache
   bool      underline;
 };
 
-/* Per-row scratch used by flush_batch. ~48 B per cell — at 160+ cols it is
- * far too large to live on the 8 KiB kernel stack, so it is heap-owned and
- * re-sized whenever the grid widens. */
+/** @brief Per-row scratch used by flush_batch. ~48 B per cell — at 160+ cols
+ *         far too large for the 8 KiB kernel stack, so heap-owned and grown
+ *         on demand whenever the grid widens. */
 static struct flush_cell_cache *s_flush_ci      = NULL;
 static int                      s_flush_ci_cols = 0;
 
-/* Grow s_flush_ci to hold at least @p cols entries. Called on grid init and
- * whenever a SET_ATLAS reflow widens the grid. On allocation failure the
- * previous buffer is retained — flush_batch tolerates s_flush_ci being NULL
- * but never a smaller-than-current cols, so leaving the larger old buffer
- * around is preferable. */
+/**
+ * @brief Grow @ref s_flush_ci to hold at least @p cols entries.
+ *
+ * Called on grid init and whenever a SET_ATLAS reflow widens the grid.
+ * Allocation failure leaves the previous buffer in place — flush_batch
+ * tolerates @ref s_flush_ci being NULL but not smaller than the current grid,
+ * so retaining the larger old buffer is preferable to shrinking on failure.
+ *
+ * @param cols  Minimum capacity in cells.
+ */
 static void flush_ci_ensure(int cols)
 {
   if(cols <= s_flush_ci_cols && s_flush_ci)
