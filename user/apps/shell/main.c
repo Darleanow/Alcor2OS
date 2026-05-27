@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <theme.h>
 #include <unistd.h>
 #include <vega/host.h>
 #include <vega/vega.h>
@@ -145,16 +146,181 @@ static WINDOW *s_input_pad;
 static struct termios s_raw_t;
 static struct termios s_cooked_t;
 
+/**
+ * @brief Return the display name for a completion entry (strip dir prefix).
+ *
+ * @param entry  Full entry string (may contain path separators).
+ * @return Pointer into @p entry past the last directory component. For
+ *         entries ending in @c / (directories), returns @c "name/".
+ */
+static const char *display_basename(const char *entry)
+{
+  const char *sl = strrchr(entry, '/');
+  if(sl && sl[1] != '\0')
+    return sl + 1;
+  if(sl && sl[1] == '\0' && sl != entry) {
+    const char *prev = sl - 1;
+    while(prev > entry && prev[-1] != '/')
+      prev--;
+    return prev;
+  }
+  return entry;
+}
+
+/**
+ * @brief Print completion candidates in coloured columns (double-tab).
+ *
+ * Layout matches @c ls: column-major order, column width derived from the
+ * longest entry, column count from the terminal width.
+ *
+ * @param comp         Completion result set.
+ * @param prompt       Current prompt (reprinted after the listing).
+ * @param buf          Current line buffer (reprinted after the listing).
+ * @param cur_b        Cursor byte-index within @p buf (for repositioning).
+ * @param prompt_cols  Visible column width of @p prompt.
+ */
+static void list_candidates(
+    const comp_result_t *comp, const char *prompt, const char *buf, int cur_b,
+    int prompt_cols
+)
+{
+  const char *names[COMP_MAX];
+  int         name_lens[COMP_MAX];
+  int         dir_flags[COMP_MAX];
+  int         max_w = 0;
+
+  for(int i = 0; i < comp->count; i++) {
+    names[i]     = display_basename(comp->entries[i]);
+    name_lens[i] = (int)strlen(names[i]);
+    dir_flags[i] = (name_lens[i] > 0 && names[i][name_lens[i] - 1] == '/');
+    if(name_lens[i] > max_w)
+      max_w = name_lens[i];
+  }
+
+  int col_w      = max_w + 2;
+  int cols_avail = COLS > 0 ? COLS : 80;
+  int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
+  if(n_cols < 1)
+    n_cols = 1;
+  int n_rows = (comp->count + n_cols - 1) / n_cols;
+
+  write_str("\n");
+  for(int row = 0; row < n_rows; row++) {
+    for(int col = 0; col < n_cols; col++) {
+      int idx = col * n_rows + row;
+      if(idx >= comp->count)
+        continue;
+      int last =
+          (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp->count);
+      write_str(dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
+      write_str(names[idx]);
+      write_str(THEME_ANSI_RESET);
+      if(!last) {
+        int padding = col_w - name_lens[idx];
+        for(int p = 0; p < padding; p++)
+          write_str(" ");
+      }
+    }
+    write_str("\n");
+  }
+
+  write_str(prompt);
+  write_str(buf);
+  int  cur_cols = utf8_cols(buf) - utf8_cols(buf + cur_b);
+  char seq[32];
+  (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
+  if(prompt_cols + cur_cols > 0)
+    write_str(seq);
+  else
+    write_str("\r");
+}
+
+/**
+ * @brief Handle a Tab keypress: complete or list candidates.
+ *
+ * On single Tab, inserts the longest common prefix of matching candidates
+ * (with a trailing space when there is exactly one match). On double Tab
+ * (last_was_tab already set), prints all candidates in coloured columns.
+ *
+ * @param buf           Line buffer (modified in place on completion).
+ * @param len           Pointer to byte length of @p buf content.
+ * @param cur_b         Pointer to cursor byte-index within @p buf.
+ * @param cap           Total capacity of @p buf.
+ * @param last_was_tab  Pointer to the double-tab flag; updated on return.
+ * @param prompt        Current prompt string (for redrawing after listing).
+ * @param prompt_cols   Visible column width of @p prompt.
+ */
+static void handle_tab(
+    char *buf, int *len, int *cur_b, size_t cap, int *last_was_tab,
+    const char *prompt, int prompt_cols
+)
+{
+  int word_start = *cur_b;
+  while(word_start > 0 && buf[word_start - 1] != ' ')
+    word_start--;
+  char prefix[MAX_CMD_LEN];
+  int  wlen = *cur_b - word_start;
+  if(wlen > 0)
+    memcpy(prefix, buf + word_start, wlen);
+  prefix[wlen] = '\0';
+
+  bool is_cmd = true;
+  for(int i = 0; i < word_start; i++) {
+    if(buf[i] != ' ') {
+      is_cmd = false;
+      break;
+    }
+  }
+
+  comp_result_t comp;
+  sh_complete(prefix, is_cmd, &comp);
+
+  if(comp.count == 0) {
+    *last_was_tab = 0;
+    return;
+  }
+
+  if(*last_was_tab && comp.count > 1) {
+    list_candidates(&comp, prompt, buf, *cur_b, prompt_cols);
+    *last_was_tab = 0;
+    return;
+  }
+
+  int clen = (int)strlen(comp.common);
+  if(clen > wlen) {
+    const char *suffix     = comp.common + wlen;
+    int         suffix_len = clen - wlen;
+    int need_space = (comp.count == 1 && comp.common[clen - 1] != '/') ? 1 : 0;
+    if(*len + suffix_len + need_space < (int)cap - 1) {
+      (void)memmove(
+          buf + *cur_b + suffix_len + need_space, buf + *cur_b,
+          (size_t)*len - (size_t)*cur_b + 1
+      );
+      memcpy(buf + *cur_b, suffix, suffix_len);
+      if(need_space)
+        buf[*cur_b + suffix_len] = ' ';
+      *len += suffix_len + need_space;
+      *cur_b += suffix_len + need_space;
+      buf[*len] = '\0';
+      redraw_line(
+          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + *cur_b)
+      );
+    }
+  }
+  *last_was_tab = (comp.count > 1) ? 1 : 0;
+}
+
 /* Read a single line. @p buf is filled with bytes (no trailing newline) and
  * null-terminated; the byte count is returned. RL_EOF on Ctrl-D at empty
  * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
 static int read_line(char *buf, size_t cap, const char *prompt)
 {
-  int prompt_cols = visible_cols(prompt);
-  int len         = 0; /* bytes in buf */
-  int cur_b       = 0; /* byte index of cursor */
-  int hist_view   = hist_count;
-  buf[0]          = '\0';
+  int prompt_cols  = visible_cols(prompt);
+  int len          = 0; /* bytes in buf */
+  int cur_b        = 0; /* byte index of cursor */
+  int hist_view    = hist_count;
+  int last_was_tab = 0;
+  buf[0]           = '\0';
 
   write_str(prompt);
 
@@ -162,6 +328,8 @@ static int read_line(char *buf, size_t cap, const char *prompt)
     int c = wgetch(s_input_pad);
     if(c == ERR)
       continue;
+    if(c != '\t')
+      last_was_tab = 0;
 
     switch(c) {
     case '\n':
@@ -252,6 +420,10 @@ static int read_line(char *buf, size_t cap, const char *prompt)
         }
         redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
       }
+      break;
+
+    case '\t':
+      handle_tab(buf, &len, &cur_b, cap, &last_was_tab, prompt, prompt_cols);
       break;
 
     case 0x03: /* Ctrl-C */

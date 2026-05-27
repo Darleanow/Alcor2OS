@@ -29,7 +29,8 @@ BASE_SRCS := \
   main.c \
   platform/io.c \
   platform/sys.c \
-  platform/builtins.c
+  platform/builtins.c \
+  platform/complete.c
 
 ifeq ($(HAVE_ATLAS),1)
 ATLAS_SRC    := platform/atlas.c
