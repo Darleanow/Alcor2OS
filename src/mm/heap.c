@@ -157,45 +157,6 @@ static void coalesce(heap_block_t *block)
 }
 
 /**
- * @brief Walk the heap free list, panicking on corruption.
- *
- * Used as a debugging probe to localize WHO corrupts the heap.
- * Verifies (a) each block has the correct magic, (b) every next/prev pointer
- * is a canonical higher-half kernel address, and (c) the list terminates
- * within HEAP_BLOCK_LIMIT iterations. Pass a tag identifying the caller.
- */
-void heap_check_panic_if_corrupt(const char *tag)
-{
-  unsigned      n = 0;
-  heap_block_t *b = heap_start;
-  while(b) {
-    u64 ba = (u64)b;
-    if((ba >> 48) != 0xffffu) {
-      console_printf(
-          "[HEAP] %s: non-canonical block ptr %x (n=%d)\n", (u64)tag, ba, (int)n
-      );
-      for(;;) {
-      }
-    }
-    if(b->magic != HEAP_BLOCK_MAGIC) {
-      console_printf(
-          "[HEAP] %s: bad magic %x at block %x (n=%d)\n", (u64)tag,
-          (u64)b->magic, ba, (int)n
-      );
-      for(;;) {
-      }
-    }
-    b = b->next;
-    n++;
-    if(n > 4096) {
-      console_printf("[HEAP] %s: free list cycle?\n", (u64)tag);
-      for(;;) {
-      }
-    }
-  }
-}
-
-/**
  * @brief Initialize the kernel heap allocator.
  *
  * Expands the heap by the initial page count and sets up

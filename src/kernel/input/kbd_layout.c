@@ -14,7 +14,6 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/keyboard.h>
-#include <alcor2/drivers/klog.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/ktermios.h>
@@ -582,12 +581,10 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
 
 static bool kbd_pop_byte(unsigned char *out, bool block)
 {
-  klogf("[kpb] enter block=%d out=%lx\n", (int)block, (u64)out);
   for(;;) {
     unsigned char pb;
     if(out_pend_take(&pb)) {
       *out = pb;
-      klogf("[kpb] pend\n");
       return true;
     }
     if(!block) {
@@ -598,7 +595,6 @@ static bool kbd_pop_byte(unsigned char *out, bool block)
       }
       return false;
     }
-    klogf("[kpb] hlt-loop\n");
     while(!keyboard_raw_available()) {
       cpu_enable_interrupts();
       __asm__ volatile("hlt");
@@ -609,7 +605,6 @@ static bool kbd_pop_byte(unsigned char *out, bool block)
       proc_schedule();
     }
     u8 raw = keyboard_raw_pop();
-    klogf("[kpb] raw=%x\n", (u64)raw);
     if(process_raw_ctx(raw, &g_kbd, out, false))
       return true;
   }
@@ -677,26 +672,15 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   if(!p || count == 0)
     return 0;
 
-  klogf("[krfp] s0 p=%lx\n", (u64)p);
-  k_termios_t *t = &p->termios;
-  klogf(
-      "[krfp] s1 t=%lx ks=%lx kst=%lx kbed=%lx\n", (u64)t, (u64)p->kernel_stack,
-      (u64)p->kernel_stack_top, (u64)p->kbd_edit
-  );
-  u32 lflag = t->c_lflag;
-  klogf("[krfp] s2 lflag=%lx\n", (u64)lflag);
-  bool icanon = (lflag & KTERM_ICANON) != 0;
-  klogf(
-      "[krfp] s3 canon=%d edit_len=%u ready_len=%u\n", (int)icanon,
-      (unsigned)p->kbd_edit_len, (unsigned)p->kbd_ready_len
-  );
+  k_termios_t  *t       = &p->termios;
+  u32           lflag   = t->c_lflag;
+  bool          icanon  = (lflag & KTERM_ICANON) != 0;
   bool          echo_on = (lflag & KTERM_ECHO) != 0;
   u8            vmin    = t->c_cc[KTERM_VMIN];
   u8            vtime   = t->c_cc[KTERM_VTIME];
   unsigned char verase  = t->c_cc[KTERM_VERASE];
   unsigned char vkill   = t->c_cc[KTERM_VKILL];
   unsigned char veof    = t->c_cc[KTERM_VEOF];
-  klogf("[krfp] s4 vmin=%u vtime=%u\n", (unsigned)vmin, (unsigned)vtime);
 
   if(icanon) {
     u64 d = kbd_deliver_ready(p, buf, count);
@@ -767,13 +751,10 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   u64 need = (u64)vmin;
   if(need > count)
     need = count;
-  klogf("[krfp] s5 need=%lu filled=%lu count=%lu\n", need, filled, count);
 
   while(filled < need) {
     unsigned char oc;
-    klogf("[krfp] s6 call kbd_pop_byte\n");
     kbd_pop_byte(&oc, true);
-    klogf("[krfp] s7 oc=%x\n", (u64)oc);
     buf[filled++] = (char)oc;
   }
   while(filled < count) {

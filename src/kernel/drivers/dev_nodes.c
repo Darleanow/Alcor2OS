@@ -14,7 +14,6 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
-#include <alcor2/drivers/klog.h>
 #include <alcor2/errno.h>
 #include <alcor2/fb_console_ioctl.h>
 #include <alcor2/fs/ramfs.h>
@@ -125,19 +124,9 @@ static i64 tty_read(void *ctx, void *buf, u64 count, u64 offset)
   (void)ctx;
   (void)offset;
   proc_t *p = proc_current();
-  u64     rsp_in;
-  __asm__ volatile("mov %%rsp, %0" : "=r"(rsp_in));
-  klogf(
-      "[ttyR] enter p=%lx pid=%d cnt=%lu rsp=%lx\n", (u64)p,
-      (int)(p ? p->pid : 0), (u64)count, rsp_in
-  );
-  i64 r;
   if(p)
-    r = (i64)kbd_read_for_process(p, (char *)buf, count);
-  else
-    r = (i64)kbd_read_translated((char *)buf, count);
-  klogf("[ttyR] exit r=%ld\n", (i64)r);
-  return r;
+    return (i64)kbd_read_for_process(p, (char *)buf, count);
+  return (i64)kbd_read_translated((char *)buf, count);
 }
 
 /**

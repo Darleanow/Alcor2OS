@@ -41,13 +41,6 @@ typedef struct heap_block
 void heap_init(void);
 
 /**
- * @brief Walk the heap free list and panic if any block is corrupt.
- *
- * Debug-only probe; pass a tag identifying the call site.
- */
-void heap_check_panic_if_corrupt(const char *tag);
-
-/**
  * @brief Allocate memory.
  * @param size Bytes to allocate.
  * @return Pointer to allocated memory, or NULL on failure.
