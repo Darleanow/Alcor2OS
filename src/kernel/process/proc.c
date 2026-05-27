@@ -850,7 +850,7 @@ void proc_start_first(
    * process — and all its fork children — have real VFS-backed stdio instead
    * of relying on the sys_io.c fd-fallback paths. */
   {
-    i64 tty = vfs_open("/dev/tty", 0x0002 /* O_RDWR */);
+    i64 tty = vfs_open("/dev/tty", O_RDWR);
     if(tty >= 0) {
       if(tty != 0)
         vfs_dup2(tty, 0);
