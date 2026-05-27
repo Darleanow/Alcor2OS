@@ -10,19 +10,21 @@
 #include <string.h>
 #include <unistd.h>
 
-
-
 /** @brief Accumulated counters for a single file or the grand total. */
-typedef struct {
-  unsigned long long lines;       /**< Number of newline characters seen. */
-  unsigned long long words;       /**< Number of whitespace-delimited tokens. */
-  unsigned long long bytes;       /**< Total bytes read. */
-  unsigned long long chars;       /**< Total characters (same as bytes; no multibyte support). */
-  unsigned long long max_line_len; /**< Length of the longest line, excluding the newline. */
+typedef struct
+{
+  unsigned long long lines; /**< Number of newline characters seen. */
+  unsigned long long words; /**< Number of whitespace-delimited tokens. */
+  unsigned long long bytes; /**< Total bytes read. */
+  unsigned long long
+      chars; /**< Total characters (same as bytes; no multibyte support). */
+  unsigned long long
+      max_line_len; /**< Length of the longest line, excluding the newline. */
 } wc_counts_t;
 
 /**
- * @brief Print the requested subset of counters followed by an optional filename.
+ * @brief Print the requested subset of counters followed by an optional
+ * filename.
  *
  * @param c    Counters to print.
  * @param l    Non-zero to print the line count.
@@ -32,7 +34,9 @@ typedef struct {
  * @param L    Non-zero to print the maximum line length.
  * @param name Filename to append after the counts, or NULL for stdin output.
  */
-static void print_counts(wc_counts_t c, int l, int w, int b, int m, int L, const char *name)
+static void print_counts(
+    wc_counts_t c, int l, int w, int b, int m, int L, const char *name
+)
 {
   if(l)
     printf("%llu ", c.lines);
@@ -51,7 +55,8 @@ static void print_counts(wc_counts_t c, int l, int w, int b, int m, int L, const
 }
 
 /**
- * @brief Count lines, words, bytes, and the longest line length from a file descriptor.
+ * @brief Count lines, words, bytes, and the longest line length from a file
+ * descriptor.
  *
  * Reads the descriptor in 512-byte chunks until EOF or an error.  The caller
  * is responsible for opening and closing @p fd.
@@ -65,10 +70,10 @@ static int count_fd(int fd, wc_counts_t *out)
 {
   unsigned char      buf[512];
   ssize_t            n;
-  int                in_word = 0;
+  int                in_word  = 0;
   unsigned long long cur_line = 0;
 
-  *out = (wc_counts_t){0};
+  *out = (wc_counts_t) {0};
 
   while((n = read(fd, buf, sizeof(buf))) > 0) {
     out->bytes += (unsigned long long)n;
@@ -116,30 +121,29 @@ static int count_fd(int fd, wc_counts_t *out)
  */
 int main(int argc, char *argv[])
 {
-  int show_lines = 0;
-  int show_words = 0;
-  int show_bytes = 0;
-  int show_chars = 0;
-  int show_max   = 0;
+  int    show_lines = 0;
+  int    show_words = 0;
+  int    show_bytes = 0;
+  int    show_chars = 0;
+  int    show_max   = 0;
 
   gr_opt opts[] = {
       GR_FLAG('c', "bytes", &show_bytes, "print the byte counts"),
       GR_FLAG('m', "chars", &show_chars, "print the character counts"),
       GR_FLAG('l', "lines", &show_lines, "print the newline counts"),
       GR_FLAG('w', "words", &show_words, "print the word counts"),
-      GR_FLAG('L', "max-line-length", &show_max, "print the maximum display width"),
+      GR_FLAG(
+          'L', "max-line-length", &show_max, "print the maximum display width"
+      ),
       GR_END
   };
 
-  gr_spec spec = {
-      .program = "wc",
-      .usage   = "[options] [file...]",
-      .options = opts
-  };
+  gr_spec spec =
+      {.program = "wc", .usage = "[options] [file...]", .options = opts};
 
   gr_rest rest;
 
-  int rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
+  int     rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
 
   if(rc != GR_OK)
     return (rc == GR_HELP) ? 0 : 1;
@@ -151,7 +155,7 @@ int main(int argc, char *argv[])
   int         counted_files = 0;
   int         status        = 0;
 
-  int stdin_only = (rest.argc == 0);
+  int         stdin_only = (rest.argc == 0);
 
   if(stdin_only) {
     wc_counts_t c;
@@ -161,14 +165,16 @@ int main(int argc, char *argv[])
       return 1;
     }
 
-    print_counts(c, show_lines, show_words, show_bytes, show_chars, show_max, NULL);
+    print_counts(
+        c, show_lines, show_words, show_bytes, show_chars, show_max, NULL
+    );
     return 0;
   }
 
   for(int i = 0; i < rest.argc; i++) {
     const char *path = rest.argv[i];
 
-    int fd = strcmp(path, "-") ? open(path, O_RDONLY) : STDIN_FILENO;
+    int         fd = strcmp(path, "-") ? open(path, O_RDONLY) : STDIN_FILENO;
 
     if(fd < 0) {
       fprintf(stderr, "wc: cannot open '%s'\n", path);
@@ -191,7 +197,9 @@ int main(int argc, char *argv[])
     if(fd != STDIN_FILENO)
       close(fd);
 
-    print_counts(c, show_lines, show_words, show_bytes, show_chars, show_max, path);
+    print_counts(
+        c, show_lines, show_words, show_bytes, show_chars, show_max, path
+    );
 
     total.lines += c.lines;
     total.words += c.words;
@@ -205,13 +213,9 @@ int main(int argc, char *argv[])
   }
 
   if(counted_files > 1)
-    print_counts(total,
-                 show_lines,
-                 show_words,
-                 show_bytes,
-                 show_chars,
-                 show_max,
-                 "total");
+    print_counts(
+        total, show_lines, show_words, show_bytes, show_chars, show_max, "total"
+    );
 
   return status;
 }

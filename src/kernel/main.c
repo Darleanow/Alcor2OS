@@ -38,25 +38,29 @@ extern void ramfs_init(void);
 LIMINE_BASE_REVISION(3)
 LIMINE_REQUESTS_START
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_framebuffer_request fb_request = {
     .id       = LIMINE_FRAMEBUFFER_REQUEST_ID,
     .revision = 0,
 };
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_memmap_request memmap_request = {
     .id       = LIMINE_MEMMAP_REQUEST_ID,
     .revision = 0,
 };
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_hhdm_request hhdm_request = {
     .id       = LIMINE_HHDM_REQUEST_ID,
     .revision = 0,
 };
 
-USED SECTION(".limine_requests"
+USED SECTION(
+    ".limine_requests"
 ) static volatile struct limine_module_request module_request = {
     .id       = LIMINE_MODULE_REQUEST_ID,
     .revision = 0,

@@ -225,8 +225,8 @@ static int proc_setup_image(
   vmm_switch(p->cr3);
 
   elf_info_t elf_info;
-  int        elf_result = (elf_fd >= 0) ? elf_load_fd(elf_fd, &elf_info)
-                                        : elf_load(elf_data, elf_size, &elf_info);
+  int elf_result = (elf_fd >= 0) ? elf_load_fd(elf_fd, &elf_info)
+                                 : elf_load(elf_data, elf_size, &elf_info);
   if(elf_result != 0) {
     vmm_switch(old_cr3);
     return -ENOEXEC;
@@ -484,9 +484,9 @@ extern void proc_enter_first_time(void);
 static void proc_vfork_wake_parent(const proc_t *child);
 
 i64         proc_exec_replace_image(
-            proc_t *p, const char *name, i64 elf_fd, char *const argv[],
-            char *const envp[]
-        )
+    proc_t *p, const char *name, i64 elf_fd, char *const argv[],
+    char *const envp[]
+)
 {
   /* We are running on @p p (this is its syscall handler), so p->cr3 IS the
    * current cr3. Wipe the user-space portion before loading the new image. */

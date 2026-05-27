@@ -278,18 +278,18 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
 
       u32 idx = atlas_lookup_attr(c->cp, c->attr);
       if(idx != ATLAS_NO_GLYPH && idx < ctx.atlas_n_glyphs) {
-        u32 fg_r = (eff_fg >> 16) & 0xffu, fg_g = (eff_fg >> 8) & 0xffu,
-            fg_b = eff_fg & 0xffu;
-        u32 bg_r = (eff_bg >> 16) & 0xffu, bg_g = (eff_bg >> 8) & 0xffu,
-            bg_b        = eff_bg & 0xffu;
-        const u8 *glyph = ctx.atlas_pixels + (size_t)idx *
-                                                 (size_t)ctx.atlas_cell_h *
-                                                 (size_t)ctx.atlas_stride;
-        u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
-        u32 cell_h     = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h
-                                                            : (u32)ctx.cell_h;
-        u32 cell_w     = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
-                                                            : (u32)ctx.cell_w;
+        u32       fg_r = (eff_fg >> 16) & 0xffu, fg_g = (eff_fg >> 8) & 0xffu,
+                  fg_b = eff_fg & 0xffu;
+        u32       bg_r = (eff_bg >> 16) & 0xffu, bg_g = (eff_bg >> 8) & 0xffu,
+                  bg_b       = eff_bg & 0xffu;
+        const u8 *glyph      = ctx.atlas_pixels + (size_t)idx *
+                                                      (size_t)ctx.atlas_cell_h *
+                                                      (size_t)ctx.atlas_stride;
+        u32       atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
+        u32       cell_h = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h
+                                                              : (u32)ctx.cell_h;
+        u32       cell_w = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
+                                                              : (u32)ctx.cell_w;
 
         /* Fill the whole cell with bg first: when the atlas glyph is smaller
          * than the cell, the unblended margin would otherwise keep stale pixels
@@ -318,18 +318,18 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
     } else {
       u32 idx = atlas_lookup_attr(c->cp, c->attr);
       if(idx != ATLAS_NO_GLYPH && idx < ctx.atlas_n_glyphs) {
-        u32 fg_r = (eff_fg >> 16) & 0xffu, fg_g = (eff_fg >> 8) & 0xffu,
-            fg_b = eff_fg & 0xffu;
-        u32 bg_r = (eff_bg >> 16) & 0xffu, bg_g = (eff_bg >> 8) & 0xffu,
-            bg_b        = eff_bg & 0xffu;
-        const u8 *glyph = ctx.atlas_pixels + (size_t)idx *
-                                                 (size_t)ctx.atlas_cell_h *
-                                                 (size_t)ctx.atlas_stride;
-        u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
-        u32 cell_h     = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h
-                                                            : (u32)ctx.cell_h;
-        u32 cell_w     = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
-                                                            : (u32)ctx.cell_w;
+        u32       fg_r = (eff_fg >> 16) & 0xffu, fg_g = (eff_fg >> 8) & 0xffu,
+                  fg_b = eff_fg & 0xffu;
+        u32       bg_r = (eff_bg >> 16) & 0xffu, bg_g = (eff_bg >> 8) & 0xffu,
+                  bg_b       = eff_bg & 0xffu;
+        const u8 *glyph      = ctx.atlas_pixels + (size_t)idx *
+                                                      (size_t)ctx.atlas_cell_h *
+                                                      (size_t)ctx.atlas_stride;
+        u32       atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
+        u32       cell_h = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h
+                                                              : (u32)ctx.cell_h;
+        u32       cell_w = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
+                                                              : (u32)ctx.cell_w;
         for(u32 gy = 0; gy < cell_h; gy++) {
           const u8 *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
           for(u32 gx = 0; gx < cell_w; gx++) {
@@ -1005,8 +1005,8 @@ static void csi_dec_private(char cmd)
   while(i < ctx.esc_len - 1 && np < 4) {
     unsigned acc = 0u;
     int      dig = 0;
-    while(i < ctx.esc_len - 1 && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9'
-    ) {
+    while(i < ctx.esc_len - 1 && ctx.esc_buf[i] >= '0' &&
+          ctx.esc_buf[i] <= '9') {
       acc = acc * 10u + (unsigned)(ctx.esc_buf[i] - '0');
       i++;
       dig++;
@@ -1349,7 +1349,7 @@ void fb_console_write_begin(void)
     fb_cell_t *cc = &ctx.cells
                          [(size_t)s_cursor_drawn_y * (size_t)ctx.cols +
                           (size_t)s_cursor_drawn_x];
-    cc->dirty = 1;
+    cc->dirty     = 1;
     if(s_cursor_drawn_y < ctx.batch_r0)
       ctx.batch_r0 = s_cursor_drawn_y;
     if(s_cursor_drawn_y > ctx.batch_r1)
