@@ -14,6 +14,7 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/drivers/klog.h>
 #include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/ktermios.h>
@@ -672,20 +673,26 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   if(!p || count == 0)
     return 0;
 
-  console_printf(
-      "[krfp] enter p=%x t=%x cnt=%d ", (u64)p, (u64)&p->termios, (int)count
+  klogf("[krfp] s0 p=%lx\n", (u64)p);
+  k_termios_t *t = &p->termios;
+  klogf(
+      "[krfp] s1 t=%lx ks=%lx kst=%lx kbed=%lx\n", (u64)t, (u64)p->kernel_stack,
+      (u64)p->kernel_stack_top, (u64)p->kbd_edit
   );
-  k_termios_t  *t       = &p->termios;
-  u32           lflag   = t->c_lflag;
-  console_printf("lflag=%x ", (u64)lflag);
-  bool          icanon  = (lflag & KTERM_ICANON) != 0;
-  console_printf("canon=%d\n", (int)icanon);
+  u32 lflag = t->c_lflag;
+  klogf("[krfp] s2 lflag=%lx\n", (u64)lflag);
+  bool icanon = (lflag & KTERM_ICANON) != 0;
+  klogf(
+      "[krfp] s3 canon=%d edit_len=%u ready_len=%u\n", (int)icanon,
+      (unsigned)p->kbd_edit_len, (unsigned)p->kbd_ready_len
+  );
   bool          echo_on = (lflag & KTERM_ECHO) != 0;
   u8            vmin    = t->c_cc[KTERM_VMIN];
   u8            vtime   = t->c_cc[KTERM_VTIME];
   unsigned char verase  = t->c_cc[KTERM_VERASE];
   unsigned char vkill   = t->c_cc[KTERM_VKILL];
   unsigned char veof    = t->c_cc[KTERM_VEOF];
+  klogf("[krfp] s4 vmin=%u vtime=%u\n", (unsigned)vmin, (unsigned)vtime);
 
   if(icanon) {
     u64 d = kbd_deliver_ready(p, buf, count);
