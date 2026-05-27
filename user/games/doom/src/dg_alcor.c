@@ -573,6 +573,8 @@ void DG_DrawFrame(void)
 
     /* Copy the expanded row into each duplicate scanline. */
     uint32_t *dst0 = fb_base + (size_t)sy * scale * s_pitch32;
+    /* cppcheck-suppress uninitvar ; row_buf was filled by the loop above
+     * via *out++ but cppcheck doesn't track pointer-increment writes. */
     memcpy(dst0, row_buf, row_bytes);
     for(uint32_t ry = 1; ry < scale; ry++)
       memcpy(dst0 + (size_t)ry * s_pitch32, row_buf, row_bytes);

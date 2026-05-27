@@ -2700,9 +2700,8 @@ static i64 ext2_ops_truncate(fs_handle_t fh, u64 length)
   return ext2_truncate((ext2_file_t *)fh, length);
 }
 
-/* cppcheck-suppress constParameterCallback ; fs_ops_t.readlink is a
- * vtable entry and must match the function-pointer type. */
 static i64
+    /* cppcheck-suppress constParameterCallback */
     ext2_ops_readlink(void *fs_data, const char *path, char *buf, u64 cap)
 {
   return ext2_readlink(fs_data, path, buf, cap);

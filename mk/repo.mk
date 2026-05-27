@@ -372,6 +372,7 @@ check:
 	  -Iuser/sdk/vega/include \
 	  -Iuser/core/vega/include \
 	  -Iuser/apps/shell/include \
+	  -Iuser/games/doom/doomgeneric/doomgeneric \
 	  $(SRC) user
 
 qa: lint check
