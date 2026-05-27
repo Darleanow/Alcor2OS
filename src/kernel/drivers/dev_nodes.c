@@ -17,9 +17,11 @@
 #define TIOCGWINSZ 0x5413
 #define TIOCSWINSZ 0x5414
 
+#include <alcor2/alcor_fb.h>
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/console.h>
 #include <alcor2/drivers/fb_console.h>
+#include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
 #include <alcor2/fb_console_ioctl.h>
 #include <alcor2/fs/ramfs.h>
@@ -267,6 +269,66 @@ static i64 tty_ioctl(void *ctx, u64 request, u64 arg)
   return -ENOTTY;
 }
 
+/* ---- /dev/fb ------------------------------------------------------------ */
+
+/**
+ * @brief Read from /dev/fb — returns an alcor_fb_info_t with the framebuffer
+ * geometry.
+ *
+ * The first @c sizeof(alcor_fb_info_t) bytes yield the geometry struct.
+ * Reads beyond that return 0 (EOF).
+ *
+ * @param ctx     Unused.
+ * @param buf     Destination buffer.
+ * @param count   Maximum bytes to read.
+ * @param offset  Byte offset into the virtual info "file".
+ * @return Bytes copied, or 0 at EOF.
+ */
+static i64 fb_read(void *ctx, void *buf, u64 count, u64 offset)
+{
+  (void)ctx;
+  alcor_fb_info_t info;
+  fb_user_fill_info(&info);
+  u64 total = sizeof(info);
+  if(offset >= total)
+    return 0;
+  u64 avail = total - offset;
+  if(count > avail)
+    count = avail;
+  kmemcpy(buf, (const u8 *)&info + offset, count);
+  return (i64)count;
+}
+
+/**
+ * @brief ioctl on /dev/fb — forwards FB_CONSOLE_YIELD, FB_CONSOLE_RECLAIM,
+ * and FB_CONSOLE_SET_ATLAS.
+ *
+ * @param ctx      Unused.
+ * @param request  ioctl request code.
+ * @param arg      User-space pointer to the ioctl argument (for SET_ATLAS).
+ * @return 0 on success, negative @c -errno on failure.
+ */
+static i64 fb_ioctl(void *ctx, u64 request, u64 arg)
+{
+  (void)ctx;
+  if(request == FB_CONSOLE_SET_ATLAS) {
+    if(!vmm_is_user_range((void *)arg, sizeof(fb_console_atlas_t)))
+      return -EFAULT;
+    fb_console_atlas_t meta;
+    kmemcpy(&meta, (void *)arg, sizeof(meta));
+    return fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL;
+  }
+  if(request == FB_CONSOLE_YIELD) {
+    fb_console_yield();
+    return 0;
+  }
+  if(request == FB_CONSOLE_RECLAIM) {
+    fb_console_reclaim();
+    return 0;
+  }
+  return -ENOTTY;
+}
+
 /* ---- ops tables --------------------------------------------------------- */
 
 static const ramfs_chardev_ops_t null_ops = {
@@ -285,20 +347,32 @@ static const ramfs_chardev_ops_t tty_ops = {
     .ioctl = tty_ioctl,
 };
 
+static const ramfs_chardev_ops_t fb_ops = {
+    .read  = fb_read,
+    .ioctl = fb_ioctl,
+};
+
 /**
- * @brief Register /dev/null, /dev/zero, and /dev/tty on the ramfs mounted
- * at /dev.
+ * @brief Register /dev/null, /dev/zero, /dev/tty, and /dev/fb on the ramfs
+ * mounted at /dev.
  */
 void dev_nodes_init(void)
 {
-  i64 rc;
-  rc = ramfs_chardev_register("/null", &null_ops, NULL);
-  if(rc < 0)
-    console_printf("[dev] /dev/null register failed: %d\n", (int)rc);
-  rc = ramfs_chardev_register("/zero", &zero_ops, NULL);
-  if(rc < 0)
-    console_printf("[dev] /dev/zero register failed: %d\n", (int)rc);
-  rc = ramfs_chardev_register("/tty", &tty_ops, NULL);
-  if(rc < 0)
-    console_printf("[dev] /dev/tty register failed: %d\n", (int)rc);
+  static const struct
+  {
+    const char                *path;
+    const ramfs_chardev_ops_t *ops;
+  } nodes[] = {
+      {"/null", &null_ops},
+      {"/zero", &zero_ops},
+      {"/tty",  &tty_ops },
+      {"/fb",   &fb_ops  },
+  };
+  for(unsigned i = 0; i < sizeof(nodes) / sizeof(nodes[0]); i++) {
+    i64 rc = ramfs_chardev_register(nodes[i].path, nodes[i].ops, NULL);
+    if(rc < 0)
+      console_printf(
+          "[dev] /dev%s register failed: %d\n", nodes[i].path, (int)rc
+      );
+  }
 }
