@@ -554,10 +554,10 @@ int main(int argc, char *argv[])
       "\n"
       "  " PC_LINE BD_TL_R BNR_H34 BD_TR_R PC_RS "\n"
       "  " PC_LINE BD_V PC_RS "            " PC_HOST "ALCOR2  OS" PC_RS
-      "            " PC_LINE     BD_V PC_RS "\n"
+      "            " PC_LINE BD_V PC_RS "\n"
       "  " PC_LINE BD_LT BNR_H34 BD_RT PC_RS "\n"
       "  " PC_LINE BD_V PC_RS "           " PC_PATH "vega v" VEGA_VERSION PC_RS
-      "            " PC_LINE       BD_V PC_RS "\n"
+      "            " PC_LINE BD_V PC_RS "\n"
       "  " PC_LINE BD_BL_R BNR_H34 BD_BR_R PC_RS "\n"
       "\n"
       "  " PC_DOLS "help" PC_LINE " " BD_ARROW_R " " PC_RS PC_PATH

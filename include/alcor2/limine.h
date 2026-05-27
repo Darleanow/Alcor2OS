@@ -50,9 +50,9 @@
  */
 #define LIMINE_BASE_REVISION(n)                                                \
   USED                  SECTION(                                               \
-      ".limine_requests"                                                       \
-  ) static volatile u64 limine_base_revision[3] = {                            \
-      0xf9562b2d5c95a6c8, 0x6a7b384944536bdc, (n)                              \
+      ".limine_requests"                                      \
+  ) static volatile u64 limine_base_revision[3] = {           \
+      0xf9562b2d5c95a6c8, 0x6a7b384944536bdc, (n)             \
   };
 
 /** @brief Check if base revision was accepted. */
@@ -61,7 +61,7 @@
 /** @brief Start of request section. */
 #define LIMINE_REQUESTS_START                                                  \
   USED                    SECTION(                                             \
-      ".limine_requests_start"                                                 \
+      ".limine_requests_start"                              \
   ) static volatile void *limine_req_start = (void *)0xf9562b2d5c95a6c8;
 
 /** @brief End of request section. */

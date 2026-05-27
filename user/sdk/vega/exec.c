@@ -249,8 +249,8 @@ static int run_external(char **argv, const redir_t *redirs)
 typedef int (*builtin_fn_t)(int argc, char *const argv[]);
 
 static int  run_in_process_redirected(
-    builtin_fn_t fn, int argc, char *const argv[], const redir_t *redirs
-)
+     builtin_fn_t fn, int argc, char *const argv[], const redir_t *redirs
+ )
 {
   if(!redirs)
     return fn(argc, argv);

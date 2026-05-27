@@ -47,7 +47,7 @@
  */
 #define VFS_FILE      1 /**< Regular file. */
 #define VFS_DIRECTORY 2 /**< Directory. */
-#define VFS_FIFO 3 /**< Pipe / FIFO — returned by ::vfs_fstat on pipe fds. */
+#define VFS_FIFO      3 /**< Pipe / FIFO — returned by ::vfs_fstat on pipe fds. */
 /** @} */
 
 /**

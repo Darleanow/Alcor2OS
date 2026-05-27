@@ -1740,7 +1740,7 @@ ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)
   vol->blocks_count     = sb->s_blocks_count;
   vol->first_data_block = sb->s_first_data_block;
   vol->groups_count     = (sb->s_blocks_count + sb->s_blocks_per_group - 1) /
-                          sb->s_blocks_per_group;
+                      sb->s_blocks_per_group;
 
   kmemcpy(&vol->sb, sb, sizeof(ext2_superblock_t));
 
