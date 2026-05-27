@@ -34,6 +34,7 @@
 #include <alcor2/types.h>
 
 extern void ramfs_init(void);
+extern void dev_nodes_init(void);
 
 LIMINE_BASE_REVISION(3)
 LIMINE_REQUESTS_START
@@ -313,6 +314,7 @@ static void init_storage(void)
     if(vfs_mount("/dev/hda", "/", "ext2") == 0) {
       console_print("[INIT] Mounted /dev/hda (ext2) on /\n");
       vfs_mount(NULL, "/dev", "ramfs");
+      dev_nodes_init();
     } else {
       console_print("[INIT] Failed to mount ext2 - falling back to ramfs\n");
     }
