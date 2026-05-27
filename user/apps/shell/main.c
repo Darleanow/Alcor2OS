@@ -303,7 +303,7 @@ static int read_line(char *buf, size_t cap, const char *prompt)
           size_t dlen   = strlen(display);
           int    is_dir = (dlen > 0 && display[dlen - 1] == '/');
           write_str("  ");
-          write_str(is_dir ? THEME_ANSI_PRIMARY_B : THEME_ANSI_TEXT);
+          write_str(is_dir ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
           write_str(display);
           write_str(THEME_ANSI_RESET);
           write_str("\n");
