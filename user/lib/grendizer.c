@@ -343,8 +343,9 @@ void gr_usage(const gr_spec *spec, FILE *stream)
         (void)snprintf(cell + len, sizeof cell - (size_t)len, " %s", hint);
       }
 
-      (void
-      )fprintf(stream, "  %-*s  %s\n", (int)col, cell, o->help ? o->help : "");
+      (void)fprintf(
+          stream, "  %-*s  %s\n", (int)col, cell, o->help ? o->help : ""
+      );
     }
   }
 
@@ -706,8 +707,9 @@ static int gr__dispatch(
   }
 
   if(!cmd->run) {
-    (void
-    )fprintf(stderr, "%s: internal: no handler for '%s'\n", prog, cmd->name);
+    (void)fprintf(
+        stderr, "%s: internal: no handler for '%s'\n", prog, cmd->name
+    );
     return 2;
   }
 

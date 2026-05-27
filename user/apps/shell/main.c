@@ -274,8 +274,9 @@ static int read_line(char *buf, size_t cap, const char *prompt)
       if(c < 0x100 && (c == ' ' || (c >= 0x21 && c <= 0x7e) || c >= 0x80)) {
         if(len + 1 >= (int)cap - 1)
           break;
-        (void
-        )memmove(buf + cur_b + 1, buf + cur_b, (size_t)len - (size_t)cur_b + 1);
+        (void)memmove(
+            buf + cur_b + 1, buf + cur_b, (size_t)len - (size_t)cur_b + 1
+        );
         buf[cur_b++] = (char)c;
         len++;
         redraw_line(

@@ -336,7 +336,7 @@ format fmt:
 	  ! -path '*/thirdparty/*' \
 	  ! -path '*/.cache/*' \
 	  ! -path '*/doomgeneric/*' \
-	  -print0 | xargs -0 clang-format -i
+	  -print0 | xargs -0 clang-format-21 -i
 
 lint:
 	clang-tidy \
