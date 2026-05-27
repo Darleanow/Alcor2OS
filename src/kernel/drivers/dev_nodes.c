@@ -9,14 +9,6 @@
  *             to fb_console, ioctls handle termios and FB_CONSOLE controls.
  */
 
-/* TTY ioctl request codes (Linux values, matched by musl). */
-#define TCGETS     0x5401
-#define TCSETS     0x5402
-#define TCSETSW    0x5403
-#define TCSETSF    0x5404
-#define TIOCGWINSZ 0x5413
-#define TIOCSWINSZ 0x5414
-
 #include <alcor2/alcor_fb.h>
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/console.h>
@@ -31,6 +23,14 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
+
+/* TTY ioctl request codes (Linux values, matched by musl). */
+#define TCGETS     0x5401
+#define TCSETS     0x5402
+#define TCSETSW    0x5403
+#define TCSETSF    0x5404
+#define TIOCGWINSZ 0x5413
+#define TIOCSWINSZ 0x5414
 
 /**
  * @brief Read from /dev/null — always returns 0 (EOF).
