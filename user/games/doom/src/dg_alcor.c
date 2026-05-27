@@ -659,15 +659,6 @@ int main(int argc, char **argv)
    * runs below. */
   doomgeneric_Create(patched_argc, patched_argv);
 
-  /* Send Doom's periodic printf to /dev/null: otherwise it repaints the console
-   * over our framebuffer. */
-  int devnull = open("/dev/null", O_WRONLY);
-  if(devnull >= 0) {
-    dup2(devnull, STDOUT_FILENO);
-    dup2(devnull, STDERR_FILENO);
-    close(devnull);
-  }
-
   for(;;) {
     feed_mouse_events();
     doomgeneric_Tick();
