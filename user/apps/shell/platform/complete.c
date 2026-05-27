@@ -111,8 +111,13 @@ void sh_complete(const char *prefix, bool is_command, comp_result_t *out)
       }
       const char *name_prefix = slash + 1;
       size_t      nplen       = strlen(name_prefix);
+      /* dir_prefix is everything up to and including the last '/'. */
+      char dir_prefix[MAX_PATH];
+      (void)snprintf(
+          dir_prefix, sizeof(dir_prefix), "%.*s/", (int)dlen, prefix
+      );
 
-      DIR        *d = sh_opendir(dir);
+      DIR *d = sh_opendir(dir);
       if(!d)
         return;
       struct dirent *ent;
@@ -123,19 +128,27 @@ void sh_complete(const char *prefix, bool is_command, comp_result_t *out)
           continue;
         if(out->count >= COMP_MAX)
           break;
-        char full[MAX_PATH];
+        /* Entries store dir_prefix + name so the common prefix includes
+         * the directory portion and the insertion math in read_line
+         * (common_len - word_len = chars to insert) works correctly. */
+        char full_stat[MAX_PATH];
         if(dlen == 1 && dir[0] == '/') {
-          (void)snprintf(full, sizeof(full), "/%s", ent->d_name);
+          (void)snprintf(full_stat, sizeof(full_stat), "/%s", ent->d_name);
         } else {
-          (void)snprintf(full, sizeof(full), "%s/%s", dir, ent->d_name);
+          (void)snprintf(
+              full_stat, sizeof(full_stat), "%s/%s", dir, ent->d_name
+          );
         }
+        char        entry[COMP_NAME_MAX];
         struct stat st;
-        if(sh_stat(full, &st) == 0 && S_ISDIR(st.st_mode)) {
-          (void)snprintf(full, sizeof(full), "%s/", ent->d_name);
-          try_add(out, full, name_prefix, nplen);
+        if(sh_stat(full_stat, &st) == 0 && S_ISDIR(st.st_mode)) {
+          (void)snprintf(
+              entry, sizeof(entry), "%s%s/", dir_prefix, ent->d_name
+          );
         } else {
-          try_add(out, ent->d_name, name_prefix, nplen);
+          (void)snprintf(entry, sizeof(entry), "%s%s", dir_prefix, ent->d_name);
         }
+        try_add(out, entry, prefix, plen);
       }
       sh_closedir(d);
     } else {
