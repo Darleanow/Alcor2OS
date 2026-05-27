@@ -289,8 +289,19 @@ static int read_line(char *buf, size_t cap, const char *prompt)
         /* Double-tab: list candidates. */
         write_str("\n");
         for(int i = 0; i < comp.count; i++) {
+          const char *display = comp.entries[i];
+          const char *sl      = strrchr(display, '/');
+          if(sl && sl[1] != '\0')
+            display = sl + 1;
+          else if(sl && sl[1] == '\0' && sl != display) {
+            /* Entry ends with '/' (directory) — show "name/" only. */
+            const char *prev = sl - 1;
+            while(prev > display && prev[-1] != '/')
+              prev--;
+            display = prev;
+          }
           write_str("  ");
-          write_str(comp.entries[i]);
+          write_str(display);
           write_str("\n");
         }
         write_str(prompt);
