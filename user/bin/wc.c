@@ -12,14 +12,26 @@
 
 
 
+/** @brief Accumulated counters for a single file or the grand total. */
 typedef struct {
-  unsigned long long lines;
-  unsigned long long words;
-  unsigned long long bytes;
-  unsigned long long chars;
-  unsigned long long max_line_len;
+  unsigned long long lines;       /**< Number of newline characters seen. */
+  unsigned long long words;       /**< Number of whitespace-delimited tokens. */
+  unsigned long long bytes;       /**< Total bytes read. */
+  unsigned long long chars;       /**< Total characters (same as bytes; no multibyte support). */
+  unsigned long long max_line_len; /**< Length of the longest line, excluding the newline. */
 } wc_counts_t;
 
+/**
+ * @brief Print the requested subset of counters followed by an optional filename.
+ *
+ * @param c    Counters to print.
+ * @param l    Non-zero to print the line count.
+ * @param w    Non-zero to print the word count.
+ * @param b    Non-zero to print the byte count.
+ * @param m    Non-zero to print the character count.
+ * @param L    Non-zero to print the maximum line length.
+ * @param name Filename to append after the counts, or NULL for stdin output.
+ */
 static void print_counts(wc_counts_t c, int l, int w, int b, int m, int L, const char *name)
 {
   if(l)
@@ -38,6 +50,17 @@ static void print_counts(wc_counts_t c, int l, int w, int b, int m, int L, const
   printf("\n");
 }
 
+/**
+ * @brief Count lines, words, bytes, and the longest line length from a file descriptor.
+ *
+ * Reads the descriptor in 512-byte chunks until EOF or an error.  The caller
+ * is responsible for opening and closing @p fd.
+ *
+ * @param fd  Open, readable file descriptor to process.
+ * @param out Pointer to the counter struct that will be populated on success.
+ *            Always zeroed before counting begins.
+ * @return 0 on success, -1 if a read error occurred.
+ */
 static int count_fd(int fd, wc_counts_t *out)
 {
   unsigned char      buf[512];
@@ -80,6 +103,17 @@ static int count_fd(int fd, wc_counts_t *out)
   return (n < 0) ? -1 : 0;
 }
 
+/**
+ * @brief Entry point for the @c wc utility.
+ *
+ * Parses command-line flags (-c, -m, -l, -w, -L) and counts the requested
+ * statistics for each file operand, or from standard input when no files are
+ * given.  When more than one file is processed a grand-total line is printed.
+ *
+ * @param argc Argument count from the shell.
+ * @param argv Argument vector from the shell.
+ * @return 0 on success, 1 if any file could not be opened or read.
+ */
 int main(int argc, char *argv[])
 {
   int show_lines = 0;
