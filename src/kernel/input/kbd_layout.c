@@ -582,10 +582,12 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
 
 static bool kbd_pop_byte(unsigned char *out, bool block)
 {
+  klogf("[kpb] enter block=%d out=%lx\n", (int)block, (u64)out);
   for(;;) {
     unsigned char pb;
     if(out_pend_take(&pb)) {
       *out = pb;
+      klogf("[kpb] pend\n");
       return true;
     }
     if(!block) {
@@ -596,6 +598,7 @@ static bool kbd_pop_byte(unsigned char *out, bool block)
       }
       return false;
     }
+    klogf("[kpb] hlt-loop\n");
     while(!keyboard_raw_available()) {
       cpu_enable_interrupts();
       __asm__ volatile("hlt");
@@ -606,6 +609,7 @@ static bool kbd_pop_byte(unsigned char *out, bool block)
       proc_schedule();
     }
     u8 raw = keyboard_raw_pop();
+    klogf("[kpb] raw=%x\n", (u64)raw);
     if(process_raw_ctx(raw, &g_kbd, out, false))
       return true;
   }
@@ -763,10 +767,13 @@ u64 kbd_read_for_process(proc_t *p, char *buf, u64 count)
   u64 need = (u64)vmin;
   if(need > count)
     need = count;
+  klogf("[krfp] s5 need=%lu filled=%lu count=%lu\n", need, filled, count);
 
   while(filled < need) {
     unsigned char oc;
+    klogf("[krfp] s6 call kbd_pop_byte\n");
     kbd_pop_byte(&oc, true);
+    klogf("[krfp] s7 oc=%x\n", (u64)oc);
     buf[filled++] = (char)oc;
   }
   while(filled < count) {
