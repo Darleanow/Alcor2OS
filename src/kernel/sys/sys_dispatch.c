@@ -149,8 +149,9 @@ u64 syscall_dispatch(syscall_frame_t *frame)
 
 #if SYS_TRACE
   klogf(
-      "[sys] %s(%lx, %lx, %lx, %lx, %lx, %lx)", d->name, frame->rdi, frame->rsi,
-      frame->rdx, frame->r10, frame->r8, frame->r9
+      "[sys pid=%d cr3=%lx rsp_k=%lx] %s(%lx, %lx, %lx, %lx, %lx, %lx)",
+      (int)(p ? p->pid : 0), p ? p->cr3 : 0, (u64)frame, d->name, frame->rdi,
+      frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
   );
 #endif
 
