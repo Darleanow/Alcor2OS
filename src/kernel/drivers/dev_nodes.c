@@ -32,8 +32,6 @@
 #include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
 
-/* ---- /dev/null ---------------------------------------------------------- */
-
 /**
  * @brief Read from /dev/null — always returns 0 (EOF).
  *
@@ -69,8 +67,6 @@ static i64 null_write(void *ctx, const void *buf, u64 count, u64 offset)
   return (i64)count;
 }
 
-/* ---- /dev/zero ---------------------------------------------------------- */
-
 /**
  * @brief Read from /dev/zero — fills the buffer with zero bytes.
  *
@@ -87,8 +83,6 @@ static i64 zero_read(void *ctx, void *buf, u64 count, u64 offset)
   kzero(buf, count);
   return (i64)count;
 }
-
-/* ---- shared tty helpers ------------------------------------------------- */
 
 /** @brief Linux-compatible @c struct @c winsize layout for ioctl wire ABI. */
 typedef struct
@@ -115,8 +109,6 @@ static void winsize_from_console(k_winsize_t *w)
   w->xpixel = 0;
   w->ypixel = 0;
 }
-
-/* ---- /dev/tty ----------------------------------------------------------- */
 
 /**
  * @brief Read from /dev/tty — delegates to the keyboard line discipline.
@@ -269,8 +261,6 @@ static i64 tty_ioctl(void *ctx, u64 request, u64 arg)
   return -ENOTTY;
 }
 
-/* ---- /dev/fb ------------------------------------------------------------ */
-
 /**
  * @brief Read from /dev/fb — returns an alcor_fb_info_t with the framebuffer
  * geometry.
@@ -328,8 +318,6 @@ static i64 fb_ioctl(void *ctx, u64 request, u64 arg)
   }
   return -ENOTTY;
 }
-
-/* ---- ops tables --------------------------------------------------------- */
 
 static const ramfs_chardev_ops_t null_ops = {
     .read  = null_read,
