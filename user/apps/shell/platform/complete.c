@@ -39,14 +39,16 @@ static void try_add(
 }
 
 /**
- * @brief Scan a directory for entries matching @p prefix and add them.
+ * @brief Scan a directory for command-name entries matching @p prefix.
+ *
+ * Used for command completion — entries are bare filenames (no path prefix).
  *
  * @param out    Result accumulator.
  * @param dir    Directory path to scan.
  * @param prefix Filename prefix to match.
  * @param plen   Length of @p prefix.
  */
-static void scan_dir(
+static void scan_cmd_dir(
     comp_result_t *out, const char *dir, const char *prefix, size_t plen
 )
 {
@@ -58,6 +60,53 @@ static void scan_dir(
     if(ent->d_name[0] == '.' && prefix[0] != '.')
       continue;
     try_add(out, ent->d_name, prefix, plen);
+  }
+  sh_closedir(d);
+}
+
+/**
+ * @brief Scan a directory for path-completion entries matching @p name_prefix.
+ *
+ * Each matching entry is stored as @c entry_prefix + filename (with trailing
+ * @c / for directories) so the common-prefix math in the caller includes the
+ * directory portion.
+ *
+ * @param out           Result accumulator.
+ * @param dir           Absolute or relative directory to scan.
+ * @param entry_prefix  String prepended to each entry name (e.g. @c "bin/").
+ * @param name_prefix   Filename prefix to match inside @p dir.
+ * @param nplen         Length of @p name_prefix.
+ * @param full_prefix   The original user-typed prefix (for try_add matching).
+ * @param fplen         Length of @p full_prefix.
+ */
+static void scan_path_dir(
+    comp_result_t *out, const char *dir, const char *entry_prefix,
+    const char *name_prefix, size_t nplen, const char *full_prefix, size_t fplen
+)
+{
+  DIR *d = sh_opendir(dir);
+  if(!d)
+    return;
+  struct dirent *ent;
+  while((ent = sh_readdir(d)) != NULL) {
+    if(ent->d_name[0] == '.' && name_prefix[0] != '.')
+      continue;
+    if(strncmp(ent->d_name, name_prefix, nplen) != 0)
+      continue;
+    if(out->count >= COMP_MAX)
+      break;
+
+    char stat_path[MAX_PATH];
+    (void)snprintf(stat_path, sizeof(stat_path), "%s/%s", dir, ent->d_name);
+
+    char        entry[COMP_NAME_MAX];
+    struct stat st;
+    if(sh_stat(stat_path, &st) == 0 && S_ISDIR(st.st_mode))
+      (void)snprintf(entry, sizeof(entry), "%s%s/", entry_prefix, ent->d_name);
+    else
+      (void)snprintf(entry, sizeof(entry), "%s%s", entry_prefix, ent->d_name);
+
+    try_add(out, entry, full_prefix, fplen);
   }
   sh_closedir(d);
 }
@@ -108,7 +157,7 @@ void sh_complete(const char *prefix, bool is_command, comp_result_t *out)
 
     static const char *const cmd_dirs[] = {"/init", "/bin", "/usr/bin", NULL};
     for(int d = 0; cmd_dirs[d]; d++)
-      scan_dir(out, cmd_dirs[d], prefix, plen);
+      scan_cmd_dir(out, cmd_dirs[d], prefix, plen);
   } else {
     const char *slash = strrchr(prefix, '/');
     if(slash) {
@@ -123,76 +172,18 @@ void sh_complete(const char *prefix, bool is_command, comp_result_t *out)
       } else {
         return;
       }
-      const char *name_prefix = slash + 1;
-      size_t      nplen       = strlen(name_prefix);
-      /* dir_prefix is everything up to and including the last '/'. */
       char dir_prefix[MAX_PATH];
       (void)snprintf(
           dir_prefix, sizeof(dir_prefix), "%.*s/", (int)dlen, prefix
       );
-
-      DIR *d = sh_opendir(dir);
-      if(!d)
-        return;
-      struct dirent *ent;
-      while((ent = sh_readdir(d)) != NULL) {
-        if(ent->d_name[0] == '.' && name_prefix[0] != '.')
-          continue;
-        if(strncmp(ent->d_name, name_prefix, nplen) != 0)
-          continue;
-        if(out->count >= COMP_MAX)
-          break;
-        /* Entries store dir_prefix + name so the common prefix includes
-         * the directory portion and the insertion math in read_line
-         * (common_len - word_len = chars to insert) works correctly. */
-        char full_stat[MAX_PATH];
-        if(dlen == 1 && dir[0] == '/') {
-          (void)snprintf(full_stat, sizeof(full_stat), "/%s", ent->d_name);
-        } else {
-          (void)snprintf(
-              full_stat, sizeof(full_stat), "%s/%s", dir, ent->d_name
-          );
-        }
-        char        entry[COMP_NAME_MAX];
-        struct stat st;
-        if(sh_stat(full_stat, &st) == 0 && S_ISDIR(st.st_mode)) {
-          (void)snprintf(
-              entry, sizeof(entry), "%s%s/", dir_prefix, ent->d_name
-          );
-        } else {
-          (void)snprintf(entry, sizeof(entry), "%s%s", dir_prefix, ent->d_name);
-        }
-        try_add(out, entry, prefix, plen);
-      }
-      sh_closedir(d);
+      scan_path_dir(
+          out, dir, dir_prefix, slash + 1, strlen(slash + 1), prefix, plen
+      );
     } else {
       char cwd[MAX_PATH];
       if(!sh_getcwd(cwd, sizeof(cwd)))
         return;
-      DIR *d = sh_opendir(cwd);
-      if(!d)
-        return;
-      struct dirent *ent;
-      while((ent = sh_readdir(d)) != NULL) {
-        if(ent->d_name[0] == '.' && prefix[0] != '.')
-          continue;
-        if(strncmp(ent->d_name, prefix, plen) != 0)
-          continue;
-        if(out->count >= COMP_MAX)
-          break;
-
-        char full[MAX_PATH];
-        (void)snprintf(full, sizeof(full), "%s/%s", cwd, ent->d_name);
-        struct stat st;
-        if(sh_stat(full, &st) == 0 && S_ISDIR(st.st_mode)) {
-          char with_slash[COMP_NAME_MAX];
-          (void)snprintf(with_slash, sizeof(with_slash), "%s/", ent->d_name);
-          try_add(out, with_slash, prefix, plen);
-        } else {
-          try_add(out, ent->d_name, prefix, plen);
-        }
-      }
-      sh_closedir(d);
+      scan_path_dir(out, cwd, "", prefix, plen, prefix, plen);
     }
   }
 

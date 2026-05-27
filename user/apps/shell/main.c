@@ -147,6 +147,95 @@ static struct termios s_raw_t;
 static struct termios s_cooked_t;
 
 /**
+ * @brief Return the display name for a completion entry (strip dir prefix).
+ *
+ * @param entry  Full entry string (may contain path separators).
+ * @return Pointer into @p entry past the last directory component. For
+ *         entries ending in @c / (directories), returns @c "name/".
+ */
+static const char *display_basename(const char *entry)
+{
+  const char *sl = strrchr(entry, '/');
+  if(sl && sl[1] != '\0')
+    return sl + 1;
+  if(sl && sl[1] == '\0' && sl != entry) {
+    const char *prev = sl - 1;
+    while(prev > entry && prev[-1] != '/')
+      prev--;
+    return prev;
+  }
+  return entry;
+}
+
+/**
+ * @brief Print completion candidates in coloured columns (double-tab).
+ *
+ * Layout matches @c ls: column-major order, column width derived from the
+ * longest entry, column count from the terminal width.
+ *
+ * @param comp         Completion result set.
+ * @param prompt       Current prompt (reprinted after the listing).
+ * @param buf          Current line buffer (reprinted after the listing).
+ * @param cur_b        Cursor byte-index within @p buf (for repositioning).
+ * @param prompt_cols  Visible column width of @p prompt.
+ */
+static void list_candidates(
+    const comp_result_t *comp, const char *prompt, const char *buf, int cur_b,
+    int prompt_cols
+)
+{
+  const char *names[COMP_MAX];
+  int         name_lens[COMP_MAX];
+  int         dir_flags[COMP_MAX];
+  int         max_w = 0;
+
+  for(int i = 0; i < comp->count; i++) {
+    names[i]     = display_basename(comp->entries[i]);
+    name_lens[i] = (int)strlen(names[i]);
+    dir_flags[i] = (name_lens[i] > 0 && names[i][name_lens[i] - 1] == '/');
+    if(name_lens[i] > max_w)
+      max_w = name_lens[i];
+  }
+
+  int col_w      = max_w + 2;
+  int cols_avail = COLS > 0 ? COLS : 80;
+  int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
+  if(n_cols < 1)
+    n_cols = 1;
+  int n_rows = (comp->count + n_cols - 1) / n_cols;
+
+  write_str("\n");
+  for(int row = 0; row < n_rows; row++) {
+    for(int col = 0; col < n_cols; col++) {
+      int idx = col * n_rows + row;
+      if(idx >= comp->count)
+        continue;
+      int last =
+          (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp->count);
+      write_str(dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
+      write_str(names[idx]);
+      write_str(THEME_ANSI_RESET);
+      if(!last) {
+        int padding = col_w - name_lens[idx];
+        for(int p = 0; p < padding; p++)
+          write_str(" ");
+      }
+    }
+    write_str("\n");
+  }
+
+  write_str(prompt);
+  write_str(buf);
+  int  cur_cols = utf8_cols(buf) - utf8_cols(buf + cur_b);
+  char seq[32];
+  (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
+  if(prompt_cols + cur_cols > 0)
+    write_str(seq);
+  else
+    write_str("\r");
+}
+
+/**
  * @brief Handle a Tab keypress: complete or list candidates.
  *
  * On single Tab, inserts the longest common prefix of matching candidates
@@ -192,64 +281,7 @@ static void handle_tab(
   }
 
   if(*last_was_tab && comp.count > 1) {
-    const char *names[COMP_MAX];
-    int         name_lens[COMP_MAX];
-    int         dir_flags[COMP_MAX];
-    int         max_w = 0;
-
-    for(int i = 0; i < comp.count; i++) {
-      const char *display = comp.entries[i];
-      const char *sl      = strrchr(display, '/');
-      if(sl && sl[1] != '\0')
-        display = sl + 1;
-      else if(sl && sl[1] == '\0' && sl != display) {
-        const char *prev = sl - 1;
-        while(prev > display && prev[-1] != '/')
-          prev--;
-        display = prev;
-      }
-      names[i]     = display;
-      name_lens[i] = (int)strlen(display);
-      dir_flags[i] = (name_lens[i] > 0 && display[name_lens[i] - 1] == '/');
-      if(name_lens[i] > max_w)
-        max_w = name_lens[i];
-    }
-
-    int col_w      = max_w + 2;
-    int cols_avail = COLS > 0 ? COLS : 80;
-    int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
-    if(n_cols < 1)
-      n_cols = 1;
-    int n_rows = (comp.count + n_cols - 1) / n_cols;
-
-    write_str("\n");
-    for(int row = 0; row < n_rows; row++) {
-      for(int col = 0; col < n_cols; col++) {
-        int idx = col * n_rows + row;
-        if(idx >= comp.count)
-          continue;
-        int last =
-            (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp.count);
-        write_str(dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
-        write_str(names[idx]);
-        write_str(THEME_ANSI_RESET);
-        if(!last) {
-          int padding = col_w - name_lens[idx];
-          for(int p = 0; p < padding; p++)
-            write_str(" ");
-        }
-      }
-      write_str("\n");
-    }
-    write_str(prompt);
-    write_str(buf);
-    int  cur_cols = utf8_cols(buf) - utf8_cols(buf + *cur_b);
-    char seq[32];
-    (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
-    if(prompt_cols + cur_cols > 0)
-      write_str(seq);
-    else
-      write_str("\r");
+    list_candidates(&comp, prompt, buf, *cur_b, prompt_cols);
     *last_was_tab = 0;
     return;
   }
