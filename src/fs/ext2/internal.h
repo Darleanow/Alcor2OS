@@ -202,6 +202,64 @@ u32 alloc_file_block(
 i64 free_inode_blocks(ext2_volume_t *vol, ext2_inode_t *inode);
 
 /**
+ * @brief Look up an entry by @p name inside directory @p dir_inode.
+ *
+ * Defined in @c dir.c. Walks the directory's data blocks via the indirect
+ * resolver until the entry is found or the size is exhausted.
+ *
+ * @param vol        Source volume.
+ * @param dir_inode  Directory inode to search.
+ * @param name       Entry name (NUL-terminated).
+ * @param out_ino    Out: matching inode number.
+ * @param out_type   Out: directory entry's @c file_type byte.
+ * @return 0 on hit, @c -ENOENT on miss, @c -EIO on read failure.
+ */
+i64 dir_find_entry(
+    const ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name,
+    u32 *out_ino, u8 *out_type
+);
+
+/**
+ * @brief Insert a new entry into @p dir_inode (creating a new data block if
+ *        no existing block has room).
+ *
+ * @param vol        Target volume.
+ * @param dir_ino    Directory inode number (needed to persist size growth).
+ * @param dir_inode  Directory inode; mutated in place.
+ * @param name       Entry name.
+ * @param inode_num  Inode number to point at.
+ * @param file_type  @c EXT2_FT_* byte for the new entry.
+ * @return 0 on success, negative errno on OOM / I/O failure.
+ */
+i64 dir_add_entry(
+    ext2_volume_t *vol, u32 dir_ino, ext2_inode_t *dir_inode, const char *name,
+    u32 inode_num, u8 file_type
+);
+
+/**
+ * @brief Remove the entry named @p name from @p dir_inode.
+ *
+ * Merges the deleted entry's @c rec_len into its predecessor when one exists,
+ * else clears its @c inode to mark it free.
+ *
+ * @param vol        Target volume.
+ * @param dir_inode  Directory inode.
+ * @param name       Entry name to drop.
+ * @return 0 on hit, @c -ENOENT on miss, @c -EIO on I/O failure.
+ */
+i64 dir_remove_entry(
+    const ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name
+);
+
+/**
+ * @brief Check whether @p dir_inode contains anything beyond @c . and @c ..
+ *
+ * @return true when empty (or unreadable — fail safe), false when it holds
+ *         user entries.
+ */
+bool dir_is_empty(const ext2_volume_t *vol, const ext2_inode_t *dir_inode);
+
+/**
  * @brief Read inode @p ino from disk into @p inode.
  *
  * Defined in @c inode.c. Locates the inode by walking
