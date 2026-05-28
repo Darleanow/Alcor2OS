@@ -7,11 +7,21 @@
 #include <string.h>
 #include <unistd.h>
 
+/**
+ * @brief Write a single byte to stdout.
+ *
+ * @param c  Byte to emit.
+ */
 void sh_putchar(char c)
 {
   sh_write(STDOUT_FILENO, &c, 1);
 }
 
+/**
+ * @brief Write a NUL-terminated string to stdout, retrying on short writes.
+ *
+ * @param s  String to emit.
+ */
 void sh_puts(const char *s)
 {
   size_t n = strlen(s);
@@ -24,12 +34,23 @@ void sh_puts(const char *s)
   }
 }
 
+/**
+ * @brief Write @p len raw bytes from @p buf to stdout (no NUL semantics).
+ *
+ * @param buf  Source buffer.
+ * @param len  Byte count.
+ */
 void sh_stdout_bytes(const void *buf, size_t len)
 {
   if(len)
     sh_write(STDOUT_FILENO, buf, len);
 }
 
+/**
+ * @brief Write @p n as a decimal integer to stdout (handles negative).
+ *
+ * @param n  Signed integer to print.
+ */
 void sh_putnum(long n)
 {
   char buf[32];
