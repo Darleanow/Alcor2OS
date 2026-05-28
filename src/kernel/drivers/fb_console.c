@@ -22,37 +22,7 @@ void             proc_signal_broadcast(int signum);
 
 fb_console_ctx_t fb_ctx;
 
-/** Resolve a codepoint to an atlas glyph index, or ATLAS_NO_GLYPH if absent. */
-static u32 atlas_lookup(u32 cp)
-{
-  if(!fb_ctx.atlas_active)
-    return ATLAS_NO_GLYPH;
-  if(cp < fb_ctx.atlas_n_cp) {
-    u32 idx = fb_ctx.atlas_cp_map[cp];
-    if(idx < fb_ctx.atlas_n_glyphs)
-      return idx;
-  }
-  return fb_ctx.atlas_fallback;
-}
-
-static u32 atlas_lookup_attr(u32 cp, u16 attr)
-{
-  u32 idx = atlas_lookup(cp);
-  if(idx == ATLAS_NO_GLYPH)
-    return ATLAS_NO_GLYPH;
-  if((attr & FB_ATTR_BOLD) && fb_ctx.atlas_bold_base > 0u) {
-    u32 bi = idx + fb_ctx.atlas_bold_base;
-    if(bi < fb_ctx.atlas_n_glyphs)
-      return bi;
-  } else if((attr & FB_ATTR_ITALIC) && fb_ctx.atlas_italic_base > 0u) {
-    u32 ii = idx + fb_ctx.atlas_italic_base;
-    if(ii < fb_ctx.atlas_n_glyphs)
-      return ii;
-  }
-  return idx;
-}
-
-static void blit_cell_data(const fb_cell_t *c, int col, int row)
+static void      blit_cell_data(const fb_cell_t *c, int col, int row)
 {
   u32 eff_fg = (c->attr & FB_ATTR_REVERSE) ? c->bg : c->fg;
   u32 eff_bg = (c->attr & FB_ATTR_REVERSE) ? c->fg : c->bg;
@@ -1444,26 +1414,6 @@ void fb_console_tick(void)
   /* Redraw every tick: mouse_cursor_render() early-outs when the pointer hasn't
    * moved, so this is free at rest and as smooth as the tick rate in motion. */
   mouse_cursor_render();
-}
-
-/* Caps are generous — they bound damage from a buggy shim, not enforce policy.
- */
-static bool atlas_meta_is_sane(const fb_console_atlas_t *meta)
-{
-  if(meta->cell_w == 0u || meta->cell_h == 0u || meta->cell_w > 64u ||
-     meta->cell_h > 64u)
-    return false;
-  if(meta->n_glyphs == 0u || meta->n_glyphs > 16384u)
-    return false;
-  if(meta->n_cp == 0u || meta->n_cp > 0x4000u)
-    return false;
-  if(meta->pixels_size == 0u || meta->pixels_size > 16u * 1024u * 1024u)
-    return false;
-  /* Stride: one row of pixels must fit inside cell_w * max-bytes-per-pixel.
-   * Cap bypp at 4 (the widest fb format we render); 1-byte alpha is typical. */
-  if(meta->stride_bytes == 0u || meta->stride_bytes > 4u * meta->cell_w)
-    return false;
-  return true;
 }
 
 int fb_console_set_atlas(const fb_console_atlas_t *meta)

@@ -14,6 +14,7 @@
 #define ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H
 
 #include <alcor2/arch/pit.h>
+#include <alcor2/fb_console_ioctl.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -50,6 +51,34 @@
 /** @brief Sentinel returned by @ref atlas_lookup when no glyph maps the
  * codepoint. Sized to never collide with a real atlas index (max 16384). */
 #define ATLAS_NO_GLYPH 0xFFFFFFFFu
+
+/* The ATLAS_*_MAX caps below bound damage from a buggy or malicious userspace
+ * atlas. They are intentionally generous (no real font needs anything near
+ * the cap); the goal is "stop a runaway allocation", not enforce font policy.
+ * Updating them requires re-checking that the products do not overflow size_t
+ * on the call paths in fb_console_set_atlas. */
+
+/** @brief Max cell side in pixels (square cap). Picked because no shipped
+ * monospaced font goes past 64 px and bigger means a typo. */
+#define ATLAS_CELL_DIM_MAX 64u
+
+/** @brief Max distinct glyph slots in the atlas. Sized for the BMP plane plus
+ * bold and italic variants with room to spare. */
+#define ATLAS_N_GLYPHS_MAX 16384u
+
+/** @brief Max codepoints in the @c cp_map lookup table. Caps the kmalloc the
+ * kernel makes to mirror @c cp_map_user. */
+#define ATLAS_N_CP_MAX 0x4000u
+
+/** @brief Max byte size of the atlas pixel buffer (16 MiB). Picked so a
+ * 64×64 RGBA atlas with 16384 glyphs (= 256 MiB) is rejected — well over the
+ * 1 GiB kernel heap we ship with. */
+#define ATLAS_PIXELS_BYTES_MAX (16u * 1024u * 1024u)
+
+/** @brief Max bytes-per-pixel the renderer is willing to handle. 4 covers
+ * RGBA; 1 covers FreeType grayscale. Anything else is rejected at submission.
+ */
+#define ATLAS_MAX_BYTES_PER_PIXEL 4u
 
 /* --- SGR attribute bits --------------------------------------------------- */
 /* One byte covers every SGR feature we render (blink/bold/italic/underline/
@@ -297,5 +326,43 @@ u8 bytes_pp_from_bpp(u16 bpp);
  * @param color  0xRRGGBB; alpha is forced to 0xFF for 32 bpp.
  */
 void fb_put_pixel(u32 x, u32 y, u32 color);
+
+/* fb_console_atlas.c — glyph cache lookup + meta validation */
+
+/**
+ * @brief Resolve @p cp to an atlas glyph slot.
+ *
+ * @param cp  Unicode codepoint to look up.
+ * @return The glyph index, or @ref ATLAS_NO_GLYPH if no atlas is registered
+ *         and the codepoint is not covered (caller falls back to bitmap).
+ */
+u32 atlas_lookup(u32 cp);
+
+/**
+ * @brief Like @ref atlas_lookup, but follow the bold/italic sub-atlas offset
+ * when the requested attribute is set. Single chokepoint for SGR-aware glyph
+ * resolution — keeps blit paths from each re-implementing the offset
+ * arithmetic.
+ *
+ * @param cp    Unicode codepoint.
+ * @param attr  Cell SGR bits; only @ref FB_ATTR_BOLD / @ref FB_ATTR_ITALIC
+ *              are consulted here.
+ * @return Glyph slot for the styled variant, or the plain slot if the variant
+ *         is unavailable, or @ref ATLAS_NO_GLYPH.
+ */
+u32 atlas_lookup_attr(u32 cp, u16 attr);
+
+/**
+ * @brief Reject a userspace atlas descriptor whose sizes/bounds would
+ * misbehave inside the renderer.
+ *
+ * Defensive gate against a malformed @c FB_CONSOLE_SET_ATLAS payload — the
+ * kernel kmalloc's @c pixels_size and walks @c cp_map_user[0..n_cp-1] based
+ * on these numbers, so they must be bounded before any allocation happens.
+ *
+ * @param meta  Descriptor copied from userspace.
+ * @return @c true if all fields fit the @c ATLAS_*_MAX caps.
+ */
+bool atlas_meta_is_sane(const fb_console_atlas_t *meta);
 
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */
