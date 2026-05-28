@@ -143,25 +143,41 @@ static void mouse_cursor_paint(i32 cx, i32 cy)
  * @param cx  Last-painted cursor x.
  * @param cy  Last-painted cursor y.
  */
-static void mouse_cursor_erase(i32 cx, i32 cy)
+/**
+ * @brief Bg-fill the cursor footprint plus the one-pixel halo border.
+ *
+ * Clamps against the framebuffer because the halo extends one pixel past
+ * each side of the cursor, and a cursor right at the edge can reach into
+ * negative or out-of-bounds coordinates that @ref fb_put_pixel would silently
+ * drop. Doing the clamp here keeps the inner loop branch-free.
+ *
+ * @param x0  Inclusive left-edge of the footprint, post-clamp.
+ * @param y0  Inclusive top-edge of the footprint, post-clamp.
+ * @param x1  Inclusive right-edge of the footprint, post-clamp.
+ * @param y1  Inclusive bottom-edge of the footprint, post-clamp.
+ */
+static void fill_cursor_footprint_bg(int x0, int y0, int x1, int y1)
 {
-  int x0 = cx - 1;
-  int y0 = cy - 1;
-  int x1 = cx + MOUSE_CURSOR_W;
-  int y1 = cy + MOUSE_CURSOR_H;
-
-  if(x0 < 0)
-    x0 = 0;
-  if(y0 < 0)
-    y0 = 0;
-  if(x1 >= (int)fb_ctx.width)
-    x1 = (int)fb_ctx.width - 1;
-  if(y1 >= (int)fb_ctx.height)
-    y1 = (int)fb_ctx.height - 1;
   for(int y = y0; y <= y1; y++)
     for(int x = x0; x <= x1; x++)
       fb_put_pixel((u32)x, (u32)y, fb_ctx.default_bg);
+}
 
+/**
+ * @brief Re-blit every cell that the cursor footprint touched, restoring the
+ *        characters under it.
+ *
+ * The bg-fill before this would otherwise leave a default-bg rectangle behind
+ * — the cell repaint puts the underlying text back. @c cell_w / @c cell_h
+ * fall back to 1 so a degenerate boot-time state doesn't divide by zero.
+ *
+ * @param x0  Inclusive left-edge of the footprint, post-clamp.
+ * @param y0  Inclusive top-edge of the footprint, post-clamp.
+ * @param x1  Inclusive right-edge of the footprint, post-clamp.
+ * @param y1  Inclusive bottom-edge of the footprint, post-clamp.
+ */
+static void reblit_cells_under_footprint(int x0, int y0, int x1, int y1)
+{
   int cw = fb_ctx.cell_w ? fb_ctx.cell_w : 1;
   int ch = fb_ctx.cell_h ? fb_ctx.cell_h : 1;
   int c0 = (x0 - fb_ctx.margin_x) / cw;
@@ -179,6 +195,24 @@ static void mouse_cursor_erase(i32 cx, i32 cy)
   for(int r = r0; r <= r1; r++)
     for(int c = c0; c <= c1; c++)
       blit_cell(c, r);
+}
+
+static void mouse_cursor_erase(i32 cx, i32 cy)
+{
+  int x0 = cx - 1;
+  int y0 = cy - 1;
+  int x1 = cx + MOUSE_CURSOR_W;
+  int y1 = cy + MOUSE_CURSOR_H;
+  if(x0 < 0)
+    x0 = 0;
+  if(y0 < 0)
+    y0 = 0;
+  if(x1 >= (int)fb_ctx.width)
+    x1 = (int)fb_ctx.width - 1;
+  if(y1 >= (int)fb_ctx.height)
+    y1 = (int)fb_ctx.height - 1;
+  fill_cursor_footprint_bg(x0, y0, x1, y1);
+  reblit_cells_under_footprint(x0, y0, x1, y1);
 }
 
 /**
