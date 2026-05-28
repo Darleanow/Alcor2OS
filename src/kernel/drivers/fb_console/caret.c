@@ -13,12 +13,17 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/* Position of the cell currently displaying the inverted-block cursor.
- * @c -1 means "no cursor on screen right now"; @ref caret_erase treats it
- * as a no-op. Tracked so a moved cursor can wipe its old block by re-blitting
- * exactly one cell instead of repainting the row. */
+/**
+ * @brief Cell currently displaying the inverted-block cursor.
+ *
+ * @c -1 means "no cursor on screen right now" — @ref caret_erase short-circuits
+ * on that sentinel. Tracked separately from the logical cursor (@c fb_ctx.cx /
+ * @c fb_ctx.cy) so a single moved-cursor frame only re-blits the previous and
+ * new cells instead of redrawing the row.
+ */
 static int s_drawn_x = -1;
-static int s_drawn_y = -1;
+static int s_drawn_y =
+    -1; /**< @brief Companion of @ref s_drawn_x; see there. */
 
 /**
  * @brief Re-blit the cell currently showing the inverted caret block,
