@@ -17,18 +17,57 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/* Rows that need to be scrolled out at the next flush. Updated by scroll_one
- * during a write; consumed by flush_pending_scroll at end-of-write. */
+/**
+ * @brief Rows whose pixels still need to be scrolled out at the next flush.
+ *
+ * Updated by @ref scroll_one during a write and consumed by
+ * @ref flush_pending_scroll at end-of-write. Deferring collapses a write that
+ * emits N newlines into a single VRAM blit instead of N — the biggest win for
+ * @c ls -style bursts where MMIO bandwidth dominates.
+ */
 static int s_pending_scroll = 0;
 
-/* Scrollback ring. Sized SCROLLBACK_ROWS * cols cells; s_sb_cols is captured
- * at allocation so the reflow path can detect a stale buffer and drop it
- * instead of writing into mis-shaped storage. */
-static fb_cell_t *s_sb_buf  = NULL;
-static int        s_sb_cols = 0;
-static int        s_sb_head = 0;
-static int        s_sb_used = 0;
-static int        s_sb_view = 0;
+/**
+ * @brief Scrollback ring storage: @c SCROLLBACK_ROWS rows of @ref s_sb_cols
+ * cells each, kmalloc'd on first need.
+ *
+ * NULL until the first @ref scrollback_alloc_for; reflowing to a different
+ * column count discards the buffer entirely because cell coordinates have no
+ * defined meaning across a column reshape.
+ */
+static fb_cell_t *s_sb_buf = NULL;
+
+/**
+ * @brief Column count captured when @ref s_sb_buf was allocated.
+ *
+ * Tracked separately so the write paths can detect a stale buffer (after a
+ * reflow without a re-alloc) and skip the push instead of striding into
+ * mis-shaped storage.
+ */
+static int s_sb_cols = 0;
+
+/**
+ * @brief Ring head index in rows — slot of the oldest stored row.
+ *
+ * Wraps via modulo @c SCROLLBACK_ROWS; combined with @ref s_sb_used to derive
+ * the write slot when the ring is not yet full.
+ */
+static int s_sb_head = 0;
+
+/**
+ * @brief Rows currently stored in the ring. Saturates at @c SCROLLBACK_ROWS;
+ * past that the ring overwrites the oldest row and @ref s_sb_head advances.
+ */
+static int s_sb_used = 0;
+
+/**
+ * @brief User-visible scrollback offset in rows from the live grid bottom.
+ *
+ * Zero means "show the live grid". Positive values shift the visible window
+ * up into history; @ref scrollback_repaint clamps to @ref s_sb_used so PgUp
+ * past the start of history is a no-op.
+ */
+static int s_sb_view = 0;
 
 /**
  * @brief Drop the top row off the grid, shift the rest up, blank the bottom,
