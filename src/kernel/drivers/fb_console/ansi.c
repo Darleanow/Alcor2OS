@@ -857,68 +857,111 @@ static void feed_utf8(u8 b)
   }
 }
 
+/** @brief ASCII ESC byte, 0x1B — opens the ANSI ESC/CSI state machine. */
+#define ASCII_ESC 0x1Bu
+
+/**
+ * @brief Handle one byte while the parser is in the @c ESC-was-just-seen state.
+ *
+ * Recognises the next byte's role (CSI introducer, DEC save/restore, charset
+ * designator) and transitions or commits accordingly. Unrecognised bytes drop
+ * back to normal so a stray escape (DECKPAM @c =, DECKPNM @c >, etc.) does not
+ * poison subsequent output.
+ *
+ * @param b  Byte following ESC.
+ */
+static void feed_byte_esc(u8 b)
+{
+  if(b == '[') {
+    fb_ctx.esc_state = 2;
+    fb_ctx.esc_len   = 0;
+    return;
+  }
+  if(b == '7') {
+    fb_ctx.saved_cx  = fb_ctx.cx;
+    fb_ctx.saved_cy  = fb_ctx.cy;
+    fb_ctx.esc_state = 0;
+    return;
+  }
+  if(b == '8') {
+    fb_ctx.cx        = fb_ctx.saved_cx;
+    fb_ctx.cy        = fb_ctx.saved_cy;
+    fb_ctx.esc_state = 0;
+    return;
+  }
+  if(b == '(' || b == ')') {
+    fb_ctx.esc_state = 3;
+    return;
+  }
+  fb_ctx.esc_state = 0;
+}
+
+/**
+ * @brief Handle one byte while the parser is accumulating a CSI sequence.
+ *
+ * Parameter bytes (digits, @c ;, @c ?) append to @c esc_buf; anything else is
+ * the final byte, which gets appended too and triggers @ref handle_csi. The
+ * @c esc_buf overflow guard silently truncates — overlong sequences would
+ * have to be hostile, not real terminal output.
+ *
+ * @param b  Byte received inside the CSI sequence.
+ */
+static void feed_byte_csi(u8 b)
+{
+  bool is_param = ((b >= '0' && b <= '9') || b == ';' || b == '?');
+  if(fb_ctx.esc_len < (u8)(sizeof fb_ctx.esc_buf - 1))
+    fb_ctx.esc_buf[fb_ctx.esc_len++] = (char)b;
+  if(is_param)
+    return;
+  handle_csi();
+  fb_ctx.esc_state = 0;
+}
+
+/**
+ * @brief Handle one byte while the parser is waiting for a G0 charset
+ *        designator after @c ESC@c (/@c ).
+ *
+ * Only @c 0 (DEC Special Graphics) and the @c B/A/U/1/2 family (US ASCII /
+ * UK / line-drawing reset) are recognised; any other byte still exits the
+ * state to avoid wedging the parser on an unknown designator.
+ *
+ * @param b  Designator byte.
+ */
+static void feed_byte_charset(u8 b)
+{
+  if(b == '0')
+    fb_ctx.g0_acs = 1;
+  else if(b == 'B' || b == 'A' || b == 'U' || b == '1' || b == '2')
+    fb_ctx.g0_acs = 0;
+  fb_ctx.esc_state = 0;
+}
+
 /**
  * @brief Top-level byte sink: drive the ESC/CSI state machine, fall through
  * to UTF-8 on plain bytes.
  *
- * Four-state machine: 0 = normal, 1 = saw @c ESC waiting for next, 2 =
- * inside CSI accumulating parameters, 3 = inside @c ESC@c (/@c ) charset
- * designator. Unknown @c ESC@c <byte> sequences are dropped to state 0 so
- * a stray escape doesn't poison subsequent output.
+ * Four-state machine — 0 normal, 1 saw @c ESC, 2 inside CSI, 3 inside
+ * charset designator — implemented as a switch + per-state helper so each
+ * branch fits in one screen.
  *
  * @param b  Input byte.
  */
 void feed_byte(u8 b)
 {
   switch(fb_ctx.esc_state) {
-  case 1: /* after ESC */
-    if(b == '[') {
-      fb_ctx.esc_state = 2;
-      fb_ctx.esc_len   = 0;
-      return;
-    }
-    if(b == '7') { /* DECSC */
-      fb_ctx.saved_cx  = fb_ctx.cx;
-      fb_ctx.saved_cy  = fb_ctx.cy;
-      fb_ctx.esc_state = 0;
-      return;
-    }
-    if(b == '8') { /* DECRC */
-      fb_ctx.cx        = fb_ctx.saved_cx;
-      fb_ctx.cy        = fb_ctx.saved_cy;
-      fb_ctx.esc_state = 0;
-      return;
-    }
-    if(b == '(' || b == ')') {
-      fb_ctx.esc_state = 3; /* wait for designator byte */
-      return;
-    }
-    /* Unrecognised ESC <byte> — swallow (DECKPAM/DECKPNM = / >, etc.). */
-    fb_ctx.esc_state = 0;
+  case 1:
+    feed_byte_esc(b);
     return;
-  case 2: /* inside CSI */
-    if((b >= '0' && b <= '9') || b == ';' || b == '?') {
-      if(fb_ctx.esc_len < (u8)(sizeof fb_ctx.esc_buf - 1))
-        fb_ctx.esc_buf[fb_ctx.esc_len++] = (char)b;
-      return;
-    }
-    if(fb_ctx.esc_len < (u8)(sizeof fb_ctx.esc_buf - 1))
-      fb_ctx.esc_buf[fb_ctx.esc_len++] = (char)b;
-    handle_csi();
-    fb_ctx.esc_state = 0;
+  case 2:
+    feed_byte_csi(b);
     return;
-  case 3: /* charset designator */
-    if(b == '0')
-      fb_ctx.g0_acs = 1;
-    else if(b == 'B' || b == 'A' || b == 'U' || b == '1' || b == '2')
-      fb_ctx.g0_acs = 0;
-    fb_ctx.esc_state = 0;
+  case 3:
+    feed_byte_charset(b);
     return;
   default:
     break;
   }
-
-  if(b == 0x1bu) {
+  if(b == ASCII_ESC) {
     fb_ctx.esc_state = 1;
     fb_ctx.utf8_rem  = 0;
     return;
