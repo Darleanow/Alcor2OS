@@ -12,6 +12,18 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
+/**
+ * @brief Resolve a Unicode codepoint to its slot in the userspace atlas.
+ *
+ * Goes through @c atlas_fallback when the codepoint is out of range or maps
+ * to no glyph, so renderers can always assume "something will be drawn" and
+ * never have to special-case a missing glyph in the hot path. The @c idx
+ * sanity check (@c < @c atlas_n_glyphs) guards against a corrupt cp_map
+ * leaking through the @ref atlas_meta_is_sane gate.
+ *
+ * @param cp  Unicode codepoint.
+ * @return Atlas glyph slot, or @ref ATLAS_NO_GLYPH when no atlas is active.
+ */
 u32 atlas_lookup(u32 cp)
 {
   if(!fb_ctx.atlas_active)
@@ -24,6 +36,20 @@ u32 atlas_lookup(u32 cp)
   return fb_ctx.atlas_fallback;
 }
 
+/**
+ * @brief Resolve to the bold or italic sub-atlas slot when SGR asks for one.
+ *
+ * Centralises the offset-add arithmetic so each blit path doesn't reinvent it
+ * (or forget the bounds check). Bold wins over italic when both bits are set:
+ * the bold variants are typically more readable, and the parser already
+ * accepts that combination silently rather than erroring out.
+ *
+ * @param cp    Unicode codepoint.
+ * @param attr  Cell SGR bits; only @ref FB_ATTR_BOLD and @ref FB_ATTR_ITALIC
+ *              are consulted.
+ * @return Styled slot when available, plain slot when not, @ref ATLAS_NO_GLYPH
+ *         on miss.
+ */
 u32 atlas_lookup_attr(u32 cp, u16 attr)
 {
   u32 idx = atlas_lookup(cp);
@@ -41,10 +67,22 @@ u32 atlas_lookup_attr(u32 cp, u16 attr)
   return idx;
 }
 
+/**
+ * @brief Reject a userspace atlas descriptor whose fields would misbehave
+ * inside the renderer.
+ *
+ * The @c kmalloc and per-codepoint walks in @ref fb_console_set_atlas trust
+ * every field of @p meta verbatim once this returns @c true, so this is the
+ * one and only place where an attacker-controlled value gets bounded. Caps
+ * are generous (no real font needs anything near them) — the goal is to
+ * stop a runaway allocation, not enforce font policy.
+ *
+ * @param meta  Descriptor copied from userspace.
+ * @return @c true if every field fits the @c ATLAS_*_MAX caps and stride is
+ *         within @c cell_w * max-bytes-per-pixel.
+ */
 bool atlas_meta_is_sane(const fb_console_atlas_t *meta)
 {
-  /* Caps are generous — they bound damage from a buggy shim, not enforce
-   * policy. */
   if(meta->cell_w == 0u || meta->cell_h == 0u ||
      meta->cell_w > ATLAS_CELL_DIM_MAX || meta->cell_h > ATLAS_CELL_DIM_MAX)
     return false;
@@ -54,8 +92,6 @@ bool atlas_meta_is_sane(const fb_console_atlas_t *meta)
     return false;
   if(meta->pixels_size == 0u || meta->pixels_size > ATLAS_PIXELS_BYTES_MAX)
     return false;
-  /* Stride: one row of pixels must fit inside cell_w * max-bytes-per-pixel.
-   * Cap bypp at 4 (the widest fb format we render); 1-byte alpha is typical. */
   if(meta->stride_bytes == 0u ||
      meta->stride_bytes > ATLAS_MAX_BYTES_PER_PIXEL * meta->cell_w)
     return false;

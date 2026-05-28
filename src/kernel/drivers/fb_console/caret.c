@@ -20,7 +20,12 @@
 static int s_drawn_x = -1;
 static int s_drawn_y = -1;
 
-void       caret_erase(void)
+/**
+ * @brief Re-blit the cell currently showing the inverted caret block,
+ * restoring the glyph beneath. Idempotent: the @c -1 sentinel makes it a
+ * no-op when nothing is painted, so callers do not need to guard themselves.
+ */
+void caret_erase(void)
 {
   if(s_drawn_x < 0 || s_drawn_y < 0)
     return;
@@ -30,6 +35,15 @@ void       caret_erase(void)
   s_drawn_y = -1;
 }
 
+/**
+ * @brief Paint the caret at @c fb_ctx.cx/cy by drawing the cell with fg/bg
+ * swapped.
+ *
+ * Saves/restores the cell's attributes around the inverted blit so the cell
+ * grid keeps the "real" glyph state — that way the next blit of the same
+ * cell from any path (scroll, atlas reload, scrollback exit) does the right
+ * thing without a separate "is this the caret" branch.
+ */
 void caret_paint(void)
 {
   if(fb_ctx.yielded || !fb_ctx.cells)
@@ -62,18 +76,43 @@ void caret_paint(void)
   s_drawn_y = y;
 }
 
+/**
+ * @brief @ref caret_erase followed by @ref caret_paint.
+ *
+ * Cheap when the cursor has not moved (erase is idempotent on the same cell
+ * and paint just re-applies the inversion). Used by the PIT tick path to
+ * make the caret blink — flipping @c fb_ctx.blink_on plus a refresh is the
+ * whole animation.
+ */
 void caret_refresh(void)
 {
   caret_erase();
   caret_paint();
 }
 
+/**
+ * @brief Forget the tracker without repainting.
+ *
+ * For paths that overwrite the cell themselves (scroll, atlas reflow, fb
+ * yield/reclaim): they need the caret machinery to drop its memory of the
+ * old position so the next @ref caret_paint records a fresh one rather than
+ * trying to erase a cell that no longer holds the inverted glyph.
+ */
 void caret_clear_drawn(void)
 {
   s_drawn_x = -1;
   s_drawn_y = -1;
 }
 
+/**
+ * @brief Mark the caret's cell dirty for the next @ref flush_batch and
+ * forget the tracker.
+ *
+ * Used by @ref fb_console_write_begin so the batched repaint also wipes the
+ * inverted block. Without this, the post-batch flush would leave the old
+ * caret visible until the next blink tick — visible flicker during fast
+ * output.
+ */
 void caret_invalidate_in_batch(void)
 {
   if(s_drawn_x < 0 || s_drawn_y < 0)
