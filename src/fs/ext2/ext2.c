@@ -22,84 +22,18 @@
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
+#include <fs/ext2/internal.h>
 
-/** @brief Maximum mounted ext2 volumes. */
-#define EXT2_MAX_VOLUMES 4
+/** @brief Mounted-volume pool — defined here pending the super.c split. */
+ext2_volume_t     g_volumes[EXT2_MAX_VOLUMES];
+const blockdev_t *g_default_dev;
 
-/** @brief Maximum concurrent open files. */
-#define EXT2_MAX_FILES 256
-
-/** @brief Block buffer cache size (pool for single-block I/O). */
-#define EXT2_BLOCK_CACHE_SIZE 8
-
-/** @brief Maximum supported block size (for cache). */
-#define EXT2_MAX_BLOCK_SIZE 4096
-
-/** @brief Max contiguous blocks coalesced in a single read (16 x 4 KB). */
-#define EXT2_READ_RUN_MAX 16
-
-/** @brief Pool of mounted volumes. */
-static ext2_volume_t     g_volumes[EXT2_MAX_VOLUMES];
-static const blockdev_t *g_default_dev;
-
-/** @brief Pool of open file handles. */
-static ext2_file_t g_files[EXT2_MAX_FILES];
+/** @brief Open-file pool — defined here pending the file.c split. */
+ext2_file_t g_files[EXT2_MAX_FILES];
 
 /** Forward declaration; full initializer is near file end (needs static ops).
  */
 static const fs_type_t g_ext2_fstype;
-
-/**
- * @brief Pre-allocated single-block scratch buffer (not a block-content cache).
- *
- * Pool avoids kmalloc churn for one-off metadata reads; backing store is ATA +
- * the driver-level sector cache only.
- */
-typedef struct
-{
-  u8   data[EXT2_MAX_BLOCK_SIZE];
-  bool in_use;
-} block_pool_entry_t;
-
-static block_pool_entry_t g_block_pool[EXT2_BLOCK_CACHE_SIZE];
-
-/**
- * @brief Acquire a single-block scratch buffer from the pool.
- * @param size Required buffer size (must be <= EXT2_MAX_BLOCK_SIZE).
- * @return Pointer to buffer, or NULL if pool exhausted (falls back to kmalloc).
- */
-static u8 *cache_get_block(u32 size)
-{
-  if(size > EXT2_MAX_BLOCK_SIZE)
-    return kmalloc(size);
-
-  for(int i = 0; i < EXT2_BLOCK_CACHE_SIZE; i++) {
-    if(!g_block_pool[i].in_use) {
-      g_block_pool[i].in_use = true;
-      return g_block_pool[i].data;
-    }
-  }
-
-  /* Pool exhausted, fall back to kmalloc */
-  return kmalloc(size);
-}
-
-/**
- * @brief Release a buffer acquired via @ref cache_get_block.
- * @param buf Buffer to release.
- */
-static void cache_put_block(u8 *buf)
-{
-  for(int i = 0; i < EXT2_BLOCK_CACHE_SIZE; i++) {
-    if(buf == g_block_pool[i].data) {
-      g_block_pool[i].in_use = false;
-      return;
-    }
-  }
-
-  /* Not from pool, was dynamically allocated */
-  kfree(buf);
-}
 
 /**
  * @brief Read sectors from volume.

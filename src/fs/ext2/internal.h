@@ -1,0 +1,79 @@
+/**
+ * @file src/fs/ext2/internal.h
+ * @brief Shared state, sizing macros, and private helpers for the ext2
+ *        module split.
+ *
+ * Not part of any public/UAPI surface — purely the contract between the
+ * source files under @c src/fs/ext2/. Public consumers go through
+ * @c <alcor2/fs/ext2.h> instead. Splitting the original 2.7 KLOC monolith
+ * required a single source of truth for the shared volume / file pools and
+ * the cross-file helpers; this header is that source.
+ */
+
+#ifndef ALCOR2_FS_EXT2_INTERNAL_H
+#define ALCOR2_FS_EXT2_INTERNAL_H
+
+#include <alcor2/fs/blockdev.h>
+#include <alcor2/fs/ext2.h>
+#include <alcor2/fs/vfs.h>
+#include <alcor2/types.h>
+
+/** @brief Maximum mounted ext2 volumes. Picked at 4 because each volume holds
+ * a copy of the superblock + group descriptor table; 4 keeps the static state
+ * around 16 KiB while still allowing root + a few mountpoints. */
+#define EXT2_MAX_VOLUMES 4
+
+/** @brief Maximum concurrent open files. 256 covers a typical shell session
+ * plus background daemons without ever evicting a handle. */
+#define EXT2_MAX_FILES 256
+
+/** @brief Size of the block scratch buffer pool. 8 is enough to overlap the
+ * deepest indirect-block walk (triple-indirect = 3 nested reads) without
+ * touching @c kmalloc, plus a handful for concurrent metadata I/O. */
+#define EXT2_BLOCK_CACHE_SIZE 8
+
+/** @brief Largest block size the scratch pool supports. ext2 allows up to
+ * 64 KiB blocks; we cap at 4 KiB because anything larger requires reworking
+ * the static pool sizing and no shipped image uses one. */
+#define EXT2_MAX_BLOCK_SIZE 4096
+
+/** @brief Max contiguous blocks coalesced in a single @ref ext2_read pass
+ * (16 × 4 KiB = 64 KiB). Picks the sweet spot between ATA DMA throughput
+ * and the kernel stack scratch needed for the run buffer. */
+#define EXT2_READ_RUN_MAX 16
+
+/** @brief Mounted-volume pool. Defined in @c super.c. */
+extern ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
+
+/** @brief Default block device — first to register, used by mount("ext2")
+ * when no @c source path is supplied. Defined in @c super.c. */
+extern const blockdev_t *g_default_dev;
+
+/** @brief Open-file pool — every @ref ext2_file_t handed back to userspace
+ * lives here. Defined in @c file.c. */
+extern ext2_file_t g_files[EXT2_MAX_FILES];
+
+/**
+ * @brief Acquire a single-block scratch buffer from the static pool.
+ *
+ * Pool entries are @ref EXT2_MAX_BLOCK_SIZE bytes each so any block size we
+ * support fits without reallocation. Falls back to @c kmalloc when the pool
+ * is exhausted or @p size exceeds the pool entry size — the caller's
+ * @ref cache_put_block knows which side to free.
+ *
+ * @param size  Required buffer size in bytes.
+ * @return Pointer to a usable buffer (pool or heap), or @c NULL on OOM.
+ */
+u8 *cache_get_block(u32 size);
+
+/**
+ * @brief Release a buffer previously returned by @ref cache_get_block.
+ *
+ * Detects pool vs heap origin by pointer identity against the pool entries,
+ * so callers don't need to track which path they came from.
+ *
+ * @param buf  Buffer to release.
+ */
+void cache_put_block(u8 *buf);
+
+#endif /* ALCOR2_FS_EXT2_INTERNAL_H */
