@@ -1,8 +1,19 @@
+/**
+ * @file main.c
+ * @brief Shell entry point: bring up ncurses input, atlas, termios snapshot,
+ *        source @c /home/.vconf, then run the REPL forever (read a complete
+ *        vega statement, hand it to @ref vega_run, restart).
+ *
+ * The actual line editor lives in @c platform/edit.c, history in
+ * @c platform/history.c, prompt rendering in @c platform/prompt.c, the
+ * brace/quote/heredoc-aware statement reader in @c platform/parse.c, and the
+ * config-file sourcing in @c platform/vconf.c. This file just sequences them.
+ */
+
+#include <boxdraw.h>
 #include <curses.h>
-#include <fcntl.h>
 #include <shell/atlas.h>
 #include <shell/shell.h>
-#include <spazer/spazer.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -23,651 +34,16 @@ static const vega_host_ops_t shell_host = {
   #define VEGA_VERSION "1.0.0"
 #endif
 
-#define HIST_MAX     128
 #define LINE_MAX_LEN MAX_CMD_LEN
-
-#define RL_EOF       (-1)
-#define RL_INTERRUPT (-2)
-#define RL_CLEAR     (-3)
-
-/* History ring. Oldest entry is at index 0; newest at hist_count-1. UP/DOWN
- * navigate a transient cursor (hist_view) into this list while editing. */
-static char history[HIST_MAX][LINE_MAX_LEN];
-static int  hist_count = 0;
-
-static void hist_push(const char *line)
-{
-  if(!line || !line[0])
-    return;
-  /* Skip if identical to the most recent entry. */
-  if(hist_count > 0 && strcmp(history[hist_count - 1], line) == 0)
-    return;
-  if(hist_count == HIST_MAX) {
-    (void)memmove(history[0], history[1], sizeof(history[0]) * (HIST_MAX - 1));
-    hist_count--;
-  }
-  strncpy(history[hist_count], line, LINE_MAX_LEN - 1);
-  history[hist_count][LINE_MAX_LEN - 1] = '\0';
-  hist_count++;
-}
-
-static void write_str(const char *s)
-{
-  size_t n = strlen(s);
-  while(n > 0) {
-    ssize_t w = write(STDOUT_FILENO, s, n);
-    if(w <= 0)
-      return;
-    s += w;
-    n -= (size_t)w;
-  }
-}
-
-static void redraw_line(
-    const char *prompt, int prompt_cols, const char *buf, int cur_cols
-)
-{
-  char tail[16];
-  /* \r → col 0; \033[K → clear to end of line. */
-  write_str("\r\033[K");
-  write_str(prompt);
-  write_str(buf);
-  /* CHA — Cursor Horizontal Absolute (1-based). */
-  (void)snprintf(tail, sizeof tail, "\r\033[%dC", prompt_cols + cur_cols);
-  if(cur_cols + prompt_cols > 0)
-    write_str(tail);
-  else
-    write_str("\r");
-}
-
-static int utf8_cols(const char *s)
-{
-  int n = 0;
-  for(; *s; s++)
-    if(((unsigned char)*s & 0xC0u) != 0x80u)
-      n++;
-  return n;
-}
-
-/* Counts visible columns in a string, skipping ANSI ESC[...m sequences. */
-static int visible_cols(const char *s)
-{
-  int n = 0;
-  while(*s) {
-    if((unsigned char)*s == 0x1b) {
-      s++;
-      if(*s == '[') {
-        s++;
-        while(*s && !(*s >= '@' && *s <= '~'))
-          s++;
-        if(*s)
-          s++;
-      } else if(*s) {
-        s++;
-      }
-    } else if(((unsigned char)*s & 0xC0u) != 0x80u) {
-      n++;
-      s++;
-    } else {
-      s++;
-    }
-  }
-  return n;
-}
-
-static int prev_char_boundary(const char *buf, int idx)
-{
-  if(idx <= 0)
-    return 0;
-  idx--;
-  while(idx > 0 && ((unsigned char)buf[idx] & 0xC0u) == 0x80u)
-    idx--;
-  return idx;
-}
-
-static int next_char_boundary(const char *buf, int len, int idx)
-{
-  if(idx >= len)
-    return len;
-  idx++;
-  while(idx < len && ((unsigned char)buf[idx] & 0xC0u) == 0x80u)
-    idx++;
-  return idx;
-}
-
-/* Off-screen pad used purely as a getch() source. Reading from a pad (rather
- * than stdscr) avoids ncurses' implicit wrefresh on the visible screen — we
- * don't want it overwriting our prompts and child stdout with blanks. */
-static WINDOW *s_input_pad;
 
 /* Termios states swapped around child execs. `raw_t` is what ncurses set up
  * (non-canonical, no echo, no signals); `cooked_t` is the same with ICANON +
  * ECHO + ISIG re-enabled so unredirected children like `cat` see line-buffered
- * input and Ctrl-D triggers EOF. Set in main() right after ncurses init. */
+ * input and Ctrl-D triggers EOF. */
 static struct termios s_raw_t;
 static struct termios s_cooked_t;
 
-/**
- * @brief Return the display name for a completion entry (strip dir prefix).
- *
- * @param entry  Full entry string (may contain path separators).
- * @return Pointer into @p entry past the last directory component. For
- *         entries ending in @c / (directories), returns @c "name/".
- */
-static const char *display_basename(const char *entry)
-{
-  const char *sl = strrchr(entry, '/');
-  if(sl && sl[1] != '\0')
-    return sl + 1;
-  if(sl && sl[1] == '\0' && sl != entry) {
-    const char *prev = sl - 1;
-    while(prev > entry && prev[-1] != '/')
-      prev--;
-    return prev;
-  }
-  return entry;
-}
-
-/**
- * @brief Print completion candidates in coloured columns (double-tab).
- *
- * Layout matches @c ls: column-major order, column width derived from the
- * longest entry, column count from the terminal width.
- *
- * @param comp         Completion result set.
- * @param prompt       Current prompt (reprinted after the listing).
- * @param buf          Current line buffer (reprinted after the listing).
- * @param cur_b        Cursor byte-index within @p buf (for repositioning).
- * @param prompt_cols  Visible column width of @p prompt.
- */
-static void list_candidates(
-    const comp_result_t *comp, const char *prompt, const char *buf, int cur_b,
-    int prompt_cols
-)
-{
-  const char *names[COMP_MAX];
-  int         name_lens[COMP_MAX];
-  int         dir_flags[COMP_MAX];
-  int         max_w = 0;
-
-  for(int i = 0; i < comp->count; i++) {
-    names[i]     = display_basename(comp->entries[i]);
-    name_lens[i] = (int)strlen(names[i]);
-    dir_flags[i] = (name_lens[i] > 0 && names[i][name_lens[i] - 1] == '/');
-    if(name_lens[i] > max_w)
-      max_w = name_lens[i];
-  }
-
-  int col_w      = max_w + 2;
-  int cols_avail = COLS > 0 ? COLS : 80;
-  int n_cols     = col_w >= cols_avail ? 1 : cols_avail / col_w;
-  if(n_cols < 1)
-    n_cols = 1;
-  int n_rows = (comp->count + n_cols - 1) / n_cols;
-
-  write_str("\n");
-  for(int row = 0; row < n_rows; row++) {
-    for(int col = 0; col < n_cols; col++) {
-      int idx = col * n_rows + row;
-      if(idx >= comp->count)
-        continue;
-      int last =
-          (col == n_cols - 1) || ((col + 1) * n_rows + row >= comp->count);
-      write_str(dir_flags[idx] ? THEME_ANSI_PRIMARY_B : THEME_ANSI_SUCCESS_B);
-      write_str(names[idx]);
-      write_str(THEME_ANSI_RESET);
-      if(!last) {
-        int padding = col_w - name_lens[idx];
-        for(int p = 0; p < padding; p++)
-          write_str(" ");
-      }
-    }
-    write_str("\n");
-  }
-
-  write_str(prompt);
-  write_str(buf);
-  int  cur_cols = utf8_cols(buf) - utf8_cols(buf + cur_b);
-  char seq[32];
-  (void)snprintf(seq, sizeof(seq), "\r\033[%dC", prompt_cols + cur_cols);
-  if(prompt_cols + cur_cols > 0)
-    write_str(seq);
-  else
-    write_str("\r");
-}
-
-/**
- * @brief Handle a Tab keypress: complete or list candidates.
- *
- * On single Tab, inserts the longest common prefix of matching candidates
- * (with a trailing space when there is exactly one match). On double Tab
- * (last_was_tab already set), prints all candidates in coloured columns.
- *
- * @param buf           Line buffer (modified in place on completion).
- * @param len           Pointer to byte length of @p buf content.
- * @param cur_b         Pointer to cursor byte-index within @p buf.
- * @param cap           Total capacity of @p buf.
- * @param last_was_tab  Pointer to the double-tab flag; updated on return.
- * @param prompt        Current prompt string (for redrawing after listing).
- * @param prompt_cols   Visible column width of @p prompt.
- */
-static void handle_tab(
-    char *buf, int *len, int *cur_b, size_t cap, int *last_was_tab,
-    const char *prompt, int prompt_cols
-)
-{
-  int word_start = *cur_b;
-  while(word_start > 0 && buf[word_start - 1] != ' ')
-    word_start--;
-  char prefix[MAX_CMD_LEN];
-  int  wlen = *cur_b - word_start;
-  if(wlen > 0)
-    memcpy(prefix, buf + word_start, wlen);
-  prefix[wlen] = '\0';
-
-  bool is_cmd = true;
-  for(int i = 0; i < word_start; i++) {
-    if(buf[i] != ' ') {
-      is_cmd = false;
-      break;
-    }
-  }
-
-  comp_result_t comp;
-  sh_complete(prefix, is_cmd, &comp);
-
-  if(comp.count == 0) {
-    *last_was_tab = 0;
-    return;
-  }
-
-  if(*last_was_tab && comp.count > 1) {
-    list_candidates(&comp, prompt, buf, *cur_b, prompt_cols);
-    *last_was_tab = 0;
-    return;
-  }
-
-  int clen = (int)strlen(comp.common);
-  if(clen > wlen) {
-    const char *suffix     = comp.common + wlen;
-    int         suffix_len = clen - wlen;
-    int need_space = (comp.count == 1 && comp.common[clen - 1] != '/') ? 1 : 0;
-    if(*len + suffix_len + need_space < (int)cap - 1) {
-      (void)memmove(
-          buf + *cur_b + suffix_len + need_space, buf + *cur_b,
-          (size_t)*len - (size_t)*cur_b + 1
-      );
-      memcpy(buf + *cur_b, suffix, suffix_len);
-      if(need_space)
-        buf[*cur_b + suffix_len] = ' ';
-      *len += suffix_len + need_space;
-      *cur_b += suffix_len + need_space;
-      buf[*len] = '\0';
-      redraw_line(
-          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + *cur_b)
-      );
-    }
-  }
-  *last_was_tab = (comp.count > 1) ? 1 : 0;
-}
-
-/* Read a single line. @p buf is filled with bytes (no trailing newline) and
- * null-terminated; the byte count is returned. RL_EOF on Ctrl-D at empty
- * line, RL_INTERRUPT on Ctrl-C, RL_CLEAR on Ctrl-L (caller redraws). */
-static int read_line(char *buf, size_t cap, const char *prompt)
-{
-  int prompt_cols  = visible_cols(prompt);
-  int len          = 0; /* bytes in buf */
-  int cur_b        = 0; /* byte index of cursor */
-  int hist_view    = hist_count;
-  int last_was_tab = 0;
-  buf[0]           = '\0';
-
-  write_str(prompt);
-
-  for(;;) {
-    int c = wgetch(s_input_pad);
-    if(c == ERR)
-      continue;
-    if(c != '\t')
-      last_was_tab = 0;
-
-    switch(c) {
-    case '\n':
-    case '\r':
-    case KEY_ENTER:
-      write_str("\n");
-      buf[len] = '\0';
-      return len;
-
-    case 0x7f:
-    case '\b':
-    case KEY_BACKSPACE: {
-      if(cur_b == 0)
-        break;
-      int prev = prev_char_boundary(buf, cur_b);
-      (void)memmove(buf + prev, buf + cur_b, (size_t)len - (size_t)cur_b + 1);
-      len -= (cur_b - prev);
-      cur_b = prev;
-      redraw_line(
-          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
-      );
-      break;
-    }
-
-    case KEY_DC: {
-      if(cur_b >= len)
-        break;
-      int nx = next_char_boundary(buf, len, cur_b);
-      (void)memmove(buf + cur_b, buf + nx, (size_t)len - (size_t)nx + 1);
-      len -= (nx - cur_b);
-      redraw_line(
-          prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
-      );
-      break;
-    }
-
-    case KEY_LEFT:
-      if(cur_b > 0) {
-        cur_b = prev_char_boundary(buf, cur_b);
-        redraw_line(
-            prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
-        );
-      }
-      break;
-
-    case KEY_RIGHT:
-      if(cur_b < len) {
-        cur_b = next_char_boundary(buf, len, cur_b);
-        redraw_line(
-            prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
-        );
-      }
-      break;
-
-    case KEY_HOME:
-      cur_b = 0;
-      redraw_line(prompt, prompt_cols, buf, 0);
-      break;
-
-    case KEY_END:
-      cur_b = len;
-      redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
-      break;
-
-    case KEY_UP:
-      if(hist_view > 0) {
-        hist_view--;
-        strncpy(buf, history[hist_view], cap - 1);
-        buf[cap - 1] = '\0';
-        len          = (int)strlen(buf);
-        cur_b        = len;
-        redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
-      }
-      break;
-
-    case KEY_DOWN:
-      if(hist_view < hist_count) {
-        hist_view++;
-        if(hist_view == hist_count) {
-          buf[0] = '\0';
-          len    = 0;
-          cur_b  = 0;
-        } else {
-          strncpy(buf, history[hist_view], cap - 1);
-          buf[cap - 1] = '\0';
-          len          = (int)strlen(buf);
-          cur_b        = len;
-        }
-        redraw_line(prompt, prompt_cols, buf, utf8_cols(buf));
-      }
-      break;
-
-    case '\t':
-      handle_tab(buf, &len, &cur_b, cap, &last_was_tab, prompt, prompt_cols);
-      break;
-
-    case 0x03: /* Ctrl-C */
-      write_str("^C\n");
-      buf[0] = '\0';
-      return RL_INTERRUPT;
-
-    case 0x04: /* Ctrl-D */
-      if(len == 0)
-        return RL_EOF;
-      break;
-
-    case 0x0C: /* Ctrl-L */
-      return RL_CLEAR;
-
-    default:
-      /* Insert byte at cur_b. ASCII printables (0x20..0x7E) and UTF-8 bytes
-       * (0x80..0xFF) are kept; everything else is ignored. KEY_* values are
-       * all >= KEY_MIN (0x101), which falls outside our printable range. */
-      if(c < 0x100 && (c == ' ' || (c >= 0x21 && c <= 0x7e) || c >= 0x80)) {
-        if(len + 1 >= (int)cap - 1)
-          break;
-        (void)memmove(
-            buf + cur_b + 1, buf + cur_b, (size_t)len - (size_t)cur_b + 1
-        );
-        buf[cur_b++] = (char)c;
-        len++;
-        redraw_line(
-            prompt, prompt_cols, buf, utf8_cols(buf) - utf8_cols(buf + cur_b)
-        );
-      }
-      break;
-    }
-  }
-}
-
-/* Prompt colours — semantic theme roles. */
-#define PC_LINE THEME_ANSI_DIM
-#define PC_HOST THEME_ANSI_ACCENT_B
-#define PC_PATH THEME_ANSI_SUBTEXT
-#define PC_DOLS THEME_ANSI_SUCCESS_B
-#define PC_RS   THEME_ANSI_RESET
-
-/* Box-drawing; rounded corners are arc-rasterised in atlas.c. */
-#define PC_TL BD_TL_R /* ╭ */
-#define PC_BL BD_BL_R /* ╰ */
-#define PC_H  BD_H    /* ─ */
-
-static void write_prompt_header(void)
-{
-  char        cwd[MAX_PATH];
-  const char *path = sh_getcwd(cwd, sizeof cwd) ? cwd : "/";
-  write_str(PC_LINE PC_TL PC_H " " PC_RS); /* ╭─ space */
-  write_str(PC_HOST "alcor2" PC_RS);
-  write_str(PC_LINE " " PC_H " " PC_RS); /* space ─ space */
-  write_str(PC_PATH);
-  write_str(path);
-  write_str(PC_RS "\n");
-}
-
-static void format_prompt(char *out, size_t cap)
-{
-  (void)snprintf(
-      out, cap,
-      PC_LINE PC_BL PC_H " " PC_RS /* ╰─ space */
-      PC_DOLS "$" PC_RS " "
-  ); /* $ space  */
-}
-
-#define MAX_HEREDOC_DELIM 64
-
-/* True if @p buf parses as a complete statement: no open quote, balanced
- * braces, no pending heredoc body. Mirrors the lexer's quoting rules —
- * single quotes are literal, double quotes recognise \" \\ \$ as escapes.
- * Brace counting is suppressed inside either quote.
- *
- * Heredoc tracking: when `<<` (not `<<<`) appears outside quotes, the next
- * word is captured as the delimiter; from the following newline onward the
- * walker watches each line for an exact match against the delimiter, and
- * stays incomplete until found. We support one heredoc per command for now.
- * A negative brace depth (`}` without `{`) is treated as complete: let the
- * parser surface the error rather than wedge the REPL. */
-static int is_input_complete(const char *buf)
-{
-  int  in_squote   = 0;
-  int  in_dquote   = 0;
-  int  brace_depth = 0;
-  int  want_delim  = 0;
-  int  in_hd_body  = 0;
-  char delim[MAX_HEREDOC_DELIM];
-  int  dn = 0;
-  char line_buf[MAX_HEREDOC_DELIM];
-  int  ln = 0;
-
-  for(const char *p = buf; *p; p++) {
-    char c = *p;
-
-    if(in_hd_body) {
-      if(c == '\n') {
-        line_buf[ln] = '\0';
-        if(ln == dn) {
-          int eq = 1;
-          for(int i = 0; i < dn; i++)
-            if(line_buf[i] != delim[i]) {
-              eq = 0;
-              break;
-            }
-          if(eq) {
-            in_hd_body = 0;
-            dn         = 0;
-            ln         = 0;
-            continue;
-          }
-        }
-        ln = 0;
-      } else if(ln < MAX_HEREDOC_DELIM - 1) {
-        line_buf[ln++] = c;
-      } else {
-        ln = MAX_HEREDOC_DELIM - 1;
-      }
-      continue;
-    }
-
-    if(want_delim) {
-      if(c == ' ' || c == '\t') {
-        if(dn > 0)
-          want_delim = 0;
-        continue;
-      }
-      if(c == '\n') {
-        if(dn > 0) {
-          want_delim = 0;
-          in_hd_body = 1;
-          ln         = 0;
-        }
-        continue;
-      }
-      if(dn < MAX_HEREDOC_DELIM - 1)
-        delim[dn++] = c;
-      continue;
-    }
-
-    if(in_squote) {
-      if(c == '\'')
-        in_squote = 0;
-      continue;
-    }
-    if(in_dquote) {
-      if(c == '\\' && p[1] && (p[1] == '"' || p[1] == '\\' || p[1] == '$')) {
-        p++;
-        continue;
-      }
-      if(c == '"')
-        in_dquote = 0;
-      continue;
-    }
-    if(c == '\'') {
-      in_squote = 1;
-      continue;
-    }
-    if(c == '"') {
-      in_dquote = 1;
-      continue;
-    }
-    if(c == '<' && p[1] == '<') {
-      if(p[2] == '<') {
-        p += 2;
-        continue;
-      }
-      want_delim = 1;
-      dn         = 0;
-      p++;
-      continue;
-    }
-    if(c == '\n') {
-      if(dn > 0) {
-        in_hd_body = 1;
-        ln         = 0;
-      }
-      continue;
-    }
-    if(c == '{')
-      brace_depth++;
-    else if(c == '}' && brace_depth > 0)
-      brace_depth--;
-  }
-  return !in_squote && !in_dquote && brace_depth == 0 && !want_delim &&
-         !in_hd_body;
-}
-
-/* Read input lines into @p buf until they form a complete statement.
- * Returns total bytes accumulated, RL_EOF on Ctrl-D at empty line, or 0
- * when interrupted with Ctrl-C. */
-static int read_complete_statement(char *buf, size_t size)
-{
-  size_t pos = 0;
-  buf[0]     = '\0';
-
-  /* Static bottom-line prompt — same every time: ╰─ $  */
-  char prompt[128];
-  format_prompt(prompt, sizeof prompt);
-
-  /* Continuation prompt for multi-line input: │ »  (indented) */
-  char cont_prompt[64];
-  (void)snprintf(
-      cont_prompt, sizeof cont_prompt,
-      PC_LINE BD_V " " PC_RS /* │ space */
-      PC_DOLS "\xc2\xbb" PC_RS " "
-  ); /* »  (U+00BB Latin-1) */
-
-  const char *cur_prompt = prompt;
-
-  while(1) {
-    /* Top decorative line only for primary prompt, not continuation. */
-    if(cur_prompt == prompt)
-      write_prompt_header();
-
-    int len = read_line(buf + pos, size - pos, cur_prompt);
-    if(len == RL_EOF)
-      return RL_EOF;
-    if(len == RL_INTERRUPT)
-      return 0;
-    if(len == RL_CLEAR) {
-      sh_clear();
-      cur_prompt = prompt; /* reset to primary so header is shown */
-      continue;
-    }
-
-    pos += (size_t)len;
-    if(pos >= size - 2)
-      return (int)pos;
-
-    buf[pos++] = '\n';
-    buf[pos]   = '\0';
-
-    if(is_input_complete(buf))
-      return (int)pos;
-
-    cur_prompt = cont_prompt;
-  }
-}
-
-int main(int argc, char *argv[])
+int                   main(int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
@@ -690,25 +66,20 @@ int main(int argc, char *argv[])
     term = "xterm-256color";
   SCREEN *scr = newterm(term, stdout, stdin);
   if(!scr) {
-    write_str("shell: newterm failed; falling back to raw stdio.\n");
+    sh_puts("shell: newterm failed; falling back to raw stdio.\n");
     return 1;
   }
   set_term(scr);
   raw();
   noecho();
   nonl();
-  /* Off-screen pad: reading from it lets us use ncurses' keypad escape
-   * parsing without ever triggering a screen refresh that would clobber our
-   * write()-based output. */
-  s_input_pad = newpad(1, 256);
-  if(!s_input_pad) {
-    write_str("shell: newpad failed\n");
+
+  if(sh_edit_init() < 0) {
+    sh_puts("shell: newpad failed\n");
     endwin();
     delscreen(scr);
     return 1;
   }
-  keypad(s_input_pad, TRUE);
-  intrflush(s_input_pad, FALSE);
 
   /* Snapshot the raw termios ncurses just configured, then build a cooked
    * variant for handing off to child processes. */
@@ -725,69 +96,35 @@ int main(int argc, char *argv[])
   BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H   \
       BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H    \
           BD_H BD_H BD_H BD_H BD_H
-  write_str(
+  sh_puts(
       "\n"
-      "  " PC_LINE BD_TL_R BNR_H34 BD_TR_R PC_RS "\n"
-      "  " PC_LINE BD_V PC_RS "            " PC_HOST "ALCOR2  OS" PC_RS
-      "            " PC_LINE BD_V PC_RS "\n"
-      "  " PC_LINE BD_LT BNR_H34 BD_RT PC_RS "\n"
-      "  " PC_LINE BD_V PC_RS "           " PC_PATH "vega v" VEGA_VERSION PC_RS
-      "            " PC_LINE BD_V PC_RS "\n"
-      "  " PC_LINE BD_BL_R BNR_H34 BD_BR_R PC_RS "\n"
+      "  " THEME_ANSI_DIM BD_TL_R BNR_H34 BD_TR_R THEME_ANSI_RESET "\n"
+      "  " THEME_ANSI_DIM BD_V THEME_ANSI_RESET
+      "            " THEME_ANSI_ACCENT_B "ALCOR2  OS" THEME_ANSI_RESET
+      "            " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "\n"
+      "  " THEME_ANSI_DIM BD_LT BNR_H34 BD_RT THEME_ANSI_RESET "\n"
+      "  " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "           " THEME_ANSI_SUBTEXT
+      "vega v" VEGA_VERSION THEME_ANSI_RESET
+      "            " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "\n"
+      "  " THEME_ANSI_DIM BD_BL_R BNR_H34 BD_BR_R THEME_ANSI_RESET "\n"
       "\n"
-      "  " PC_DOLS "help" PC_LINE " " BD_ARROW_R " " PC_RS PC_PATH
-      "list available commands" PC_RS "\n\n"
+      "  " THEME_ANSI_SUCCESS_B "help" THEME_ANSI_DIM " " BD_ARROW_R
+      " " THEME_ANSI_RESET THEME_ANSI_SUBTEXT
+      "list available commands" THEME_ANSI_RESET "\n\n"
   );
 #undef BNR_H34
 
-  /* Source /home/.vconf if it exists — the shell's equivalent of .bashrc.
-   * Runs as a vega script so any language feature (let, if, fn, …) works. */
-  {
-    int cfd = open("/home/.vconf", O_RDONLY);
-    if(cfd >= 0) {
-      size_t cap = 4096;
-      size_t len = 0;
-      char  *src = (char *)malloc(cap);
-      if(src) {
-        for(;;) {
-          if(len + 1 >= cap) {
-            cap *= 2;
-            char *nb = (char *)realloc(src, cap);
-            if(!nb)
-              break;
-            src = nb;
-          }
-          ssize_t n = read(cfd, src + len, cap - len - 1);
-          if(n <= 0)
-            break;
-          len += (size_t)n;
-        }
-        src[len] = '\0';
-        /* Silence stdout so .vconf commands don't print to the console. */
-        int saved_out = -1;
-        int devnull   = open("/dev/null", O_WRONLY);
-        if(devnull >= 0) {
-          saved_out = dup(STDOUT_FILENO);
-          dup2(devnull, STDOUT_FILENO);
-          close(devnull);
-        }
-        tcsetattr(STDIN_FILENO, TCSANOW, &s_cooked_t);
-        vega_run(src);
-        tcsetattr(STDIN_FILENO, TCSANOW, &s_raw_t);
-        if(saved_out >= 0) {
-          dup2(saved_out, STDOUT_FILENO);
-          close(saved_out);
-        }
-        free(src);
-      }
-      close(cfd);
-    }
-  }
+  /* Source /home/.vconf if it exists — equivalent of .bashrc. Runs as a vega
+   * script so any language feature (let, if, fn, kbd, …) works. tcsetattr is
+   * required so children inside the script see canonical mode. */
+  tcsetattr(STDIN_FILENO, TCSANOW, &s_cooked_t);
+  sh_source_vconf("/home/.vconf");
+  tcsetattr(STDIN_FILENO, TCSANOW, &s_raw_t);
 
   while(1) {
-    int len = read_complete_statement(line, sizeof line);
+    int len = sh_read_complete_statement(line, sizeof line);
     if(len == RL_EOF) {
-      write_str("exit\n");
+      sh_puts("exit\n");
       break;
     }
     if(len > 0) {
@@ -796,7 +133,7 @@ int main(int argc, char *argv[])
       size_t tlen = (size_t)len;
       while(tlen > 0 && line[tlen - 1] == '\n')
         line[--tlen] = '\0';
-      hist_push(line);
+      sh_hist_push(line);
 
       /* Restore canonical termios before forking children so things like
        * `cat` with no args can be terminated with Ctrl-D (VEOF only fires

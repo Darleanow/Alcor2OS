@@ -95,4 +95,78 @@ typedef struct
  */
 void sh_complete(const char *prefix, bool is_command, comp_result_t *out);
 
+/* History ring (sh_hist_*) --------------------------------------------------
+ */
+
+/** @brief Append @p line to history (no-op on empty, dedupe-on-most-recent). */
+void sh_hist_push(const char *line);
+
+/** @brief Number of entries currently held. */
+int sh_hist_count(void);
+
+/** @brief Entry at @p idx (0 = oldest), or @c NULL if @p idx is out of range.
+ */
+const char *sh_hist_at(int idx);
+
+/* Line editor (sh_read_line) ------------------------------------------------
+ */
+
+#define RL_EOF       (-1) /**< Ctrl-D on an empty line. */
+#define RL_INTERRUPT (-2) /**< Ctrl-C — in-progress line is discarded. */
+#define RL_CLEAR     (-3) /**< Ctrl-L — caller should clear the screen. */
+
+/**
+ * @brief Initialise the off-screen ncurses input pad used by ::sh_read_line.
+ *
+ * Must be called once after @c newterm() and before the first ::sh_read_line.
+ *
+ * @return 0 on success, -1 if @c newpad failed.
+ */
+int sh_edit_init(void);
+
+/**
+ * @brief Read one logical input line, with history navigation, tab completion,
+ *        and UTF-8-aware cursor movement.
+ *
+ * @param buf     Caller buffer; receives a NUL-terminated line (no @c \\n).
+ * @param cap     Capacity of @p buf in bytes.
+ * @param prompt  Prompt string (may include ANSI escapes).
+ * @return Byte length of the line, or @c RL_EOF / @c RL_INTERRUPT / @c
+ * RL_CLEAR.
+ */
+int sh_read_line(char *buf, size_t cap, const char *prompt);
+
+/* Prompt rendering (sh_prompt_*) --------------------------------------------
+ */
+
+/** @brief Paint the decorative header line above the primary prompt. */
+void sh_write_prompt_header(void);
+
+/** @brief Format the bottom-line prompt (`╰─ $ `) into @p out. */
+void sh_format_prompt(char *out, size_t cap);
+
+/* Multi-line statement reader (sh_parse_*) ----------------------------------
+ */
+
+/**
+ * @brief Read input lines into @p buf until they form a complete statement.
+ *
+ * Returns total bytes accumulated, @c RL_EOF on Ctrl-D at an empty primary
+ * prompt, or 0 when interrupted (Ctrl-C).
+ */
+int sh_read_complete_statement(char *buf, size_t size);
+
+/* Config file (.vconf) ------------------------------------------------------
+ */
+
+/**
+ * @brief Source @p path as a vega script with stdout redirected to /dev/null.
+ *
+ * Acts like @c .bashrc — silently ignored if @p path doesn't exist. Restores
+ * the original stdout on return.
+ *
+ * @param path  Absolute path to the config file (e.g. @c "/home/.vconf").
+ */
+void sh_source_vconf(const char *path);
+
 #endif /* SHELL_H */

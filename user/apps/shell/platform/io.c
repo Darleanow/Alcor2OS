@@ -14,7 +14,14 @@ void sh_putchar(char c)
 
 void sh_puts(const char *s)
 {
-  sh_write(STDOUT_FILENO, s, strlen(s));
+  size_t n = strlen(s);
+  while(n > 0) {
+    long w = sh_write(STDOUT_FILENO, s, n);
+    if(w <= 0)
+      return;
+    s += w;
+    n -= (size_t)w;
+  }
 }
 
 void sh_stdout_bytes(const void *buf, size_t len)
