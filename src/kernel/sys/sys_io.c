@@ -3,21 +3,17 @@
  * @brief I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep,
  *        select, poll.
  *
- * fd 0 (stdin) reads from the keyboard IRQ path when no OFT entry is mapped.
- * fd 1/2 (stdout/stderr) fall back to the framebuffer console under the same
- * condition.  All other fds are dispatched through the VFS layer.
+ * Every fd is dispatched through the VFS layer. Stdio (fd 0/1/2) gets its
+ * behaviour from the @c /dev/tty chardev installed by @c proc_start_first;
+ * the underlying tty_ops in @c dev_nodes.c handles the kbd/fb_console wiring.
  */
 
 #include <alcor2/arch/cpu.h>
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/console.h>
-#include <alcor2/drivers/fb_console.h>
-#include <alcor2/drivers/keyboard.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/vfs.h>
-#include <alcor2/kbd.h>
 #include <alcor2/kstdlib.h>
-#include <alcor2/ktermios.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
@@ -30,32 +26,14 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
 }
 
 /**
- * @brief Write @p count bytes from @p buf directly to the framebuffer console.
- *
- * Used as a fallback for fd 1/2 when no OFT entry is mapped (unredirected
- * programs).  Stdin uses the keyboard path directly; this only covers stdout.
- */
-static u64 stdout_fallback(u64 buf, u64 count)
-{
-  /* fb_console handles cell grid + ANSI/CSI; falls through to a no-op when
-   * not initialised. The legacy console_putchar path is still hit during
-   * very early boot (pre-heap), which doesn't go through this fallback. */
-  fb_console_write((const void *)buf, (size_t)count);
-  return count;
-}
-
-/** @brief Return @c true if @p fd has an OFT entry in the current process. */
-static bool fd_has_oft(u64 fd)
-{
-  proc_t *p = proc_current();
-  return p && fd < (u64)VFS_MAX_FD && p->fds[fd] >= 0;
-}
-
-/**
  * @brief Read up to @p count bytes from @p fd into @p buf.
  *
- * fd 0 without an OFT entry is served by the keyboard line discipline.
- * All other fds are dispatched to ::vfs_read.
+ * @param fd     File descriptor to read from.
+ * @param buf    User-space destination buffer (must be writable for @p count
+ *               bytes).
+ * @param count  Maximum bytes to read.
+ * @return Bytes read on success (0 on EOF), negative @c -errno on failure
+ *         (@c -EFAULT, @c -EBADF, etc.).
  */
 u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
@@ -68,21 +46,17 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   if(count == 0)
     return 0;
 
-  if(fd == 0 && !fd_has_oft(fd)) {
-    proc_t *p = proc_current();
-    if(p)
-      return kbd_read_for_process(p, (char *)buf, count);
-    return kbd_read_translated((char *)buf, count);
-  }
-
   return (u64)vfs_read((i64)fd, (void *)buf, count);
 }
 
 /**
  * @brief Write @p count bytes from @p buf to @p fd.
  *
- * fd 1/2 without an OFT entry go to the framebuffer console fallback.
- * All other fds are dispatched to ::vfs_write.
+ * @param fd     File descriptor to write to.
+ * @param buf    User-space source buffer (must be readable for @p count
+ *               bytes).
+ * @param count  Bytes to write.
+ * @return Bytes written on success, negative @c -errno on failure.
  */
 u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
@@ -94,9 +68,6 @@ u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
     return (u64)-EFAULT;
   if(count == 0)
     return 0;
-
-  if((fd == 1 || fd == 2) && !fd_has_oft(fd))
-    return stdout_fallback(buf, count);
 
   return (u64)vfs_write((i64)fd, (void *)buf, count);
 }
@@ -110,149 +81,18 @@ u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
   return (u64)vfs_seek((i64)fd, (i64)offset, (i32)whence);
 }
 
-#define TCGETS     0x5401
-#define TCSETS     0x5402
-#define TCSETSW    0x5403
-#define TCSETSF    0x5404
-#define TIOCGWINSZ 0x5413
-#define TIOCSWINSZ 0x5414
-
-/**
- * @brief Linux-compatible @c struct @c winsize layout for ioctl wire ABI.
- */
-typedef struct
-{
-  u16 row, col, xpixel, ypixel;
-} k_winsize_t;
-
-/** Fill @p w from the live fb_console grid. SIGWINCH is emitted whenever the
- *  grid reflows, so userspace re-queries this on signal delivery. */
-static void winsize_from_console(k_winsize_t *w)
-{
-  int cols = 80;
-  int rows = 25;
-  fb_console_get_size(&cols, &rows);
-  if(cols <= 0)
-    cols = 80;
-  if(rows <= 0)
-    rows = 25;
-  w->row    = (u16)rows;
-  w->col    = (u16)cols;
-  w->xpixel = 0;
-  w->ypixel = 0;
-}
-
-/**
- * @brief Emulated TTY ioctls for stdio fds and pipe ends.
- *
- * Handles @c TIOCGWINSZ / @c TIOCSWINSZ against the shared ::g_winsize and
- * @c TCGETS / @c TCSETS variants against the per-process @c k_termios_t.
- * Any other request returns @c -ENOTTY.
- */
-static u64 ioctl_tty_emulated(proc_t *p, u64 request, u64 arg)
-{
-  if(!p)
-    return (u64)-EINVAL;
-
-  switch(request) {
-  case TIOCGWINSZ: {
-    if(!user_rw_ok(arg, sizeof(k_winsize_t)))
-      return (u64)-EFAULT;
-    k_winsize_t w;
-    winsize_from_console(&w);
-    kmemcpy((void *)arg, &w, sizeof(w));
-    return 0;
-  }
-  case TIOCSWINSZ:
-    /* The grid is owned by fb_console, not userspace. Accept the call so
-     * `stty cols X rows Y` doesn't error, but ignore the values. */
-    if(!user_rw_ok(arg, sizeof(k_winsize_t)))
-      return (u64)-EFAULT;
-    return 0;
-  case TCGETS:
-    if(!user_rw_ok(arg, sizeof(k_termios_t)))
-      return (u64)-EFAULT;
-    kmemcpy((void *)arg, &p->termios, sizeof(p->termios));
-    return 0;
-  case TCSETS:
-  case TCSETSW:
-  case TCSETSF:
-    if(!user_rw_ok(arg, sizeof(k_termios_t)))
-      return (u64)-EFAULT;
-    kmemcpy(&p->termios, (void *)arg, sizeof(p->termios));
-    return 0;
-  default:
-    return (u64)-ENOTTY;
-  }
-}
-
 /**
  * @brief Perform a device control operation on @p fd.
  *
- * fd 0 handles the Alcor2-specific keyboard layout request
- * (@c ALCOR2_IOC_KBD_SET_LAYOUT).  stdio fds and pipe ends use the emulated
- * TTY path.  All other fds return @c -ENOTTY.
+ * Every request is routed through the VFS: tty_ops in @c dev_nodes.c handles
+ * the stdio termios + ALCOR2/FB_CONSOLE ioctls, mouse_ops handles
+ * @c /dev/mouse, and pipes / regular files return @c -ENOTTY.
  */
 u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
-
-  if(fd == 0 && request == ALCOR2_IOC_KBD_SET_LAYOUT) {
-    u32 lid;
-    if(!user_rw_ok(arg, sizeof(lid)))
-      return (u64)-EFAULT;
-    kmemcpy(&lid, (void *)arg, sizeof(lid));
-    if(lid >= KBD_LAYOUT_COUNT)
-      return (u64)-EINVAL;
-    kbd_set_layout((kbd_layout_t)lid);
-    return 0;
-  }
-
-  if(fd == 0 && request == ALCOR2_IOC_KBD_RELEASE_EVENTS) {
-    u32 on;
-    if(!user_rw_ok(arg, sizeof(on)))
-      return (u64)-EFAULT;
-    kmemcpy(&on, (void *)arg, sizeof(on));
-    kbd_set_release_events(on != 0);
-    return 0;
-  }
-
-  if(fd == 0 && request == ALCOR2_IOC_TIMER_FAST) {
-    u32 on;
-    if(!user_rw_ok(arg, sizeof(on)))
-      return (u64)-EFAULT;
-    kmemcpy(&on, (void *)arg, sizeof(on));
-    if(on)
-      pit_request_fast();
-    else
-      pit_release_fast();
-    return 0;
-  }
-
-  /* Framebuffer console controls: SET_ATLAS uses the encoded request, while
-   * YIELD / RECLAIM are bare ('F'<<8 | nr) ioctls with no data. Routing
-   * through fd 1/2 is consistent with the rest of the TTY ioctls. */
-  if((fd == 1 || fd == 2) && request == FB_CONSOLE_SET_ATLAS) {
-    if(!user_rw_ok(arg, sizeof(fb_console_atlas_t)))
-      return (u64)-EFAULT;
-    fb_console_atlas_t meta;
-    kmemcpy(&meta, (void *)arg, sizeof(meta));
-    return (u64)(fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL);
-  }
-  if((fd == 1 || fd == 2) && request == FB_CONSOLE_YIELD) {
-    fb_console_yield();
-    return 0;
-  }
-  if((fd == 1 || fd == 2) && request == FB_CONSOLE_RECLAIM) {
-    fb_console_reclaim();
-    return 0;
-  }
-
-  if(fd <= 2 || vfs_fd_is_pipe(fd))
-    return ioctl_tty_emulated(proc_current(), request, arg);
-
   return (u64)vfs_ioctl((i64)fd, request, arg);
 }
 
@@ -336,8 +176,18 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   return total;
 }
 
-/* Coalesce all iovecs into a single fb_console batch so ncurses refresh()
- * (typically 5–20 iovecs) triggers only one flush_batch() + cursor_paint(). */
+/**
+ * @brief Gathered-write across @p iovcnt iovecs into @p fd.
+ *
+ * Each iov is dispatched as a separate ::sys_write — the VFS driver decides
+ * how to coalesce. @c tty_write goes through @c fb_console_write whose
+ * begin/end pair is idempotent enough that a multi-iov refresh stays cheap.
+ *
+ * @param fd      File descriptor to write to.
+ * @param iov     User-space pointer to @c struct @c iovec array.
+ * @param iovcnt  Number of iovecs in the array.
+ * @return Total bytes written on success, negative @c -errno on failure.
+ */
 u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
@@ -347,26 +197,8 @@ u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   if(!iov)
     return (u64)-EFAULT;
 
-  const struct iovec *vec = (const struct iovec *)iov;
-
-  if((fd == 1 || fd == 2) && !fd_has_oft(fd)) {
-    u64 total = 0;
-    fb_console_write_begin();
-    for(u64 i = 0; i < iovcnt; i++) {
-      if(!vec[i].iov_base || vec[i].iov_len == 0)
-        continue;
-      if(!user_rw_ok((u64)vec[i].iov_base, vec[i].iov_len)) {
-        fb_console_write_end();
-        return (u64)-EFAULT;
-      }
-      fb_console_write_raw(vec[i].iov_base, vec[i].iov_len);
-      total += vec[i].iov_len;
-    }
-    fb_console_write_end();
-    return total;
-  }
-
-  u64 total = 0;
+  const struct iovec *vec   = (const struct iovec *)iov;
+  u64                 total = 0;
   for(u64 i = 0; i < iovcnt; i++) {
     if(vec[i].iov_base && vec[i].iov_len > 0) {
       u64 written =
@@ -419,14 +251,6 @@ static i32 sel_read_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
     return -EBADF;
-  if(fd == 0 && !fd_has_oft(fd)) {
-    const proc_t *p = proc_current();
-    if(!p)
-      return kbd_raw_pending() ? 1 : 0;
-    return kbd_select_read_ready(p) ? 1 : 0;
-  }
-  if((fd == 1 || fd == 2) && !fd_has_oft(fd))
-    return -EBADF;
   return vfs_select_read_ready((i64)fd);
 }
 
@@ -435,10 +259,6 @@ static i32 sel_read_ready(u64 fd)
 static i32 sel_write_ready(u64 fd)
 {
   if(fd >= VFS_MAX_FD)
-    return -EBADF;
-  if((fd == 1 || fd == 2) && !fd_has_oft(fd))
-    return 1;
-  if(fd == 0 && !fd_has_oft(fd))
     return -EBADF;
   return vfs_select_write_ready((i64)fd);
 }
@@ -501,10 +321,6 @@ static bool poll__fd_is_open(i32 fd)
 {
   if(fd < 0)
     return false;
-  if(fd == 0 && !fd_has_oft(0))
-    return true;
-  if((fd == 1 || fd == 2) && !fd_has_oft((u64)fd))
-    return true;
   return vfs_fd_is_valid(fd);
 }
 

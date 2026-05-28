@@ -636,6 +636,37 @@ struct flush_cell_cache
   bool      underline;
 };
 
+/** @brief Per-row scratch used by flush_batch. ~48 B per cell — at 160+ cols
+ *         far too large for the 8 KiB kernel stack, so heap-owned and grown
+ *         on demand whenever the grid widens. */
+static struct flush_cell_cache *s_flush_ci      = NULL;
+static int                      s_flush_ci_cols = 0;
+
+/**
+ * @brief Grow @ref s_flush_ci to hold at least @p cols entries.
+ *
+ * Called on grid init and whenever a SET_ATLAS reflow widens the grid.
+ * Allocation failure leaves the previous buffer in place — flush_batch
+ * tolerates @ref s_flush_ci being NULL but not smaller than the current grid,
+ * so retaining the larger old buffer is preferable to shrinking on failure.
+ *
+ * @param cols  Minimum capacity in cells.
+ */
+static void flush_ci_ensure(int cols)
+{
+  if(cols <= s_flush_ci_cols && s_flush_ci)
+    return;
+  struct flush_cell_cache *nb = (struct flush_cell_cache *)kmalloc(
+      (size_t)cols * sizeof(struct flush_cell_cache)
+  );
+  if(!nb)
+    return;
+  if(s_flush_ci)
+    kfree(s_flush_ci);
+  s_flush_ci      = nb;
+  s_flush_ci_cols = cols;
+}
+
 static void flush_batch(void)
 {
   if(!ctx.cells || ctx.batch_r0 > ctx.batch_r1)
@@ -659,7 +690,13 @@ static void flush_batch(void)
   u32 acw =
       (ctx.atlas_cell_w < (u32)ctx.cell_w) ? ctx.atlas_cell_w : (u32)ctx.cell_w;
 
-  struct flush_cell_cache ci[160] = {0};
+  /* Heap-owned scratch; sized at grid init and grown on reflow. The setup
+   * loop below fills every column unconditionally, so we don't pre-zero. */
+  if(!s_flush_ci || s_flush_ci_cols < ctx.cols)
+    flush_ci_ensure(ctx.cols);
+  if(!s_flush_ci)
+    return;
+  struct flush_cell_cache *ci = s_flush_ci;
 
   for(int cr = r0; cr <= r1; cr++) {
     fb_cell_t *row = &ctx.cells[(size_t)cr * (size_t)ctx.cols];
@@ -1276,6 +1313,7 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
   );
   s_sb_cols = ctx.cols;
   s_sb_head = s_sb_used = s_sb_view = 0;
+  flush_ci_ensure(ctx.cols);
   return true;
 }
 
@@ -1706,6 +1744,7 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
       );
       s_sb_cols = new_cols;
       s_sb_head = s_sb_used = s_sb_view = 0;
+      flush_ci_ensure(new_cols);
       /* Wipe stale pixels left around the old grid. */
       for(u32 y = 0; y < ctx.height; y++)
         for(u32 x = 0; x < ctx.width; x++)

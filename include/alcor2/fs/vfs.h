@@ -183,7 +183,24 @@ typedef struct
    * @return 0 (or driver-defined positive) on success, negative @c -errno.
    */
   i64 (*ioctl)(fs_handle_t fh, u64 request, u64 arg);
+
+  /**
+   * @brief Report I/O readiness for @c select / @c poll.
+   *
+   * May be @c NULL — VFS treats an absent op as "always ready" (regular-file
+   * semantics).
+   *
+   * @param fh      Open handle.
+   * @param events  Bitmask of @c POLL_IN / @c POLL_OUT to query.
+   * @return Subset of @p events actionable right now.
+   */
+  u32 (*poll)(fs_handle_t fh, u32 events);
 } fs_ops_t;
+
+/** @name poll/select event bits — match Linux POLLIN / POLLOUT. */
+#define POLL_IN  0x001u
+#define POLL_OUT 0x004u
+/** @} */
 
 /**
  * @brief Filesystem type descriptor — registered once, instantiated per mount.

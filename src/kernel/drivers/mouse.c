@@ -13,6 +13,7 @@
 #include <alcor2/drivers/mouse.h>
 #include <alcor2/errno.h>
 #include <alcor2/fs/ramfs.h>
+#include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/sched.h>
@@ -119,10 +120,30 @@ static i64 mouse_dev_ioctl(void *ctx, u64 request, u64 arg)
   }
 }
 
+/**
+ * @brief Report read-readiness for @c /dev/mouse.
+ *
+ * POLL_IN is set when the event ring has at least one pending event. Writes
+ * always fail with @c -EROFS, so POLL_OUT is reported as unavailable.
+ *
+ * @param ctx     Unused.
+ * @param events  Requested events.
+ * @return Subset of @p events that are actionable now.
+ */
+static u32 mouse_dev_poll(void *ctx, u32 events)
+{
+  (void)ctx;
+  u32 ready = 0;
+  if((events & POLL_IN) && !ring_empty())
+    ready |= POLL_IN;
+  return ready;
+}
+
 static const ramfs_chardev_ops_t mouse_chardev_ops = {
     .read  = mouse_dev_read,
     .write = mouse_dev_write,
     .ioctl = mouse_dev_ioctl,
+    .poll  = mouse_dev_poll,
 };
 
 void mouse_init(void)
