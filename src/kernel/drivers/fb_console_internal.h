@@ -365,4 +365,28 @@ u32 atlas_lookup_attr(u32 cp, u16 attr);
  */
 bool atlas_meta_is_sane(const fb_console_atlas_t *meta);
 
+/* fb_console_cell.c — cell-to-pixel rendering */
+
+/**
+ * @brief Render an arbitrary cell value at grid position (col, row).
+ *
+ * Taking the cell by pointer lets @ref scrollback_repaint pass a synthetic
+ * cell that does not live in the live grid (e.g. a row pulled from the
+ * scrollback ring) without copying it into @c fb_ctx.cells first.
+ *
+ * @param c    Cell content to render.
+ * @param col  Grid column.
+ * @param row  Grid row.
+ */
+void blit_cell_data(const fb_cell_t *c, int col, int row);
+
+/**
+ * @brief Render @c fb_ctx.cells[row * cols + col] — the common case when the
+ * caller already owns the grid coordinates and just needs the cell repainted.
+ *
+ * @param col  Grid column.
+ * @param row  Grid row.
+ */
+void blit_cell(int col, int row);
+
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */
