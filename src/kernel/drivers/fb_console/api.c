@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console.c
+ * @file src/kernel/drivers/fb_console/api.c
  * @brief Runtime framebuffer text console with UTF-8 and ANSI/CSI support.
  *
  * Maintains an in-RAM cell grid, blits glyphs via the compiled-in CP437 bitmap
@@ -14,7 +14,7 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/types.h>
 #include <drivers/console/font.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 /* Forward declaration — avoids pulling in proc/signal.h for one call. */
 #define SIGWINCH 28

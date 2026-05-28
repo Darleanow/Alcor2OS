@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_cell.c
+ * @file src/kernel/drivers/fb_console/cell.c
  * @brief Cell-to-pixel rendering for the framebuffer console.
  *
  * Turns one @ref fb_cell_t into a rectangle of framebuffer pixels via the
@@ -11,7 +11,7 @@
 
 #include <alcor2/types.h>
 #include <drivers/console/font.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 void blit_cell_data(const fb_cell_t *c, int col, int row)
 {

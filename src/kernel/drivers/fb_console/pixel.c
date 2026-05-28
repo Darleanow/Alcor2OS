@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_pixel.c
+ * @file src/kernel/drivers/fb_console/pixel.c
  * @brief Raw framebuffer pixel primitives for the fb_console module.
  *
  * Pure pixel-level access: no awareness of cells, glyphs, or grid. Every
@@ -8,7 +8,7 @@
  */
 
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 u8 bytes_pp_from_bpp(u16 bpp)
 {

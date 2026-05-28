@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_scrollback.c
+ * @file src/kernel/drivers/fb_console/scrollback.c
  * @brief Scrollback ring + deferred pixel-scroll for the framebuffer console.
  *
  * Two responsibilities, kept together because they share a state machine:
@@ -15,7 +15,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 /* Rows that need to be scrolled out at the next flush. Updated by scroll_one
  * during a write; consumed by flush_pending_scroll at end-of-write. */

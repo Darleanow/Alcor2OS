@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_internal.h
+ * @file src/kernel/drivers/fb_console/internal.h
  * @brief Shared state, types, and hot-path primitives for the fb_console
  * module split.
  *

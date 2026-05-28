@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_ansi.c
+ * @file src/kernel/drivers/fb_console/ansi.c
  * @brief ANSI/CSI escape parser, UTF-8 decoder, and SGR/colour resolution for
  * the framebuffer console.
  *
@@ -11,7 +11,7 @@
  */
 
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 /* Catppuccin Mocha 16-colour palette. Indices match ANSI SGR 30-37 / 90-97. */
 static const u32 ansi16_fg[8] = {

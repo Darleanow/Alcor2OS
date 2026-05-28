@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_mouse.c
+ * @file src/kernel/drivers/fb_console/mouse.c
  * @brief Software mouse cursor overlay for the framebuffer console.
  *
  * 12×19 white arrow with a one-pixel black halo so the pointer stays
@@ -12,7 +12,7 @@
 
 #include <alcor2/drivers/mouse.h>
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 /* Opaque arrow cursor, 12 wide × 19 tall. Painted as a filled white shape
  * with an automatic 1-pixel black halo: any pixel adjacent to a "1" bit gets

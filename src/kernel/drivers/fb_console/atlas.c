@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_atlas.c
+ * @file src/kernel/drivers/fb_console/atlas.c
  * @brief Glyph atlas lookup + meta validation.
  *
  * Hot side: codepoint → glyph index resolution called per dirty cell during
@@ -10,7 +10,7 @@
 
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 u32 atlas_lookup(u32 cp)
 {

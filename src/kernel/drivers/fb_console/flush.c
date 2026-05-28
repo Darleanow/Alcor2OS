@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_flush.c
+ * @file src/kernel/drivers/fb_console/flush.c
  * @brief Dirty-cell flush batch + character emission for the framebuffer
  * console.
  *
@@ -16,7 +16,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 struct flush_cell_cache
 {

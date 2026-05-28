@@ -1,5 +1,5 @@
 /**
- * @file src/kernel/drivers/fb_console_caret.c
+ * @file src/kernel/drivers/fb_console/caret.c
  * @brief Text caret (blinking block cursor) tracker for the framebuffer
  * console.
  *
@@ -11,7 +11,7 @@
  */
 
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console_internal.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 /* Position of the cell currently displaying the inverted-block cursor.
  * @c -1 means "no cursor on screen right now"; @ref caret_erase treats it
