@@ -389,4 +389,43 @@ void blit_cell_data(const fb_cell_t *c, int col, int row);
  */
 void blit_cell(int col, int row);
 
+/* fb_console_caret.c — text caret (inverted-block cursor) */
+
+/**
+ * @brief Re-blit the cell currently showing the inverted caret block,
+ * restoring the glyph beneath it. Idempotent: no-op when nothing is painted.
+ */
+void caret_erase(void);
+
+/**
+ * @brief Paint the caret at the current @c fb_ctx.cx/cy by drawing the cell
+ * with fg/bg swapped. Records the position so a later @ref caret_erase can
+ * undo the inversion.
+ */
+void caret_paint(void);
+
+/**
+ * @brief Convenience: @ref caret_erase followed by @ref caret_paint. Used
+ * after a write completes; cheap when the cursor hasn't moved (erase is
+ * idempotent on the same cell).
+ */
+void caret_refresh(void);
+
+/**
+ * @brief Drop the @c last-drawn tracker without repainting.
+ *
+ * Used by paths that overwrite the cell themselves (full repaint, scroll,
+ * fb yield/reclaim) — they need the caret machinery to forget the previous
+ * position so the next @ref caret_paint records a fresh one.
+ */
+void caret_clear_drawn(void);
+
+/**
+ * @brief Mark the cell currently under the caret dirty for the next
+ * @ref flush_batch and forget the tracker. Used by @ref fb_console_write_begin
+ * so the batched repaint also wipes the inverted block — without this the
+ * post-batch flush would leave the old caret visible until the next refresh.
+ */
+void caret_invalidate_in_batch(void);
+
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */

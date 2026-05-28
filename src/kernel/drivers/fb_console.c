@@ -22,64 +22,6 @@ void             proc_signal_broadcast(int signum);
 
 fb_console_ctx_t fb_ctx;
 
-/* Last drawn cursor cell. -1 means "no cursor on screen right now", which
- * cursor_erase treats as a no-op. Tracked so a moved cursor can wipe its
- * previous block by re-blitting just that one cell. */
-static int s_cursor_drawn_x = -1;
-static int s_cursor_drawn_y = -1;
-
-/** Re-blit the cell that currently shows the cursor block, restoring the
- *  glyph that was underneath. */
-static void cursor_erase(void)
-{
-  if(s_cursor_drawn_x < 0 || s_cursor_drawn_y < 0)
-    return;
-  if(fb_ctx.cells && s_cursor_drawn_y < fb_ctx.rows &&
-     s_cursor_drawn_x < fb_ctx.cols)
-    blit_cell(s_cursor_drawn_x, s_cursor_drawn_y);
-  s_cursor_drawn_x = -1;
-  s_cursor_drawn_y = -1;
-}
-
-static void cursor_paint(void)
-{
-  if(fb_ctx.yielded || !fb_ctx.cells)
-    return;
-  if(!fb_ctx.cursor_visible || !fb_ctx.blink_on)
-    return;
-  int x = fb_ctx.cx;
-  int y = fb_ctx.cy;
-  if(x >= fb_ctx.cols)
-    x = fb_ctx.cols - 1;
-  if(y >= fb_ctx.rows)
-    y = fb_ctx.rows - 1;
-  if(x < 0 || y < 0)
-    return;
-
-  fb_cell_t *cell = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols + (size_t)x];
-  u32        saved_fg = cell->fg;
-  u32        saved_bg = cell->bg;
-  u16        saved_at = cell->attr;
-
-  cell->fg   = saved_bg;
-  cell->bg   = saved_fg;
-  cell->attr = 0;
-  blit_cell(x, y);
-  cell->fg   = saved_fg;
-  cell->bg   = saved_bg;
-  cell->attr = saved_at;
-
-  s_cursor_drawn_x = x;
-  s_cursor_drawn_y = y;
-}
-
-/** Erase + paint in one call. Cheap when the cursor hasn't moved. */
-static void cursor_refresh(void)
-{
-  cursor_erase();
-  cursor_paint();
-}
-
 /* Rows that need to be scrolled out at the next flush. Updated by scroll_one
  * during a write; consumed by flush_pending_scroll at end-of-write. Batching
  * matters because pixel writes hit MMIO — collapsing N scrolls into one move
@@ -136,8 +78,7 @@ static void scroll_one(void)
     cell->dirty = 0;
   }
   s_pending_scroll++;
-  s_cursor_drawn_x = -1;
-  s_cursor_drawn_y = -1;
+  caret_clear_drawn();
   /* After a scroll, dirty cells may have shifted rows — expand the range
    * to cover all rows so flush_batch() doesn't miss any. */
   if(fb_ctx.in_batch) {
@@ -152,7 +93,7 @@ static void scrollback_repaint(void)
 {
   if(!fb_ctx.base || !fb_ctx.cells)
     return;
-  cursor_erase();
+  caret_erase();
   for(int r = 0; r < fb_ctx.rows; r++) {
     const fb_cell_t *src;
     fb_cell_t        blank;
@@ -1014,18 +955,7 @@ void fb_console_write_begin(void)
   scrollback_exit(); /* any write returns to live view */
   fb_ctx.batch_r0 = fb_ctx.rows;
   fb_ctx.batch_r1 = -1;
-  if(s_cursor_drawn_x >= 0 && s_cursor_drawn_y >= 0) {
-    fb_cell_t *cc = &fb_ctx.cells
-                         [(size_t)s_cursor_drawn_y * (size_t)fb_ctx.cols +
-                          (size_t)s_cursor_drawn_x];
-    cc->dirty = 1;
-    if(s_cursor_drawn_y < fb_ctx.batch_r0)
-      fb_ctx.batch_r0 = s_cursor_drawn_y;
-    if(s_cursor_drawn_y > fb_ctx.batch_r1)
-      fb_ctx.batch_r1 = s_cursor_drawn_y;
-    s_cursor_drawn_x = -1;
-    s_cursor_drawn_y = -1;
-  }
+  caret_invalidate_in_batch();
   fb_ctx.in_batch = true;
 }
 
@@ -1047,7 +977,7 @@ void fb_console_write_end(void)
   flush_batch();
   fb_ctx.blink_ticks = FB_BLINK_PERIOD_TICKS;
   fb_ctx.blink_on    = 1;
-  cursor_paint();
+  caret_paint();
 }
 
 void fb_console_write(const void *buf, size_t len)
@@ -1256,7 +1186,7 @@ void fb_console_tick(void)
       mouse_cur.drawn = false;
     }
 
-    cursor_refresh();
+    caret_refresh();
   } else {
     fb_ctx.blink_ticks--;
   }
@@ -1374,9 +1304,8 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   for(int r = 0; r < fb_ctx.rows; r++)
     for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
-  s_cursor_drawn_x = -1;
-  s_cursor_drawn_y = -1;
-  cursor_paint();
+  caret_clear_drawn();
+  caret_paint();
 
   /* Wake every TUI so they re-query TIOCGWINSZ and redraw at the real grid
    * size. Skipped when the grid stayed the same (e.g. atlas reloaded with
@@ -1456,7 +1385,6 @@ void fb_console_reclaim(void)
   for(int r = 0; r < fb_ctx.rows; r++)
     for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
-  s_cursor_drawn_x = -1;
-  s_cursor_drawn_y = -1;
-  cursor_paint();
+  caret_clear_drawn();
+  caret_paint();
 }
