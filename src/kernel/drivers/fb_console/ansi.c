@@ -683,8 +683,61 @@ static void handle_control(u8 b)
 }
 
 /**
+ * @brief Emit a single ASCII byte to the cursor, applying DEC ACS translation
+ *        when the G0 set is the special-graphics one.
+ *
+ * @param b  Byte in the 0x20..0x7E printable range.
+ */
+static void emit_ascii(u8 b)
+{
+  if(fb_ctx.g0_acs && b >= 0x60u) {
+    put_cp_at_cursor(acs_to_unicode(b));
+    return;
+  }
+  put_cp_at_cursor((u32)b);
+}
+
+/**
+ * @brief Begin a multi-byte UTF-8 sequence: store the lead bits and remaining
+ *        continuation-byte count, then wait for more input.
+ *
+ * @param lead_bits   Payload bits carried by the lead byte.
+ * @param remaining   Continuation bytes still expected.
+ */
+static void utf8_begin(u32 lead_bits, u8 remaining)
+{
+  fb_ctx.utf8_partial = lead_bits;
+  fb_ctx.utf8_rem     = remaining;
+}
+
+/**
+ * @brief Try to start a UTF-8 multi-byte sequence based on the high bits of
+ *        @p b.
+ *
+ * @param b  Lead byte (≥ 0x80).
+ * @return @c true if @p b is a valid 2/3/4-byte lead and the decoder is now
+ *         armed; @c false if @p b is a stray continuation or invalid lead.
+ */
+static bool utf8_try_start(u8 b)
+{
+  if((b & 0xe0u) == 0xc0u) {
+    utf8_begin((u32)(b & 0x1fu), 1);
+    return true;
+  }
+  if((b & 0xf0u) == 0xe0u) {
+    utf8_begin((u32)(b & 0x0fu), 2);
+    return true;
+  }
+  if((b & 0xf8u) == 0xf0u) {
+    utf8_begin((u32)(b & 0x07u), 3);
+    return true;
+  }
+  return false;
+}
+
+/**
  * @brief Stream one byte through the UTF-8 decoder; emit a codepoint when a
- * sequence completes.
+ *        sequence completes.
  *
  * Self-restarting on broken sequences (stray continuation, invalid lead):
  * emits a @c ? and replays the offending byte fresh. This keeps a corrupt
@@ -702,31 +755,11 @@ static void feed_utf8(u8 b)
       return;
     }
     if(b < 0x80u) {
-      /* G0 DEC ACS in effect: map printable ASCII to box-drawing/math. */
-      if(fb_ctx.g0_acs && b >= 0x60u) {
-        put_cp_at_cursor(acs_to_unicode(b));
-        return;
-      }
-      put_cp_at_cursor((u32)b);
+      emit_ascii(b);
       return;
     }
-    if((b & 0xe0u) == 0xc0u) {
-      fb_ctx.utf8_partial = (u32)(b & 0x1fu);
-      fb_ctx.utf8_rem     = 1;
-      return;
-    }
-    if((b & 0xf0u) == 0xe0u) {
-      fb_ctx.utf8_partial = (u32)(b & 0x0fu);
-      fb_ctx.utf8_rem     = 2;
-      return;
-    }
-    if((b & 0xf8u) == 0xf0u) {
-      fb_ctx.utf8_partial = (u32)(b & 0x07u);
-      fb_ctx.utf8_rem     = 3;
-      return;
-    }
-    /* Stray continuation / invalid lead — show '?'. */
-    put_cp_at_cursor((u32)'?');
+    if(!utf8_try_start(b))
+      put_cp_at_cursor((u32)'?');
     return;
   }
   if((b & 0xc0u) != 0x80u) {
@@ -740,10 +773,7 @@ static void feed_utf8(u8 b)
   fb_ctx.utf8_rem--;
   if(fb_ctx.utf8_rem == 0) {
     u32 cp = fb_ctx.utf8_partial;
-    if(cp <= 0x10ffffu)
-      put_cp_at_cursor(cp);
-    else
-      put_cp_at_cursor((u32)'?');
+    put_cp_at_cursor((cp <= 0x10ffffu) ? cp : (u32)'?');
   }
 }
 
