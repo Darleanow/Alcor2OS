@@ -835,153 +835,6 @@ size_t fb_console_read(void *buf, size_t max)
   return n;
 }
 
-/* Opaque arrow cursor, 12 wide × 19 tall. Painted as a filled white shape
- * with an automatic 1-pixel black halo: any pixel adjacent to a "1" bit gets
- * black first, then the "1" pixels themselves are overpainted white. Visible
- * on any background. Old cursor is removed by re-blitting the cells it
- * covered — that way terminal writes between ticks don't leave artefacts. */
-static const u16 mouse_cursor_bits[19] = {
-    0x8000, /* 1............... */
-    0xC000, /* 11.............. */
-    0xE000, /* 111............. */
-    0xF000, /* 1111............ */
-    0xF800, /* 11111........... */
-    0xFC00, /* 111111.......... */
-    0xFE00, /* 1111111......... */
-    0xFF00, /* 11111111........ */
-    0xFF80, /* 111111111....... */
-    0xFFC0, /* 1111111111...... */
-    0xFFE0, /* 11111111111..... */
-    0xFE00, /* 1111111......... */
-    0xEE00, /* 111.111......... */
-    0xCE00, /* 11..111......... */
-    0x8700, /* 1....111........ */
-    0x0700, /* .....111........ */
-    0x0380, /* ......111....... */
-    0x0380, /* ......111....... */
-    0x0100, /* .......1........ */
-};
-
-#define CURSOR_W 12
-#define CURSOR_H 19
-
-static struct
-{
-  bool drawn;
-  i32  x;
-  i32  y;
-} mouse_cur;
-
-static inline bool cursor_bit(int row, int col)
-{
-  if(row < 0 || row >= CURSOR_H || col < 0 || col >= CURSOR_W)
-    return false;
-  return (mouse_cursor_bits[row] & (0x8000u >> col)) != 0;
-}
-
-static void mouse_cursor_paint(i32 cx, i32 cy)
-{
-  /* Halo pass: paint black at every neighbour of a "1" pixel that is not
-   * itself a "1". One pixel wide outline. */
-  for(int row = -1; row <= CURSOR_H; row++) {
-    for(int col = -1; col <= CURSOR_W; col++) {
-      if(cursor_bit(row, col))
-        continue;
-      bool border = false;
-      for(int dy = -1; dy <= 1 && !border; dy++)
-        for(int dx = -1; dx <= 1 && !border; dx++)
-          if((dx || dy) && cursor_bit(row + dy, col + dx))
-            border = true;
-      if(border)
-        fb_put_pixel((u32)(cx + col), (u32)(cy + row), 0x000000u);
-    }
-  }
-  /* Fill pass: white where the bitmap is set. */
-  for(int row = 0; row < CURSOR_H; row++) {
-    for(int col = 0; col < CURSOR_W; col++) {
-      if(cursor_bit(row, col))
-        fb_put_pixel((u32)(cx + col), (u32)(cy + row), 0xFFFFFFu);
-    }
-  }
-}
-
-/* bg-fill first so margin pixels (outside the cell grid) get cleaned, then
- * re-blit cells to restore glyphs. */
-static void mouse_cursor_erase(i32 cx, i32 cy)
-{
-  int x0 = cx - 1;
-  int y0 = cy - 1;
-  int x1 = cx + CURSOR_W;
-  int y1 = cy + CURSOR_H;
-
-  if(x0 < 0)
-    x0 = 0;
-  if(y0 < 0)
-    y0 = 0;
-  if(x1 >= (int)fb_ctx.width)
-    x1 = (int)fb_ctx.width - 1;
-  if(y1 >= (int)fb_ctx.height)
-    y1 = (int)fb_ctx.height - 1;
-  for(int y = y0; y <= y1; y++)
-    for(int x = x0; x <= x1; x++)
-      fb_put_pixel((u32)x, (u32)y, fb_ctx.default_bg);
-
-  int cw = fb_ctx.cell_w ? fb_ctx.cell_w : 1;
-  int ch = fb_ctx.cell_h ? fb_ctx.cell_h : 1;
-  int c0 = (x0 - fb_ctx.margin_x) / cw;
-  int c1 = (x1 - fb_ctx.margin_x) / cw;
-  int r0 = (y0 - fb_ctx.margin_y) / ch;
-  int r1 = (y1 - fb_ctx.margin_y) / ch;
-  if(c0 < 0)
-    c0 = 0;
-  if(r0 < 0)
-    r0 = 0;
-  if(c1 >= fb_ctx.cols)
-    c1 = fb_ctx.cols - 1;
-  if(r1 >= fb_ctx.rows)
-    r1 = fb_ctx.rows - 1;
-  for(int r = r0; r <= r1; r++)
-    for(int c = c0; c <= c1; c++)
-      blit_cell(c, r);
-}
-
-static void mouse_cursor_render(void)
-{
-  if(fb_ctx.yielded || !fb_ctx.cells)
-    return;
-  /* Keep the pointer hidden until the user actually moves it, so a fresh boot
-   * doesn't show a stray cursor pinned at screen centre. */
-  if(!mouse_has_moved())
-    return;
-  i32 nx, ny;
-  mouse_get_cursor(&nx, &ny);
-
-  /* Nothing to do if the pointer is already drawn where it belongs. Repainting
-   * an unmoved cursor every tick is what makes it flicker. */
-  if(mouse_cur.drawn && nx == mouse_cur.x && ny == mouse_cur.y)
-    return;
-
-  if(mouse_cur.drawn)
-    mouse_cursor_erase(mouse_cur.x, mouse_cur.y);
-  /* Also clear the destination, removing stale pixels from scroll races or
-   * scrollback/reclaim transitions. */
-  mouse_cursor_erase(nx, ny);
-  mouse_cursor_paint(nx, ny);
-  mouse_cur.drawn = true;
-  mouse_cur.x     = nx;
-  mouse_cur.y     = ny;
-}
-
-/* Called by flush_pending_scroll just before its kmemcpy: if a cursor is
- * painted, restore the cells under it so the scroll moves clean cells. */
-void mouse_cursor_invalidate_for_scroll(void)
-{
-  if(!mouse_cur.drawn)
-    return;
-  mouse_cursor_erase(mouse_cur.x, mouse_cur.y);
-  mouse_cur.drawn = false;
-}
-
 void fb_console_tick(void)
 {
   if(fb_ctx.yielded || !fb_ctx.cells)
@@ -1009,7 +862,7 @@ void fb_console_tick(void)
     if(fb_ctx.batch_r0 <= fb_ctx.batch_r1) {
       flush_batch();
       /* The re-blit may have painted over the pointer; force a full redraw. */
-      mouse_cur.drawn = false;
+      mouse_cursor_drop();
     }
 
     caret_refresh();
@@ -1181,14 +1034,14 @@ bool fb_console_app_cursor_keys(void)
 void fb_console_yield(void)
 {
   fb_ctx.yielded = true;
-  mouse_cur.drawn =
-      false; /* user owns the pixels; don't XOR-erase a stale pos. */
+  /* User owns the pixels; don't XOR-erase a stale pos when we come back. */
+  mouse_cursor_drop();
 }
 
 void fb_console_reclaim(void)
 {
-  fb_ctx.yielded  = false;
-  mouse_cur.drawn = false;
+  fb_ctx.yielded = false;
+  mouse_cursor_drop();
   if(!fb_ctx.cells)
     return;
   /* Fill the whole framebuffer with the theme background first: a yielding app

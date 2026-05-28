@@ -482,4 +482,19 @@ void scrollback_drop_pending(void);
  */
 void mouse_cursor_invalidate_for_scroll(void);
 
+/**
+ * @brief Paint or move the software mouse cursor. Early-outs when the pointer
+ * has not moved since the last call, so this is free at rest and as smooth as
+ * the tick rate in motion. Called from the PIT tick path.
+ */
+void mouse_cursor_render(void);
+
+/**
+ * @brief Forget the painted-at position without erasing pixels. Used by paths
+ * that are about to repaint the whole framebuffer themselves (yield, reclaim,
+ * blink-driven re-blit) — the cursor's pixels will be overwritten anyway, so
+ * the next @ref mouse_cursor_render must redraw rather than skip-as-unchanged.
+ */
+void mouse_cursor_drop(void);
+
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */
