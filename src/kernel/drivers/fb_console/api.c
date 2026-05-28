@@ -23,22 +23,21 @@ void             proc_signal_broadcast(int signum);
 fb_console_ctx_t fb_ctx;
 
 /**
- * @brief Bring the framebuffer console online and allocate its cell grid.
+ * @brief Populate @c fb_ctx with the geometry from Limine + the boot-time
+ * defaults (CP437 cell size, zero margin, Catppuccin palette).
  *
- * Sized to fill the framebuffer with the bitmap font (8×16); the grid is
- * resized once a userspace atlas registers a different cell size. Margins
- * stay zero on this path so boot output uses every pixel — the margin is
- * an atlas-era cosmetic, not a fundamental layout property.
+ * Pulled out of @ref fb_console_init so the init function's "did the kmalloc
+ * succeed" branch is the only failure path to read; the field assignments
+ * cannot fail and clutter that decision when inlined.
  *
- * @param fb      MMIO base of the framebuffer (kernel-mapped pointer).
+ * @param fb      MMIO base of the framebuffer.
  * @param width   Framebuffer width in pixels.
  * @param height  Framebuffer height in pixels.
- * @param pitch   Bytes per scanline (may exceed @p width * bytes-per-pixel).
- * @param bpp     Bits per pixel; normalised to 1/2/3/4 bytes-per-pixel.
- * @return @c true on success, @c false if the cell grid kmalloc failed
- *         (in which case every subsequent fb_console_* call no-ops).
+ * @param pitch   Bytes per scanline.
+ * @param bpp     Bits per pixel.
  */
-bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
+static void
+    fb_console_init_ctx(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
 {
   fb_ctx.base       = fb;
   fb_ctx.width      = width;
@@ -64,7 +63,20 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
   fb_ctx.cursor_visible = 1;
   fb_ctx.yielded        = false;
   fb_ctx.in_head = fb_ctx.in_tail = 0;
+}
 
+/**
+ * @brief Allocate the cell grid and prime every cell with the default empty
+ * state.
+ *
+ * Single failure point so callers can collapse "no grid, no rendering" into
+ * a NULL check elsewhere; on failure the rest of the renderer is forced into
+ * its no-op path.
+ *
+ * @return @c true on success, @c false on kmalloc failure.
+ */
+static bool fb_console_alloc_grid(void)
+{
   size_t total = (size_t)fb_ctx.rows * (size_t)fb_ctx.cols;
   fb_ctx.cells = kmalloc(total * sizeof(fb_cell_t));
   if(!fb_ctx.cells)
@@ -76,7 +88,30 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
     fb_ctx.cells[i].attr  = 0;
     fb_ctx.cells[i].dirty = 0;
   }
+  return true;
+}
 
+/**
+ * @brief Bring the framebuffer console online and allocate its cell grid.
+ *
+ * Sized to fill the framebuffer with the bitmap font (8x16); the grid is
+ * resized once a userspace atlas registers a different cell size. Margins
+ * stay zero on this path so boot output uses every pixel — the margin is
+ * an atlas-era cosmetic, not a fundamental layout property.
+ *
+ * @param fb      MMIO base of the framebuffer (kernel-mapped pointer).
+ * @param width   Framebuffer width in pixels.
+ * @param height  Framebuffer height in pixels.
+ * @param pitch   Bytes per scanline (may exceed @p width * bytes-per-pixel).
+ * @param bpp     Bits per pixel; normalised to 1/2/3/4 bytes-per-pixel.
+ * @return @c true on success, @c false if the cell grid kmalloc failed
+ *         (in which case every subsequent fb_console_* call no-ops).
+ */
+bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
+{
+  fb_console_init_ctx(fb, width, height, pitch, bpp);
+  if(!fb_console_alloc_grid())
+    return false;
   scrollback_alloc_for(fb_ctx.cols);
   flush_ci_ensure(fb_ctx.cols);
   return true;
@@ -199,6 +234,52 @@ size_t fb_console_read(void *buf, size_t max)
 }
 
 /**
+ * @brief Mark every blinking cell dirty and update the dirty-row range.
+ *
+ * Called once per blink half-period so SGR-blink cells get repainted with the
+ * new phase. Whole-grid scan is intentional — the renderer doesn't track a
+ * separate "blink cells" set; bytes saved per cell outweigh the cost of the
+ * occasional full sweep.
+ */
+static void mark_blink_cells_dirty(void)
+{
+  fb_ctx.batch_r0 = fb_ctx.rows;
+  fb_ctx.batch_r1 = -1;
+  for(int r = 0; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++) {
+      fb_cell_t *cell =
+          &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c];
+      if(!(cell->attr & FB_ATTR_BLINK))
+        continue;
+      cell->dirty = 1;
+      if(r < fb_ctx.batch_r0)
+        fb_ctx.batch_r0 = r;
+      if(r > fb_ctx.batch_r1)
+        fb_ctx.batch_r1 = r;
+    }
+}
+
+/**
+ * @brief Flip the blink phase and repaint every cell that depends on it.
+ *
+ * Repaint is batched (one VRAM pass for every blinking cell) and the mouse
+ * cursor is dropped beforehand because the same scanlines are about to be
+ * overwritten — the next @ref mouse_cursor_render redraws cleanly.
+ */
+static void blink_tick(void)
+{
+  fb_ctx.blink_on      = !fb_ctx.blink_on;
+  fb_ctx.cell_blink_on = fb_ctx.blink_on;
+  fb_ctx.blink_ticks   = FB_BLINK_PERIOD_TICKS;
+  mark_blink_cells_dirty();
+  if(fb_ctx.batch_r0 <= fb_ctx.batch_r1) {
+    flush_batch();
+    mouse_cursor_drop();
+  }
+  caret_refresh();
+}
+
+/**
  * @brief PIT tick callback: advance blink phase and reposition the mouse
  * cursor.
  *
@@ -212,36 +293,10 @@ void fb_console_tick(void)
 {
   if(fb_ctx.yielded || !fb_ctx.cells)
     return;
-  if(fb_ctx.blink_ticks == 0) {
-    fb_ctx.blink_on      = !fb_ctx.blink_on;
-    fb_ctx.cell_blink_on = fb_ctx.blink_on;
-    fb_ctx.blink_ticks   = FB_BLINK_PERIOD_TICKS;
-
-    fb_ctx.batch_r0 = fb_ctx.rows;
-    fb_ctx.batch_r1 = -1;
-    for(int r = 0; r < fb_ctx.rows; r++) {
-      for(int c = 0; c < fb_ctx.cols; c++) {
-        fb_cell_t *cell =
-            &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c];
-        if(cell->attr & FB_ATTR_BLINK) {
-          cell->dirty = 1;
-          if(r < fb_ctx.batch_r0)
-            fb_ctx.batch_r0 = r;
-          if(r > fb_ctx.batch_r1)
-            fb_ctx.batch_r1 = r;
-        }
-      }
-    }
-    if(fb_ctx.batch_r0 <= fb_ctx.batch_r1) {
-      flush_batch();
-      mouse_cursor_drop();
-    }
-
-    caret_refresh();
-  } else {
+  if(fb_ctx.blink_ticks == 0)
+    blink_tick();
+  else
     fb_ctx.blink_ticks--;
-  }
-
   mouse_cursor_render();
 }
 
@@ -330,6 +385,90 @@ static int install_atlas_payload(const fb_console_atlas_t *meta, u64 cp_bytes)
  *
  * @param meta  Validated descriptor.
  */
+/**
+ * @brief Compute the new column/row counts that fit @p new_cell_w/h pixels
+ * inside the framebuffer with @ref FB_CONSOLE_MARGIN on each side.
+ *
+ * Clamped to at least 1x1 so a comically large atlas doesn't produce a
+ * degenerate empty grid that breaks the renderer's bounds assumptions.
+ *
+ * @param new_cell_w  Cell width in pixels.
+ * @param new_cell_h  Cell height in pixels.
+ * @param new_cols    Out: column count.
+ * @param new_rows    Out: row count.
+ */
+static void compute_grid_dims(
+    int new_cell_w, int new_cell_h, int *new_cols, int *new_rows
+)
+{
+  *new_cols = (int)((fb_ctx.width - MARGIN_SIDES_COUNT * FB_CONSOLE_MARGIN) /
+                    (u64)new_cell_w);
+  *new_rows = (int)((fb_ctx.height - MARGIN_SIDES_COUNT * FB_CONSOLE_MARGIN) /
+                    (u64)new_cell_h);
+  if(*new_cols < 1)
+    *new_cols = 1;
+  if(*new_rows < 1)
+    *new_rows = 1;
+}
+
+/**
+ * @brief Allocate a fresh empty grid sized @p cols x @p rows and replace
+ *        @c fb_ctx.cells with it.
+ *
+ * Pre-existing cells are dropped — cell coordinates have no meaning across a
+ * column reflow. On kmalloc failure the existing grid stays in place; the
+ * caller (still inside the atlas install path) keeps rendering with the old
+ * geometry rather than crashing.
+ *
+ * @param cols  New column count.
+ * @param rows  New row count.
+ * @return @c true on success, @c false on allocation failure.
+ */
+static bool swap_grid_for_dims(int cols, int rows)
+{
+  size_t     total = (size_t)cols * (size_t)rows;
+  fb_cell_t *nc    = kmalloc(total * sizeof(fb_cell_t));
+  if(!nc)
+    return false;
+  for(size_t i = 0; i < total; i++) {
+    nc[i].cp   = ' ';
+    nc[i].fg   = fb_ctx.default_fg;
+    nc[i].bg   = fb_ctx.default_bg;
+    nc[i].attr = 0;
+  }
+  if(fb_ctx.cells)
+    kfree(fb_ctx.cells);
+  fb_ctx.cells = nc;
+  return true;
+}
+
+/**
+ * @brief Bg-fill the whole framebuffer (margins included) at the current
+ *        default bg colour.
+ *
+ * Used by @ref reflow_grid_for_atlas after a cell-size change so margin
+ * pixels that fell outside the new grid get cleared — without it, residue
+ * from the previous geometry would survive at the edges.
+ */
+static void clear_framebuffer_to_default_bg(void)
+{
+  for(u32 y = 0; y < fb_ctx.height; y++)
+    for(u32 x = 0; x < fb_ctx.width; x++)
+      fb_put_pixel(x, y, fb_ctx.default_bg);
+}
+
+/**
+ * @brief Reflow the cell grid when the new atlas's cell size differs from
+ *        the live one.
+ *
+ * No-op when the cell geometry matches what's already on screen (atlas reload
+ * with same metrics). On grid resize, the previous cell content is discarded —
+ * cell coordinates don't survive a cols/rows change in any well-defined way.
+ * On kmalloc failure the existing grid is left in place and the atlas blit
+ * clips to the old @c cell_w/cell_h instead.
+ *
+ * @param meta  Validated descriptor.
+ */
 static void reflow_grid_for_atlas(const fb_console_atlas_t *meta)
 {
   int new_cell_w = (int)meta->cell_w;
@@ -340,28 +479,11 @@ static void reflow_grid_for_atlas(const fb_console_atlas_t *meta)
      new_marg_x == fb_ctx.margin_x && new_marg_y == fb_ctx.margin_y)
     return;
 
-  int new_cols = (int)((fb_ctx.width - MARGIN_SIDES_COUNT * (u64)new_marg_x) /
-                       (u64)new_cell_w);
-  int new_rows = (int)((fb_ctx.height - MARGIN_SIDES_COUNT * (u64)new_marg_y) /
-                       (u64)new_cell_h);
-  if(new_cols < 1)
-    new_cols = 1;
-  if(new_rows < 1)
-    new_rows = 1;
-  size_t     total = (size_t)new_cols * (size_t)new_rows;
-  fb_cell_t *nc    = kmalloc(total * sizeof(fb_cell_t));
-  if(!nc)
+  int new_cols, new_rows;
+  compute_grid_dims(new_cell_w, new_cell_h, &new_cols, &new_rows);
+  if(!swap_grid_for_dims(new_cols, new_rows))
     return;
 
-  for(size_t i = 0; i < total; i++) {
-    nc[i].cp   = ' ';
-    nc[i].fg   = fb_ctx.default_fg;
-    nc[i].bg   = fb_ctx.default_bg;
-    nc[i].attr = 0;
-  }
-  if(fb_ctx.cells)
-    kfree(fb_ctx.cells);
-  fb_ctx.cells    = nc;
   fb_ctx.cols     = new_cols;
   fb_ctx.rows     = new_rows;
   fb_ctx.cell_w   = new_cell_w;
@@ -372,9 +494,7 @@ static void reflow_grid_for_atlas(const fb_console_atlas_t *meta)
   fb_ctx.saved_cx = fb_ctx.saved_cy = 0;
   scrollback_alloc_for(new_cols);
   flush_ci_ensure(new_cols);
-  for(u32 y = 0; y < fb_ctx.height; y++)
-    for(u32 x = 0; x < fb_ctx.width; x++)
-      fb_put_pixel(x, y, fb_ctx.default_bg);
+  clear_framebuffer_to_default_bg();
 }
 
 /**
