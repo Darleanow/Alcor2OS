@@ -27,7 +27,17 @@ static const u32 ansi16_bg[8] = {
     0x89b4fau, 0xf5c2e7u, 0x94e2d5u, 0xbac2deu,
 };
 
-/* xterm-256 → RGB. ANSI 16..231 are a 6×6×6 cube; 232..255 are 24 grays. */
+/**
+ * @brief Map an xterm 256-colour index to a 0xRRGGBB triplet.
+ *
+ * 0..15 are the standard + bright palettes; 16..231 are a 6×6×6 cube where
+ * each axis takes values @c {0, 95, 135, 175, 215, 255}; 232..255 are 24
+ * shades of grey. Formulas mirror the xterm definitions so a TUI program
+ * sees the same colours it would on real xterm.
+ *
+ * @param idx  Palette index 0..255.
+ * @return Packed RGB.
+ */
 static u32 ansi256_to_rgb(unsigned idx)
 {
   if(idx < 8u)
@@ -49,9 +59,18 @@ static u32 ansi256_to_rgb(unsigned idx)
   return (v << 16) | (v << 8) | v;
 }
 
-/* Active while ESC ( 0 is in effect. Maps the printable ASCII range used by
- * DEC ACS to Unicode box-drawing / math glyphs. The kernel's CP437 bitmap
- * lacks most of these; the userspace atlas will provide proper glyphs. */
+/**
+ * @brief Translate a DEC ACS (Special Graphics) printable ASCII byte to its
+ * Unicode equivalent.
+ *
+ * Active only while @c ESC @c ( @c 0 has selected G0=ACS. The kernel's CP437
+ * bitmap lacks most of these glyphs; the userspace atlas provides them when
+ * loaded. Unrecognised bytes pass through unchanged so ncurses falling back
+ * to ACS still draws plain text where a translation isn't defined.
+ *
+ * @param b  Input byte in the printable ASCII range.
+ * @return Translated codepoint, or @p b unchanged when no mapping exists.
+ */
 static u32 acs_to_unicode(u8 b)
 {
   switch(b) {
@@ -98,8 +117,18 @@ static u32 acs_to_unicode(u8 b)
   }
 }
 
-/* Parse N decimal params separated by `;` from esc_buf (everything before the
- * final byte). Empty fields default to 0. Returns count parsed. */
+/**
+ * @brief Parse up to @p maxn decimal parameters from @c esc_buf into @p pv.
+ *
+ * Empty fields default to 0 so a sequence like @c CSI@c ;5@c m parses as
+ * (0, 5) — matches xterm so SGR's "reset" semantics survive an empty
+ * first param. Stops before the final byte; @ref handle_csi consumes the
+ * final byte after parameter parsing.
+ *
+ * @param pv    Destination buffer for parsed params.
+ * @param maxn  Capacity of @p pv.
+ * @return Number of params parsed.
+ */
 static int csi_params(int *pv, int maxn)
 {
   int pn = fb_ctx.esc_len - 1;
@@ -120,6 +149,16 @@ static int csi_params(int *pv, int maxn)
   return np;
 }
 
+/**
+ * @brief Convenience for cursor-movement sequences: parse first param,
+ * default to 1 when missing or zero.
+ *
+ * Matches CSI semantics for @c CUU/@c CUD/@c CUF/@c CUB and friends — a
+ * missing or zero count means "move by 1", not "move by 0". Returning 1
+ * directly here keeps the @ref handle_csi switch arms tiny.
+ *
+ * @return First parameter or 1.
+ */
 static int csi_param1(void)
 {
   int pv[8];
@@ -129,6 +168,20 @@ static int csi_param1(void)
   return pv[0];
 }
 
+/**
+ * @brief Blank the inclusive rectangle [(y0, x0), (y1, x1)] using the
+ * current SGR fg/bg.
+ *
+ * Skips cells that already match the target state — every CSI @c K (erase
+ * line) on a clean line would otherwise mark hundreds of unchanged cells
+ * dirty and waste VRAM bandwidth. Bounds-clamp per cell rather than per
+ * call so partially-off-screen rectangles still erase the visible region.
+ *
+ * @param y0  Top row (inclusive).
+ * @param x0  Left column (inclusive).
+ * @param y1  Bottom row (inclusive).
+ * @param x1  Right column (inclusive).
+ */
 static void erase_rect(int y0, int x0, int y1, int x1)
 {
   for(int y = y0; y <= y1; y++) {
@@ -158,6 +211,10 @@ static void erase_rect(int y0, int x0, int y1, int x1)
   }
 }
 
+/**
+ * @brief @c CSI @c H / @c f — cursor position. Row and column are 1-based on
+ * the wire; the cell grid is 0-based, so each gets a @c -1.
+ */
 static void csi_cup(void)
 {
   int pv[4];
@@ -172,6 +229,14 @@ static void csi_cup(void)
   fb_ctx.cx = col - 1;
 }
 
+/**
+ * @brief @c CSI @c m — Select Graphic Rendition: mutate fg/bg/attrs.
+ *
+ * Long if-else ladder (not a switch) because of the range tests for the
+ * 30..37 / 40..47 / 90..97 / 100..107 colour ranges and the multi-param
+ * forms @c 38;2/@c 38;5/@c 48;2/@c 48;5. Unknown codes are silently ignored
+ * — matches xterm and avoids burning the screen on a malformed sequence.
+ */
 static void csi_sgr(void)
 {
   int pv[32];
@@ -246,6 +311,16 @@ static void csi_sgr(void)
   }
 }
 
+/**
+ * @brief @c CSI @c ?N @c h / @c CSI @c ?N @c l — DEC private mode set/reset.
+ *
+ * Only the modes the renderer actually honours are tracked: cursor
+ * visibility (mode 25) and application cursor keys (mode 1). Mode @c ?1049
+ * (alt screen) is intentionally ignored — we draw into the live grid and
+ * accept the cosmetic mismatch in exchange for simpler state.
+ *
+ * @param cmd  @c 'h' for set, @c 'l' for reset.
+ */
 static void csi_dec_private(char cmd)
 {
   /* esc_buf starts with `?`. Parse the trailing param list. */
@@ -280,6 +355,14 @@ static void csi_dec_private(char cmd)
   }
 }
 
+/**
+ * @brief Dispatch a fully-buffered CSI sequence to its handler.
+ *
+ * Big switch on the final byte. Unknown final bytes are dropped silently
+ * (the modern terminal protocol is full of obscure sequences — erroring
+ * out would burn legit output to the screen). The DEC private-mode prefix
+ * @c ? is detected up-front and routed through @ref csi_dec_private.
+ */
 static void handle_csi(void)
 {
   if(fb_ctx.esc_len < 1)
@@ -400,6 +483,15 @@ static void handle_csi(void)
   }
 }
 
+/**
+ * @brief Apply one C0 control character to the cursor/grid state.
+ *
+ * Only the four characters userspace actually emits in normal output
+ * (LF/CR/BS/HT) are honoured. Everything else (BEL, etc.) is dropped — no
+ * audible terminal, no in-band signalling we care about.
+ *
+ * @param b  Control byte (< 0x20 or 0x7F).
+ */
 static void handle_control(u8 b)
 {
   switch(b) {
@@ -428,9 +520,18 @@ static void handle_control(u8 b)
   }
 }
 
-/* UTF-8 decoder, byte at a time. Emits a codepoint at the cursor when one
- * completes; ANSI/CSI sequences are picked off ahead of this by feed_byte
- * before they ever reach feed_utf8. */
+/**
+ * @brief Stream one byte through the UTF-8 decoder; emit a codepoint when a
+ * sequence completes.
+ *
+ * Self-restarting on broken sequences (stray continuation, invalid lead):
+ * emits a @c ? and replays the offending byte fresh. This keeps a corrupt
+ * input stream from desyncing the parser forever, at the cost of one
+ * placeholder glyph. ANSI/CSI sequences are stripped upstream by
+ * @ref feed_byte so this only ever sees printable / control bytes.
+ *
+ * @param b  Input byte.
+ */
 static void feed_utf8(u8 b)
 {
   if(fb_ctx.utf8_rem == 0) {
@@ -484,6 +585,17 @@ static void feed_utf8(u8 b)
   }
 }
 
+/**
+ * @brief Top-level byte sink: drive the ESC/CSI state machine, fall through
+ * to UTF-8 on plain bytes.
+ *
+ * Four-state machine: 0 = normal, 1 = saw @c ESC waiting for next, 2 =
+ * inside CSI accumulating parameters, 3 = inside @c ESC@c (/@c ) charset
+ * designator. Unknown @c ESC@c <byte> sequences are dropped to state 0 so
+ * a stray escape doesn't poison subsequent output.
+ *
+ * @param b  Input byte.
+ */
 void feed_byte(u8 b)
 {
   switch(fb_ctx.esc_state) {

@@ -19,8 +19,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/* --- Constants ----------------------------------------------------------- */
-
 /** @brief Cursor blink half-period in PIT ticks (~2 Hz). Derived from
  * @c PIT_TICK_HZ so the visible rate is independent of the chosen PIT
  * frequency (the timer can be reprogrammed at runtime). */
@@ -80,7 +78,6 @@
  */
 #define ATLAS_MAX_BYTES_PER_PIXEL 4u
 
-/* --- SGR attribute bits --------------------------------------------------- */
 /* One byte covers every SGR feature we render (blink/bold/italic/underline/
  * reverse), so attr fits in a u8 inside the cell. Keeping the cell small
  * matters: the grid is one contiguous kmalloc allocation, so bytes saved per
@@ -101,7 +98,6 @@
 /** @brief SGR 7: reverse video — swaps fg/bg at blit time, not in the cell. */
 #define FB_ATTR_REVERSE (1u << 4)
 
-/* --- SGR / DEC private mode codes ---------------------------------------- */
 /* The SGR_* values below are the wire-format numbers a terminal emits after
  * @c CSI; mirrored verbatim from ECMA-48 / xterm so an unmodified TUI program
  * sees the same behaviour as it would on a real terminal. Defined here so
@@ -196,8 +192,6 @@
 /** @brief DEC private mode 25 — cursor visibility. */
 #define DEC_PM_CURSOR_VISIBLE 25
 
-/* --- Pixel encoding ------------------------------------------------------ */
-
 /** @brief Alpha byte set to opaque in a 0xAARRGGBB packed pixel. The kernel
  * only emits opaque writes — this masks every result so a downstream
  * compositor that respects alpha doesn't see ghosts. */
@@ -207,8 +201,6 @@
  * @c & 255 reads as a magic number in dense colour code. */
 #define BYTE_MASK 0xFFu
 
-/* --- TTY behaviour ------------------------------------------------------- */
-
 /** @brief Tab stops every 8 cells. ANSI/xterm default; matches what userspace
  * terminfo expects, so editors and shells align as designed. */
 #define TAB_WIDTH 8
@@ -217,7 +209,6 @@
  * tab stop. Derived from @ref TAB_WIDTH so the two stay in sync. */
 #define TAB_SNAP_MASK (TAB_WIDTH - 1)
 
-/* --- Hardware framebuffer depths ----------------------------------------- */
 /* The FB_BPP_* values are the bits-per-pixel modes Limine can report;
  * FB_BYTES_PER_PIXEL_* is the corresponding stride coefficient. Centralised
  * here so the fast-path predicate (@c bytes_pp == @c FB_BYTES_PER_PIXEL_32)
@@ -249,7 +240,30 @@
  * Picked to be readable across font sizes from 8 px CP437 to 20 px Fira. */
 #define UNDERLINE_THICKNESS_PX 2u
 
-/* --- Types --------------------------------------------------------------- */
+/** @brief Fully-opaque alpha value (max byte). Marker for "skip the multiply,
+ * just use the foreground" in the alpha-blend fast path. */
+#define ALPHA_OPAQUE 255u
+
+/** @brief Rounding bias for fixed-point alpha-blend division: adding 128
+ * before the shift-by-8 converts truncation to round-to-nearest, avoiding
+ * one-quantum darkening of mid-alpha pixels. */
+#define ALPHA_ROUND_BIAS 128u
+
+/* The default fg/bg the console boots into. Picked from Catppuccin Mocha so
+ * boot output matches the userspace theme and there's no jarring re-paint
+ * once a userspace atlas takes over. */
+
+/** @brief Catppuccin Mocha "Text" — default foreground colour. */
+#define CATPPUCCIN_MOCHA_TEXT 0xcdd6f4u
+
+/** @brief Catppuccin Mocha "Base" — default background colour. */
+#define CATPPUCCIN_MOCHA_BASE 0x1e1e2eu
+
+/** @brief Number of margin sides (left+right or top+bottom) — derived from
+ * how @ref FB_CONSOLE_MARGIN is applied symmetrically on both edges. Named
+ * so the reflow arithmetic in @ref fb_console_set_atlas doesn't have a bare
+ * 2 doing layout work. */
+#define MARGIN_SIDES_COUNT 2u
 
 /**
  * @brief One cell of the text grid.
@@ -361,8 +375,6 @@ typedef struct
 /** @brief The framebuffer console singleton. Defined in @c fb_console.c. */
 extern fb_console_ctx_t fb_ctx;
 
-/* --- Inline hot-path primitives ------------------------------------------ */
-
 /**
  * @brief 32-bit splat using @c rep @c stosl. Inlined across every TU that
  * touches pixels because the call overhead dominates the work for cell-sized
@@ -415,15 +427,15 @@ static inline void blend_glyph_row(
         dst[gx] = bg_pk;
         continue;
       }
-      if(a == 255u) {
+      if(a == ALPHA_OPAQUE) {
         dst[gx] = fg_pk;
         continue;
       }
-      u32 inv = 255u - a;
+      u32 inv = ALPHA_OPAQUE - a;
       dst[gx] = BGRA_OPAQUE_ALPHA |
-                ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
-                ((fg_g * a + bg_g * inv + 128u) >> 8) << 8 |
-                (fg_b * a + bg_b * inv + 128u) >> 8;
+                ((fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> 8) << 16 |
+                ((fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> 8) << 8 |
+                (fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> 8;
     }
   } else {
     for(u32 gx = 0; gx < n; gx++) {
@@ -433,20 +445,18 @@ static inline void blend_glyph_row(
         dst[gx] = bg_pk;
         continue;
       }
-      if(a == 255u) {
+      if(a == ALPHA_OPAQUE) {
         dst[gx] = fg_pk;
         continue;
       }
-      u32 inv = 255u - a;
+      u32 inv = ALPHA_OPAQUE - a;
       dst[gx] = BGRA_OPAQUE_ALPHA |
-                ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
-                ((fg_g * a + bg_g * inv + 128u) >> 8) << 8 |
-                (fg_b * a + bg_b * inv + 128u) >> 8;
+                ((fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> 8) << 16 |
+                ((fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> 8) << 8 |
+                (fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> 8;
     }
   }
 }
-
-/* --- Cross-file function decls ------------------------------------------- */
 
 /* fb_console_pixel.c — raw framebuffer access */
 
