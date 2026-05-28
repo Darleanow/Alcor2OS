@@ -18,22 +18,42 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
+/**
+ * @brief Per-cell scratch built by @ref flush_batch before walking scanlines.
+ *
+ * Holds everything a single cell's row blit needs so the inner scanline loop
+ * never re-touches the @ref fb_cell_t — that loop already runs @c cell_h times
+ * per dirty cell, so any per-cell work paid up-front is amortised.
+ *
+ * @c glyph_base @c == @c NULL signals "bg-only" (space, blink-off, or atlas
+ * miss): the scanline loop fills the cell width with @c bg_pk and skips the
+ * blend altogether.
+ */
 struct flush_cell_cache
 {
-  const u8 *glyph_base; /* NULL = bg-only (space / blink-off) */
-  u32       bg_pk;
-  u32       fg_pk;
-  u32       fg_r, fg_g, fg_b;
-  u32       bg_r, bg_g, bg_b;
-  bool      active;
-  bool      underline;
+  const u8 *glyph_base; /**< Atlas row start, or NULL for bg-only cells. */
+  u32       bg_pk;      /**< 0xFF000000 | effective bg, ready for fill32. */
+  u32       fg_pk; /**< 0xFF000000 | effective fg; underline uses it too. */
+  u32       fg_r, fg_g, fg_b; /**< Unpacked fg channels for the blender. */
+  u32       bg_r, bg_g, bg_b; /**< Unpacked bg channels for the blender. */
+  bool      active;    /**< true when this cell's @c dirty bit was set. */
+  bool      underline; /**< true when SGR underline is on for this cell. */
 };
 
-/* Per-row scratch used by flush_batch. ~48 B per cell — at 160+ cols far too
- * large for the 8 KiB kernel stack, so heap-owned and grown on demand
- * whenever the grid widens. */
-static struct flush_cell_cache *s_flush_ci      = NULL;
-static int                      s_flush_ci_cols = 0;
+/**
+ * @brief Per-row scratch used by @ref flush_batch.
+ *
+ * Sized at ~48 B per cell — at 160+ cols far too large for the 8 KiB kernel
+ * stack, so heap-owned and only grown via @ref flush_ci_ensure when the grid
+ * widens. NULL until the first reflow allocates it.
+ */
+static struct flush_cell_cache *s_flush_ci = NULL;
+
+/**
+ * @brief Capacity of @ref s_flush_ci, in cells. Tracked separately because the
+ * heap allocator does not let us query a block's size.
+ */
+static int s_flush_ci_cols = 0;
 
 /**
  * @brief Grow the per-row scratch to hold at least @p cols entries.
