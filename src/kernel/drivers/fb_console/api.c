@@ -30,6 +30,11 @@ fb_console_ctx_t fb_ctx;
  * stay zero on this path so boot output uses every pixel — the margin is
  * an atlas-era cosmetic, not a fundamental layout property.
  *
+ * @param fb      MMIO base of the framebuffer (kernel-mapped pointer).
+ * @param width   Framebuffer width in pixels.
+ * @param height  Framebuffer height in pixels.
+ * @param pitch   Bytes per scanline (may exceed @p width * bytes-per-pixel).
+ * @param bpp     Bits per pixel; normalised to 1/2/3/4 bytes-per-pixel.
  * @return @c true on success, @c false if the cell grid kmalloc failed
  *         (in which case every subsequent fb_console_* call no-ops).
  */
@@ -241,30 +246,45 @@ void fb_console_tick(void)
 }
 
 /**
- * @brief Register a userspace glyph atlas and reflow the cell grid to its
- * cell size.
+ * @brief Validate @p meta and the user buffers it points at.
  *
- * Multi-step coordinator: validate descriptor, mirror user buffers into
- * kernel-owned copies (so a later @c mmap(2) tear-down by the submitter
- * doesn't yank the atlas out from under the renderer), then reflow the grid
- * and broadcast @c SIGWINCH so every TUI re-queries TIOCGWINSZ. Existing
- * cell content is discarded because cell coordinates don't survive a
- * cols/rows change in any well-defined way.
+ * Kept separate from the install step so a bad submission fails fast without
+ * any allocation churn. Both halves of validation (logical caps via
+ * @ref atlas_meta_is_sane, and address-range checks via vmm) must pass.
  *
- * @param meta  Atlas descriptor.
- * @return 0 on success, -1 on any validation or allocation failure.
+ * @param meta      Atlas descriptor copied from userspace.
+ * @param cp_bytes  Out: size of the codepoint map in bytes, for the install
+ *                  step to reuse.
+ * @return @c true if the descriptor is safe to copy; @c false otherwise.
  */
-int fb_console_set_atlas(const fb_console_atlas_t *meta)
+static bool validate_atlas_meta(const fb_console_atlas_t *meta, u64 *cp_bytes)
 {
   if(!meta || !atlas_meta_is_sane(meta))
-    return -1;
-
+    return false;
   if(!vmm_is_user_range((void *)(u64)meta->pixels_user, meta->pixels_size))
-    return -1;
-  u64 cp_bytes = (u64)meta->n_cp * sizeof(u32);
-  if(!vmm_is_user_range((void *)(u64)meta->cp_map_user, cp_bytes))
-    return -1;
+    return false;
+  *cp_bytes = (u64)meta->n_cp * sizeof(u32);
+  if(!vmm_is_user_range((void *)(u64)meta->cp_map_user, *cp_bytes))
+    return false;
+  return true;
+}
 
+/**
+ * @brief Mirror the user-side atlas into kernel-owned buffers and publish
+ *        every field of @p meta into @c fb_ctx.atlas_*.
+ *
+ * The copy is what lets the kernel keep rendering after the submitting
+ * process @c munmap's its source — without it, every cell blit would race
+ * the unmap. Previous atlas storage is kfree'd here so a reload doesn't
+ * leak memory across submissions.
+ *
+ * @param meta      Validated descriptor.
+ * @param cp_bytes  Size of the codepoint map (from @ref validate_atlas_meta).
+ * @return 0 on success, -1 if either copy buffer kmalloc failed (state
+ *         unchanged in that case).
+ */
+static int install_atlas_payload(const fb_console_atlas_t *meta, u64 cp_bytes)
+{
   u8  *new_pixels = kmalloc(meta->pixels_size);
   u32 *new_cp_map = kmalloc(cp_bytes);
   if(!new_pixels || !new_cp_map) {
@@ -295,66 +315,113 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   fb_ctx.atlas_bold_base   = meta->bold_offset;
   fb_ctx.atlas_italic_base = meta->italic_offset;
   fb_ctx.atlas_active      = true;
+  return 0;
+}
 
+/**
+ * @brief Reflow the cell grid when the new atlas's cell size differs from
+ *        the live one.
+ *
+ * No-op when the cell geometry matches what's already on screen (atlas
+ * reload with same metrics). On grid resize, the previous cell content is
+ * discarded — cell coordinates don't survive a cols/rows change in any
+ * well-defined way. On kmalloc failure, the existing grid is left in place
+ * and the atlas blit clips to the old @c cell_w/cell_h instead.
+ *
+ * @param meta  Validated descriptor.
+ */
+static void reflow_grid_for_atlas(const fb_console_atlas_t *meta)
+{
   int new_cell_w = (int)meta->cell_w;
   int new_cell_h = (int)meta->cell_h;
   int new_marg_x = FB_CONSOLE_MARGIN;
   int new_marg_y = FB_CONSOLE_MARGIN;
-  int old_cols   = fb_ctx.cols;
-  int old_rows   = fb_ctx.rows;
-  if(new_cell_w != fb_ctx.cell_w || new_cell_h != fb_ctx.cell_h ||
-     new_marg_x != fb_ctx.margin_x || new_marg_y != fb_ctx.margin_y) {
-    int new_cols = (int)((fb_ctx.width - MARGIN_SIDES_COUNT * (u64)new_marg_x) /
-                         (u64)new_cell_w);
-    int new_rows =
-        (int)((fb_ctx.height - MARGIN_SIDES_COUNT * (u64)new_marg_y) /
-              (u64)new_cell_h);
-    if(new_cols < 1)
-      new_cols = 1;
-    if(new_rows < 1)
-      new_rows = 1;
-    size_t     total = (size_t)new_cols * (size_t)new_rows;
-    fb_cell_t *nc    = kmalloc(total * sizeof(fb_cell_t));
-    if(nc) {
-      for(size_t i = 0; i < total; i++) {
-        nc[i].cp   = ' ';
-        nc[i].fg   = fb_ctx.default_fg;
-        nc[i].bg   = fb_ctx.default_bg;
-        nc[i].attr = 0;
-      }
-      if(fb_ctx.cells)
-        kfree(fb_ctx.cells);
-      fb_ctx.cells    = nc;
-      fb_ctx.cols     = new_cols;
-      fb_ctx.rows     = new_rows;
-      fb_ctx.cell_w   = new_cell_w;
-      fb_ctx.cell_h   = new_cell_h;
-      fb_ctx.margin_x = new_marg_x;
-      fb_ctx.margin_y = new_marg_y;
-      fb_ctx.cx = fb_ctx.cy = 0;
-      fb_ctx.saved_cx = fb_ctx.saved_cy = 0;
-      scrollback_alloc_for(new_cols);
-      flush_ci_ensure(new_cols);
-      for(u32 y = 0; y < fb_ctx.height; y++)
-        for(u32 x = 0; x < fb_ctx.width; x++)
-          fb_put_pixel(x, y, fb_ctx.default_bg);
-    }
-    /* If kmalloc fails, fall through and repaint with the existing grid;
-     * the atlas blit will just clip to fb_ctx.cell_w/cell_h as before. */
-  }
+  if(new_cell_w == fb_ctx.cell_w && new_cell_h == fb_ctx.cell_h &&
+     new_marg_x == fb_ctx.margin_x && new_marg_y == fb_ctx.margin_y)
+    return;
 
+  int new_cols = (int)((fb_ctx.width - MARGIN_SIDES_COUNT * (u64)new_marg_x) /
+                       (u64)new_cell_w);
+  int new_rows = (int)((fb_ctx.height - MARGIN_SIDES_COUNT * (u64)new_marg_y) /
+                       (u64)new_cell_h);
+  if(new_cols < 1)
+    new_cols = 1;
+  if(new_rows < 1)
+    new_rows = 1;
+  size_t     total = (size_t)new_cols * (size_t)new_rows;
+  fb_cell_t *nc    = kmalloc(total * sizeof(fb_cell_t));
+  if(!nc)
+    return;
+
+  for(size_t i = 0; i < total; i++) {
+    nc[i].cp   = ' ';
+    nc[i].fg   = fb_ctx.default_fg;
+    nc[i].bg   = fb_ctx.default_bg;
+    nc[i].attr = 0;
+  }
+  if(fb_ctx.cells)
+    kfree(fb_ctx.cells);
+  fb_ctx.cells    = nc;
+  fb_ctx.cols     = new_cols;
+  fb_ctx.rows     = new_rows;
+  fb_ctx.cell_w   = new_cell_w;
+  fb_ctx.cell_h   = new_cell_h;
+  fb_ctx.margin_x = new_marg_x;
+  fb_ctx.margin_y = new_marg_y;
+  fb_ctx.cx = fb_ctx.cy = 0;
+  fb_ctx.saved_cx = fb_ctx.saved_cy = 0;
+  scrollback_alloc_for(new_cols);
+  flush_ci_ensure(new_cols);
+  for(u32 y = 0; y < fb_ctx.height; y++)
+    for(u32 x = 0; x < fb_ctx.width; x++)
+      fb_put_pixel(x, y, fb_ctx.default_bg);
+}
+
+/**
+ * @brief Repaint the whole grid and wake every TUI when the geometry changed.
+ *
+ * @c SIGWINCH is sent only when the grid dimensions actually changed; a same-
+ * size reload doesn't need to disturb any TUI's redraw state.
+ *
+ * @param old_cols  Column count captured before @ref reflow_grid_for_atlas.
+ * @param old_rows  Row count captured before @ref reflow_grid_for_atlas.
+ */
+static void repaint_and_notify_winsize(int old_cols, int old_rows)
+{
   scrollback_drop_pending();
   for(int r = 0; r < fb_ctx.rows; r++)
     for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
   caret_clear_drawn();
   caret_paint();
-
-  /* Wake every TUI so they re-query TIOCGWINSZ and redraw at the real grid
-   * size. Skipped when the grid stayed the same (e.g. atlas reloaded with
-   * identical metrics) — no point waking anyone in that case. */
   if(fb_ctx.cols != old_cols || fb_ctx.rows != old_rows)
     proc_signal_broadcast(SIGWINCH);
+}
+
+/**
+ * @brief Register a userspace glyph atlas and reflow the cell grid to its
+ *        cell size.
+ *
+ * Pipeline: validate descriptor → mirror user buffers into kernel copies →
+ * reflow the grid if cell geometry changed → repaint + broadcast
+ * @c SIGWINCH. Each phase is its own helper so the failure cases (validation
+ * fails, copy OOM, reflow OOM) have unambiguous return paths.
+ *
+ * @param meta  Atlas descriptor.
+ * @return 0 on success, -1 on any validation or installation failure.
+ */
+int fb_console_set_atlas(const fb_console_atlas_t *meta)
+{
+  u64 cp_bytes;
+  if(!validate_atlas_meta(meta, &cp_bytes))
+    return -1;
+  if(install_atlas_payload(meta, cp_bytes) < 0)
+    return -1;
+
+  int old_cols = fb_ctx.cols;
+  int old_rows = fb_ctx.rows;
+  reflow_grid_for_atlas(meta);
+  repaint_and_notify_winsize(old_cols, old_rows);
   return 0;
 }
 
