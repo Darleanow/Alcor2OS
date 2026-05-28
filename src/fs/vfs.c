@@ -774,9 +774,17 @@ i64 vfs_dup2(i64 oldfd, i64 newfd)
   return newfd;
 }
 
-/** @brief Return positive if @p fd has data available without blocking, 0 if
- * not ready. Pipes are handled directly; everything else goes through the
- * driver's @c poll op (regular files fall back to "always ready"). */
+/**
+ * @brief Poll @p fd's read end for non-blocking readiness.
+ *
+ * Pipe write ends are invalid for reading and return @c -EBADF. Pipe read
+ * ends consult the ring buffer directly. Other fds delegate to the driver's
+ * @c poll op; regular files fall back to "always readable".
+ *
+ * @param fd  File descriptor.
+ * @return 1 if a read would not block, 0 if it would, negative @c -errno
+ *         on a bad fd.
+ */
 i32 vfs_select_read_ready(i64 fd)
 {
   i32 idx = fd_to_oft(fd);
@@ -791,9 +799,17 @@ i32 vfs_select_read_ready(i64 fd)
   return 1;
 }
 
-/** @brief Return positive if @p fd can accept a write without blocking, 0 if
- * not ready. Pipes are handled directly; everything else delegates to the
- * driver's @c poll op (regular files default to "always writable"). */
+/**
+ * @brief Poll @p fd's write end for non-blocking readiness.
+ *
+ * Pipe read ends are invalid for writing and return @c -EBADF. Pipe write
+ * ends consult the ring buffer's free space. Other fds delegate to the
+ * driver's @c poll op; regular files fall back to "always writable".
+ *
+ * @param fd  File descriptor.
+ * @return 1 if a write would not block, 0 if it would, negative @c -errno
+ *         on a bad fd.
+ */
 i32 vfs_select_write_ready(i64 fd)
 {
   i32 idx = fd_to_oft(fd);

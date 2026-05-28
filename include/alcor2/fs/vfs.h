@@ -187,16 +187,12 @@ typedef struct
   /**
    * @brief Report I/O readiness for @c select / @c poll.
    *
-   * Implementations return the subset of @p events that are currently
-   * actionable without blocking.  @c POLL_IN means a non-blocking @c read
-   * would either yield data or detect EOF; @c POLL_OUT means a write would
-   * make progress.  May be @c NULL — the VFS treats absent op as
-   * "always ready" for both directions, matching regular-file semantics.
+   * May be @c NULL — VFS treats an absent op as "always ready" (regular-file
+   * semantics).
    *
    * @param fh      Open handle.
-   * @param events  Bitmask of @c POLL_IN / @c POLL_OUT the caller is asking
-   *                about.
-   * @return Subset of @p events that are ready right now.
+   * @param events  Bitmask of @c POLL_IN / @c POLL_OUT to query.
+   * @return Subset of @p events actionable right now.
    */
   u32 (*poll)(fs_handle_t fh, u32 events);
 } fs_ops_t;

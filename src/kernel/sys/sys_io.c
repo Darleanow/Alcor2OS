@@ -27,6 +27,13 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
 
 /**
  * @brief Read up to @p count bytes from @p fd into @p buf.
+ *
+ * @param fd     File descriptor to read from.
+ * @param buf    User-space destination buffer (must be writable for @p count
+ *               bytes).
+ * @param count  Maximum bytes to read.
+ * @return Bytes read on success (0 on EOF), negative @c -errno on failure
+ *         (@c -EFAULT, @c -EBADF, etc.).
  */
 u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
@@ -44,6 +51,12 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 
 /**
  * @brief Write @p count bytes from @p buf to @p fd.
+ *
+ * @param fd     File descriptor to write to.
+ * @param buf    User-space source buffer (must be readable for @p count
+ *               bytes).
+ * @param count  Bytes to write.
+ * @return Bytes written on success, negative @c -errno on failure.
  */
 u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
@@ -163,9 +176,18 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
   return total;
 }
 
-/* Dispatch each iov as a separate sys_write — the VFS driver decides how to
- * coalesce. tty_write goes through fb_console_write whose begin/end pair is
- * idempotent enough that a multi-iov refresh remains cheap. */
+/**
+ * @brief Gathered-write across @p iovcnt iovecs into @p fd.
+ *
+ * Each iov is dispatched as a separate ::sys_write — the VFS driver decides
+ * how to coalesce. @c tty_write goes through @c fb_console_write whose
+ * begin/end pair is idempotent enough that a multi-iov refresh stays cheap.
+ *
+ * @param fd      File descriptor to write to.
+ * @param iov     User-space pointer to @c struct @c iovec array.
+ * @param iovcnt  Number of iovecs in the array.
+ * @return Total bytes written on success, negative @c -errno on failure.
+ */
 u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;

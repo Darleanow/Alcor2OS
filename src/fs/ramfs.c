@@ -286,8 +286,16 @@ static i64 ram_ioctl(fs_handle_t fh, u64 request, u64 arg)
   return -ENOTTY;
 }
 
-/* Regular files are always ready; chardevs delegate to their poll callback
- * (or default to "ready" if the driver didn't supply one). */
+/**
+ * @brief Report read/write readiness for a ramfs node.
+ *
+ * Regular files are always ready; chardevs delegate to @c cops->poll when
+ * the driver supplied one, otherwise default to "ready" for both directions.
+ *
+ * @param fh      Ramfs node handle.
+ * @param events  Bitmask of @c POLL_IN / @c POLL_OUT to query.
+ * @return Subset of @p events actionable now.
+ */
 static u32 ram_poll(fs_handle_t fh, u32 events)
 {
   ram_node_t *node = (ram_node_t *)fh;
