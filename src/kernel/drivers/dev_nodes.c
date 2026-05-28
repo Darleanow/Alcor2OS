@@ -25,14 +25,6 @@
 #include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
 
-/* TTY ioctl request codes (Linux values, matched by musl). */
-#define TCGETS     0x5401
-#define TCSETS     0x5402
-#define TCSETSW    0x5403
-#define TCSETSF    0x5404
-#define TIOCGWINSZ 0x5413
-#define TIOCSWINSZ 0x5414
-
 /**
  * @brief Read from /dev/null — always returns 0 (EOF).
  *
@@ -83,32 +75,6 @@ static i64 zero_read(void *ctx, void *buf, u64 count, u64 offset)
   (void)offset;
   kzero(buf, count);
   return (i64)count;
-}
-
-/** @brief Linux-compatible @c struct @c winsize layout for ioctl wire ABI. */
-typedef struct
-{
-  u16 row, col, xpixel, ypixel;
-} k_winsize_t;
-
-/**
- * @brief Fill @p w from the live fb_console grid dimensions.
- *
- * @param w  Destination winsize buffer.
- */
-static void winsize_from_console(k_winsize_t *w)
-{
-  int cols = 80;
-  int rows = 25;
-  fb_console_get_size(&cols, &rows);
-  if(cols <= 0)
-    cols = 80;
-  if(rows <= 0)
-    rows = 25;
-  w->row    = (u16)rows;
-  w->col    = (u16)cols;
-  w->xpixel = 0;
-  w->ypixel = 0;
 }
 
 /**
@@ -228,20 +194,20 @@ static i64 tty_ioctl(void *ctx, u64 request, u64 arg)
     return -EINVAL;
 
   switch(request) {
-  case TIOCGWINSZ: {
+  case KTERM_TIOCGWINSZ: {
     k_winsize_t w;
-    winsize_from_console(&w);
+    fb_console_fill_winsize(&w);
     return copy_to_user(arg, &w, sizeof(w));
   }
-  case TIOCSWINSZ:
+  case KTERM_TIOCSWINSZ:
     if(!vmm_is_user_range((void *)arg, sizeof(k_winsize_t)))
       return -EFAULT;
     return 0;
-  case TCGETS:
+  case KTERM_TCGETS:
     return copy_to_user(arg, &p->termios, sizeof(p->termios));
-  case TCSETS:
-  case TCSETSW:
-  case TCSETSF:
+  case KTERM_TCSETS:
+  case KTERM_TCSETSW:
+  case KTERM_TCSETSF:
     return copy_from_user(&p->termios, arg, sizeof(p->termios));
 
   case ALCOR2_IOC_KBD_SET_LAYOUT: {

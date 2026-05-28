@@ -1781,6 +1781,37 @@ void fb_console_get_size(int *cols, int *rows)
     *rows = ctx.rows;
 }
 
+/**
+ * @brief Pack live console geometry into a Linux winsize for a TIOCGWINSZ
+ * answer.
+ *
+ * Pre-seeded with the VT100 fallback and re-clamped after the query because
+ * @ref fb_console_get_size returns the raw @c ctx fields without sanitising —
+ * if a TTY ioctl ever races the boot path before @ref fb_console_init runs we
+ * still hand userspace something a TUI can divide by.
+ *
+ * Pixel dimensions are zeroed: the grid is a character matrix, no caller has
+ * a use for the underlying pixel span and reporting a wrong value would mislead
+ * TUIs into laying out against a non-existent geometry.
+ *
+ * @param out  Destination winsize. Caller-owned, no NULL guard (a kernel
+ *             caller passing NULL is a logic bug — fail fast via crash).
+ */
+void fb_console_fill_winsize(k_winsize_t *out)
+{
+  int cols = KTERM_WINSIZE_FALLBACK_COLS;
+  int rows = KTERM_WINSIZE_FALLBACK_ROWS;
+  fb_console_get_size(&cols, &rows);
+  if(cols <= 0)
+    cols = KTERM_WINSIZE_FALLBACK_COLS;
+  if(rows <= 0)
+    rows = KTERM_WINSIZE_FALLBACK_ROWS;
+  out->row    = rows;
+  out->col    = cols;
+  out->xpixel = 0;
+  out->ypixel = 0;
+}
+
 bool fb_console_app_cursor_keys(void)
 {
   return ctx.app_cursor_keys;
