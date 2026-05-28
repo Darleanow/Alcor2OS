@@ -722,6 +722,31 @@ extern const u32 ansi16_bg[8];
 u32 ansi256_to_rgb(unsigned idx);
 
 /**
+ * @brief Parse up to @p maxn decimal parameters from @c esc_buf into @p pv.
+ *
+ * Defined in @c csi.c; @c sgr.c also consumes it for the @c CSI @c m param
+ * list. Empty fields default to 0 so the parser stays xterm-compatible.
+ *
+ * @param pv    Destination buffer.
+ * @param maxn  Capacity of @p pv.
+ * @return Number of params parsed.
+ */
+int csi_params(int *pv, int maxn);
+
+/**
+ * @brief @c CSI @c m — Select Graphic Rendition. Defined in @c sgr.c; called
+ * from @c csi.c's @ref handle_csi switch.
+ */
+void csi_sgr(void);
+
+/**
+ * @brief @c CSI dispatcher — final-byte switch for a buffered CSI sequence.
+ * Defined in @c csi.c; called from @c ansi.c's state machine when @c esc_buf
+ * is complete.
+ */
+void handle_csi(void);
+
+/**
  * @brief Push one byte through the ANSI/CSI/charset state machine.
  *
  * Recognised sequences mutate @c fb_ctx.cur_* / @c fb_ctx.cx / cy directly;
