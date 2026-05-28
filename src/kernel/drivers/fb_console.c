@@ -120,7 +120,7 @@ static struct
   u32  atlas_fallback;
   u32  atlas_bold_base;   /* first bold glyph slot; 0 = no bold atlas   */
   u32  atlas_italic_base; /* first italic glyph slot; 0 = no italic atlas */
-} ctx;
+} fb_ctx;
 
 #define ATLAS_NO_GLYPH    0xFFFFFFFFu
 #define SCROLLBACK_ROWS   500
@@ -146,10 +146,11 @@ static u8 bytes_pp_from_bpp(u16 bpp)
 
 static void fb_put_pixel(u32 x, u32 y, u32 color)
 {
-  if(!ctx.base || x >= ctx.width || y >= ctx.height)
+  if(!fb_ctx.base || x >= fb_ctx.width || y >= fb_ctx.height)
     return;
-  volatile u8 *p = ctx.base + (u64)y * ctx.pitch + (u64)x * ctx.bytes_pp;
-  switch(ctx.bytes_pp) {
+  volatile u8 *p =
+      fb_ctx.base + (u64)y * fb_ctx.pitch + (u64)x * fb_ctx.bytes_pp;
+  switch(fb_ctx.bytes_pp) {
   case 4:
     *(volatile u32 *)p = color | 0xFF000000u;
     return;
@@ -175,14 +176,14 @@ static void fb_put_pixel(u32 x, u32 y, u32 color)
 /** Resolve a codepoint to an atlas glyph index, or ATLAS_NO_GLYPH if absent. */
 static u32 atlas_lookup(u32 cp)
 {
-  if(!ctx.atlas_active)
+  if(!fb_ctx.atlas_active)
     return ATLAS_NO_GLYPH;
-  if(cp < ctx.atlas_n_cp) {
-    u32 idx = ctx.atlas_cp_map[cp];
-    if(idx < ctx.atlas_n_glyphs)
+  if(cp < fb_ctx.atlas_n_cp) {
+    u32 idx = fb_ctx.atlas_cp_map[cp];
+    if(idx < fb_ctx.atlas_n_glyphs)
       return idx;
   }
-  return ctx.atlas_fallback;
+  return fb_ctx.atlas_fallback;
 }
 
 static u32 atlas_lookup_attr(u32 cp, u16 attr)
@@ -190,13 +191,13 @@ static u32 atlas_lookup_attr(u32 cp, u16 attr)
   u32 idx = atlas_lookup(cp);
   if(idx == ATLAS_NO_GLYPH)
     return ATLAS_NO_GLYPH;
-  if((attr & FB_ATTR_BOLD) && ctx.atlas_bold_base > 0u) {
-    u32 bi = idx + ctx.atlas_bold_base;
-    if(bi < ctx.atlas_n_glyphs)
+  if((attr & FB_ATTR_BOLD) && fb_ctx.atlas_bold_base > 0u) {
+    u32 bi = idx + fb_ctx.atlas_bold_base;
+    if(bi < fb_ctx.atlas_n_glyphs)
       return bi;
-  } else if((attr & FB_ATTR_ITALIC) && ctx.atlas_italic_base > 0u) {
-    u32 ii = idx + ctx.atlas_italic_base;
-    if(ii < ctx.atlas_n_glyphs)
+  } else if((attr & FB_ATTR_ITALIC) && fb_ctx.atlas_italic_base > 0u) {
+    u32 ii = idx + fb_ctx.atlas_italic_base;
+    if(ii < fb_ctx.atlas_n_glyphs)
       return ii;
   }
   return idx;
@@ -259,55 +260,57 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
   u32 eff_fg = (c->attr & FB_ATTR_REVERSE) ? c->bg : c->fg;
   u32 eff_bg = (c->attr & FB_ATTR_REVERSE) ? c->fg : c->bg;
 
-  u32 px_x = (u32)ctx.margin_x + (u32)col * (u32)ctx.cell_w;
-  u32 px_y = (u32)ctx.margin_y + (u32)row * (u32)ctx.cell_h;
+  u32 px_x = (u32)fb_ctx.margin_x + (u32)col * (u32)fb_ctx.cell_w;
+  u32 px_y = (u32)fb_ctx.margin_y + (u32)row * (u32)fb_ctx.cell_h;
 
-  if(ctx.atlas_active) {
-    if(ctx.bytes_pp == 4) {
+  if(fb_ctx.atlas_active) {
+    if(fb_ctx.bytes_pp == 4) {
       u32 bg_pk = 0xFF000000u | eff_bg;
       u32 fg_pk = 0xFF000000u | eff_fg;
 
       if(c->cp == ' ') {
-        for(u32 gy = 0; gy < (u32)ctx.cell_h; gy++) {
+        for(u32 gy = 0; gy < (u32)fb_ctx.cell_h; gy++) {
           volatile u32 *dst =
-              (volatile u32 *)(ctx.base + (u64)(px_y + gy) * ctx.pitch +
+              (volatile u32 *)(fb_ctx.base + (u64)(px_y + gy) * fb_ctx.pitch +
                                (u64)px_x * 4u);
-          fill32(dst, bg_pk, (u32)ctx.cell_w);
+          fill32(dst, bg_pk, (u32)fb_ctx.cell_w);
         }
         goto post;
       }
 
       u32 idx = atlas_lookup_attr(c->cp, c->attr);
-      if(idx != ATLAS_NO_GLYPH && idx < ctx.atlas_n_glyphs) {
+      if(idx != ATLAS_NO_GLYPH && idx < fb_ctx.atlas_n_glyphs) {
         u32 fg_r = (eff_fg >> 16) & 0xffu, fg_g = (eff_fg >> 8) & 0xffu,
             fg_b = eff_fg & 0xffu;
         u32 bg_r = (eff_bg >> 16) & 0xffu, bg_g = (eff_bg >> 8) & 0xffu,
-            bg_b        = eff_bg & 0xffu;
-        const u8 *glyph = ctx.atlas_pixels + (size_t)idx *
-                                                 (size_t)ctx.atlas_cell_h *
-                                                 (size_t)ctx.atlas_stride;
-        u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
-        u32 cell_h     = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h
-                                                            : (u32)ctx.cell_h;
-        u32 cell_w     = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
-                                                            : (u32)ctx.cell_w;
+            bg_b = eff_bg & 0xffu;
+        const u8 *glyph =
+            fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *
+                                      (size_t)fb_ctx.atlas_stride;
+        u32 atlas_bypp = (fb_ctx.atlas_bpp + 7u) / 8u;
+        u32 cell_h     = fb_ctx.atlas_cell_h < (u32)fb_ctx.cell_h
+                             ? fb_ctx.atlas_cell_h
+                             : (u32)fb_ctx.cell_h;
+        u32 cell_w     = fb_ctx.atlas_cell_w < (u32)fb_ctx.cell_w
+                             ? fb_ctx.atlas_cell_w
+                             : (u32)fb_ctx.cell_w;
 
         /* Fill the whole cell with bg first: when the atlas glyph is smaller
          * than the cell, the unblended margin would otherwise keep stale pixels
          * (e.g. the inverted cursor block), showing as artefacts. */
-        if(cell_w < (u32)ctx.cell_w || cell_h < (u32)ctx.cell_h) {
-          for(u32 gy = 0; gy < (u32)ctx.cell_h; gy++) {
+        if(cell_w < (u32)fb_ctx.cell_w || cell_h < (u32)fb_ctx.cell_h) {
+          for(u32 gy = 0; gy < (u32)fb_ctx.cell_h; gy++) {
             volatile u32 *cell_row =
-                (volatile u32 *)(ctx.base + (u64)(px_y + gy) * ctx.pitch +
+                (volatile u32 *)(fb_ctx.base + (u64)(px_y + gy) * fb_ctx.pitch +
                                  (u64)px_x * 4u);
-            fill32(cell_row, bg_pk, (u32)ctx.cell_w);
+            fill32(cell_row, bg_pk, (u32)fb_ctx.cell_w);
           }
         }
 
         for(u32 gy = 0; gy < cell_h; gy++) {
-          const u8     *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
+          const u8     *src = glyph + (size_t)gy * (size_t)fb_ctx.atlas_stride;
           volatile u32 *dst =
-              (volatile u32 *)(ctx.base + (u64)(px_y + gy) * ctx.pitch +
+              (volatile u32 *)(fb_ctx.base + (u64)(px_y + gy) * fb_ctx.pitch +
                                (u64)px_x * 4u);
           blend_glyph_row(
               dst, src, cell_w, atlas_bypp, fg_r, fg_g, fg_b, bg_r, bg_g, bg_b,
@@ -318,21 +321,23 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
       }
     } else {
       u32 idx = atlas_lookup_attr(c->cp, c->attr);
-      if(idx != ATLAS_NO_GLYPH && idx < ctx.atlas_n_glyphs) {
+      if(idx != ATLAS_NO_GLYPH && idx < fb_ctx.atlas_n_glyphs) {
         u32 fg_r = (eff_fg >> 16) & 0xffu, fg_g = (eff_fg >> 8) & 0xffu,
             fg_b = eff_fg & 0xffu;
         u32 bg_r = (eff_bg >> 16) & 0xffu, bg_g = (eff_bg >> 8) & 0xffu,
-            bg_b        = eff_bg & 0xffu;
-        const u8 *glyph = ctx.atlas_pixels + (size_t)idx *
-                                                 (size_t)ctx.atlas_cell_h *
-                                                 (size_t)ctx.atlas_stride;
-        u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
-        u32 cell_h     = ctx.atlas_cell_h < (u32)ctx.cell_h ? ctx.atlas_cell_h
-                                                            : (u32)ctx.cell_h;
-        u32 cell_w     = ctx.atlas_cell_w < (u32)ctx.cell_w ? ctx.atlas_cell_w
-                                                            : (u32)ctx.cell_w;
+            bg_b = eff_bg & 0xffu;
+        const u8 *glyph =
+            fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *
+                                      (size_t)fb_ctx.atlas_stride;
+        u32 atlas_bypp = (fb_ctx.atlas_bpp + 7u) / 8u;
+        u32 cell_h     = fb_ctx.atlas_cell_h < (u32)fb_ctx.cell_h
+                             ? fb_ctx.atlas_cell_h
+                             : (u32)fb_ctx.cell_h;
+        u32 cell_w     = fb_ctx.atlas_cell_w < (u32)fb_ctx.cell_w
+                             ? fb_ctx.atlas_cell_w
+                             : (u32)fb_ctx.cell_w;
         for(u32 gy = 0; gy < cell_h; gy++) {
-          const u8 *src = glyph + (size_t)gy * (size_t)ctx.atlas_stride;
+          const u8 *src = glyph + (size_t)gy * (size_t)fb_ctx.atlas_stride;
           for(u32 gx = 0; gx < cell_w; gx++) {
             const u8 *px = src + (size_t)gx * atlas_bypp;
             u32       a  = (atlas_bypp == 4u) ? (u32)px[3] : (u32)px[0];
@@ -356,8 +361,8 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
     }
   }
 
-  for(int gy = 0; gy < ctx.cell_h; gy++)
-    for(int gx = 0; gx < ctx.cell_w; gx++)
+  for(int gy = 0; gy < fb_ctx.cell_h; gy++)
+    for(int gx = 0; gx < fb_ctx.cell_w; gx++)
       fb_put_pixel(px_x + (u32)gx, px_y + (u32)gy, eff_bg);
   {
     u32 cp        = c->cp;
@@ -366,12 +371,12 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
     if(gi < 0)
       gi = font_glyph_index((u8)'?');
     if(gi >= 0) {
-      int       gx_off = (ctx.cell_w > FONT_W) ? (ctx.cell_w - FONT_W) / 2 : 0;
-      int       gy_off = (ctx.cell_h > FONT_H) ? (ctx.cell_h - FONT_H) / 2 : 0;
-      const u8 *glyph  = font_latin1[gi];
-      for(int gy = 0; gy < FONT_H && gy < ctx.cell_h; gy++) {
+      int gx_off = (fb_ctx.cell_w > FONT_W) ? (fb_ctx.cell_w - FONT_W) / 2 : 0;
+      int gy_off = (fb_ctx.cell_h > FONT_H) ? (fb_ctx.cell_h - FONT_H) / 2 : 0;
+      const u8 *glyph = font_latin1[gi];
+      for(int gy = 0; gy < FONT_H && gy < fb_ctx.cell_h; gy++) {
         u8 bits = glyph[gy];
-        for(int gx = 0; gx < FONT_W && gx < ctx.cell_w; gx++)
+        for(int gx = 0; gx < FONT_W && gx < fb_ctx.cell_w; gx++)
           if((bits & (0x80u >> gx)) != 0)
             fb_put_pixel(
                 px_x + (u32)(gx_off + gx), px_y + (u32)(gy_off + gy), eff_fg
@@ -381,13 +386,14 @@ static void blit_cell_data(const fb_cell_t *c, int col, int row)
   }
 
 post:
-  if((c->attr & FB_ATTR_UNDERLINE) && ctx.base && ctx.bytes_pp == 4) {
+  if((c->attr & FB_ATTR_UNDERLINE) && fb_ctx.base && fb_ctx.bytes_pp == 4) {
     u32 uline_color = 0xFF000000u | eff_fg;
-    u32 uline_y     = px_y + (u32)ctx.cell_h - 2u;
-    for(u32 uy = uline_y; uy < px_y + (u32)ctx.cell_h; uy++) {
+    u32 uline_y     = px_y + (u32)fb_ctx.cell_h - 2u;
+    for(u32 uy = uline_y; uy < px_y + (u32)fb_ctx.cell_h; uy++) {
       volatile u32 *dst =
-          (volatile u32 *)(ctx.base + (u64)uy * ctx.pitch + (u64)px_x * 4u);
-      fill32(dst, uline_color, (u32)ctx.cell_w);
+          (volatile u32 *)(fb_ctx.base + (u64)uy * fb_ctx.pitch +
+                           (u64)px_x * 4u);
+      fill32(dst, uline_color, (u32)fb_ctx.cell_w);
     }
   }
 }
@@ -395,7 +401,7 @@ post:
 static void blit_cell(int col, int row)
 {
   blit_cell_data(
-      &ctx.cells[(size_t)row * (size_t)ctx.cols + (size_t)col], col, row
+      &fb_ctx.cells[(size_t)row * (size_t)fb_ctx.cols + (size_t)col], col, row
   );
 }
 
@@ -411,7 +417,8 @@ static void cursor_erase(void)
 {
   if(s_cursor_drawn_x < 0 || s_cursor_drawn_y < 0)
     return;
-  if(ctx.cells && s_cursor_drawn_y < ctx.rows && s_cursor_drawn_x < ctx.cols)
+  if(fb_ctx.cells && s_cursor_drawn_y < fb_ctx.rows &&
+     s_cursor_drawn_x < fb_ctx.cols)
     blit_cell(s_cursor_drawn_x, s_cursor_drawn_y);
   s_cursor_drawn_x = -1;
   s_cursor_drawn_y = -1;
@@ -419,20 +426,20 @@ static void cursor_erase(void)
 
 static void cursor_paint(void)
 {
-  if(ctx.yielded || !ctx.cells)
+  if(fb_ctx.yielded || !fb_ctx.cells)
     return;
-  if(!ctx.cursor_visible || !ctx.blink_on)
+  if(!fb_ctx.cursor_visible || !fb_ctx.blink_on)
     return;
-  int x = ctx.cx;
-  int y = ctx.cy;
-  if(x >= ctx.cols)
-    x = ctx.cols - 1;
-  if(y >= ctx.rows)
-    y = ctx.rows - 1;
+  int x = fb_ctx.cx;
+  int y = fb_ctx.cy;
+  if(x >= fb_ctx.cols)
+    x = fb_ctx.cols - 1;
+  if(y >= fb_ctx.rows)
+    y = fb_ctx.rows - 1;
   if(x < 0 || y < 0)
     return;
 
-  fb_cell_t *cell     = &ctx.cells[(size_t)y * (size_t)ctx.cols + (size_t)x];
+  fb_cell_t *cell = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols + (size_t)x];
   u32        saved_fg = cell->fg;
   u32        saved_bg = cell->bg;
   u16        saved_at = cell->attr;
@@ -467,10 +474,10 @@ static void mouse_cursor_invalidate_for_scroll(void);
 
 /* Scrollback ring ------------------------------------------------------- */
 static fb_cell_t *s_sb_buf  = NULL; /* kmalloc'd: SCROLLBACK_ROWS * cols    */
-static int        s_sb_cols = 0;    /* ctx.cols when buf was allocated       */
-static int        s_sb_head = 0;    /* ring head (oldest row index)          */
-static int        s_sb_used = 0;    /* rows currently stored                 */
-static int        s_sb_view = 0;    /* rows scrolled back; 0 = live view     */
+static int        s_sb_cols = 0; /* fb_ctx.cols when buf was allocated       */
+static int        s_sb_head = 0; /* ring head (oldest row index)          */
+static int        s_sb_used = 0; /* rows currently stored                 */
+static int        s_sb_view = 0; /* rows scrolled back; 0 = live view     */
 
 /* Logical scroll only — moves the cell array up by one row and queues a
  * pixel move for the next flush. Cell blits done between now and flush land
@@ -478,10 +485,10 @@ static int        s_sb_view = 0;    /* rows scrolled back; 0 = live view     */
  * pending pixel move catches up. */
 static void scroll_one(void)
 {
-  size_t row_bytes = (size_t)ctx.cols * sizeof(fb_cell_t);
+  size_t row_bytes = (size_t)fb_ctx.cols * sizeof(fb_cell_t);
 
   /* Save the row scrolling off the top into the scrollback ring. */
-  if(s_sb_buf && s_sb_cols == ctx.cols) {
+  if(s_sb_buf && s_sb_cols == fb_ctx.cols) {
     int slot;
     if(s_sb_used < SCROLLBACK_ROWS) {
       slot = (s_sb_head + s_sb_used) % SCROLLBACK_ROWS;
@@ -491,21 +498,23 @@ static void scroll_one(void)
       s_sb_head = (s_sb_head + 1) % SCROLLBACK_ROWS;
     }
     kmemcpy(
-        &s_sb_buf[(size_t)slot * (size_t)ctx.cols], &ctx.cells[0], row_bytes
+        &s_sb_buf[(size_t)slot * (size_t)fb_ctx.cols], &fb_ctx.cells[0],
+        row_bytes
     );
   }
 
-  for(int r = 0; r < ctx.rows - 1; r++)
+  for(int r = 0; r < fb_ctx.rows - 1; r++)
     kmemcpy(
-        &ctx.cells[(size_t)r * (size_t)ctx.cols],
-        &ctx.cells[(size_t)(r + 1) * (size_t)ctx.cols], row_bytes
+        &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols],
+        &fb_ctx.cells[(size_t)(r + 1) * (size_t)fb_ctx.cols], row_bytes
     );
-  for(int c = 0; c < ctx.cols; c++) {
+  for(int c = 0; c < fb_ctx.cols; c++) {
     fb_cell_t *cell =
-        &ctx.cells[(size_t)(ctx.rows - 1) * (size_t)ctx.cols + (size_t)c];
+        &fb_ctx.cells
+             [(size_t)(fb_ctx.rows - 1) * (size_t)fb_ctx.cols + (size_t)c];
     cell->cp    = (u32)' ';
-    cell->fg    = ctx.cur_fg;
-    cell->bg    = ctx.cur_bg;
+    cell->fg    = fb_ctx.cur_fg;
+    cell->bg    = fb_ctx.cur_bg;
     cell->attr  = 0;
     cell->dirty = 0;
   }
@@ -514,9 +523,9 @@ static void scroll_one(void)
   s_cursor_drawn_y = -1;
   /* After a scroll, dirty cells may have shifted rows — expand the range
    * to cover all rows so flush_batch() doesn't miss any. */
-  if(ctx.in_batch) {
-    ctx.batch_r0 = 0;
-    ctx.batch_r1 = ctx.rows - 1;
+  if(fb_ctx.in_batch) {
+    fb_ctx.batch_r0 = 0;
+    fb_ctx.batch_r1 = fb_ctx.rows - 1;
   }
 }
 
@@ -524,10 +533,10 @@ static void scroll_one(void)
  * entering scrollback mode or scrolling within it. */
 static void scrollback_repaint(void)
 {
-  if(!ctx.base || !ctx.cells)
+  if(!fb_ctx.base || !fb_ctx.cells)
     return;
   cursor_erase();
-  for(int r = 0; r < ctx.rows; r++) {
+  for(int r = 0; r < fb_ctx.rows; r++) {
     const fb_cell_t *src;
     fb_cell_t        blank;
     if(r < s_sb_view) {
@@ -535,18 +544,18 @@ static void scrollback_repaint(void)
       if(sb_idx < 0 || !s_sb_buf) {
         kmemset(&blank, 0, sizeof blank);
         blank.cp = ' ';
-        blank.fg = ctx.default_fg;
-        blank.bg = ctx.default_bg;
+        blank.fg = fb_ctx.default_fg;
+        blank.bg = fb_ctx.default_bg;
         src      = &blank;
       } else {
         int slot = (s_sb_head + sb_idx) % SCROLLBACK_ROWS;
-        src      = &s_sb_buf[(size_t)slot * (size_t)ctx.cols];
+        src      = &s_sb_buf[(size_t)slot * (size_t)fb_ctx.cols];
       }
-      for(int c = 0; c < ctx.cols; c++)
+      for(int c = 0; c < fb_ctx.cols; c++)
         blit_cell_data(src + c, c, r);
     } else {
-      src = &ctx.cells[(size_t)(r - s_sb_view) * (size_t)ctx.cols];
-      for(int c = 0; c < ctx.cols; c++)
+      src = &fb_ctx.cells[(size_t)(r - s_sb_view) * (size_t)fb_ctx.cols];
+      for(int c = 0; c < fb_ctx.cols; c++)
         blit_cell_data(src + c, c, r);
     }
   }
@@ -557,9 +566,9 @@ static void scrollback_exit(void)
   if(s_sb_view == 0)
     return;
   s_sb_view = 0;
-  for(int r = 0; r < ctx.rows; r++)
-    for(int c = 0; c < ctx.cols; c++)
-      ctx.cells[(size_t)r * (size_t)ctx.cols + (size_t)c].dirty = 1;
+  for(int r = 0; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++)
+      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
 }
 
 void fb_console_scrollback_up(int lines)
@@ -592,37 +601,37 @@ static void flush_pending_scroll(void)
 
   int n            = s_pending_scroll;
   s_pending_scroll = 0;
-  if(n > ctx.rows)
-    n = ctx.rows;
+  if(n > fb_ctx.rows)
+    n = fb_ctx.rows;
 
   /* Drop any painted cursor so it isn't carried along as a ghost. */
   mouse_cursor_invalidate_for_scroll();
 
-  if(ctx.base && ctx.bytes_pp == 4) {
-    u32 scroll_px = (u32)n * (u32)ctx.cell_h;
-    u32 total_px  = (u32)ctx.rows * (u32)ctx.cell_h;
+  if(fb_ctx.base && fb_ctx.bytes_pp == 4) {
+    u32 scroll_px = (u32)n * (u32)fb_ctx.cell_h;
+    u32 total_px  = (u32)fb_ctx.rows * (u32)fb_ctx.cell_h;
     u32 copy_px   = total_px - scroll_px;
     if(copy_px > 0) {
-      u8       *dst = (u8 *)ctx.base + (u64)ctx.margin_y * ctx.pitch;
-      const u8 *src = dst + (u64)scroll_px * ctx.pitch;
-      kmemcpy(dst, src, (u64)copy_px * ctx.pitch);
+      u8       *dst = (u8 *)fb_ctx.base + (u64)fb_ctx.margin_y * fb_ctx.pitch;
+      const u8 *src = dst + (u64)scroll_px * fb_ctx.pitch;
+      kmemcpy(dst, src, (u64)copy_px * fb_ctx.pitch);
     }
-    int first_new = ctx.rows - n;
-    for(int r = first_new; r < ctx.rows; r++)
-      for(int c = 0; c < ctx.cols; c++)
-        ctx.cells[(size_t)r * (size_t)ctx.cols + (size_t)c].dirty = 1;
-    if(ctx.batch_r0 > first_new)
-      ctx.batch_r0 = first_new;
-    if(ctx.batch_r1 < ctx.rows - 1)
-      ctx.batch_r1 = ctx.rows - 1;
+    int first_new = fb_ctx.rows - n;
+    for(int r = first_new; r < fb_ctx.rows; r++)
+      for(int c = 0; c < fb_ctx.cols; c++)
+        fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
+    if(fb_ctx.batch_r0 > first_new)
+      fb_ctx.batch_r0 = first_new;
+    if(fb_ctx.batch_r1 < fb_ctx.rows - 1)
+      fb_ctx.batch_r1 = fb_ctx.rows - 1;
     return;
   }
 
-  for(int r = 0; r < ctx.rows; r++)
-    for(int c = 0; c < ctx.cols; c++)
-      ctx.cells[(size_t)r * (size_t)ctx.cols + (size_t)c].dirty = 1;
-  ctx.batch_r0 = 0;
-  ctx.batch_r1 = ctx.rows - 1;
+  for(int r = 0; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++)
+      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
+  fb_ctx.batch_r0 = 0;
+  fb_ctx.batch_r1 = fb_ctx.rows - 1;
 }
 
 struct flush_cell_cache
@@ -669,15 +678,16 @@ static void flush_ci_ensure(int cols)
 
 static void flush_batch(void)
 {
-  if(!ctx.cells || ctx.batch_r0 > ctx.batch_r1)
+  if(!fb_ctx.cells || fb_ctx.batch_r0 > fb_ctx.batch_r1)
     return;
-  int r0 = ctx.batch_r0 < 0 ? 0 : ctx.batch_r0;
-  int r1 = ctx.batch_r1 >= ctx.rows ? ctx.rows - 1 : ctx.batch_r1;
+  int r0 = fb_ctx.batch_r0 < 0 ? 0 : fb_ctx.batch_r0;
+  int r1 = fb_ctx.batch_r1 >= fb_ctx.rows ? fb_ctx.rows - 1 : fb_ctx.batch_r1;
 
-  if(!ctx.base || ctx.bytes_pp != 4) {
+  if(!fb_ctx.base || fb_ctx.bytes_pp != 4) {
     for(int r = r0; r <= r1; r++)
-      for(int c = 0; c < ctx.cols; c++) {
-        fb_cell_t *cell = &ctx.cells[(size_t)r * (size_t)ctx.cols + (size_t)c];
+      for(int c = 0; c < fb_ctx.cols; c++) {
+        fb_cell_t *cell =
+            &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c];
         if(cell->dirty) {
           cell->dirty = 0;
           blit_cell(c, r);
@@ -686,23 +696,23 @@ static void flush_batch(void)
     return;
   }
 
-  u32 atlas_bypp = (ctx.atlas_bpp + 7u) / 8u;
-  u32 acw =
-      (ctx.atlas_cell_w < (u32)ctx.cell_w) ? ctx.atlas_cell_w : (u32)ctx.cell_w;
+  u32 atlas_bypp = (fb_ctx.atlas_bpp + 7u) / 8u;
+  u32 acw = (fb_ctx.atlas_cell_w < (u32)fb_ctx.cell_w) ? fb_ctx.atlas_cell_w
+                                                       : (u32)fb_ctx.cell_w;
 
   /* Heap-owned scratch; sized at grid init and grown on reflow. The setup
    * loop below fills every column unconditionally, so we don't pre-zero. */
-  if(!s_flush_ci || s_flush_ci_cols < ctx.cols)
-    flush_ci_ensure(ctx.cols);
+  if(!s_flush_ci || s_flush_ci_cols < fb_ctx.cols)
+    flush_ci_ensure(fb_ctx.cols);
   if(!s_flush_ci)
     return;
   struct flush_cell_cache *ci = s_flush_ci;
 
   for(int cr = r0; cr <= r1; cr++) {
-    fb_cell_t *row = &ctx.cells[(size_t)cr * (size_t)ctx.cols];
-    u32        py0 = (u32)ctx.margin_y + (u32)cr * (u32)ctx.cell_h;
+    fb_cell_t *row = &fb_ctx.cells[(size_t)cr * (size_t)fb_ctx.cols];
+    u32        py0 = (u32)fb_ctx.margin_y + (u32)cr * (u32)fb_ctx.cell_h;
 
-    for(int cc = 0; cc < ctx.cols; cc++) {
+    for(int cc = 0; cc < fb_ctx.cols; cc++) {
       const fb_cell_t *c = &row[cc];
       ci[cc].active      = (c->dirty != 0);
       if(!ci[cc].active)
@@ -716,91 +726,93 @@ static void flush_batch(void)
       ci[cc].underline = (c->attr & FB_ATTR_UNDERLINE) != 0;
 
       bool bg_only =
-          (!ctx.atlas_active || c->cp == ' ' ||
-           ((c->attr & FB_ATTR_BLINK) && !ctx.cell_blink_on));
+          (!fb_ctx.atlas_active || c->cp == ' ' ||
+           ((c->attr & FB_ATTR_BLINK) && !fb_ctx.cell_blink_on));
       if(!bg_only) {
         u32 idx = atlas_lookup_attr(c->cp, c->attr);
-        if(idx == ATLAS_NO_GLYPH || idx >= ctx.atlas_n_glyphs) {
+        if(idx == ATLAS_NO_GLYPH || idx >= fb_ctx.atlas_n_glyphs) {
           bg_only = true;
         } else {
-          ci[cc].fg_pk      = 0xFF000000u | eff_fg;
-          ci[cc].fg_r       = (eff_fg >> 16) & 0xffu;
-          ci[cc].fg_g       = (eff_fg >> 8) & 0xffu;
-          ci[cc].fg_b       = eff_fg & 0xffu;
-          ci[cc].bg_r       = (eff_bg >> 16) & 0xffu;
-          ci[cc].bg_g       = (eff_bg >> 8) & 0xffu;
-          ci[cc].bg_b       = eff_bg & 0xffu;
-          ci[cc].glyph_base = ctx.atlas_pixels + (size_t)idx *
-                                                     (size_t)ctx.atlas_cell_h *
-                                                     (size_t)ctx.atlas_stride;
+          ci[cc].fg_pk = 0xFF000000u | eff_fg;
+          ci[cc].fg_r  = (eff_fg >> 16) & 0xffu;
+          ci[cc].fg_g  = (eff_fg >> 8) & 0xffu;
+          ci[cc].fg_b  = eff_fg & 0xffu;
+          ci[cc].bg_r  = (eff_bg >> 16) & 0xffu;
+          ci[cc].bg_g  = (eff_bg >> 8) & 0xffu;
+          ci[cc].bg_b  = eff_bg & 0xffu;
+          ci[cc].glyph_base =
+              fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *
+                                        (size_t)fb_ctx.atlas_stride;
         }
       }
       if(bg_only)
         ci[cc].glyph_base = NULL;
     }
 
-    for(u32 spy = 0; spy < (u32)ctx.cell_h; spy++) {
+    for(u32 spy = 0; spy < (u32)fb_ctx.cell_h; spy++) {
       volatile u32 *fb_line =
-          (volatile u32 *)(ctx.base + (u64)(py0 + spy) * ctx.pitch +
-                           (u64)ctx.margin_x * 4u);
-      for(int cc = 0; cc < ctx.cols; cc++) {
+          (volatile u32 *)(fb_ctx.base + (u64)(py0 + spy) * fb_ctx.pitch +
+                           (u64)fb_ctx.margin_x * 4u);
+      for(int cc = 0; cc < fb_ctx.cols; cc++) {
         if(!ci[cc].active)
           continue;
-        volatile u32 *dst = fb_line + (size_t)cc * (size_t)ctx.cell_w;
+        volatile u32 *dst = fb_line + (size_t)cc * (size_t)fb_ctx.cell_w;
 
-        if(ci[cc].underline && spy >= (u32)ctx.cell_h - 2u) {
-          fill32(dst, ci[cc].fg_pk, (u32)ctx.cell_w);
+        if(ci[cc].underline && spy >= (u32)fb_ctx.cell_h - 2u) {
+          fill32(dst, ci[cc].fg_pk, (u32)fb_ctx.cell_w);
           continue;
         }
-        if(!ci[cc].glyph_base || spy >= ctx.atlas_cell_h) {
-          fill32(dst, ci[cc].bg_pk, (u32)ctx.cell_w);
+        if(!ci[cc].glyph_base || spy >= fb_ctx.atlas_cell_h) {
+          fill32(dst, ci[cc].bg_pk, (u32)fb_ctx.cell_w);
           continue;
         }
 
         const u8 *src =
-            ci[cc].glyph_base + (size_t)spy * (size_t)ctx.atlas_stride;
+            ci[cc].glyph_base + (size_t)spy * (size_t)fb_ctx.atlas_stride;
         blend_glyph_row(
             dst, src, acw, atlas_bypp, ci[cc].fg_r, ci[cc].fg_g, ci[cc].fg_b,
             ci[cc].bg_r, ci[cc].bg_g, ci[cc].bg_b, ci[cc].fg_pk, ci[cc].bg_pk
         );
       }
     }
-    for(int cc = 0; cc < ctx.cols; cc++)
+    for(int cc = 0; cc < fb_ctx.cols; cc++)
       row[cc].dirty = 0;
   }
 }
 
 static void put_cp_at_cursor(u32 cp)
 {
-  if(ctx.cx >= ctx.cols) {
-    ctx.cx = 0;
-    ctx.cy++;
-    if(ctx.cy >= ctx.rows) {
+  if(fb_ctx.cx >= fb_ctx.cols) {
+    fb_ctx.cx = 0;
+    fb_ctx.cy++;
+    if(fb_ctx.cy >= fb_ctx.rows) {
       scroll_one();
-      ctx.cy = ctx.rows - 1;
+      fb_ctx.cy = fb_ctx.rows - 1;
     }
   }
-  fb_cell_t *c = &ctx.cells[(size_t)ctx.cy * (size_t)ctx.cols + (size_t)ctx.cx];
+  fb_cell_t *c =
+      &fb_ctx
+           .cells[(size_t)fb_ctx.cy * (size_t)fb_ctx.cols + (size_t)fb_ctx.cx];
   /* Skip when nothing actually changed — avoids redundant VRAM writes during
    * line-editor redraws that repaint identical content. */
-  if(c->cp != cp || c->fg != ctx.cur_fg || c->bg != ctx.cur_bg ||
-     c->attr != ctx.cur_attr) {
+  if(c->cp != cp || c->fg != fb_ctx.cur_fg || c->bg != fb_ctx.cur_bg ||
+     c->attr != fb_ctx.cur_attr) {
     c->cp   = cp;
-    c->fg   = ctx.cur_fg;
-    c->bg   = ctx.cur_bg;
-    c->attr = (u16)ctx.cur_attr;
-    if(ctx.in_batch) {
+    c->fg   = fb_ctx.cur_fg;
+    c->bg   = fb_ctx.cur_bg;
+    c->attr = (u16)fb_ctx.cur_attr;
+    if(fb_ctx.in_batch) {
       c->dirty = 1;
-      if(ctx.cy < ctx.batch_r0)
-        ctx.batch_r0 = ctx.cy;
-      if(ctx.cy > ctx.batch_r1)
-        ctx.batch_r1 = ctx.cy;
+      if(fb_ctx.cy < fb_ctx.batch_r0)
+        fb_ctx.batch_r0 = fb_ctx.cy;
+      if(fb_ctx.cy > fb_ctx.batch_r1)
+        fb_ctx.batch_r1 = fb_ctx.cy;
     } else {
-      blit_cell(ctx.cx, ctx.cy);
+      blit_cell(fb_ctx.cx, fb_ctx.cy);
     }
   }
-  ctx.last_cp = cp;
-  ctx.cx++;
+  fb_ctx.last_cp = cp;
+  fb_ctx.cx++;
 }
 
 /* Catppuccin Mocha 16-color palette.  Indices match ANSI SGR 30-37 / 90-97. */
@@ -892,19 +904,19 @@ static u32 acs_to_unicode(u8 b)
  * final byte). Empty fields default to 0. Returns count parsed. */
 static int csi_params(int *pv, int maxn)
 {
-  int pn = ctx.esc_len - 1;
+  int pn = fb_ctx.esc_len - 1;
   int np = 0;
   int i  = 0;
   while(i < pn && np < maxn) {
     unsigned acc = 0u;
     int      dig = 0;
-    while(i < pn && ctx.esc_buf[i] >= '0' && ctx.esc_buf[i] <= '9') {
-      acc = acc * 10u + (unsigned)(ctx.esc_buf[i] - '0');
+    while(i < pn && fb_ctx.esc_buf[i] >= '0' && fb_ctx.esc_buf[i] <= '9') {
+      acc = acc * 10u + (unsigned)(fb_ctx.esc_buf[i] - '0');
       i++;
       dig++;
     }
     pv[np++] = (int)((dig != 0) ? acc : 0u);
-    if(i < pn && ctx.esc_buf[i] == ';')
+    if(i < pn && fb_ctx.esc_buf[i] == ';')
       i++;
   }
   return np;
@@ -922,25 +934,25 @@ static int csi_param1(void)
 static void erase_rect(int y0, int x0, int y1, int x1)
 {
   for(int y = y0; y <= y1; y++) {
-    if(y < 0 || y >= ctx.rows)
+    if(y < 0 || y >= fb_ctx.rows)
       continue;
     for(int x = x0; x <= x1; x++) {
-      if(x < 0 || x >= ctx.cols)
+      if(x < 0 || x >= fb_ctx.cols)
         continue;
-      fb_cell_t *c = &ctx.cells[(size_t)y * (size_t)ctx.cols + (size_t)x];
-      if(c->cp == (u32)' ' && c->fg == ctx.cur_fg && c->bg == ctx.cur_bg &&
-         c->attr == 0)
+      fb_cell_t *c = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols + (size_t)x];
+      if(c->cp == (u32)' ' && c->fg == fb_ctx.cur_fg &&
+         c->bg == fb_ctx.cur_bg && c->attr == 0)
         continue;
       c->cp   = (u32)' ';
-      c->fg   = ctx.cur_fg;
-      c->bg   = ctx.cur_bg;
+      c->fg   = fb_ctx.cur_fg;
+      c->bg   = fb_ctx.cur_bg;
       c->attr = 0;
-      if(ctx.in_batch) {
+      if(fb_ctx.in_batch) {
         c->dirty = 1;
-        if(y < ctx.batch_r0)
-          ctx.batch_r0 = y;
-        if(y > ctx.batch_r1)
-          ctx.batch_r1 = y;
+        if(y < fb_ctx.batch_r0)
+          fb_ctx.batch_r0 = y;
+        if(y > fb_ctx.batch_r1)
+          fb_ctx.batch_r1 = y;
       } else {
         blit_cell(x, y);
       }
@@ -954,12 +966,12 @@ static void csi_cup(void)
   int np  = csi_params(pv, 4);
   int row = (np >= 1 && pv[0] >= 1) ? pv[0] : 1;
   int col = (np >= 2 && pv[1] >= 1) ? pv[1] : 1;
-  if(row > ctx.rows)
-    row = ctx.rows;
-  if(col > ctx.cols)
-    col = ctx.cols;
-  ctx.cy = row - 1;
-  ctx.cx = col - 1;
+  if(row > fb_ctx.rows)
+    row = fb_ctx.rows;
+  if(col > fb_ctx.cols)
+    col = fb_ctx.cols;
+  fb_ctx.cy = row - 1;
+  fb_ctx.cx = col - 1;
 }
 
 static void csi_sgr(void)
@@ -967,66 +979,66 @@ static void csi_sgr(void)
   int pv[32];
   int np = csi_params(pv, 32);
   if(np == 0) {
-    ctx.cur_fg   = ctx.default_fg;
-    ctx.cur_bg   = ctx.default_bg;
-    ctx.cur_attr = 0;
+    fb_ctx.cur_fg   = fb_ctx.default_fg;
+    fb_ctx.cur_bg   = fb_ctx.default_bg;
+    fb_ctx.cur_attr = 0;
     return;
   }
   for(int pi = 0; pi < np; pi++) {
     int p = pv[pi];
     if(p == 0) {
-      ctx.cur_fg   = ctx.default_fg;
-      ctx.cur_bg   = ctx.default_bg;
-      ctx.cur_attr = 0;
+      fb_ctx.cur_fg   = fb_ctx.default_fg;
+      fb_ctx.cur_bg   = fb_ctx.default_bg;
+      fb_ctx.cur_attr = 0;
     } else if(p == 1) {
-      ctx.cur_attr |= (u8)FB_ATTR_BOLD;
+      fb_ctx.cur_attr |= (u8)FB_ATTR_BOLD;
     } else if(p == 3) {
-      ctx.cur_attr |= (u8)FB_ATTR_ITALIC;
+      fb_ctx.cur_attr |= (u8)FB_ATTR_ITALIC;
     } else if(p == 4) {
-      ctx.cur_attr |= (u8)FB_ATTR_UNDERLINE;
+      fb_ctx.cur_attr |= (u8)FB_ATTR_UNDERLINE;
     } else if(p == 5) {
-      ctx.cur_attr |= (u8)FB_ATTR_BLINK;
+      fb_ctx.cur_attr |= (u8)FB_ATTR_BLINK;
     } else if(p == 7) {
-      ctx.cur_attr |= (u8)FB_ATTR_REVERSE;
+      fb_ctx.cur_attr |= (u8)FB_ATTR_REVERSE;
     } else if(p == 22) {
-      ctx.cur_attr = (u8)(ctx.cur_attr & ~(u8)FB_ATTR_BOLD);
+      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_BOLD);
     } else if(p == 23) {
-      ctx.cur_attr = (u8)(ctx.cur_attr & ~(u8)FB_ATTR_ITALIC);
+      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_ITALIC);
     } else if(p == 24) {
-      ctx.cur_attr = (u8)(ctx.cur_attr & ~(u8)FB_ATTR_UNDERLINE);
+      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_UNDERLINE);
     } else if(p == 25) {
-      ctx.cur_attr = (u8)(ctx.cur_attr & ~(u8)FB_ATTR_BLINK);
+      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_BLINK);
     } else if(p == 27) {
-      ctx.cur_attr = (u8)(ctx.cur_attr & ~(u8)FB_ATTR_REVERSE);
+      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_REVERSE);
     } else if(p == 39) {
-      ctx.cur_fg = ctx.default_fg;
+      fb_ctx.cur_fg = fb_ctx.default_fg;
     } else if(p == 49) {
-      ctx.cur_bg = ctx.default_bg;
+      fb_ctx.cur_bg = fb_ctx.default_bg;
     } else if(p >= 30 && p <= 37) {
-      ctx.cur_fg = ansi16_fg[p - 30];
+      fb_ctx.cur_fg = ansi16_fg[p - 30];
     } else if(p >= 90 && p <= 97) {
-      ctx.cur_fg = ansi16_fg_bright[p - 90];
+      fb_ctx.cur_fg = ansi16_fg_bright[p - 90];
     } else if(p >= 40 && p <= 47) {
-      ctx.cur_bg = ansi16_bg[p - 40];
+      fb_ctx.cur_bg = ansi16_bg[p - 40];
     } else if(p >= 100 && p <= 107) {
-      ctx.cur_bg = ansi16_bg[p - 100];
+      fb_ctx.cur_bg = ansi16_bg[p - 100];
     } else if(p == 38 && pi + 2 < np && pv[pi + 1] == 5) {
-      ctx.cur_fg = ansi256_to_rgb((unsigned)pv[pi + 2]);
+      fb_ctx.cur_fg = ansi256_to_rgb((unsigned)pv[pi + 2]);
       pi += 2;
     } else if(p == 38 && pi + 4 < np && pv[pi + 1] == 2) {
-      u32 r      = (u32)(pv[pi + 2] & 255);
-      u32 g      = (u32)(pv[pi + 3] & 255);
-      u32 b      = (u32)(pv[pi + 4] & 255);
-      ctx.cur_fg = (r << 16) | (g << 8) | b;
+      u32 r         = (u32)(pv[pi + 2] & 255);
+      u32 g         = (u32)(pv[pi + 3] & 255);
+      u32 b         = (u32)(pv[pi + 4] & 255);
+      fb_ctx.cur_fg = (r << 16) | (g << 8) | b;
       pi += 4;
     } else if(p == 48 && pi + 2 < np && pv[pi + 1] == 5) {
-      ctx.cur_bg = ansi256_to_rgb((unsigned)pv[pi + 2]);
+      fb_ctx.cur_bg = ansi256_to_rgb((unsigned)pv[pi + 2]);
       pi += 2;
     } else if(p == 48 && pi + 4 < np && pv[pi + 1] == 2) {
-      u32 r      = (u32)(pv[pi + 2] & 255);
-      u32 g      = (u32)(pv[pi + 3] & 255);
-      u32 b      = (u32)(pv[pi + 4] & 255);
-      ctx.cur_bg = (r << 16) | (g << 8) | b;
+      u32 r         = (u32)(pv[pi + 2] & 255);
+      u32 g         = (u32)(pv[pi + 3] & 255);
+      u32 b         = (u32)(pv[pi + 4] & 255);
+      fb_ctx.cur_bg = (r << 16) | (g << 8) | b;
       pi += 4;
     }
   }
@@ -1035,75 +1047,76 @@ static void csi_sgr(void)
 static void csi_dec_private(char cmd)
 {
   /* esc_buf starts with `?`. Parse the trailing param list. */
-  if(ctx.esc_len < 3)
+  if(fb_ctx.esc_len < 3)
     return;
   int pv[4];
   int np = 0;
   int i  = 1;
-  while(i < ctx.esc_len - 1 && np < 4) {
+  while(i < fb_ctx.esc_len - 1 && np < 4) {
     unsigned acc = 0u;
     int      dig = 0;
-    while(i < ctx.esc_len - 1 && ctx.esc_buf[i] >= '0' &&
-          ctx.esc_buf[i] <= '9') {
-      acc = acc * 10u + (unsigned)(ctx.esc_buf[i] - '0');
+    while(i < fb_ctx.esc_len - 1 && fb_ctx.esc_buf[i] >= '0' &&
+          fb_ctx.esc_buf[i] <= '9') {
+      acc = acc * 10u + (unsigned)(fb_ctx.esc_buf[i] - '0');
       i++;
       dig++;
     }
     if(dig)
       pv[np++] = (int)acc;
-    if(i < ctx.esc_len - 1 && ctx.esc_buf[i] == ';')
+    if(i < fb_ctx.esc_len - 1 && fb_ctx.esc_buf[i] == ';')
       i++;
-    else if(!dig && i < ctx.esc_len - 1)
+    else if(!dig && i < fb_ctx.esc_len - 1)
       i++;
   }
   int on = (cmd == 'h');
   for(int k = 0; k < np; k++) {
     if(pv[k] == 25)
-      ctx.cursor_visible = (u8)on;
+      fb_ctx.cursor_visible = (u8)on;
     else if(pv[k] == 1)
-      ctx.app_cursor_keys = (on != 0);
+      fb_ctx.app_cursor_keys = (on != 0);
     /* ?1049 (alt screen) intentionally ignored — draw into the live grid. */
   }
 }
 
 static void handle_csi(void)
 {
-  if(ctx.esc_len < 1)
+  if(fb_ctx.esc_len < 1)
     return;
-  char cmd = ctx.esc_buf[ctx.esc_len - 1];
+  char cmd = fb_ctx.esc_buf[fb_ctx.esc_len - 1];
 
-  if((cmd == 'h' || cmd == 'l') && ctx.esc_len >= 2 && ctx.esc_buf[0] == '?') {
+  if((cmd == 'h' || cmd == 'l') && fb_ctx.esc_len >= 2 &&
+     fb_ctx.esc_buf[0] == '?') {
     csi_dec_private(cmd);
     return;
   }
 
   switch(cmd) {
   case 'A': { /* CUU */
-    int n  = csi_param1();
-    ctx.cy = (ctx.cy >= n) ? (ctx.cy - n) : 0;
+    int n     = csi_param1();
+    fb_ctx.cy = (fb_ctx.cy >= n) ? (fb_ctx.cy - n) : 0;
     break;
   }
   case 'B': { /* CUD */
     int n  = csi_param1();
-    int mx = ctx.rows - 1 - ctx.cy;
+    int mx = fb_ctx.rows - 1 - fb_ctx.cy;
     if(n > mx)
       n = mx;
     if(n > 0)
-      ctx.cy += n;
+      fb_ctx.cy += n;
     break;
   }
   case 'C': { /* CUF */
     int n  = csi_param1();
-    int mx = ctx.cols - 1 - ctx.cx;
+    int mx = fb_ctx.cols - 1 - fb_ctx.cx;
     if(n > mx)
       n = mx;
     if(n > 0)
-      ctx.cx += n;
+      fb_ctx.cx += n;
     break;
   }
   case 'D': { /* CUB */
-    int n  = csi_param1();
-    ctx.cx = (ctx.cx >= n) ? (ctx.cx - n) : 0;
+    int n     = csi_param1();
+    fb_ctx.cx = (fb_ctx.cx >= n) ? (fb_ctx.cx - n) : 0;
     break;
   }
   case 'H':
@@ -1112,16 +1125,16 @@ static void handle_csi(void)
     break;
   case 'G': { /* CHA — absolute column (1-based) */
     int n = csi_param1();
-    if(n > ctx.cols)
-      n = ctx.cols;
-    ctx.cx = n - 1;
+    if(n > fb_ctx.cols)
+      n = fb_ctx.cols;
+    fb_ctx.cx = n - 1;
     break;
   }
   case 'd': { /* VPA — absolute row (1-based) */
     int n = csi_param1();
-    if(n > ctx.rows)
-      n = ctx.rows;
-    ctx.cy = n - 1;
+    if(n > fb_ctx.rows)
+      n = fb_ctx.rows;
+    fb_ctx.cy = n - 1;
     break;
   }
   case 'J': { /* ED */
@@ -1129,15 +1142,15 @@ static void handle_csi(void)
     int np   = csi_params(pv, 2);
     int mode = (np > 0) ? pv[0] : 0;
     if(mode == 2) {
-      erase_rect(0, 0, ctx.rows - 1, ctx.cols - 1);
+      erase_rect(0, 0, fb_ctx.rows - 1, fb_ctx.cols - 1);
     } else if(mode == 0) {
-      erase_rect(ctx.cy, ctx.cx, ctx.cy, ctx.cols - 1);
-      if(ctx.cy < ctx.rows - 1)
-        erase_rect(ctx.cy + 1, 0, ctx.rows - 1, ctx.cols - 1);
+      erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, fb_ctx.cols - 1);
+      if(fb_ctx.cy < fb_ctx.rows - 1)
+        erase_rect(fb_ctx.cy + 1, 0, fb_ctx.rows - 1, fb_ctx.cols - 1);
     } else if(mode == 1) {
-      if(ctx.cy > 0)
-        erase_rect(0, 0, ctx.cy - 1, ctx.cols - 1);
-      erase_rect(ctx.cy, 0, ctx.cy, ctx.cx);
+      if(fb_ctx.cy > 0)
+        erase_rect(0, 0, fb_ctx.cy - 1, fb_ctx.cols - 1);
+      erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cx);
     }
     break;
   }
@@ -1146,39 +1159,39 @@ static void handle_csi(void)
     int np   = csi_params(pv, 2);
     int mode = (np > 0) ? pv[0] : 0;
     if(mode == 0)
-      erase_rect(ctx.cy, ctx.cx, ctx.cy, ctx.cols - 1);
+      erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, fb_ctx.cols - 1);
     else if(mode == 1)
-      erase_rect(ctx.cy, 0, ctx.cy, ctx.cx);
+      erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cx);
     else if(mode == 2)
-      erase_rect(ctx.cy, 0, ctx.cy, ctx.cols - 1);
+      erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cols - 1);
     break;
   }
   case 'X': { /* ECH — erase Pn chars at cursor (no cursor move) */
     int n  = csi_param1();
-    int x1 = ctx.cx + n - 1;
-    if(x1 >= ctx.cols)
-      x1 = ctx.cols - 1;
-    erase_rect(ctx.cy, ctx.cx, ctx.cy, x1);
+    int x1 = fb_ctx.cx + n - 1;
+    if(x1 >= fb_ctx.cols)
+      x1 = fb_ctx.cols - 1;
+    erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, x1);
     break;
   }
   case 'm':
     csi_sgr();
     break;
   case 'b': { /* REP — repeat last codepoint Pn times */
-    if(ctx.last_cp == 0)
+    if(fb_ctx.last_cp == 0)
       break;
     int n = csi_param1();
     for(int i = 0; i < n; i++)
-      put_cp_at_cursor(ctx.last_cp);
+      put_cp_at_cursor(fb_ctx.last_cp);
     break;
   }
   case 's':
-    ctx.saved_cx = ctx.cx;
-    ctx.saved_cy = ctx.cy;
+    fb_ctx.saved_cx = fb_ctx.cx;
+    fb_ctx.saved_cy = fb_ctx.cy;
     break;
   case 'u':
-    ctx.cx = ctx.saved_cx;
-    ctx.cy = ctx.saved_cy;
+    fb_ctx.cx = fb_ctx.saved_cx;
+    fb_ctx.cy = fb_ctx.saved_cy;
     break;
   default:
     break;
@@ -1189,24 +1202,24 @@ static void handle_control(u8 b)
 {
   switch(b) {
   case '\n':
-    ctx.cx = 0;
-    ctx.cy++;
-    if(ctx.cy >= ctx.rows) {
+    fb_ctx.cx = 0;
+    fb_ctx.cy++;
+    if(fb_ctx.cy >= fb_ctx.rows) {
       scroll_one();
-      ctx.cy = ctx.rows - 1;
+      fb_ctx.cy = fb_ctx.rows - 1;
     }
     return;
   case '\r':
-    ctx.cx = 0;
+    fb_ctx.cx = 0;
     return;
   case '\b':
-    if(ctx.cx > 0)
-      ctx.cx--;
+    if(fb_ctx.cx > 0)
+      fb_ctx.cx--;
     return;
   case '\t':
-    ctx.cx = (ctx.cx + 8) & ~7;
-    if(ctx.cx >= ctx.cols)
-      ctx.cx = ctx.cols - 1;
+    fb_ctx.cx = (fb_ctx.cx + 8) & ~7;
+    if(fb_ctx.cx >= fb_ctx.cols)
+      fb_ctx.cx = fb_ctx.cols - 1;
     return;
   default:
     return;
@@ -1218,14 +1231,14 @@ static void handle_control(u8 b)
  * before they ever reach feed_utf8. */
 static void feed_utf8(u8 b)
 {
-  if(ctx.utf8_rem == 0) {
+  if(fb_ctx.utf8_rem == 0) {
     if(b < 0x20u || b == 0x7fu) {
       handle_control(b);
       return;
     }
     if(b < 0x80u) {
       /* G0 DEC ACS in effect: map printable ASCII to box-drawing/math. */
-      if(ctx.g0_acs && b >= 0x60u) {
+      if(fb_ctx.g0_acs && b >= 0x60u) {
         put_cp_at_cursor(acs_to_unicode(b));
         return;
       }
@@ -1233,18 +1246,18 @@ static void feed_utf8(u8 b)
       return;
     }
     if((b & 0xe0u) == 0xc0u) {
-      ctx.utf8_partial = (u32)(b & 0x1fu);
-      ctx.utf8_rem     = 1;
+      fb_ctx.utf8_partial = (u32)(b & 0x1fu);
+      fb_ctx.utf8_rem     = 1;
       return;
     }
     if((b & 0xf0u) == 0xe0u) {
-      ctx.utf8_partial = (u32)(b & 0x0fu);
-      ctx.utf8_rem     = 2;
+      fb_ctx.utf8_partial = (u32)(b & 0x0fu);
+      fb_ctx.utf8_rem     = 2;
       return;
     }
     if((b & 0xf8u) == 0xf0u) {
-      ctx.utf8_partial = (u32)(b & 0x07u);
-      ctx.utf8_rem     = 3;
+      fb_ctx.utf8_partial = (u32)(b & 0x07u);
+      fb_ctx.utf8_rem     = 3;
       return;
     }
     /* Stray continuation / invalid lead — show '?'. */
@@ -1253,15 +1266,15 @@ static void feed_utf8(u8 b)
   }
   if((b & 0xc0u) != 0x80u) {
     /* Broken sequence; recover by replaying this byte fresh. */
-    ctx.utf8_rem = 0;
+    fb_ctx.utf8_rem = 0;
     put_cp_at_cursor((u32)'?');
     feed_utf8(b);
     return;
   }
-  ctx.utf8_partial = (ctx.utf8_partial << 6) | (u32)(b & 0x3fu);
-  ctx.utf8_rem--;
-  if(ctx.utf8_rem == 0) {
-    u32 cp = ctx.utf8_partial;
+  fb_ctx.utf8_partial = (fb_ctx.utf8_partial << 6) | (u32)(b & 0x3fu);
+  fb_ctx.utf8_rem--;
+  if(fb_ctx.utf8_rem == 0) {
+    u32 cp = fb_ctx.utf8_partial;
     if(cp <= 0x10ffffu)
       put_cp_at_cursor(cp);
     else
@@ -1271,49 +1284,49 @@ static void feed_utf8(u8 b)
 
 bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
 {
-  ctx.base       = (volatile u8 *)fb;
-  ctx.width      = width;
-  ctx.height     = height;
-  ctx.pitch      = pitch;
-  ctx.bytes_pp   = bytes_pp_from_bpp(bpp);
-  ctx.cell_w     = FONT_W;
-  ctx.cell_h     = FONT_H;
-  ctx.margin_x   = 0;
-  ctx.margin_y   = 0;
-  ctx.cols       = (int)(width / (u64)ctx.cell_w);
-  ctx.rows       = (int)(height / (u64)ctx.cell_h);
-  ctx.default_fg = 0xcdd6f4u; /* Catppuccin Mocha Text */
-  ctx.default_bg = 0x1e1e2eu; /* Catppuccin Mocha Base */
-  ctx.cur_fg     = ctx.default_fg;
-  ctx.cur_bg     = ctx.default_bg;
-  ctx.cx = ctx.cy    = 0;
-  ctx.utf8_rem       = 0;
-  ctx.blink_ticks    = FB_BLINK_PERIOD_TICKS;
-  ctx.blink_on       = 1;
-  ctx.cell_blink_on  = 1;
-  ctx.cur_attr       = 0;
-  ctx.cursor_visible = 1;
-  ctx.yielded        = false;
-  ctx.in_head = ctx.in_tail = 0;
+  fb_ctx.base       = (volatile u8 *)fb;
+  fb_ctx.width      = width;
+  fb_ctx.height     = height;
+  fb_ctx.pitch      = pitch;
+  fb_ctx.bytes_pp   = bytes_pp_from_bpp(bpp);
+  fb_ctx.cell_w     = FONT_W;
+  fb_ctx.cell_h     = FONT_H;
+  fb_ctx.margin_x   = 0;
+  fb_ctx.margin_y   = 0;
+  fb_ctx.cols       = (int)(width / (u64)fb_ctx.cell_w);
+  fb_ctx.rows       = (int)(height / (u64)fb_ctx.cell_h);
+  fb_ctx.default_fg = 0xcdd6f4u; /* Catppuccin Mocha Text */
+  fb_ctx.default_bg = 0x1e1e2eu; /* Catppuccin Mocha Base */
+  fb_ctx.cur_fg     = fb_ctx.default_fg;
+  fb_ctx.cur_bg     = fb_ctx.default_bg;
+  fb_ctx.cx = fb_ctx.cy = 0;
+  fb_ctx.utf8_rem       = 0;
+  fb_ctx.blink_ticks    = FB_BLINK_PERIOD_TICKS;
+  fb_ctx.blink_on       = 1;
+  fb_ctx.cell_blink_on  = 1;
+  fb_ctx.cur_attr       = 0;
+  fb_ctx.cursor_visible = 1;
+  fb_ctx.yielded        = false;
+  fb_ctx.in_head = fb_ctx.in_tail = 0;
 
-  size_t total = (size_t)ctx.rows * (size_t)ctx.cols;
-  ctx.cells    = (fb_cell_t *)kmalloc(total * sizeof(fb_cell_t));
-  if(!ctx.cells)
+  size_t total = (size_t)fb_ctx.rows * (size_t)fb_ctx.cols;
+  fb_ctx.cells = (fb_cell_t *)kmalloc(total * sizeof(fb_cell_t));
+  if(!fb_ctx.cells)
     return false;
   for(size_t i = 0; i < total; i++) {
-    ctx.cells[i].cp    = (u32)' ';
-    ctx.cells[i].fg    = ctx.default_fg;
-    ctx.cells[i].bg    = ctx.default_bg;
-    ctx.cells[i].attr  = 0;
-    ctx.cells[i].dirty = 0;
+    fb_ctx.cells[i].cp    = (u32)' ';
+    fb_ctx.cells[i].fg    = fb_ctx.default_fg;
+    fb_ctx.cells[i].bg    = fb_ctx.default_bg;
+    fb_ctx.cells[i].attr  = 0;
+    fb_ctx.cells[i].dirty = 0;
   }
 
   s_sb_buf = (fb_cell_t *)kmalloc(
-      (size_t)SCROLLBACK_ROWS * (size_t)ctx.cols * sizeof(fb_cell_t)
+      (size_t)SCROLLBACK_ROWS * (size_t)fb_ctx.cols * sizeof(fb_cell_t)
   );
-  s_sb_cols = ctx.cols;
+  s_sb_cols = fb_ctx.cols;
   s_sb_head = s_sb_used = s_sb_view = 0;
-  flush_ci_ensure(ctx.cols);
+  flush_ci_ensure(fb_ctx.cols);
   return true;
 }
 
@@ -1321,57 +1334,57 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
  * states before falling through to UTF-8 → cell emission. */
 static void feed_byte(u8 b)
 {
-  switch(ctx.esc_state) {
+  switch(fb_ctx.esc_state) {
   case 1: /* after ESC */
     if(b == '[') {
-      ctx.esc_state = 2;
-      ctx.esc_len   = 0;
+      fb_ctx.esc_state = 2;
+      fb_ctx.esc_len   = 0;
       return;
     }
     if(b == '7') { /* DECSC */
-      ctx.saved_cx  = ctx.cx;
-      ctx.saved_cy  = ctx.cy;
-      ctx.esc_state = 0;
+      fb_ctx.saved_cx  = fb_ctx.cx;
+      fb_ctx.saved_cy  = fb_ctx.cy;
+      fb_ctx.esc_state = 0;
       return;
     }
     if(b == '8') { /* DECRC */
-      ctx.cx        = ctx.saved_cx;
-      ctx.cy        = ctx.saved_cy;
-      ctx.esc_state = 0;
+      fb_ctx.cx        = fb_ctx.saved_cx;
+      fb_ctx.cy        = fb_ctx.saved_cy;
+      fb_ctx.esc_state = 0;
       return;
     }
     if(b == '(' || b == ')') {
-      ctx.esc_state = 3; /* wait for designator byte */
+      fb_ctx.esc_state = 3; /* wait for designator byte */
       return;
     }
     /* Unrecognised ESC <byte> — swallow (DECKPAM/DECKPNM = / >, etc.). */
-    ctx.esc_state = 0;
+    fb_ctx.esc_state = 0;
     return;
   case 2: /* inside CSI */
     if((b >= '0' && b <= '9') || b == ';' || b == '?') {
-      if(ctx.esc_len < (u8)(sizeof ctx.esc_buf - 1))
-        ctx.esc_buf[ctx.esc_len++] = (char)b;
+      if(fb_ctx.esc_len < (u8)(sizeof fb_ctx.esc_buf - 1))
+        fb_ctx.esc_buf[fb_ctx.esc_len++] = (char)b;
       return;
     }
-    if(ctx.esc_len < (u8)(sizeof ctx.esc_buf - 1))
-      ctx.esc_buf[ctx.esc_len++] = (char)b;
+    if(fb_ctx.esc_len < (u8)(sizeof fb_ctx.esc_buf - 1))
+      fb_ctx.esc_buf[fb_ctx.esc_len++] = (char)b;
     handle_csi();
-    ctx.esc_state = 0;
+    fb_ctx.esc_state = 0;
     return;
   case 3: /* charset designator */
     if(b == '0')
-      ctx.g0_acs = 1;
+      fb_ctx.g0_acs = 1;
     else if(b == 'B' || b == 'A' || b == 'U' || b == '1' || b == '2')
-      ctx.g0_acs = 0;
-    ctx.esc_state = 0;
+      fb_ctx.g0_acs = 0;
+    fb_ctx.esc_state = 0;
     return;
   default:
     break;
   }
 
   if(b == 0x1bu) {
-    ctx.esc_state = 1;
-    ctx.utf8_rem  = 0;
+    fb_ctx.esc_state = 1;
+    fb_ctx.utf8_rem  = 0;
     return;
   }
   feed_utf8(b);
@@ -1379,29 +1392,29 @@ static void feed_byte(u8 b)
 
 void fb_console_write_begin(void)
 {
-  if(ctx.yielded || !ctx.cells)
+  if(fb_ctx.yielded || !fb_ctx.cells)
     return;
   scrollback_exit(); /* any write returns to live view */
-  ctx.batch_r0 = ctx.rows;
-  ctx.batch_r1 = -1;
+  fb_ctx.batch_r0 = fb_ctx.rows;
+  fb_ctx.batch_r1 = -1;
   if(s_cursor_drawn_x >= 0 && s_cursor_drawn_y >= 0) {
-    fb_cell_t *cc = &ctx.cells
-                         [(size_t)s_cursor_drawn_y * (size_t)ctx.cols +
+    fb_cell_t *cc = &fb_ctx.cells
+                         [(size_t)s_cursor_drawn_y * (size_t)fb_ctx.cols +
                           (size_t)s_cursor_drawn_x];
     cc->dirty = 1;
-    if(s_cursor_drawn_y < ctx.batch_r0)
-      ctx.batch_r0 = s_cursor_drawn_y;
-    if(s_cursor_drawn_y > ctx.batch_r1)
-      ctx.batch_r1 = s_cursor_drawn_y;
+    if(s_cursor_drawn_y < fb_ctx.batch_r0)
+      fb_ctx.batch_r0 = s_cursor_drawn_y;
+    if(s_cursor_drawn_y > fb_ctx.batch_r1)
+      fb_ctx.batch_r1 = s_cursor_drawn_y;
     s_cursor_drawn_x = -1;
     s_cursor_drawn_y = -1;
   }
-  ctx.in_batch = true;
+  fb_ctx.in_batch = true;
 }
 
 void fb_console_write_raw(const void *buf, size_t len)
 {
-  if(ctx.yielded || !ctx.cells)
+  if(fb_ctx.yielded || !fb_ctx.cells)
     return;
   const u8 *p = (const u8 *)buf;
   for(size_t i = 0; i < len; i++)
@@ -1410,13 +1423,13 @@ void fb_console_write_raw(const void *buf, size_t len)
 
 void fb_console_write_end(void)
 {
-  if(ctx.yielded || !ctx.cells)
+  if(fb_ctx.yielded || !fb_ctx.cells)
     return;
-  ctx.in_batch = false;
+  fb_ctx.in_batch = false;
   flush_pending_scroll();
   flush_batch();
-  ctx.blink_ticks = FB_BLINK_PERIOD_TICKS;
-  ctx.blink_on    = 1;
+  fb_ctx.blink_ticks = FB_BLINK_PERIOD_TICKS;
+  fb_ctx.blink_on    = 1;
   cursor_paint();
 }
 
@@ -1429,22 +1442,22 @@ void fb_console_write(const void *buf, size_t len)
 
 void fb_console_push_input(u8 byte)
 {
-  unsigned int next = (ctx.in_tail + 1u) % INPUT_RING;
-  if(next == ctx.in_head)
+  unsigned int next = (fb_ctx.in_tail + 1u) % INPUT_RING;
+  if(next == fb_ctx.in_head)
     return; /* drop on overflow */
-  ctx.in_buf[ctx.in_tail] = byte;
-  ctx.in_tail             = next;
-  ctx.blink_ticks         = FB_BLINK_PERIOD_TICKS;
-  ctx.blink_on            = 1;
+  fb_ctx.in_buf[fb_ctx.in_tail] = byte;
+  fb_ctx.in_tail                = next;
+  fb_ctx.blink_ticks            = FB_BLINK_PERIOD_TICKS;
+  fb_ctx.blink_on               = 1;
 }
 
 size_t fb_console_read(void *buf, size_t max)
 {
   u8    *out = (u8 *)buf;
   size_t n   = 0;
-  while(n < max && ctx.in_head != ctx.in_tail) {
-    out[n++]    = ctx.in_buf[ctx.in_head];
-    ctx.in_head = (ctx.in_head + 1u) % INPUT_RING;
+  while(n < max && fb_ctx.in_head != fb_ctx.in_tail) {
+    out[n++]       = fb_ctx.in_buf[fb_ctx.in_head];
+    fb_ctx.in_head = (fb_ctx.in_head + 1u) % INPUT_RING;
   }
   return n;
 }
@@ -1532,28 +1545,28 @@ static void mouse_cursor_erase(i32 cx, i32 cy)
     x0 = 0;
   if(y0 < 0)
     y0 = 0;
-  if(x1 >= (int)ctx.width)
-    x1 = (int)ctx.width - 1;
-  if(y1 >= (int)ctx.height)
-    y1 = (int)ctx.height - 1;
+  if(x1 >= (int)fb_ctx.width)
+    x1 = (int)fb_ctx.width - 1;
+  if(y1 >= (int)fb_ctx.height)
+    y1 = (int)fb_ctx.height - 1;
   for(int y = y0; y <= y1; y++)
     for(int x = x0; x <= x1; x++)
-      fb_put_pixel((u32)x, (u32)y, ctx.default_bg);
+      fb_put_pixel((u32)x, (u32)y, fb_ctx.default_bg);
 
-  int cw = ctx.cell_w ? ctx.cell_w : 1;
-  int ch = ctx.cell_h ? ctx.cell_h : 1;
-  int c0 = (x0 - ctx.margin_x) / cw;
-  int c1 = (x1 - ctx.margin_x) / cw;
-  int r0 = (y0 - ctx.margin_y) / ch;
-  int r1 = (y1 - ctx.margin_y) / ch;
+  int cw = fb_ctx.cell_w ? fb_ctx.cell_w : 1;
+  int ch = fb_ctx.cell_h ? fb_ctx.cell_h : 1;
+  int c0 = (x0 - fb_ctx.margin_x) / cw;
+  int c1 = (x1 - fb_ctx.margin_x) / cw;
+  int r0 = (y0 - fb_ctx.margin_y) / ch;
+  int r1 = (y1 - fb_ctx.margin_y) / ch;
   if(c0 < 0)
     c0 = 0;
   if(r0 < 0)
     r0 = 0;
-  if(c1 >= ctx.cols)
-    c1 = ctx.cols - 1;
-  if(r1 >= ctx.rows)
-    r1 = ctx.rows - 1;
+  if(c1 >= fb_ctx.cols)
+    c1 = fb_ctx.cols - 1;
+  if(r1 >= fb_ctx.rows)
+    r1 = fb_ctx.rows - 1;
   for(int r = r0; r <= r1; r++)
     for(int c = c0; c <= c1; c++)
       blit_cell(c, r);
@@ -1561,7 +1574,7 @@ static void mouse_cursor_erase(i32 cx, i32 cy)
 
 static void mouse_cursor_render(void)
 {
-  if(ctx.yielded || !ctx.cells)
+  if(fb_ctx.yielded || !fb_ctx.cells)
     return;
   /* Keep the pointer hidden until the user actually moves it, so a fresh boot
    * doesn't show a stray cursor pinned at screen centre. */
@@ -1598,28 +1611,29 @@ static void mouse_cursor_invalidate_for_scroll(void)
 
 void fb_console_tick(void)
 {
-  if(ctx.yielded || !ctx.cells)
+  if(fb_ctx.yielded || !fb_ctx.cells)
     return;
-  if(ctx.blink_ticks == 0) {
-    ctx.blink_on      = (u8)!ctx.blink_on;
-    ctx.cell_blink_on = ctx.blink_on;
-    ctx.blink_ticks   = FB_BLINK_PERIOD_TICKS;
+  if(fb_ctx.blink_ticks == 0) {
+    fb_ctx.blink_on      = (u8)!fb_ctx.blink_on;
+    fb_ctx.cell_blink_on = fb_ctx.blink_on;
+    fb_ctx.blink_ticks   = FB_BLINK_PERIOD_TICKS;
 
-    ctx.batch_r0 = ctx.rows;
-    ctx.batch_r1 = -1;
-    for(int r = 0; r < ctx.rows; r++) {
-      for(int c = 0; c < ctx.cols; c++) {
-        fb_cell_t *cell = &ctx.cells[(size_t)r * (size_t)ctx.cols + (size_t)c];
+    fb_ctx.batch_r0 = fb_ctx.rows;
+    fb_ctx.batch_r1 = -1;
+    for(int r = 0; r < fb_ctx.rows; r++) {
+      for(int c = 0; c < fb_ctx.cols; c++) {
+        fb_cell_t *cell =
+            &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c];
         if(cell->attr & FB_ATTR_BLINK) {
           cell->dirty = 1;
-          if(r < ctx.batch_r0)
-            ctx.batch_r0 = r;
-          if(r > ctx.batch_r1)
-            ctx.batch_r1 = r;
+          if(r < fb_ctx.batch_r0)
+            fb_ctx.batch_r0 = r;
+          if(r > fb_ctx.batch_r1)
+            fb_ctx.batch_r1 = r;
         }
       }
     }
-    if(ctx.batch_r0 <= ctx.batch_r1) {
+    if(fb_ctx.batch_r0 <= fb_ctx.batch_r1) {
       flush_batch();
       /* The re-blit may have painted over the pointer; force a full redraw. */
       mouse_cur.drawn = false;
@@ -1627,7 +1641,7 @@ void fb_console_tick(void)
 
     cursor_refresh();
   } else {
-    ctx.blink_ticks--;
+    fb_ctx.blink_ticks--;
   }
 
   /* Redraw every tick: mouse_cursor_render() early-outs when the pointer hasn't
@@ -1680,23 +1694,23 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   kmemcpy(new_cp_map, (const void *)(u64)meta->cp_map_user, cp_bytes);
 
   /* Release any prior atlas. */
-  if(ctx.atlas_pixels)
-    kfree(ctx.atlas_pixels);
-  if(ctx.atlas_cp_map)
-    kfree(ctx.atlas_cp_map);
+  if(fb_ctx.atlas_pixels)
+    kfree(fb_ctx.atlas_pixels);
+  if(fb_ctx.atlas_cp_map)
+    kfree(fb_ctx.atlas_cp_map);
 
-  ctx.atlas_pixels      = new_pixels;
-  ctx.atlas_cp_map      = new_cp_map;
-  ctx.atlas_cell_w      = meta->cell_w;
-  ctx.atlas_cell_h      = meta->cell_h;
-  ctx.atlas_stride      = meta->stride_bytes;
-  ctx.atlas_bpp         = meta->bpp;
-  ctx.atlas_n_glyphs    = meta->n_glyphs;
-  ctx.atlas_n_cp        = meta->n_cp;
-  ctx.atlas_fallback    = meta->fallback_idx;
-  ctx.atlas_bold_base   = meta->bold_offset;
-  ctx.atlas_italic_base = meta->italic_offset;
-  ctx.atlas_active      = true;
+  fb_ctx.atlas_pixels      = new_pixels;
+  fb_ctx.atlas_cp_map      = new_cp_map;
+  fb_ctx.atlas_cell_w      = meta->cell_w;
+  fb_ctx.atlas_cell_h      = meta->cell_h;
+  fb_ctx.atlas_stride      = meta->stride_bytes;
+  fb_ctx.atlas_bpp         = meta->bpp;
+  fb_ctx.atlas_n_glyphs    = meta->n_glyphs;
+  fb_ctx.atlas_n_cp        = meta->n_cp;
+  fb_ctx.atlas_fallback    = meta->fallback_idx;
+  fb_ctx.atlas_bold_base   = meta->bold_offset;
+  fb_ctx.atlas_italic_base = meta->italic_offset;
+  fb_ctx.atlas_active      = true;
 
   /* Adopt the atlas's cell pixel size and reflow the grid. Cursor + saved
    * cursor get clamped into the new geometry; existing content is discarded
@@ -1706,12 +1720,14 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   int new_cell_h = (int)meta->cell_h;
   int new_marg_x = FB_CONSOLE_MARGIN;
   int new_marg_y = FB_CONSOLE_MARGIN;
-  int old_cols   = ctx.cols;
-  int old_rows   = ctx.rows;
-  if(new_cell_w != ctx.cell_w || new_cell_h != ctx.cell_h ||
-     new_marg_x != ctx.margin_x || new_marg_y != ctx.margin_y) {
-    int new_cols = (int)((ctx.width - 2u * (u64)new_marg_x) / (u64)new_cell_w);
-    int new_rows = (int)((ctx.height - 2u * (u64)new_marg_y) / (u64)new_cell_h);
+  int old_cols   = fb_ctx.cols;
+  int old_rows   = fb_ctx.rows;
+  if(new_cell_w != fb_ctx.cell_w || new_cell_h != fb_ctx.cell_h ||
+     new_marg_x != fb_ctx.margin_x || new_marg_y != fb_ctx.margin_y) {
+    int new_cols =
+        (int)((fb_ctx.width - 2u * (u64)new_marg_x) / (u64)new_cell_w);
+    int new_rows =
+        (int)((fb_ctx.height - 2u * (u64)new_marg_y) / (u64)new_cell_h);
     if(new_cols < 1)
       new_cols = 1;
     if(new_rows < 1)
@@ -1721,21 +1737,21 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
     if(nc) {
       for(size_t i = 0; i < total; i++) {
         nc[i].cp   = (u32)' ';
-        nc[i].fg   = ctx.default_fg;
-        nc[i].bg   = ctx.default_bg;
+        nc[i].fg   = fb_ctx.default_fg;
+        nc[i].bg   = fb_ctx.default_bg;
         nc[i].attr = 0;
       }
-      if(ctx.cells)
-        kfree(ctx.cells);
-      ctx.cells    = nc;
-      ctx.cols     = new_cols;
-      ctx.rows     = new_rows;
-      ctx.cell_w   = new_cell_w;
-      ctx.cell_h   = new_cell_h;
-      ctx.margin_x = new_marg_x;
-      ctx.margin_y = new_marg_y;
-      ctx.cx = ctx.cy = 0;
-      ctx.saved_cx = ctx.saved_cy = 0;
+      if(fb_ctx.cells)
+        kfree(fb_ctx.cells);
+      fb_ctx.cells    = nc;
+      fb_ctx.cols     = new_cols;
+      fb_ctx.rows     = new_rows;
+      fb_ctx.cell_w   = new_cell_w;
+      fb_ctx.cell_h   = new_cell_h;
+      fb_ctx.margin_x = new_marg_x;
+      fb_ctx.margin_y = new_marg_y;
+      fb_ctx.cx = fb_ctx.cy = 0;
+      fb_ctx.saved_cx = fb_ctx.saved_cy = 0;
       /* Reallocate scrollback for the new column count. */
       if(s_sb_buf)
         kfree(s_sb_buf);
@@ -1746,20 +1762,20 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
       s_sb_head = s_sb_used = s_sb_view = 0;
       flush_ci_ensure(new_cols);
       /* Wipe stale pixels left around the old grid. */
-      for(u32 y = 0; y < ctx.height; y++)
-        for(u32 x = 0; x < ctx.width; x++)
-          fb_put_pixel(x, y, ctx.default_bg);
+      for(u32 y = 0; y < fb_ctx.height; y++)
+        for(u32 x = 0; x < fb_ctx.width; x++)
+          fb_put_pixel(x, y, fb_ctx.default_bg);
     }
     /* If kmalloc fails, fall through and repaint with the existing grid;
-     * the atlas blit will just clip to ctx.cell_w/cell_h as before. */
+     * the atlas blit will just clip to fb_ctx.cell_w/cell_h as before. */
   }
 
   /* Repaint the whole grid through the new path. The cursor cell, if any,
    * was overwritten by that loop so its tracked position is now stale; any
    * pending scroll is moot because we just repainted everything. */
   s_pending_scroll = 0;
-  for(int r = 0; r < ctx.rows; r++)
-    for(int c = 0; c < ctx.cols; c++)
+  for(int r = 0; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
   s_cursor_drawn_x = -1;
   s_cursor_drawn_y = -1;
@@ -1768,7 +1784,7 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   /* Wake every TUI so they re-query TIOCGWINSZ and redraw at the real grid
    * size. Skipped when the grid stayed the same (e.g. atlas reloaded with
    * identical metrics) — no point waking anyone in that case. */
-  if(ctx.cols != old_cols || ctx.rows != old_rows)
+  if(fb_ctx.cols != old_cols || fb_ctx.rows != old_rows)
     proc_signal_broadcast(SIGWINCH);
   return 0;
 }
@@ -1776,9 +1792,9 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
 void fb_console_get_size(int *cols, int *rows)
 {
   if(cols)
-    *cols = ctx.cols;
+    *cols = fb_ctx.cols;
   if(rows)
-    *rows = ctx.rows;
+    *rows = fb_ctx.rows;
 }
 
 /**
@@ -1814,34 +1830,34 @@ void fb_console_fill_winsize(k_winsize_t *out)
 
 bool fb_console_app_cursor_keys(void)
 {
-  return ctx.app_cursor_keys;
+  return fb_ctx.app_cursor_keys;
 }
 
 void fb_console_yield(void)
 {
-  ctx.yielded = true;
+  fb_ctx.yielded = true;
   mouse_cur.drawn =
       false; /* user owns the pixels; don't XOR-erase a stale pos. */
 }
 
 void fb_console_reclaim(void)
 {
-  ctx.yielded     = false;
+  fb_ctx.yielded  = false;
   mouse_cur.drawn = false;
-  if(!ctx.cells)
+  if(!fb_ctx.cells)
     return;
   /* Fill the whole framebuffer with the theme background first: a yielding app
    * (e.g. doom) may have left arbitrary pixels in the margins outside the cell
    * grid, which re-blitting cells alone would not cover. */
-  if(ctx.base && ctx.bytes_pp == 4)
-    for(u32 y = 0; y < ctx.height; y++)
+  if(fb_ctx.base && fb_ctx.bytes_pp == 4)
+    for(u32 y = 0; y < fb_ctx.height; y++)
       fill32(
-          (volatile u32 *)(ctx.base + (u64)y * ctx.pitch),
-          0xFF000000u | ctx.default_bg, ctx.width
+          (volatile u32 *)(fb_ctx.base + (u64)y * fb_ctx.pitch),
+          0xFF000000u | fb_ctx.default_bg, fb_ctx.width
       );
   s_pending_scroll = 0;
-  for(int r = 0; r < ctx.rows; r++)
-    for(int c = 0; c < ctx.cols; c++)
+  for(int r = 0; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
   s_cursor_drawn_x = -1;
   s_cursor_drawn_y = -1;
