@@ -95,4 +95,95 @@ typedef struct
  */
 void sh_complete(const char *prefix, bool is_command, comp_result_t *out);
 
+/**
+ * @brief Append @p line to history.
+ *
+ * No-op when @p line is empty or duplicates the most recent entry.
+ *
+ * @param line  Line to record; copied into the ring (need not outlive call).
+ */
+void sh_hist_push(const char *line);
+
+/**
+ * @brief Return the number of entries currently held.
+ *
+ * @return Entry count in [0, HIST_MAX].
+ */
+int sh_hist_count(void);
+
+/**
+ * @brief Look up history entry at @p idx (0 = oldest).
+ *
+ * @param idx  Zero-based index.
+ * @return Pointer to internal storage (valid until next ::sh_hist_push), or
+ *         @c NULL if @p idx is out of range.
+ */
+const char *sh_hist_at(int idx);
+
+/**
+ * @brief Non-byte-length return values from ::sh_read_line.
+ *
+ * Encoded as negative @c int so ::sh_read_line can return either a positive
+ * byte count (line length) or one of these control codes from the same
+ * function signature.
+ */
+typedef enum
+{
+  RL_EOF       = -1, /**< Ctrl-D on an empty line. */
+  RL_INTERRUPT = -2, /**< Ctrl-C — in-progress line is discarded. */
+  RL_CLEAR     = -3, /**< Ctrl-L — caller should clear the screen. */
+} rl_result_t;
+
+/**
+ * @brief Initialise the off-screen ncurses input pad used by ::sh_read_line.
+ *
+ * Must be called once after @c newterm() and before the first ::sh_read_line.
+ *
+ * @return 0 on success, -1 if @c newpad failed.
+ */
+int sh_edit_init(void);
+
+/**
+ * @brief Read one logical input line, with history navigation, tab completion,
+ *        and UTF-8-aware cursor movement.
+ *
+ * @param buf     Caller buffer; receives a NUL-terminated line (no @c \\n).
+ * @param cap     Capacity of @p buf in bytes.
+ * @param prompt  Prompt string (may include ANSI escapes).
+ * @return Byte length of the line, or @c RL_EOF / @c RL_INTERRUPT / @c
+ * RL_CLEAR.
+ */
+int sh_read_line(char *buf, size_t cap, const char *prompt);
+
+/** @brief Paint the decorative header line above the primary prompt. */
+void sh_write_prompt_header(void);
+
+/**
+ * @brief Format the bottom-line prompt (`╰─ $ `) into @p out.
+ *
+ * @param out  Destination buffer (NUL-terminated on return).
+ * @param cap  Capacity of @p out (≥ 32 bytes recommended for full prompt).
+ */
+void sh_format_prompt(char *out, size_t cap);
+
+/**
+ * @brief Read input lines into @p buf until they form a complete statement.
+ *
+ * @param buf   Destination accumulator (NUL-terminated on return).
+ * @param size  Capacity of @p buf in bytes.
+ * @return Total bytes accumulated, @c RL_EOF on Ctrl-D at an empty primary
+ *         prompt, or 0 when interrupted (Ctrl-C).
+ */
+int sh_read_complete_statement(char *buf, size_t size);
+
+/**
+ * @brief Source @p path as a vega script with stdout redirected to /dev/null.
+ *
+ * Acts like @c .bashrc — silently ignored if @p path doesn't exist. Restores
+ * the original stdout on return.
+ *
+ * @param path  Absolute path to the config file (e.g. @c "/home/.vconf").
+ */
+void sh_source_vconf(const char *path);
+
 #endif /* SHELL_H */

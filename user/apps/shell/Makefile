@@ -30,7 +30,12 @@ BASE_SRCS := \
   platform/io.c \
   platform/sys.c \
   platform/builtins.c \
-  platform/complete.c
+  platform/complete.c \
+  platform/history.c \
+  platform/edit.c \
+  platform/prompt.c \
+  platform/parse.c \
+  platform/vconf.c
 
 ifeq ($(HAVE_ATLAS),1)
 ATLAS_SRC    := platform/atlas.c

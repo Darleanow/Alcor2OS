@@ -58,6 +58,15 @@ printf 'int main(void){return 0;}\n' \
 printf '#include <stdio.h>\nint main(void){printf("hi\\n");return 0;}\n' \
   | $S tee "$MNT/home/hi.c" >/dev/null
 
+# Default .vconf — sourced by the shell on startup (like .bashrc).
+if [ ! -f "$MNT/home/.vconf" ]; then
+  $S tee "$MNT/home/.vconf" >/dev/null <<'VCONF'
+# ~/.vconf — vega shell startup script
+# Set default keyboard layout (us or fr)
+kbd fr
+VCONF
+fi
+
 # ----- 2. Shell apps (heavier, persistent) -----------------------------------
 # Wipe everything in /bin except heavy toolchain binaries we may keep cached.
 # Small POSIX utilities (user/bin/) are shipped via the kernel's /init overlay
