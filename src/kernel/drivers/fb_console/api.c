@@ -374,18 +374,6 @@ static int install_atlas_payload(const fb_console_atlas_t *meta, u64 cp_bytes)
 }
 
 /**
- * @brief Reflow the cell grid when the new atlas's cell size differs from
- *        the live one.
- *
- * No-op when the cell geometry matches what's already on screen (atlas
- * reload with same metrics). On grid resize, the previous cell content is
- * discarded — cell coordinates don't survive a cols/rows change in any
- * well-defined way. On kmalloc failure, the existing grid is left in place
- * and the atlas blit clips to the old @c cell_w/cell_h instead.
- *
- * @param meta  Validated descriptor.
- */
-/**
  * @brief Compute the new column/row counts that fit @p new_cell_w/h pixels
  * inside the framebuffer with @ref FB_CONSOLE_MARGIN on each side.
  *

@@ -799,6 +799,80 @@ static void handle_control(u8 b)
   }
 }
 
+/** @brief First lower-case ASCII codepoint. The DEC Special Graphics set only
+ * remaps the lower-case range, so the translation gate is "is this in the ACS
+ * mapping range?" — anything below stays untouched. */
+#define ASCII_LOWER_A 0x60u
+
+/** @brief First printable ASCII codepoint (space). Everything below is C0
+ * control which feeds @ref handle_control. */
+#define ASCII_SPACE 0x20u
+
+/** @brief ASCII DEL (0x7F). Outside the printable range but also not a
+ * standard C0 control; routed through @ref handle_control with the other
+ * controls so the UTF-8 lead-byte check skips it. */
+#define ASCII_DEL 0x7Fu
+
+/** @brief First non-ASCII byte. Anything @c >= this is either a UTF-8
+ * continuation (rejected as stray) or a multi-byte lead. */
+#define UTF8_NON_ASCII_BASE 0x80u
+
+/** @brief Mask isolating the leading 3 bits of a UTF-8 byte (used to detect
+ * 2-byte lead pattern @c 110xxxxx). */
+#define UTF8_2BYTE_LEAD_MASK 0xE0u
+
+/** @brief 2-byte lead pattern after masking. */
+#define UTF8_2BYTE_LEAD_VAL 0xC0u
+
+/** @brief Payload bits carried by a 2-byte lead (lower 5 bits). */
+#define UTF8_2BYTE_PAYLOAD_MASK 0x1Fu
+
+/** @brief Mask isolating the leading 4 bits of a UTF-8 byte (used to detect
+ * 3-byte lead pattern @c 1110xxxx). */
+#define UTF8_3BYTE_LEAD_MASK 0xF0u
+
+/** @brief 3-byte lead pattern after masking. */
+#define UTF8_3BYTE_LEAD_VAL 0xE0u
+
+/** @brief Payload bits carried by a 3-byte lead (lower 4 bits). */
+#define UTF8_3BYTE_PAYLOAD_MASK 0x0Fu
+
+/** @brief Mask isolating the leading 5 bits of a UTF-8 byte (used to detect
+ * 4-byte lead pattern @c 11110xxx). */
+#define UTF8_4BYTE_LEAD_MASK 0xF8u
+
+/** @brief 4-byte lead pattern after masking. */
+#define UTF8_4BYTE_LEAD_VAL 0xF0u
+
+/** @brief Payload bits carried by a 4-byte lead (lower 3 bits). */
+#define UTF8_4BYTE_PAYLOAD_MASK 0x07u
+
+/** @brief Continuation bytes after a 2-byte lead. */
+#define UTF8_2BYTE_TAIL 1u
+
+/** @brief Continuation bytes after a 3-byte lead. */
+#define UTF8_3BYTE_TAIL 2u
+
+/** @brief Continuation bytes after a 4-byte lead. */
+#define UTF8_4BYTE_TAIL 3u
+
+/** @brief Mask isolating the high 2 bits of a UTF-8 continuation byte. */
+#define UTF8_CONT_LEAD_MASK 0xC0u
+
+/** @brief Required pattern of a continuation byte after masking
+ * (@c 10xxxxxx). */
+#define UTF8_CONT_LEAD_VAL 0x80u
+
+/** @brief Payload bits carried by a UTF-8 continuation byte (lower 6 bits). */
+#define UTF8_CONT_PAYLOAD_MASK 0x3Fu
+
+/** @brief Bit-shift width of one UTF-8 continuation byte's payload. */
+#define UTF8_CONT_PAYLOAD_BITS 6u
+
+/** @brief Highest valid Unicode codepoint (Plane 16's last slot). Anything
+ * above gets replaced with @c '?' rather than rendered as a phantom glyph. */
+#define UNICODE_MAX 0x10FFFFu
+
 /**
  * @brief Emit a single ASCII byte to the cursor, applying DEC ACS translation
  *        when the G0 set is the special-graphics one.
@@ -807,7 +881,7 @@ static void handle_control(u8 b)
  */
 static void emit_ascii(u8 b)
 {
-  if(fb_ctx.g0_acs && b >= 0x60u) {
+  if(fb_ctx.g0_acs && b >= ASCII_LOWER_A) {
     put_cp_at_cursor(acs_to_unicode(b));
     return;
   }
@@ -837,16 +911,16 @@ static void utf8_begin(u32 lead_bits, u8 remaining)
  */
 static bool utf8_try_start(u8 b)
 {
-  if((b & 0xe0u) == 0xc0u) {
-    utf8_begin((u32)(b & 0x1fu), 1);
+  if((b & UTF8_2BYTE_LEAD_MASK) == UTF8_2BYTE_LEAD_VAL) {
+    utf8_begin((u32)(b & UTF8_2BYTE_PAYLOAD_MASK), UTF8_2BYTE_TAIL);
     return true;
   }
-  if((b & 0xf0u) == 0xe0u) {
-    utf8_begin((u32)(b & 0x0fu), 2);
+  if((b & UTF8_3BYTE_LEAD_MASK) == UTF8_3BYTE_LEAD_VAL) {
+    utf8_begin((u32)(b & UTF8_3BYTE_PAYLOAD_MASK), UTF8_3BYTE_TAIL);
     return true;
   }
-  if((b & 0xf8u) == 0xf0u) {
-    utf8_begin((u32)(b & 0x07u), 3);
+  if((b & UTF8_4BYTE_LEAD_MASK) == UTF8_4BYTE_LEAD_VAL) {
+    utf8_begin((u32)(b & UTF8_4BYTE_PAYLOAD_MASK), UTF8_4BYTE_TAIL);
     return true;
   }
   return false;
@@ -867,11 +941,11 @@ static bool utf8_try_start(u8 b)
 static void feed_utf8(u8 b)
 {
   if(fb_ctx.utf8_rem == 0) {
-    if(b < 0x20u || b == 0x7fu) {
+    if(b < ASCII_SPACE || b == ASCII_DEL) {
       handle_control(b);
       return;
     }
-    if(b < 0x80u) {
+    if(b < UTF8_NON_ASCII_BASE) {
       emit_ascii(b);
       return;
     }
@@ -879,18 +953,19 @@ static void feed_utf8(u8 b)
       put_cp_at_cursor((u32)'?');
     return;
   }
-  if((b & 0xc0u) != 0x80u) {
+  if((b & UTF8_CONT_LEAD_MASK) != UTF8_CONT_LEAD_VAL) {
     /* Broken sequence; recover by replaying this byte fresh. */
     fb_ctx.utf8_rem = 0;
     put_cp_at_cursor((u32)'?');
     feed_utf8(b);
     return;
   }
-  fb_ctx.utf8_partial = (fb_ctx.utf8_partial << 6) | (u32)(b & 0x3fu);
+  fb_ctx.utf8_partial = (fb_ctx.utf8_partial << UTF8_CONT_PAYLOAD_BITS) |
+                        (u32)(b & UTF8_CONT_PAYLOAD_MASK);
   fb_ctx.utf8_rem--;
   if(fb_ctx.utf8_rem == 0) {
     u32 cp = fb_ctx.utf8_partial;
-    put_cp_at_cursor((cp <= 0x10ffffu) ? cp : (u32)'?');
+    put_cp_at_cursor((cp <= UNICODE_MAX) ? cp : (u32)'?');
   }
 }
 
