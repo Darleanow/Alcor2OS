@@ -428,4 +428,58 @@ void caret_clear_drawn(void);
  */
 void caret_invalidate_in_batch(void);
 
+/* fb_console_scrollback.c — scrollback ring + deferred pixel-scroll */
+
+/**
+ * @brief Move the top row off the grid into the scrollback ring and shift
+ * every remaining row up. Increments the pending-scroll counter so the next
+ * flush copies pixels in a single move.
+ */
+void scroll_one(void);
+
+/**
+ * @brief Repaint the visible grid from the scrollback ring blended with the
+ * live cells, based on the current scroll-up offset. Called when entering
+ * scrollback mode or scrolling within it.
+ */
+void scrollback_repaint(void);
+
+/**
+ * @brief Drop back to the live view (scroll offset = 0) and mark every cell
+ * dirty so the next @ref flush_batch repaints what the scrollback overlay
+ * had been hiding.
+ */
+void scrollback_exit(void);
+
+/**
+ * @brief Drain the pending-scroll counter: copies pixels up in one MMIO blit
+ * and marks the freshly exposed rows dirty for the next @ref flush_batch.
+ * No-op when no scrolls are pending.
+ */
+void flush_pending_scroll(void);
+
+/**
+ * @brief (Re)allocate the scrollback ring for @p cols columns; existing
+ * contents are dropped (cell coordinates do not survive a column reflow).
+ *
+ * @param cols  New column count.
+ */
+void scrollback_alloc_for(int cols);
+
+/**
+ * @brief Forget pending scrolls without flushing them. Used by paths that
+ * are about to repaint the entire grid anyway (fb_console_reclaim,
+ * fb_console_set_atlas) — flushing first would just waste a VRAM copy.
+ */
+void scrollback_drop_pending(void);
+
+/* fb_console_mouse.c — software mouse cursor */
+
+/**
+ * @brief Erase the software mouse cursor if it is painted, so the scrollback
+ * pixel-move does not drag a stale copy along. Called by
+ * @ref flush_pending_scroll just before the kmemcpy.
+ */
+void mouse_cursor_invalidate_for_scroll(void);
+
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */

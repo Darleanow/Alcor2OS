@@ -22,176 +22,6 @@ void             proc_signal_broadcast(int signum);
 
 fb_console_ctx_t fb_ctx;
 
-/* Rows that need to be scrolled out at the next flush. Updated by scroll_one
- * during a write; consumed by flush_pending_scroll at end-of-write. Batching
- * matters because pixel writes hit MMIO — collapsing N scrolls into one move
- * keeps `ls` of a long dir interactive instead of bandwidth-bound. */
-static int s_pending_scroll = 0;
-
-/* Implemented below alongside the rest of the mouse-cursor block. */
-static void mouse_cursor_invalidate_for_scroll(void);
-
-/* Scrollback ring ------------------------------------------------------- */
-static fb_cell_t *s_sb_buf  = NULL; /* kmalloc'd: SCROLLBACK_ROWS * cols    */
-static int        s_sb_cols = 0; /* fb_ctx.cols when buf was allocated       */
-static int        s_sb_head = 0; /* ring head (oldest row index)          */
-static int        s_sb_used = 0; /* rows currently stored                 */
-static int        s_sb_view = 0; /* rows scrolled back; 0 = live view     */
-
-/* Logical scroll only — moves the cell array up by one row and queues a
- * pixel move for the next flush. Cell blits done between now and flush land
- * at their final logical row, so the visible result is the same once the
- * pending pixel move catches up. */
-static void scroll_one(void)
-{
-  size_t row_bytes = (size_t)fb_ctx.cols * sizeof(fb_cell_t);
-
-  /* Save the row scrolling off the top into the scrollback ring. */
-  if(s_sb_buf && s_sb_cols == fb_ctx.cols) {
-    int slot;
-    if(s_sb_used < SCROLLBACK_ROWS) {
-      slot = (s_sb_head + s_sb_used) % SCROLLBACK_ROWS;
-      s_sb_used++;
-    } else {
-      slot      = s_sb_head;
-      s_sb_head = (s_sb_head + 1) % SCROLLBACK_ROWS;
-    }
-    kmemcpy(
-        &s_sb_buf[(size_t)slot * (size_t)fb_ctx.cols], &fb_ctx.cells[0],
-        row_bytes
-    );
-  }
-
-  for(int r = 0; r < fb_ctx.rows - 1; r++)
-    kmemcpy(
-        &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols],
-        &fb_ctx.cells[(size_t)(r + 1) * (size_t)fb_ctx.cols], row_bytes
-    );
-  for(int c = 0; c < fb_ctx.cols; c++) {
-    fb_cell_t *cell =
-        &fb_ctx.cells
-             [(size_t)(fb_ctx.rows - 1) * (size_t)fb_ctx.cols + (size_t)c];
-    cell->cp    = (u32)' ';
-    cell->fg    = fb_ctx.cur_fg;
-    cell->bg    = fb_ctx.cur_bg;
-    cell->attr  = 0;
-    cell->dirty = 0;
-  }
-  s_pending_scroll++;
-  caret_clear_drawn();
-  /* After a scroll, dirty cells may have shifted rows — expand the range
-   * to cover all rows so flush_batch() doesn't miss any. */
-  if(fb_ctx.in_batch) {
-    fb_ctx.batch_r0 = 0;
-    fb_ctx.batch_r1 = fb_ctx.rows - 1;
-  }
-}
-
-/* Repaint the full visible grid from scrollback + live cells. Called when
- * entering scrollback mode or scrolling within it. */
-static void scrollback_repaint(void)
-{
-  if(!fb_ctx.base || !fb_ctx.cells)
-    return;
-  caret_erase();
-  for(int r = 0; r < fb_ctx.rows; r++) {
-    const fb_cell_t *src;
-    fb_cell_t        blank;
-    if(r < s_sb_view) {
-      int sb_idx = s_sb_used - s_sb_view + r;
-      if(sb_idx < 0 || !s_sb_buf) {
-        kmemset(&blank, 0, sizeof blank);
-        blank.cp = ' ';
-        blank.fg = fb_ctx.default_fg;
-        blank.bg = fb_ctx.default_bg;
-        src      = &blank;
-      } else {
-        int slot = (s_sb_head + sb_idx) % SCROLLBACK_ROWS;
-        src      = &s_sb_buf[(size_t)slot * (size_t)fb_ctx.cols];
-      }
-      for(int c = 0; c < fb_ctx.cols; c++)
-        blit_cell_data(src + c, c, r);
-    } else {
-      src = &fb_ctx.cells[(size_t)(r - s_sb_view) * (size_t)fb_ctx.cols];
-      for(int c = 0; c < fb_ctx.cols; c++)
-        blit_cell_data(src + c, c, r);
-    }
-  }
-}
-
-static void scrollback_exit(void)
-{
-  if(s_sb_view == 0)
-    return;
-  s_sb_view = 0;
-  for(int r = 0; r < fb_ctx.rows; r++)
-    for(int c = 0; c < fb_ctx.cols; c++)
-      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
-}
-
-void fb_console_scrollback_up(int lines)
-{
-  if(!s_sb_buf || s_sb_used == 0 || lines <= 0)
-    return;
-  s_sb_view += lines;
-  if(s_sb_view > s_sb_used)
-    s_sb_view = s_sb_used;
-  scrollback_repaint();
-}
-
-void fb_console_scrollback_down(int lines)
-{
-  if(s_sb_view == 0 || lines <= 0)
-    return;
-  s_sb_view -= lines;
-  if(s_sb_view < 0)
-    s_sb_view = 0;
-  if(s_sb_view == 0)
-    scrollback_exit();
-  else
-    scrollback_repaint();
-}
-
-static void flush_pending_scroll(void)
-{
-  if(s_pending_scroll <= 0)
-    return;
-
-  int n            = s_pending_scroll;
-  s_pending_scroll = 0;
-  if(n > fb_ctx.rows)
-    n = fb_ctx.rows;
-
-  /* Drop any painted cursor so it isn't carried along as a ghost. */
-  mouse_cursor_invalidate_for_scroll();
-
-  if(fb_ctx.base && fb_ctx.bytes_pp == 4) {
-    u32 scroll_px = (u32)n * (u32)fb_ctx.cell_h;
-    u32 total_px  = (u32)fb_ctx.rows * (u32)fb_ctx.cell_h;
-    u32 copy_px   = total_px - scroll_px;
-    if(copy_px > 0) {
-      u8       *dst = (u8 *)fb_ctx.base + (u64)fb_ctx.margin_y * fb_ctx.pitch;
-      const u8 *src = dst + (u64)scroll_px * fb_ctx.pitch;
-      kmemcpy(dst, src, (u64)copy_px * fb_ctx.pitch);
-    }
-    int first_new = fb_ctx.rows - n;
-    for(int r = first_new; r < fb_ctx.rows; r++)
-      for(int c = 0; c < fb_ctx.cols; c++)
-        fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
-    if(fb_ctx.batch_r0 > first_new)
-      fb_ctx.batch_r0 = first_new;
-    if(fb_ctx.batch_r1 < fb_ctx.rows - 1)
-      fb_ctx.batch_r1 = fb_ctx.rows - 1;
-    return;
-  }
-
-  for(int r = 0; r < fb_ctx.rows; r++)
-    for(int c = 0; c < fb_ctx.cols; c++)
-      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
-  fb_ctx.batch_r0 = 0;
-  fb_ctx.batch_r1 = fb_ctx.rows - 1;
-}
-
 struct flush_cell_cache
 {
   const u8 *glyph_base; /* NULL = bg-only (space / blink-off) */
@@ -879,11 +709,7 @@ bool fb_console_init(void *fb, u64 width, u64 height, u64 pitch, u16 bpp)
     fb_ctx.cells[i].dirty = 0;
   }
 
-  s_sb_buf = (fb_cell_t *)kmalloc(
-      (size_t)SCROLLBACK_ROWS * (size_t)fb_ctx.cols * sizeof(fb_cell_t)
-  );
-  s_sb_cols = fb_ctx.cols;
-  s_sb_head = s_sb_used = s_sb_view = 0;
+  scrollback_alloc_for(fb_ctx.cols);
   flush_ci_ensure(fb_ctx.cols);
   return true;
 }
@@ -1148,7 +974,7 @@ static void mouse_cursor_render(void)
 
 /* Called by flush_pending_scroll just before its kmemcpy: if a cursor is
  * painted, restore the cells under it so the scroll moves clean cells. */
-static void mouse_cursor_invalidate_for_scroll(void)
+void mouse_cursor_invalidate_for_scroll(void)
 {
   if(!mouse_cur.drawn)
     return;
@@ -1279,14 +1105,7 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
       fb_ctx.margin_y = new_marg_y;
       fb_ctx.cx = fb_ctx.cy = 0;
       fb_ctx.saved_cx = fb_ctx.saved_cy = 0;
-      /* Reallocate scrollback for the new column count. */
-      if(s_sb_buf)
-        kfree(s_sb_buf);
-      s_sb_buf = (fb_cell_t *)kmalloc(
-          (size_t)SCROLLBACK_ROWS * (size_t)new_cols * sizeof(fb_cell_t)
-      );
-      s_sb_cols = new_cols;
-      s_sb_head = s_sb_used = s_sb_view = 0;
+      scrollback_alloc_for(new_cols);
       flush_ci_ensure(new_cols);
       /* Wipe stale pixels left around the old grid. */
       for(u32 y = 0; y < fb_ctx.height; y++)
@@ -1300,7 +1119,7 @@ int fb_console_set_atlas(const fb_console_atlas_t *meta)
   /* Repaint the whole grid through the new path. The cursor cell, if any,
    * was overwritten by that loop so its tracked position is now stale; any
    * pending scroll is moot because we just repainted everything. */
-  s_pending_scroll = 0;
+  scrollback_drop_pending();
   for(int r = 0; r < fb_ctx.rows; r++)
     for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
@@ -1381,7 +1200,7 @@ void fb_console_reclaim(void)
           (volatile u32 *)(fb_ctx.base + (u64)y * fb_ctx.pitch),
           0xFF000000u | fb_ctx.default_bg, fb_ctx.width
       );
-  s_pending_scroll = 0;
+  scrollback_drop_pending();
   for(int r = 0; r < fb_ctx.rows; r++)
     for(int c = 0; c < fb_ctx.cols; c++)
       blit_cell(c, r);
