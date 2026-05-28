@@ -29,6 +29,27 @@
  * the 5-bit slot inside RGB565. */
 #define RGB565_B_LOSS 3
 
+/** @brief Byte index of the blue channel in a little-endian 24-bit RGB
+ * triplet (B is first byte, then G, then R). Named because the bare @c [0]
+ * subscript reads as positional even when it's intentional. */
+#define BGR24_B 0u
+
+/** @brief Byte index of the green channel in a little-endian 24-bit RGB
+ * triplet. */
+#define BGR24_G 1u
+
+/** @brief Byte index of the red channel in a little-endian 24-bit RGB
+ * triplet. */
+#define BGR24_R 2u
+
+/** @brief Byte index of the low byte of an RGB565 word stored little-endian
+ * in framebuffer memory. */
+#define RGB565_LO 0u
+
+/** @brief Byte index of the high byte of an RGB565 word stored little-endian
+ * in framebuffer memory. */
+#define RGB565_HI 1u
+
 /**
  * @brief Translate the framebuffer's bits-per-pixel into bytes-per-pixel.
  *
@@ -78,9 +99,9 @@ void fb_put_pixel(u32 x, u32 y, u32 color)
     *(volatile u32 *)p = color | BGRA_OPAQUE_ALPHA;
     return;
   case FB_BYTES_PER_PIXEL_24:
-    p[0] = color & BYTE_MASK;
-    p[1] = (color >> BGRA_GREEN_SHIFT) & BYTE_MASK;
-    p[2] = (color >> BGRA_RED_SHIFT) & BYTE_MASK;
+    p[BGR24_B] = color & BYTE_MASK;
+    p[BGR24_G] = (color >> BGRA_GREEN_SHIFT) & BYTE_MASK;
+    p[BGR24_R] = (color >> BGRA_RED_SHIFT) & BYTE_MASK;
     return;
   case FB_BYTES_PER_PIXEL_16: {
     u32 r      = (color >> BGRA_RED_SHIFT) & BYTE_MASK;
@@ -89,8 +110,8 @@ void fb_put_pixel(u32 x, u32 y, u32 color)
     u16 rgb565 = ((r >> RGB565_R_LOSS) << RGB565_R_SHIFT) |
                  ((g >> RGB565_G_LOSS) << RGB565_G_SHIFT) |
                  (b >> RGB565_B_LOSS);
-    p[0] = rgb565 & BYTE_MASK;
-    p[1] = rgb565 >> BGRA_GREEN_SHIFT;
+    p[RGB565_LO] = rgb565 & BYTE_MASK;
+    p[RGB565_HI] = rgb565 >> BGRA_GREEN_SHIFT;
     return;
   }
   default:
