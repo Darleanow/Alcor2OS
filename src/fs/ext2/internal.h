@@ -154,6 +154,54 @@ i64 flush_metadata(ext2_volume_t *vol);
 extern const fs_type_t g_ext2_fstype;
 
 /**
+ * @brief Resolve a file-block index into its on-disk block number.
+ *
+ * Walks direct → single → double → triple indirect blocks as needed. Defined
+ * in @c blockmap.c. Returns 0 (the disk's "no block" marker for ext2) when
+ * the index falls in a hole.
+ *
+ * @param vol         Source volume.
+ * @param inode       File inode (read-only — no allocation happens here).
+ * @param file_block  Zero-based file block index.
+ * @return On-disk block number, or 0 when the index is unallocated.
+ */
+u32 get_block_num(
+    const ext2_volume_t *vol, const ext2_inode_t *inode, u32 file_block
+);
+
+/**
+ * @brief Ensure a block is allocated for file-block index @p file_block.
+ *
+ * Allocates the data block, plus any indirect blocks along the way, then
+ * patches them into @p inode 's block array. Defined in @c blockmap.c.
+ *
+ * @param vol              Target volume.
+ * @param inode            File inode; mutated in place when new blocks are
+ *                         added.
+ * @param file_block       Zero-based file block index.
+ * @param preferred_group  Group hint passed through to @ref alloc_block —
+ *                         pass the inode's group to keep allocations local.
+ * @return On-disk block number, or 0 on allocation failure.
+ */
+u32 alloc_file_block(
+    ext2_volume_t *vol, ext2_inode_t *inode, u32 file_block, u32 preferred_group
+);
+
+/**
+ * @brief Free every block referenced by @p inode, including indirect blocks
+ *        themselves.
+ *
+ * Walks direct + indirect ranges, calling @ref free_block on each. Resets
+ * @p inode 's block array and size/blocks counters so the caller can persist
+ * the truncated inode.
+ *
+ * @param vol    Source volume.
+ * @param inode  File inode; mutated in place.
+ * @return 0 on success, negative errno on I/O failure.
+ */
+i64 free_inode_blocks(ext2_volume_t *vol, ext2_inode_t *inode);
+
+/**
  * @brief Read inode @p ino from disk into @p inode.
  *
  * Defined in @c inode.c. Locates the inode by walking
