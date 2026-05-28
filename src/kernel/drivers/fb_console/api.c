@@ -339,7 +339,7 @@ void fb_console_reclaim(void)
   /* Fill the whole framebuffer with the theme background first: a yielding app
    * (e.g. doom) may have left arbitrary pixels in the margins outside the cell
    * grid, which re-blitting cells alone would not cover. */
-  if(fb_ctx.base && fb_ctx.bytes_pp == 4)
+  if(fb_ctx.base && fb_ctx.bytes_pp == FB_BYTES_PER_PIXEL_32)
     for(u32 y = 0; y < fb_ctx.height; y++)
       fill32(
           (volatile u32 *)(fb_ctx.base + (u64)y * fb_ctx.pitch),

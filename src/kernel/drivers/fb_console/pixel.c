@@ -10,15 +10,6 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/* Hardware framebuffer depths Limine can hand us; mapping their bpp to bytes
- * per pixel is the per-row stride coefficient used by every blit path. */
-#define FB_BPP_32             32
-#define FB_BPP_24             24
-#define FB_BPP_16             16
-#define FB_BYTES_PER_PIXEL_32 4u
-#define FB_BYTES_PER_PIXEL_24 3u
-#define FB_BYTES_PER_PIXEL_16 2u
-
 /* RGB565 packing: R takes the top 5 bits, G the next 6, B the bottom 5.
  * Named so the shifts in fb_put_pixel read as "build the 565 word", not
  * "shuffle bits by magic offsets". */

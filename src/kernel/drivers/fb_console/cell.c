@@ -22,7 +22,7 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
   u32 px_y = (u32)fb_ctx.margin_y + (u32)row * (u32)fb_ctx.cell_h;
 
   if(fb_ctx.atlas_active) {
-    if(fb_ctx.bytes_pp == 4) {
+    if(fb_ctx.bytes_pp == FB_BYTES_PER_PIXEL_32) {
       u32 bg_pk = BGRA_OPAQUE_ALPHA | eff_bg;
       u32 fg_pk = BGRA_OPAQUE_ALPHA | eff_fg;
 
@@ -144,7 +144,8 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
   }
 
 post:
-  if((c->attr & FB_ATTR_UNDERLINE) && fb_ctx.base && fb_ctx.bytes_pp == 4) {
+  if((c->attr & FB_ATTR_UNDERLINE) && fb_ctx.base &&
+     fb_ctx.bytes_pp == FB_BYTES_PER_PIXEL_32) {
     u32 uline_color = BGRA_OPAQUE_ALPHA | eff_fg;
     u32 uline_y     = px_y + (u32)fb_ctx.cell_h - 2u;
     for(u32 uy = uline_y; uy < px_y + (u32)fb_ctx.cell_h; uy++) {

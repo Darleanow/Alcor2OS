@@ -52,6 +52,11 @@ static const u16 cursor_bitmap[19] = {
 /** @brief Halo (black) colour painted around the body for contrast. */
 #define MOUSE_CURSOR_HALO 0x000000u
 
+/** @brief MSB of a 16-bit bitmap row — used as the seed for the left-to-right
+ * column scan via @c (BIT_MSB_16 >> col). Named so the shift in @ref
+ * cursor_bit reads as a sweep, not a magic constant. */
+#define BIT_MSB_16 0x8000u
+
 /* "drawn" defaults to false so a fresh boot does not show a stray cursor at
  * (0,0) until the user moves the mouse for the first time. */
 static struct
@@ -61,17 +66,38 @@ static struct
   i32  y;
 } mouse_cur;
 
+/**
+ * @brief Test whether the (row, col) of the arrow bitmap is set.
+ *
+ * Out-of-range coordinates return false so the halo loop can probe one cell
+ * past every edge without bounds-checking the bitmap itself — that one
+ * negative result is what gives the cursor its one-pixel outline.
+ *
+ * @param row  Row index (may be negative for halo probing).
+ * @param col  Column index (may be negative for halo probing).
+ * @return @c true when the bitmap bit is set, @c false otherwise.
+ */
 static inline bool cursor_bit(int row, int col)
 {
   if(row < 0 || row >= MOUSE_CURSOR_H || col < 0 || col >= MOUSE_CURSOR_W)
     return false;
-  return (cursor_bitmap[row] & (0x8000u >> col)) != 0;
+  return (cursor_bitmap[row] & (BIT_MSB_16 >> col)) != 0;
 }
 
+/**
+ * @brief Paint the arrow at (@p cx, @p cy) in two passes.
+ *
+ * The halo pass paints each unset cell that has at least one set neighbour,
+ * giving a one-pixel black outline; the fill pass paints the set cells white.
+ * Doing it as two passes (rather than one with branch-per-pixel) keeps both
+ * loops branch-light and lets the inner halo loop bail early once a single
+ * neighbour is found.
+ *
+ * @param cx  Cursor x in framebuffer coordinates (top-left of the arrow).
+ * @param cy  Cursor y in framebuffer coordinates.
+ */
 static void mouse_cursor_paint(i32 cx, i32 cy)
 {
-  /* Halo pass: paint black at every neighbour of a "1" pixel that is not
-   * itself a "1". One pixel wide outline. */
   for(int row = -1; row <= MOUSE_CURSOR_H; row++) {
     for(int col = -1; col <= MOUSE_CURSOR_W; col++) {
       if(cursor_bit(row, col))
@@ -85,7 +111,6 @@ static void mouse_cursor_paint(i32 cx, i32 cy)
         fb_put_pixel((u32)(cx + col), (u32)(cy + row), MOUSE_CURSOR_HALO);
     }
   }
-  /* Fill pass: white where the bitmap is set. */
   for(int row = 0; row < MOUSE_CURSOR_H; row++) {
     for(int col = 0; col < MOUSE_CURSOR_W; col++) {
       if(cursor_bit(row, col))
@@ -94,8 +119,16 @@ static void mouse_cursor_paint(i32 cx, i32 cy)
   }
 }
 
-/* bg-fill first so margin pixels (outside the cell grid) get cleaned, then
- * re-blit cells to restore glyphs. */
+/**
+ * @brief Wipe the arrow's footprint and restore the cells beneath.
+ *
+ * bg-fills first so margin pixels (outside the cell grid) get cleaned —
+ * @ref blit_cell only repaints whole cells, so an arrow that overhangs the
+ * margin would otherwise leave a residual rectangle there.
+ *
+ * @param cx  Last-painted cursor x.
+ * @param cy  Last-painted cursor y.
+ */
 static void mouse_cursor_erase(i32 cx, i32 cy)
 {
   int x0 = cx - 1;
@@ -134,26 +167,29 @@ static void mouse_cursor_erase(i32 cx, i32 cy)
       blit_cell(c, r);
 }
 
+/**
+ * @brief Paint or move the software mouse cursor to the current PS/2 position.
+ *
+ * Early-outs in two stages so the PIT tick path stays cheap at rest: first
+ * before any work when the user has never moved the mouse (avoids a stray
+ * cursor at boot), then after fetching the position when it matches the
+ * already-painted location. Erases both the old AND new positions before
+ * painting so a fast move past a scroll race can't leave a stale halo.
+ */
 void mouse_cursor_render(void)
 {
   if(fb_ctx.yielded || !fb_ctx.cells)
     return;
-  /* Keep the pointer hidden until the user actually moves it, so a fresh boot
-   * doesn't show a stray cursor pinned at screen centre. */
   if(!mouse_has_moved())
     return;
   i32 nx, ny;
   mouse_get_cursor(&nx, &ny);
 
-  /* Nothing to do if the pointer is already drawn where it belongs. Repainting
-   * an unmoved cursor every tick is what makes it flicker. */
   if(mouse_cur.drawn && nx == mouse_cur.x && ny == mouse_cur.y)
     return;
 
   if(mouse_cur.drawn)
     mouse_cursor_erase(mouse_cur.x, mouse_cur.y);
-  /* Also clear the destination, removing stale pixels from scroll races or
-   * scrollback/reclaim transitions. */
   mouse_cursor_erase(nx, ny);
   mouse_cursor_paint(nx, ny);
   mouse_cur.drawn = true;
@@ -161,6 +197,14 @@ void mouse_cursor_render(void)
   mouse_cur.y     = ny;
 }
 
+/**
+ * @brief Erase the cursor (if drawn) so an imminent scrollback pixel-move
+ * doesn't kmemcpy a stale arrow into a new row.
+ *
+ * Called by @ref flush_pending_scroll before its scroll-region kmemcpy. The
+ * @c drawn flag is cleared so the next @ref mouse_cursor_render does a fresh
+ * paint rather than skipping as "already where it should be".
+ */
 void mouse_cursor_invalidate_for_scroll(void)
 {
   if(!mouse_cur.drawn)
@@ -169,6 +213,14 @@ void mouse_cursor_invalidate_for_scroll(void)
   mouse_cur.drawn = false;
 }
 
+/**
+ * @brief Forget the painted-at position without touching pixels.
+ *
+ * For paths that are about to overwrite the framebuffer themselves
+ * (yield, reclaim, blink-driven full re-blit): erasing first would just be
+ * extra work, but the next @ref mouse_cursor_render still needs to redraw
+ * rather than skip-as-unchanged.
+ */
 void mouse_cursor_drop(void)
 {
   mouse_cur.drawn = false;

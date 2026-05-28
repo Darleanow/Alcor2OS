@@ -35,13 +35,21 @@ struct flush_cell_cache
 static struct flush_cell_cache *s_flush_ci      = NULL;
 static int                      s_flush_ci_cols = 0;
 
-void                            flush_ci_ensure(int cols)
+/**
+ * @brief Grow the per-row scratch to hold at least @p cols entries.
+ *
+ * Allocation failure leaves the previous buffer in place: @ref flush_batch
+ * tolerates @c s_flush_ci being NULL but not smaller than the current grid,
+ * so retaining the larger old buffer is preferable to shrinking on failure.
+ *
+ * @param cols  Minimum capacity in cells.
+ */
+void flush_ci_ensure(int cols)
 {
   if(cols <= s_flush_ci_cols && s_flush_ci)
     return;
-  struct flush_cell_cache *nb = (struct flush_cell_cache *)kmalloc(
-      (size_t)cols * sizeof(struct flush_cell_cache)
-  );
+  struct flush_cell_cache *nb =
+      kmalloc((size_t)cols * sizeof(struct flush_cell_cache));
   if(!nb)
     return;
   if(s_flush_ci)
@@ -50,6 +58,16 @@ void                            flush_ci_ensure(int cols)
   s_flush_ci_cols = cols;
 }
 
+/**
+ * @brief Repaint every dirty cell in the @c [batch_r0, batch_r1] row range
+ * in one VRAM pass.
+ *
+ * Fast path resolves each cell's atlas glyph into the per-row scratch once,
+ * then walks scanline-by-scanline so the inner loop is a tight 4-byte fill
+ * or alpha-blend. The slow path falls back to @ref blit_cell per cell — that
+ * covers 24/16-bpp and the no-atlas state, neither of which is performance
+ * critical.
+ */
 void flush_batch(void)
 {
   if(!fb_ctx.cells || fb_ctx.batch_r0 > fb_ctx.batch_r1)
@@ -57,7 +75,7 @@ void flush_batch(void)
   int r0 = fb_ctx.batch_r0 < 0 ? 0 : fb_ctx.batch_r0;
   int r1 = fb_ctx.batch_r1 >= fb_ctx.rows ? fb_ctx.rows - 1 : fb_ctx.batch_r1;
 
-  if(!fb_ctx.base || fb_ctx.bytes_pp != 4) {
+  if(!fb_ctx.base || fb_ctx.bytes_pp != FB_BYTES_PER_PIXEL_32) {
     for(int r = r0; r <= r1; r++)
       for(int c = 0; c < fb_ctx.cols; c++) {
         fb_cell_t *cell =
@@ -70,7 +88,7 @@ void flush_batch(void)
     return;
   }
 
-  u32 atlas_bypp = (fb_ctx.atlas_bpp + 7u) / 8u;
+  u32 atlas_bypp = (fb_ctx.atlas_bpp + BITS_PER_BYTE - 1u) / BITS_PER_BYTE;
   u32 acw = (fb_ctx.atlas_cell_w < (u32)fb_ctx.cell_w) ? fb_ctx.atlas_cell_w
                                                        : (u32)fb_ctx.cell_w;
 
@@ -109,12 +127,12 @@ void flush_batch(void)
           bg_only = true;
         } else {
           ci[cc].fg_pk = BGRA_OPAQUE_ALPHA | eff_fg;
-          ci[cc].fg_r  = (eff_fg >> 16) & 0xffu;
-          ci[cc].fg_g  = (eff_fg >> 8) & 0xffu;
-          ci[cc].fg_b  = eff_fg & 0xffu;
-          ci[cc].bg_r  = (eff_bg >> 16) & 0xffu;
-          ci[cc].bg_g  = (eff_bg >> 8) & 0xffu;
-          ci[cc].bg_b  = eff_bg & 0xffu;
+          ci[cc].fg_r  = (eff_fg >> 16) & BYTE_MASK;
+          ci[cc].fg_g  = (eff_fg >> 8) & BYTE_MASK;
+          ci[cc].fg_b  = eff_fg & BYTE_MASK;
+          ci[cc].bg_r  = (eff_bg >> 16) & BYTE_MASK;
+          ci[cc].bg_g  = (eff_bg >> 8) & BYTE_MASK;
+          ci[cc].bg_b  = eff_bg & BYTE_MASK;
           ci[cc].glyph_base =
               fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *
                                         (size_t)fb_ctx.atlas_stride;
@@ -127,13 +145,14 @@ void flush_batch(void)
     for(u32 spy = 0; spy < (u32)fb_ctx.cell_h; spy++) {
       volatile u32 *fb_line =
           (volatile u32 *)(fb_ctx.base + (u64)(py0 + spy) * fb_ctx.pitch +
-                           (u64)fb_ctx.margin_x * 4u);
+                           (u64)fb_ctx.margin_x * FB_BYTES_PER_PIXEL_32);
       for(int cc = 0; cc < fb_ctx.cols; cc++) {
         if(!ci[cc].active)
           continue;
         volatile u32 *dst = fb_line + (size_t)cc * (size_t)fb_ctx.cell_w;
 
-        if(ci[cc].underline && spy >= (u32)fb_ctx.cell_h - 2u) {
+        if(ci[cc].underline &&
+           spy >= (u32)fb_ctx.cell_h - UNDERLINE_THICKNESS_PX) {
           fill32(dst, ci[cc].fg_pk, (u32)fb_ctx.cell_w);
           continue;
         }
@@ -155,6 +174,18 @@ void flush_batch(void)
   }
 }
 
+/**
+ * @brief Emit one codepoint at the cell cursor and advance, wrapping or
+ * scrolling as needed.
+ *
+ * Identical-content writes are skipped so line editors that repaint
+ * unchanged regions every keystroke don't hammer VRAM. In batch mode the
+ * write only marks the cell dirty + grows the row range; outside batch it
+ * blits immediately so a one-off @c write(2) is visible without an explicit
+ * flush.
+ *
+ * @param cp  Unicode codepoint.
+ */
 void put_cp_at_cursor(u32 cp)
 {
   if(fb_ctx.cx >= fb_ctx.cols) {
@@ -175,7 +206,7 @@ void put_cp_at_cursor(u32 cp)
     c->cp   = cp;
     c->fg   = fb_ctx.cur_fg;
     c->bg   = fb_ctx.cur_bg;
-    c->attr = (u16)fb_ctx.cur_attr;
+    c->attr = fb_ctx.cur_attr;
     if(fb_ctx.in_batch) {
       c->dirty = 1;
       if(fb_ctx.cy < fb_ctx.batch_r0)

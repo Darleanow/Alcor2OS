@@ -30,7 +30,16 @@ static int        s_sb_head = 0;
 static int        s_sb_used = 0;
 static int        s_sb_view = 0;
 
-void              scroll_one(void)
+/**
+ * @brief Drop the top row off the grid, shift the rest up, blank the bottom,
+ * and queue one pixel-move for flush time.
+ *
+ * Pushes the scrolled-off row into the ring so it stays accessible via
+ * Shift-PgUp. The pixel side is deferred to @ref flush_pending_scroll so a
+ * write that emits N newlines collapses to one VRAM blit instead of N — by
+ * far the biggest win for `ls`-style bursts where MMIO bandwidth dominates.
+ */
+void scroll_one(void)
 {
   size_t row_bytes = (size_t)fb_ctx.cols * sizeof(fb_cell_t);
 
@@ -75,6 +84,15 @@ void              scroll_one(void)
   }
 }
 
+/**
+ * @brief Repaint the visible grid blending scrollback history with live cells.
+ *
+ * Rows above @c s_sb_view come from the ring; the rest come from @c fb_ctx
+ * shifted by the offset. Routed through @ref blit_cell_data (not blit_cell)
+ * because the ring's cells are private — they must not get written back into
+ * @c fb_ctx.cells, only displayed. Caret is erased first so the inverted
+ * block doesn't end up duplicated when the live view comes back.
+ */
 void scrollback_repaint(void)
 {
   if(!fb_ctx.base || !fb_ctx.cells)
@@ -105,6 +123,13 @@ void scrollback_repaint(void)
   }
 }
 
+/**
+ * @brief Snap back to the live view (offset = 0) and force a full repaint.
+ *
+ * Marks every live cell dirty so the next @ref flush_batch picks them up —
+ * pixels currently show scrollback rows, so a cheaper "draw the cells under
+ * the previous view" would leave the rest unchanged. No-op when already live.
+ */
 void scrollback_exit(void)
 {
   if(s_sb_view == 0)
@@ -115,6 +140,15 @@ void scrollback_exit(void)
       fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
 }
 
+/**
+ * @brief Scroll the view @p lines rows back into history.
+ *
+ * Public API called by the keyboard layer on Shift-PgUp. Clamps to the
+ * number of rows actually stored so a power-user holding the key down
+ * doesn't run past the ring.
+ *
+ * @param lines  Positive number of rows to reveal from history.
+ */
 void fb_console_scrollback_up(int lines)
 {
   if(!s_sb_buf || s_sb_used == 0 || lines <= 0)
@@ -125,6 +159,15 @@ void fb_console_scrollback_up(int lines)
   scrollback_repaint();
 }
 
+/**
+ * @brief Scroll the view @p lines rows toward the live tail.
+ *
+ * Symmetric counterpart to @ref fb_console_scrollback_up. Reaching offset 0
+ * routes through @ref scrollback_exit to mark everything dirty for a clean
+ * resume; intermediate positions just repaint the blended view.
+ *
+ * @param lines  Positive number of rows to advance toward live.
+ */
 void fb_console_scrollback_down(int lines)
 {
   if(s_sb_view == 0 || lines <= 0)
@@ -138,6 +181,14 @@ void fb_console_scrollback_down(int lines)
     scrollback_repaint();
 }
 
+/**
+ * @brief Drain the pending-scroll counter in one VRAM copy plus dirty marks.
+ *
+ * 32-bpp fast path does a single in-place kmemcpy of the scrolled-up region
+ * (saves N MMIO write passes). Other depths fall back to "mark every cell
+ * dirty" and let @ref flush_batch re-blit them. Mouse cursor is invalidated
+ * first so the kmemcpy doesn't drag a stale arrow to a new row.
+ */
 void flush_pending_scroll(void)
 {
   if(s_pending_scroll <= 0)
@@ -148,10 +199,9 @@ void flush_pending_scroll(void)
   if(n > fb_ctx.rows)
     n = fb_ctx.rows;
 
-  /* Drop any painted cursor so it isn't carried along as a ghost. */
   mouse_cursor_invalidate_for_scroll();
 
-  if(fb_ctx.base && fb_ctx.bytes_pp == 4) {
+  if(fb_ctx.base && fb_ctx.bytes_pp == FB_BYTES_PER_PIXEL_32) {
     u32 scroll_px = (u32)n * (u32)fb_ctx.cell_h;
     u32 total_px  = (u32)fb_ctx.rows * (u32)fb_ctx.cell_h;
     u32 copy_px   = total_px - scroll_px;
@@ -178,17 +228,31 @@ void flush_pending_scroll(void)
   fb_ctx.batch_r1 = fb_ctx.rows - 1;
 }
 
+/**
+ * @brief (Re)allocate the scrollback ring for @p cols columns.
+ *
+ * Existing contents are dropped because cell coordinates do not survive a
+ * column-count change in any well-defined way. Called on initial bring-up
+ * and on every @ref fb_console_set_atlas reflow.
+ *
+ * @param cols  New column count.
+ */
 void scrollback_alloc_for(int cols)
 {
   if(s_sb_buf)
     kfree(s_sb_buf);
-  s_sb_buf = (fb_cell_t *)kmalloc(
-      (size_t)SCROLLBACK_ROWS * (size_t)cols * sizeof(fb_cell_t)
-  );
+  s_sb_buf =
+      kmalloc((size_t)SCROLLBACK_ROWS * (size_t)cols * sizeof(fb_cell_t));
   s_sb_cols = cols;
   s_sb_head = s_sb_used = s_sb_view = 0;
 }
 
+/**
+ * @brief Forget pending scrolls without flushing them.
+ *
+ * For paths that are about to repaint the whole grid anyway (reclaim,
+ * set_atlas) — flushing first would just waste a VRAM copy.
+ */
 void scrollback_drop_pending(void)
 {
   s_pending_scroll = 0;

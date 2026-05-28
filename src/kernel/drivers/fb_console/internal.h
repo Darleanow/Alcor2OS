@@ -217,6 +217,38 @@
  * tab stop. Derived from @ref TAB_WIDTH so the two stay in sync. */
 #define TAB_SNAP_MASK (TAB_WIDTH - 1)
 
+/* --- Hardware framebuffer depths ----------------------------------------- */
+/* The FB_BPP_* values are the bits-per-pixel modes Limine can report;
+ * FB_BYTES_PER_PIXEL_* is the corresponding stride coefficient. Centralised
+ * here so the fast-path predicate (@c bytes_pp == @c FB_BYTES_PER_PIXEL_32)
+ * reads as a named check across every blit module instead of a bare 4. */
+
+/** @brief 32-bit pixel: 0xAARRGGBB; the renderer's fast path. */
+#define FB_BPP_32 32
+
+/** @brief 24-bit pixel: 0xRRGGBB packed in 3 bytes. */
+#define FB_BPP_24 24
+
+/** @brief 16-bit pixel: RGB565 packed. */
+#define FB_BPP_16 16
+
+/** @brief Bytes per pixel at @ref FB_BPP_32. */
+#define FB_BYTES_PER_PIXEL_32 4u
+
+/** @brief Bytes per pixel at @ref FB_BPP_24. */
+#define FB_BYTES_PER_PIXEL_24 3u
+
+/** @brief Bytes per pixel at @ref FB_BPP_16. */
+#define FB_BYTES_PER_PIXEL_16 2u
+
+/** @brief Bits in a byte. Named so atlas-bpp → bytes-up math (@c (bpp + @c
+ * BITS_PER_BYTE @c - @c 1) @c / @c BITS_PER_BYTE) doesn't read as "magic 8". */
+#define BITS_PER_BYTE 8u
+
+/** @brief Pixel thickness of the SGR underline bar drawn below the glyph row.
+ * Picked to be readable across font sizes from 8 px CP437 to 20 px Fira. */
+#define UNDERLINE_THICKNESS_PX 2u
+
 /* --- Types --------------------------------------------------------------- */
 
 /**
