@@ -477,25 +477,30 @@ static void csi_sgr(void)
   }
 }
 
+/** @brief Capacity of the DEC private-mode param vector. xterm only ever
+ * sends a handful of modes in one sequence; 4 covers every real-world case
+ * without growing the kernel stack. */
+#define DEC_PM_MAX_PARAMS 4
+
+/** @brief @c esc_buf length minimum for a valid private-mode sequence:
+ * @c ? + at least one digit + final byte. Anything shorter is malformed. */
+#define DEC_PM_MIN_LEN 3
+
 /**
- * @brief @c CSI @c ?N @c h / @c CSI @c ?N @c l — DEC private mode set/reset.
+ * @brief Parse the DEC private-mode param list out of @c esc_buf.
  *
- * Only the modes the renderer actually honours are tracked: cursor
- * visibility (mode 25) and application cursor keys (mode 1). Mode @c ?1049
- * (alt screen) is intentionally ignored — we draw into the live grid and
- * accept the cosmetic mismatch in exchange for simpler state.
+ * @c esc_buf starts with @c ? followed by semicolon-separated decimals and
+ * then the final byte. Skips empty params (one stray @c ; doesn't add a
+ * zero), which matches xterm's quiet handling of malformed sequences.
  *
- * @param cmd  @c 'h' for set, @c 'l' for reset.
+ * @param pv    Destination buffer, sized to @ref DEC_PM_MAX_PARAMS.
+ * @return Number of params parsed.
  */
-static void csi_dec_private(char cmd)
+static int dec_pm_parse_params(int *pv)
 {
-  /* esc_buf starts with `?`. Parse the trailing param list. */
-  if(fb_ctx.esc_len < 3)
-    return;
-  int pv[4];
   int np = 0;
   int i  = 1;
-  while(i < fb_ctx.esc_len - 1 && np < 4) {
+  while(i < fb_ctx.esc_len - 1 && np < DEC_PM_MAX_PARAMS) {
     unsigned acc = 0u;
     int      dig = 0;
     while(i < fb_ctx.esc_len - 1 && fb_ctx.esc_buf[i] >= '0' &&
@@ -511,14 +516,46 @@ static void csi_dec_private(char cmd)
     else if(!dig && i < fb_ctx.esc_len - 1)
       i++;
   }
-  int on = (cmd == 'h');
-  for(int k = 0; k < np; k++) {
-    if(pv[k] == DEC_PM_CURSOR_VISIBLE)
-      fb_ctx.cursor_visible = (u8)on;
-    else if(pv[k] == DEC_PM_APP_CURSOR_KEYS)
-      fb_ctx.app_cursor_keys = (on != 0);
-    /* ?1049 (alt screen) intentionally ignored — draw into the live grid. */
-  }
+  return np;
+}
+
+/**
+ * @brief Apply one parsed DEC private-mode number with set/reset polarity.
+ *
+ * Only the modes the renderer honours are tracked: cursor visibility (25) and
+ * application cursor keys (1). Mode @c ?1049 (alt screen) is intentionally
+ * ignored — we draw into the live grid and accept the cosmetic mismatch in
+ * exchange for simpler state.
+ *
+ * @param mode  DEC private-mode number.
+ * @param on    @c true for @c h (set), @c false for @c l (reset).
+ */
+static void dec_pm_apply(int mode, bool on)
+{
+  if(mode == DEC_PM_CURSOR_VISIBLE)
+    fb_ctx.cursor_visible = (u8)(on ? 1u : 0u);
+  else if(mode == DEC_PM_APP_CURSOR_KEYS)
+    fb_ctx.app_cursor_keys = on;
+}
+
+/**
+ * @brief @c CSI @c ?N @c h / @c CSI @c ?N @c l — DEC private mode set/reset.
+ *
+ * Parse-then-apply split: @ref dec_pm_parse_params extracts the param list,
+ * @ref dec_pm_apply consumes one entry. Done this way so the parser does not
+ * need to know which modes the renderer cares about, and the apply step does
+ * not need to know how the param list was buffered.
+ *
+ * @param cmd  @c 'h' for set, @c 'l' for reset.
+ */
+static void csi_dec_private(char cmd)
+{
+  if(fb_ctx.esc_len < DEC_PM_MIN_LEN)
+    return;
+  int pv[DEC_PM_MAX_PARAMS];
+  int np = dec_pm_parse_params(pv);
+  for(int k = 0; k < np; k++)
+    dec_pm_apply(pv[k], cmd == 'h');
 }
 
 /**

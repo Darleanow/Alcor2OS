@@ -255,48 +255,73 @@ void flush_batch(void)
 }
 
 /**
+ * @brief Wrap the cursor to the next line, scrolling the grid when at the
+ *        bottom.
+ *
+ * Called from @ref put_cp_at_cursor when the cursor sat past the right
+ * margin from the previous emit — we wait until the next emit to wrap so a
+ * write that ends on the last column doesn't add a phantom newline.
+ */
+static void wrap_cursor(void)
+{
+  fb_ctx.cx = 0;
+  fb_ctx.cy++;
+  if(fb_ctx.cy >= fb_ctx.rows) {
+    scroll_one();
+    fb_ctx.cy = fb_ctx.rows - 1;
+  }
+}
+
+/**
+ * @brief Commit @p cp with the live SGR state into @p c and either mark dirty
+ *        (batch mode) or blit immediately.
+ *
+ * Splits out so the equality check is a single early-return rather than the
+ * top of a deeply nested block. Skips identical-content writes so line editors
+ * that repaint unchanged regions don't hammer VRAM.
+ *
+ * @param c   Target cell.
+ * @param cp  Codepoint to store.
+ */
+static void commit_cell_at(fb_cell_t *c, u32 cp)
+{
+  if(c->cp == cp && c->fg == fb_ctx.cur_fg && c->bg == fb_ctx.cur_bg &&
+     c->attr == fb_ctx.cur_attr)
+    return;
+  c->cp   = cp;
+  c->fg   = fb_ctx.cur_fg;
+  c->bg   = fb_ctx.cur_bg;
+  c->attr = fb_ctx.cur_attr;
+  if(!fb_ctx.in_batch) {
+    blit_cell(fb_ctx.cx, fb_ctx.cy);
+    return;
+  }
+  c->dirty = 1;
+  if(fb_ctx.cy < fb_ctx.batch_r0)
+    fb_ctx.batch_r0 = fb_ctx.cy;
+  if(fb_ctx.cy > fb_ctx.batch_r1)
+    fb_ctx.batch_r1 = fb_ctx.cy;
+}
+
+/**
  * @brief Emit one codepoint at the cell cursor and advance, wrapping or
  * scrolling as needed.
  *
- * Identical-content writes are skipped so line editors that repaint
- * unchanged regions every keystroke don't hammer VRAM. In batch mode the
- * write only marks the cell dirty + grows the row range; outside batch it
- * blits immediately so a one-off @c write(2) is visible without an explicit
- * flush.
+ * Skipped identical-content writes happen inside @ref commit_cell_at. In
+ * batch mode the write only marks the cell dirty + grows the row range;
+ * outside batch it blits immediately so a one-off @c write(2) is visible
+ * without an explicit flush.
  *
  * @param cp  Unicode codepoint.
  */
 void put_cp_at_cursor(u32 cp)
 {
-  if(fb_ctx.cx >= fb_ctx.cols) {
-    fb_ctx.cx = 0;
-    fb_ctx.cy++;
-    if(fb_ctx.cy >= fb_ctx.rows) {
-      scroll_one();
-      fb_ctx.cy = fb_ctx.rows - 1;
-    }
-  }
+  if(fb_ctx.cx >= fb_ctx.cols)
+    wrap_cursor();
   fb_cell_t *c =
       &fb_ctx
            .cells[(size_t)fb_ctx.cy * (size_t)fb_ctx.cols + (size_t)fb_ctx.cx];
-  /* Skip when nothing actually changed — avoids redundant VRAM writes during
-   * line-editor redraws that repaint identical content. */
-  if(c->cp != cp || c->fg != fb_ctx.cur_fg || c->bg != fb_ctx.cur_bg ||
-     c->attr != fb_ctx.cur_attr) {
-    c->cp   = cp;
-    c->fg   = fb_ctx.cur_fg;
-    c->bg   = fb_ctx.cur_bg;
-    c->attr = fb_ctx.cur_attr;
-    if(fb_ctx.in_batch) {
-      c->dirty = 1;
-      if(fb_ctx.cy < fb_ctx.batch_r0)
-        fb_ctx.batch_r0 = fb_ctx.cy;
-      if(fb_ctx.cy > fb_ctx.batch_r1)
-        fb_ctx.batch_r1 = fb_ctx.cy;
-    } else {
-      blit_cell(fb_ctx.cx, fb_ctx.cy);
-    }
-  }
+  commit_cell_at(c, cp);
   fb_ctx.last_cp = cp;
   fb_ctx.cx++;
 }
