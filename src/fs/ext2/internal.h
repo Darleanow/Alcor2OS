@@ -168,6 +168,48 @@ extern const fs_type_t g_ext2_fstype;
 i64 read_inode(const ext2_volume_t *vol, u32 ino, ext2_inode_t *inode);
 
 /**
+ * @brief Allocate one block on @p vol, biased toward @p preferred_group.
+ *
+ * Tries @p preferred_group first to keep allocations spatially local (good
+ * for the indirect-block walker); falls back to a linear scan over the rest.
+ * Defined in @c alloc.c.
+ *
+ * @param vol              Target volume.
+ * @param preferred_group  Group to consult first.
+ * @return Block number on success, 0 when every group is full.
+ */
+u32 alloc_block(ext2_volume_t *vol, u32 preferred_group);
+
+/**
+ * @brief Mark @p block free on @p vol.
+ *
+ * @param vol    Source volume.
+ * @param block  Block number to free.
+ * @return 0 on success, negative errno on out-of-range / I/O failure.
+ */
+i64 free_block(ext2_volume_t *vol, u32 block);
+
+/**
+ * @brief Allocate one inode on @p vol, biased toward @p preferred_group.
+ *
+ * @param vol              Target volume.
+ * @param preferred_group  Group to consult first.
+ * @param is_dir           When true, also bumps @c bg_used_dirs_count.
+ * @return Inode number on success, 0 when every group is full.
+ */
+u32 alloc_inode(ext2_volume_t *vol, u32 preferred_group, bool is_dir);
+
+/**
+ * @brief Mark inode @p ino free on @p vol.
+ *
+ * @param vol     Source volume.
+ * @param ino     1-based inode number.
+ * @param is_dir  When true, decrements @c bg_used_dirs_count.
+ * @return 0 on success, negative errno on out-of-range / I/O failure.
+ */
+i64 free_inode(ext2_volume_t *vol, u32 ino, bool is_dir);
+
+/**
  * @brief Persist @p inode for inode number @p ino back to disk.
  *
  * Read-modify-write: the inode lives inside a block that also holds other
