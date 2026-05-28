@@ -50,6 +50,32 @@ _Static_assert(sizeof(k_termios_t) == KTERM_SZ, "k_termios_t must be 60 bytes");
 #define KTERM_VTIME  5
 #define KTERM_VMIN   6
 
+/* TTY ioctl request codes (Linux/musl wire ABI). Single source of truth: every
+ * driver and syscall path that handles a TTY ioctl reads them from here. */
+#define KTERM_TCGETS     0x5401
+#define KTERM_TCSETS     0x5402
+#define KTERM_TCSETSW    0x5403
+#define KTERM_TCSETSF    0x5404
+#define KTERM_TIOCGWINSZ 0x5413
+#define KTERM_TIOCSWINSZ 0x5414
+
+/**
+ * @brief Linux-compatible @c struct @c winsize layout for TIOCGWINSZ/SWINSZ.
+ *
+ * Layout matches musl @c bits/ioctl.h so unmodified userspace TUIs (ncurses,
+ * fleed, &hellip;) marshal it without translation.
+ */
+typedef struct
+{
+  u16 row, col, xpixel, ypixel;
+} k_winsize_t;
+
+/* VT100-era 80x25 fallback used when the console reports a zero geometry —
+ * only happens if a TTY ioctl races boot before fb_console_init wrote a real
+ * grid. Lets TUIs lay out something sane instead of dividing by zero. */
+#define KTERM_WINSIZE_FALLBACK_COLS 80
+#define KTERM_WINSIZE_FALLBACK_ROWS 25
+
 void ktermios_init_default(k_termios_t *t);
 
 #endif

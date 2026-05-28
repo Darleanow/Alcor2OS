@@ -15,6 +15,7 @@
 #define ALCOR2_FB_CONSOLE_H
 
 #include <alcor2/fb_console_ioctl.h>
+#include <alcor2/ktermios.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -99,6 +100,18 @@ void fb_console_reclaim(void);
 /** @brief Cell grid dimensions in cells (not pixels). Both pointers may be
  * NULL. Used by TIOCGWINSZ so userspace TUIs lay out against the real grid. */
 void fb_console_get_size(int *cols, int *rows);
+
+/**
+ * @brief Fill @p out with the live grid dimensions, packaged as a Linux
+ * winsize struct ready to be copied to userspace by a TIOCGWINSZ handler.
+ *
+ * Centralised here (rather than re-derived in every TTY chardev) so the
+ * fallback policy and clamp lives next to the console that produces the
+ * numbers — single source of truth for TIOCGWINSZ payloads.
+ *
+ * @param out  Destination winsize; must be non-NULL.
+ */
+void fb_console_fill_winsize(k_winsize_t *out);
 
 /** @brief DECCKM state. When true the keyboard layer emits SS3 (@c \\EOA)
  * for cursor keys instead of CSI (@c \\E[A). Toggled by ncurses keypad(). */

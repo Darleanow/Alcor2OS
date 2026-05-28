@@ -1781,6 +1781,21 @@ void fb_console_get_size(int *cols, int *rows)
     *rows = ctx.rows;
 }
 
+void fb_console_fill_winsize(k_winsize_t *out)
+{
+  int cols = KTERM_WINSIZE_FALLBACK_COLS;
+  int rows = KTERM_WINSIZE_FALLBACK_ROWS;
+  fb_console_get_size(&cols, &rows);
+  if(cols <= 0)
+    cols = KTERM_WINSIZE_FALLBACK_COLS;
+  if(rows <= 0)
+    rows = KTERM_WINSIZE_FALLBACK_ROWS;
+  out->row    = (u16)rows;
+  out->col    = (u16)cols;
+  out->xpixel = 0;
+  out->ypixel = 0;
+}
+
 bool fb_console_app_cursor_keys(void)
 {
   return ctx.app_cursor_keys;
