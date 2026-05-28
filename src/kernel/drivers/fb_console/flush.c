@@ -147,11 +147,11 @@ void flush_batch(void)
           bg_only = true;
         } else {
           ci[cc].fg_pk = BGRA_OPAQUE_ALPHA | eff_fg;
-          ci[cc].fg_r  = (eff_fg >> 16) & BYTE_MASK;
-          ci[cc].fg_g  = (eff_fg >> 8) & BYTE_MASK;
+          ci[cc].fg_r  = (eff_fg >> BGRA_RED_SHIFT) & BYTE_MASK;
+          ci[cc].fg_g  = (eff_fg >> BGRA_GREEN_SHIFT) & BYTE_MASK;
           ci[cc].fg_b  = eff_fg & BYTE_MASK;
-          ci[cc].bg_r  = (eff_bg >> 16) & BYTE_MASK;
-          ci[cc].bg_g  = (eff_bg >> 8) & BYTE_MASK;
+          ci[cc].bg_r  = (eff_bg >> BGRA_RED_SHIFT) & BYTE_MASK;
+          ci[cc].bg_g  = (eff_bg >> BGRA_GREEN_SHIFT) & BYTE_MASK;
           ci[cc].bg_b  = eff_bg & BYTE_MASK;
           ci[cc].glyph_base =
               fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *

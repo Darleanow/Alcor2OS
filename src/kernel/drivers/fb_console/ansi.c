@@ -52,36 +52,99 @@ static const u32 ansi16_bg[8] = {
     0x89b4fau, 0xf5c2e7u, 0x94e2d5u, 0xbac2deu,
 };
 
+/** @brief First palette slot of the 6x6x6 colour cube in xterm 256. */
+#define XTERM256_CUBE_BASE 16u
+
+/** @brief First palette slot of the 24-step greyscale ramp in xterm 256. */
+#define XTERM256_GREY_BASE 232u
+
+/** @brief Number of palette slots in one slice of the 6x6x6 cube
+ * (one fixed red channel = 6 greens × 6 blues). */
+#define XTERM256_CUBE_SLICE 36u
+
+/** @brief Side length of the 6x6x6 colour cube along one axis. */
+#define XTERM256_CUBE_SIDE 6u
+
+/** @brief Cube axis value 1 (out of 0..5) in the 8-bit channel space — the
+ * xterm cube uses {0, 95, 135, 175, 215, 255}; this is the first non-zero
+ * stop. */
+#define XTERM256_CUBE_STOP_1 55u
+
+/** @brief Spacing between successive non-zero cube stops (135-95, 175-135,
+ * etc.). */
+#define XTERM256_CUBE_STEP 40u
+
+/** @brief Brightness of greyscale slot 0 (palette index 232). */
+#define XTERM256_GREY_BASE_LEVEL 8u
+
+/** @brief Step between successive greyscale slots. */
+#define XTERM256_GREY_STEP 10u
+
+/**
+ * @brief Pack three 0..255 channels into a 0xRRGGBB triplet.
+ *
+ * Tiny helper so every place that builds an RGB word uses the named shifts
+ * rather than scattering @c << @c 16 / @c << @c 8 across the renderer.
+ *
+ * @param r  Red channel.
+ * @param g  Green channel.
+ * @param b  Blue channel.
+ * @return Packed 0xRRGGBB.
+ */
+static inline u32 rgb_pack(u32 r, u32 g, u32 b)
+{
+  return (r << BGRA_RED_SHIFT) | (g << BGRA_GREEN_SHIFT) | b;
+}
+
+/**
+ * @brief Look up one axis (red, green, or blue) of the xterm 6x6x6 cube.
+ *
+ * The xterm cube uses non-linear stops @c {0, 95, 135, 175, 215, 255}; modeled
+ * here as "0 for stop 0, else @c XTERM256_CUBE_STOP_1 plus a step per axis
+ * tick". Pulled out of @ref ansi256_to_rgb so the cube math reads once instead
+ * of three times.
+ *
+ * @param axis  Axis position 0..5.
+ * @return 8-bit channel value at that stop.
+ */
+static inline u32 xterm_cube_axis(unsigned axis)
+{
+  if(axis == 0u)
+    return 0u;
+  return XTERM256_CUBE_STOP_1 + XTERM256_CUBE_STEP * (axis - 1u);
+}
+
 /**
  * @brief Map an xterm 256-colour index to a 0xRRGGBB triplet.
  *
- * 0..15 are the standard + bright palettes; 16..231 are a 6×6×6 cube where
- * each axis takes values @c {0, 95, 135, 175, 215, 255}; 232..255 are 24
- * shades of grey. Formulas mirror the xterm definitions so a TUI program
- * sees the same colours it would on real xterm.
+ * Three slots back-to-back in the palette: 0..15 = base + bright ANSI,
+ * 16..231 = the 6x6x6 cube, 232..255 = the 24-step greyscale. Formulas
+ * mirror the xterm definitions verbatim so a TUI program sees the same
+ * colours it would on real xterm.
  *
  * @param idx  Palette index 0..255.
  * @return Packed RGB.
  */
 static u32 ansi256_to_rgb(unsigned idx)
 {
-  if(idx < 8u)
+  if(idx < SGR_FG_END - SGR_FG_BASE + 1u)
     return ansi16_fg[idx];
-  if(idx < 16u)
-    return ansi16_fg_bright[idx - 8u];
-  if(idx < 232u) {
-    unsigned i   = idx - 16u;
-    unsigned r6  = i / 36u;
-    unsigned rem = i % 36u;
-    unsigned g6  = rem / 6u;
-    unsigned b6  = rem % 6u;
-    u32      r   = (r6 == 0u) ? 0u : (55u + 40u * (r6 - 1u));
-    u32      g   = (g6 == 0u) ? 0u : (55u + 40u * (g6 - 1u));
-    u32      b   = (b6 == 0u) ? 0u : (55u + 40u * (b6 - 1u));
-    return (r << 16) | (g << 8) | b;
+  if(idx < XTERM256_CUBE_BASE)
+    return ansi16_fg_bright[idx - (SGR_FG_END - SGR_FG_BASE + 1u)];
+  if(idx < XTERM256_GREY_BASE) {
+    unsigned cube_idx = idx - XTERM256_CUBE_BASE;
+    unsigned r_axis   = cube_idx / XTERM256_CUBE_SLICE;
+    unsigned rem      = cube_idx % XTERM256_CUBE_SLICE;
+    unsigned g_axis   = rem / XTERM256_CUBE_SIDE;
+    unsigned b_axis   = rem % XTERM256_CUBE_SIDE;
+    return rgb_pack(
+        xterm_cube_axis(r_axis), xterm_cube_axis(g_axis),
+        xterm_cube_axis(b_axis)
+    );
   }
-  u32 v = 8u + 10u * (idx - 232u);
-  return (v << 16) | (v << 8) | v;
+  u32 v = XTERM256_GREY_BASE_LEVEL +
+          XTERM256_GREY_STEP * (idx - XTERM256_GREY_BASE);
+  return rgb_pack(v, v, v);
 }
 
 /**

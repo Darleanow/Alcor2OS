@@ -60,9 +60,11 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
 
       u32 idx = atlas_lookup_attr(c->cp, c->attr);
       if(idx != ATLAS_NO_GLYPH && idx < fb_ctx.atlas_n_glyphs) {
-        u32 fg_r = (eff_fg >> 16) & BYTE_MASK, fg_g = (eff_fg >> 8) & BYTE_MASK,
+        u32 fg_r = (eff_fg >> BGRA_RED_SHIFT) & BYTE_MASK,
+            fg_g = (eff_fg >> BGRA_GREEN_SHIFT) & BYTE_MASK,
             fg_b = eff_fg & BYTE_MASK;
-        u32 bg_r = (eff_bg >> 16) & BYTE_MASK, bg_g = (eff_bg >> 8) & BYTE_MASK,
+        u32 bg_r = (eff_bg >> BGRA_RED_SHIFT) & BYTE_MASK,
+            bg_g = (eff_bg >> BGRA_GREEN_SHIFT) & BYTE_MASK,
             bg_b = eff_bg & BYTE_MASK;
         const u8 *glyph =
             fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *
@@ -103,9 +105,11 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
     } else {
       u32 idx = atlas_lookup_attr(c->cp, c->attr);
       if(idx != ATLAS_NO_GLYPH && idx < fb_ctx.atlas_n_glyphs) {
-        u32 fg_r = (eff_fg >> 16) & BYTE_MASK, fg_g = (eff_fg >> 8) & BYTE_MASK,
+        u32 fg_r = (eff_fg >> BGRA_RED_SHIFT) & BYTE_MASK,
+            fg_g = (eff_fg >> BGRA_GREEN_SHIFT) & BYTE_MASK,
             fg_b = eff_fg & BYTE_MASK;
-        u32 bg_r = (eff_bg >> 16) & BYTE_MASK, bg_g = (eff_bg >> 8) & BYTE_MASK,
+        u32 bg_r = (eff_bg >> BGRA_RED_SHIFT) & BYTE_MASK,
+            bg_g = (eff_bg >> BGRA_GREEN_SHIFT) & BYTE_MASK,
             bg_b = eff_bg & BYTE_MASK;
         const u8 *glyph =
             fb_ctx.atlas_pixels + (size_t)idx * (size_t)fb_ctx.atlas_cell_h *
@@ -122,8 +126,9 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
           const u8 *src = glyph + (size_t)gy * (size_t)fb_ctx.atlas_stride;
           for(u32 gx = 0; gx < cell_w; gx++) {
             const u8 *px = src + (size_t)gx * atlas_bypp;
-            u32       a =
-                (atlas_bypp == FB_BYTES_PER_PIXEL_32) ? (u32)px[3] : (u32)px[0];
+            u32       a  = (atlas_bypp == FB_BYTES_PER_PIXEL_32)
+                               ? (u32)px[ATLAS_RGBA_ALPHA_BYTE]
+                               : (u32)px[ATLAS_GRAY_ALPHA_BYTE];
             if(!a) {
               fb_put_pixel(px_x + gx, px_y + gy, eff_bg);
               continue;
@@ -133,10 +138,13 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
               continue;
             }
             u32 inv = ALPHA_OPAQUE - a;
-            u32 r   = (fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> 8;
-            u32 g   = (fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> 8;
-            u32 b   = (fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> 8;
-            fb_put_pixel(px_x + gx, px_y + gy, (r << 16) | (g << 8) | b);
+            u32 r = (fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE;
+            u32 g = (fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE;
+            u32 b = (fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE;
+            fb_put_pixel(
+                px_x + gx, px_y + gy,
+                (r << BGRA_RED_SHIFT) | (g << BGRA_GREEN_SHIFT) | b
+            );
           }
         }
         goto post;

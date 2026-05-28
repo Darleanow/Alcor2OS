@@ -10,19 +10,24 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/* RGB565 packing: R takes the top 5 bits, G the next 6, B the bottom 5.
- * Named so the shifts in fb_put_pixel read as "build the 565 word", not
- * "shuffle bits by magic offsets". */
+/** @brief Bit offset of the red component inside a 16-bit RGB565 word.
+ * R takes the top 5 bits of the 16-bit value. */
 #define RGB565_R_SHIFT 11
-#define RGB565_G_SHIFT 5
-#define RGB565_R_LOSS  3 /* 8-bit → 5-bit drop. */
-#define RGB565_G_LOSS  2 /* 8-bit → 6-bit drop. */
-#define RGB565_B_LOSS  3 /* 8-bit → 5-bit drop. */
 
-/* Byte positions inside a 32-bit packed pixel; written this way so the green
- * and red splits don't appear as bare shifts in the colour math. */
-#define BGRA_GREEN_SHIFT 8
-#define BGRA_RED_SHIFT   16
+/** @brief Bit offset of the green component inside a 16-bit RGB565 word. */
+#define RGB565_G_SHIFT 5
+
+/** @brief Number of low bits dropped to compress an 8-bit red channel into
+ * the 5-bit slot inside RGB565. */
+#define RGB565_R_LOSS 3
+
+/** @brief Number of low bits dropped to compress an 8-bit green channel into
+ * the 6-bit slot inside RGB565. */
+#define RGB565_G_LOSS 2
+
+/** @brief Number of low bits dropped to compress an 8-bit blue channel into
+ * the 5-bit slot inside RGB565. */
+#define RGB565_B_LOSS 3
 
 /**
  * @brief Translate the framebuffer's bits-per-pixel into bytes-per-pixel.

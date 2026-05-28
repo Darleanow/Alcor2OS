@@ -201,6 +201,24 @@
  * @c & 255 reads as a magic number in dense colour code. */
 #define BYTE_MASK 0xFFu
 
+/** @brief Bit offset of the red channel in a 0xRRGGBB or 0xAARRGGBB pixel.
+ * Named so every @c >> @c 16 in the colour-unpack paths reads as "extract red"
+ * instead of a bare shift. */
+#define BGRA_RED_SHIFT 16u
+
+/** @brief Bit offset of the green channel in a packed RGB(A) pixel. Same role
+ * as @ref BGRA_RED_SHIFT for the middle byte. */
+#define BGRA_GREEN_SHIFT 8u
+
+/** @brief Byte index of the alpha channel inside an atlas RGBA pixel.
+ * Used by the per-pixel blend path so the @c [3] subscript reads as "alpha
+ * from RGBA" rather than a magic offset. */
+#define ATLAS_RGBA_ALPHA_BYTE 3u
+
+/** @brief Byte index used as alpha when the atlas pixel format is single-byte
+ * grayscale (FreeType coverage map). The byte itself is the coverage. */
+#define ATLAS_GRAY_ALPHA_BYTE 0u
+
 /** @brief Tab stops every 8 cells. ANSI/xterm default; matches what userspace
  * terminfo expects, so editors and shells align as designed. */
 #define TAB_WIDTH 8
@@ -433,14 +451,17 @@ static inline void blend_glyph_row(
       }
       u32 inv = ALPHA_OPAQUE - a;
       dst[gx] = BGRA_OPAQUE_ALPHA |
-                ((fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> 8) << 16 |
-                ((fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> 8) << 8 |
-                (fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> 8;
+                (((fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE)
+                 << BGRA_RED_SHIFT) |
+                (((fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE)
+                 << BGRA_GREEN_SHIFT) |
+                ((fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE);
     }
   } else {
     for(u32 gx = 0; gx < n; gx++) {
       const u8 *px = src + (size_t)gx * bypp;
-      u32       a  = (bypp == 4u) ? (u32)px[3] : (u32)px[0];
+      u32 a = (bypp == FB_BYTES_PER_PIXEL_32) ? (u32)px[ATLAS_RGBA_ALPHA_BYTE]
+                                              : (u32)px[ATLAS_GRAY_ALPHA_BYTE];
       if(!a) {
         dst[gx] = bg_pk;
         continue;
@@ -451,9 +472,11 @@ static inline void blend_glyph_row(
       }
       u32 inv = ALPHA_OPAQUE - a;
       dst[gx] = BGRA_OPAQUE_ALPHA |
-                ((fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> 8) << 16 |
-                ((fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> 8) << 8 |
-                (fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> 8;
+                (((fg_r * a + bg_r * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE)
+                 << BGRA_RED_SHIFT) |
+                (((fg_g * a + bg_g * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE)
+                 << BGRA_GREEN_SHIFT) |
+                ((fg_b * a + bg_b * inv + ALPHA_ROUND_BIAS) >> BITS_PER_BYTE);
     }
   }
 }
