@@ -13,15 +13,40 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/* Catppuccin Mocha 16-colour palette. Indices match ANSI SGR 30-37 / 90-97. */
+/**
+ * @brief Catppuccin Mocha 16-colour foreground palette.
+ *
+ * Indices are the ANSI SGR codes minus the @c 30 base — slot 0 is @c SGR @c 30
+ * (black), slot 7 is @c SGR @c 37 (white). Kept in-kernel rather than pushed
+ * out to the spazer graphics SDK because the boot-time console must paint
+ * before any userspace lib is loaded, so the palette has to live where the
+ * renderer does.
+ */
 static const u32 ansi16_fg[8] = {
     0x45475au, 0xf38ba8u, 0xa6e3a1u, 0xf9e2afu,
     0x89b4fau, 0xf5c2e7u, 0x94e2d5u, 0xbac2deu,
 };
+
+/**
+ * @brief Catppuccin Mocha bright-foreground palette (@c SGR @c 90..@c 97).
+ *
+ * Slot 0 is the "bright black" surface tone, used as a slightly lighter
+ * background tint by some TUIs; the other slots match the non-bright palette
+ * except for magenta/cyan/white which are pushed brighter so reverse-video
+ * stays legible.
+ */
 static const u32 ansi16_fg_bright[8] = {
     0x585b70u, 0xf38ba8u, 0xa6e3a1u, 0xf9e2afu,
     0x89b4fau, 0xcba6f7u, 0x89dcebu, 0xa6adc8u,
 };
+
+/**
+ * @brief Catppuccin Mocha 16-colour background palette (@c SGR @c 40..@c 47).
+ *
+ * Identical to @ref ansi16_fg because Catppuccin Mocha has no separate
+ * background variants — the two arrays are kept distinct so a future palette
+ * swap can tune the bg side without touching the fg renderer.
+ */
 static const u32 ansi16_bg[8] = {
     0x45475au, 0xf38ba8u, 0xa6e3a1u, 0xf9e2afu,
     0x89b4fau, 0xf5c2e7u, 0x94e2d5u, 0xbac2deu,
@@ -433,14 +458,6 @@ static void csi_dec_private(char cmd)
   }
 }
 
-/**
- * @brief Dispatch a fully-buffered CSI sequence to its handler.
- *
- * Big switch on the final byte. Unknown final bytes are dropped silently
- * (the modern terminal protocol is full of obscure sequences — erroring
- * out would burn legit output to the screen). The DEC private-mode prefix
- * @c ? is detected up-front and routed through @ref csi_dec_private.
- */
 /**
  * @brief @c CSI @c A/@c B/@c C/@c D — relative cursor motion, clamped to the
  *        grid edge.
