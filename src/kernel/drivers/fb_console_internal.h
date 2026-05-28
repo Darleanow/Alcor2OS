@@ -268,7 +268,34 @@ static inline void blend_glyph_row(
 }
 
 /* --- Cross-file function decls ------------------------------------------- */
-/* Filled in as sibling source files land; for now only the rename + types
- * live here, so consumers within fb_console.c don't need any extern decls. */
+
+/* fb_console_pixel.c — raw framebuffer access */
+
+/**
+ * @brief Map a hardware @c bpp value (32/24/16) to bytes-per-pixel.
+ *
+ * Centralised so every code path that walks framebuffer rows agrees on the
+ * pixel stride. Falls back to 4 on unknown bpp because that matches Limine's
+ * default and is the only depth the atlas blit path supports.
+ *
+ * @param bpp  Bits per pixel reported by the bootloader/framebuffer request.
+ * @return Bytes per pixel (1..4).
+ */
+u8 bytes_pp_from_bpp(u16 bpp);
+
+/**
+ * @brief Write one pixel of @p color at (@p x, @p y) honouring the
+ * framebuffer's current @c bytes_pp.
+ *
+ * Out-of-bounds writes are silently dropped — callers (atlas glyph path,
+ * mouse cursor halo) tile from coordinates that can lie slightly past the
+ * grid edge, and clipping at this single chokepoint is cheaper than guarding
+ * every loop.
+ *
+ * @param x      Pixel column, in framebuffer coordinates.
+ * @param y      Pixel row, in framebuffer coordinates.
+ * @param color  0xRRGGBB; alpha is forced to 0xFF for 32 bpp.
+ */
+void fb_put_pixel(u32 x, u32 y, u32 color);
 
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */
