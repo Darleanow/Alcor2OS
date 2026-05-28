@@ -153,4 +153,31 @@ i64 flush_metadata(ext2_volume_t *vol);
  * @c ops.c; @ref ext2_init publishes it via @c vfs_register_fs. */
 extern const fs_type_t g_ext2_fstype;
 
+/**
+ * @brief Read inode @p ino from disk into @p inode.
+ *
+ * Defined in @c inode.c. Locates the inode by walking
+ * @c group → @c inode_table → @c offset; the block read goes through
+ * @ref vol_read_block.
+ *
+ * @param vol    Source volume.
+ * @param ino    1-based inode number.
+ * @param inode  Destination inode struct.
+ * @return 0 on success, negative errno on invalid @p ino or I/O failure.
+ */
+i64 read_inode(const ext2_volume_t *vol, u32 ino, ext2_inode_t *inode);
+
+/**
+ * @brief Persist @p inode for inode number @p ino back to disk.
+ *
+ * Read-modify-write: the inode lives inside a block that also holds other
+ * inodes, so we need to preserve them.
+ *
+ * @param vol    Target volume.
+ * @param ino    1-based inode number.
+ * @param inode  Inode struct to persist.
+ * @return 0 on success, negative errno on invalid @p ino or I/O failure.
+ */
+i64 write_inode(const ext2_volume_t *vol, u32 ino, const ext2_inode_t *inode);
+
 #endif /* ALCOR2_FS_EXT2_INTERNAL_H */
