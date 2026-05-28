@@ -95,9 +95,6 @@ typedef struct
  */
 void sh_complete(const char *prefix, bool is_command, comp_result_t *out);
 
-/* History ring (sh_hist_*) --------------------------------------------------
- */
-
 /** @brief Append @p line to history (no-op on empty, dedupe-on-most-recent). */
 void sh_hist_push(const char *line);
 
@@ -107,9 +104,6 @@ int sh_hist_count(void);
 /** @brief Entry at @p idx (0 = oldest), or @c NULL if @p idx is out of range.
  */
 const char *sh_hist_at(int idx);
-
-/* Line editor (sh_read_line) ------------------------------------------------
- */
 
 #define RL_EOF       (-1) /**< Ctrl-D on an empty line. */
 #define RL_INTERRUPT (-2) /**< Ctrl-C — in-progress line is discarded. */
@@ -136,17 +130,11 @@ int sh_edit_init(void);
  */
 int sh_read_line(char *buf, size_t cap, const char *prompt);
 
-/* Prompt rendering (sh_prompt_*) --------------------------------------------
- */
-
 /** @brief Paint the decorative header line above the primary prompt. */
 void sh_write_prompt_header(void);
 
 /** @brief Format the bottom-line prompt (`╰─ $ `) into @p out. */
 void sh_format_prompt(char *out, size_t cap);
-
-/* Multi-line statement reader (sh_parse_*) ----------------------------------
- */
 
 /**
  * @brief Read input lines into @p buf until they form a complete statement.
@@ -155,9 +143,6 @@ void sh_format_prompt(char *out, size_t cap);
  * prompt, or 0 when interrupted (Ctrl-C).
  */
 int sh_read_complete_statement(char *buf, size_t size);
-
-/* Config file (.vconf) ------------------------------------------------------
- */
 
 /**
  * @brief Source @p path as a vega script with stdout redirected to /dev/null.
