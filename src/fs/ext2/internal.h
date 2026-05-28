@@ -202,6 +202,36 @@ u32 alloc_file_block(
 i64 free_inode_blocks(ext2_volume_t *vol, ext2_inode_t *inode);
 
 /**
+ * @brief Resolve a full path to an inode number + inode struct.
+ *
+ * Follows symlinks transparently and walks across directories. Defined in
+ * @c path.c; the public entry points (@c ext2_open / @c ext2_stat /
+ * @c ext2_unlink / etc.) all route through this.
+ *
+ * @param vol         Source volume.
+ * @param path        Absolute path.
+ * @param out_ino     Out: resolved inode number.
+ * @param out_inode   Out: resolved inode struct.
+ * @return 0 on success, @c -ENOENT when any component is missing.
+ */
+i64 resolve_path(
+    const ext2_volume_t *vol, const char *path, u32 *out_ino,
+    ext2_inode_t *out_inode
+);
+
+/**
+ * @brief Split a path into its parent and final component.
+ *
+ * Used by mutating ops (@c ext2_mkdir / @c ext2_unlink / @c ext2_rmdir) to
+ * resolve the parent separately from the new/old name. Defined in @c path.c.
+ *
+ * @param path    Input path.
+ * @param parent  Out: parent path (or @c "/" when at root).
+ * @param name    Out: final component, truncated to @c EXT2_NAME_MAX.
+ */
+void path_split(const char *path, char *parent, char *name);
+
+/**
  * @brief Look up an entry by @p name inside directory @p dir_inode.
  *
  * Defined in @c dir.c. Walks the directory's data blocks via the indirect
