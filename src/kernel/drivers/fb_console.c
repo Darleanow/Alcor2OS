@@ -7,130 +7,22 @@
  * Takes over the framebuffer from the early boot logger once kmalloc is up.
  */
 
-#include <alcor2/arch/pit.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/mouse.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/types.h>
 #include <drivers/console/font.h>
+#include <kernel/drivers/fb_console_internal.h>
+
 /* Forward declaration — avoids pulling in proc/signal.h for one call. */
 #define SIGWINCH 28
-void proc_signal_broadcast(int signum);
-#include <alcor2/types.h>
+void             proc_signal_broadcast(int signum);
 
-/* Cursor blink period (~2 Hz) in PIT ticks, so the rate tracks PIT_TICK_HZ. */
-#define FB_BLINK_PERIOD_TICKS (PIT_TICK_HZ / 2u)
+fb_console_ctx_t fb_ctx;
 
-typedef struct
-{
-  u32 cp;    /**< Unicode codepoint at this cell. */
-  u32 fg;    /**< RGB foreground. */
-  u32 bg;    /**< RGB background. */
-  u16 attr;  /**< SGR attribute bits (FB_ATTR_*). */
-  u16 dirty; /**< Batch-blit dirty flag: 1 = needs blit at flush_batch(). */
-} fb_cell_t;
-
-#define FB_ATTR_BLINK     (1u << 0)
-#define FB_ATTR_BOLD      (1u << 1)
-#define FB_ATTR_ITALIC    (1u << 2)
-#define FB_ATTR_UNDERLINE (1u << 3)
-#define FB_ATTR_REVERSE   (1u << 4)
-
-#define INPUT_RING        256
-
-static struct
-{
-  /* Framebuffer */
-  volatile u8 *base;
-  u64          width, height, pitch;
-  u8           bytes_pp;
-
-  /* Cell grid (kmalloc'd at init). */
-  fb_cell_t *cells;
-  int        rows, cols; /* in cells */
-  int        cx, cy;     /* cursor in cell coords */
-
-  /* Cell pixel dimensions. Defaults to the compiled-in CP437 bitmap size;
-   * an atlas submission can replace them with its own cell_w / cell_h. */
-  int cell_w, cell_h;
-
-  /* Grid offset in pixels from the framebuffer origin (top-left padding).
-   * Zero at boot so the bitmap path fills the screen; bumped to
-   * FB_CONSOLE_MARGIN once an atlas takes over. */
-  int margin_x, margin_y;
-
-  /* Default colors (used for SGR resets). */
-  u32 default_fg, default_bg;
-  u32 cur_fg, cur_bg;
-  u8  cur_attr;      /* current SGR attribute bits (FB_ATTR_*) */
-  u8  cell_blink_on; /* cell blink display phase: 1=visible, 0=hidden */
-
-  /* UTF-8 decoder state. */
-  u32 utf8_partial;
-  u8  utf8_rem;
-
-  /* ANSI escape-sequence state machine.
-   *   0: NORMAL — bytes feed straight through UTF-8 → cell
-   *   1: ESC    — saw 0x1b, waiting for the next byte
-   *   2: CSI    — inside `ESC [`, accumulating params into esc_buf
-   *   3: G0SET  — inside `ESC (`, waiting for the charset designator */
-  u8   esc_state;
-  u8   esc_len;
-  char esc_buf[64];
-  u8   g0_acs;  /* 1 once `ESC ( 0` has selected DEC Special Graphics. */
-  u32  last_cp; /* last emitted codepoint, replayed by CSI REP (`b`). */
-
-  /* Saved cursor for ESC 7/8 + CSI s/u. */
-  int saved_cx, saved_cy;
-
-  /* Cursor blink: counts down one PIT tick at a time; reloaded with
-   * FB_BLINK_PERIOD_TICKS so the ~2 Hz rate holds regardless of PIT_TICK_HZ. */
-  u16 blink_ticks;
-  u8  blink_on;
-  u8  cursor_visible;
-
-  /* DECCKM: when set, cursor keys send SS3 (\EOA) instead of CSI (\E[A).
-   * ncurses' keypad(TRUE) toggles this via the terminfo smkx string. */
-  bool app_cursor_keys;
-
-  /* fb yielded to a userspace mmap-er (e.g. doom). */
-  bool yielded;
-
-  /* Batch-blit mode: when true, put_cp_at_cursor/erase_rect mark cell
-   * dirty rather than blitting immediately. flush_batch() drains them.
-   * batch_r0..batch_r1 track the inclusive dirty row range so flush_batch
-   * can skip the full 80×25 scan when only a few rows changed. */
-  bool in_batch;
-  int  batch_r0, batch_r1;
-
-  /* Input ring (keyboard → reader). */
-  u8           in_buf[INPUT_RING];
-  unsigned int in_head, in_tail;
-
-  /* Userspace-submitted glyph atlas; bitmap font is the fallback. */
-  bool atlas_active;
-  u8  *atlas_pixels; /* kernel buffer copy. */
-  u32 *atlas_cp_map; /* kernel buffer copy: u32[atlas_n_cp]. */
-  u32  atlas_cell_w, atlas_cell_h;
-  u32  atlas_stride;
-  u32  atlas_bpp;
-  u32  atlas_n_glyphs;
-  u32  atlas_n_cp;
-  u32  atlas_fallback;
-  u32  atlas_bold_base;   /* first bold glyph slot; 0 = no bold atlas   */
-  u32  atlas_italic_base; /* first italic glyph slot; 0 = no italic atlas */
-} fb_ctx;
-
-#define ATLAS_NO_GLYPH    0xFFFFFFFFu
-#define SCROLLBACK_ROWS   500
-
-#define FB_CONSOLE_MARGIN 20
-
-#define FONT_W            8
-#define FONT_H            16
-
-static u8 bytes_pp_from_bpp(u16 bpp)
+static u8        bytes_pp_from_bpp(u16 bpp)
 {
   switch(bpp) {
   case 32:
@@ -201,58 +93,6 @@ static u32 atlas_lookup_attr(u32 cp, u16 attr)
       return ii;
   }
   return idx;
-}
-
-static inline void fill32(volatile u32 *dst, u32 val, u32 n)
-{
-  __asm__ volatile("rep stosl" : "+D"(dst), "+c"(n) : "a"(val) : "memory");
-}
-
-/* Blend one row of glyph pixels into the framebuffer.  bypp==1: alpha-only
- * atlas (typical FreeType grayscale).  bypp==4: RGBA atlas (px[3] = alpha).
- * The fast-paths for a=0 and a=255 avoid the multiply for solid/transparent
- * pixels, which covers the majority of glyph coverage maps. */
-static inline void blend_glyph_row(
-    volatile u32 *dst, const u8 *src, u32 n, u32 bypp, u32 fg_r, u32 fg_g,
-    u32 fg_b, u32 bg_r, u32 bg_g, u32 bg_b, u32 fg_pk, u32 bg_pk
-)
-{
-  if(!dst || !src)
-    return;
-  if(bypp == 1u) {
-    for(u32 gx = 0; gx < n; gx++) {
-      u32 a = src[gx];
-      if(!a) {
-        dst[gx] = bg_pk;
-        continue;
-      }
-      if(a == 255u) {
-        dst[gx] = fg_pk;
-        continue;
-      }
-      u32 inv = 255u - a;
-      dst[gx] = 0xFF000000u | ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
-                ((fg_g * a + bg_g * inv + 128u) >> 8) << 8 |
-                (fg_b * a + bg_b * inv + 128u) >> 8;
-    }
-  } else {
-    for(u32 gx = 0; gx < n; gx++) {
-      const u8 *px = src + (size_t)gx * bypp;
-      u32       a  = (bypp == 4u) ? (u32)px[3] : (u32)px[0];
-      if(!a) {
-        dst[gx] = bg_pk;
-        continue;
-      }
-      if(a == 255u) {
-        dst[gx] = fg_pk;
-        continue;
-      }
-      u32 inv = 255u - a;
-      dst[gx] = 0xFF000000u | ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
-                ((fg_g * a + bg_g * inv + 128u) >> 8) << 8 |
-                (fg_b * a + bg_b * inv + 128u) >> 8;
-    }
-  }
 }
 
 static void blit_cell_data(const fb_cell_t *c, int col, int row)
