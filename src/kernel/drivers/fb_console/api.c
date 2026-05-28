@@ -389,10 +389,9 @@ static void compute_grid_dims(
     int new_cell_w, int new_cell_h, int *new_cols, int *new_rows
 )
 {
-  *new_cols = (int)((fb_ctx.width - MARGIN_SIDES_COUNT * FB_CONSOLE_MARGIN) /
-                    (u64)new_cell_w);
-  *new_rows = (int)((fb_ctx.height - MARGIN_SIDES_COUNT * FB_CONSOLE_MARGIN) /
-                    (u64)new_cell_h);
+  u64 margin_px = (u64)MARGIN_SIDES_COUNT * (u64)FB_CONSOLE_MARGIN;
+  *new_cols     = (int)((fb_ctx.width - margin_px) / (u64)new_cell_w);
+  *new_rows     = (int)((fb_ctx.height - margin_px) / (u64)new_cell_h);
   if(*new_cols < 1)
     *new_cols = 1;
   if(*new_rows < 1)
