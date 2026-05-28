@@ -528,4 +528,18 @@ void flush_batch(void);
  */
 void put_cp_at_cursor(u32 cp);
 
+/* fb_console_ansi.c — escape parser + UTF-8 decoder */
+
+/**
+ * @brief Push one byte through the ANSI/CSI/charset state machine.
+ *
+ * Recognised sequences mutate @c fb_ctx.cur_* / @c fb_ctx.cx / cy directly;
+ * bytes that survive the parser fall through to UTF-8 decoding and
+ * @ref put_cp_at_cursor. Single entry point so @ref fb_console_write_raw
+ * is a tight loop over this function.
+ *
+ * @param b  Input byte.
+ */
+void feed_byte(u8 b);
+
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */
