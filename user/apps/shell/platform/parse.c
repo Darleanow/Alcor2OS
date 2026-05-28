@@ -13,128 +13,192 @@
 #define MAX_HEREDOC_DELIM 64
 
 /**
- * @brief True if @p buf parses as a complete statement.
+ * @brief Persistent walker state for ::is_input_complete.
+ *
+ * Bundled so each sub-state handler can read/update one struct rather than
+ * juggling individual ints and char arrays. Zero-init = "outside any state".
+ */
+typedef struct
+{
+  int  in_squote;   /**< Inside single-quoted string. */
+  int  in_dquote;   /**< Inside double-quoted string. */
+  int  brace_depth; /**< Net @c { minus @c } seen outside quotes. */
+  int  want_delim;  /**< Just saw @c <<; accumulating the heredoc delimiter. */
+  int  in_hd_body; /**< Inside the heredoc body, scanning for delimiter line. */
+  char delim[MAX_HEREDOC_DELIM];    /**< Captured heredoc delimiter. */
+  int  dn;                          /**< Bytes used in @c delim. */
+  char line_buf[MAX_HEREDOC_DELIM]; /**< Current heredoc-body line so far. */
+  int  ln;                          /**< Bytes used in @c line_buf. */
+} parse_state_t;
+
+/** @brief Compare @p st->line_buf (length @p st->ln) against @p st->delim
+ *         (length @p st->dn). @return Non-zero if identical. */
+static int delim_matches(const parse_state_t *st)
+{
+  if(st->ln != st->dn)
+    return 0;
+  for(int i = 0; i < st->dn; i++)
+    if(st->line_buf[i] != st->delim[i])
+      return 0;
+  return 1;
+}
+
+/**
+ * @brief Heredoc body: accumulate one line at a time, exit on delim match.
+ *
+ * @param st  State (mutated).
+ * @param c   Current char.
+ */
+static void handle_hd_body(parse_state_t *st, char c)
+{
+  if(c != '\n') {
+    if(st->ln < MAX_HEREDOC_DELIM - 1)
+      st->line_buf[st->ln++] = c;
+    return;
+  }
+  st->line_buf[st->ln] = '\0';
+  if(delim_matches(st)) {
+    st->in_hd_body = 0;
+    st->dn         = 0;
+  }
+  st->ln = 0;
+}
+
+/**
+ * @brief @c << delimiter-collection state: read the word that follows.
+ *
+ * Newline (with at least one delimiter char) transitions into the heredoc
+ * body. Whitespace ends the delimiter; subsequent chars are normal input.
+ *
+ * @param st  State (mutated).
+ * @param c   Current char.
+ */
+static void handle_want_delim(parse_state_t *st, char c)
+{
+  if(c == ' ' || c == '\t') {
+    if(st->dn > 0)
+      st->want_delim = 0;
+    return;
+  }
+  if(c == '\n') {
+    if(st->dn > 0) {
+      st->want_delim = 0;
+      st->in_hd_body = 1;
+      st->ln         = 0;
+    }
+    return;
+  }
+  if(st->dn < MAX_HEREDOC_DELIM - 1)
+    st->delim[st->dn++] = c;
+}
+
+/**
+ * @brief Double-quoted state: handle @c \\" @c \\\\ @c \\$ escapes, exit on
+ *        closing quote.
+ *
+ * @param st       State (mutated).
+ * @param cursor   Pointer to the cursor into the source string; may be
+ *                 advanced one position to consume an escape pair.
+ */
+static void handle_dquote(parse_state_t *st, const char **cursor)
+{
+  char c = **cursor;
+  if(c == '\\') {
+    char n = (*cursor)[1];
+    if(n == '"' || n == '\\' || n == '$') {
+      (*cursor)++;
+      return;
+    }
+  }
+  if(c == '"')
+    st->in_dquote = 0;
+}
+
+/**
+ * @brief Top-level dispatch: brace counting, quote/heredoc triggers.
+ *
+ * Only called when no specialised state is active.
+ *
+ * @param st       State (mutated).
+ * @param cursor   Pointer to the cursor into the source string; may be
+ *                 advanced to skip @c <<< or the second @c < of @c <<.
+ */
+static void handle_normal(parse_state_t *st, const char **cursor)
+{
+  char c = **cursor;
+  switch(c) {
+  case '\'':
+    st->in_squote = 1;
+    return;
+  case '"':
+    st->in_dquote = 1;
+    return;
+  case '<':
+    if((*cursor)[1] != '<')
+      return;
+    if((*cursor)[2] == '<') {
+      *cursor += 2;
+      return;
+    }
+    st->want_delim = 1;
+    st->dn         = 0;
+    (*cursor)++;
+    return;
+  case '\n':
+    if(st->dn > 0) {
+      st->in_hd_body = 1;
+      st->ln         = 0;
+    }
+    return;
+  case '{':
+    st->brace_depth++;
+    return;
+  case '}':
+    if(st->brace_depth > 0)
+      st->brace_depth--;
+    return;
+  default:
+    return;
+  }
+}
+
+/**
+ * @brief True if @p buf parses as a complete vega statement.
  *
  * Mirrors the lexer's quoting rules — single quotes are literal, double
  * quotes recognise @c \\" @c \\\\ @c \\$ as escapes. Brace counting is
- * suppressed inside either quote.
- *
- * Heredoc tracking: when @c << (not @c <<<) appears outside quotes the next
- * word is captured as the delimiter; from the following newline onward the
- * walker watches each line for an exact match against the delimiter, and
- * stays incomplete until found. One heredoc per command for now. A negative
- * brace depth (@c } without @c {) is treated as complete: let the parser
- * surface the error rather than wedge the REPL.
+ * suppressed inside either quote. One heredoc per command. A negative brace
+ * depth (@c } without @c {) is treated as complete: let the parser surface
+ * the error rather than wedge the REPL.
  *
  * @param buf  NUL-terminated input buffer.
  * @return Non-zero if the input is complete, 0 if more input is needed.
  */
 static int is_input_complete(const char *buf)
 {
-  int  in_squote   = 0;
-  int  in_dquote   = 0;
-  int  brace_depth = 0;
-  int  want_delim  = 0;
-  int  in_hd_body  = 0;
-  char delim[MAX_HEREDOC_DELIM];
-  int  dn = 0;
-  char line_buf[MAX_HEREDOC_DELIM];
-  int  ln = 0;
-
+  parse_state_t st = {0};
   for(const char *p = buf; *p; p++) {
-    char c = *p;
-
-    if(in_hd_body) {
-      if(c == '\n') {
-        line_buf[ln] = '\0';
-        if(ln == dn) {
-          int eq = 1;
-          for(int i = 0; i < dn; i++)
-            if(line_buf[i] != delim[i]) {
-              eq = 0;
-              break;
-            }
-          if(eq) {
-            in_hd_body = 0;
-            dn         = 0;
-            ln         = 0;
-            continue;
-          }
-        }
-        ln = 0;
-      } else if(ln < MAX_HEREDOC_DELIM - 1) {
-        line_buf[ln++] = c;
-      } else {
-        ln = MAX_HEREDOC_DELIM - 1;
-      }
+    if(st.in_hd_body) {
+      handle_hd_body(&st, *p);
       continue;
     }
-
-    if(want_delim) {
-      if(c == ' ' || c == '\t') {
-        if(dn > 0)
-          want_delim = 0;
-        continue;
-      }
-      if(c == '\n') {
-        if(dn > 0) {
-          want_delim = 0;
-          in_hd_body = 1;
-          ln         = 0;
-        }
-        continue;
-      }
-      if(dn < MAX_HEREDOC_DELIM - 1)
-        delim[dn++] = c;
+    if(st.want_delim) {
+      handle_want_delim(&st, *p);
       continue;
     }
-
-    if(in_squote) {
-      if(c == '\'')
-        in_squote = 0;
+    if(st.in_squote) {
+      if(*p == '\'')
+        st.in_squote = 0;
       continue;
     }
-    if(in_dquote) {
-      if(c == '\\' && p[1] && (p[1] == '"' || p[1] == '\\' || p[1] == '$')) {
-        p++;
-        continue;
-      }
-      if(c == '"')
-        in_dquote = 0;
+    if(st.in_dquote) {
+      handle_dquote(&st, &p);
       continue;
     }
-    if(c == '\'') {
-      in_squote = 1;
-      continue;
-    }
-    if(c == '"') {
-      in_dquote = 1;
-      continue;
-    }
-    if(c == '<' && p[1] == '<') {
-      if(p[2] == '<') {
-        p += 2;
-        continue;
-      }
-      want_delim = 1;
-      dn         = 0;
-      p++;
-      continue;
-    }
-    if(c == '\n') {
-      if(dn > 0) {
-        in_hd_body = 1;
-        ln         = 0;
-      }
-      continue;
-    }
-    if(c == '{')
-      brace_depth++;
-    else if(c == '}' && brace_depth > 0)
-      brace_depth--;
+    handle_normal(&st, &p);
   }
-  return !in_squote && !in_dquote && brace_depth == 0 && !want_delim &&
-         !in_hd_body;
+  return !st.in_squote && !st.in_dquote && st.brace_depth == 0 &&
+         !st.want_delim && !st.in_hd_body;
 }
 
 /**
