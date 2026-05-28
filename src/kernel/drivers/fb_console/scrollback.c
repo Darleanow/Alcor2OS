@@ -70,34 +70,41 @@ static int s_sb_used = 0;
 static int s_sb_view = 0;
 
 /**
- * @brief Drop the top row off the grid, shift the rest up, blank the bottom,
- * and queue one pixel-move for flush time.
+ * @brief Copy the live top row into the scrollback ring before it gets
+ * shifted off.
  *
- * Pushes the scrolled-off row into the ring so it stays accessible via
- * Shift-PgUp. The pixel side is deferred to @ref flush_pending_scroll so a
- * write that emits N newlines collapses to one VRAM blit instead of N — by
- * far the biggest win for `ls`-style bursts where MMIO bandwidth dominates.
+ * Skips when the ring is missing or stale (cols mismatch); the live grid
+ * keeps scrolling, but PgUp won't reach this row. Wraps via modulo at the
+ * ring boundary so the oldest row gets overwritten when capacity is hit.
  */
-void scroll_one(void)
+static void scrollback_push_top_row(void)
+{
+  if(!s_sb_buf || s_sb_cols != fb_ctx.cols)
+    return;
+  int slot;
+  if(s_sb_used < SCROLLBACK_ROWS) {
+    slot = (s_sb_head + s_sb_used) % SCROLLBACK_ROWS;
+    s_sb_used++;
+  } else {
+    slot      = s_sb_head;
+    s_sb_head = (s_sb_head + 1) % SCROLLBACK_ROWS;
+  }
+  kmemcpy(
+      &s_sb_buf[(size_t)slot * (size_t)fb_ctx.cols], &fb_ctx.cells[0],
+      (size_t)fb_ctx.cols * sizeof(fb_cell_t)
+  );
+}
+
+/**
+ * @brief Shift every grid row up by one and blank the freshly exposed bottom.
+ *
+ * Pure cell-grid bookkeeping; the pixel side is deferred via
+ * @ref s_pending_scroll so the renderer can collapse N consecutive scrolls
+ * into one VRAM kmemcpy.
+ */
+static void scrollback_shift_grid_up(void)
 {
   size_t row_bytes = (size_t)fb_ctx.cols * sizeof(fb_cell_t);
-
-  /* Save the row scrolling off the top into the scrollback ring. */
-  if(s_sb_buf && s_sb_cols == fb_ctx.cols) {
-    int slot;
-    if(s_sb_used < SCROLLBACK_ROWS) {
-      slot = (s_sb_head + s_sb_used) % SCROLLBACK_ROWS;
-      s_sb_used++;
-    } else {
-      slot      = s_sb_head;
-      s_sb_head = (s_sb_head + 1) % SCROLLBACK_ROWS;
-    }
-    kmemcpy(
-        &s_sb_buf[(size_t)slot * (size_t)fb_ctx.cols], &fb_ctx.cells[0],
-        row_bytes
-    );
-  }
-
   for(int r = 0; r < fb_ctx.rows - 1; r++)
     kmemcpy(
         &fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols],
@@ -113,10 +120,26 @@ void scroll_one(void)
     cell->attr  = 0;
     cell->dirty = 0;
   }
+}
+
+/**
+ * @brief Drop the top row off the grid, shift the rest up, blank the bottom,
+ * and queue one pixel-move for flush time.
+ *
+ * Pushes the scrolled-off row into the ring so it stays accessible via
+ * Shift-PgUp. The pixel side is deferred to @ref flush_pending_scroll so a
+ * write that emits N newlines collapses to one VRAM blit instead of N — by
+ * far the biggest win for @c ls -style bursts where MMIO bandwidth dominates.
+ *
+ * Expands the in-batch dirty range to the full grid because cells have
+ * shifted rows; without that, @ref flush_batch would miss the moved cells.
+ */
+void scroll_one(void)
+{
+  scrollback_push_top_row();
+  scrollback_shift_grid_up();
   s_pending_scroll++;
   caret_clear_drawn();
-  /* After a scroll, dirty cells may have shifted rows — expand the range
-   * to cover all rows so flush_batch() doesn't miss any. */
   if(fb_ctx.in_batch) {
     fb_ctx.batch_r0 = 0;
     fb_ctx.batch_r1 = fb_ctx.rows - 1;
@@ -228,43 +251,74 @@ void fb_console_scrollback_down(int lines)
  * dirty" and let @ref flush_batch re-blit them. Mouse cursor is invalidated
  * first so the kmemcpy doesn't drag a stale arrow to a new row.
  */
+/**
+ * @brief 32-bpp fast path: kmemcpy the surviving rows up by @p n cells, then
+ *        mark the freshly exposed bottom rows dirty for the next flush.
+ *
+ * One MMIO copy beats N per-row blits when bandwidth is the bottleneck —
+ * that's the whole reason scrolling is deferred.
+ *
+ * @param n  Number of cell-rows to scroll out (clamped to @c fb_ctx.rows).
+ */
+static void flush_scroll_32bpp(int n)
+{
+  u32 scroll_px = (u32)n * (u32)fb_ctx.cell_h;
+  u32 total_px  = (u32)fb_ctx.rows * (u32)fb_ctx.cell_h;
+  u32 copy_px   = total_px - scroll_px;
+  if(copy_px > 0) {
+    u8       *dst = (u8 *)fb_ctx.base + (u64)fb_ctx.margin_y * fb_ctx.pitch;
+    const u8 *src = dst + (u64)scroll_px * fb_ctx.pitch;
+    kmemcpy(dst, src, (u64)copy_px * fb_ctx.pitch);
+  }
+  int first_new = fb_ctx.rows - n;
+  for(int r = first_new; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++)
+      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
+  if(fb_ctx.batch_r0 > first_new)
+    fb_ctx.batch_r0 = first_new;
+  if(fb_ctx.batch_r1 < fb_ctx.rows - 1)
+    fb_ctx.batch_r1 = fb_ctx.rows - 1;
+}
+
+/**
+ * @brief Slow-path scroll for non-32-bpp framebuffers: mark every cell dirty
+ *        and let @ref flush_batch re-blit them.
+ *
+ * No MMIO kmemcpy here because the row stride math depends on bytes-per-pixel
+ * the slow path can't assume; full repaint is simpler and 24/16-bpp is not
+ * shipped today.
+ */
+static void flush_scroll_slow(void)
+{
+  for(int r = 0; r < fb_ctx.rows; r++)
+    for(int c = 0; c < fb_ctx.cols; c++)
+      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
+  fb_ctx.batch_r0 = 0;
+  fb_ctx.batch_r1 = fb_ctx.rows - 1;
+}
+
+/**
+ * @brief Drain the pending-scroll counter in one VRAM copy plus dirty marks.
+ *
+ * 32-bpp fast path does a single in-place kmemcpy of the scrolled-up region
+ * (saves N MMIO write passes). Other depths fall back to "mark every cell
+ * dirty" and let @ref flush_batch re-blit them. Mouse cursor is invalidated
+ * first so the kmemcpy doesn't drag a stale arrow to a new row.
+ */
 void flush_pending_scroll(void)
 {
   if(s_pending_scroll <= 0)
     return;
-
   int n            = s_pending_scroll;
   s_pending_scroll = 0;
   if(n > fb_ctx.rows)
     n = fb_ctx.rows;
 
   mouse_cursor_invalidate_for_scroll();
-
-  if(fb_ctx.base && fb_ctx.bytes_pp == FB_BYTES_PER_PIXEL_32) {
-    u32 scroll_px = (u32)n * (u32)fb_ctx.cell_h;
-    u32 total_px  = (u32)fb_ctx.rows * (u32)fb_ctx.cell_h;
-    u32 copy_px   = total_px - scroll_px;
-    if(copy_px > 0) {
-      u8       *dst = (u8 *)fb_ctx.base + (u64)fb_ctx.margin_y * fb_ctx.pitch;
-      const u8 *src = dst + (u64)scroll_px * fb_ctx.pitch;
-      kmemcpy(dst, src, (u64)copy_px * fb_ctx.pitch);
-    }
-    int first_new = fb_ctx.rows - n;
-    for(int r = first_new; r < fb_ctx.rows; r++)
-      for(int c = 0; c < fb_ctx.cols; c++)
-        fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
-    if(fb_ctx.batch_r0 > first_new)
-      fb_ctx.batch_r0 = first_new;
-    if(fb_ctx.batch_r1 < fb_ctx.rows - 1)
-      fb_ctx.batch_r1 = fb_ctx.rows - 1;
-    return;
-  }
-
-  for(int r = 0; r < fb_ctx.rows; r++)
-    for(int c = 0; c < fb_ctx.cols; c++)
-      fb_ctx.cells[(size_t)r * (size_t)fb_ctx.cols + (size_t)c].dirty = 1;
-  fb_ctx.batch_r0 = 0;
-  fb_ctx.batch_r1 = fb_ctx.rows - 1;
+  if(fb_ctx.base && fb_ctx.bytes_pp == FB_BYTES_PER_PIXEL_32)
+    flush_scroll_32bpp(n);
+  else
+    flush_scroll_slow();
 }
 
 /**
