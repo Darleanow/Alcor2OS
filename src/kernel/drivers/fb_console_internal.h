@@ -497,4 +497,35 @@ void mouse_cursor_render(void);
  */
 void mouse_cursor_drop(void);
 
+/* fb_console_flush.c — dirty-cell batch + character emission */
+
+/**
+ * @brief Grow the per-row scratch used by @ref flush_batch to at least
+ * @p cols entries. Called on grid init and whenever a SET_ATLAS reflow
+ * widens the grid.
+ *
+ * @param cols  Minimum capacity in cells.
+ */
+void flush_ci_ensure(int cols);
+
+/**
+ * @brief Repaint every dirty cell in the [@c batch_r0, @c batch_r1] row range
+ * in one VRAM pass, then clear their @c dirty bits.
+ *
+ * The fast 32-bpp path resolves atlas glyphs once per cell into the scratch,
+ * then walks scanline-by-scanline; the slow path falls back to @ref blit_cell.
+ */
+void flush_batch(void);
+
+/**
+ * @brief Write one Unicode codepoint at the cell cursor and advance.
+ *
+ * Wraps at the right margin (scrolls if needed) and either marks the cell
+ * dirty (batch mode) or blits it immediately. Skips identical-content writes
+ * so editors that repaint unchanged lines don't pound VRAM.
+ *
+ * @param cp  Unicode codepoint to write.
+ */
+void put_cp_at_cursor(u32 cp);
+
 #endif /* ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H */
