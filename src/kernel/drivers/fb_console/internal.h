@@ -698,6 +698,30 @@ void flush_batch(void);
 void put_cp_at_cursor(u32 cp);
 
 /**
+ * @brief Catppuccin Mocha 16-colour foreground palette. Indices match
+ * @c SGR @c 30..37. Defined in @c palette.c; shared with @c sgr.c so the
+ * SGR handler can resolve colour codes without re-declaring the table.
+ */
+extern const u32 ansi16_fg[8];
+
+/** @brief Bright foreground palette (@c SGR @c 90..97). See @ref ansi16_fg. */
+extern const u32 ansi16_fg_bright[8];
+
+/** @brief Background palette (@c SGR @c 40..47). See @ref ansi16_fg. */
+extern const u32 ansi16_bg[8];
+
+/**
+ * @brief Resolve an xterm 256-colour palette index to a 0xRRGGBB triplet.
+ *
+ * Used by the SGR extended-colour subform (@c CSI @c 38;5;N or @c 48;5;N).
+ * Defined in @c palette.c.
+ *
+ * @param idx  Palette index 0..255.
+ * @return Packed RGB.
+ */
+u32 ansi256_to_rgb(unsigned idx);
+
+/**
  * @brief Push one byte through the ANSI/CSI/charset state machine.
  *
  * Recognised sequences mutate @c fb_ctx.cur_* / @c fb_ctx.cx / cy directly;
