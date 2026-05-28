@@ -95,19 +95,44 @@ typedef struct
  */
 void sh_complete(const char *prefix, bool is_command, comp_result_t *out);
 
-/** @brief Append @p line to history (no-op on empty, dedupe-on-most-recent). */
+/**
+ * @brief Append @p line to history.
+ *
+ * No-op when @p line is empty or duplicates the most recent entry.
+ *
+ * @param line  Line to record; copied into the ring (need not outlive call).
+ */
 void sh_hist_push(const char *line);
 
-/** @brief Number of entries currently held. */
+/**
+ * @brief Return the number of entries currently held.
+ *
+ * @return Entry count in [0, HIST_MAX].
+ */
 int sh_hist_count(void);
 
-/** @brief Entry at @p idx (0 = oldest), or @c NULL if @p idx is out of range.
+/**
+ * @brief Look up history entry at @p idx (0 = oldest).
+ *
+ * @param idx  Zero-based index.
+ * @return Pointer to internal storage (valid until next ::sh_hist_push), or
+ *         @c NULL if @p idx is out of range.
  */
 const char *sh_hist_at(int idx);
 
-#define RL_EOF       (-1) /**< Ctrl-D on an empty line. */
-#define RL_INTERRUPT (-2) /**< Ctrl-C — in-progress line is discarded. */
-#define RL_CLEAR     (-3) /**< Ctrl-L — caller should clear the screen. */
+/**
+ * @brief Non-byte-length return values from ::sh_read_line.
+ *
+ * Encoded as negative @c int so ::sh_read_line can return either a positive
+ * byte count (line length) or one of these control codes from the same
+ * function signature.
+ */
+typedef enum
+{
+  RL_EOF       = -1, /**< Ctrl-D on an empty line. */
+  RL_INTERRUPT = -2, /**< Ctrl-C — in-progress line is discarded. */
+  RL_CLEAR     = -3, /**< Ctrl-L — caller should clear the screen. */
+} rl_result_t;
 
 /**
  * @brief Initialise the off-screen ncurses input pad used by ::sh_read_line.
@@ -133,14 +158,21 @@ int sh_read_line(char *buf, size_t cap, const char *prompt);
 /** @brief Paint the decorative header line above the primary prompt. */
 void sh_write_prompt_header(void);
 
-/** @brief Format the bottom-line prompt (`╰─ $ `) into @p out. */
+/**
+ * @brief Format the bottom-line prompt (`╰─ $ `) into @p out.
+ *
+ * @param out  Destination buffer (NUL-terminated on return).
+ * @param cap  Capacity of @p out (≥ 32 bytes recommended for full prompt).
+ */
 void sh_format_prompt(char *out, size_t cap);
 
 /**
  * @brief Read input lines into @p buf until they form a complete statement.
  *
- * Returns total bytes accumulated, @c RL_EOF on Ctrl-D at an empty primary
- * prompt, or 0 when interrupted (Ctrl-C).
+ * @param buf   Destination accumulator (NUL-terminated on return).
+ * @param size  Capacity of @p buf in bytes.
+ * @return Total bytes accumulated, @c RL_EOF on Ctrl-D at an empty primary
+ *         prompt, or 0 when interrupted (Ctrl-C).
  */
 int sh_read_complete_statement(char *buf, size_t size);
 
