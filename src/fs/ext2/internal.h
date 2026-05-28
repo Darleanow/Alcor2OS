@@ -76,4 +76,81 @@ u8 *cache_get_block(u32 size);
  */
 void cache_put_block(u8 *buf);
 
+/**
+ * @brief Read a sector run from a volume.
+ *
+ * Inlined here so the multi-block DMA fast path in @ref ext2_read can use it
+ * without paying for an extra function call per @c EXT2_READ_RUN_MAX-sized
+ * chunk. Adds the partition LBA so callers stay in partition-local sector
+ * coordinates.
+ *
+ * @param vol     Source volume.
+ * @param sector  Sector offset within the partition.
+ * @param count   Sector count.
+ * @param buf     Destination buffer.
+ * @return Bytes read on success, negative errno on I/O failure.
+ */
+static inline i64
+    vol_read_sectors(const ext2_volume_t *vol, u32 sector, u32 count, void *buf)
+{
+  return vol->dev->read(vol->dev->ctx, vol->partition_lba + sector, count, buf);
+}
+
+/**
+ * @brief Companion of @ref vol_read_sectors for writes.
+ *
+ * @param vol     Target volume.
+ * @param sector  Sector offset within the partition.
+ * @param count   Sector count.
+ * @param buf     Source buffer.
+ * @return Bytes written on success, negative errno on I/O failure.
+ */
+static inline i64 vol_write_sectors(
+    const ext2_volume_t *vol, u32 sector, u32 count, const void *buf
+)
+{
+  return vol->dev->write(
+      vol->dev->ctx, vol->partition_lba + sector, count, buf
+  );
+}
+
+/**
+ * @brief Read one filesystem block (vol-relative) into @p buf.
+ *
+ * Defined in @c super.c. Bridges the byte-addressed block layer to the
+ * blockdev's sector-based read by multiplying by @c sectors_per_block.
+ *
+ * @param vol    Source volume.
+ * @param block  Block number (0 = superblock area).
+ * @param buf    Destination buffer of @c vol->block_size bytes.
+ * @return 0 on success, negative errno on I/O failure.
+ */
+i64 vol_read_block(const ext2_volume_t *vol, u32 block, void *buf);
+
+/**
+ * @brief Companion of @ref vol_read_block for writes.
+ *
+ * @param vol    Target volume.
+ * @param block  Block number.
+ * @param buf    Source buffer of @c vol->block_size bytes.
+ * @return 0 on success, negative errno on I/O failure.
+ */
+i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf);
+
+/**
+ * @brief Flush the in-memory superblock + group descriptor table back to disk.
+ *
+ * Called after any allocation / free that mutates metadata so a power loss
+ * doesn't leave the on-disk view diverged from the live state. Defined in
+ * @c super.c.
+ *
+ * @param vol  Volume to flush.
+ * @return 0 on success, negative errno on I/O failure.
+ */
+i64 flush_metadata(ext2_volume_t *vol);
+
+/** @brief @c fs_ops_t / @c fs_type_t registration record for ext2. Defined in
+ * @c ops.c; @ref ext2_init publishes it via @c vfs_register_fs. */
+extern const fs_type_t g_ext2_fstype;
+
 #endif /* ALCOR2_FS_EXT2_INTERNAL_H */
