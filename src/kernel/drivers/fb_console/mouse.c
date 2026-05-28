@@ -14,10 +14,16 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/* Opaque arrow cursor, 12 wide × 19 tall. Painted as a filled white shape
- * with an automatic 1-pixel black halo: any pixel adjacent to a "1" bit gets
- * black first, then the "1" pixels themselves are overpainted white. Visible
- * on any background. */
+/**
+ * @brief Opaque arrow cursor bitmap, @ref MOUSE_CURSOR_W wide x
+ * @ref MOUSE_CURSOR_H tall.
+ *
+ * Each @c u16 is one row of the cursor; bit @c (BIT_MSB_16 @c >> @c col) is
+ * set when that pixel is part of the white body. The halo pass in
+ * @ref mouse_cursor_paint walks one cell past every edge so an unset cell
+ * with a set neighbour gets painted black first, then the body pass overpaints
+ * the set cells white. Two-pass to keep both inner loops branch-light.
+ */
 static const u16 cursor_bitmap[19] = {
     0x8000, /* 1............... */
     0xC000, /* 11.............. */
@@ -57,14 +63,22 @@ static const u16 cursor_bitmap[19] = {
  * cursor_bit reads as a sweep, not a magic constant. */
 #define BIT_MSB_16 0x8000u
 
-/* "drawn" defaults to false so a fresh boot does not show a stray cursor at
- * (0,0) until the user moves the mouse for the first time. */
-static struct
+/**
+ * @brief Position and paint-state of the software mouse cursor.
+ *
+ * @c drawn defaults to @c false so a fresh boot does not show a stray cursor
+ * at (0,0) before the user moves the mouse for the first time. Stored
+ * separately from the PS/2 driver's position because the renderer also needs
+ * "where was the cursor last painted" to erase before repainting.
+ */
+struct mouse_cur_state
 {
-  bool drawn;
-  i32  x;
-  i32  y;
-} mouse_cur;
+  bool drawn; /**< true when the arrow is currently on the framebuffer. */
+  i32  x;     /**< Last painted x in framebuffer pixels. */
+  i32  y;     /**< Last painted y in framebuffer pixels. */
+};
+
+static struct mouse_cur_state mouse_cur;
 
 /**
  * @brief Test whether the (row, col) of the arrow bitmap is set.
