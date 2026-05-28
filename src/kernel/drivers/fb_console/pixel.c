@@ -32,7 +32,7 @@ void fb_put_pixel(u32 x, u32 y, u32 color)
       fb_ctx.base + (u64)y * fb_ctx.pitch + (u64)x * fb_ctx.bytes_pp;
   switch(fb_ctx.bytes_pp) {
   case 4:
-    *(volatile u32 *)p = color | 0xFF000000u;
+    *(volatile u32 *)p = color | BGRA_OPAQUE_ALPHA;
     return;
   case 3:
     p[0] = (u8)(color & 0xffu);

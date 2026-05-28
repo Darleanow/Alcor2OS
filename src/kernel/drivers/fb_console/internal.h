@@ -101,6 +101,122 @@
 /** @brief SGR 7: reverse video — swaps fg/bg at blit time, not in the cell. */
 #define FB_ATTR_REVERSE (1u << 4)
 
+/* --- SGR / DEC private mode codes ---------------------------------------- */
+/* The SGR_* values below are the wire-format numbers a terminal emits after
+ * @c CSI; mirrored verbatim from ECMA-48 / xterm so an unmodified TUI program
+ * sees the same behaviour as it would on a real terminal. Defined here so
+ * the parser in @ref ansi.c references named symbols instead of bare ints. */
+
+/** @brief @c CSI @c 0 @c m — reset all SGR state to defaults. */
+#define SGR_RESET 0
+
+/** @brief @c CSI @c 1 @c m — set bold. */
+#define SGR_BOLD 1
+
+/** @brief @c CSI @c 3 @c m — set italic. */
+#define SGR_ITALIC 3
+
+/** @brief @c CSI @c 4 @c m — set underline. */
+#define SGR_UNDERLINE 4
+
+/** @brief @c CSI @c 5 @c m — set blink. */
+#define SGR_BLINK 5
+
+/** @brief @c CSI @c 7 @c m — set reverse video. */
+#define SGR_REVERSE 7
+
+/** @brief @c CSI @c 22 @c m — clear bold. */
+#define SGR_NO_BOLD 22
+
+/** @brief @c CSI @c 23 @c m — clear italic. */
+#define SGR_NO_ITALIC 23
+
+/** @brief @c CSI @c 24 @c m — clear underline. */
+#define SGR_NO_UNDERLINE 24
+
+/** @brief @c CSI @c 25 @c m — clear blink. */
+#define SGR_NO_BLINK 25
+
+/** @brief @c CSI @c 27 @c m — clear reverse. */
+#define SGR_NO_REVERSE 27
+
+/** @brief First foreground colour code; @c CSI @c 30..37 @c m index
+ * @ref ansi16_fg through @c (p - SGR_FG_BASE). */
+#define SGR_FG_BASE 30
+
+/** @brief Last foreground colour code in the 30..37 range. */
+#define SGR_FG_END 37
+
+/** @brief @c CSI @c 38 @c m — extended foreground (256-colour or truecolour
+ * sub-form follows). */
+#define SGR_FG_EXTENDED 38
+
+/** @brief @c CSI @c 39 @c m — reset foreground to the default colour. */
+#define SGR_FG_DEFAULT 39
+
+/** @brief First background colour code; @c CSI @c 40..47 @c m index
+ * @ref ansi16_bg through @c (p - SGR_BG_BASE). */
+#define SGR_BG_BASE 40
+
+/** @brief Last background colour code in the 40..47 range. */
+#define SGR_BG_END 47
+
+/** @brief @c CSI @c 48 @c m — extended background (256-colour or truecolour
+ * sub-form follows). */
+#define SGR_BG_EXTENDED 48
+
+/** @brief @c CSI @c 49 @c m — reset background to the default colour. */
+#define SGR_BG_DEFAULT 49
+
+/** @brief First bright foreground colour code; @c CSI @c 90..97 @c m. */
+#define SGR_FG_BRIGHT_BASE 90
+
+/** @brief Last bright foreground colour code in the 90..97 range. */
+#define SGR_FG_BRIGHT_END 97
+
+/** @brief First bright background colour code; @c CSI @c 100..107 @c m. */
+#define SGR_BG_BRIGHT_BASE 100
+
+/** @brief Last bright background colour code in the 100..107 range. */
+#define SGR_BG_BRIGHT_END 107
+
+/** @brief Sub-form selector after SGR 38/48 selecting truecolour:
+ * @c CSI @c 38;2;R;G;B @c m. */
+#define SGR_EXT_FORM_TRUECOLOR 2
+
+/** @brief Sub-form selector after SGR 38/48 selecting 256-colour palette:
+ * @c CSI @c 38;5;N @c m. */
+#define SGR_EXT_FORM_256 5
+
+/** @brief DEC private mode 1 (DECCKM) — when set, cursor keys send SS3
+ * sequences (@c \\EOA) instead of CSI (@c \\E[A). ncurses' keypad() toggles
+ * this via the terminfo smkx string. */
+#define DEC_PM_APP_CURSOR_KEYS 1
+
+/** @brief DEC private mode 25 — cursor visibility. */
+#define DEC_PM_CURSOR_VISIBLE 25
+
+/* --- Pixel encoding ------------------------------------------------------ */
+
+/** @brief Alpha byte set to opaque in a 0xAARRGGBB packed pixel. The kernel
+ * only emits opaque writes — this masks every result so a downstream
+ * compositor that respects alpha doesn't see ghosts. */
+#define BGRA_OPAQUE_ALPHA 0xFF000000u
+
+/** @brief 8-bit channel mask — extract one BGRA component. Named because
+ * @c & 255 reads as a magic number in dense colour code. */
+#define BYTE_MASK 0xFFu
+
+/* --- TTY behaviour ------------------------------------------------------- */
+
+/** @brief Tab stops every 8 cells. ANSI/xterm default; matches what userspace
+ * terminfo expects, so editors and shells align as designed. */
+#define TAB_WIDTH 8
+
+/** @brief Bit mask whose AND-NOT with the cursor column snaps to the previous
+ * tab stop. Derived from @ref TAB_WIDTH so the two stay in sync. */
+#define TAB_SNAP_MASK (TAB_WIDTH - 1)
+
 /* --- Types --------------------------------------------------------------- */
 
 /**
@@ -272,7 +388,8 @@ static inline void blend_glyph_row(
         continue;
       }
       u32 inv = 255u - a;
-      dst[gx] = 0xFF000000u | ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
+      dst[gx] = BGRA_OPAQUE_ALPHA |
+                ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
                 ((fg_g * a + bg_g * inv + 128u) >> 8) << 8 |
                 (fg_b * a + bg_b * inv + 128u) >> 8;
     }
@@ -289,7 +406,8 @@ static inline void blend_glyph_row(
         continue;
       }
       u32 inv = 255u - a;
-      dst[gx] = 0xFF000000u | ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
+      dst[gx] = BGRA_OPAQUE_ALPHA |
+                ((fg_r * a + bg_r * inv + 128u) >> 8) << 16 |
                 ((fg_g * a + bg_g * inv + 128u) >> 8) << 8 |
                 (fg_b * a + bg_b * inv + 128u) >> 8;
     }

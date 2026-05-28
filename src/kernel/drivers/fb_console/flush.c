@@ -95,8 +95,9 @@ void flush_batch(void)
       u32 eff_fg = (c->attr & FB_ATTR_REVERSE) ? c->bg : c->fg;
       u32 eff_bg = (c->attr & FB_ATTR_REVERSE) ? c->fg : c->bg;
 
-      ci[cc].bg_pk = 0xFF000000u | eff_bg;
-      ci[cc].fg_pk = 0xFF000000u | eff_fg; /* always set — underline needs it */
+      ci[cc].bg_pk = BGRA_OPAQUE_ALPHA | eff_bg;
+      ci[cc].fg_pk =
+          BGRA_OPAQUE_ALPHA | eff_fg; /* always set — underline needs it */
       ci[cc].underline = (c->attr & FB_ATTR_UNDERLINE) != 0;
 
       bool bg_only =
@@ -107,7 +108,7 @@ void flush_batch(void)
         if(idx == ATLAS_NO_GLYPH || idx >= fb_ctx.atlas_n_glyphs) {
           bg_only = true;
         } else {
-          ci[cc].fg_pk = 0xFF000000u | eff_fg;
+          ci[cc].fg_pk = BGRA_OPAQUE_ALPHA | eff_fg;
           ci[cc].fg_r  = (eff_fg >> 16) & 0xffu;
           ci[cc].fg_g  = (eff_fg >> 8) & 0xffu;
           ci[cc].fg_b  = eff_fg & 0xffu;

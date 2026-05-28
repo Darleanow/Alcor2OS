@@ -343,7 +343,7 @@ void fb_console_reclaim(void)
     for(u32 y = 0; y < fb_ctx.height; y++)
       fill32(
           (volatile u32 *)(fb_ctx.base + (u64)y * fb_ctx.pitch),
-          0xFF000000u | fb_ctx.default_bg, fb_ctx.width
+          BGRA_OPAQUE_ALPHA | fb_ctx.default_bg, fb_ctx.width
       );
   scrollback_drop_pending();
   for(int r = 0; r < fb_ctx.rows; r++)

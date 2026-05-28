@@ -23,8 +23,8 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
 
   if(fb_ctx.atlas_active) {
     if(fb_ctx.bytes_pp == 4) {
-      u32 bg_pk = 0xFF000000u | eff_bg;
-      u32 fg_pk = 0xFF000000u | eff_fg;
+      u32 bg_pk = BGRA_OPAQUE_ALPHA | eff_bg;
+      u32 fg_pk = BGRA_OPAQUE_ALPHA | eff_fg;
 
       if(c->cp == ' ') {
         for(u32 gy = 0; gy < (u32)fb_ctx.cell_h; gy++) {
@@ -145,7 +145,7 @@ void blit_cell_data(const fb_cell_t *c, int col, int row)
 
 post:
   if((c->attr & FB_ATTR_UNDERLINE) && fb_ctx.base && fb_ctx.bytes_pp == 4) {
-    u32 uline_color = 0xFF000000u | eff_fg;
+    u32 uline_color = BGRA_OPAQUE_ALPHA | eff_fg;
     u32 uline_y     = px_y + (u32)fb_ctx.cell_h - 2u;
     for(u32 uy = uline_y; uy < px_y + (u32)fb_ctx.cell_h; uy++) {
       volatile u32 *dst =

@@ -184,58 +184,62 @@ static void csi_sgr(void)
   }
   for(int pi = 0; pi < np; pi++) {
     int p = pv[pi];
-    if(p == 0) {
+    if(p == SGR_RESET) {
       fb_ctx.cur_fg   = fb_ctx.default_fg;
       fb_ctx.cur_bg   = fb_ctx.default_bg;
       fb_ctx.cur_attr = 0;
-    } else if(p == 1) {
+    } else if(p == SGR_BOLD) {
       fb_ctx.cur_attr |= (u8)FB_ATTR_BOLD;
-    } else if(p == 3) {
+    } else if(p == SGR_ITALIC) {
       fb_ctx.cur_attr |= (u8)FB_ATTR_ITALIC;
-    } else if(p == 4) {
+    } else if(p == SGR_UNDERLINE) {
       fb_ctx.cur_attr |= (u8)FB_ATTR_UNDERLINE;
-    } else if(p == 5) {
+    } else if(p == SGR_BLINK) {
       fb_ctx.cur_attr |= (u8)FB_ATTR_BLINK;
-    } else if(p == 7) {
+    } else if(p == SGR_REVERSE) {
       fb_ctx.cur_attr |= (u8)FB_ATTR_REVERSE;
-    } else if(p == 22) {
+    } else if(p == SGR_NO_BOLD) {
       fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_BOLD);
-    } else if(p == 23) {
+    } else if(p == SGR_NO_ITALIC) {
       fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_ITALIC);
-    } else if(p == 24) {
+    } else if(p == SGR_NO_UNDERLINE) {
       fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_UNDERLINE);
-    } else if(p == 25) {
+    } else if(p == SGR_NO_BLINK) {
       fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_BLINK);
-    } else if(p == 27) {
+    } else if(p == SGR_NO_REVERSE) {
       fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_REVERSE);
-    } else if(p == 39) {
+    } else if(p == SGR_FG_DEFAULT) {
       fb_ctx.cur_fg = fb_ctx.default_fg;
-    } else if(p == 49) {
+    } else if(p == SGR_BG_DEFAULT) {
       fb_ctx.cur_bg = fb_ctx.default_bg;
-    } else if(p >= 30 && p <= 37) {
-      fb_ctx.cur_fg = ansi16_fg[p - 30];
-    } else if(p >= 90 && p <= 97) {
-      fb_ctx.cur_fg = ansi16_fg_bright[p - 90];
-    } else if(p >= 40 && p <= 47) {
-      fb_ctx.cur_bg = ansi16_bg[p - 40];
-    } else if(p >= 100 && p <= 107) {
-      fb_ctx.cur_bg = ansi16_bg[p - 100];
-    } else if(p == 38 && pi + 2 < np && pv[pi + 1] == 5) {
+    } else if(p >= SGR_FG_BASE && p <= SGR_FG_END) {
+      fb_ctx.cur_fg = ansi16_fg[p - SGR_FG_BASE];
+    } else if(p >= SGR_FG_BRIGHT_BASE && p <= SGR_FG_BRIGHT_END) {
+      fb_ctx.cur_fg = ansi16_fg_bright[p - SGR_FG_BRIGHT_BASE];
+    } else if(p >= SGR_BG_BASE && p <= SGR_BG_END) {
+      fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BASE];
+    } else if(p >= SGR_BG_BRIGHT_BASE && p <= SGR_BG_BRIGHT_END) {
+      fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BRIGHT_BASE];
+    } else if(p == SGR_FG_EXTENDED && pi + 2 < np &&
+              pv[pi + 1] == SGR_EXT_FORM_256) {
       fb_ctx.cur_fg = ansi256_to_rgb((unsigned)pv[pi + 2]);
       pi += 2;
-    } else if(p == 38 && pi + 4 < np && pv[pi + 1] == 2) {
-      u32 r         = (u32)(pv[pi + 2] & 255);
-      u32 g         = (u32)(pv[pi + 3] & 255);
-      u32 b         = (u32)(pv[pi + 4] & 255);
+    } else if(p == SGR_FG_EXTENDED && pi + 4 < np &&
+              pv[pi + 1] == SGR_EXT_FORM_TRUECOLOR) {
+      u32 r         = (u32)pv[pi + 2] & BYTE_MASK;
+      u32 g         = (u32)pv[pi + 3] & BYTE_MASK;
+      u32 b         = (u32)pv[pi + 4] & BYTE_MASK;
       fb_ctx.cur_fg = (r << 16) | (g << 8) | b;
       pi += 4;
-    } else if(p == 48 && pi + 2 < np && pv[pi + 1] == 5) {
+    } else if(p == SGR_BG_EXTENDED && pi + 2 < np &&
+              pv[pi + 1] == SGR_EXT_FORM_256) {
       fb_ctx.cur_bg = ansi256_to_rgb((unsigned)pv[pi + 2]);
       pi += 2;
-    } else if(p == 48 && pi + 4 < np && pv[pi + 1] == 2) {
-      u32 r         = (u32)(pv[pi + 2] & 255);
-      u32 g         = (u32)(pv[pi + 3] & 255);
-      u32 b         = (u32)(pv[pi + 4] & 255);
+    } else if(p == SGR_BG_EXTENDED && pi + 4 < np &&
+              pv[pi + 1] == SGR_EXT_FORM_TRUECOLOR) {
+      u32 r         = (u32)pv[pi + 2] & BYTE_MASK;
+      u32 g         = (u32)pv[pi + 3] & BYTE_MASK;
+      u32 b         = (u32)pv[pi + 4] & BYTE_MASK;
       fb_ctx.cur_bg = (r << 16) | (g << 8) | b;
       pi += 4;
     }
@@ -268,9 +272,9 @@ static void csi_dec_private(char cmd)
   }
   int on = (cmd == 'h');
   for(int k = 0; k < np; k++) {
-    if(pv[k] == 25)
+    if(pv[k] == DEC_PM_CURSOR_VISIBLE)
       fb_ctx.cursor_visible = (u8)on;
-    else if(pv[k] == 1)
+    else if(pv[k] == DEC_PM_APP_CURSOR_KEYS)
       fb_ctx.app_cursor_keys = (on != 0);
     /* ?1049 (alt screen) intentionally ignored — draw into the live grid. */
   }
@@ -415,7 +419,7 @@ static void handle_control(u8 b)
       fb_ctx.cx--;
     return;
   case '\t':
-    fb_ctx.cx = (fb_ctx.cx + 8) & ~7;
+    fb_ctx.cx = (fb_ctx.cx + TAB_WIDTH) & ~TAB_SNAP_MASK;
     if(fb_ctx.cx >= fb_ctx.cols)
       fb_ctx.cx = fb_ctx.cols - 1;
     return;
