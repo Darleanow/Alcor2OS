@@ -229,85 +229,163 @@ static void csi_cup(void)
   fb_ctx.cx = col - 1;
 }
 
+/** @brief Reset @c cur_fg / @c cur_bg / @c cur_attr to the boot defaults. */
+static void sgr_reset(void)
+{
+  fb_ctx.cur_fg   = fb_ctx.default_fg;
+  fb_ctx.cur_bg   = fb_ctx.default_bg;
+  fb_ctx.cur_attr = 0;
+}
+
+/**
+ * @brief Update @c cur_attr from a single-param attribute code (bold,
+ *        italic, …, or the corresponding @c 21/22/23/… reset).
+ *
+ * @param p  SGR code already known to be in the attribute range.
+ * @return @c true if @p p matched an attribute code; @c false if the caller
+ *         should fall through to colour handling.
+ */
+static bool sgr_apply_attr(int p)
+{
+  switch(p) {
+  case SGR_BOLD:
+    fb_ctx.cur_attr |= (u8)FB_ATTR_BOLD;
+    return true;
+  case SGR_ITALIC:
+    fb_ctx.cur_attr |= (u8)FB_ATTR_ITALIC;
+    return true;
+  case SGR_UNDERLINE:
+    fb_ctx.cur_attr |= (u8)FB_ATTR_UNDERLINE;
+    return true;
+  case SGR_BLINK:
+    fb_ctx.cur_attr |= (u8)FB_ATTR_BLINK;
+    return true;
+  case SGR_REVERSE:
+    fb_ctx.cur_attr |= (u8)FB_ATTR_REVERSE;
+    return true;
+  case SGR_NO_BOLD:
+    fb_ctx.cur_attr &= (u8) ~(u8)FB_ATTR_BOLD;
+    return true;
+  case SGR_NO_ITALIC:
+    fb_ctx.cur_attr &= (u8) ~(u8)FB_ATTR_ITALIC;
+    return true;
+  case SGR_NO_UNDERLINE:
+    fb_ctx.cur_attr &= (u8) ~(u8)FB_ATTR_UNDERLINE;
+    return true;
+  case SGR_NO_BLINK:
+    fb_ctx.cur_attr &= (u8) ~(u8)FB_ATTR_BLINK;
+    return true;
+  case SGR_NO_REVERSE:
+    fb_ctx.cur_attr &= (u8) ~(u8)FB_ATTR_REVERSE;
+    return true;
+  default:
+    return false;
+  }
+}
+
+/**
+ * @brief Update @c cur_fg / @c cur_bg from a single-param colour code
+ *        (default, 30..37, 40..47, 90..97, 100..107).
+ *
+ * @param p  SGR code.
+ * @return @c true if @p p matched a basic colour code; @c false otherwise.
+ */
+static bool sgr_apply_basic_color(int p)
+{
+  if(p == SGR_FG_DEFAULT) {
+    fb_ctx.cur_fg = fb_ctx.default_fg;
+    return true;
+  }
+  if(p == SGR_BG_DEFAULT) {
+    fb_ctx.cur_bg = fb_ctx.default_bg;
+    return true;
+  }
+  if(p >= SGR_FG_BASE && p <= SGR_FG_END) {
+    fb_ctx.cur_fg = ansi16_fg[p - SGR_FG_BASE];
+    return true;
+  }
+  if(p >= SGR_FG_BRIGHT_BASE && p <= SGR_FG_BRIGHT_END) {
+    fb_ctx.cur_fg = ansi16_fg_bright[p - SGR_FG_BRIGHT_BASE];
+    return true;
+  }
+  if(p >= SGR_BG_BASE && p <= SGR_BG_END) {
+    fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BASE];
+    return true;
+  }
+  if(p >= SGR_BG_BRIGHT_BASE && p <= SGR_BG_BRIGHT_END) {
+    fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BRIGHT_BASE];
+    return true;
+  }
+  return false;
+}
+
+/**
+ * @brief Handle the multi-param extended colour forms @c 38;5;N, @c 38;2;R;G;B,
+ *        @c 48;5;N, @c 48;2;R;G;B.
+ *
+ * Advances the parameter cursor past the consumed subform so the caller can
+ * resume its loop without double-counting.
+ *
+ * @param pv  Parameter vector.
+ * @param np  Number of valid entries in @p pv.
+ * @param pi  Pointer to the cursor; updated to the last consumed index.
+ * @return @c true if an extended form was consumed; @c false if the params
+ *         at @p pi don't form a complete subform (caller drops the code).
+ */
+static bool sgr_apply_extended_color(const int *pv, int np, int *pi)
+{
+  int p = pv[*pi];
+  if(p != SGR_FG_EXTENDED && p != SGR_BG_EXTENDED)
+    return false;
+  if(*pi + 2 >= np)
+    return false;
+  int form = pv[*pi + 1];
+  u32 colour;
+  if(form == SGR_EXT_FORM_256) {
+    colour = ansi256_to_rgb((unsigned)pv[*pi + 2]);
+    *pi += 2;
+  } else if(form == SGR_EXT_FORM_TRUECOLOR && *pi + 4 < np) {
+    u32 r  = (u32)pv[*pi + 2] & BYTE_MASK;
+    u32 g  = (u32)pv[*pi + 3] & BYTE_MASK;
+    u32 b  = (u32)pv[*pi + 4] & BYTE_MASK;
+    colour = (r << 16) | (g << 8) | b;
+    *pi += 4;
+  } else {
+    return false;
+  }
+  if(p == SGR_FG_EXTENDED)
+    fb_ctx.cur_fg = colour;
+  else
+    fb_ctx.cur_bg = colour;
+  return true;
+}
+
 /**
  * @brief @c CSI @c m — Select Graphic Rendition: mutate fg/bg/attrs.
  *
- * Long if-else ladder (not a switch) because of the range tests for the
- * 30..37 / 40..47 / 90..97 / 100..107 colour ranges and the multi-param
- * forms @c 38;2/@c 38;5/@c 48;2/@c 48;5. Unknown codes are silently ignored
- * — matches xterm and avoids burning the screen on a malformed sequence.
+ * Empty parameter list is the same as @c CSI @c 0 @c m (full reset). Each
+ * parameter is dispatched to the attr / basic-colour / extended-colour
+ * helper in turn; unknown codes are silently ignored, matching xterm.
  */
 static void csi_sgr(void)
 {
   int pv[32];
   int np = csi_params(pv, 32);
   if(np == 0) {
-    fb_ctx.cur_fg   = fb_ctx.default_fg;
-    fb_ctx.cur_bg   = fb_ctx.default_bg;
-    fb_ctx.cur_attr = 0;
+    sgr_reset();
     return;
   }
   for(int pi = 0; pi < np; pi++) {
     int p = pv[pi];
     if(p == SGR_RESET) {
-      fb_ctx.cur_fg   = fb_ctx.default_fg;
-      fb_ctx.cur_bg   = fb_ctx.default_bg;
-      fb_ctx.cur_attr = 0;
-    } else if(p == SGR_BOLD) {
-      fb_ctx.cur_attr |= (u8)FB_ATTR_BOLD;
-    } else if(p == SGR_ITALIC) {
-      fb_ctx.cur_attr |= (u8)FB_ATTR_ITALIC;
-    } else if(p == SGR_UNDERLINE) {
-      fb_ctx.cur_attr |= (u8)FB_ATTR_UNDERLINE;
-    } else if(p == SGR_BLINK) {
-      fb_ctx.cur_attr |= (u8)FB_ATTR_BLINK;
-    } else if(p == SGR_REVERSE) {
-      fb_ctx.cur_attr |= (u8)FB_ATTR_REVERSE;
-    } else if(p == SGR_NO_BOLD) {
-      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_BOLD);
-    } else if(p == SGR_NO_ITALIC) {
-      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_ITALIC);
-    } else if(p == SGR_NO_UNDERLINE) {
-      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_UNDERLINE);
-    } else if(p == SGR_NO_BLINK) {
-      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_BLINK);
-    } else if(p == SGR_NO_REVERSE) {
-      fb_ctx.cur_attr = (u8)(fb_ctx.cur_attr & ~(u8)FB_ATTR_REVERSE);
-    } else if(p == SGR_FG_DEFAULT) {
-      fb_ctx.cur_fg = fb_ctx.default_fg;
-    } else if(p == SGR_BG_DEFAULT) {
-      fb_ctx.cur_bg = fb_ctx.default_bg;
-    } else if(p >= SGR_FG_BASE && p <= SGR_FG_END) {
-      fb_ctx.cur_fg = ansi16_fg[p - SGR_FG_BASE];
-    } else if(p >= SGR_FG_BRIGHT_BASE && p <= SGR_FG_BRIGHT_END) {
-      fb_ctx.cur_fg = ansi16_fg_bright[p - SGR_FG_BRIGHT_BASE];
-    } else if(p >= SGR_BG_BASE && p <= SGR_BG_END) {
-      fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BASE];
-    } else if(p >= SGR_BG_BRIGHT_BASE && p <= SGR_BG_BRIGHT_END) {
-      fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BRIGHT_BASE];
-    } else if(p == SGR_FG_EXTENDED && pi + 2 < np &&
-              pv[pi + 1] == SGR_EXT_FORM_256) {
-      fb_ctx.cur_fg = ansi256_to_rgb((unsigned)pv[pi + 2]);
-      pi += 2;
-    } else if(p == SGR_FG_EXTENDED && pi + 4 < np &&
-              pv[pi + 1] == SGR_EXT_FORM_TRUECOLOR) {
-      u32 r         = (u32)pv[pi + 2] & BYTE_MASK;
-      u32 g         = (u32)pv[pi + 3] & BYTE_MASK;
-      u32 b         = (u32)pv[pi + 4] & BYTE_MASK;
-      fb_ctx.cur_fg = (r << 16) | (g << 8) | b;
-      pi += 4;
-    } else if(p == SGR_BG_EXTENDED && pi + 2 < np &&
-              pv[pi + 1] == SGR_EXT_FORM_256) {
-      fb_ctx.cur_bg = ansi256_to_rgb((unsigned)pv[pi + 2]);
-      pi += 2;
-    } else if(p == SGR_BG_EXTENDED && pi + 4 < np &&
-              pv[pi + 1] == SGR_EXT_FORM_TRUECOLOR) {
-      u32 r         = (u32)pv[pi + 2] & BYTE_MASK;
-      u32 g         = (u32)pv[pi + 3] & BYTE_MASK;
-      u32 b         = (u32)pv[pi + 4] & BYTE_MASK;
-      fb_ctx.cur_bg = (r << 16) | (g << 8) | b;
-      pi += 4;
+      sgr_reset();
+      continue;
     }
+    if(sgr_apply_attr(p))
+      continue;
+    if(sgr_apply_basic_color(p))
+      continue;
+    (void)sgr_apply_extended_color(pv, np, &pi);
   }
 }
 
@@ -363,6 +441,157 @@ static void csi_dec_private(char cmd)
  * out would burn legit output to the screen). The DEC private-mode prefix
  * @c ? is detected up-front and routed through @ref csi_dec_private.
  */
+/**
+ * @brief @c CSI @c A/@c B/@c C/@c D — relative cursor motion, clamped to the
+ *        grid edge.
+ *
+ * One function for all four because they only differ in axis and sign; the
+ * clamp logic is identical and easy to get wrong if duplicated.
+ *
+ * @param cmd  Final byte, one of @c A / @c B / @c C / @c D.
+ */
+static void csi_cursor_move(char cmd)
+{
+  int n = csi_param1();
+  switch(cmd) {
+  case 'A':
+    fb_ctx.cy = (fb_ctx.cy >= n) ? (fb_ctx.cy - n) : 0;
+    return;
+  case 'D':
+    fb_ctx.cx = (fb_ctx.cx >= n) ? (fb_ctx.cx - n) : 0;
+    return;
+  case 'B': {
+    int mx = fb_ctx.rows - 1 - fb_ctx.cy;
+    if(n > mx)
+      n = mx;
+    if(n > 0)
+      fb_ctx.cy += n;
+    return;
+  }
+  case 'C': {
+    int mx = fb_ctx.cols - 1 - fb_ctx.cx;
+    if(n > mx)
+      n = mx;
+    if(n > 0)
+      fb_ctx.cx += n;
+    return;
+  }
+  default:
+    return;
+  }
+}
+
+/**
+ * @brief @c CSI @c G (CHA) / @c CSI @c d (VPA) — absolute column or row
+ *        positioning. Both are 1-based on the wire and clamped to the grid.
+ *
+ * @param cmd  Final byte: @c G for column, @c d for row.
+ */
+static void csi_absolute_axis(char cmd)
+{
+  int n = csi_param1();
+  if(cmd == 'G') {
+    if(n > fb_ctx.cols)
+      n = fb_ctx.cols;
+    fb_ctx.cx = n - 1;
+  } else { /* 'd' */
+    if(n > fb_ctx.rows)
+      n = fb_ctx.rows;
+    fb_ctx.cy = n - 1;
+  }
+}
+
+/**
+ * @brief @c CSI @c J (ED) — erase in display (mode 0/1/2).
+ *
+ * Empty param defaults to mode 0 (cursor → end of display). Unknown modes
+ * drop silently so an obscure mode 3 (scrollback clear) doesn't burn output.
+ */
+static void csi_erase_display(void)
+{
+  int pv[2];
+  int np   = csi_params(pv, 2);
+  int mode = (np > 0) ? pv[0] : 0;
+  if(mode == 2) {
+    erase_rect(0, 0, fb_ctx.rows - 1, fb_ctx.cols - 1);
+  } else if(mode == 0) {
+    erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, fb_ctx.cols - 1);
+    if(fb_ctx.cy < fb_ctx.rows - 1)
+      erase_rect(fb_ctx.cy + 1, 0, fb_ctx.rows - 1, fb_ctx.cols - 1);
+  } else if(mode == 1) {
+    if(fb_ctx.cy > 0)
+      erase_rect(0, 0, fb_ctx.cy - 1, fb_ctx.cols - 1);
+    erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cx);
+  }
+}
+
+/**
+ * @brief @c CSI @c K (EL) — erase in line (mode 0/1/2).
+ *
+ * Same default + drop-unknown rule as @ref csi_erase_display.
+ */
+static void csi_erase_line(void)
+{
+  int pv[2];
+  int np   = csi_params(pv, 2);
+  int mode = (np > 0) ? pv[0] : 0;
+  if(mode == 0)
+    erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, fb_ctx.cols - 1);
+  else if(mode == 1)
+    erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cx);
+  else if(mode == 2)
+    erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cols - 1);
+}
+
+/**
+ * @brief @c CSI @c X (ECH) — erase Pn chars at the cursor, no cursor move.
+ */
+static void csi_erase_chars(void)
+{
+  int n  = csi_param1();
+  int x1 = fb_ctx.cx + n - 1;
+  if(x1 >= fb_ctx.cols)
+    x1 = fb_ctx.cols - 1;
+  erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, x1);
+}
+
+/**
+ * @brief @c CSI @c b (REP) — repeat the last emitted codepoint Pn times.
+ *
+ * No-op when no codepoint has been emitted yet — there is nothing to repeat.
+ */
+static void csi_repeat(void)
+{
+  if(fb_ctx.last_cp == 0)
+    return;
+  int n = csi_param1();
+  for(int i = 0; i < n; i++)
+    put_cp_at_cursor(fb_ctx.last_cp);
+}
+
+/** @brief @c CSI @c s — save cursor (paired with @c CSI @c u). */
+static void csi_save_cursor(void)
+{
+  fb_ctx.saved_cx = fb_ctx.cx;
+  fb_ctx.saved_cy = fb_ctx.cy;
+}
+
+/** @brief @c CSI @c u — restore cursor saved by @c CSI @c s. */
+static void csi_restore_cursor(void)
+{
+  fb_ctx.cx = fb_ctx.saved_cx;
+  fb_ctx.cy = fb_ctx.saved_cy;
+}
+
+/**
+ * @brief Final-byte dispatcher for the assembled CSI sequence.
+ *
+ * The DEC private-mode prefix (@c ?) is detected up-front and routed to
+ * @ref csi_dec_private. Each remaining final byte hands off to a small
+ * per-command helper. Unknown final bytes are dropped silently — the modern
+ * terminal protocol is full of obscure sequences and erroring out would
+ * burn legitimate output to the screen.
+ */
 static void handle_csi(void)
 {
   if(fb_ctx.esc_len < 1)
@@ -376,107 +605,40 @@ static void handle_csi(void)
   }
 
   switch(cmd) {
-  case 'A': { /* CUU */
-    int n     = csi_param1();
-    fb_ctx.cy = (fb_ctx.cy >= n) ? (fb_ctx.cy - n) : 0;
+  case 'A':
+  case 'B':
+  case 'C':
+  case 'D':
+    csi_cursor_move(cmd);
     break;
-  }
-  case 'B': { /* CUD */
-    int n  = csi_param1();
-    int mx = fb_ctx.rows - 1 - fb_ctx.cy;
-    if(n > mx)
-      n = mx;
-    if(n > 0)
-      fb_ctx.cy += n;
-    break;
-  }
-  case 'C': { /* CUF */
-    int n  = csi_param1();
-    int mx = fb_ctx.cols - 1 - fb_ctx.cx;
-    if(n > mx)
-      n = mx;
-    if(n > 0)
-      fb_ctx.cx += n;
-    break;
-  }
-  case 'D': { /* CUB */
-    int n     = csi_param1();
-    fb_ctx.cx = (fb_ctx.cx >= n) ? (fb_ctx.cx - n) : 0;
-    break;
-  }
   case 'H':
   case 'f':
     csi_cup();
     break;
-  case 'G': { /* CHA — absolute column (1-based) */
-    int n = csi_param1();
-    if(n > fb_ctx.cols)
-      n = fb_ctx.cols;
-    fb_ctx.cx = n - 1;
+  case 'G':
+  case 'd':
+    csi_absolute_axis(cmd);
     break;
-  }
-  case 'd': { /* VPA — absolute row (1-based) */
-    int n = csi_param1();
-    if(n > fb_ctx.rows)
-      n = fb_ctx.rows;
-    fb_ctx.cy = n - 1;
+  case 'J':
+    csi_erase_display();
     break;
-  }
-  case 'J': { /* ED */
-    int pv[2];
-    int np   = csi_params(pv, 2);
-    int mode = (np > 0) ? pv[0] : 0;
-    if(mode == 2) {
-      erase_rect(0, 0, fb_ctx.rows - 1, fb_ctx.cols - 1);
-    } else if(mode == 0) {
-      erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, fb_ctx.cols - 1);
-      if(fb_ctx.cy < fb_ctx.rows - 1)
-        erase_rect(fb_ctx.cy + 1, 0, fb_ctx.rows - 1, fb_ctx.cols - 1);
-    } else if(mode == 1) {
-      if(fb_ctx.cy > 0)
-        erase_rect(0, 0, fb_ctx.cy - 1, fb_ctx.cols - 1);
-      erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cx);
-    }
+  case 'K':
+    csi_erase_line();
     break;
-  }
-  case 'K': { /* EL */
-    int pv[2];
-    int np   = csi_params(pv, 2);
-    int mode = (np > 0) ? pv[0] : 0;
-    if(mode == 0)
-      erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, fb_ctx.cols - 1);
-    else if(mode == 1)
-      erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cx);
-    else if(mode == 2)
-      erase_rect(fb_ctx.cy, 0, fb_ctx.cy, fb_ctx.cols - 1);
+  case 'X':
+    csi_erase_chars();
     break;
-  }
-  case 'X': { /* ECH — erase Pn chars at cursor (no cursor move) */
-    int n  = csi_param1();
-    int x1 = fb_ctx.cx + n - 1;
-    if(x1 >= fb_ctx.cols)
-      x1 = fb_ctx.cols - 1;
-    erase_rect(fb_ctx.cy, fb_ctx.cx, fb_ctx.cy, x1);
-    break;
-  }
   case 'm':
     csi_sgr();
     break;
-  case 'b': { /* REP — repeat last codepoint Pn times */
-    if(fb_ctx.last_cp == 0)
-      break;
-    int n = csi_param1();
-    for(int i = 0; i < n; i++)
-      put_cp_at_cursor(fb_ctx.last_cp);
+  case 'b':
+    csi_repeat();
     break;
-  }
   case 's':
-    fb_ctx.saved_cx = fb_ctx.cx;
-    fb_ctx.saved_cy = fb_ctx.cy;
+    csi_save_cursor();
     break;
   case 'u':
-    fb_ctx.cx = fb_ctx.saved_cx;
-    fb_ctx.cy = fb_ctx.saved_cy;
+    csi_restore_cursor();
     break;
   default:
     break;
