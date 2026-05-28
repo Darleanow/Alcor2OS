@@ -1790,8 +1790,8 @@ void fb_console_fill_winsize(k_winsize_t *out)
     cols = KTERM_WINSIZE_FALLBACK_COLS;
   if(rows <= 0)
     rows = KTERM_WINSIZE_FALLBACK_ROWS;
-  out->row    = (u16)rows;
-  out->col    = (u16)cols;
+  out->row    = rows;
+  out->col    = cols;
   out->xpixel = 0;
   out->ypixel = 0;
 }
