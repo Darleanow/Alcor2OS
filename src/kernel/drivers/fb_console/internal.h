@@ -481,8 +481,6 @@ static inline void blend_glyph_row(
   }
 }
 
-/* fb_console_pixel.c — raw framebuffer access */
-
 /**
  * @brief Map a hardware @c bpp value (32/24/16) to bytes-per-pixel.
  *
@@ -509,8 +507,6 @@ u8 bytes_pp_from_bpp(u16 bpp);
  * @param color  0xRRGGBB; alpha is forced to 0xFF for 32 bpp.
  */
 void fb_put_pixel(u32 x, u32 y, u32 color);
-
-/* fb_console_atlas.c — glyph cache lookup + meta validation */
 
 /**
  * @brief Resolve @p cp to an atlas glyph slot.
@@ -548,8 +544,6 @@ u32 atlas_lookup_attr(u32 cp, u16 attr);
  */
 bool atlas_meta_is_sane(const fb_console_atlas_t *meta);
 
-/* fb_console_cell.c — cell-to-pixel rendering */
-
 /**
  * @brief Render an arbitrary cell value at grid position (col, row).
  *
@@ -571,8 +565,6 @@ void blit_cell_data(const fb_cell_t *c, int col, int row);
  * @param row  Grid row.
  */
 void blit_cell(int col, int row);
-
-/* fb_console_caret.c — text caret (inverted-block cursor) */
 
 /**
  * @brief Re-blit the cell currently showing the inverted caret block,
@@ -610,8 +602,6 @@ void caret_clear_drawn(void);
  * post-batch flush would leave the old caret visible until the next refresh.
  */
 void caret_invalidate_in_batch(void);
-
-/* fb_console_scrollback.c — scrollback ring + deferred pixel-scroll */
 
 /**
  * @brief Move the top row off the grid into the scrollback ring and shift
@@ -656,8 +646,6 @@ void scrollback_alloc_for(int cols);
  */
 void scrollback_drop_pending(void);
 
-/* fb_console_mouse.c — software mouse cursor */
-
 /**
  * @brief Erase the software mouse cursor if it is painted, so the scrollback
  * pixel-move does not drag a stale copy along. Called by
@@ -679,8 +667,6 @@ void mouse_cursor_render(void);
  * the next @ref mouse_cursor_render must redraw rather than skip-as-unchanged.
  */
 void mouse_cursor_drop(void);
-
-/* fb_console_flush.c — dirty-cell batch + character emission */
 
 /**
  * @brief Grow the per-row scratch used by @ref flush_batch to at least
@@ -710,8 +696,6 @@ void flush_batch(void);
  * @param cp  Unicode codepoint to write.
  */
 void put_cp_at_cursor(u32 cp);
-
-/* fb_console_ansi.c — escape parser + UTF-8 decoder */
 
 /**
  * @brief Push one byte through the ANSI/CSI/charset state machine.
