@@ -49,6 +49,15 @@ static char *slurp_fd(int fd, size_t *out_len)
   return src;
 }
 
+/**
+ * @brief Read @p path and execute its content via @ref vega_run.
+ *
+ * Stdout is dup2'd to @c /dev/null for the duration so commands in the script
+ * (e.g. @c echo) don't bleed onto the user's prompt. The original stdout is
+ * restored on return. Silently no-ops when the file doesn't exist.
+ *
+ * @param path  Absolute path to the config file (e.g. @c "/home/.vconf").
+ */
 void sh_source_vconf(const char *path)
 {
   int cfd = open(path, O_RDONLY);

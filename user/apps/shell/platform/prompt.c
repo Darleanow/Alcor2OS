@@ -21,6 +21,11 @@
 #define PC_BL BD_BL_R /* ╰ */
 #define PC_H  BD_H    /* ─ */
 
+/**
+ * @brief Paint the decorative header line: `╭─ alcor2 ─ <cwd>`.
+ *
+ * Written via ::sh_puts; fits on one row and ends with @c \\n.
+ */
 void sh_write_prompt_header(void)
 {
   char        cwd[MAX_PATH];
@@ -33,6 +38,14 @@ void sh_write_prompt_header(void)
   sh_puts(PC_RS "\n");
 }
 
+/**
+ * @brief Format the bottom-line prompt `╰─ $ ` into @p out.
+ *
+ * Includes ANSI colour escapes; visible column width is 4.
+ *
+ * @param out  Destination buffer.
+ * @param cap  Capacity of @p out (must be ≥ ~32 bytes for the full prompt).
+ */
 void sh_format_prompt(char *out, size_t cap)
 {
   (void)snprintf(

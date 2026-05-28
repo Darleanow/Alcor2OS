@@ -15,7 +15,15 @@
 static char history[HIST_MAX][LINE_MAX_LEN];
 static int  hist_count = 0;
 
-void        sh_hist_push(const char *line)
+/**
+ * @brief Append @p line to history.
+ *
+ * No-op when @p line is empty or duplicates the most recent entry. Oldest
+ * entry is dropped (shift-left) once the ring fills.
+ *
+ * @param line  Line to record (must outlive the call; copied into the ring).
+ */
+void sh_hist_push(const char *line)
 {
   if(!line || !line[0])
     return;
@@ -31,11 +39,23 @@ void        sh_hist_push(const char *line)
   hist_count++;
 }
 
+/**
+ * @brief Return the number of entries currently held.
+ *
+ * @return Entry count in @c [0, HIST_MAX].
+ */
 int sh_hist_count(void)
 {
   return hist_count;
 }
 
+/**
+ * @brief Look up history entry at @p idx (0 = oldest).
+ *
+ * @param idx  Zero-based index.
+ * @return Pointer to internal storage (valid until next ::sh_hist_push), or
+ *         @c NULL if @p idx is out of range.
+ */
 const char *sh_hist_at(int idx)
 {
   if(idx < 0 || idx >= hist_count)

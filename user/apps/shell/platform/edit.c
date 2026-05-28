@@ -19,7 +19,14 @@
 
 static WINDOW *s_input_pad;
 
-int            sh_edit_init(void)
+/**
+ * @brief Create the off-screen pad and enable extended key + flush flags.
+ *
+ * Must be called once after @c newterm() and before the first ::sh_read_line.
+ *
+ * @return 0 on success, -1 if @c newpad failed.
+ */
+int sh_edit_init(void)
 {
   s_input_pad = newpad(1, 256);
   if(!s_input_pad)
@@ -54,7 +61,12 @@ static void redraw_line(
     sh_puts("\r");
 }
 
-/** @brief Count visible UTF-8 glyphs in @p s. */
+/**
+ * @brief Count visible UTF-8 glyphs in @p s.
+ *
+ * @param s  NUL-terminated UTF-8 string.
+ * @return Number of code points (continuation bytes are skipped).
+ */
 static int utf8_cols(const char *s)
 {
   int n = 0;
@@ -64,7 +76,12 @@ static int utf8_cols(const char *s)
   return n;
 }
 
-/** @brief Count visible columns in @p s, skipping @c ESC[...m sequences. */
+/**
+ * @brief Count visible columns in @p s, skipping @c ESC[...m sequences.
+ *
+ * @param s  NUL-terminated string that may contain ANSI escape sequences.
+ * @return Visible column width (escape bytes contribute 0).
+ */
 static int visible_cols(const char *s)
 {
   int n = 0;
@@ -90,7 +107,13 @@ static int visible_cols(const char *s)
   return n;
 }
 
-/** @brief Move @p idx left to the previous UTF-8 character boundary. */
+/**
+ * @brief Move @p idx left to the previous UTF-8 character boundary.
+ *
+ * @param buf  NUL-terminated UTF-8 buffer (only @p idx is read).
+ * @param idx  Current byte offset.
+ * @return New byte offset; 0 if already at the start.
+ */
 static int prev_char_boundary(const char *buf, int idx)
 {
   if(idx <= 0)
@@ -101,7 +124,14 @@ static int prev_char_boundary(const char *buf, int idx)
   return idx;
 }
 
-/** @brief Move @p idx right to the next UTF-8 character boundary. */
+/**
+ * @brief Move @p idx right to the next UTF-8 character boundary.
+ *
+ * @param buf  UTF-8 buffer.
+ * @param len  Byte length of @p buf.
+ * @param idx  Current byte offset.
+ * @return New byte offset; @p len if already at the end.
+ */
 static int next_char_boundary(const char *buf, int len, int idx)
 {
   if(idx >= len)
@@ -274,6 +304,19 @@ static void handle_tab(
   *last_was_tab = (comp.count > 1) ? 1 : 0;
 }
 
+/**
+ * @brief Read one input line with editing, history, and tab completion.
+ *
+ * Blocks until the user presses Enter, Ctrl-C, Ctrl-D, or Ctrl-L. Cursor
+ * motion (←/→, Home, End, Backspace, Delete) and history navigation (↑/↓)
+ * are handled in-place via ::redraw_line.
+ *
+ * @param buf     Caller-owned buffer; receives a NUL-terminated line.
+ * @param cap     Capacity of @p buf in bytes.
+ * @param prompt  Prompt string (may include ANSI escapes).
+ * @return Byte length of the line, @c RL_EOF (Ctrl-D on empty line),
+ *         @c RL_INTERRUPT (Ctrl-C), or @c RL_CLEAR (Ctrl-L).
+ */
 int sh_read_line(char *buf, size_t cap, const char *prompt)
 {
   int prompt_cols  = visible_cols(prompt);

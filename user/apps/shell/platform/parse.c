@@ -137,6 +137,20 @@ static int is_input_complete(const char *buf)
          !in_hd_body;
 }
 
+/**
+ * @brief Drive ::sh_read_line in a loop until @p buf forms a complete
+ *        statement (closed quotes, balanced braces, finished heredoc).
+ *
+ * The primary prompt (with decorative header) is used for the first line and
+ * the @c │ » continuation prompt for subsequent lines. Each successful line
+ * is appended to @p buf followed by @c \\n.
+ *
+ * @param buf   Destination accumulator (NUL-terminated on return).
+ * @param size  Capacity of @p buf in bytes.
+ * @return Total bytes accumulated (including separator newlines), @c RL_EOF
+ *         if Ctrl-D was pressed on an empty primary prompt, or 0 if
+ *         interrupted with Ctrl-C.
+ */
 int sh_read_complete_statement(char *buf, size_t size)
 {
   size_t pos = 0;
