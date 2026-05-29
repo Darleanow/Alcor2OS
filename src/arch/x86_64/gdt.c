@@ -92,11 +92,12 @@ static void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
  */
 void gdt_init(void)
 {
-  gdt_set_entry(&gdt.null, 0, 0);
-
-  for(int i = 0; i < 4; i++) {
-    gdt_set_entry(&gdt.reserved[i], 0, 0);
-  }
+  /* Entry 0 must be a true null descriptor, and the padding slots are
+   * reserved (never loaded). gdt_set_entry would stamp a 4 GiB flat limit
+   * into them, so zero them outright instead. */
+  gdt.null = (gdt_entry_t) {0};
+  for(int i = 0; i < 4; i++)
+    gdt.reserved[i] = (gdt_entry_t) {0};
 
   gdt_set_entry(
       &gdt.kernel_code,
