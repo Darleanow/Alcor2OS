@@ -82,19 +82,19 @@ static void pend_ss3(char tail)
   out_pend_push((unsigned char)tail);
 }
 
-/* Deliver one codepoint.  ASCII (<0x80) is written to *out directly.
- * Latin-1 (0x80..0xFF, AZERTY accents) is transcoded to 2-byte UTF-8 and
- * pushed to out_pend; kbd_pop_byte drains the queue so the second byte
- * surfaces on the very next read.  dry=true reports readability without
- * touching any state. */
+/* Deliver one codepoint.  ASCII (<0x80) is written to *out directly even in
+ * dry mode so peek paths (kbd_irq_check_intr) can inspect the byte they
+ * would emit. Latin-1 (0x80..0xFF, AZERTY accents) is transcoded to 2-byte
+ * UTF-8 and pushed to out_pend; that step is the global-state mutation we
+ * skip in dry mode and the caller gets readability=true without a byte. */
 static bool emit_user_cp(unsigned char cp, unsigned char *out, bool dry)
 {
-  if(dry)
-    return true;
   if(cp < 0x80u) {
     *out = cp;
     return true;
   }
+  if(dry)
+    return true;
   /* Latin-1 → UTF-8: 0xC0|(cp>>6), 0x80|(cp&0x3F).  No need for the 3/4-byte
    * cases — the layout tables only hold codepoints up to 0xff. */
   out_pend_push((unsigned char)(0xc0u | (cp >> 6u)));
@@ -540,13 +540,11 @@ static bool
   if(s->mod.ctrl) {
     unsigned char b = pl[key];
     if(b >= 'a' && b <= 'z') {
-      if(!dry)
-        *out = (unsigned char)(b - 'a' + 1);
+      *out = (unsigned char)(b - 'a' + 1);
       return true;
     }
     if(b >= 'A' && b <= 'Z') {
-      if(!dry)
-        *out = (unsigned char)(b - 'A' + 1);
+      *out = (unsigned char)(b - 'A' + 1);
       return true;
     }
     return false;
@@ -581,46 +579,45 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
 }
 
 /**
- * @brief Scan the peek buffer for the @p vintr byte using a state copy.
+ * @brief Check whether the first byte the translator would emit equals
+ *        @p vintr.
  *
- * Walks @p buf one scancode at a time through @ref process_raw_ctx with
- * @c dry=true so the real translator state isn't mutated. Returns the
- * number of scancodes up to and including the one that produced @p vintr,
- * or 0 if @p vintr isn't reached.
+ * Walks @p buf through @ref process_raw_ctx using @p st (a state copy
+ * passed by value, so neither @c g_kbd nor @p st leaks out) with
+ * @c dry=true. We only act when @p vintr is the *first* emitted byte —
+ * other emits earlier in the buffer mean the user typed something
+ * legitimate and we should defer to the normal pop path.
  *
  * @param buf    Peeked scancodes.
  * @param n      Number of scancodes in @p buf.
  * @param vintr  The byte to match.
  * @param st     Copy of translator state (taken by value at call site).
- * @return Consume count, or 0 on no match.
+ * @return @c true when the first emit equals @p vintr.
  */
-static u32 kbd_peek_find_intr(
+static bool kbd_peek_first_emit_is(
     const u8 *buf, u32 n, unsigned char vintr, kbd_ev_ctx_t st
 )
 {
   for(u32 i = 0; i < n; i++) {
     unsigned char out;
-    if(process_raw_ctx(buf[i], &st, &out, true) && out == vintr)
-      return i + 1;
+    if(process_raw_ctx(buf[i], &st, &out, true))
+      return out == vintr;
   }
-  return 0;
+  return false;
 }
 
 /**
- * @brief Drain @p count scancodes through the real translator state.
+ * @brief Drain the entire raw scancode ring through the real translator.
  *
- * Used after @ref kbd_peek_find_intr finds a VINTR-producing run: we
- * commit the same scancodes through @c g_kbd so modifier state stays
- * coherent with the rest of the read path, while throwing away the
- * emitted bytes (they would have been the VINTR byte itself).
- *
- * @param count  Scancodes to consume.
+ * Called only after @ref kbd_peek_first_emit_is matches: by definition
+ * the only "real" byte in the queued sequence is the VINTR we are
+ * intercepting, so dropping everything is correct and keeps
+ * @c g_kbd's modifier flags in sync (Ctrl-up scancodes pending behind
+ * the VINTR would otherwise leave @c mod.ctrl stuck).
  */
-static void kbd_consume_raw(u32 count)
+static void kbd_drain_raw(void)
 {
-  for(u32 i = 0; i < count; i++) {
-    if(!keyboard_raw_available())
-      return;
+  while(keyboard_raw_available()) {
     u8            raw = keyboard_raw_pop();
     unsigned char out;
     process_raw_ctx(raw, &g_kbd, &out, false);
@@ -645,11 +642,10 @@ void kbd_irq_check_intr(void)
   if(n == 0)
     return;
 
-  u32 consume = kbd_peek_find_intr(peek, n, vintr, g_kbd);
-  if(consume == 0)
+  if(!kbd_peek_first_emit_is(peek, n, vintr, g_kbd))
     return;
 
-  kbd_consume_raw(consume);
+  kbd_drain_raw();
   proc_signal(fg_pid, SIGINT);
 }
 
