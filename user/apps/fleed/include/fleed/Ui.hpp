@@ -51,19 +51,21 @@ public:
   void redraw(const Buffer &buffer);
 
   /**
-   * @brief Append one character at the cursor and flush the panel.
-   * @param ch Wide character to draw (codepoint).
-   */
-  void putChar(wchar_t ch);
-
-  /**
    * @brief Replace the centre slot of the bottom status bar.
    * @param text Status text, or @c nullptr to clear the slot.
    */
   void setStatus(const char *text);
 
   /**
-   * @brief redraws cursor at current position.
+   * @brief Redraw a single line in-place without flushing to screen.
+   *        Call redrawCursor() afterwards to trigger the actual update.
+   * @param buffer Buffer to read line content from.
+   * @param line_idx Absolute line index in the buffer.
+   */
+  void redrawLine(const Buffer &buffer, size_t line_idx);
+
+  /**
+   * @brief Redraws cursor at current position and flushes to screen.
    * @param buffer The text buffer containing the cursor.
    */
   void redrawCursor(const Buffer &buffer);

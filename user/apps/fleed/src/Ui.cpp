@@ -6,7 +6,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <unistd.h>
 
 namespace fleed {
@@ -94,28 +93,34 @@ void Ui::redraw(const Buffer &buffer)
   else if(cy >= m_scroll_offset + rows)
     m_scroll_offset = cy - rows + 1;
 
-  wclear(m_editor->body);
-
   for(size_t i = 0; i < rows; i++) {
     size_t li = m_scroll_offset + i;
-    if(li >= buffer.lineCount())
-      break;
-    mvwaddstr(m_editor->body, static_cast<int>(i), 0, buffer.line(li).c_str());
+    wmove(m_editor->body, static_cast<int>(i), 0);
+    wclrtoeol(m_editor->body);
+    if(li < buffer.lineCount())
+      waddstr(m_editor->body, buffer.line(li).c_str());
   }
 
-  refreshStatus(buffer);
   wmove(
       m_editor->body, static_cast<int>(cy - m_scroll_offset),
       static_cast<int>(buffer.cursor().x)
   );
-
   spz_panel_refresh(m_editor);
 }
 
-void Ui::putChar(wchar_t ch)
+void Ui::redrawLine(const Buffer &buffer, size_t line_idx)
 {
-  waddch(m_editor->body, static_cast<chtype>(ch));
-  spz_panel_refresh(m_editor);
+  int vis_rows = 0, vis_cols = 0;
+  getmaxyx(m_editor->body, vis_rows, vis_cols);
+  (void)vis_cols;
+
+  if(line_idx < m_scroll_offset ||
+     line_idx >= m_scroll_offset + static_cast<size_t>(vis_rows))
+    return;
+
+  int row = static_cast<int>(line_idx - m_scroll_offset);
+  mvwaddstr(m_editor->body, row, 0, buffer.line(line_idx).c_str());
+  wclrtoeol(m_editor->body);
 }
 
 void Ui::setStatus(const char *text)
