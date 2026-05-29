@@ -41,7 +41,7 @@ endif
 
 LDFLAGS := -nostdlib -static -T $(USER_LD) --gc-sections
 
-CRT0  := $(BUILD_DIR)/crt/crt0.o $(BUILD_DIR)/crt/alcor2_stdio_tty.o $(BUILD_DIR)/crt/alcor_tty.o
+CRT0  := $(BUILD_DIR)/crt/crt0.o $(BUILD_DIR)/crt/alcor2_stdio_tty.o
 LIBS  := $(BUILD_DIR)/lib/libgrendizer.a $(MUSL_LIB)/libc.a
 
 # C++ apps: musl-cross g++ matches musl-hosted libstdc++ (avoid host libstdc++).
