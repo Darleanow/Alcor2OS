@@ -258,6 +258,29 @@ void proc_wake(proc_t *p);
 proc_t *proc_get(u64 pid);
 
 /**
+ * @brief Get the PID that currently owns the TTY foreground "job".
+ *
+ * Returned by @ref proc_get_foreground; used by the keyboard input path
+ * to decide which process receives @c SIGINT / @c SIGQUIT / @c SIGTSTP
+ * on the corresponding canonical-mode control byte.
+ *
+ * @return Foreground PID, or 0 when no process has registered itself.
+ */
+u64 proc_get_foreground(void);
+
+/**
+ * @brief Register the TTY foreground PID.
+ *
+ * Called by the shell before waiting on a child so kernel-side TTY signal
+ * delivery routes to that child instead of the shell. The shell resets to
+ * its own PID (or 0) after the wait returns. No process-group machinery
+ * yet — single foreground job model.
+ *
+ * @param pid  Target PID, or 0 to clear.
+ */
+void proc_set_foreground(u64 pid);
+
+/**
  * @brief Start the first user process (from kernel main).
  * @param elf_data Pointer to ELF data.
  * @param elf_size Size of ELF data.

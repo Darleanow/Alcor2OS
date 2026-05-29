@@ -106,6 +106,25 @@ proc_t *proc_get(u64 pid)
   return NULL;
 }
 
+/**
+ * @brief Single source of truth for the TTY-foreground PID.
+ *
+ * Volatile because it's read from the keyboard IRQ (eager VINTR check) and
+ * written from the syscall path (shell registration). x86_64 makes the
+ * @c u64 read/write atomic per access, so no extra locking needed.
+ */
+static volatile u64 g_foreground_pid = 0;
+
+u64                 proc_get_foreground(void)
+{
+  return g_foreground_pid;
+}
+
+void proc_set_foreground(u64 pid)
+{
+  g_foreground_pid = pid;
+}
+
 void proc_signal_broadcast(int signum)
 {
   for(int i = 0; i < PROC_MAX; i++) {
