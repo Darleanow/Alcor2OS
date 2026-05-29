@@ -281,6 +281,21 @@ u64 proc_get_foreground(void);
 void proc_set_foreground(u64 pid);
 
 /**
+ * @brief Whether @p p has any unmasked pending signal.
+ *
+ * Used by blocking syscalls (pipe read/write, mouse read, future tty
+ * read) to decide whether to bail with @c -EINTR after a wake. Kept
+ * inline because it's a one-test predicate on a hot path.
+ *
+ * @param p  Process to inspect (may be NULL — returns @c false then).
+ * @return @c true when @p p has a pending signal that is not masked.
+ */
+static inline bool proc_signal_pending(const proc_t *p)
+{
+  return p && (p->sig_pending & ~p->sig_mask) != 0;
+}
+
+/**
  * @brief Start the first user process (from kernel main).
  * @param elf_data Pointer to ELF data.
  * @param elf_size Size of ELF data.

@@ -11,6 +11,7 @@
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>
+#include <alcor2/proc/proc.h>
 #include <alcor2/proc/sched.h>
 
 #define PIPE_BUF_SIZE 4096
@@ -126,6 +127,11 @@ i64 pipe_read_obj(void *pipe_ptr, void *buf, u64 count)
     proc_schedule();
     if(me)
       p->waiting_reader = NULL;
+    /* A pending signal wakes the proc via proc_signal (BLOCKED → READY);
+     * surface it as -EINTR so the syscall return path runs handlers /
+     * default actions instead of looping back into proc_block. */
+    if(proc_signal_pending(me))
+      return -EINTR;
   }
 
   if(p->count == 0)
@@ -172,6 +178,10 @@ i64 pipe_write_obj(void *pipe_ptr, const void *buf, u64 count)
       proc_schedule();
       if(me)
         p->waiting_writer = NULL;
+      /* Partial-write semantics: return what we have so far on signal;
+       * caller's next syscall return drives signal delivery. */
+      if(proc_signal_pending(me))
+        return written > 0 ? (i64)written : -EINTR;
     }
 
     if(!p->read_open)
