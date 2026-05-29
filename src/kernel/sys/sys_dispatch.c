@@ -100,6 +100,7 @@ static const sys_def_t sys_table[] = {
     SYS_DEF(SYS_TGKILL, "tgkill", sys_tgkill),
     SYS_DEF(SYS_ALCOR_FB_INFO, "alcor_fb_info", sys_alcor_fb_info),
     SYS_DEF(SYS_ALCOR_FB_MMAP, "alcor_fb_mmap", sys_alcor_fb_mmap),
+    SYS_DEF(SYS_ALCOR_SET_FG_PID, "alcor_set_fg_pid", sys_alcor_set_fg_pid),
     SYS_END
 };
 
