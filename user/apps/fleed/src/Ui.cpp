@@ -91,13 +91,13 @@ void Ui::redraw(const Buffer &buffer)
       static_cast<int>(buffer.cursor().x)
   );
 
-  wrefresh(m_editor->body);
+  spz_panel_refresh(m_editor);
 }
 
 void Ui::putChar(wchar_t ch)
 {
   waddch(m_editor->body, static_cast<chtype>(ch));
-  wrefresh(m_editor->body);
+  spz_panel_refresh(m_editor);
 }
 
 void Ui::setStatus(const char *text)
@@ -111,7 +111,7 @@ void Ui::redrawCursor(const Buffer &buffer)
       m_editor->body, static_cast<int>(buffer.cursor().y),
       static_cast<int>(buffer.cursor().x)
   );
-  wrefresh(m_editor->body);
+  spz_panel_refresh(m_editor);
 }
 
 } /* namespace fleed */
