@@ -14,8 +14,6 @@
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
-#include <uapi/alcor2/fb.h>
-#include <uapi/alcor2/fb_console_ioctl.h>
 #include <alcor2/fs/ramfs.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kbd.h>
@@ -24,6 +22,8 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
+#include <uapi/alcor2/fb.h>
+#include <uapi/alcor2/fb_console_ioctl.h>
 
 /**
  * @brief Read from /dev/null — always returns 0 (EOF).

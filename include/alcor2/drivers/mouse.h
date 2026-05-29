@@ -7,8 +7,8 @@
 #ifndef ALCOR2_DRIVERS_MOUSE_H
 #define ALCOR2_DRIVERS_MOUSE_H
 
-#include <uapi/alcor2/mouse.h>
 #include <alcor2/types.h>
+#include <uapi/alcor2/mouse.h>
 
 /** @brief Initialise the broker: clear the ring, cursor, and waiter slot. */
 void mouse_init(void);

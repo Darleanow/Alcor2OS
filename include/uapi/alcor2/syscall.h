@@ -91,12 +91,13 @@
 
 /** @name Alcor-specific syscalls (497–499).
  * @{ */
-#define SYS_ALCOR_SET_FG_PID  497 /**< Register TTY foreground PID (shell only). */
-#define SYS_ALCOR_FB_INFO     498 /**< User FB geometry (@ref alcor_fb_info_t). */
-#define SYS_ALCOR_FB_MMAP     499 /**< Map linear framebuffer (RW, shared). */
+#define SYS_ALCOR_SET_FG_PID                                                   \
+  497                         /**< Register TTY foreground PID (shell only). */
+#define SYS_ALCOR_FB_INFO 498 /**< User FB geometry (@ref alcor_fb_info_t). */
+#define SYS_ALCOR_FB_MMAP 499 /**< Map linear framebuffer (RW, shared). */
 /** @} */
 
 /** @brief One past the last valid syscall number. */
-#define SYS_MAX               512
+#define SYS_MAX 512
 
 #endif /* ALCOR2_UAPI_SYSCALL_H */

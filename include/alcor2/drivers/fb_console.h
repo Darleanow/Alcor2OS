@@ -14,11 +14,11 @@
 #ifndef ALCOR2_FB_CONSOLE_H
 #define ALCOR2_FB_CONSOLE_H
 
-#include <uapi/alcor2/fb_console_ioctl.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <uapi/alcor2/fb_console_ioctl.h>
 
 /**
  * @brief Initialise the runtime console using the same framebuffer the boot
@@ -81,7 +81,8 @@ size_t fb_console_read(void *buf, size_t max);
  */
 void fb_console_tick(void);
 
-/* fb_console_atlas_t and ioctl constants are in <uapi/alcor2/fb_console_ioctl.h>. */
+/* fb_console_atlas_t and ioctl constants are in
+ * <uapi/alcor2/fb_console_ioctl.h>. */
 
 /** @brief Register a userspace glyph atlas; subsequent renders use Fira. */
 int fb_console_set_atlas(const fb_console_atlas_t *meta);

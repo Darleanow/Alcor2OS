@@ -5,13 +5,13 @@
 
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
-#include <uapi/alcor2/fb.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/memory_layout.h>
 #include <alcor2/mm/pmm.h>
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/sys/internal.h>
+#include <uapi/alcor2/fb.h>
 
 static inline bool user_rw_ok(u64 ptr, u64 size)
 {
