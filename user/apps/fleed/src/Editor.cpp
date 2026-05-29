@@ -66,7 +66,10 @@ int Editor::run()
           m_buffer.line(m_buffer.cursor().y).size(), m_buffer.cursor().y
       );
       break;
-
+    case Command::Enter:
+      m_buffer.newLine();
+      m_ui.redraw(m_buffer);
+      break;
     case Command::None:
       break;
     }
@@ -82,7 +85,7 @@ void Editor::insertChar(wchar_t ch)
   if(n == static_cast<std::size_t>(-1))
     return;
   m_buffer.append(mb.data(), n);
-  m_ui.putChar(ch);
+  m_ui.redraw(m_buffer);
 }
 
 void Editor::handleSave()
