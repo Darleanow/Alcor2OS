@@ -10,6 +10,7 @@
 
 #include <alcor2/drivers/console.h>
 #include <alcor2/errno.h>
+#include <alcor2/fs/ext2.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/heap.h>
 #include <alcor2/types.h>
@@ -22,6 +23,28 @@ ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
 /** @brief First-registered block device; used by @c mount("ext2") when no
  * source path is supplied. */
 const blockdev_t *g_default_dev;
+
+/**
+ * @brief Sector offset (from the partition start) where the superblock
+ *        begins.
+ *
+ * ext2 places the superblock at byte 1024 of the volume; with 512-byte
+ * sectors that's sector 2.
+ */
+#define EXT2_SB_SECTOR_OFFSET 2u
+
+/**
+ * @brief Sectors spanned by the on-disk superblock (1024 bytes / 512).
+ */
+#define EXT2_SB_SECTOR_COUNT 2u
+
+/**
+ * @brief Default on-disk inode size for revision-0 ext2 volumes.
+ *
+ * Revision 0 has no @c s_inode_size field; the size is fixed at 128.
+ * Revision ≥ 1 reads it from the superblock instead.
+ */
+#define EXT2_REV0_INODE_SIZE 128u
 
 /**
  * @brief Read one ext2 block worth of bytes into @p buf.
@@ -72,10 +95,12 @@ i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf)
 static i64 write_superblock(ext2_volume_t *vol)
 {
   u8 buf[EXT2_MIN_BLOCK_SIZE];
-  if(vol_read_sectors(vol, 2, 2, buf) < 0)
+  if(vol_read_sectors(vol, EXT2_SB_SECTOR_OFFSET, EXT2_SB_SECTOR_COUNT, buf) <
+     0)
     return -EIO;
   kmemcpy(buf, &vol->sb, sizeof(ext2_superblock_t));
-  if(vol_write_sectors(vol, 2, 2, buf) < 0)
+  if(vol_write_sectors(vol, EXT2_SB_SECTOR_OFFSET, EXT2_SB_SECTOR_COUNT, buf) <
+     0)
     return -EIO;
   return 0;
 }
@@ -86,6 +111,10 @@ static i64 write_superblock(ext2_volume_t *vol)
  * Walks block-by-block so a single huge GDT split across many blocks doesn't
  * need a contiguous kmalloc the size of the whole table — only one block's
  * worth of scratch.
+ *
+ * @note Body is 29 LOC: one allocation, one per-block loop with bounds
+ *       clipping. Splitting the loop body out gains nothing — the per-
+ *       block payload is two function calls and two arithmetic ops.
  *
  * @param vol  Volume with the mutated @c vol->groups.
  * @return 0 on success, negative errno on I/O failure or OOM.
@@ -155,69 +184,105 @@ void ext2_init(const blockdev_t *dev)
 }
 
 /**
- * @brief Mount an ext2 partition: read the superblock, validate the magic,
- * load the group descriptor table into RAM, mark the slot live.
+ * @brief Claim the first free slot in @ref g_volumes.
  *
- * @param dev            Block device backing the volume.
- * @param partition_lba  Partition start, in sectors.
- * @return Volume handle on success, NULL on slot exhaustion / bad magic / OOM.
+ * @return Slot pointer, or NULL when the pool is full.
  */
-ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)
+static ext2_volume_t *claim_free_volume_slot(void)
 {
-  ext2_volume_t *vol = NULL;
   for(int i = 0; i < EXT2_MAX_VOLUMES; i++) {
-    if(!g_volumes[i].mounted) {
-      vol = &g_volumes[i];
-      break;
-    }
+    if(!g_volumes[i].mounted)
+      return &g_volumes[i];
   }
+  return NULL;
+}
 
-  if(!vol) {
-    console_print("[EXT2] No free volume slots\n");
-    return NULL;
-  }
+/**
+ * @brief Read the on-disk superblock and validate its magic.
+ *
+ * Goes via the raw @c dev->read because the volume isn't bootstrapped yet
+ * — @ref vol_read_sectors needs a populated @c vol.
+ *
+ * @param dev            Block device.
+ * @param partition_lba  Sector offset of the partition start.
+ * @param sb_buf         Output buffer (@c EXT2_MIN_BLOCK_SIZE bytes).
+ * @return 0 on success, -EIO on read failure, -EINVAL on bad magic.
+ */
+static i64 read_partition_superblock(
+    const blockdev_t *dev, u32 partition_lba, u8 *sb_buf
+)
+{
+  if(dev->read(
+         dev->ctx, partition_lba + EXT2_SB_SECTOR_OFFSET, EXT2_SB_SECTOR_COUNT,
+         sb_buf
+     ) < 0)
+    return -EIO;
+  const ext2_superblock_t *sb = (const ext2_superblock_t *)sb_buf;
+  return (sb->s_magic == EXT2_MAGIC) ? 0 : -EINVAL;
+}
 
-  u8 sb_buf[EXT2_MIN_BLOCK_SIZE];
-  if(dev->read(dev->ctx, partition_lba + 2, 2, sb_buf) < 0) {
-    console_print("[EXT2] Failed to read superblock\n");
-    return NULL;
-  }
-
-  ext2_superblock_t *sb = (ext2_superblock_t *)sb_buf;
-  if(sb->s_magic != EXT2_MAGIC) {
-    console_print("[EXT2] Invalid magic number\n");
-    return NULL;
-  }
-
+/**
+ * @brief Populate @p vol's cached fields from the on-disk superblock.
+ *
+ * Caches the derived counts (block size, inode size, group count) so the
+ * rest of the driver doesn't recompute them per call. Revision 0 has no
+ * @c s_inode_size, so the default @ref EXT2_REV0_INODE_SIZE is used.
+ *
+ * @param vol            Volume to populate.
+ * @param dev            Underlying block device.
+ * @param partition_lba  Partition start.
+ * @param sb             Source superblock.
+ */
+static void populate_volume_from_sb(
+    ext2_volume_t *vol, const blockdev_t *dev, u32 partition_lba,
+    const ext2_superblock_t *sb
+)
+{
   vol->dev              = dev;
   vol->partition_lba    = partition_lba;
   vol->block_size       = EXT2_MIN_BLOCK_SIZE << sb->s_log_block_size;
   vol->blocks_per_group = sb->s_blocks_per_group;
   vol->inodes_per_group = sb->s_inodes_per_group;
-  vol->inode_size       = (sb->s_rev_level >= 1) ? sb->s_inode_size : 128;
+  vol->inode_size =
+      (sb->s_rev_level >= 1) ? sb->s_inode_size : EXT2_REV0_INODE_SIZE;
   vol->inodes_count     = sb->s_inodes_count;
   vol->blocks_count     = sb->s_blocks_count;
   vol->first_data_block = sb->s_first_data_block;
   vol->groups_count     = (sb->s_blocks_count + sb->s_blocks_per_group - 1) /
                       sb->s_blocks_per_group;
+  kmemcpy(&vol->sb, sb, sizeof(*sb));
+}
 
-  kmemcpy(&vol->sb, sb, sizeof(ext2_superblock_t));
-
+/**
+ * @brief Allocate @p vol->groups and fill it from disk.
+ *
+ * Uses a temporary contiguous buffer to absorb the multi-block read, then
+ * copies into the typed @c groups array. Two allocations are required —
+ * @c groups must outlive the function but @c gdt_buf doesn't.
+ *
+ * @note Body is 30 LOC: two kmalloc lifecycles must bracket the per-block
+ *       read loop. Splitting would force the second alloc to bubble back
+ *       up through an extra layer.
+ *
+ * @param vol  Volume (already populated by @ref populate_volume_from_sb).
+ * @return 0 on success, -ENOMEM / -EIO otherwise; on failure @c vol->groups
+ *         is freed and left NULL.
+ */
+static i64 load_group_descriptors(ext2_volume_t *vol)
+{
   u32 gdt_block  = vol->first_data_block + 1;
   u32 gdt_size   = vol->groups_count * sizeof(ext2_group_desc_t);
   u32 gdt_blocks = (gdt_size + vol->block_size - 1) / vol->block_size;
 
   vol->groups = kmalloc((u64)vol->groups_count * sizeof(ext2_group_desc_t));
-  if(!vol->groups) {
-    console_print("[EXT2] Failed to allocate group descriptors\n");
-    return NULL;
-  }
+  if(!vol->groups)
+    return -ENOMEM;
 
   u8 *gdt_buf = kmalloc((u64)gdt_blocks * vol->block_size);
   if(!gdt_buf) {
     kfree(vol->groups);
-    console_print("[EXT2] Failed to allocate GDT buffer\n");
-    return NULL;
+    vol->groups = NULL;
+    return -ENOMEM;
   }
 
   for(u32 b = 0; b < gdt_blocks; b++) {
@@ -225,20 +290,64 @@ ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)
        0) {
       kfree(gdt_buf);
       kfree(vol->groups);
-      console_print("[EXT2] Failed to read group descriptors\n");
-      return NULL;
+      vol->groups = NULL;
+      return -EIO;
     }
   }
 
   kmemcpy(vol->groups, gdt_buf, vol->groups_count * sizeof(ext2_group_desc_t));
   kfree(gdt_buf);
+  return 0;
+}
+
+/**
+ * @brief Mount an ext2 partition: read the superblock, validate the magic,
+ * load the group descriptor table into RAM, mark the slot live.
+ *
+ * Linear bring-up: each helper either succeeds or rolls back what it
+ * allocated. Errors funnel to a single NULL return with a console message,
+ * so the caller doesn't need an errno channel.
+ *
+ * @note Body is 33 LOC: four phases (slot-claim / superblock-read /
+ *       populate / GDT-load) plus per-phase logging. Each console_print
+ *       is tied to a specific failure mode the user diagnoses from boot
+ *       output, so they stay inlined rather than wrapped in a helper.
+ *
+ * @param dev            Block device backing the volume.
+ * @param partition_lba  Partition start, in sectors.
+ * @return Volume handle on success, NULL on slot exhaustion / bad magic / OOM.
+ */
+ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)
+{
+  ext2_volume_t *vol = claim_free_volume_slot();
+  if(!vol) {
+    console_print("[EXT2] No free volume slots\n");
+    return NULL;
+  }
+
+  u8  sb_buf[EXT2_MIN_BLOCK_SIZE];
+  i64 ret = read_partition_superblock(dev, partition_lba, sb_buf);
+  if(ret < 0) {
+    console_print(
+        ret == -EIO ? "[EXT2] Failed to read superblock\n"
+                    : "[EXT2] Invalid magic number\n"
+    );
+    return NULL;
+  }
+
+  populate_volume_from_sb(
+      vol, dev, partition_lba, (const ext2_superblock_t *)sb_buf
+  );
+
+  if(load_group_descriptors(vol) < 0) {
+    console_print("[EXT2] Failed to load group descriptors\n");
+    return NULL;
+  }
 
   vol->mounted = true;
-
   console_printf(
       "[EXT2] Mounted: %u blocks, %u inodes, %u block size\n",
       vol->blocks_count, vol->inodes_count, vol->block_size
   );
-
   return vol;
 }
