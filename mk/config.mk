@@ -5,6 +5,7 @@ ISO    := alcor2.iso
 BUILD   := build
 SRC     := src
 INCLUDE := include
+UAPI    := include/uapi
 
 DISK      := disk.img
 DISK_SIZE := 1024M
@@ -59,7 +60,7 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Werror \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -DSYS_TRACE=$(SYS_TRACE) \
-          -I$(INCLUDE) -Isrc -MMD -MP
+          -I$(INCLUDE) -I$(UAPI) -Isrc -MMD -MP
 ifeq ($(DEBUG),1)
   CFLAGS += -g
 endif

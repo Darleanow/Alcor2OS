@@ -33,6 +33,7 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Os \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -I$(MUSL_INC) \
+          -I$(USER_BASE)/../include/uapi \
           -I$(USER_BASE)/../include \
           -I$(USER_BASE)/include
 ifeq ($(DEBUG),1)
@@ -57,6 +58,7 @@ CXXFLAGS := -std=gnu++17 -Wall -Wextra -Os \
             -fno-lto -fno-PIC -fno-PIE -m64 -march=x86-64 \
             -mno-red-zone \
             -I$(MUSL_INC) \
+            -I$(USER_BASE)/../include/uapi \
             -I$(USER_BASE)/../include \
             -I$(USER_BASE)/include
 
