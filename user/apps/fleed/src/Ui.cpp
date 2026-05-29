@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <unistd.h>
 
 namespace fleed {
 
@@ -49,6 +50,12 @@ bool Ui::init(const std::string &header)
     return false;
   }
   keypad(m_editor->body, TRUE);
+  /* Force DECCKM (application cursor keys mode): the kernel fb_console
+   * emits SS3 (\EOA) for arrow keys when this is set and CSI (\E[A) when
+   * cleared. ncurses' keypad() sends "smkx" via terminfo to flip it on, but
+   * relying on terminfo is brittle here — write it explicitly so arrows
+   * reach wget_wch as KEY_UP/DOWN/LEFT/RIGHT instead of raw bytes. */
+  (void)write(STDOUT_FILENO, "\033[?1h", 5);
   spz_statusbar("fleed", nullptr, kHints);
   spz_panel_refresh(m_editor);
   return true;
@@ -72,10 +79,18 @@ int Ui::readKey(wint_t &out)
   return wget_wch(m_editor->body, &out);
 }
 
-void Ui::redraw(const std::string &text)
+void Ui::redraw(const Buffer &buffer)
 {
   wclear(m_editor->body);
-  waddstr(m_editor->body, text.c_str());
+
+  for(size_t i = 0; i < buffer.lineCount(); i++) {
+    mvwaddstr(m_editor->body, i, 0, buffer.line(i).c_str());
+  }
+  wmove(
+      m_editor->body, static_cast<int>(buffer.cursor().y),
+      static_cast<int>(buffer.cursor().x)
+  );
+
   wrefresh(m_editor->body);
 }
 
@@ -88,6 +103,15 @@ void Ui::putChar(wchar_t ch)
 void Ui::setStatus(const char *text)
 {
   spz_statusbar("fleed", text, kHints);
+}
+
+void Ui::redrawCursor(const Buffer &buffer)
+{
+  wmove(
+      m_editor->body, static_cast<int>(buffer.cursor().y),
+      static_cast<int>(buffer.cursor().x)
+  );
+  wrefresh(m_editor->body);
 }
 
 } /* namespace fleed */

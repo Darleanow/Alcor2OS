@@ -9,6 +9,7 @@
 #pragma once
 
 #include <curses.h>
+#include <fleed/Buffer.hpp>
 #include <spazer/spazer.h>
 #include <string>
 
@@ -31,7 +32,8 @@ public:
    */
   bool init(const std::string &header);
 
-  /** @brief Tear ncurses down. Idempotent and safe to call from the destructor. */
+  /** @brief Tear ncurses down. Idempotent and safe to call from the destructor.
+   */
   void shutdown();
 
   /**
@@ -44,9 +46,9 @@ public:
 
   /**
    * @brief Repaint the editor panel from scratch with the given text.
-   * @param text Full buffer contents to display.
+   * @param buffer Full buffer contents to display.
    */
-  void redraw(const std::string &text);
+  void redraw(const Buffer &buffer);
 
   /**
    * @brief Append one character at the cursor and flush the panel.
@@ -59,6 +61,12 @@ public:
    * @param text Status text, or @c nullptr to clear the slot.
    */
   void setStatus(const char *text);
+
+  /**
+   * @brief redraws cursor at current position.
+   * buffer The text buffer containing the cursor.
+   */
+  void redrawCursor(const Buffer &buffer);
 
 private:
   SCREEN      *m_scr    = nullptr;
