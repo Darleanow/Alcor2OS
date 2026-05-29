@@ -99,6 +99,15 @@ static void build_symlink_path(
 }
 
 /**
+ * @brief Maximum symlink chase depth before declaring @c -ELOOP.
+ *
+ * Same constant Linux uses. Far above any sane userland chain, low enough
+ * to keep the recursive @ref resolve_path_depth from blowing the kernel
+ * stack on a hand-crafted symlink cycle.
+ */
+#define SYMLINK_MAX_FOLLOW 8
+
+/**
  * @brief Resolve a path to an inode, following symlinks.
  * @param vol          Volume.
  * @param path         Path to resolve (relative to volume root).
@@ -107,8 +116,6 @@ static void build_symlink_path(
  * @param follow_depth Current symlink-follow depth (prevents loops).
  * @return 0 on success, negative errno on error.
  */
-#define SYMLINK_MAX_FOLLOW 8
-
 static i64 resolve_path_depth(
     const ext2_volume_t *vol, const char *path, u32 *out_ino,
     ext2_inode_t *out_inode, int follow_depth
@@ -331,6 +338,22 @@ i64 ext2_stat(const ext2_volume_t *vol, const char *path, ext2_entry_t *entry)
   return 0;
 }
 
+/**
+ * @brief Read the target of the symlink at @p path into @p buf.
+ *
+ * Splits the path so the target's *containing directory* is resolved (not
+ * the symlink itself — that would follow it). The final component is then
+ * looked up directly, its inode validated as a symlink, and the target
+ * read via the shared @ref read_symlink_target so fast/slow link layouts
+ * stay in one place.
+ *
+ * @param vol   Volume handle.
+ * @param path  Absolute path of the symlink.
+ * @param buf   Output buffer (no terminating NUL appended).
+ * @param cap   Capacity of @p buf.
+ * @return Bytes written, or negative errno (-EINVAL for non-symlinks,
+ *         -ENAMETOOLONG when the target exceeds @p cap).
+ */
 i64 ext2_readlink(
     const ext2_volume_t *vol, const char *path, char *buf, u64 cap
 )

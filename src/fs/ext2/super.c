@@ -23,13 +23,36 @@ ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];
  * source path is supplied. */
 const blockdev_t *g_default_dev;
 
-i64               vol_read_block(const ext2_volume_t *vol, u32 block, void *buf)
+/**
+ * @brief Read one ext2 block worth of bytes into @p buf.
+ *
+ * Translates the ext2-level block number to the underlying device's sector
+ * range. Every metadata + data read in the driver goes through this so the
+ * block-to-sector ratio lives in exactly one place.
+ *
+ * @param vol    Source volume.
+ * @param block  Ext2 block number.
+ * @param buf    Destination buffer (≥ @c vol->block_size bytes).
+ * @return Bytes transferred on success, negative errno on I/O failure.
+ */
+i64 vol_read_block(const ext2_volume_t *vol, u32 block, void *buf)
 {
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
   const u32 sector            = block * sectors_per_block;
   return vol_read_sectors(vol, sector, sectors_per_block, buf);
 }
 
+/**
+ * @brief Write one ext2 block worth of bytes from @p buf.
+ *
+ * Counterpart of @ref vol_read_block; same single-source-of-truth rationale
+ * for the block-to-sector translation.
+ *
+ * @param vol    Target volume.
+ * @param block  Ext2 block number.
+ * @param buf    Source buffer (≥ @c vol->block_size bytes).
+ * @return Bytes transferred on success, negative errno on I/O failure.
+ */
 i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf)
 {
   const u32 sectors_per_block = vol->block_size / EXT2_SECTOR_SIZE;
@@ -98,6 +121,16 @@ static i64 write_group_descriptors(ext2_volume_t *vol)
   return 0;
 }
 
+/**
+ * @brief Persist superblock + GDT in a single call.
+ *
+ * Called by every mutating op (mkdir, unlink, write…) so a crash between
+ * the in-memory mutation and the next flush only loses content, never the
+ * structural metadata that points at it.
+ *
+ * @param vol  Volume whose in-memory metadata is dirty.
+ * @return 0 on success, the first negative errno encountered otherwise.
+ */
 i64 flush_metadata(ext2_volume_t *vol)
 {
   i64 ret = write_superblock(vol);

@@ -14,6 +14,19 @@
 #include <alcor2/types.h>
 #include <fs/ext2/internal.h>
 
+/**
+ * @brief Load on-disk inode @p ino into the caller-provided @p inode.
+ *
+ * The inode table is a packed array with stride @c vol->inode_size, which
+ * can exceed @c sizeof(ext2_inode_t) on newer revisions — so the math
+ * uses @c inode_size for both the per-block count and the offset, and the
+ * @c kmemcpy clips to the in-memory struct size.
+ *
+ * @param vol    Source volume.
+ * @param ino    Inode number (1-indexed; 0 is reserved).
+ * @param inode  Output struct.
+ * @return 0 on success, -EINVAL for out-of-range, -ENOMEM / -EIO otherwise.
+ */
 i64 read_inode(const ext2_volume_t *vol, u32 ino, ext2_inode_t *inode)
 {
   if(ino < 1 || ino > vol->inodes_count)
@@ -41,6 +54,19 @@ i64 read_inode(const ext2_volume_t *vol, u32 ino, ext2_inode_t *inode)
   return 0;
 }
 
+/**
+ * @brief Persist @p inode to its on-disk slot for inode number @p ino.
+ *
+ * Read-modify-write of the containing block: we read the table block
+ * first because the slot is a sub-region inside a shared block (other
+ * inodes live alongside it), and overwriting without merge would clobber
+ * them.
+ *
+ * @param vol    Target volume.
+ * @param ino    Inode number (1-indexed).
+ * @param inode  Inode to write.
+ * @return 0 on success, -EINVAL for out-of-range, -ENOMEM / -EIO otherwise.
+ */
 i64 write_inode(const ext2_volume_t *vol, u32 ino, const ext2_inode_t *inode)
 {
   if(ino < 1 || ino > vol->inodes_count)

@@ -33,7 +33,19 @@ typedef struct
  */
 static block_pool_entry_t g_block_pool[EXT2_BLOCK_CACHE_SIZE];
 
-u8                       *cache_get_block(u32 size)
+/**
+ * @brief Borrow a one-block scratch buffer from the pool.
+ *
+ * Oversized requests bypass the pool so the fixed-size slots stay reusable
+ * for the common case (4K or smaller blocks). Pool exhaustion silently
+ * falls back to kmalloc — caller's contract is "you got a buffer", not
+ * "you got a pooled buffer".
+ *
+ * @param size  Requested block size in bytes.
+ * @return Pointer to a buffer of at least @p size bytes; never NULL unless
+ *         the kmalloc fallback fails.
+ */
+u8 *cache_get_block(u32 size)
 {
   if(size > EXT2_MAX_BLOCK_SIZE)
     return kmalloc(size);
@@ -50,6 +62,15 @@ u8                       *cache_get_block(u32 size)
   return kmalloc(size);
 }
 
+/**
+ * @brief Return a buffer obtained from @ref cache_get_block.
+ *
+ * Pointer-equality against each slot's payload base; a miss means the
+ * buffer came from the kmalloc fallback and is freed instead of pooled.
+ *
+ * @param buf  Buffer previously returned by @ref cache_get_block; NULL is
+ *             not a valid input.
+ */
 void cache_put_block(u8 *buf)
 {
   for(int i = 0; i < EXT2_BLOCK_CACHE_SIZE; i++) {

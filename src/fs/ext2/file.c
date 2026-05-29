@@ -81,12 +81,17 @@ void ext2_close(ext2_file_t *file)
 }
 
 /**
- * @brief Read data from an ext2 file.
+ * @brief Read up to @p count bytes from @p file at byte @p offset.
  *
- * @param file  Open file handle.
- * @param buf   Destination buffer.
- * @param count Maximum bytes to read.
- * @return Bytes read, or negative errno on error.
+ * Pread-style: takes @p offset directly instead of mutating an
+ * internal file position, so the VFS layer can keep per-fd state and
+ * concurrent reads on the same handle don't trample each other.
+ *
+ * @param file    Open file handle.
+ * @param buf     Destination buffer.
+ * @param count   Maximum bytes to read.
+ * @param offset  Byte offset within the file.
+ * @return Bytes read, 0 at EOF, or negative errno on error.
  */
 i64 ext2_read(ext2_file_t *file, void *buf, u64 count, u64 offset)
 {
@@ -193,13 +198,16 @@ i64 ext2_read(ext2_file_t *file, void *buf, u64 count, u64 offset)
 }
 
 /**
- * @brief Write data to an ext2 file.
+ * @brief Write @p count bytes to @p file at byte @p offset.
  *
- * Allocates new blocks as needed and extends the file.
+ * Pwrite-style (see @ref ext2_read for the rationale). Allocates new
+ * blocks lazily via @ref alloc_file_block as the write crosses block
+ * boundaries; writes past EOF extend the file and update @c i_size.
  *
- * @param file  Open file handle.
- * @param buf   Source buffer.
- * @param count Number of bytes to write.
+ * @param file    Open file handle.
+ * @param buf     Source buffer.
+ * @param count   Bytes to write.
+ * @param offset  Byte offset within the file.
  * @return Bytes written, or negative errno on error.
  */
 i64 ext2_write(ext2_file_t *file, const void *buf, u64 count, u64 offset)

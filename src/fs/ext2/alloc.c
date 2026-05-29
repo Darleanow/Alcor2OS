@@ -29,14 +29,22 @@
  * @c 3). */
 #define BITMAP_BIT_INDEX_SHIFT 3u
 
-/** @brief Set bit @p bit in the bitmap rooted at @p bitmap. */
+/**
+ * @brief Set bit @p bit in the bitmap rooted at @p bitmap.
+ * @param bitmap  Bitmap buffer (mutated in place).
+ * @param bit     Bit index to set; caller guarantees in-range.
+ */
 static inline void bitmap_set(u8 *bitmap, u32 bit)
 {
   bitmap[bit >> BITMAP_BIT_INDEX_SHIFT] |=
       (u8)(1u << (bit & BITMAP_BIT_INDEX_MASK));
 }
 
-/** @brief Clear bit @p bit in the bitmap rooted at @p bitmap. */
+/**
+ * @brief Clear bit @p bit in the bitmap rooted at @p bitmap.
+ * @param bitmap  Bitmap buffer (mutated in place).
+ * @param bit     Bit index to clear; caller guarantees in-range.
+ */
 static inline void bitmap_clear(u8 *bitmap, u32 bit)
 {
   bitmap[bit >> BITMAP_BIT_INDEX_SHIFT] &=
@@ -121,6 +129,18 @@ static u32 alloc_block_in_group(ext2_volume_t *vol, u32 group)
   return group * vol->blocks_per_group + bit + vol->first_data_block;
 }
 
+/**
+ * @brief Allocate a free block, preferring @p preferred_group.
+ *
+ * Tries the preferred group first to keep related blocks (file + its
+ * indirect blocks, file + its parent directory) clustered for locality;
+ * falls back to a linear sweep so a full preferred group doesn't fail
+ * the allocation while space exists elsewhere.
+ *
+ * @param vol              Target volume.
+ * @param preferred_group  Locality hint (usually the inode's own group).
+ * @return Block number on success, 0 when the whole volume is full.
+ */
 u32 alloc_block(ext2_volume_t *vol, u32 preferred_group)
 {
   u32 block = alloc_block_in_group(vol, preferred_group);
@@ -136,6 +156,18 @@ u32 alloc_block(ext2_volume_t *vol, u32 preferred_group)
   return 0;
 }
 
+/**
+ * @brief Mark @p block as free in its owning group's bitmap.
+ *
+ * Bumps the per-group and superblock free counters so subsequent allocs
+ * see the space; the bitmap write is the source of truth and the counters
+ * are only hints — staying in sync prevents quiet under-utilisation when
+ * @ref alloc_block_in_group short-circuits on a zero count.
+ *
+ * @param vol    Target volume.
+ * @param block  Absolute block number to free.
+ * @return 0 on success, -EINVAL for out-of-range, -ENOMEM / -EIO otherwise.
+ */
 i64 free_block(ext2_volume_t *vol, u32 block)
 {
   if(block < vol->first_data_block || block >= vol->blocks_count)
@@ -222,6 +254,19 @@ static u32 alloc_inode_in_group(ext2_volume_t *vol, u32 group, bool is_dir)
   return group * vol->inodes_per_group + bit + 1;
 }
 
+/**
+ * @brief Allocate a free inode, preferring @p preferred_group.
+ *
+ * Same locality strategy as @ref alloc_block: preferred group first, then
+ * linear fallback. @p is_dir is forwarded so the per-group dir count tracks
+ * actual usage — Orlov-style placement uses it to spread directories.
+ *
+ * @param vol              Target volume.
+ * @param preferred_group  Locality hint (parent directory's group for files,
+ *                         best-fit for new directories).
+ * @param is_dir           True when allocating an inode for a directory.
+ * @return Inode number on success, 0 when the volume is out of inodes.
+ */
 u32 alloc_inode(ext2_volume_t *vol, u32 preferred_group, bool is_dir)
 {
   u32 ino = alloc_inode_in_group(vol, preferred_group, is_dir);
@@ -237,6 +282,19 @@ u32 alloc_inode(ext2_volume_t *vol, u32 preferred_group, bool is_dir)
   return 0;
 }
 
+/**
+ * @brief Mark inode @p ino as free in its owning group's bitmap.
+ *
+ * Mirror of @ref free_block on the inode bitmap. The @p is_dir guard
+ * matches the bump done at alloc time so the per-group dir count stays
+ * accurate; the @c > @c 0 check survives a stale flag from a corrupted
+ * caller without underflowing.
+ *
+ * @param vol     Target volume.
+ * @param ino     Inode number to free (1-indexed).
+ * @param is_dir  True when the inode was allocated as a directory.
+ * @return 0 on success, -EINVAL for out-of-range, -ENOMEM / -EIO otherwise.
+ */
 i64 free_inode(ext2_volume_t *vol, u32 ino, bool is_dir)
 {
   if(ino < 1 || ino > vol->inodes_count)

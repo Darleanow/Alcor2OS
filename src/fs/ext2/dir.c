@@ -18,10 +18,17 @@
 #include <fs/ext2/internal.h>
 
 /**
- * @brief Read the next directory entry.
+ * @brief Read the entry at @p index from an open directory.
  *
- * @param dir   Open directory handle.
- * @param entry Output entry structure.
+ * Walks the directory's data blocks from the start each call, counting
+ * non-deleted entries until it reaches @p index. Linear scan is the
+ * correct choice here: dir entries are variable-length, so a "seek to N"
+ * is meaningless on disk; the only authoritative way to find entry N is
+ * to walk N entries. Callers (readdir loops) just increment @p index.
+ *
+ * @param dir    Open directory handle.
+ * @param index  Zero-based entry index to fetch.
+ * @param entry  Output entry structure.
  * @return 1 if an entry was read, 0 at end, or negative errno on error.
  */
 i64 ext2_readdir(ext2_file_t *dir, u64 index, ext2_entry_t *entry)
