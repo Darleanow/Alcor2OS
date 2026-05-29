@@ -134,4 +134,4 @@ if cd /work { echo ok } else { echo missing }
 cd! /work    # exits shell on failure
 ```
 
-Full language reference: [user/lib/vega/README.md](user/lib/vega/README.md)
+Full language reference: [user/sdk/vega/README.md](user/sdk/vega/README.md)
