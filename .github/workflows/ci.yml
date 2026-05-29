@@ -201,6 +201,40 @@ jobs:
           retention-days: 14
           compression-level: 0   # ISO is already compressed
 
+  # Host-compiled unit tests + coverage report
+  unit-tests:
+    name: Unit tests + coverage (cmocka, llvm-cov)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang-18 \
+            llvm-18 \
+            libcmocka-dev \
+            make
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+
+      - name: Run unit tests + coverage
+        run: make coverage
+
+      - name: Coverage summary
+        if: always()
+        run: cat tests/build/coverage/coverage.txt || true
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-html-${{ github.sha }}
+          path: tests/build/coverage/html
+          retention-days: 14
+
   # Userland + apps (needs musl-cross for C++ targets)
   user-apps:
     name: Build userland + apps (musl-cross)
