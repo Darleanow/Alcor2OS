@@ -85,7 +85,7 @@ void Editor::insertChar(wchar_t ch)
   if(n == static_cast<std::size_t>(-1))
     return;
   m_buffer.append(mb.data(), n);
-  m_ui.redraw(m_buffer);
+  m_ui.redrawLine(m_buffer, m_buffer.cursor().y);
 }
 
 void Editor::handleSave()
