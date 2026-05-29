@@ -86,6 +86,11 @@ static u32 bitmap_find_clear(const u8 *bitmap, u32 size)
  * @c bg_free_blocks_count short-circuits the bitmap read when the group is
  * known full; on success it's decremented along with the superblock counter.
  *
+ * @note Body is 37 LOC: a single locked RMW with multiple early-return
+ *       error paths that each free the bitmap buffer. Extracting a
+ *       "load + try + commit" helper would just trade one inline routine
+ *       for two with the same cleanup pattern.
+ *
  * @param vol    Target volume.
  * @param group  Group index to try.
  * @return Block number on success, 0 on miss / I/O failure.
@@ -164,6 +169,9 @@ u32 alloc_block(ext2_volume_t *vol, u32 preferred_group)
  * are only hints — staying in sync prevents quiet under-utilisation when
  * @ref alloc_block_in_group short-circuits on a zero count.
  *
+ * @note Body is 31 LOC: same locked-RMW pattern as
+ *       @ref alloc_block_in_group; kept symmetric on purpose.
+ *
  * @param vol    Target volume.
  * @param block  Absolute block number to free.
  * @return 0 on success, -EINVAL for out-of-range, -ENOMEM / -EIO otherwise.
@@ -207,6 +215,12 @@ i64 free_block(ext2_volume_t *vol, u32 block)
  * Mirror of @ref alloc_block_in_group on the inode bitmap. When @p is_dir is
  * set, the group's @c bg_used_dirs_count is also bumped — the allocator uses
  * that hint to spread directories across groups.
+ *
+ * @note Body is 39 LOC: same locked-RMW pattern as
+ *       @ref alloc_block_in_group plus the @c is_dir dir-counter bump;
+ *       symmetry with that function is more valuable than de-duplicating
+ *       into a generic bitmap helper that would obscure which counter is
+ *       being touched.
  *
  * @param vol     Target volume.
  * @param group   Group index to try.
@@ -289,6 +303,9 @@ u32 alloc_inode(ext2_volume_t *vol, u32 preferred_group, bool is_dir)
  * matches the bump done at alloc time so the per-group dir count stays
  * accurate; the @c > @c 0 check survives a stale flag from a corrupted
  * caller without underflowing.
+ *
+ * @note Body is 32 LOC: locked-RMW + dir-counter bookkeeping; kept
+ *       symmetric with @ref alloc_inode_in_group.
  *
  * @param vol     Target volume.
  * @param ino     Inode number to free (1-indexed).
