@@ -43,10 +43,6 @@
  * stored inline in @c i_block[]) and slow symlinks (target stored in the
  * first data block).
  *
- * @note Body is 27 LOC: the fast/slow branch is one cohesive choice — the
- *       point of having a single function here is that callers don't have
- *       to know which layout the symlink uses.
- *
  * @param vol    Volume.
  * @param inode  Symlink inode.
  * @param buf    Output buffer.
@@ -171,11 +167,6 @@ static i64 resolve_path_depth(
  * separate from the path walker because the path-building math (dummy
  * filename, base offset) is its own concern.
  *
- * @note Body is 36 LOC: the path composition is three buffer manipulations
- *       (base, target join, remainder append) that share state — splitting
- *       them would push the shared buffers through more out-params than
- *       the helper saves.
- *
  * @param vol           Volume.
  * @param work          Original path being walked.
  * @param p             Current position in @p work (start of post-symlink
@@ -266,11 +257,6 @@ static i64 walk_one_component(
  * Owns the path-walk state (current inode, position in @c work) and
  * delegates the per-step work to @ref parse_path_component, @ref
  * walk_one_component, and @ref follow_symlink_step.
- *
- * @note Body is 38 LOC: the state machine (depth-check / root-load /
- *       fast-paths for "/" and "" / setup of work copy / component loop)
- *       is the resolver's whole purpose; further extraction would split
- *       that walk across functions for no clarity gain.
  *
  * @param vol          Volume.
  * @param path         Path to resolve (relative to volume root).
@@ -462,11 +448,6 @@ i64 ext2_stat(const ext2_volume_t *vol, const char *path, ext2_entry_t *entry)
  * looked up directly, its inode validated as a symlink, and the target
  * read via the shared @ref read_symlink_target so fast/slow link layouts
  * stay in one place.
- *
- * @note Body is 33 LOC: linear validation chain (split / non-empty-name
- *       / resolve-parent / not-a-dir / find-entry / read-inode / type-
- *       check / read-target / cap-check / copy) — each gate maps to a
- *       distinct errno.
  *
  * @param vol   Volume handle.
  * @param path  Absolute path of the symlink.

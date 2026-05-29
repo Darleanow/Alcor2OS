@@ -209,12 +209,6 @@ u32 get_block_num(
  * partial alloc doesn't strand metadata blocks the inode now thinks it
  * owns but can't reach.
  *
- * @note Body exceeds the 25-LOC soft cap (four mutually exclusive ranges:
- *       direct, single, double, triple). This is the table-walk exception
- *       the rules allow: the four blocks mirror the on-disk indirect-tree
- *       layout 1:1, and folding them into a loop over a level table loses
- *       that direct correspondence.
- *
  * @param vol              Target volume.
  * @param inode            Inode being grown.
  * @param file_block       File-relative block index.

@@ -62,10 +62,6 @@ i64 read_inode(const ext2_volume_t *vol, u32 ino, ext2_inode_t *inode)
  * inodes live alongside it), and overwriting without merge would clobber
  * them.
  *
- * @note Body is 31 LOC: standard locked-RMW (alloc-read-modify-write-
- *       free) with per-step error cleanup. Same pattern as
- *       @ref read_inode plus the write step.
- *
  * @param vol    Target volume.
  * @param ino    Inode number (1-indexed).
  * @param inode  Inode to write.

@@ -367,11 +367,6 @@ static u32
  * (offset != 0 or short tail); whole-block writes skip the read. Bumps
  * @c i_size + dirty flag when the write extends EOF.
  *
- * @note Body is 27 LOC: the RMW + boundary-clip + size-extend steps are
- *       one logical operation per iteration; extracting a further
- *       sub-helper would split a single read-modify-write across two
- *       functions for no clarity gain.
- *
  * @param file           Open file handle (mutated: i_size, dirty).
  * @param current_pos    Byte offset inside the file.
  * @param src            Source for this iteration only.
@@ -547,12 +542,6 @@ static bool validate_parent_for_create(
  *
  * If the file already exists, opens it instead — matches POSIX
  * @c O_CREAT semantics without @c O_EXCL.
- *
- * @note Body is 33 LOC: a linear sequence of independent validation gates
- *       (exists-check, slot-claim, path-split, parent-validate, inode-
- *       link, handle-fill). Each gate is necessary at this level and
- *       early-returns with NULL; folding any pair would create artificial
- *       coupling between unrelated failure modes.
  *
  * @param vol  Volume handle.
  * @param path Path for the new file.

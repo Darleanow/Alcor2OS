@@ -226,11 +226,6 @@ static void dir_init_first_entry(
  * Holes (sparse blocks) are skipped silently — a hole means "no entries
  * in this slot".
  *
- * @note Body is 30 LOC: the per-block work is delegated, but the kmalloc
- *       lifecycle + per-iteration error cleanup needs to bracket the
- *       outer loop. Extracting that into a callback iterator would cost
- *       more clarity than it saves.
- *
  * @param vol        Volume.
  * @param dir_inode  Directory inode.
  * @param name       Entry name to find.
@@ -390,10 +385,6 @@ i64 dir_add_entry(
  * Per-block scan via @ref dir_block_remove_name; on hit, the block is
  * written back since the scanner mutated it in place (either tombstoned
  * the head dirent or merged into the previous one).
- *
- * @note Body is 27 LOC — same kmalloc-bracketed outer loop as
- *       @ref dir_find_entry, kept symmetric on purpose so the two read
- *       identically next to each other.
  *
  * @param vol        Volume.
  * @param dir_inode  Directory inode.

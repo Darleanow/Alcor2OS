@@ -68,12 +68,6 @@ static void fill_entry_from_dirent(
  * is meaningless on disk; the only authoritative way to find entry N is
  * to walk N entries. Callers (readdir loops) just increment @p index.
  *
- * @note Body is 44 LOC: the outer block-walk needs to advance the
- *       per-block position via @c rec_len after every dirent (which the
- *       per-block scanners in @c dir_entry.c can't expose without losing
- *       the "Nth in dir" counter), so the inline scan is the natural
- *       shape.
- *
  * @param dir    Open directory handle.
  * @param index  Zero-based entry index to fetch.
  * @param entry  Output entry structure.
@@ -290,12 +284,6 @@ static i64 mkdir_finalize_or_rollback(
  * Linear bring-up with rollback delegated to @ref
  * mkdir_finalize_or_rollback.
  *
- * @note Body is 33 LOC: the seven phases (validate / alloc-inode /
- *       init-inode / seed-block / finalize-or-rollback / parent-link-
- *       bump / flush) are each one or two calls; the residual LOC is
- *       interleaved declarations + blank-line grouping that keeps the
- *       phases visually separated.
- *
  * @param vol  Volume handle.
  * @param path Path for the new directory.
  * @return 0 on success, negative errno on error.
@@ -342,11 +330,6 @@ i64 ext2_mkdir(ext2_volume_t *vol, const char *path)
  * zero — preserves hard-link semantics even though the rest of the
  * driver doesn't expose link/2.
  *
- * @note Body is 32 LOC: linear validation chain (resolve / type-check /
- *       split / resolve-parent / remove-entry / link-bookkeeping) with
- *       each gate returning a distinct errno — folding any pair would
- *       merge unrelated failure modes.
- *
  * @param vol  Volume handle.
  * @param path Path to the file.
  * @return 0 on success, negative errno on error.
@@ -391,10 +374,6 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
  * Refuses non-empty directories (-ENOTEMPTY) and the root (-EINVAL) up
  * front so the destructive frees only run on cases that genuinely
  * collapse to "no longer reachable".
- *
- * @note Body is 33 LOC: linear validation chain (root / resolve /
- *       not-a-dir / not-empty / split / resolve-parent / remove-entry)
- *       — each gate is necessary at this level.
  *
  * @param vol  Volume handle.
  * @param path Path to the directory.

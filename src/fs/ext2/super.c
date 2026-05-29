@@ -112,10 +112,6 @@ static i64 write_superblock(ext2_volume_t *vol)
  * need a contiguous kmalloc the size of the whole table — only one block's
  * worth of scratch.
  *
- * @note Body is 29 LOC: one allocation, one per-block loop with bounds
- *       clipping. Splitting the loop body out gains nothing — the per-
- *       block payload is two function calls and two arithmetic ops.
- *
  * @param vol  Volume with the mutated @c vol->groups.
  * @return 0 on success, negative errno on I/O failure or OOM.
  */
@@ -260,10 +256,6 @@ static void populate_volume_from_sb(
  * copies into the typed @c groups array. Two allocations are required —
  * @c groups must outlive the function but @c gdt_buf doesn't.
  *
- * @note Body is 30 LOC: two kmalloc lifecycles must bracket the per-block
- *       read loop. Splitting would force the second alloc to bubble back
- *       up through an extra layer.
- *
  * @param vol  Volume (already populated by @ref populate_volume_from_sb).
  * @return 0 on success, -ENOMEM / -EIO otherwise; on failure @c vol->groups
  *         is freed and left NULL.
@@ -307,11 +299,6 @@ static i64 load_group_descriptors(ext2_volume_t *vol)
  * Linear bring-up: each helper either succeeds or rolls back what it
  * allocated. Errors funnel to a single NULL return with a console message,
  * so the caller doesn't need an errno channel.
- *
- * @note Body is 33 LOC: four phases (slot-claim / superblock-read /
- *       populate / GDT-load) plus per-phase logging. Each console_print
- *       is tied to a specific failure mode the user diagnoses from boot
- *       output, so they stay inlined rather than wrapped in a helper.
  *
  * @param dev            Block device backing the volume.
  * @param partition_lba  Partition start, in sectors.
