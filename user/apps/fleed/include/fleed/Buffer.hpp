@@ -10,8 +10,14 @@
 #include <cstddef>
 #include <filesystem>
 #include <string>
+#include <vector>
 
 namespace fleed {
+
+struct Cursor
+{
+  size_t y = 0, x = 0;
+};
 
 class Buffer
 {
@@ -34,9 +40,9 @@ public:
   /**
    * @brief Append raw bytes at the end of the buffer.
    * @param data Pointer to the bytes to copy.
-   * @param n    Number of bytes to copy from @p data.
+   * @param n length.
    */
-  void append(const char *data, std::size_t n);
+  void append(const char *data, size_t n);
 
   /**
    * @brief Remove the last byte of the buffer if any.
@@ -44,17 +50,47 @@ public:
    */
   bool popBack();
 
-  /** @brief Read-only view of the underlying text. */
-  const std::string &text() const noexcept;
+  /**
+   * @brief Get the line corresponding to the @c row.
+   * @param row Row index.
+   * @return the line of text.
+   */
+  const std::string &line(size_t row) const;
 
-  /** @brief Number of bytes currently held. */
-  std::size_t size() const noexcept;
+  /** @brief get total line count.
+   * @return total line count.
+   */
+  size_t lineCount() const;
 
   /** @brief Whether the buffer holds any bytes. */
-  bool empty() const noexcept;
+  bool          empty() const noexcept;
+
+  /** @brief Get the current cursor position.
+    * @return the current cursor position.
+    */
+  const Cursor &cursor() const noexcept;
+
+  /** @brief Sets cursor position at @c y @c x
+   * @param y the Y coordinate
+   * @param x the X coordinate
+   */
+  void setCursorPos(size_t x, size_t y);
+
+  /** @brief Moves cursor Up if possible.*/
+  void cursorMoveUp();
+
+  /** @brief Moves the cursor Down if possible */
+  void cursorMoveDown();
+
+  /** @brief Moves the cursor Left if possible. */
+  void cursorMoveLeft();
+
+  /** @brief Moves the cursor Right if possible. */
+  void cursorMoveRight();
 
 private:
-  std::string m_text;
+  std::vector<std::string> m_text;
+  Cursor                   m_cursor;
 };
 
 } /* namespace fleed */
