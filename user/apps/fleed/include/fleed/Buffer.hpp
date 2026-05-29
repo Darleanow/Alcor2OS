@@ -45,6 +45,11 @@ public:
   void append(const char *data, size_t n);
 
   /**
+   * @brief Copies from cursor to next line.
+   */
+  void newLine();
+
+  /**
    * @brief Remove the last byte of the buffer if any.
    * @return @c true if a byte was removed, @c false if the buffer was empty.
    */
@@ -63,11 +68,11 @@ public:
   size_t lineCount() const;
 
   /** @brief Whether the buffer holds any bytes. */
-  bool          empty() const noexcept;
+  bool empty() const noexcept;
 
   /** @brief Get the current cursor position.
-    * @return the current cursor position.
-    */
+   * @return the current cursor position.
+   */
   const Cursor &cursor() const noexcept;
 
   /** @brief Sets cursor position at @c y @c x

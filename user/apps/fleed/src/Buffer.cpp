@@ -49,6 +49,19 @@ void Buffer::append(const char *data, size_t n)
   setCursorPos(m_cursor.x + n, m_cursor.y);
 }
 
+void Buffer::newLine()
+{
+  std::string &curr_line = m_text.at(m_cursor.y);
+
+  std::string  s = curr_line.substr(m_cursor.x, curr_line.size());
+  curr_line.erase(
+      curr_line.begin() + static_cast<int>(m_cursor.x), curr_line.end()
+  );
+  m_text.insert(m_text.begin() + static_cast<int>(m_cursor.y) + 1, s);
+
+  setCursorPos(0, m_cursor.y + 1);
+}
+
 bool Buffer::popBack()
 {
   if(m_text.empty())
