@@ -16,6 +16,7 @@
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kstdlib.h>
 #include <alcor2/mm/vmm.h>
+#include <alcor2/proc/proc.h>
 #include <alcor2/proc/sched.h>
 
 #define RING_CAP 256
@@ -237,7 +238,16 @@ i64 mouse_read_block(alcor2_mouse_event_t *out)
     proc_block(me);
     cpu_enable_interrupts();
     proc_schedule();
-    /* Loop and re-check the ring after waking. */
+    /* Pending signal? Drop the waiter slot and bail with -EINTR so the
+     * syscall return path drives delivery (default action / handler). */
+    if(proc_signal_pending(me)) {
+      cpu_disable_interrupts();
+      if(g.waiter == me)
+        g.waiter = NULL;
+      cpu_enable_interrupts();
+      return -EINTR;
+    }
+    /* Otherwise loop and re-check the ring after waking. */
   }
 }
 
