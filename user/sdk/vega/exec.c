@@ -219,10 +219,19 @@ static int resolve_path(const char *name, char *out_path)
   return 0;
 }
 
-/* Fork an external command. The parent registers the child as TTY
- * foreground for the wait window so Ctrl+C routes SIGINT to the child;
- * foreground is cleared (not reset to the shell's PID) after the wait so
- * a subsequent Ctrl+C at the prompt does not target the shell. */
+/**
+ * @brief Fork-exec a single external command.
+ *
+ * Parent registers the child as TTY foreground for the wait window so
+ * Ctrl+C routes SIGINT to the child; foreground is cleared (not reset to
+ * the shell's PID) after the wait so a subsequent Ctrl+C at the prompt
+ * does not target the shell.
+ *
+ * @param argv    NULL-terminated expanded argv (argv[0] rewritten to the
+ *                resolved path in the child).
+ * @param redirs  Redirection list applied inside the child.
+ * @return Exit status (0-255), or -1 on resolve/fork failure.
+ */
 static int run_external(char **argv, const redir_t *redirs)
 {
   char path[MAX_EXEC_PATH];
@@ -450,10 +459,16 @@ static void exec_stage_in_child(ast_t *stage)
   _exit(127);
 }
 
-/* Close the first @p opened pipe pairs in @p pipes. Used by both error
- * cleanup (close what we successfully created before bailing) and the
- * post-fork drain (parent has to close all stage-to-stage fds so EOF
- * propagates when stages exit). */
+/**
+ * @brief Close the first @p opened pipe pairs in @p pipes.
+ *
+ * Used by both error cleanup (close what we successfully created before
+ * bailing) and the post-fork drain (parent has to close every stage-to-
+ * stage fd so EOF propagates when stages exit).
+ *
+ * @param pipes   Array of pipe pairs.
+ * @param opened  Number of leading pairs that were successfully opened.
+ */
 static void pipeline_close_pipes(int (*pipes)[2], int opened)
 {
   for(int j = 0; j < opened; j++) {
@@ -462,10 +477,17 @@ static void pipeline_close_pipes(int (*pipes)[2], int opened)
   }
 }
 
-/* Print a one-line error to stdout and clean up any opened pipes.
- * Centralised so the three pipeline error sites (too-long, pipe(), fork())
- * have one cleanup contract. Always returns 1 — the shell's "pipeline
- * failed" exit status. */
+/**
+ * @brief Print a one-line error and clean up any opened pipes.
+ *
+ * Centralised so the three pipeline error sites (too-long, pipe(),
+ * fork()) share one cleanup contract.
+ *
+ * @param msg     NUL-terminated error message (written verbatim).
+ * @param pipes   Array of pipe pairs to close.
+ * @param opened  Number of leading pairs that were successfully opened.
+ * @return Always 1 — the shell's "pipeline failed" exit status.
+ */
 static int pipeline_die(const char *msg, int (*pipes)[2], int opened)
 {
   pipeline_close_pipes(pipes, opened);
@@ -473,8 +495,17 @@ static int pipeline_die(const char *msg, int (*pipes)[2], int opened)
   return 1;
 }
 
-/* Open the N-1 internal pipes for an N-stage pipeline; rolls back any
- * already-opened pairs on the first pipe() failure. */
+/**
+ * @brief Open the N-1 internal pipes for an N-stage pipeline.
+ *
+ * Rolls back any already-opened pairs on the first @c pipe() failure so
+ * the caller's @p pipes array contains no half-open descriptors on
+ * error.
+ *
+ * @param pipes  Out-array of pipe pairs (N-1 used).
+ * @param N      Stage count.
+ * @return 0 on success, -1 on any @c pipe() failure.
+ */
 static int pipeline_open_pipes(int (*pipes)[2], int N)
 {
   for(int i = 0; i < N - 1; i++) {
@@ -486,10 +517,19 @@ static int pipeline_open_pipes(int (*pipes)[2], int N)
   return 0;
 }
 
-/* In the child of stage @p i: dup2 the right pipe ends onto fds 0/1, close
- * every internal pipe (no longer needed once dup2'd), and exec the stage —
- * exec_stage_in_child never returns. The caller (parent) treats this
- * function as a no-op when fork returned a non-zero pid. */
+/**
+ * @brief Child-side entry for one pipeline stage.
+ *
+ * dup2 the right pipe ends onto fds 0/1, close every internal pipe (no
+ * longer needed once dup2'd), and exec the stage — @ref
+ * exec_stage_in_child never returns. Only invoked when fork returned
+ * @c 0 in the caller.
+ *
+ * @param stage  AST node for this stage.
+ * @param pipes  Full pipeline pipes array.
+ * @param i      Zero-based stage index.
+ * @param N      Total stage count.
+ */
 static void pipeline_run_stage(ast_t *stage, int (*pipes)[2], int i, int N)
 {
   if(i > 0)
@@ -500,10 +540,19 @@ static void pipeline_run_stage(ast_t *stage, int (*pipes)[2], int i, int N)
   exec_stage_in_child(stage);
 }
 
-/* Fork the N stages into pids[]. On any fork() failure, kill nothing
- * (already-forked children will exit on their own once their parent dies
- * or pipes close) but close every pipe so the survivors get EOF and the
- * caller can report the error. */
+/**
+ * @brief Fork the N stages into @p pids.
+ *
+ * On any @c fork() failure the function returns immediately without
+ * killing already-forked children; the caller closes the pipes so the
+ * survivors get EOF and exit on their own.
+ *
+ * @param stages  Stage AST nodes.
+ * @param pipes   Internal pipes for the pipeline (used by the child branch).
+ * @param N       Stage count.
+ * @param pids    Out-array of N child PIDs.
+ * @return 0 on success, -1 if any @c fork failed.
+ */
 static int pipeline_fork_all(ast_t **stages, int (*pipes)[2], int N, int *pids)
 {
   for(int i = 0; i < N; i++) {
@@ -516,9 +565,17 @@ static int pipeline_fork_all(ast_t **stages, int (*pipes)[2], int N, int *pids)
   return 0;
 }
 
-/* Reap the N stages. Pipeline exit status is the last stage's status,
- * matching bash. The TTY foreground is the last stage so a user pressing
- * Ctrl+C targets the stage whose status the shell is about to surface. */
+/**
+ * @brief Reap the N pipeline stages and return the last stage's status.
+ *
+ * Pipeline exit status is the last stage's status, matching bash. TTY
+ * foreground is registered for the last stage so Ctrl+C targets the
+ * stage whose status the shell is about to surface.
+ *
+ * @param pids  PIDs of the N forked stages.
+ * @param N     Stage count.
+ * @return Last stage's exit status (0-255).
+ */
 static int pipeline_wait_all(int *pids, int N)
 {
   alcor_set_fg_pid(pids[N - 1]);
@@ -533,10 +590,18 @@ static int pipeline_wait_all(int *pids, int N)
   return last_status;
 }
 
-/* Run an N-stage pipeline. Phases: validate → open pipes → fork stages →
- * close pipes in parent → wait. Each phase is one helper call; error
- * paths funnel through pipeline_die. Expansion happens inside each child
- * (exec_stage_in_child) to avoid mutating the shared AST. */
+/**
+ * @brief Run an N-stage pipeline.
+ *
+ * Phases: validate → open pipes → fork stages → close pipes in parent →
+ * wait. Each phase is one helper call; error paths funnel through
+ * @ref pipeline_die. Expansion happens inside each child
+ * (@ref exec_stage_in_child) to avoid mutating the shared AST that loop
+ * bodies re-execute.
+ *
+ * @param n  AST node of kind @c AST_PIPE.
+ * @return Last stage's exit status, or 1 on pipeline setup failure.
+ */
 static int exec_pipeline(ast_t *n)
 {
   int     N      = n->u.pipeline.n;

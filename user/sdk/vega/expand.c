@@ -166,13 +166,22 @@ static int is_name_cont(char c)
   return is_name_start(c) || (c >= '0' && c <= '9');
 }
 
-/* Bytes the substitution read loop pulls per iteration; also the grow
- * trigger (next iteration needs room for SUBST_CHUNK + 1 bytes). */
+/**
+ * @brief Bytes the substitution read loop pulls per iteration; also the
+ *        grow trigger (next iteration needs room for SUBST_CHUNK + 1).
+ */
 #define SUBST_CHUNK 256
 
-/* Ensure @p *buf has room for at least one more SUBST_CHUNK + NUL.
- * Doubles @p *cap when short. Returns 0 on success, -1 on realloc
- * failure (caller's @p *buf is unchanged in that case). */
+/**
+ * @brief Grow @p *buf if it lacks room for another @ref SUBST_CHUNK + NUL.
+ *
+ * Doubles @p *cap when short; @p *buf is unchanged on @c realloc failure.
+ *
+ * @param buf  In/out heap pointer (replaced on grow).
+ * @param cap  In/out capacity in bytes (doubled on grow).
+ * @param len  Current occupied length.
+ * @return 0 on success, -1 on @c realloc failure.
+ */
 static int subst_grow_if_needed(char **buf, size_t *cap, size_t len)
 {
   if(len + SUBST_CHUNK + 1 <= *cap)
@@ -186,9 +195,17 @@ static int subst_grow_if_needed(char **buf, size_t *cap, size_t len)
   return 0;
 }
 
-/* Drain @p fd into a freshly-allocated, NUL-terminated heap buffer.
- * Returns NULL on malloc/realloc failure (caller still has to reap the
- * child); @p *out_len holds the final byte count. */
+/**
+ * @brief Drain @p fd into a freshly-allocated, NUL-terminated heap buffer.
+ *
+ * On malloc/realloc failure returns NULL; the caller is still responsible
+ * for reaping the child that's writing to @p fd.
+ *
+ * @param fd       Pipe read fd to drain (read until 0 or error).
+ * @param out_len  Output: bytes captured (excluding the appended NUL).
+ * @return Heap-allocated buffer (caller frees), or NULL on allocation
+ *         failure.
+ */
 static char *capture_pipe_to_buf(int fd, size_t *out_len)
 {
   size_t cap = SUBST_CHUNK;
@@ -211,10 +228,17 @@ static char *capture_pipe_to_buf(int fd, size_t *out_len)
   return buf;
 }
 
-/* Fork a child that runs @p cmd_str through vega_run with stdout
- * redirected to a fresh pipe. Returns the parent-side read fd and the
- * child's pid via @p *out_pid; returns -1 on pipe/fork failure. The
- * child path never returns (_exit). */
+/**
+ * @brief Fork a child that runs @p cmd_str with stdout redirected to a
+ *        fresh pipe.
+ *
+ * The child path never returns (@c _exit). Parent receives the read fd
+ * via the return value and the child PID via @p *out_pid.
+ *
+ * @param cmd_str  Vega source for the child to execute.
+ * @param out_pid  Output: child PID (set only on success).
+ * @return Read fd of the pipe on success, -1 on @c pipe / @c fork failure.
+ */
 static int fork_subst_child(const char *cmd_str, int *out_pid)
 {
   int pipefd[2];
@@ -238,11 +262,18 @@ static int fork_subst_child(const char *cmd_str, int *out_pid)
   return pipefd[0];
 }
 
-/* Run @p cmd_str through vega_run in a forked child with stdout captured
- * via a pipe; trailing newlines are stripped (matches bash $(...)).
- * Returns NULL on any failure. The TTY foreground is set to the child
- * for the wait window so Ctrl+C kills the substitution rather than the
- * shell that's draining its pipe. */
+/**
+ * @brief Implement vega's @c $(...) command substitution.
+ *
+ * Runs @p cmd_str in a forked child with stdout captured via a pipe;
+ * trailing newlines are stripped (matches bash). TTY foreground is set
+ * to the child for the wait window so Ctrl+C kills the substitution
+ * rather than the shell that's draining its pipe.
+ *
+ * @param cmd_str  Vega source to run.
+ * @return Heap-allocated captured output (caller frees), or NULL on any
+ *         setup/alloc failure.
+ */
 static char *run_substitution(const char *cmd_str)
 {
   int pid;

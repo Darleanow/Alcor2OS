@@ -82,11 +82,22 @@ static void pend_ss3(char tail)
   out_pend_push((unsigned char)tail);
 }
 
-/* Deliver one codepoint.  ASCII (<0x80) is written to *out directly even in
- * dry mode so peek paths (kbd_irq_check_intr) can inspect the byte they
- * would emit. Latin-1 (0x80..0xFF, AZERTY accents) is transcoded to 2-byte
- * UTF-8 and pushed to out_pend; that step is the global-state mutation we
- * skip in dry mode and the caller gets readability=true without a byte. */
+/**
+ * @brief Deliver one codepoint as ASCII into @p *out or as UTF-8 into
+ *        the pending-bytes queue.
+ *
+ * ASCII (< 0x80) is written to @p *out directly even in dry mode so peek
+ * paths (@ref kbd_irq_check_intr) can inspect the byte they would emit.
+ * Latin-1 (0x80..0xFF — AZERTY accents) is transcoded to 2-byte UTF-8
+ * and pushed to @c out_pend; that step is the global-state mutation that
+ * dry mode skips, returning readability=true without producing a byte.
+ *
+ * @param cp   Codepoint to emit (≤ 0xFF; layout tables hold no higher).
+ * @param out  Single-byte output slot (written for ASCII even when @p dry).
+ * @param dry  When true, no @c out_pend push happens.
+ * @return @c true when the call would deliver a byte (ASCII path always;
+ *         Latin-1 path only when not dry).
+ */
 static bool emit_user_cp(unsigned char cp, unsigned char *out, bool dry)
 {
   if(cp < 0x80u) {
@@ -322,8 +333,28 @@ bool kbd_get_release_events(void)
   return release_events;
 }
 
-/* dry=true: report whether the scancode would emit without touching state
- * (used by kbd_raw_pending for select(2) readability). */
+/**
+ * @brief Drive one PS/2 scancode through the keyboard state machine.
+ *
+ * Handles @c 0xE0 prefixes (arrow keys, navigation, extended Alt),
+ * modifier press/release, Function-key dispatch, and layout-aware
+ * printable translation. Multi-byte emits (CSI / SS3 escape sequences,
+ * UTF-8 continuation bytes) go via @c out_pend so the single-byte
+ * @p *out slot stays simple. @p dry runs the dispatch on @p s without
+ * pushing to @c out_pend — used by @ref kbd_raw_pending for select(2)
+ * readability and by @ref kbd_irq_check_intr to peek for VINTR; both
+ * pass a state copy by value so the real translator isn't mutated.
+ *
+ * @note Body intentionally exceeds the 25-LOC soft cap: it is a multi-
+ *       phase scancode dispatcher (e0 path / modifier / release / F1-F12
+ *       table / printable). See #94 for the proposed decomposition.
+ *
+ * @param raw  Raw scancode byte from the keyboard ring.
+ * @param s    Translator state (mutated unless caller passes a copy).
+ * @param out  Single-byte output slot (written for ASCII emits).
+ * @param dry  When true, suppress @c out_pend pushes.
+ * @return @c true when the scancode would (or did) produce a byte.
+ */
 static bool
     process_raw_ctx(u8 raw, kbd_ev_ctx_t *s, unsigned char *out, bool dry)
 {
