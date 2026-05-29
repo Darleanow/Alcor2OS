@@ -4,18 +4,25 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <curses.h>
 
 namespace fleed {
 
 /** @brief Editor-level operations that a keystroke can request. */
-enum class Command
+enum class Command : std::uint8_t
 {
   None,      /**< Unhandled keystroke; the caller should ignore it. */
   Quit,      /**< Leave the editor without saving. */
   Save,      /**< Persist the buffer to its file. */
   Backspace, /**< Remove the last byte of the buffer. */
   Insert,    /**< Insert @c KeyAction::data into the buffer at the cursor. */
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Home,
+  End
 };
 
 /** @brief Result of @ref classify: a command and, for @ref Command::Insert,
