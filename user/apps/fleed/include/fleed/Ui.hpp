@@ -64,7 +64,7 @@ public:
 
   /**
    * @brief redraws cursor at current position.
-   * buffer The text buffer containing the cursor.
+   * @param buffer The text buffer containing the cursor.
    */
   void redrawCursor(const Buffer &buffer);
 
