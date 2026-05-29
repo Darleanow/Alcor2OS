@@ -258,9 +258,10 @@ while cmd { body }
 
 Loops while `cmd` returns 0. There is no `break` or `continue`.
 
-There is no Ctrl-C handler in vega; an infinite loop wedges the QEMU
-console. Design test cases to terminate (e.g. `while ls /m { rm /m; ... }`
-removes the marker the condition tests for).
+A runaway external command inside a `while` body is killable with Ctrl-C
+(the kernel routes SIGINT to the foreground child). A pure-vega tight
+loop with no externals is not — vega itself has no signal handler yet,
+so `while true { let i 0 }` still wedges the console.
 
 ### Control flow: `for`
 
@@ -611,7 +612,9 @@ itself reading a pipe).
 - **Heredoc delimiter cap** `MAX_HEREDOC_DELIM = 64` chars.
 - **`fail-fast (cmd!)` does not propagate through pipelines** — only
   triggers in simple-command position.
-- **No Ctrl-C handler** — runaway loops wedge the console; reset QEMU.
+- **No vega-internal Ctrl-C handler** — kernel-side SIGINT kills the
+  current external child, but a pure-vega tight loop with no external
+  command still wedges the console.
 - **No history / line editing** beyond Backspace and Ctrl-L (clear).
 - **Stdio uses a kernel fallback path** when the shell hasn't explicitly
   opened fds 0/1/2; some interactions with redir-save/restore depend on
@@ -644,7 +647,9 @@ Roughly ordered by impact:
 - **`set -o pipefail`** and other shell options.
 - **History + line editing** (arrow keys, Ctrl-R search).
 - **Globbing** (`*`, `?`, `[...]`).
-- **`trap`** — register handlers for signals (needs kernel SIGINT first).
+- **`trap`** — register handlers for signals (kernel SIGINT delivery is
+  in place; vega just needs to install its own handler and surface a
+  builtin to register user-provided ones).
 - **Subshell groups** `(...)` and brace groups `{...}` as expressions.
 - **Arithmetic** — `$((a+b))` or a `let` expression form.
 
