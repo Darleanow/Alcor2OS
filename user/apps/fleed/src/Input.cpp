@@ -29,11 +29,17 @@ KeyAction classify(int kind, wint_t ch)
       return {Command::Home, 0};
     if(ch == static_cast<wint_t>(KEY_END))
       return {Command::End, 0};
+    if(ch == static_cast<wint_t>(KEY_ENTER))
+      return {Command::Enter, 0};
     return {Command::None, 0};
   }
 
-  if(kind == OK && (std::iswprint(ch) || ch == L'\n'))
-    return {Command::Insert, static_cast<wchar_t>(ch)};
+  if(kind == OK) {
+    if(ch == L'\n')
+      return {Command::Enter, 0};
+    if(std::iswprint(ch))
+      return {Command::Insert, static_cast<wchar_t>(ch)};
+  };
 
   return {Command::None, 0};
 }

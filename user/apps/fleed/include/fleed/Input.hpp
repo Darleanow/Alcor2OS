@@ -22,7 +22,8 @@ enum class Command : std::uint8_t
   ArrowLeft,
   ArrowRight,
   Home,
-  End
+  End,
+  Enter
 };
 
 /** @brief Result of @ref classify: a command and, for @ref Command::Insert,
