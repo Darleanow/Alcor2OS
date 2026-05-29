@@ -7,6 +7,7 @@
 
 #include <array>
 #include <climits>
+#include <cstdio>
 #include <cwchar>
 #include <iostream>
 
@@ -25,7 +26,7 @@ int Editor::run()
     std::cerr << "fleed: failed to initialise UI\n";
     return 1;
   }
-  m_ui.redraw(m_buffer.text());
+  m_ui.redraw(m_buffer);
 
   for(;;) {
     wint_t ch   = 0;
@@ -40,14 +41,36 @@ int Editor::run()
       break;
     case Command::Backspace:
       if(m_buffer.popBack())
-        m_ui.redraw(m_buffer.text());
+        m_ui.redraw(m_buffer);
       break;
     case Command::Insert:
       insertChar(act.data);
       break;
+    case Command::ArrowUp:
+      m_buffer.cursorMoveUp();
+      break;
+    case Command::ArrowDown:
+      m_buffer.cursorMoveDown();
+      break;
+    case Command::ArrowLeft:
+      m_buffer.cursorMoveLeft();
+      break;
+    case Command::ArrowRight:
+      m_buffer.cursorMoveRight();
+      break;
+    case Command::Home:
+      m_buffer.setCursorPos(0, m_buffer.cursor().y);
+      break;
+    case Command::End:
+      m_buffer.setCursorPos(
+          m_buffer.line(m_buffer.cursor().y).size(), m_buffer.cursor().y
+      );
+      break;
+
     case Command::None:
       break;
     }
+    m_ui.redrawCursor(m_buffer);
   }
 }
 
