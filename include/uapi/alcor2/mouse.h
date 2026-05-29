@@ -6,16 +6,16 @@
 #ifndef ALCOR2_MOUSE_H
 #define ALCOR2_MOUSE_H
 
-#include <alcor2/types.h>
+#include <stdint.h>
 
 /** @brief One mouse event delivered via @c read(/dev/mouse). */
 typedef struct alcor2_mouse_event
 {
-  i32 dx;      /**< Relative X delta since last EV_SYN. */
-  i32 dy;      /**< Relative Y delta since last EV_SYN. */
-  i16 dwheel;  /**< Vertical wheel notches (positive = up). */
-  u8  buttons; /**< Bitmask: bit 0 LEFT, bit 1 RIGHT, bit 2 MIDDLE. */
-  u8  flags;   /**< Reserved; zero today. */
+  int32_t dx;      /**< Relative X delta since last EV_SYN. */
+  int32_t dy;      /**< Relative Y delta since last EV_SYN. */
+  int16_t dwheel;  /**< Vertical wheel notches (positive = up). */
+  uint8_t buttons; /**< Bitmask: bit 0 LEFT, bit 1 RIGHT, bit 2 MIDDLE. */
+  uint8_t flags;   /**< Reserved; zero today. */
 } alcor2_mouse_event_t;
 
 /** @brief Button bit positions in @c alcor2_mouse_event.buttons. */
@@ -28,7 +28,7 @@ typedef struct alcor2_mouse_event
 #define ALCOR2_MOUSE_IOC_DIR_W 1U
 #define ALCOR2_MOUSE_IOC_DIR_R 2U
 #define ALCOR2_MOUSE_IOC_MAKE(dir, size, nr)                                   \
-  (((dir) << 30) | ((u32)(size) << 16) | ('M' << 8) | (nr))
+  (((dir) << 30) | ((uint32_t)(size) << 16) | ('M' << 8) | (nr))
 
 /** ioctl(fd, ALCOR2_IOC_MOUSE_SET_RELATIVE, &uint32_t enabled).
  *  enabled != 0 → relative mode (cursor pinned, deltas flow). */

@@ -10,20 +10,20 @@
 #ifndef ALCOR2_ALCOR_FB_H
 #define ALCOR2_ALCOR_FB_H
 
-#include <alcor2/types.h>
+#include <stdint.h>
 
 /** @brief Linear framebuffer description (fixed layout for syscall ABI). */
-typedef struct PACKED
+typedef struct __attribute__((packed))
 {
-  u32 width;
-  u32 height;
-  u32 pitch;
-  u16 bpp;
-  u16 _pad;
+  uint32_t width;
+  uint32_t height;
+  uint32_t pitch;
+  uint16_t bpp;
+  uint16_t _pad;
   /** @brief Active bytes: @c pitch * height (may be less than @a map_size). */
-  u64 byte_len;
+  uint64_t byte_len;
   /** @brief Mappable span in bytes (page-aligned, includes leading padding). */
-  u64 map_size;
+  uint64_t map_size;
 } alcor_fb_info_t;
 
 #endif
