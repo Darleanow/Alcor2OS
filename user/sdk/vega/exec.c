@@ -621,6 +621,24 @@ static int exec_pipeline(ast_t *n)
   return pipeline_wait_all(pids, N);
 }
 
+/**
+ * @brief Walk one vega AST node and run it.
+ *
+ * Dispatches by @c node->kind:
+ *  - @c AST_CMD → @ref exec_cmd (single command, function, or builtin)
+ *  - @c AST_AND / @c AST_OR → recursive short-circuit on the binop pair
+ *  - @c AST_SEQ → left then right, return right's status
+ *  - @c AST_PIPE → @ref exec_pipeline
+ *  - @c AST_IF / @c AST_WHILE / @c AST_FOR → control-flow recursion
+ *  - @c AST_FAILFAST → unwraps the trailing `!` modifier
+ *  - @c AST_FN_DEF → register the function and return 0
+ *
+ * The status of each branch is also written to @c expand_set_status so
+ * @c $? sees it on the next expansion.
+ *
+ * @param node  AST node (NULL is allowed and returns 0).
+ * @return Exit status of the executed node (0-255).
+ */
 int vega_exec(ast_t *node)
 {
   if(!node)
