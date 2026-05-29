@@ -9,6 +9,12 @@
 #include <string.h>
 #include <unistd.h>
 
+/**
+ * @brief Remove a single empty directory, printing an error on failure.
+ *
+ * @param path Directory path to remove.
+ * @return 0 on success, -1 on failure.
+ */
 static int remove_dir(const char *path)
 {
   if(rmdir(path) < 0) {
@@ -18,6 +24,13 @@ static int remove_dir(const char *path)
   return 0;
 }
 
+/**
+ * @brief Remove a directory and optionally each successive parent component.
+ *
+ * @param path    Directory path to remove.
+ * @param parents Non-zero to also remove ancestor directories.
+ * @return 0 on success, -1 on the first failure.
+ */
 static int remove_with_parents(const char *path, int parents)
 {
   char buf[4096];
@@ -58,6 +71,13 @@ static int remove_with_parents(const char *path, int parents)
   return 0;
 }
 
+/**
+ * @brief Entry point for the @c rmdir utility.
+ *
+ * @param argc Argument count from the shell.
+ * @param argv Argument vector from the shell.
+ * @return 0 on success, 1 if any directory could not be removed.
+ */
 int main(int argc, char *argv[])
 {
   int show_parents = 0;
