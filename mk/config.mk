@@ -60,7 +60,7 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Werror \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -DSYS_TRACE=$(SYS_TRACE) \
-          -I$(INCLUDE) -I$(UAPI) -Isrc -MMD -MP
+          -I$(INCLUDE) -Isrc -MMD -MP
 ifeq ($(DEBUG),1)
   CFLAGS += -g
 endif

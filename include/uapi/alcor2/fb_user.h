@@ -15,17 +15,9 @@
 #define ALCOR2_ALCOR_FB_USER_H
 
 #include <alcor2/fb.h>
+#include <alcor2/syscall.h> /* SYS_ALCOR_FB_INFO / MMAP — single source of truth. */
 #include <sys/syscall.h>
 #include <unistd.h>
-
-/** @name Custom syscall numbers — must match the kernel's syscall.h. @{ */
-#ifndef SYS_ALCOR_FB_INFO
-  #define SYS_ALCOR_FB_INFO 498
-#endif
-#ifndef SYS_ALCOR_FB_MMAP
-  #define SYS_ALCOR_FB_MMAP 499
-#endif
-/** @} */
 
 /**
  * @brief Query framebuffer geometry (dimensions, pitch, pixel offset).

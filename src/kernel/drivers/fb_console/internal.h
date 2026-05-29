@@ -14,7 +14,7 @@
 #define ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H
 
 #include <alcor2/arch/pit.h>
-#include <alcor2/fb_console_ioctl.h>
+#include <uapi/alcor2/fb_console_ioctl.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>

@@ -34,7 +34,6 @@ CFLAGS := -std=gnu11 -Wall -Wextra -Os \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -I$(MUSL_INC) \
           -I$(USER_BASE)/../include/uapi \
-          -I$(USER_BASE)/../include \
           -I$(USER_BASE)/include
 ifeq ($(DEBUG),1)
   CFLAGS += -g -fsanitize=undefined
@@ -59,7 +58,6 @@ CXXFLAGS := -std=gnu++17 -Wall -Wextra -Os \
             -mno-red-zone \
             -I$(MUSL_INC) \
             -I$(USER_BASE)/../include/uapi \
-            -I$(USER_BASE)/../include \
             -I$(USER_BASE)/include
 
 # libgcc_eh before libc (unwind / dl_iterate_phdr from libc.a)

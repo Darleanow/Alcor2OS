@@ -10,49 +10,9 @@
 
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/types.h>
+#include <uapi/alcor2/kbd.h> /* UAPI: ioctl codes and kbd_layout_t enum */
 
 struct proc;
-
-/*
- * Linux ioctl direction/size encoding (same as _IOW et al.):
- * bits 31:30 — direction (01 = write, user → kernel)
- * bits 23:16 — argument size in bytes
- * bits 15:8  — type character ('K' = keyboard)
- * bits  7:0  — command ordinal
- */
-
-/**
- * ioctl(request) for stdin (fd 0): set layout by id.
- *
- * Mirrors musl `_IOW('K', 1, uint32_t)` encoding.
- *
- * Usage (user): uint32_t id = KBD_LAYOUT_FR; ioctl(0,
- * ALCOR2_IOC_KBD_SET_LAYOUT, &id);
- */
-#define ALCOR2_IOC_KBD_SET_LAYOUT                                              \
-  ((1U << 30) | (0x4BU << 8) | 1U | (sizeof(uint32_t) << 16))
-
-/**
- * ioctl(request) for stdin (fd 0): toggle key-release events.
- *
- * When enabled, releasing a printable key emits a \x00<char> sentinel so apps
- * can track key-up precisely. Needed for simultaneous keys: PS/2 typematic
- * only repeats the last key pressed, so without this Z+D diagonal movement
- * breaks. Mirrors musl `_IOW('K', 2, uint32_t)`.
- *
- * Usage (user): uint32_t on = 1; ioctl(0, ALCOR2_IOC_KBD_RELEASE_EVENTS, &on);
- */
-#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                          \
-  ((1U << 30) | (0x4BU << 8) | 2U | (sizeof(uint32_t) << 16))
-
-/** @brief Selectable keyboard layouts. */
-typedef enum
-{
-  KBD_LAYOUT_US = 0, /**< US QWERTY. */
-  KBD_LAYOUT_FR =
-      1, /**< AZERTY lettering on a US scan map; US-ASCII digit row. */
-  KBD_LAYOUT_COUNT
-} kbd_layout_t;
 
 /**
  * @brief Select the active layout.

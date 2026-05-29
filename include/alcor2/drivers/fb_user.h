@@ -6,7 +6,7 @@
 #ifndef ALCOR2_FB_USER_H
 #define ALCOR2_FB_USER_H
 
-#include <alcor2/fb.h>
+#include <uapi/alcor2/fb.h>
 #include <alcor2/limine.h>
 #include <alcor2/types.h>
 

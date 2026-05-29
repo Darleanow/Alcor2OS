@@ -343,6 +343,7 @@ lint:
 	  --header-filter='^(src|include|user)/(?!games/doom/doomgeneric/).*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
+	     -I$(UAPI) \
 	     -I$(SRC) \
 	     -Iuser/sdk/vega/include \
 	     -Iuser/core/vega/include \
@@ -368,6 +369,7 @@ check:
 	  -DVEGA_VERSION=\"qa\" \
 	  -i user/games/doom/doomgeneric \
 	  -I$(INCLUDE) \
+	  -I$(UAPI) \
 	  -Iuser/include \
 	  -Iuser/sdk/vega/include \
 	  -Iuser/core/vega/include \

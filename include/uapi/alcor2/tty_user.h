@@ -10,10 +10,7 @@
 #ifndef ALCOR2_ALCOR_TTY_USER_H
 #define ALCOR2_ALCOR_TTY_USER_H
 
-/** @brief Custom syscall number — must match the kernel's syscall.h. */
-#ifndef SYS_ALCOR_SET_FG_PID
-  #define SYS_ALCOR_SET_FG_PID 497
-#endif
+#include <alcor2/syscall.h> /* SYS_ALCOR_SET_FG_PID — single source of truth. */
 
 /**
  * @brief Tell the kernel which PID is the current TTY foreground "job".
@@ -23,7 +20,7 @@
  * instead of the shell. Reset to the shell's own PID (or 0) after the
  * child is reaped.
  *
- * Definition lives in @c user/crt/alcor_tty.c.
+ * Definition lives in @c user/sdk/vega/alcor_tty.c.
  *
  * @param pid  PID to register, or 0 to clear.
  * @return 0 on success, negative errno on failure.
