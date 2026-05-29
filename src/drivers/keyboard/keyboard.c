@@ -8,6 +8,7 @@
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/kbd.h>
 
 #define KB_DATA_PORT   0x60
 #define KB_CMD_PORT    0x64
@@ -70,6 +71,11 @@ void keyboard_irq(void)
 {
   u8 scancode = inb(KB_DATA_PORT);
   kb_push(scancode);
+  /* Eager VINTR detection: the canonical-mode read path that normally
+   * matches VINTR only runs when someone calls read(stdin). For a
+   * foreground process not reading stdin (e.g. `cat /dev/zero`), Ctrl+C
+   * has to be intercepted here so SIGINT actually reaches the proc. */
+  kbd_irq_check_intr();
 }
 
 static void keyboard_irq_handler(u8 irq)

@@ -18,6 +18,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/proc/proc.h>
+#include <alcor2/proc/signal.h>
 
 #define LAT_mu      '\xb5'
 #define LAT_deg     '\xb0'
@@ -577,6 +578,79 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
       return true;
   }
   return false;
+}
+
+/**
+ * @brief Scan the peek buffer for the @p vintr byte using a state copy.
+ *
+ * Walks @p buf one scancode at a time through @ref process_raw_ctx with
+ * @c dry=true so the real translator state isn't mutated. Returns the
+ * number of scancodes up to and including the one that produced @p vintr,
+ * or 0 if @p vintr isn't reached.
+ *
+ * @param buf    Peeked scancodes.
+ * @param n      Number of scancodes in @p buf.
+ * @param vintr  The byte to match.
+ * @param st     Copy of translator state (taken by value at call site).
+ * @return Consume count, or 0 on no match.
+ */
+static u32 kbd_peek_find_intr(
+    const u8 *buf, u32 n, unsigned char vintr, kbd_ev_ctx_t st
+)
+{
+  for(u32 i = 0; i < n; i++) {
+    unsigned char out;
+    if(process_raw_ctx(buf[i], &st, &out, true) && out == vintr)
+      return i + 1;
+  }
+  return 0;
+}
+
+/**
+ * @brief Drain @p count scancodes through the real translator state.
+ *
+ * Used after @ref kbd_peek_find_intr finds a VINTR-producing run: we
+ * commit the same scancodes through @c g_kbd so modifier state stays
+ * coherent with the rest of the read path, while throwing away the
+ * emitted bytes (they would have been the VINTR byte itself).
+ *
+ * @param count  Scancodes to consume.
+ */
+static void kbd_consume_raw(u32 count)
+{
+  for(u32 i = 0; i < count; i++) {
+    if(!keyboard_raw_available())
+      return;
+    u8            raw = keyboard_raw_pop();
+    unsigned char out;
+    process_raw_ctx(raw, &g_kbd, &out, false);
+  }
+}
+
+void kbd_irq_check_intr(void)
+{
+  u64 fg_pid = proc_get_foreground();
+  if(fg_pid == 0)
+    return;
+  proc_t *p = proc_get(fg_pid);
+  if(!p || !(p->termios.c_lflag & KTERM_ISIG))
+    return;
+
+  unsigned char vintr = p->termios.c_cc[KTERM_VINTR];
+  if(vintr == 0)
+    return;
+
+  u8  peek[KBD_RAW_PEEK_MAX];
+  u32 n = keyboard_raw_peek(peek, (u32)sizeof(peek));
+  if(n == 0)
+    return;
+
+  u32 consume = kbd_peek_find_intr(peek, n, vintr, g_kbd);
+  if(consume == 0)
+    return;
+
+  kbd_consume_raw(consume);
+  proc_signal(fg_pid, SIGINT);
 }
 
 static bool kbd_pop_byte(unsigned char *out, bool block)
