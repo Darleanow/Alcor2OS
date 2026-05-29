@@ -219,6 +219,10 @@ static int resolve_path(const char *name, char *out_path)
   return 0;
 }
 
+/* Fork an external command. The parent registers the child as TTY
+ * foreground for the wait window so Ctrl+C routes SIGINT to the child;
+ * foreground is cleared (not reset to the shell's PID) after the wait so
+ * a subsequent Ctrl+C at the prompt does not target the shell. */
 static int run_external(char **argv, const redir_t *redirs)
 {
   char path[MAX_EXEC_PATH];
@@ -446,6 +450,11 @@ static void exec_stage_in_child(ast_t *stage)
   _exit(127);
 }
 
+/* Run an N-stage pipeline. Each stage runs in its own forked child with
+ * the in-between pipes wired through dup2. TTY foreground is set to the
+ * last stage's PID (its exit status is the one the shell surfaces and
+ * the natural target of a user pressing Ctrl+C) and cleared after all
+ * stages are reaped. */
 static int exec_pipeline(ast_t *n)
 {
   int     N      = n->u.pipeline.n;

@@ -213,6 +213,36 @@ void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons)
   }
 }
 
+/**
+ * @brief Drop @p me from the waiter slot under the IRQ lock.
+ *
+ * Pulled out so the signal-bail path in @ref mouse_read_block is a single
+ * call instead of an inline cpu_disable/enable bracket repeating the lock
+ * structure. Only clears the slot when it still belongs to @p me — a
+ * concurrent IRQ may have already woken us and handed it off.
+ *
+ * @param me  Process that may currently own the waiter slot.
+ */
+static void mouse_clear_waiter_if(proc_t *me)
+{
+  cpu_disable_interrupts();
+  if(g.waiter == me)
+    g.waiter = NULL;
+  cpu_enable_interrupts();
+}
+
+/**
+ * @brief Block until a mouse event arrives, then deliver it.
+ *
+ * Three paths inside the loop, in priority order: (1) ring non-empty →
+ * pop and return; (2) no proc context or another reader already parked →
+ * spin (cannot park); (3) park as the single waiter and yield. After the
+ * wake-up, a deliverable signal short-circuits with @c -EINTR so the
+ * syscall-return path can run handlers / default actions.
+ *
+ * @param out  Output event slot.
+ * @return 0 on success, @c -EAGAIN with no proc context, @c -EINTR on signal.
+ */
 i64 mouse_read_block(alcor2_mouse_event_t *out)
 {
   while(1) {
@@ -226,8 +256,6 @@ i64 mouse_read_block(alcor2_mouse_event_t *out)
 
     proc_t *me = proc_current();
     if(!me || g.waiter) {
-      /* No process context, or another reader already parked. Spin to a
-       * non-empty ring with interrupts on so IRQs can deliver. */
       cpu_enable_interrupts();
       if(!me)
         return -EAGAIN;
@@ -238,16 +266,10 @@ i64 mouse_read_block(alcor2_mouse_event_t *out)
     proc_block(me);
     cpu_enable_interrupts();
     proc_schedule();
-    /* Pending signal? Drop the waiter slot and bail with -EINTR so the
-     * syscall return path drives delivery (default action / handler). */
     if(proc_signal_pending(me)) {
-      cpu_disable_interrupts();
-      if(g.waiter == me)
-        g.waiter = NULL;
-      cpu_enable_interrupts();
+      mouse_clear_waiter_if(me);
       return -EINTR;
     }
-    /* Otherwise loop and re-check the ring after waking. */
   }
 }
 

@@ -115,11 +115,26 @@ proc_t *proc_get(u64 pid)
  */
 static volatile u64 g_foreground_pid = 0;
 
-u64                 proc_get_foreground(void)
+/**
+ * @brief Return the TTY-foreground PID (or 0 when none registered).
+ *
+ * Trivial accessor — kept out of the header so @c g_foreground_pid stays
+ * a translation-unit-local detail.
+ *
+ * @return Current foreground PID, or 0.
+ */
+u64 proc_get_foreground(void)
 {
   return g_foreground_pid;
 }
 
+/**
+ * @brief Set the TTY-foreground PID (0 clears).
+ *
+ * Companion of @ref proc_get_foreground; same locality rationale.
+ *
+ * @param pid  PID to register, or 0 to clear.
+ */
 void proc_set_foreground(u64 pid)
 {
   g_foreground_pid = pid;

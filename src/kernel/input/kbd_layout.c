@@ -624,6 +624,14 @@ static void kbd_drain_raw(void)
   }
 }
 
+/**
+ * @brief Eager VINTR (Ctrl+C) detection at keyboard IRQ time.
+ *
+ * Implementation note: every check is a guard that early-returns so the
+ * fast path (no foreground proc / ISIG off / nothing in the ring / first
+ * emit isn't VINTR) is roughly five loads and a comparison. The drain +
+ * @ref proc_signal pair only runs on a confirmed match.
+ */
 void kbd_irq_check_intr(void)
 {
   u64 fg_pid = proc_get_foreground();

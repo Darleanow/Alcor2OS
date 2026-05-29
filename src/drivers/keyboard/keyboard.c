@@ -67,14 +67,19 @@ u32 keyboard_raw_peek(u8 *dst, u32 cap)
   return n;
 }
 
+/**
+ * @brief Top-half PS/2 keyboard interrupt handler.
+ *
+ * Reads the scancode off the data port, pushes it into the raw ring for
+ * lazy translation, then runs @ref kbd_irq_check_intr so a foreground
+ * process not reading stdin (e.g. @c cat @c /dev/zero) still sees
+ * @c SIGINT when the user hits Ctrl+C — the canonical-mode VINTR match
+ * normally only runs from inside @c read(stdin).
+ */
 void keyboard_irq(void)
 {
   u8 scancode = inb(KB_DATA_PORT);
   kb_push(scancode);
-  /* Eager VINTR detection: the canonical-mode read path that normally
-   * matches VINTR only runs when someone calls read(stdin). For a
-   * foreground process not reading stdin (e.g. `cat /dev/zero`), Ctrl+C
-   * has to be intercepted here so SIGINT actually reaches the proc. */
   kbd_irq_check_intr();
 }
 
