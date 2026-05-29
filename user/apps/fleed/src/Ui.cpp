@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 namespace fleed {
@@ -81,13 +82,30 @@ int Ui::readKey(wint_t &out)
 
 void Ui::redraw(const Buffer &buffer)
 {
+  int vis_rows = 0, vis_cols = 0;
+  getmaxyx(m_editor->body, vis_rows, vis_cols);
+  (void)vis_cols;
+
+  const size_t rows = static_cast<size_t>(vis_rows);
+  const size_t cy   = buffer.cursor().y;
+
+  if(cy < m_scroll_offset)
+    m_scroll_offset = cy;
+  else if(cy >= m_scroll_offset + rows)
+    m_scroll_offset = cy - rows + 1;
+
   wclear(m_editor->body);
 
-  for(size_t i = 0; i < buffer.lineCount(); i++) {
-    mvwaddstr(m_editor->body, i, 0, buffer.line(i).c_str());
+  for(size_t i = 0; i < rows; i++) {
+    size_t li = m_scroll_offset + i;
+    if(li >= buffer.lineCount())
+      break;
+    mvwaddstr(m_editor->body, static_cast<int>(i), 0, buffer.line(li).c_str());
   }
+
+  refreshStatus(buffer);
   wmove(
-      m_editor->body, static_cast<int>(buffer.cursor().y),
+      m_editor->body, static_cast<int>(cy - m_scroll_offset),
       static_cast<int>(buffer.cursor().x)
   );
 
@@ -105,10 +123,31 @@ void Ui::setStatus(const char *text)
   spz_statusbar("fleed", text, kHints);
 }
 
+void Ui::refreshStatus(const Buffer &buffer)
+{
+  char pos[32];
+  (void)std::snprintf(pos, sizeof(pos), "L:%zu C:%zu",
+                      buffer.cursor().y + 1, buffer.cursor().x + 1);
+  spz_statusbar("fleed", pos, kHints);
+}
+
 void Ui::redrawCursor(const Buffer &buffer)
 {
+  int vis_rows = 0, vis_cols = 0;
+  getmaxyx(m_editor->body, vis_rows, vis_cols);
+  (void)vis_cols;
+
+  const size_t rows = static_cast<size_t>(vis_rows);
+  const size_t cy   = buffer.cursor().y;
+
+  if(cy < m_scroll_offset || cy >= m_scroll_offset + rows) {
+    redraw(buffer);
+    return;
+  }
+
+  refreshStatus(buffer);
   wmove(
-      m_editor->body, static_cast<int>(buffer.cursor().y),
+      m_editor->body, static_cast<int>(cy - m_scroll_offset),
       static_cast<int>(buffer.cursor().x)
   );
   spz_panel_refresh(m_editor);

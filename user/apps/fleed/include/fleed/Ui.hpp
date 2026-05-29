@@ -69,8 +69,11 @@ public:
   void redrawCursor(const Buffer &buffer);
 
 private:
-  SCREEN      *m_scr    = nullptr;
-  spz_panel_t *m_editor = nullptr;
+  void        refreshStatus(const Buffer &buffer);
+
+  SCREEN      *m_scr          = nullptr;
+  spz_panel_t *m_editor       = nullptr;
+  size_t       m_scroll_offset = 0;
 };
 
 } /* namespace fleed */
