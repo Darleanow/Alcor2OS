@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/mouse.h
+ * @file include/uapi/alcor2/mouse.h
  * @brief Shared user/kernel ABI for /dev/mouse events and mode control.
  */
 

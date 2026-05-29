@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/alcor_tty_user.h
+ * @file include/uapi/alcor2/tty_user.h
  * @brief Userland helpers for the Alcor2 TTY / signal-routing syscalls.
  *
  * Thin inline wrappers around the @c SYS_ALCOR_* syscalls that don't fit

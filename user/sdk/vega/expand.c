@@ -7,7 +7,7 @@
  * MVP; will be revisited if/when scoping gets richer.
  */
 
-#include <alcor2/alcor_tty_user.h>
+#include <alcor2/tty_user.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>

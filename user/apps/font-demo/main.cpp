@@ -5,7 +5,7 @@
  * Default font on guest: /bin/FiraCode-Regular.ttf (SIL OFL). Any TTF/OTF
  * works.
  */
-#include <alcor2/alcor_fb_user.h>
+#include <alcor2/fb_user.h>
 
 #include <fcntl.h>
 #include <stdint.h>

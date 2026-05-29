@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/fb_console_ioctl.h
+ * @file include/uapi/alcor2/fb_console_ioctl.h
  * @brief Userspace-facing ioctl interface for the framebuffer console.
  *
  * Safe to include from userland — no kernel-only types or functions.

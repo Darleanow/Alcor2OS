@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/alcor_fb_user.h
+ * @file include/uapi/alcor2/fb_user.h
  * @brief Userland helpers for the Alcor2 custom framebuffer syscalls.
  *
  * Thin inline wrappers around @c SYS_ALCOR_FB_INFO and @c SYS_ALCOR_FB_MMAP.
@@ -14,7 +14,7 @@
 #ifndef ALCOR2_ALCOR_FB_USER_H
 #define ALCOR2_ALCOR_FB_USER_H
 
-#include <alcor2/alcor_fb.h>
+#include <alcor2/fb.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 

@@ -1,5 +1,5 @@
 /**
- * @file include/alcor2/alcor_fb.h
+ * @file include/uapi/alcor2/fb.h
  * @brief Userspace API: Limine linear framebuffer info and mmap helpers.
  *
  * Syscalls @ref SYS_ALCOR_FB_INFO and @ref SYS_ALCOR_FB_MMAP expose the same
