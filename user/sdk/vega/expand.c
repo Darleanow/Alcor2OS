@@ -7,6 +7,7 @@
  * MVP; will be revisited if/when scoping gets richer.
  */
 
+#include <alcor2/alcor_tty_user.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -188,6 +189,9 @@ static char *run_substitution(const char *cmd_str)
     _exit(rc);
   }
 
+  /* Route TTY signals to the substitution child so Ctrl+C kills it,
+   * not the shell that's draining its pipe. */
+  alcor_set_fg_pid(pid);
   close(pipefd[1]);
 
   size_t cap = 256;
@@ -196,6 +200,7 @@ static char *run_substitution(const char *cmd_str)
   if(!buf) {
     close(pipefd[0]);
     waitpid(pid, NULL, 0);
+    alcor_set_fg_pid(getpid());
     return NULL;
   }
 
@@ -207,6 +212,7 @@ static char *run_substitution(const char *cmd_str)
         free(buf);
         close(pipefd[0]);
         waitpid(pid, NULL, 0);
+        alcor_set_fg_pid(getpid());
         return NULL;
       }
       buf = new_buf;
@@ -219,6 +225,7 @@ static char *run_substitution(const char *cmd_str)
   }
   close(pipefd[0]);
   waitpid(pid, NULL, 0);
+  alcor_set_fg_pid(getpid());
 
   while(len > 0 && buf[len - 1] == '\n')
     len--;

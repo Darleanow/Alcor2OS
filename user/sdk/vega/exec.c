@@ -10,6 +10,7 @@
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
+#include <alcor2/alcor_tty_user.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -235,8 +236,12 @@ static int run_external(char **argv, const redir_t *redirs)
     execve(path, argv, environ);
     _exit(127);
   }
+  /* Route TTY signals (SIGINT etc.) to the child while we wait on it. */
+  alcor_set_fg_pid(pid);
   int status = 0;
-  if(waitpid(pid, &status, 0) < 0)
+  int wret   = waitpid(pid, &status, 0);
+  alcor_set_fg_pid(getpid());
+  if(wret < 0)
     return -1;
   return (status >> 8) & 0xff;
 }
@@ -506,6 +511,9 @@ static int exec_pipeline(ast_t *n)
     close(pipes[i][1]);
   }
 
+  /* TTY signals route to the last stage — that's the one whose status the
+   * shell surfaces and the one a user pressing Ctrl+C is trying to kill. */
+  alcor_set_fg_pid(pids[N - 1]);
   int last_status = 0;
   for(int i = 0; i < N; i++) {
     int status = 0;
@@ -513,6 +521,7 @@ static int exec_pipeline(ast_t *n)
     if(i == N - 1)
       last_status = (status >> 8) & 0xff;
   }
+  alcor_set_fg_pid(getpid());
   return last_status;
 }
 
