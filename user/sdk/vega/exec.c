@@ -240,7 +240,7 @@ static int run_external(char **argv, const redir_t *redirs)
   alcor_set_fg_pid(pid);
   int status = 0;
   int wret   = waitpid(pid, &status, 0);
-  alcor_set_fg_pid(getpid());
+  alcor_set_fg_pid(0);
   if(wret < 0)
     return -1;
   return (status >> 8) & 0xff;
@@ -521,7 +521,7 @@ static int exec_pipeline(ast_t *n)
     if(i == N - 1)
       last_status = (status >> 8) & 0xff;
   }
-  alcor_set_fg_pid(getpid());
+  alcor_set_fg_pid(0);
   return last_status;
 }
 

@@ -200,7 +200,7 @@ static char *run_substitution(const char *cmd_str)
   if(!buf) {
     close(pipefd[0]);
     waitpid(pid, NULL, 0);
-    alcor_set_fg_pid(getpid());
+    alcor_set_fg_pid(0);
     return NULL;
   }
 
@@ -212,7 +212,7 @@ static char *run_substitution(const char *cmd_str)
         free(buf);
         close(pipefd[0]);
         waitpid(pid, NULL, 0);
-        alcor_set_fg_pid(getpid());
+        alcor_set_fg_pid(0);
         return NULL;
       }
       buf = new_buf;
@@ -225,7 +225,7 @@ static char *run_substitution(const char *cmd_str)
   }
   close(pipefd[0]);
   waitpid(pid, NULL, 0);
-  alcor_set_fg_pid(getpid());
+  alcor_set_fg_pid(0);
 
   while(len > 0 && buf[len - 1] == '\n')
     len--;
