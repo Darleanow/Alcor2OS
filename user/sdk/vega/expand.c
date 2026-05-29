@@ -166,20 +166,65 @@ static int is_name_cont(char c)
   return is_name_start(c) || (c >= '0' && c <= '9');
 }
 
-/* Run @p cmd_str through vega_run in a forked child with stdout redirected
- * to a pipe; capture stdout into a heap-allocated string. Trailing newlines
- * are stripped (matches bash $(...)). Returns NULL on any failure. */
-static char *run_substitution(const char *cmd_str)
+/* Bytes the substitution read loop pulls per iteration; also the grow
+ * trigger (next iteration needs room for SUBST_CHUNK + 1 bytes). */
+#define SUBST_CHUNK 256
+
+/* Ensure @p *buf has room for at least one more SUBST_CHUNK + NUL.
+ * Doubles @p *cap when short. Returns 0 on success, -1 on realloc
+ * failure (caller's @p *buf is unchanged in that case). */
+static int subst_grow_if_needed(char **buf, size_t *cap, size_t len)
+{
+  if(len + SUBST_CHUNK + 1 <= *cap)
+    return 0;
+  size_t new_cap = *cap * 2;
+  char  *new_buf = (char *)realloc(*buf, new_cap);
+  if(!new_buf)
+    return -1;
+  *buf = new_buf;
+  *cap = new_cap;
+  return 0;
+}
+
+/* Drain @p fd into a freshly-allocated, NUL-terminated heap buffer.
+ * Returns NULL on malloc/realloc failure (caller still has to reap the
+ * child); @p *out_len holds the final byte count. */
+static char *capture_pipe_to_buf(int fd, size_t *out_len)
+{
+  size_t cap = SUBST_CHUNK;
+  size_t len = 0;
+  char  *buf = (char *)malloc(cap);
+  if(!buf)
+    return NULL;
+  while(1) {
+    if(subst_grow_if_needed(&buf, &cap, len) < 0) {
+      free(buf);
+      return NULL;
+    }
+    long n = read(fd, buf + len, SUBST_CHUNK);
+    if(n <= 0)
+      break;
+    len += (size_t)n;
+  }
+  buf[len] = '\0';
+  *out_len = len;
+  return buf;
+}
+
+/* Fork a child that runs @p cmd_str through vega_run with stdout
+ * redirected to a fresh pipe. Returns the parent-side read fd and the
+ * child's pid via @p *out_pid; returns -1 on pipe/fork failure. The
+ * child path never returns (_exit). */
+static int fork_subst_child(const char *cmd_str, int *out_pid)
 {
   int pipefd[2];
   if(pipe(pipefd) < 0)
-    return NULL;
-
+    return -1;
   int pid = fork();
   if(pid < 0) {
     close(pipefd[0]);
     close(pipefd[1]);
-    return NULL;
+    return -1;
   }
   if(pid == 0) {
     close(pipefd[0]);
@@ -188,45 +233,33 @@ static char *run_substitution(const char *cmd_str)
     int rc = vega_run(cmd_str);
     _exit(rc);
   }
-
-  /* Route TTY signals to the substitution child so Ctrl+C kills it,
-   * not the shell that's draining its pipe. */
-  alcor_set_fg_pid(pid);
   close(pipefd[1]);
+  *out_pid = pid;
+  return pipefd[0];
+}
 
-  size_t cap = 256;
-  size_t len = 0;
-  char  *buf = (char *)malloc(cap);
-  if(!buf) {
-    close(pipefd[0]);
-    waitpid(pid, NULL, 0);
-    alcor_set_fg_pid(0);
+/* Run @p cmd_str through vega_run in a forked child with stdout captured
+ * via a pipe; trailing newlines are stripped (matches bash $(...)).
+ * Returns NULL on any failure. The TTY foreground is set to the child
+ * for the wait window so Ctrl+C kills the substitution rather than the
+ * shell that's draining its pipe. */
+static char *run_substitution(const char *cmd_str)
+{
+  int pid;
+  int rfd = fork_subst_child(cmd_str, &pid);
+  if(rfd < 0)
     return NULL;
-  }
 
-  while(1) {
-    if(len + 256 + 1 > cap) {
-      size_t new_cap = cap * 2;
-      char  *new_buf = (char *)realloc(buf, new_cap);
-      if(!new_buf) {
-        free(buf);
-        close(pipefd[0]);
-        waitpid(pid, NULL, 0);
-        alcor_set_fg_pid(0);
-        return NULL;
-      }
-      buf = new_buf;
-      cap = new_cap;
-    }
-    long n = read(pipefd[0], buf + len, 256);
-    if(n <= 0)
-      break;
-    len += (size_t)n;
-  }
-  close(pipefd[0]);
+  alcor_set_fg_pid(pid);
+  size_t len = 0;
+  char  *buf = capture_pipe_to_buf(rfd, &len);
+
+  close(rfd);
   waitpid(pid, NULL, 0);
   alcor_set_fg_pid(0);
 
+  if(!buf)
+    return NULL;
   while(len > 0 && buf[len - 1] == '\n')
     len--;
   buf[len] = '\0';
