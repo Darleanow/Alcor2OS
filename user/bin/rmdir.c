@@ -9,12 +9,6 @@
 #include <string.h>
 #include <unistd.h>
 
-/**
- * @brief Remove a single empty directory, printing an error on failure.
- *
- * @param path Directory path to remove.
- * @return 0 on success, -1 on failure.
- */
 static int remove_dir(const char *path)
 {
   if(rmdir(path) < 0) {
@@ -24,20 +18,8 @@ static int remove_dir(const char *path)
   return 0;
 }
 
-/**
- * @brief Remove a directory and, with -p, each successive parent component.
- *
- * With @p parents set, after removing @p path the function strips the last
- * path component and retries until only one component remains or a removal
- * fails.
- *
- * @param path    Directory path to remove.
- * @param parents Non-zero to also remove parent directories.
- * @return 0 if all targeted directories were removed, -1 on the first failure.
- */
 static int remove_with_parents(const char *path, int parents)
 {
-  /* Work on a mutable copy so we can truncate in-place. */
   char buf[4096];
   int  len = (int)strlen(path);
 
@@ -48,7 +30,7 @@ static int remove_with_parents(const char *path, int parents)
 
   (void)memcpy(buf, path, (size_t)(len + 1));
 
-  /* Strip trailing slashes (except the root). */
+  /* Strip trailing slashes, except for root. */
   while(len > 1 && buf[len - 1] == '/')
     buf[--len] = '\0';
 
@@ -58,13 +40,11 @@ static int remove_with_parents(const char *path, int parents)
   if(!parents)
     return 0;
 
-  /* Walk up the tree, stripping the last component each iteration. */
   while(len > 1) {
     int i = len - 1;
     while(i > 0 && buf[i] != '/')
       i--;
 
-    /* i == 0 means we reached the root or a bare name; stop. */
     if(i <= 0)
       break;
 
@@ -78,16 +58,6 @@ static int remove_with_parents(const char *path, int parents)
   return 0;
 }
 
-/**
- * @brief Entry point for the @c rmdir utility.
- *
- * Accepts one or more directory paths and removes them if they are empty.
- * With @c -p each path component is removed from innermost to outermost.
- *
- * @param argc Argument count from the shell.
- * @param argv Argument vector from the shell.
- * @return 0 if every directory was removed successfully, 1 otherwise.
- */
 int main(int argc, char *argv[])
 {
   int show_parents = 0;
