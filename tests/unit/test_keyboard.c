@@ -146,6 +146,48 @@ static void peek_respects_cap(void **state)
   assert_int_equal(buf[1], 0x0B);
 }
 
+static void drop_count_accessible(void **state)
+{
+  (void)state;
+  assert_int_equal(keyboard_raw_drop_count(), 0);
+  for(int i = 0; i < KB_BUFFER_SIZE - 1; i++)
+    kb_push(0xAA);
+  kb_push(0xBB);
+  kb_push(0xCC);
+  assert_int_equal(keyboard_raw_drop_count(), 2);
+}
+
+static void capacity_is_buffer_size_minus_one(void **state)
+{
+  (void)state;
+  /* Ring buffer uses one slot as sentinel: capacity = KB_BUFFER_SIZE - 1. */
+  for(int i = 0; i < KB_BUFFER_SIZE - 1; i++)
+    kb_push((u8)i);
+  assert_int_equal(kb_drop_count, 0);
+  kb_push(0xFF);
+  assert_int_equal(kb_drop_count, 1);
+}
+
+static void pop_on_empty_buffer_does_not_advance_past_write(void **state)
+{
+  (void)state;
+  /* Buffer is empty: pop must not move read_pos past write_pos.
+   * If it does, the next available() check would spuriously return true. */
+  assert_false(keyboard_raw_available());
+  keyboard_raw_pop(); /* UB in current impl — read_pos wraps past write_pos */
+  assert_false(keyboard_raw_available());
+}
+
+static void multiple_drops_accumulate(void **state)
+{
+  (void)state;
+  for(int i = 0; i < KB_BUFFER_SIZE - 1; i++)
+    kb_push(0xAA);
+  for(int i = 0; i < 5; i++)
+    kb_push(0xFF);
+  assert_int_equal(kb_drop_count, 5);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -159,6 +201,12 @@ int main(void)
       cmocka_unit_test_setup(peek_cap_zero_returns_zero, reset),
       cmocka_unit_test_setup(peek_copies_without_consuming, reset),
       cmocka_unit_test_setup(peek_respects_cap, reset),
+      cmocka_unit_test_setup(drop_count_accessible, reset),
+      cmocka_unit_test_setup(capacity_is_buffer_size_minus_one, reset),
+      cmocka_unit_test_setup(
+          pop_on_empty_buffer_does_not_advance_past_write, reset
+      ),
+      cmocka_unit_test_setup(multiple_drops_accumulate, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
