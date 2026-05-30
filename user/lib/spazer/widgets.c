@@ -26,10 +26,7 @@ void spz_progress(WINDOW *win, int y, int x, int width, int num, int den)
     return;
   if(den <= 0)
     den = 1;
-  if(num < 0)
-    num = 0;
-  if(num > den)
-    num = den;
+  num        = spz_clamp(num, den);
   int filled = (num * width) / den;
 
   wmove(win, y, x);
