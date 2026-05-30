@@ -129,12 +129,6 @@ static ext2_volume_t make_vol(void)
   return v;
 }
 
-/* ── direct/indirect boundary ─────────────────────────────────────────────
- * file_block 11 MUST come from i_block[11] directly.
- * file_block 12 MUST go through the indirect block.
- * Putting DIFFERENT sentinel values in both ensures the wrong branch is
- * immediately caught rather than accidentally passing. */
-
 static void direct_last_slot_not_routed_through_indirect(void **state)
 {
   (void)state;
@@ -166,10 +160,6 @@ static void indirect_first_slot_not_routed_direct(void **state)
    * it returns the BLOCK NUMBER of the indirect block (5), not 0xBEEF. */
   assert_int_equal(get_block_num(&v, &inode, EXT2_NDIR_BLOCKS), 0xBEEF);
 }
-
-/* ── single/double-indirect boundary ─────────────────────────────────────
- * file_block = 12 + PPB - 1 = 267 → last single-indirect slot
- * file_block = 12 + PPB     = 268 → first double-indirect slot          */
 
 static void single_indirect_last_slot_correct(void **state)
 {
@@ -216,12 +206,6 @@ static void double_indirect_first_slot_correct(void **state)
   assert_int_equal(get_block_num(&v, &inode, fb), 0xCCCC);
 }
 
-/* ── hole propagation ─────────────────────────────────────────────────────
- * When i_block[EXT2_IND_BLOCK] == 0, get_block_num must return 0 for ALL
- * file blocks in the single-indirect range, without dereferencing block 0.
- * A naive bug: read_indirect_slot(vol, 0, slot) → reads g_store[0] (the
- * superblock area), possibly returning garbage instead of 0. */
-
 static void hole_indirect_never_reads_block_zero(void **state)
 {
   (void)state;
@@ -253,11 +237,6 @@ static void hole_dind_never_reads_block_zero(void **state)
   assert_int_equal(get_block_num(&v, &inode, fb), 0);
 }
 
-/* ── double-indirect index arithmetic ────────────────────────────────────
- * Verify that the dind→ind decomposition uses the right slot index.
- * file_block (after removing direct+ppb offset) = i*ppb + j.
- * We place a unique value at dind[i][j] and verify it comes back. */
-
 static void double_indirect_slot_arithmetic(void **state)
 {
   (void)state;
@@ -281,11 +260,6 @@ static void double_indirect_slot_arithmetic(void **state)
   u32 fb = EXT2_NDIR_BLOCKS + (u32)PPB + 1 * (u32)PPB + 3;
   assert_int_equal(get_block_num(&v, &inode, fb), 0x1234);
 }
-
-/* ── free_inode_blocks clears the right entries ───────────────────────────
- * After free_inode_blocks, every i_block[] entry must be 0 and i_blocks
- * must be 0.  Also verifies that non-existent indirect blocks (value 0)
- * are not dereferenced (would segfault or read poison). */
 
 static void free_inode_blocks_resets_all_pointers(void **state)
 {

@@ -57,10 +57,6 @@ ext2_file_t g_files[EXT2_MAX_FILES];
 
 #include "../../src/fs/ext2/inode.c"
 
-/* ── volume fixture ────────────────────────────────────────────────────────
- * 1 group, 8 inodes per block (1024 / 128), inode table at block 2.
- * Inodes 1..8 all live in the same on-disk block → RMW tests are in-scope. */
-
 #define INODE_TABLE 2u
 
 static ext2_group_desc_t g_gd;
@@ -90,8 +86,6 @@ static void make_inode(ext2_inode_t *out, u32 id)
   out->i_links_count  = (u16)id;
   out->i_block[0]     = 0xDEAD0000 | id;
 }
-
-/* ── boundary validation ──────────────────────────────────────────────────*/
 
 static void read_ino_zero_is_einval(void **state)
 {
@@ -137,11 +131,6 @@ static void write_ino_above_count_is_einval(void **state)
   memset(&dummy, 0, sizeof(dummy));
   assert_int_equal(write_inode(&v, 9, &dummy), -EINVAL);
 }
-
-/* ── RMW correctness ──────────────────────────────────────────────────────
- * These are the tests most likely to find a real bug.
- * Inodes 1..8 share a single 1 KiB table block.  Writing any one of them
- * must leave the others byte-for-byte identical.                           */
 
 static void write_inode1_does_not_corrupt_inode2(void **state)
 {

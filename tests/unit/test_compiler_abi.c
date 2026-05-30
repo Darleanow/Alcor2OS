@@ -29,10 +29,6 @@ void  kzero(void *dst, u64 n)                    { memset(dst, 0, n); }
 #undef memset
 #undef memmove
 
-/* ── memmove: right-shift (dst > src, overlap) ────────────────────────────
- * A forward-copy-only memmove corrupts data here because it reads src[i]
- * after the previous iteration has already overwritten it via dst[i-1]. */
-
 static void memmove_right_shift_by_1(void **state)
 {
   (void)state;
@@ -70,8 +66,6 @@ static void memmove_right_shift_by_4_full_corruption_probe(void **state)
     assert_int_equal(buf[i], i + 1);
 }
 
-/* ── memmove: left-shift (dst < src, overlap — forward-copy is safe) ──────*/
-
 static void memmove_left_shift_by_1(void **state)
 {
   (void)state;
@@ -86,10 +80,6 @@ static void memmove_left_shift_by_1(void **state)
   assert_int_equal(buf[6], 'H');
 }
 
-/* ── memmove: single-byte overlap on the right — minimum-stress case ──────
- * dst = src + (n-1): only 1 byte overlaps.  Forward copy reads buf[n-1]
- * AFTER it has been overwritten by the dst[0] write. */
-
 static void memmove_single_byte_overlap_right_edge(void **state)
 {
   (void)state;
@@ -100,8 +90,6 @@ static void memmove_single_byte_overlap_right_edge(void **state)
   assert_int_equal(buf[4], 'Z');
 }
 
-/* ── memmove: dst == src (identity, must be a no-op) ─────────────────────*/
-
 static void memmove_identity_preserves_data(void **state)
 {
   (void)state;
@@ -109,10 +97,6 @@ static void memmove_identity_preserves_data(void **state)
   abi_memmove(buf, buf, 9);
   assert_string_equal(buf, "SENTINEL");
 }
-
-/* ── memmove: adjacent regions (no overlap, boundary condition) ───────────
- * dst == src + n: zero bytes of overlap.  Must copy correctly without
- * triggering the backward-copy path. */
 
 static void memmove_adjacent_dst_after_src(void **state)
 {
@@ -124,8 +108,6 @@ static void memmove_adjacent_dst_after_src(void **state)
   assert_memory_equal(buf + 8, "12345678", 8);
 }
 
-/* ── memmove: zero-length must never write ────────────────────────────────*/
-
 static void memmove_zero_length_is_noop(void **state)
 {
   (void)state;
@@ -135,8 +117,6 @@ static void memmove_zero_length_is_noop(void **state)
   assert_int_equal(buf[1], 0xBB);
 }
 
-/* ── memmove: return value must be dst ───────────────────────────────────*/
-
 static void memmove_returns_dst(void **state)
 {
   (void)state;
@@ -144,8 +124,6 @@ static void memmove_returns_dst(void **state)
   void *ret = abi_memmove(buf + 2, buf, 4);
   assert_ptr_equal(ret, buf + 2);
 }
-
-/* ── memcpy sanity ────────────────────────────────────────────────────────*/
 
 static void abi_memcpy_copies_and_returns_dst(void **state)
 {
@@ -157,8 +135,6 @@ static void abi_memcpy_copies_and_returns_dst(void **state)
   assert_ptr_equal(ret, dst);
   assert_string_equal(dst, "hello");
 }
-
-/* ── memset sanity ────────────────────────────────────────────────────────*/
 
 static void abi_memset_fills_buffer(void **state)
 {
