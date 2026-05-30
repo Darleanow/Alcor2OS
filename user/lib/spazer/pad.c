@@ -213,16 +213,21 @@ void spz_pad_refresh(spz_pad_t *p)
 
 int spz_pad_resize(spz_pad_t *p, int virt_rows, int virt_cols)
 {
-  if(!p || virt_rows < p->virt_rows || virt_cols < p->virt_cols)
+  if(!p || virt_rows < 1 || virt_cols < 1)
     return -1;
-  if(virt_rows == p->virt_rows && virt_cols == p->virt_cols)
+
+  /* Each axis grows independently — a request that would shrink one axis is
+   * clamped to the current size on that axis. */
+  int new_rows = (virt_rows > p->virt_rows) ? virt_rows : p->virt_rows;
+  int new_cols = (virt_cols > p->virt_cols) ? virt_cols : p->virt_cols;
+  if(new_rows == p->virt_rows && new_cols == p->virt_cols)
     return 0;
 
   /* @c wresize on a pad keeps existing cells in place and zero-fills the new
    * region with the pad's current background. */
-  if(wresize(p->body, virt_rows, virt_cols) != OK)
+  if(wresize(p->body, new_rows, new_cols) != OK)
     return -1;
-  p->virt_rows = virt_rows;
-  p->virt_cols = virt_cols;
+  p->virt_rows = new_rows;
+  p->virt_cols = new_cols;
   return 0;
 }
