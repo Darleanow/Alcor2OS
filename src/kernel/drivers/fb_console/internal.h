@@ -352,6 +352,13 @@ typedef struct
   /* Saved cursor for ESC 7/8 + CSI s/u. */
   int saved_cx, saved_cy;
 
+  /* DECSTBM scrolling region (inclusive, 0-based). Initialised to the full
+   * grid by the init path; ESC [ Pt ; Pb r (DECSTBM) reprograms it. ESC M
+   * (RI) and ESC D (IND) honour these bounds when scrolling so that line
+   * editors using the "set region + reverse-index" trick to insert a line
+   * work as expected. */
+  int scroll_top, scroll_bot;
+
   /* Cursor blink: counts down one PIT tick at a time; reloaded with
    * FB_BLINK_PERIOD_TICKS so the ~2 Hz rate holds regardless of PIT_TICK_HZ. */
   u16 blink_ticks;
@@ -609,6 +616,15 @@ void caret_invalidate_in_batch(void);
  * flush copies pixels in a single move.
  */
 void scroll_one(void);
+
+/**
+ * @brief Scroll the current DECSTBM region down by one row (reverse-index
+ * semantics): rows @c [scroll_top, scroll_bot-1] move to @c [scroll_top+1,
+ * scroll_bot], and the top row of the region is blanked with the current
+ * SGR background. Cells outside the region are untouched. Used by the
+ * @c ESC@c M (RI) handler to satisfy ncurses' line-insert sequence.
+ */
+void scroll_region_down(void);
 
 /**
  * @brief Repaint the visible grid from the scrollback ring blended with the
