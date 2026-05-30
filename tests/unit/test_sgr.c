@@ -52,6 +52,7 @@ static int setup(void **state)
   return 0;
 }
 
+
 static void sgr_reset_clears_attrs_and_colours(void **state)
 {
   (void)state;
@@ -74,6 +75,7 @@ static void sgr_empty_params_is_reset(void **state)
   assert_int_equal(fb_ctx.cur_attr, 0);
 }
 
+
 static void sgr_bold_sets_bit(void **state)
 {
   (void)state;
@@ -95,6 +97,20 @@ static void sgr_underline_sets_bit(void **state)
   assert_true(fb_ctx.cur_attr & FB_ATTR_UNDERLINE);
 }
 
+static void sgr_blink_sets_bit(void **state)
+{
+  (void)state;
+  assert_true(sgr_apply_attr(SGR_BLINK));
+  assert_true(fb_ctx.cur_attr & FB_ATTR_BLINK);
+}
+
+static void sgr_reverse_sets_bit(void **state)
+{
+  (void)state;
+  assert_true(sgr_apply_attr(SGR_REVERSE));
+  assert_true(fb_ctx.cur_attr & FB_ATTR_REVERSE);
+}
+
 static void sgr_no_bold_clears_bit(void **state)
 {
   (void)state;
@@ -103,11 +119,44 @@ static void sgr_no_bold_clears_bit(void **state)
   assert_false(fb_ctx.cur_attr & FB_ATTR_BOLD);
 }
 
+static void sgr_no_italic_clears_bit(void **state)
+{
+  (void)state;
+  fb_ctx.cur_attr = FB_ATTR_ITALIC;
+  assert_true(sgr_apply_attr(SGR_NO_ITALIC));
+  assert_false(fb_ctx.cur_attr & FB_ATTR_ITALIC);
+}
+
+static void sgr_no_underline_clears_bit(void **state)
+{
+  (void)state;
+  fb_ctx.cur_attr = FB_ATTR_UNDERLINE;
+  assert_true(sgr_apply_attr(SGR_NO_UNDERLINE));
+  assert_false(fb_ctx.cur_attr & FB_ATTR_UNDERLINE);
+}
+
+static void sgr_no_blink_clears_bit(void **state)
+{
+  (void)state;
+  fb_ctx.cur_attr = FB_ATTR_BLINK;
+  assert_true(sgr_apply_attr(SGR_NO_BLINK));
+  assert_false(fb_ctx.cur_attr & FB_ATTR_BLINK);
+}
+
+static void sgr_no_reverse_clears_bit(void **state)
+{
+  (void)state;
+  fb_ctx.cur_attr = FB_ATTR_REVERSE;
+  assert_true(sgr_apply_attr(SGR_NO_REVERSE));
+  assert_false(fb_ctx.cur_attr & FB_ATTR_REVERSE);
+}
+
 static void sgr_unknown_attr_returns_false(void **state)
 {
   (void)state;
   assert_false(sgr_apply_attr(999));
 }
+
 
 static void sgr_fg_base_sets_colour(void **state)
 {
@@ -128,6 +177,13 @@ static void sgr_bg_base_sets_colour(void **state)
   (void)state;
   assert_true(sgr_apply_basic_color(SGR_BG_BASE));
   assert_int_equal(fb_ctx.cur_bg, ansi16_bg[0]);
+}
+
+static void sgr_bg_end_sets_colour(void **state)
+{
+  (void)state;
+  assert_true(sgr_apply_basic_color(SGR_BG_END));
+  assert_int_equal(fb_ctx.cur_bg, ansi16_bg[SGR_BG_END - SGR_BG_BASE]);
 }
 
 static void sgr_fg_default_restores(void **state)
@@ -153,11 +209,33 @@ static void sgr_bright_fg_sets_colour(void **state)
   assert_int_equal(fb_ctx.cur_fg, ansi16_fg_bright[0]);
 }
 
+static void sgr_bright_fg_end_sets_colour(void **state)
+{
+  (void)state;
+  assert_true(sgr_apply_basic_color(SGR_FG_BRIGHT_END));
+  assert_int_equal(fb_ctx.cur_fg, ansi16_fg_bright[SGR_FG_BRIGHT_END - SGR_FG_BRIGHT_BASE]);
+}
+
+static void sgr_bright_bg_base_sets_colour(void **state)
+{
+  (void)state;
+  assert_true(sgr_apply_basic_color(SGR_BG_BRIGHT_BASE));
+  assert_int_equal(fb_ctx.cur_bg, ansi16_bg[0]);
+}
+
+static void sgr_bright_bg_end_sets_colour(void **state)
+{
+  (void)state;
+  assert_true(sgr_apply_basic_color(SGR_BG_BRIGHT_END));
+  assert_int_equal(fb_ctx.cur_bg, ansi16_bg[SGR_BG_BRIGHT_END - SGR_BG_BRIGHT_BASE]);
+}
+
 static void sgr_unknown_colour_returns_false(void **state)
 {
   (void)state;
   assert_false(sgr_apply_basic_color(20));
 }
+
 
 static void sgr_extended_256_fg(void **state)
 {
@@ -188,6 +266,15 @@ static void sgr_extended_truecolor_fg(void **state)
   assert_int_equal(pi, 4);
 }
 
+static void sgr_extended_truecolor_bg(void **state)
+{
+  (void)state;
+  int pv[] = {SGR_BG_EXTENDED, SGR_EXT_FORM_TRUECOLOR, 0x10, 0x20, 0x30};
+  int pi   = 0;
+  assert_true(sgr_apply_extended_color(pv, 5, &pi));
+  assert_int_equal(fb_ctx.cur_bg, 0x102030u);
+}
+
 static void sgr_extended_too_few_params_returns_false(void **state)
 {
   (void)state;
@@ -204,28 +291,88 @@ static void sgr_extended_unknown_form_returns_false(void **state)
   assert_false(sgr_apply_extended_color(pv, 3, &pi));
 }
 
+static void sgr_extended_256_index_0(void **state)
+{
+  (void)state;
+  int pv[] = {SGR_FG_EXTENDED, SGR_EXT_FORM_256, 0};
+  int pi   = 0;
+  assert_true(sgr_apply_extended_color(pv, 3, &pi));
+  assert_int_equal(fb_ctx.cur_fg, ansi256_to_rgb(0));
+}
+
+static void sgr_extended_256_index_255(void **state)
+{
+  (void)state;
+  int pv[] = {SGR_BG_EXTENDED, SGR_EXT_FORM_256, 255};
+  int pi   = 0;
+  assert_true(sgr_apply_extended_color(pv, 3, &pi));
+  assert_int_equal(fb_ctx.cur_bg, ansi256_to_rgb(255));
+}
+
+
+static void csi_sgr_blink_then_reset(void **state)
+{
+  (void)state;
+  g_nparams   = 2;
+  g_params[0] = SGR_BLINK;
+  g_params[1] = SGR_RESET;
+  csi_sgr();
+  assert_int_equal(fb_ctx.cur_attr, 0); /* reset clears blink */
+}
+
+static void csi_sgr_reverse_survives_bold(void **state)
+{
+  (void)state;
+  g_nparams   = 2;
+  g_params[0] = SGR_REVERSE;
+  g_params[1] = SGR_BOLD;
+  csi_sgr();
+  assert_true(fb_ctx.cur_attr & FB_ATTR_REVERSE);
+  assert_true(fb_ctx.cur_attr & FB_ATTR_BOLD);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
+      /* reset */
       cmocka_unit_test_setup(sgr_reset_clears_attrs_and_colours, setup),
       cmocka_unit_test_setup(sgr_empty_params_is_reset, setup),
+      /* attrs */
       cmocka_unit_test_setup(sgr_bold_sets_bit, setup),
       cmocka_unit_test_setup(sgr_italic_sets_bit, setup),
       cmocka_unit_test_setup(sgr_underline_sets_bit, setup),
+      cmocka_unit_test_setup(sgr_blink_sets_bit, setup),
+      cmocka_unit_test_setup(sgr_reverse_sets_bit, setup),
       cmocka_unit_test_setup(sgr_no_bold_clears_bit, setup),
+      cmocka_unit_test_setup(sgr_no_italic_clears_bit, setup),
+      cmocka_unit_test_setup(sgr_no_underline_clears_bit, setup),
+      cmocka_unit_test_setup(sgr_no_blink_clears_bit, setup),
+      cmocka_unit_test_setup(sgr_no_reverse_clears_bit, setup),
       cmocka_unit_test_setup(sgr_unknown_attr_returns_false, setup),
+      /* basic colours */
       cmocka_unit_test_setup(sgr_fg_base_sets_colour, setup),
       cmocka_unit_test_setup(sgr_fg_end_sets_colour, setup),
       cmocka_unit_test_setup(sgr_bg_base_sets_colour, setup),
+      cmocka_unit_test_setup(sgr_bg_end_sets_colour, setup),
       cmocka_unit_test_setup(sgr_fg_default_restores, setup),
       cmocka_unit_test_setup(sgr_bg_default_restores, setup),
       cmocka_unit_test_setup(sgr_bright_fg_sets_colour, setup),
+      cmocka_unit_test_setup(sgr_bright_fg_end_sets_colour, setup),
+      cmocka_unit_test_setup(sgr_bright_bg_base_sets_colour, setup),
+      cmocka_unit_test_setup(sgr_bright_bg_end_sets_colour, setup),
       cmocka_unit_test_setup(sgr_unknown_colour_returns_false, setup),
+      /* extended */
       cmocka_unit_test_setup(sgr_extended_256_fg, setup),
       cmocka_unit_test_setup(sgr_extended_256_bg, setup),
       cmocka_unit_test_setup(sgr_extended_truecolor_fg, setup),
+      cmocka_unit_test_setup(sgr_extended_truecolor_bg, setup),
       cmocka_unit_test_setup(sgr_extended_too_few_params_returns_false, setup),
       cmocka_unit_test_setup(sgr_extended_unknown_form_returns_false, setup),
+      cmocka_unit_test_setup(sgr_extended_256_index_0, setup),
+      cmocka_unit_test_setup(sgr_extended_256_index_255, setup),
+      /* csi_sgr integration */
+      cmocka_unit_test_setup(csi_sgr_blink_then_reset, setup),
+      cmocka_unit_test_setup(csi_sgr_reverse_survives_bold, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
