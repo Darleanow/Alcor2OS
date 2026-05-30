@@ -215,10 +215,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             clang-18 \
+            lld-18 \
             llvm-18 \
             libcmocka-dev \
+            nasm \
             make
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-18 100
 
       - name: Run unit tests + coverage
         run: make coverage
