@@ -9,11 +9,13 @@
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/console.h>
 
-static idt_entry_t idt[IDT_ENTRIES];
-static idt_ptr_t   idtr;
+#include "idt_internal.h"
 
-extern void       *isr_stub_table[];
-extern void       *irq_stub_table[];
+idt_entry_t      idt[IDT_ENTRIES];
+static idt_ptr_t idtr;
+
+extern void     *isr_stub_table[];
+extern void     *irq_stub_table[];
 
 enum
 {
