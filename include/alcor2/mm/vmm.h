@@ -22,8 +22,9 @@
  * Only VMM_WC below is used today; VMM_PCD/VMM_PAT are provided for
  * completeness and are currently unused. */
 #define VMM_PAT (1ULL << 7)
-#define VMM_MMIO (1ULL << 9) /* Software bit: Do not free physical page on teardown */
-#define VMM_NX  (1ULL << 63)
+#define VMM_MMIO                                                               \
+  (1ULL << 9) /* Software bit: Do not free physical page on teardown */
+#define VMM_NX (1ULL << 63)
 /** @} */
 
 /* Write-Combining: selects PAT entry 4 (PAT=1, PCD=0, PWT=0) on a 4 KiB PTE,

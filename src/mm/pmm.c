@@ -55,7 +55,7 @@ static inline bool bitmap_test(u64 page)
  */
 void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
 {
-  hhdm = hhdm_offset;
+  hhdm   = hhdm_offset;
   bitmap = NULL;
 
   u64 highest_addr = 0;
@@ -114,7 +114,8 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
  */
 void *pmm_alloc(void)
 {
-  if (free_pages == 0) return NULL;
+  if(free_pages == 0)
+    return NULL;
 
   for(u64 i = 0; i < bitmap_size / sizeof(u64); i++) {
     if(bitmap[i] != ALL_BITS_SET) {
@@ -143,7 +144,8 @@ void *pmm_alloc(void)
  */
 void *pmm_alloc_pages(u64 count)
 {
-  if (count == 0 || free_pages < count) return NULL;
+  if(count == 0 || free_pages < count)
+    return NULL;
   u64 consecutive = 0;
   u64 start_page  = 0;
 

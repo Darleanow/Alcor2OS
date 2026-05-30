@@ -73,16 +73,16 @@ void vmm_init(u64 hhdm_offset)
   kzero(kernel_pml4, 512 * sizeof(u64));
 
 #ifndef TEST_ENV
-#ifndef TEST_ENV
+  #ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+  #else
+  extern u64 fake_cr3;
+  u64        cr3 = fake_cr3;
+  #endif
 #else
   extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
-#endif
-#else
-  extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
+  u64        cr3 = fake_cr3;
 #endif
   const u64 *const old_pml4 = (const u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
@@ -110,7 +110,7 @@ void vmm_map(u64 virt, u64 phys, u64 flags)
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
 #else
   extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
+  u64        cr3 = fake_cr3;
 #endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
@@ -157,7 +157,7 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
 #else
   extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
+  u64        cr3 = fake_cr3;
 #endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
@@ -204,8 +204,8 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
 
     kzero(phys_to_virt((u64)phys), PAGE_SIZE);
     pt[pt_idx] = ((u64)phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
-  #ifndef TEST_ENV
-  __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
+#ifndef TEST_ENV
+    __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
 #endif
   }
   return true;
@@ -227,7 +227,7 @@ void vmm_unmap(u64 virt)
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
 #else
   extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
+  u64        cr3 = fake_cr3;
 #endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
@@ -273,7 +273,7 @@ u64 vmm_get_phys(u64 virt)
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
 #else
   extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
+  u64        cr3 = fake_cr3;
 #endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
@@ -405,7 +405,7 @@ u64 vmm_get_current_pml4(void)
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
 #else
   extern u64 fake_cr3;
-  u64 cr3 = fake_cr3;
+  u64        cr3 = fake_cr3;
 #endif
   return cr3 & PAGE_FRAME_MASK;
 }
