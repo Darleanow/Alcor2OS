@@ -104,6 +104,10 @@ public:
   void          cursorMoveLeft();
   /** @brief Move the cursor one byte right, wrapping to the next line. */
   void          cursorMoveRight();
+  /** @brief Move the cursor to the first byte of the current line. */
+  void          cursorMoveLineStart();
+  /** @brief Move the cursor past the last byte of the current line. */
+  void          cursorMoveLineEnd();
 
 private:
   std::vector<std::string> m_text;

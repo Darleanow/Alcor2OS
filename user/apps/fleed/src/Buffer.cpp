@@ -151,4 +151,14 @@ void Buffer::cursorMoveRight()
   ++m_cursor.x;
 }
 
+void Buffer::cursorMoveLineStart()
+{
+  m_cursor.x = 0;
+}
+
+void Buffer::cursorMoveLineEnd()
+{
+  m_cursor.x = m_text.at(m_cursor.y).size();
+}
+
 } /* namespace fleed */
