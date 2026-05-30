@@ -23,6 +23,8 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/sched.h>
 
+#include "ata_internal.h"
+
 #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */
 #define LBA28_LIMIT      0x10000000ULL
 #define MAX_RETRIES      3
@@ -111,7 +113,7 @@ static void select_drive(const ata_drive_t *d)
  * @param s   String buffer (modified in place).
  * @param len Maximum length.
  */
-static void trim_string(char *s, size_t len)
+void trim_string(char *s, size_t len)
 {
   char *end = s + len;
   while(end > s && (end[-1] == ' ' || end[-1] == '\0'))
@@ -512,24 +514,11 @@ static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)
  * fetch a full 4 KB block so adjacent reads land hot.
  */
 
-#define CACHE_BLOCK_SECTORS 8u
-#define CACHE_BLOCK_BYTES   ((u64)CACHE_BLOCK_SECTORS * 512u)
-#define CACHE_NUM_ENTRIES   1024
-#define CACHE_INVALID_LBA   ((u64) - 1)
+ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];
+u64               g_cache_counter = 0;
+int               g_cache_inited  = 0;
 
-typedef struct
-{
-  u64 block_lba; /* aligned, CACHE_INVALID_LBA = free slot */
-  u64 last_used;
-  u8  drive;
-  u8  data[CACHE_BLOCK_BYTES] __attribute__((aligned(8)));
-} ata_cache_entry_t;
-
-static ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];
-static u64               g_cache_counter = 0;
-static int               g_cache_inited  = 0;
-
-static void              cache_init_once(void)
+void              cache_init_once(void)
 {
   if(g_cache_inited)
     return;
@@ -538,7 +527,7 @@ static void              cache_init_once(void)
   g_cache_inited = 1;
 }
 
-static ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
+ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
 {
   for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
     if(g_ata_cache[i].block_lba == block_lba && g_ata_cache[i].drive == drive) {
@@ -549,7 +538,7 @@ static ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)
   return NULL;
 }
 
-static ata_cache_entry_t *cache_alloc(void)
+ata_cache_entry_t *cache_alloc(void)
 {
   /* Prefer free slot; else evict LRU. */
   int idx    = 0;
@@ -565,7 +554,7 @@ static ata_cache_entry_t *cache_alloc(void)
   return &g_ata_cache[idx];
 }
 
-static void cache_invalidate_range(u8 drive, u64 lba, u32 count)
+void cache_invalidate_range(u8 drive, u64 lba, u32 count)
 {
   u64 end = lba + count;
   for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
@@ -772,14 +761,16 @@ static void init_dma(void)
 /** @brief Initialize the ATA subsystem (channels, drives, IRQs, DMA). */
 void ata_init(void)
 {
-  channels[0] = (ata_channel_t) {.base  = ATA_PRIMARY_DATA,
-                                 .ctrl  = ATA_PRIMARY_CTRL,
-                                 .irq   = IRQ_ATA_PRIMARY,
-                                 .state = ATA_STATE_IDLE};
-  channels[1] = (ata_channel_t) {.base  = ATA_SECONDARY_DATA,
-                                 .ctrl  = ATA_SECONDARY_CTRL,
-                                 .irq   = IRQ_ATA_SECONDARY,
-                                 .state = ATA_STATE_IDLE};
+  channels[0] = (ata_channel_t
+  ) {.base  = ATA_PRIMARY_DATA,
+     .ctrl  = ATA_PRIMARY_CTRL,
+     .irq   = IRQ_ATA_PRIMARY,
+     .state = ATA_STATE_IDLE};
+  channels[1] = (ata_channel_t
+  ) {.base  = ATA_SECONDARY_DATA,
+     .ctrl  = ATA_SECONDARY_CTRL,
+     .irq   = IRQ_ATA_SECONDARY,
+     .state = ATA_STATE_IDLE};
 
   for(int i = 0; i < 4; i++) {
     drives[i].channel = &channels[i / 2];
