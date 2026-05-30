@@ -21,39 +21,98 @@
 
 static u8 g_store[STORE_BLOCKS][BLOCK_SZ];
 
-void *kmalloc(u64 n)  { return malloc((size_t)n); }
-void  kfree(void *p)  { free(p); }
-void *kmemcpy(void *d, const void *s, u64 n) { return memcpy(d, s, n); }
-void  kzero(void *d, u64 n)  { memset(d, 0, n); }
-u8   *cache_get_block(u32 s) { (void)s; return NULL; }
-void  cache_put_block(u8 *p) { (void)p; }
-i64   ata_read(u8 d, u64 l, u32 c, void *b)
-{ (void)d;(void)l;(void)c;(void)b; return -1; }
-i64   ata_write(u8 d, u64 l, u32 c, const void *b)
-{ (void)d;(void)l;(void)c;(void)b; return -1; }
-i64   vol_read_block(const ext2_volume_t *v, u32 blk, void *buf)
+void     *kmalloc(u64 n)
+{
+  return malloc((size_t)n);
+}
+void kfree(void *p)
+{
+  free(p);
+}
+void *kmemcpy(void *d, const void *s, u64 n)
+{
+  return memcpy(d, s, n);
+}
+void kzero(void *d, u64 n)
+{
+  memset(d, 0, n);
+}
+u8 *cache_get_block(u32 s)
+{
+  (void)s;
+  return NULL;
+}
+void cache_put_block(u8 *p)
+{
+  (void)p;
+}
+i64 ata_read(u8 d, u64 l, u32 c, void *b)
+{
+  (void)d;
+  (void)l;
+  (void)c;
+  (void)b;
+  return -1;
+}
+i64 ata_write(u8 d, u64 l, u32 c, const void *b)
+{
+  (void)d;
+  (void)l;
+  (void)c;
+  (void)b;
+  return -1;
+}
+i64 vol_read_block(const ext2_volume_t *v, u32 blk, void *buf)
 {
   (void)v;
-  if(blk >= STORE_BLOCKS) return -EIO;
+  if(blk >= STORE_BLOCKS)
+    return -EIO;
   memcpy(buf, g_store[blk], BLOCK_SZ);
   return (i64)BLOCK_SZ;
 }
 i64 vol_write_block(const ext2_volume_t *v, u32 blk, const void *buf)
 {
   (void)v;
-  if(blk >= STORE_BLOCKS) return -EIO;
+  if(blk >= STORE_BLOCKS)
+    return -EIO;
   memcpy(g_store[blk], buf, BLOCK_SZ);
   return (i64)BLOCK_SZ;
 }
-i64 flush_metadata(ext2_volume_t *v) { (void)v; return 0; }
-u32 alloc_block(ext2_volume_t *v, u32 g) { (void)v;(void)g; return 0; }
-i64 free_block(ext2_volume_t *v, u32 b) { (void)v;(void)b; return 0; }
+i64 flush_metadata(ext2_volume_t *v)
+{
+  (void)v;
+  return 0;
+}
+static u32 g_next_block = 0;
+u32        alloc_block(ext2_volume_t *v, u32 g)
+{
+  (void)v;
+  (void)g;
+  return g_next_block ? g_next_block++ : 0;
+}
+i64 free_block(ext2_volume_t *v, u32 b)
+{
+  (void)v;
+  (void)b;
+  return 0;
+}
 i64 write_inode(const ext2_volume_t *v, u32 i, const ext2_inode_t *n)
-{ (void)v;(void)i;(void)n; return 0; }
+{
+  (void)v;
+  (void)i;
+  (void)n;
+  return 0;
+}
 
 #include "../../src/fs/ext2/blockmap.c"
 
-static int reset(void **s) { (void)s; memset(g_store,0,sizeof(g_store)); return 0; }
+static int reset(void **s)
+{
+  (void)s;
+  memset(g_store, 0, sizeof(g_store));
+  g_next_block = 0;
+  return 0;
+}
 
 static ext2_volume_t make_vol(void)
 {
@@ -83,7 +142,7 @@ static void direct_last_slot_not_routed_through_indirect(void **state)
   ext2_inode_t  inode;
   memset(&inode, 0, sizeof(inode));
 
-  inode.i_block[11]            = 0xDEAD; /* direct sentinel */
+  inode.i_block[11]             = 0xDEAD; /* direct sentinel */
   inode.i_block[EXT2_IND_BLOCK] = 5;
 
   /* If the code mistakenly uses <= instead of < it routes fb=11 through
@@ -115,20 +174,20 @@ static void indirect_first_slot_not_routed_direct(void **state)
 static void single_indirect_last_slot_correct(void **state)
 {
   (void)state;
-  ext2_volume_t v   = make_vol();
+  ext2_volume_t v = make_vol();
   ext2_inode_t  inode;
   memset(&inode, 0, sizeof(inode));
 
   inode.i_block[EXT2_IND_BLOCK]  = 5;
   inode.i_block[EXT2_DIND_BLOCK] = 6; /* should NOT be reached */
 
-  u32 *ind = (u32 *)g_store[5];
+  u32 *ind     = (u32 *)g_store[5];
   ind[PPB - 1] = 0xAAAA; /* last slot of single-indirect */
 
   u32 *dind = (u32 *)g_store[6];
-  dind[0]    = 7;
-  u32 *ind2  = (u32 *)g_store[7];
-  ind2[0]    = 0xBBBB; /* first dind slot — must NOT be returned */
+  dind[0]   = 7;
+  u32 *ind2 = (u32 *)g_store[7];
+  ind2[0]   = 0xBBBB; /* first dind slot — must NOT be returned */
 
   u32 fb = EXT2_NDIR_BLOCKS + (u32)PPB - 1;
   assert_int_equal(get_block_num(&v, &inode, fb), 0xAAAA);
@@ -142,16 +201,16 @@ static void double_indirect_first_slot_correct(void **state)
   memset(&inode, 0, sizeof(inode));
 
   /* Single-indirect block's last slot holds 0xAAAA — must NOT be returned. */
-  inode.i_block[EXT2_IND_BLOCK]  = 5;
-  u32 *ind = (u32 *)g_store[5];
-  ind[PPB - 1] = 0xAAAA;
+  inode.i_block[EXT2_IND_BLOCK] = 5;
+  u32 *ind                      = (u32 *)g_store[5];
+  ind[PPB - 1]                  = 0xAAAA;
 
   /* Double-indirect: dind→ind→data */
   inode.i_block[EXT2_DIND_BLOCK] = 8;
-  u32 *dind = (u32 *)g_store[8];
-  dind[0]   = 9;
-  u32 *ind2 = (u32 *)g_store[9];
-  ind2[0]   = 0xCCCC;
+  u32 *dind                      = (u32 *)g_store[8];
+  dind[0]                        = 9;
+  u32 *ind2                      = (u32 *)g_store[9];
+  ind2[0]                        = 0xCCCC;
 
   u32 fb = EXT2_NDIR_BLOCKS + (u32)PPB;
   assert_int_equal(get_block_num(&v, &inode, fb), 0xCCCC);
@@ -175,7 +234,7 @@ static void hole_indirect_never_reads_block_zero(void **state)
 
   inode.i_block[EXT2_IND_BLOCK] = 0; /* null pointer → hole */
 
-  assert_int_equal(get_block_num(&v, &inode, EXT2_NDIR_BLOCKS),     0);
+  assert_int_equal(get_block_num(&v, &inode, EXT2_NDIR_BLOCKS), 0);
   assert_int_equal(get_block_num(&v, &inode, EXT2_NDIR_BLOCKS + 1), 0);
 }
 
@@ -208,15 +267,15 @@ static void double_indirect_slot_arithmetic(void **state)
 
   /* Target: dind slot 1 → ind block 11 → slot 3 = 0x1234 */
   inode.i_block[EXT2_DIND_BLOCK] = 10;
-  u32 *dind  = (u32 *)g_store[10];
-  dind[0]    = 12; /* slot 0 — wrong slot for our target */
-  dind[1]    = 11; /* slot 1 — correct for i=1               */
+  u32 *dind                      = (u32 *)g_store[10];
+  dind[0] = 12; /* slot 0 — wrong slot for our target */
+  dind[1] = 11; /* slot 1 — correct for i=1               */
 
-  u32 *ind0  = (u32 *)g_store[12]; /* decoy */
-  ind0[3]    = 0xDEAD;
+  u32 *ind0 = (u32 *)g_store[12]; /* decoy */
+  ind0[3]   = 0xDEAD;
 
-  u32 *ind1  = (u32 *)g_store[11];
-  ind1[3]    = 0x1234;
+  u32 *ind1 = (u32 *)g_store[11];
+  ind1[3]   = 0x1234;
 
   /* file_block offset within dind range = 1*PPB + 3 */
   u32 fb = EXT2_NDIR_BLOCKS + (u32)PPB + 1 * (u32)PPB + 3;
@@ -231,7 +290,7 @@ static void double_indirect_slot_arithmetic(void **state)
 static void free_inode_blocks_resets_all_pointers(void **state)
 {
   (void)state;
-  ext2_volume_t     v  = make_vol();
+  ext2_volume_t     v = make_vol();
   ext2_group_desc_t gd;
   memset(&gd, 0, sizeof(gd));
   v.groups = &gd;
@@ -252,10 +311,98 @@ static void free_inode_blocks_resets_all_pointers(void **state)
   assert_int_equal(inode.i_blocks, 0);
 }
 
+/* ptrs_per_block */
+
+static void ptrs_per_block_matches_block_size(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  assert_int_equal(ptrs_per_block(&v), BLOCK_SZ / sizeof(u32));
+}
+
+/* triple indirect boundary */
+
+static void triple_indirect_first_slot(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  inode;
+  memset(&inode, 0, sizeof(inode));
+
+  /* tind = block 1, dind = block 2, ind = block 3, data = 0xF00F */
+  u32 tind_blk = 1, dind_blk = 2, ind_blk = 3;
+  inode.i_block[EXT2_TIND_BLOCK] = tind_blk;
+
+  /* tind[0] = dind_blk */
+  ((u32 *)g_store[tind_blk])[0] = dind_blk;
+  /* dind[0] = ind_blk */
+  ((u32 *)g_store[dind_blk])[0] = ind_blk;
+  /* ind[0] = data block */
+  ((u32 *)g_store[ind_blk])[0] = 0xF00F;
+
+  u32 fb = EXT2_NDIR_BLOCKS + PPB + PPB * PPB; /* first tind block */
+  assert_int_equal(get_block_num(&v, &inode, fb), 0xF00F);
+}
+
+/* alloc_file_block direct */
+
+static void alloc_file_block_direct(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+
+  g_next_block = 10; /* alloc_block returns 10, 11, ... */
+  u32 blk      = alloc_file_block(&v, &inode, 0, 0);
+  assert_int_equal(blk, 10);
+  assert_int_equal(inode.i_block[0], 10);
+}
+
+static void alloc_file_block_single_indirect(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+
+  /* block 10 = indirect table, block 11 = data */
+  g_next_block = 10;
+  u32 blk      = alloc_file_block(&v, &inode, EXT2_NDIR_BLOCKS, 0);
+  assert_true(blk > 0);
+  assert_true(inode.i_block[EXT2_IND_BLOCK] != 0);
+}
+
+static void alloc_file_block_returns_zero_when_alloc_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+
+  g_next_block = 0; /* alloc_block always returns 0 = failure */
+  u32 blk      = alloc_file_block(&v, &inode, 0, 0);
+  assert_int_equal(blk, 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test_setup(direct_last_slot_not_routed_through_indirect, reset),
+      cmocka_unit_test_setup(
+          direct_last_slot_not_routed_through_indirect, reset
+      ),
       cmocka_unit_test_setup(indirect_first_slot_not_routed_direct, reset),
       cmocka_unit_test_setup(single_indirect_last_slot_correct, reset),
       cmocka_unit_test_setup(double_indirect_first_slot_correct, reset),
@@ -263,6 +410,13 @@ int main(void)
       cmocka_unit_test_setup(hole_dind_never_reads_block_zero, reset),
       cmocka_unit_test_setup(double_indirect_slot_arithmetic, reset),
       cmocka_unit_test_setup(free_inode_blocks_resets_all_pointers, reset),
+      cmocka_unit_test_setup(ptrs_per_block_matches_block_size, reset),
+      cmocka_unit_test_setup(triple_indirect_first_slot, reset),
+      cmocka_unit_test_setup(alloc_file_block_direct, reset),
+      cmocka_unit_test_setup(alloc_file_block_single_indirect, reset),
+      cmocka_unit_test_setup(
+          alloc_file_block_returns_zero_when_alloc_fails, reset
+      ),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

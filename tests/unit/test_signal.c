@@ -221,6 +221,131 @@ static void sys_kill_sends_signal(void **state)
   assert_true(g_proc.sig_pending & (1ULL << SIGUSR1));
 }
 
+static void sigaction_registers_handler(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  act.sa_handler    = 0xDEAD0000ULL;
+  act.sa_restorer   = 0xDEAD0001ULL;
+  u64 ret           = sys_rt_sigaction(SIGUSR1, (u64)&act, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_int_equal(g_proc.sig_actions[SIGUSR1].sa_handler, 0xDEAD0000ULL);
+}
+
+static void sigaction_returns_old_action(void **state)
+{
+  (void)state;
+  g_proc.sig_actions[SIGUSR2].sa_handler = 0xBEEFULL;
+  k_sigaction_t old                      = {0};
+  u64           ret = sys_rt_sigaction(SIGUSR2, 0, (u64)&old, 8, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_int_equal(old.sa_handler, 0xBEEFULL);
+}
+
+static void sigaction_rejects_sigkill(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  u64           ret = sys_rt_sigaction(SIGKILL, (u64)&act, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+static void sigaction_rejects_sigstop(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  u64           ret = sys_rt_sigaction(SIGSTOP, (u64)&act, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+static void sigaction_rejects_sig_zero(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  u64           ret = sys_rt_sigaction(0, (u64)&act, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+static void sigaction_rejects_bad_sigsetsize(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  u64           ret = sys_rt_sigaction(SIGUSR1, (u64)&act, 0, 4, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+static void sigaltstack_zeros_old_ss(void **state)
+{
+  (void)state;
+  u8 buf[24];
+  memset(buf, 0xFF, sizeof(buf));
+  u64 ret = sys_sigaltstack(0, (u64)buf, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_int_equal(*(int *)(buf + 8), 2); /* SS_DISABLE */
+  assert_int_equal(buf[0], 0);
+  assert_int_equal(buf[23], 0);
+}
+
+static void sigaltstack_no_old_ss_is_noop(void **state)
+{
+  (void)state;
+  u64 ret = sys_sigaltstack(0, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+static void proc_check_signals_delivers_pending(void **state)
+{
+  (void)state;
+  /* Set up a handler for SIGUSR1 */
+  g_proc.sig_actions[SIGUSR1].sa_handler  = 0x400000ULL;
+  g_proc.sig_actions[SIGUSR1].sa_restorer = 0x400100ULL;
+  g_proc.sig_pending                      = 1ULL << SIGUSR1;
+  g_proc.sig_mask                         = 0;
+
+  /* Provide a fake syscall frame on the stack */
+  u8 frame_buf[sizeof(sig_ucontext_t) + 64 + 128 + 8];
+  memset(frame_buf, 0, sizeof(frame_buf));
+  syscall_frame_t *frame = (syscall_frame_t *)frame_buf;
+  frame->rsp             = (u64)(frame_buf + sizeof(frame_buf));
+
+  proc_check_signals(frame);
+
+  /* Pending bit must be cleared */
+  assert_false(g_proc.sig_pending & (1ULL << SIGUSR1));
+  /* rip redirected to handler */
+  assert_int_equal(frame->rip, 0x400000ULL);
+  /* rdi = signal number */
+  assert_int_equal(frame->rdi, SIGUSR1);
+}
+
+static void proc_check_signals_ignores_sig_ign(void **state)
+{
+  (void)state;
+  g_proc.sig_actions[SIGUSR1].sa_handler = SIG_IGN;
+  g_proc.sig_pending                     = 1ULL << SIGUSR1;
+
+  u8 frame_buf[sizeof(syscall_frame_t)];
+  memset(frame_buf, 0, sizeof(frame_buf));
+  proc_check_signals(frame_buf);
+
+  assert_false(g_proc.sig_pending & (1ULL << SIGUSR1));
+}
+
+static void proc_check_signals_masked_not_delivered(void **state)
+{
+  (void)state;
+  g_proc.sig_actions[SIGUSR1].sa_handler = 0x400000ULL;
+  g_proc.sig_pending                     = 1ULL << SIGUSR1;
+  g_proc.sig_mask                        = 1ULL << SIGUSR1;
+
+  syscall_frame_t frame   = {0};
+  u64             old_rip = frame.rip;
+  proc_check_signals(&frame);
+
+  assert_true(g_proc.sig_pending & (1ULL << SIGUSR1));
+  assert_int_equal(frame.rip, old_rip);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -243,6 +368,17 @@ int main(void)
       cmocka_unit_test_setup(sys_kill_unknown_pid_returns_esrch, setup),
       cmocka_unit_test_setup(sys_kill_invalid_sig_returns_einval, setup),
       cmocka_unit_test_setup(sys_kill_sends_signal, setup),
+      cmocka_unit_test_setup(sigaction_registers_handler, setup),
+      cmocka_unit_test_setup(sigaction_returns_old_action, setup),
+      cmocka_unit_test_setup(sigaction_rejects_sigkill, setup),
+      cmocka_unit_test_setup(sigaction_rejects_sigstop, setup),
+      cmocka_unit_test_setup(sigaction_rejects_sig_zero, setup),
+      cmocka_unit_test_setup(sigaction_rejects_bad_sigsetsize, setup),
+      cmocka_unit_test_setup(sigaltstack_zeros_old_ss, setup),
+      cmocka_unit_test_setup(sigaltstack_no_old_ss_is_noop, setup),
+      cmocka_unit_test_setup(proc_check_signals_delivers_pending, setup),
+      cmocka_unit_test_setup(proc_check_signals_ignores_sig_ign, setup),
+      cmocka_unit_test_setup(proc_check_signals_masked_not_delivered, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

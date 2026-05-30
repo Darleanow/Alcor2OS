@@ -188,6 +188,89 @@ static void bar_base64_oob_returns_zero(void **state)
   assert_int_equal(pci_bar_base64(&dev, -1), 0);
 }
 
+/* pci_for_each / pci_find_device */
+
+static void for_each_finds_device_by_class(void **state)
+{
+  (void)state;
+  /* Place a device at bus=0, slot=0, func=0.
+   * Layout: vendor=0x8086, device=0x1234, class=0x01 (storage), sub=0x00 */
+  cfgspace[PCI_VENDOR_ID / 4] = 0x12348086u; /* device_id<<16 | vendor_id */
+  /* class at byte 0x0B inside dword 0x08: bits [31:24] */
+  cfgspace[0x08 / 4] = (0x01u << 24); /* class=0x01 */
+  /* subclass at byte 0x0A: bits [23:16] */
+  cfgspace[0x08 / 4] |= (0x00u << 16);
+  /* header_type at 0x0E: single-function (bit7=0) */
+  cfgspace[0x0C / 4] = 0x00;
+
+  pci_device_t out;
+  bool         found = pci_find_device(0x01, 0x00, &out);
+  assert_true(found);
+  assert_int_equal(out.vendor_id, 0x8086);
+  assert_int_equal(out.device_id, 0x1234);
+  assert_int_equal(out.class_code, 0x01);
+}
+
+static void for_each_returns_false_when_all_0xffff(void **state)
+{
+  (void)state;
+  /* All vendor IDs = 0xFFFF (empty bus) */
+  for(size_t i = 0; i < sizeof(cfgspace) / sizeof(cfgspace[0]); i++)
+    cfgspace[i] = 0xFFFFFFFF;
+  pci_device_t out;
+  assert_false(pci_find_device(0x01, 0x00, &out));
+}
+
+/* pci_find_capability */
+
+static void find_capability_present(void **state)
+{
+  (void)state;
+  /* status register: bit 4 = capabilities list present */
+  cfgspace[PCI_STATUS / 4] = PCI_STATUS_CAP_LIST << ((PCI_STATUS & 2) * 8);
+  /* vendor_id must be non-0xFFFF */
+  cfgspace[PCI_VENDOR_ID / 4] = 0x00018086u;
+
+  /* cap ptr at 0x34 points to 0x40 */
+  cfgspace[0x34 / 4] = 0x40;
+  /* at 0x40: id=0x05 (MSI), next=0x00 */
+  cfgspace[0x40 / 4] = 0x0005;
+
+  pci_device_t dev = {0};
+  dev.bus          = 0;
+  dev.slot         = 0;
+  dev.func         = 0;
+
+  u8 off = 0;
+  assert_true(pci_find_capability(&dev, 0x05, &off));
+  assert_int_equal(off, 0x40);
+}
+
+static void find_capability_absent(void **state)
+{
+  (void)state;
+  cfgspace[PCI_STATUS / 4]    = PCI_STATUS_CAP_LIST << ((PCI_STATUS & 2) * 8);
+  cfgspace[PCI_VENDOR_ID / 4] = 0x00018086u;
+  cfgspace[0x34 / 4]          = 0x40;
+  cfgspace[0x40 / 4]          = 0x0004; /* id=0x04 (power mgmt), next=0x00 */
+
+  pci_device_t dev = {0};
+  dev.bus          = 0;
+  dev.slot         = 0;
+  dev.func         = 0;
+
+  assert_false(pci_find_capability(&dev, 0x05, NULL));
+}
+
+static void find_capability_no_cap_list(void **state)
+{
+  (void)state;
+  /* status bit 4 cleared */
+  cfgspace[PCI_STATUS / 4] = 0;
+  pci_device_t dev         = {0};
+  assert_false(pci_find_capability(&dev, 0x05, NULL));
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -208,6 +291,11 @@ int main(void)
       cmocka_unit_test_setup(bar_base64_64bit_combines_hi_lo, reset),
       cmocka_unit_test_setup(bar_base64_io_strips_lower_bits, reset),
       cmocka_unit_test_setup(bar_base64_oob_returns_zero, reset),
+      cmocka_unit_test_setup(for_each_finds_device_by_class, reset),
+      cmocka_unit_test_setup(for_each_returns_false_when_all_0xffff, reset),
+      cmocka_unit_test_setup(find_capability_present, reset),
+      cmocka_unit_test_setup(find_capability_absent, reset),
+      cmocka_unit_test_setup(find_capability_no_cap_list, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

@@ -200,6 +200,122 @@ static void elf_load_no_phdrs_fails(void **state)
   assert_int_equal(elf_load(&h, sizeof(h), &info), -1);
 }
 
+static void elf_load_valid_single_segment(void **state)
+{
+  (void)state;
+  /* Build a minimal ELF: header + one PT_LOAD phdr inline. */
+  typedef struct __attribute__((packed))
+  {
+    Elf64_Ehdr ehdr;
+    Elf64_Phdr phdr;
+    u8         data[16];
+  } mini_elf_t;
+
+  mini_elf_t elf;
+  memset(&elf, 0, sizeof(elf));
+
+  elf.ehdr             = make_valid_ehdr();
+  elf.ehdr.e_phoff     = sizeof(Elf64_Ehdr);
+  elf.ehdr.e_phentsize = sizeof(Elf64_Phdr);
+  elf.ehdr.e_phnum     = 1;
+
+  elf.phdr.p_type   = PT_LOAD;
+  elf.phdr.p_offset = sizeof(Elf64_Ehdr) + sizeof(Elf64_Phdr);
+  elf.phdr.p_vaddr  = 0x400000;
+  elf.phdr.p_memsz  = 16;
+  elf.phdr.p_filesz = 0; /* skip copy — vmm_get_phys stub points to host addr */
+
+  elf_info_t info;
+  int        ret = elf_load(&elf, sizeof(elf), &info);
+  assert_int_equal(ret, 0);
+  assert_int_equal(info.entry, 0x400000);
+  assert_int_equal(info.base, 0x400000);
+  assert_int_equal(info.end, 0x400000 + 16);
+}
+
+static void elf_load_skips_non_load_segments(void **state)
+{
+  (void)state;
+  typedef struct __attribute__((packed))
+  {
+    Elf64_Ehdr ehdr;
+    Elf64_Phdr phdr_interp;
+    Elf64_Phdr phdr_load;
+  } two_elf_t;
+
+  two_elf_t elf;
+  memset(&elf, 0, sizeof(elf));
+
+  elf.ehdr             = make_valid_ehdr();
+  elf.ehdr.e_phoff     = sizeof(Elf64_Ehdr);
+  elf.ehdr.e_phentsize = sizeof(Elf64_Phdr);
+  elf.ehdr.e_phnum     = 2;
+
+  elf.phdr_interp.p_type  = 3; /* PT_INTERP — not PT_LOAD */
+  elf.phdr_interp.p_memsz = 16;
+
+  elf.phdr_load.p_type   = PT_LOAD;
+  elf.phdr_load.p_vaddr  = 0x401000;
+  elf.phdr_load.p_memsz  = 32;
+  elf.phdr_load.p_filesz = 0; /* no file data */
+
+  elf_info_t info;
+  assert_int_equal(elf_load(&elf, sizeof(elf), &info), 0);
+  assert_int_equal(info.base, 0x401000);
+}
+
+static void elf_load_zero_memsz_skipped(void **state)
+{
+  (void)state;
+  typedef struct __attribute__((packed))
+  {
+    Elf64_Ehdr ehdr;
+    Elf64_Phdr phdr_zero;
+    Elf64_Phdr phdr_real;
+  } zero_elf_t;
+
+  zero_elf_t elf;
+  memset(&elf, 0, sizeof(elf));
+
+  elf.ehdr             = make_valid_ehdr();
+  elf.ehdr.e_phoff     = sizeof(Elf64_Ehdr);
+  elf.ehdr.e_phentsize = sizeof(Elf64_Phdr);
+  elf.ehdr.e_phnum     = 2;
+
+  elf.phdr_zero.p_type  = PT_LOAD;
+  elf.phdr_zero.p_memsz = 0; /* must be skipped */
+
+  elf.phdr_real.p_type  = PT_LOAD;
+  elf.phdr_real.p_vaddr = 0x402000;
+  elf.phdr_real.p_memsz = 8;
+
+  elf_info_t info;
+  assert_int_equal(elf_load(&elf, sizeof(elf), &info), 0);
+  assert_int_equal(info.base, 0x402000);
+}
+
+static void elf_info_track_phdr_with_zero_offset_sets_phdr(void **state)
+{
+  (void)state;
+  Elf64_Ehdr h  = make_valid_ehdr();
+  h.e_phoff     = 64;
+  h.e_phentsize = sizeof(Elf64_Phdr);
+  h.e_phnum     = 1;
+
+  elf_info_t info;
+  elf_info_init(&h, &info);
+
+  Elf64_Phdr phdr;
+  memset(&phdr, 0, sizeof(phdr));
+  phdr.p_type   = PT_LOAD;
+  phdr.p_vaddr  = 0x400000;
+  phdr.p_memsz  = 0x1000;
+  phdr.p_offset = 0; /* zero offset → phdr field should be set */
+
+  elf_info_track_segment(&h, &phdr, &info);
+  assert_int_equal(info.phdr, 0x400000 + h.e_phoff);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -216,6 +332,10 @@ int main(void)
       cmocka_unit_test(elf_load_too_small_fails),
       cmocka_unit_test(elf_load_bad_magic_fails),
       cmocka_unit_test(elf_load_no_phdrs_fails),
+      cmocka_unit_test(elf_load_valid_single_segment),
+      cmocka_unit_test(elf_load_skips_non_load_segments),
+      cmocka_unit_test(elf_load_zero_memsz_skipped),
+      cmocka_unit_test(elf_info_track_phdr_with_zero_offset_sets_phdr),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
