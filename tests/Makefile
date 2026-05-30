@@ -24,7 +24,7 @@ LLVM_COV      ?= $(shell command -v llvm-cov-$(CLANG_VER) 2>/dev/null || command
 # links and runs as a normal host program.
 COV_FLAGS  := -fprofile-instr-generate -fcoverage-mapping
 CFLAGS     := -std=gnu11 -g -O0 -Wall -Wextra -Werror -Wno-unused-parameter -I$(INCLUDE) -I$(SRC)
-TESTCFLAGS := -std=gnu11 -g -O0 -Wall -Wextra -I$(INCLUDE) -I$(SRC) -I$(SUPPORT)
+TESTCFLAGS := -std=gnu11 -g -O0 -Wall -Wextra -I$(INCLUDE) -I$(SRC) -I$(SUPPORT) -I$(ROOT)/user/include -I$(ROOT)/user/core/vega/include -I$(ROOT)/user/sdk/vega/include -I$(ROOT)/user/core/vega/include
 LDLIBS     := -lcmocka
 
 # Suite registry: one entry per unit, with the sources it exercises.
@@ -34,7 +34,8 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc \
           elf signal pipe \
           palette sgr sys_misc sys_mm \
-          kbd_layout fb_console_caret_cell fb_console_pixel
+          kbd_layout fb_console_caret_cell fb_console_pixel \
+          user_lib vega_sdk user_bin user_init
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_fb_console_pixel := 
 
@@ -76,6 +77,10 @@ SRC_signal             :=
 SRC_pipe               :=
 SRC_kbd_layout         :=
 SRC_fb_console_caret_cell :=
+SRC_user_lib           :=
+SRC_vega_sdk           :=
+SRC_user_bin           :=
+SRC_user_init          :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 
@@ -110,16 +115,17 @@ test: $(TEST_BINS) | $(COV)
 	done; \
 	exit $$fail
 
-COV_SRCS := $(shell find $(SRC) $(ROOT)/user -name '*.c')
-# llvm-cov takes one binary positionally and the rest via -object.
-COV_BIN  := $(firstword $(TEST_BINS))
-COV_REST := $(foreach t,$(filter-out $(COV_BIN),$(TEST_BINS)),-object $(t))
+COV_SRCS := $(shell find $(SRC) -name '*.c')
+COV_BIN  := ../build/alcor2.elf
 
-coverage: test
+../build/alcor2.elf:
+	$(MAKE) -C .. iso-kernel COV=1 CC=clang
+
+coverage: test ../build/alcor2.elf
 	$(LLVM_PROFDATA) merge -sparse $(COV)/*.profraw -o $(COV)/merged.profdata
-	$(LLVM_COV) report $(COV_BIN) $(COV_REST) \
+	$(LLVM_COV) report $(COV_BIN) \
 	  -instr-profile=$(COV)/merged.profdata $(COV_SRCS) | tee $(COV)/coverage.txt
-	$(LLVM_COV) show $(COV_BIN) $(COV_REST) \
+	$(LLVM_COV) show $(COV_BIN) \
 	  -instr-profile=$(COV)/merged.profdata \
 	  -format=html -show-line-counts-or-regions -output-dir=$(COV)/html \
 	  $(COV_SRCS)
