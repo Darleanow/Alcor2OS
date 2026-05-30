@@ -36,63 +36,40 @@ int Editor::run()
       return 1;
     KeyAction act = classify(ev);
 
+    /* Cases that touch the view themselves (redraw / insertChar) continue;
+     * cursor-only moves fall through to the single refreshCursor below. */
     switch(act.cmd) {
     case Command::Quit:
       return 0;
-
-    case Command::Save:
-      handleSave();
-      m_ui.refreshCursor(m_buffer);
-      break;
+    case Command::None:
+      continue;
 
     case Command::Insert:
       insertChar(act.data);
-      break;
+      continue;
 
     case Command::Backspace:
-      /* popBack may fuse two lines; redraw fully when something changed. */
-      if(m_buffer.popBack())
+      if(m_buffer.popBack()) {
         m_ui.redraw(m_buffer);
-      else
-        m_ui.refreshCursor(m_buffer);
+        continue;
+      }
       break;
 
     case Command::Enter:
       m_buffer.newLine();
       m_ui.redraw(m_buffer);
-      break;
+      continue;
 
-    case Command::ArrowUp:
-      m_buffer.cursorMoveUp();
-      m_ui.refreshCursor(m_buffer);
-      break;
-    case Command::ArrowDown:
-      m_buffer.cursorMoveDown();
-      m_ui.refreshCursor(m_buffer);
-      break;
-    case Command::ArrowLeft:
-      m_buffer.cursorMoveLeft();
-      m_ui.refreshCursor(m_buffer);
-      break;
-    case Command::ArrowRight:
-      m_buffer.cursorMoveRight();
-      m_ui.refreshCursor(m_buffer);
-      break;
-
-    case Command::Home:
-      m_buffer.setCursorPos(0, m_buffer.cursor().y);
-      m_ui.refreshCursor(m_buffer);
-      break;
-    case Command::End:
-      m_buffer.setCursorPos(
-          m_buffer.line(m_buffer.cursor().y).size(), m_buffer.cursor().y
-      );
-      m_ui.refreshCursor(m_buffer);
-      break;
-
-    case Command::None:
-      break;
+    case Command::Save:        handleSave();                   break;
+    case Command::ArrowUp:     m_buffer.cursorMoveUp();        break;
+    case Command::ArrowDown:   m_buffer.cursorMoveDown();      break;
+    case Command::ArrowLeft:   m_buffer.cursorMoveLeft();      break;
+    case Command::ArrowRight:  m_buffer.cursorMoveRight();     break;
+    case Command::Home:        m_buffer.cursorMoveLineStart(); break;
+    case Command::End:         m_buffer.cursorMoveLineEnd();   break;
     }
+
+    m_ui.refreshCursor(m_buffer);
   }
 }
 
