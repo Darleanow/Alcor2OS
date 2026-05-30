@@ -246,7 +246,9 @@ static i64 ram_mkdir(void *fs_data, const char *path)
   kstrncpy(name, last_slash + 1, VFS_NAME_MAX);
 
   ram_node_t *parent = ram__resolve(parent_path);
-  if(!parent || parent->type != VFS_DIRECTORY)
+  if(!parent)
+    return -ENOENT;
+  if(parent->type != VFS_DIRECTORY)
     return -ENOTDIR;
 
   ram_node_t *node = ram__create_node(name, VFS_DIRECTORY);
@@ -449,8 +451,10 @@ i64 ramfs_chardev_register(
   kstrncpy(name, last_slash + 1, VFS_NAME_MAX);
 
   ram_node_t *parent = ram__resolve(parent_path);
-  if(!parent || parent->type != VFS_DIRECTORY)
+  if(!parent)
     return -ENOENT;
+  if(parent->type != VFS_DIRECTORY)
+    return -ENOTDIR;
 
   ram_node_t *node = ram__create_node(name, VFS_FILE);
   if(!node)
