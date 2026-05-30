@@ -24,32 +24,32 @@ static inline void outb(u16 port, u8 val)
   if(port == DEBUGCON_PORT && cap_len < CAPBUF_SIZE - 1)
     cap[cap_len++] = (char)val;
 }
-static inline u8 inb(u16 p)
+static inline u8 __attribute__((unused)) inb(u16 p)
 {
   (void)p;
   return 0;
 }
-static inline void outw(u16 p, u16 v)
+static inline void __attribute__((unused)) outw(u16 p, u16 v)
 {
   (void)p;
   (void)v;
 }
-static inline u16 inw(u16 p)
+static inline u16 __attribute__((unused)) inw(u16 p)
 {
   (void)p;
   return 0;
 }
-static inline void outl(u16 p, u32 v)
+static inline void __attribute__((unused)) outl(u16 p, u32 v)
 {
   (void)p;
   (void)v;
 }
-static inline u32 inl(u16 p)
+static inline u32 __attribute__((unused)) inl(u16 p)
 {
   (void)p;
   return 0;
 }
-static inline void io_wait(void) {}
+static inline void __attribute__((unused)) io_wait(void) {}
 
 /* Now pull in the entire klog.c translation unit. */
 #include "../../src/drivers/console/klog.c"

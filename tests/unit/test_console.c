@@ -32,7 +32,7 @@ static unsigned cap_len;
 #define io_wait()  ((void)0)
 
 /* kstdlib symbols used by console.c scroll/clear paths. */
-static inline void *kmemset(void *d, int v, u64 n)
+static inline void *__attribute__((unused)) kmemset(void *d, int v, u64 n)
 {
   return memset(d, v, n);
 }
@@ -40,7 +40,7 @@ static inline void *kmemcpy(void *d, const void *s, u64 n)
 {
   return memcpy(d, s, n);
 }
-static inline void kzero(void *d, u64 n)
+static inline void __attribute__((unused)) kzero(void *d, u64 n)
 {
   memset(d, 0, n);
 }
