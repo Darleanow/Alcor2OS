@@ -115,21 +115,28 @@ test: $(TEST_BINS) | $(COV)
 	done; \
 	exit $$fail
 
-COV_SRCS := $(shell find $(SRC) -name '*.c')
-COV_BIN  := ../build/alcor2.elf
+COV_KERNEL_SRCS := $(shell find $(SRC) -name '*.c')
+COV_USER_SRCS   := $(shell find $(ROOT)/user -name '*.c' ! -path '*/doomgeneric/*' ! -path '*/ncurses-hello/*' ! -path '*/thirdparty/*')
+COV_BIN         := ../build/alcor2.elf
+COV_TEST_BINS   := $(firstword $(TEST_BINS)) $(foreach t,$(filter-out $(firstword $(TEST_BINS)),$(TEST_BINS)),-object $(t))
 
 ../build/alcor2.elf:
 	$(MAKE) -C .. build/alcor2.elf COV=1 CC=clang
 
 coverage: test ../build/alcor2.elf
 	$(LLVM_PROFDATA) merge -sparse $(COV)/*.profraw -o $(COV)/merged.profdata
-	$(LLVM_COV) report $(COV_BIN) \
-	  -instr-profile=$(COV)/merged.profdata $(COV_SRCS) | tee $(COV)/coverage.txt
-	$(LLVM_COV) show $(COV_BIN) \
+	@echo ""
+	@echo "==========================================================="
+	@echo "               GLOBAL COVERAGE (KERNEL + USER)             "
+	@echo "==========================================================="
+	$(LLVM_COV) report $(COV_BIN) $(COV_TEST_BINS) \
+	  -instr-profile=$(COV)/merged.profdata $(COV_KERNEL_SRCS) $(COV_USER_SRCS) | tee $(COV)/coverage.txt
+	$(LLVM_COV) show $(COV_BIN) $(COV_TEST_BINS) \
 	  -instr-profile=$(COV)/merged.profdata \
 	  -format=html -show-line-counts-or-regions -output-dir=$(COV)/html \
-	  $(COV_SRCS)
-	@echo "HTML report: $(COV)/html/index.html"
+	  $(COV_KERNEL_SRCS) $(COV_USER_SRCS)
+	@echo ""
+	@echo "HTML Report generated: $(COV)/html/index.html"
 
 clean:
 	rm -rf $(BUILD)
