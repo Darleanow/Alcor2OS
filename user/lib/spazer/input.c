@@ -63,7 +63,7 @@ static int decode(int kind, wint_t ch, spz_event_t *out)
       out->key.kind = SPZ_KEY_ENTER;
       return 1;
     default:
-      /* F-keys map linearly: KEY_F(1) = SPZ_KEY_F1, KEY_F(2) = +1, etc. */
+      /* KEY_F(n) maps linearly to SPZ_KEY_F1 + (n - 1). */
       if(ch >= KEY_F(1) && ch <= KEY_F(12)) {
         out->key.kind = (spz_key_kind_t)(SPZ_KEY_F1 + (ch - KEY_F(1)));
         return 1;
@@ -73,8 +73,7 @@ static int decode(int kind, wint_t ch, spz_event_t *out)
     }
   }
 
-  /* OK path: ch is a wide character. Map a few control codes that
-   * terminals send as bytes rather than KEY_* codes. */
+  /* Wide-char path: map control bytes terminals send raw instead of KEY_*. */
   switch(ch) {
   case L'\r':
   case L'\n':
@@ -86,10 +85,9 @@ static int decode(int kind, wint_t ch, spz_event_t *out)
   case 27:
     out->key.kind = SPZ_KEY_ESCAPE;
     return 1;
+  /* DEL (0x7F) and BS (0x08) — both used as backspace by various terminals. */
   case 127:
   case 8:
-    /* DEL (0x7F) and BS (0x08) — both used as "backspace" by various
-     * terminals; KEY_BACKSPACE catches the keypad-decoded form above. */
     out->key.kind = SPZ_KEY_BACKSPACE;
     return 1;
   default:
