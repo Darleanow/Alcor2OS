@@ -92,7 +92,10 @@ static vfs_mount_t *vfs_find_mount(const char *path, const char **rel_path)
   }
 
   if(best && rel_path) {
-    *rel_path = path + best_len;
+    if(best_len == 1 && best->target[0] == '/')
+      *rel_path = path;
+    else
+      *rel_path = path + best_len;
     if((*rel_path)[0] == '\0')
       *rel_path = "/";
   }
@@ -133,8 +136,9 @@ static void vfs_normalize(char *path)
       continue;
     if(len == 2 && start[0] == '.' && start[1] == '.') {
       if(out > res + 1) {
-        out--;
         while(out > res + 1 && *(out - 1) != '/')
+          out--;
+        if(out > res + 1 && *(out - 1) == '/')
           out--;
       }
       continue;
