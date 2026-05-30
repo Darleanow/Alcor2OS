@@ -205,12 +205,14 @@ extern "C"
   /**
    * @brief Grow the underlying pad.
    *
-   * Existing content is preserved. Shrinking is not supported — destroy and
-   * recreate the pad instead.
+   * Each axis grows independently: a request that shrinks one dimension is
+   * silently clamped to the current size on that axis so callers can compute
+   * a desired @c (rows, cols) without first reading the current geometry.
+   * To shrink a pad, destroy it and create a new one.
    *
    * @param p          Pad.
-   * @param virt_rows  New row count; must be >= current.
-   * @param virt_cols  New column count; must be >= current.
+   * @param virt_rows  Desired row count; clamped to >= current.
+   * @param virt_cols  Desired column count; clamped to >= current.
    * @return           0 on success, -1 on allocation failure or invalid args.
    */
   int spz_pad_resize(spz_pad_t *p, int virt_rows, int virt_cols);
