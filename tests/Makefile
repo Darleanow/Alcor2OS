@@ -29,7 +29,9 @@ LDLIBS     := -lcmocka
 
 # Suite registry: one entry per unit, with the sources it exercises.
 SUITES := kstdlib gdt idt ktermios pixel_bpp ata keyboard klog console ext2_cache \
-          mouse_ps2 pci pic pit
+          mouse_ps2 pci pic pit \
+          ext2_alloc ext2_path ext2_dirent \
+          ext2_blockmap ext2_inode compiler_abi
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_gdt       := $(SRC)/arch/x86_64/gdt.c
 SRC_idt       := $(SRC)/arch/x86_64/idt.c
@@ -43,7 +45,13 @@ SRC_ext2_cache := $(SRC)/fs/ext2/cache.c
 SRC_mouse_ps2  :=
 SRC_pci        :=
 SRC_pic        :=
-SRC_pit        :=
+SRC_pit          :=
+SRC_ext2_alloc   :=
+SRC_ext2_path    := $(SRC)/lib/kstdlib.c
+SRC_ext2_dirent  :=
+SRC_ext2_blockmap :=
+SRC_ext2_inode    :=
+SRC_compiler_abi  :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 
