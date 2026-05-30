@@ -53,6 +53,8 @@ i64 vol_write_block(const ext2_volume_t *v, u32 blk, const void *buf)
   return (i64)BLOCK_SZ;
 }
 
+ext2_file_t g_files[EXT2_MAX_FILES];
+
 #include "../../src/fs/ext2/inode.c"
 
 /* ── volume fixture ────────────────────────────────────────────────────────

@@ -97,6 +97,22 @@ void ext2_close(ext2_file_t *file)
   if(!file || !file->in_use)
     return;
 
+  if(file->inode.i_links_count == 0) {
+    int open_count = 0;
+    for(int i = 0; i < EXT2_MAX_FILES; i++) {
+      if(g_files[i].in_use && g_files[i].vol == file->vol && g_files[i].inode_num == file->inode_num) {
+        open_count++;
+      }
+    }
+    if(open_count == 1) {
+      free_inode_blocks(file->vol, &file->inode);
+      free_inode(file->vol, file->inode_num, false);
+      flush_metadata(file->vol);
+      file->in_use = false;
+      return;
+    }
+  }
+
   if(file->dirty) {
     write_inode(file->vol, file->inode_num, &file->inode);
     flush_metadata(file->vol);

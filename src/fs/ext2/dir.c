@@ -359,8 +359,19 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
 
   file_inode.i_links_count--;
   if(file_inode.i_links_count == 0) {
-    free_inode_blocks(vol, &file_inode);
-    free_inode(vol, file_ino, false);
+    bool is_open = false;
+    for(int i = 0; i < EXT2_MAX_FILES; i++) {
+      if(g_files[i].in_use && g_files[i].vol == vol && g_files[i].inode_num == file_ino) {
+        is_open = true;
+        break;
+      }
+    }
+    if(!is_open) {
+      free_inode_blocks(vol, &file_inode);
+      free_inode(vol, file_ino, false);
+    } else {
+      write_inode(vol, file_ino, &file_inode);
+    }
   } else {
     write_inode(vol, file_ino, &file_inode);
   }
@@ -398,6 +409,9 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
   char parent_path[VFS_PATH_MAX];
   char dirname[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, dirname);
+
+  if(kstrcmp(dirname, ".") == 0 || kstrcmp(dirname, "..") == 0)
+    return -EINVAL;
 
   u32          parent_ino;
   ext2_inode_t parent_inode;
