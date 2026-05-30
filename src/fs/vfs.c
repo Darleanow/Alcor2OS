@@ -577,8 +577,11 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
     vfs_stat_t st;
     char       name[VFS_NAME_MAX + 1];
     i64        ret = e->ops->readdir(e->handle, e->offset, name, &st);
-    if(ret <= 0)
+    if(ret <= 0) {
+      if(written == 0 && ret < 0)
+        return ret;
       break;
+    }
 
     u32 namelen = (u32)kstrlen(name);
     u32 reclen  = (u32)((19 + namelen + 1 + 7) & ~7ULL);
@@ -673,13 +676,21 @@ i64 vfs_rename(const char *oldpath, const char *newpath)
     return -EIO;
   }
 
-  static u8 rename_buf[RENAME_CHUNK];
+  u8 *rename_buf = kmalloc(RENAME_CHUNK);
+  if(!rename_buf) {
+    src_m->ops->close(src_fh);
+    dst_m->ops->close(dst_fh);
+    return -ENOMEM;
+  }
+  
   u64       off = 0;
   i64       n;
   while((n = src_m->ops->read(src_fh, rename_buf, RENAME_CHUNK, off)) > 0) {
     dst_m->ops->write(dst_fh, rename_buf, (u64)n, off);
     off += (u64)n;
   }
+  
+  kfree(rename_buf);
 
   src_m->ops->close(src_fh);
   dst_m->ops->close(dst_fh);
