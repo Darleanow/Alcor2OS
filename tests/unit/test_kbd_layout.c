@@ -12,6 +12,7 @@
 
 #include <alcor2/kbd.h>
 #include <alcor2/ktermios.h>
+#include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
 
 #include <stddef.h>
@@ -65,8 +66,8 @@ u32 keyboard_raw_peek(u8 *buf, u32 n)
 void cpu_enable_interrupts(void)  {}
 void cpu_disable_interrupts(void) {}
 
-struct proc;
-struct proc *proc_current(void)    { return NULL; }
+static proc_t g_test_proc;
+proc_t *proc_current(void)    { return &g_test_proc; }
 void         proc_schedule(void)   {}
 
 /* termios stub */
@@ -98,6 +99,9 @@ static int setup(void **state)
   kbd_set_release_events(false);
   out_pend_w = out_pend_r = 0;
   memset(&g_kbd, 0, sizeof(g_kbd));
+  
+  memset(&g_test_proc, 0, sizeof(g_test_proc));
+  ktermios_init_default(&g_test_proc.termios);
   return 0;
 }
 
@@ -398,6 +402,43 @@ static void kbd_raw_pending_printable_press_returns_true(void **state)
   assert_true(kbd_raw_pending());
 }
 
+static void kbd_read_translated_canon_echoes_and_blocks_until_newline(void **state)
+{
+  (void)state;
+  char buf[32] = {0};
+  
+  /* Type 'h', 'i', '\n' */
+  raw_push(0x23); /* 'h' press */
+  raw_push(0x23 | 0x80); /* 'h' release */
+  raw_push(0x17); /* 'i' press */
+  raw_push(0x17 | 0x80); /* 'i' release */
+  raw_push(0x1C); /* 'Enter' press */
+  raw_push(0x1C | 0x80); /* 'Enter' release */
+  
+  u64 n = kbd_read_translated(buf, sizeof(buf));
+  assert_int_equal(n, 3);
+  assert_int_equal(buf[0], 'h');
+  assert_int_equal(buf[1], 'i');
+  assert_int_equal(buf[2], '\n');
+}
+
+static void kbd_read_translated_canon_handles_backspace(void **state)
+{
+  (void)state;
+  char buf[32] = {0};
+  
+  /* Type 'h', 'o', backspace, 'i', '\n' */
+  raw_push(0x23); /* 'h' */
+  raw_push(0x18); /* 'o' */
+  raw_push(0x0E); /* backspace */
+  raw_push(0x17); /* 'i' */
+  raw_push(0x1C); /* enter */
+  
+  u64 n = kbd_read_translated(buf, sizeof(buf));
+  assert_int_equal(n, 3);
+  assert_string_equal(buf, "hi\n");
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -444,6 +485,9 @@ int main(void)
       cmocka_unit_test_setup(kbd_raw_pending_with_pend_byte_returns_true, setup),
       cmocka_unit_test_setup(kbd_raw_pending_key_up_only_returns_false, setup),
       cmocka_unit_test_setup(kbd_raw_pending_printable_press_returns_true, setup),
+      /* TTY Queue */
+      cmocka_unit_test_setup(kbd_read_translated_canon_echoes_and_blocks_until_newline, setup),
+      cmocka_unit_test_setup(kbd_read_translated_canon_handles_backspace, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

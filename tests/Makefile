@@ -34,13 +34,15 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc \
           elf signal pipe \
           palette sgr sys_misc sys_mm \
-          kbd_layout fb_console_caret_cell
+          kbd_layout fb_console_caret_cell fb_console_pixel
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
+SRC_fb_console_pixel := 
+
 SRC_gdt       := $(SRC)/arch/x86_64/gdt.c
 SRC_idt       := $(SRC)/arch/x86_64/idt.c
 SRC_ktermios  := $(SRC)/kernel/ktermios.c $(SRC)/lib/kstdlib.c
 SRC_pixel_bpp := $(SRC)/kernel/drivers/fb_console/pixel.c
-SRC_ata       := $(SRC)/drivers/ata/ata.c
+SRC_ata       :=
 SRC_keyboard  := $(SRC)/drivers/keyboard/keyboard.c
 SRC_klog      :=
 SRC_console    :=
