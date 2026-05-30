@@ -43,6 +43,10 @@ bool keyboard_raw_available(void)
 u8 keyboard_raw_pop(void)
 {
   cpu_disable_interrupts();
+  if(kb_read_pos == kb_write_pos) {
+    cpu_enable_interrupts();
+    return 0;
+  }
   u8 b        = kb_buffer[kb_read_pos];
   kb_read_pos = (kb_read_pos + 1) % KB_BUFFER_SIZE;
   cpu_enable_interrupts();
