@@ -1,5 +1,7 @@
 /**
  * @file fleed/src/Ui.cpp
+ * @brief Spazer-backed view layer for the editor — owns the SCREEN, the
+ *        scrollable pad, and the status-bar string.
  */
 
 #include <fleed/Ui.hpp>
@@ -11,8 +13,31 @@
 namespace fleed {
 
 namespace {
+
+/** Right-hand text shown in every status bar variant. */
 constexpr const char *kHints = "F1 quit F2 save";
+
+/** Horizontal headroom (columns) reserved past the longest line so a few
+ *  inserts at end-of-line don't force a pad resize. */
+constexpr int kPadWidthPad = 16;
+
+/** Minimum virtual pad rows / cols at creation time — avoids one resize on
+ *  the first redraw for typical small files. */
+constexpr int kPadMinRows = 32;
+constexpr int kPadMinCols = 80;
+
+/**
+ * @brief Push the current bottom status bar with a centre slot.
+ *
+ * @param center  Centre text, NULL for empty.
+ */
+void paintStatus(const char *center)
+{
+  spz_bar_t bar = {"fleed", center, kHints, SPZ_STYLE_STATUS};
+  spz_statusbar(&bar);
 }
+
+} /* namespace */
 
 Ui::Ui() = default;
 
@@ -34,128 +59,108 @@ bool Ui::init(const std::string &header)
     return false;
   set_term(m_scr);
   typeahead(-1);
-  raw();
-  keypad(stdscr, TRUE);
-  noecho();
-  curs_set(1);
-  spz_init();
+
+  if(spz_init() != 0) {
+    shutdown();
+    return false;
+  }
 
   int rows = 0, cols = 0;
   getmaxyx(stdscr, rows, cols);
 
-  m_editor =
-      spz_panel_new(0, 0, rows - 1, cols, header.c_str(), SPZ_BORDER_SINGLE);
-  if(!m_editor) {
+  /* Reserve the bottom row for the status bar. */
+  spz_rect_t outer = {0, 0, rows - 1, cols};
+  spz_rect_t virt  = {
+      0, 0, (kPadMinRows > rows ? kPadMinRows : rows),
+      (kPadMinCols > cols ? kPadMinCols : cols)
+  };
+  m_pad = spz_pad_new(outer, virt, header.c_str(), SPZ_BORDER_SINGLE);
+  if(!m_pad) {
     shutdown();
     return false;
   }
-  keypad(m_editor->body, TRUE);
-  /* Force DECCKM (application cursor keys mode): the kernel fb_console
-   * emits SS3 (\EOA) for arrow keys when this is set and CSI (\E[A) when
-   * cleared. ncurses' keypad() sends "smkx" via terminfo to flip it on, but
-   * relying on terminfo is brittle here — write it explicitly so arrows
-   * reach wget_wch as KEY_UP/DOWN/LEFT/RIGHT instead of raw bytes. */
-  (void)write(STDOUT_FILENO, "\033[?1h", 5);
-  spz_statusbar("fleed", nullptr, kHints);
-  spz_panel_refresh(m_editor);
+  keypad(spz_pad_buffer(m_pad), TRUE);
+
+  paintStatus(nullptr);
+  spz_pad_refresh(m_pad);
   return true;
 }
 
 void Ui::shutdown()
 {
-  if(m_editor) {
-    spz_panel_del(m_editor);
-    m_editor = nullptr;
+  if(m_pad) {
+    spz_pad_del(m_pad);
+    m_pad = nullptr;
   }
   if(m_scr) {
+    spz_shutdown();
     endwin();
     delscreen(m_scr);
     m_scr = nullptr;
   }
 }
 
-int Ui::readKey(wint_t &out)
+int Ui::pollEvent(spz_event_t &out)
 {
-  return wget_wch(m_editor->body, &out);
+  return spz_poll(spz_pad_buffer(m_pad), &out);
+}
+
+void Ui::ensurePadSize(const Buffer &buffer)
+{
+  size_t max_w = 0;
+  for(size_t i = 0; i < buffer.lineCount(); ++i) {
+    size_t w = buffer.line(i).size();
+    if(w > max_w)
+      max_w = w;
+  }
+  int need_rows = static_cast<int>(buffer.lineCount()) + 1;
+  int need_cols = static_cast<int>(max_w) + kPadWidthPad;
+  (void)spz_pad_resize(m_pad, need_rows, need_cols);
 }
 
 void Ui::redraw(const Buffer &buffer)
 {
-  int vis_rows = 0, vis_cols = 0;
-  getmaxyx(m_editor->body, vis_rows, vis_cols);
-  (void)vis_cols;
-
-  const size_t rows = static_cast<size_t>(vis_rows);
-  const size_t cy   = buffer.cursor().y;
-
-  if(cy < m_scroll_offset)
-    m_scroll_offset = cy;
-  else if(cy >= m_scroll_offset + rows)
-    m_scroll_offset = cy - rows + 1;
-
-  for(size_t i = 0; i < rows; i++) {
-    size_t li = m_scroll_offset + i;
-    wmove(m_editor->body, static_cast<int>(i), 0);
-    wclrtoeol(m_editor->body);
-    if(li < buffer.lineCount())
-      waddstr(m_editor->body, buffer.line(li).c_str());
-  }
-
-  wmove(
-      m_editor->body, static_cast<int>(cy - m_scroll_offset),
-      static_cast<int>(buffer.cursor().x)
-  );
-  spz_panel_refresh(m_editor);
+  ensurePadSize(buffer);
+  WINDOW *body = spz_pad_buffer(m_pad);
+  werase(body);
+  for(size_t i = 0; i < buffer.lineCount(); ++i)
+    mvwaddstr(body, static_cast<int>(i), 0, buffer.line(i).c_str());
+  refreshCursor(buffer);
 }
 
 void Ui::redrawLine(const Buffer &buffer, size_t line_idx)
 {
-  int vis_rows = 0, vis_cols = 0;
-  getmaxyx(m_editor->body, vis_rows, vis_cols);
-  (void)vis_cols;
+  ensurePadSize(buffer);
+  WINDOW *body = spz_pad_buffer(m_pad);
+  wmove(body, static_cast<int>(line_idx), 0);
+  wclrtoeol(body);
+  mvwaddstr(body, static_cast<int>(line_idx), 0, buffer.line(line_idx).c_str());
+}
 
-  if(line_idx < m_scroll_offset ||
-     line_idx >= m_scroll_offset + static_cast<size_t>(vis_rows))
-    return;
-
-  int row = static_cast<int>(line_idx - m_scroll_offset);
-  mvwaddstr(m_editor->body, row, 0, buffer.line(line_idx).c_str());
-  wclrtoeol(m_editor->body);
+void Ui::refreshCursor(const Buffer &buffer)
+{
+  spz_pad_set_cursor(
+      m_pad, static_cast<int>(buffer.cursor().y),
+      static_cast<int>(buffer.cursor().x)
+  );
+  refreshStatusBar(buffer);
+  spz_pad_refresh(m_pad);
 }
 
 void Ui::setStatus(const char *text)
 {
-  spz_statusbar("fleed", text, kHints);
+  m_status_msg = text ? text : "";
+  paintStatus(m_status_msg.empty() ? nullptr : m_status_msg.c_str());
 }
 
-void Ui::refreshStatus(const Buffer &buffer)
+void Ui::refreshStatusBar(const Buffer &buffer)
 {
   char pos[32];
-  (void)std::snprintf(pos, sizeof(pos), "L:%zu C:%zu",
-                      buffer.cursor().y + 1, buffer.cursor().x + 1);
-  spz_statusbar("fleed", pos, kHints);
-}
-
-void Ui::redrawCursor(const Buffer &buffer)
-{
-  int vis_rows = 0, vis_cols = 0;
-  getmaxyx(m_editor->body, vis_rows, vis_cols);
-  (void)vis_cols;
-
-  const size_t rows = static_cast<size_t>(vis_rows);
-  const size_t cy   = buffer.cursor().y;
-
-  if(cy < m_scroll_offset || cy >= m_scroll_offset + rows) {
-    redraw(buffer);
-    return;
-  }
-
-  refreshStatus(buffer);
-  wmove(
-      m_editor->body, static_cast<int>(cy - m_scroll_offset),
-      static_cast<int>(buffer.cursor().x)
+  (void)std::snprintf(
+      pos, sizeof(pos), "L:%zu C:%zu", buffer.cursor().y + 1,
+      buffer.cursor().x + 1
   );
-  spz_panel_refresh(m_editor);
+  paintStatus(pos);
 }
 
 } /* namespace fleed */
