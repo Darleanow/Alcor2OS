@@ -86,7 +86,7 @@ test: $(TEST_BINS) | $(COV)
 	done; \
 	exit $$fail
 
-COV_SRCS := $(shell find $(SRC) -name '*.c')
+COV_SRCS := $(shell find $(SRC) $(ROOT)/user -name '*.c')
 # llvm-cov takes one binary positionally and the rest via -object.
 COV_BIN  := $(firstword $(TEST_BINS))
 COV_REST := $(foreach t,$(filter-out $(COV_BIN),$(TEST_BINS)),-object $(t))

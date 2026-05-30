@@ -60,18 +60,7 @@ void pic_unmask(u8 irq)
  * Status needs OUTPUT_FULL (0x01) | AUX_DATA (0x20) = 0x21 to proceed. */
 #define STATUS_MOUSE_READY 0x21
 
-static void __attribute__((unused)) feed3(u8 b0, u8 b1, u8 b2)
-{
-  /* Each byte call: status read (0x64) then data read (0x60) */
-  inb_idx    = 0;
-  inb_len    = 6;
-  inb_seq[0] = STATUS_MOUSE_READY;
-  inb_seq[1] = b0;
-  inb_seq[2] = STATUS_MOUSE_READY;
-  inb_seq[3] = b1;
-  inb_seq[4] = STATUS_MOUSE_READY;
-  inb_seq[5] = b2;
-}
+
 
 static int reset(void **state)
 {
