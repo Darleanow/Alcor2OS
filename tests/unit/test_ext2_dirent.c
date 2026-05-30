@@ -10,14 +10,27 @@
 
 #include <string.h>
 
+#include <stdlib.h>
+
+#define STORE_BLOCKS 16
+#define BLOCK_SZ     1024u
+
+static u8 g_blocks[STORE_BLOCKS][BLOCK_SZ];
+
+static int reset(void **s)
+{
+  (void)s;
+  memset(g_blocks, 0, sizeof(g_blocks));
+  return 0;
+}
+
 void *kmalloc(u64 n)
 {
-  (void)n;
-  return NULL;
+  return malloc((size_t)n);
 }
 void kfree(void *p)
 {
-  (void)p;
+  free(p);
 }
 void *kmemcpy(void *d, const void *s, u64 n)
 {
@@ -82,36 +95,36 @@ i64 write_inode(const ext2_volume_t *v, u32 i, const ext2_inode_t *n)
   (void)v;
   (void)i;
   (void)n;
-  return -1;
+  return 0;
 }
 i64 vol_read_block(const ext2_volume_t *v, u32 b, void *buf)
 {
   (void)v;
-  (void)b;
-  (void)buf;
-  return -1;
+  if(b >= STORE_BLOCKS)
+    return -1;
+  memcpy(buf, g_blocks[b], BLOCK_SZ);
+  return BLOCK_SZ;
 }
 i64 vol_write_block(const ext2_volume_t *v, u32 b, const void *buf)
 {
   (void)v;
-  (void)b;
-  (void)buf;
-  return -1;
+  if(b >= STORE_BLOCKS)
+    return -1;
+  memcpy(g_blocks[b], buf, BLOCK_SZ);
+  return BLOCK_SZ;
 }
 u32 get_block_num(const ext2_volume_t *v, const ext2_inode_t *inode, u32 fb)
 {
   (void)v;
   (void)inode;
-  (void)fb;
-  return 0;
+  return fb + 1;
 }
 u32 alloc_file_block(ext2_volume_t *v, ext2_inode_t *inode, u32 fb, u32 grp)
 {
   (void)v;
   (void)inode;
-  (void)fb;
   (void)grp;
-  return 0;
+  return fb + 1;
 }
 i64 flush_metadata(ext2_volume_t *v)
 {
@@ -361,26 +374,197 @@ static void try_insert_fails_when_no_slack(void **state)
   );
 }
 
+/* Public API Tests */
+static ext2_volume_t make_vol(void) {
+  ext2_volume_t v;
+  memset(&v, 0, sizeof(v));
+  v.block_size = BLOCK_SZ;
+  v.inode_size = 128;
+  v.inodes_per_group = 8;
+  return v;
+}
+
+static void pub_dir_is_empty_true(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 block_num = get_block_num(&v, &dir, 0);
+  u32 off = 0;
+  build_dirent(g_blocks[block_num], &off, 1, ".");
+  build_dirent(g_blocks[block_num], &off, 2, "..");
+  
+  assert_true(dir_is_empty(&v, &dir));
+}
+
+static void pub_dir_is_empty_false(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 block_num = get_block_num(&v, &dir, 0);
+  u32 off = 0;
+  build_dirent(g_blocks[block_num], &off, 1, ".");
+  build_dirent(g_blocks[block_num], &off, 2, "..");
+  build_dirent(g_blocks[block_num], &off, 3, "foo");
+  
+  assert_false(dir_is_empty(&v, &dir));
+}
+
+static void pub_dir_find_entry_success(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = 2 * BLOCK_SZ;
+  
+  u32 b1 = get_block_num(&v, &dir, 0);
+  u32 b2 = get_block_num(&v, &dir, 1);
+  
+  u32 off1 = 0;
+  build_dirent(g_blocks[b1], &off1, 10, "foo");
+  
+  u32 off2 = 0;
+  build_dirent(g_blocks[b2], &off2, 20, "bar");
+  
+  u32 out_ino;
+  u8 out_type;
+  assert_int_equal(dir_find_entry(&v, &dir, "bar", &out_ino, &out_type), 0);
+  assert_int_equal(out_ino, 20);
+}
+
+static void pub_dir_find_entry_failure(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 b1 = get_block_num(&v, &dir, 0);
+  u32 off1 = 0;
+  build_dirent(g_blocks[b1], &off1, 10, "foo");
+  
+  u32 out_ino;
+  u8 out_type;
+  assert_int_equal(dir_find_entry(&v, &dir, "baz", &out_ino, &out_type), -ENOENT);
+}
+
+static void pub_dir_add_entry_slack(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 b1 = get_block_num(&v, &dir, 0);
+  ext2_dirent_t *seed = (ext2_dirent_t *)g_blocks[b1];
+  seed->inode = 1;
+  seed->rec_len = BLOCK_SZ;
+  seed->name_len = 1;
+  seed->name[0] = '.';
+  
+  assert_int_equal(dir_add_entry(&v, 100, &dir, "new", 42, EXT2_FT_REG_FILE), 0);
+  
+  u32 out_ino;
+  u8 out_type;
+  assert_int_equal(dir_find_entry(&v, &dir, "new", &out_ino, &out_type), 0);
+  assert_int_equal(out_ino, 42);
+}
+
+static void pub_dir_add_entry_new_block(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 b1 = get_block_num(&v, &dir, 0);
+  u32 off = 0;
+  // Fill the 1024-byte block perfectly.
+  // 1024 / 256 = 4 entries of rec_len 256.
+  // A rec_len of 256 requires a name_len of at least 256 - 8 - 3 = 245.
+  // We'll use name_len = 248 to get exact 256 aligned size.
+  for(int i = 0; i < 4; i++) {
+    ext2_dirent_t *de = (ext2_dirent_t *)(g_blocks[b1] + off);
+    de->inode = 1;
+    de->rec_len = 256;
+    de->name_len = 248;
+    off += 256;
+  }
+  
+  assert_int_equal(dir_add_entry(&v, 100, &dir, "new2", 43, EXT2_FT_REG_FILE), 0);
+  assert_int_equal(dir.i_size, 2 * BLOCK_SZ);
+  
+  u32 out_ino;
+  u8 out_type;
+  assert_int_equal(dir_find_entry(&v, &dir, "new2", &out_ino, &out_type), 0);
+  assert_int_equal(out_ino, 43);
+}
+
+static void pub_dir_remove_entry_success(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 b1 = get_block_num(&v, &dir, 0);
+  u32 off = 0;
+  build_dirent(g_blocks[b1], &off, 10, "foo");
+  
+  assert_int_equal(dir_remove_entry(&v, &dir, "foo"), 0);
+  
+  u32 out_ino;
+  u8 out_type;
+  assert_int_equal(dir_find_entry(&v, &dir, "foo", &out_ino, &out_type), -ENOENT);
+}
+
+static void pub_dir_remove_entry_failure(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  
+  u32 b1 = get_block_num(&v, &dir, 0);
+  u32 off = 0;
+  build_dirent(g_blocks[b1], &off, 10, "foo");
+  
+  assert_int_equal(dir_remove_entry(&v, &dir, "bar"), -ENOENT);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(aligned_len_zero_name),
-      cmocka_unit_test(aligned_len_one_char),
-      cmocka_unit_test(aligned_len_already_aligned),
-      cmocka_unit_test(aligned_len_always_multiple_of_4),
-      cmocka_unit_test(find_name_hit),
-      cmocka_unit_test(find_name_miss),
-      cmocka_unit_test(find_name_skips_deleted_entry),
-      cmocka_unit_test(find_name_stops_on_zero_rec_len),
-      cmocka_unit_test(find_name_partial_match_not_returned),
-      cmocka_unit_test(remove_first_entry_tombstones),
-      cmocka_unit_test(remove_middle_entry_merges_into_prev),
-      cmocka_unit_test(remove_nonexistent_returns_false),
-      cmocka_unit_test(count_entries_excludes_dot_and_dotdot),
-      cmocka_unit_test(count_entries_empty_block_is_zero),
-      cmocka_unit_test(count_entries_skips_tombstones),
-      cmocka_unit_test(try_insert_into_slack),
-      cmocka_unit_test(try_insert_fails_when_no_slack),
+      cmocka_unit_test_setup(aligned_len_zero_name, reset),
+      cmocka_unit_test_setup(aligned_len_one_char, reset),
+      cmocka_unit_test_setup(aligned_len_already_aligned, reset),
+      cmocka_unit_test_setup(aligned_len_always_multiple_of_4, reset),
+      cmocka_unit_test_setup(find_name_hit, reset),
+      cmocka_unit_test_setup(find_name_miss, reset),
+      cmocka_unit_test_setup(find_name_skips_deleted_entry, reset),
+      cmocka_unit_test_setup(find_name_stops_on_zero_rec_len, reset),
+      cmocka_unit_test_setup(find_name_partial_match_not_returned, reset),
+      cmocka_unit_test_setup(remove_first_entry_tombstones, reset),
+      cmocka_unit_test_setup(remove_middle_entry_merges_into_prev, reset),
+      cmocka_unit_test_setup(remove_nonexistent_returns_false, reset),
+      cmocka_unit_test_setup(count_entries_excludes_dot_and_dotdot, reset),
+      cmocka_unit_test_setup(count_entries_empty_block_is_zero, reset),
+      cmocka_unit_test_setup(count_entries_skips_tombstones, reset),
+      cmocka_unit_test_setup(try_insert_into_slack, reset),
+      cmocka_unit_test_setup(try_insert_fails_when_no_slack, reset),
+      cmocka_unit_test_setup(pub_dir_is_empty_true, reset),
+      cmocka_unit_test_setup(pub_dir_is_empty_false, reset),
+      cmocka_unit_test_setup(pub_dir_find_entry_success, reset),
+      cmocka_unit_test_setup(pub_dir_find_entry_failure, reset),
+      cmocka_unit_test_setup(pub_dir_add_entry_slack, reset),
+      cmocka_unit_test_setup(pub_dir_add_entry_new_block, reset),
+      cmocka_unit_test_setup(pub_dir_remove_entry_success, reset),
+      cmocka_unit_test_setup(pub_dir_remove_entry_failure, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
