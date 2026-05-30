@@ -1,5 +1,7 @@
 /**
  * @file fleed/src/Editor.cpp
+ * @brief Editor event loop: loads the file, classifies UI events into
+ *        commands, applies them to the buffer, then asks the view to repaint.
  */
 
 #include <fleed/Editor.hpp>
@@ -29,51 +31,68 @@ int Editor::run()
   m_ui.redraw(m_buffer);
 
   for(;;) {
-    wint_t ch   = 0;
-    int    kind = m_ui.readKey(ch);
-    auto   act  = classify(kind, ch);
+    spz_event_t ev {};
+    if(m_ui.pollEvent(ev) < 0)
+      return 1;
+    KeyAction act = classify(ev);
 
     switch(act.cmd) {
     case Command::Quit:
       return 0;
+
     case Command::Save:
       handleSave();
+      m_ui.refreshCursor(m_buffer);
       break;
-    case Command::Backspace:
-      if(m_buffer.popBack())
-        m_ui.redraw(m_buffer);
-      break;
+
     case Command::Insert:
       insertChar(act.data);
       break;
+
+    case Command::Backspace:
+      /* popBack may fuse two lines; redraw fully when something changed. */
+      if(m_buffer.popBack())
+        m_ui.redraw(m_buffer);
+      else
+        m_ui.refreshCursor(m_buffer);
+      break;
+
+    case Command::Enter:
+      m_buffer.newLine();
+      m_ui.redraw(m_buffer);
+      break;
+
     case Command::ArrowUp:
       m_buffer.cursorMoveUp();
+      m_ui.refreshCursor(m_buffer);
       break;
     case Command::ArrowDown:
       m_buffer.cursorMoveDown();
+      m_ui.refreshCursor(m_buffer);
       break;
     case Command::ArrowLeft:
       m_buffer.cursorMoveLeft();
+      m_ui.refreshCursor(m_buffer);
       break;
     case Command::ArrowRight:
       m_buffer.cursorMoveRight();
+      m_ui.refreshCursor(m_buffer);
       break;
+
     case Command::Home:
       m_buffer.setCursorPos(0, m_buffer.cursor().y);
+      m_ui.refreshCursor(m_buffer);
       break;
     case Command::End:
       m_buffer.setCursorPos(
           m_buffer.line(m_buffer.cursor().y).size(), m_buffer.cursor().y
       );
+      m_ui.refreshCursor(m_buffer);
       break;
-    case Command::Enter:
-      m_buffer.newLine();
-      m_ui.redraw(m_buffer);
-      break;
+
     case Command::None:
       break;
     }
-    m_ui.redrawCursor(m_buffer);
   }
 }
 
@@ -82,10 +101,12 @@ void Editor::insertChar(wchar_t ch)
   std::array<char, MB_LEN_MAX> mb {};
   std::mbstate_t               st {};
   std::size_t                  n = std::wcrtomb(mb.data(), ch, &st);
+  /* Drop the keystroke on encoding failure rather than insert garbage. */
   if(n == static_cast<std::size_t>(-1))
     return;
   m_buffer.append(mb.data(), n);
   m_ui.redrawLine(m_buffer, m_buffer.cursor().y);
+  m_ui.refreshCursor(m_buffer);
 }
 
 void Editor::handleSave()
