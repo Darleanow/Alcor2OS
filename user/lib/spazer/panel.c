@@ -90,8 +90,7 @@ void spz_panel_set_title(spz_panel_t *p, const char *title)
   if(!p)
     return;
   char *new_title = spz_strdup(title);
-  /* If the caller asked for a title but we failed to allocate, keep the old
-   * one rather than silently dropping it. */
+  /* On allocation failure, keep the old title rather than dropping it. */
   if(title && !new_title)
     return;
   free(p->title);
@@ -109,9 +108,7 @@ void spz_panel_refresh(spz_panel_t *p)
     p->frame_dirty = false;
   }
   wnoutrefresh(p->frame);
-  /* The body is a derwin and shares cells with the frame; touch it so the
-   * overlay re-renders even when ncurses thinks the underlying frame already
-   * covers those cells. */
+  /* derwin shares cells with the frame; touch so the body overlay re-renders. */
   touchwin(p->body);
   wnoutrefresh(p->body);
   doupdate();
