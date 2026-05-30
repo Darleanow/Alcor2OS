@@ -9,18 +9,17 @@
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/keyboard.h>
 
-#define KB_DATA_PORT   0x60
-#define KB_CMD_PORT    0x64
-#define KB_BUFFER_SIZE 256
+#include "keyboard_internal.h"
 
-static u8           kb_buffer[KB_BUFFER_SIZE];
-static volatile u32 kb_read_pos  = 0;
-static volatile u32 kb_write_pos = 0;
-/** @brief Raw scancodes dropped because the ring buffer was full (burst input).
- */
-static u32  kb_drop_count = 0;
+#define KB_DATA_PORT 0x60
+#define KB_CMD_PORT  0x64
 
-static void kb_push(u8 b)
+u8           kb_buffer[KB_BUFFER_SIZE];
+volatile u32 kb_read_pos   = 0;
+volatile u32 kb_write_pos  = 0;
+u32          kb_drop_count = 0;
+
+void         kb_push(u8 b)
 {
   u32 next = (kb_write_pos + 1) % KB_BUFFER_SIZE;
   if(next != kb_read_pos) {
