@@ -30,17 +30,30 @@ static int reset(void **s)
   return 0;
 }
 
-void *kmalloc(u64 n)  { return malloc((size_t)n); }
+
+static bool g_kmalloc_fail = false;
+void       *kmalloc(u64 n)
+{
+  if(g_kmalloc_fail)
+    return NULL;
+  return malloc((size_t)n);
+}
 void  kfree(void *p)  { free(p); }
 void *kmemcpy(void *d, const void *s, u64 n) { return memcpy(d, s, n); }
 void  kzero(void *d, u64 n) { memset(d, 0, n); }
 u8   *cache_get_block(u32 s) { (void)s; return NULL; }
 void  cache_put_block(u8 *p) { (void)p; }
 
+static bool g_read_fail  = false;
+static bool g_write_fail = false;
+
 i64 vol_read_block(const ext2_volume_t *v, u32 blk, void *buf)
 {
   (void)v;
-  if(blk >= STORE_BLOCKS) return -EIO;
+  if(g_read_fail)
+    return -EIO;
+  if(blk >= STORE_BLOCKS)
+    return -EIO;
   memcpy(buf, g_store[blk], BLOCK_SZ);
   return (i64)BLOCK_SZ;
 }
@@ -48,7 +61,10 @@ i64 vol_read_block(const ext2_volume_t *v, u32 blk, void *buf)
 i64 vol_write_block(const ext2_volume_t *v, u32 blk, const void *buf)
 {
   (void)v;
-  if(blk >= STORE_BLOCKS) return -EIO;
+  if(g_write_fail)
+    return -EIO;
+  if(blk >= STORE_BLOCKS)
+    return -EIO;
   memcpy(g_store[blk], buf, BLOCK_SZ);
   return (i64)BLOCK_SZ;
 }
@@ -87,6 +103,7 @@ static void make_inode(ext2_inode_t *out, u32 id)
   out->i_block[0]     = 0xDEAD0000 | id;
 }
 
+
 static void read_ino_zero_is_einval(void **state)
 {
   (void)state;
@@ -100,7 +117,7 @@ static void read_ino_above_count_is_einval(void **state)
   (void)state;
   ext2_volume_t v = make_vol();
   ext2_inode_t  out;
-  assert_int_equal(read_inode(&v, 9, &out), -EINVAL);  /* count = 8 */
+  assert_int_equal(read_inode(&v, 9, &out), -EINVAL); /* count = 8 */
 }
 
 static void read_ino_at_count_succeeds(void **state)
@@ -132,6 +149,66 @@ static void write_ino_above_count_is_einval(void **state)
   assert_int_equal(write_inode(&v, 9, &dummy), -EINVAL);
 }
 
+
+static void write_inode_read_fail_returns_eio(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_read_fail = true;
+  i64 ret     = write_inode(&v, 1, &dummy);
+  g_read_fail = false;
+  assert_int_equal(ret, -EIO);
+}
+
+static void write_inode_write_fail_returns_eio(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_write_fail = true;
+  i64 ret      = write_inode(&v, 1, &dummy);
+  g_write_fail = false;
+  assert_int_equal(ret, -EIO);
+}
+
+static void write_inode_kmalloc_fail_returns_enomem(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_kmalloc_fail = true;
+  i64 ret        = write_inode(&v, 1, &dummy);
+  g_kmalloc_fail = false;
+  assert_int_equal(ret, -ENOMEM);
+}
+
+static void read_inode_read_fail_returns_eio(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  out;
+  g_read_fail = true;
+  i64 ret     = read_inode(&v, 1, &out);
+  g_read_fail = false;
+  assert_int_equal(ret, -EIO);
+}
+
+static void read_inode_kmalloc_fail_returns_enomem(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  out;
+  g_kmalloc_fail = true;
+  i64 ret        = read_inode(&v, 1, &out);
+  g_kmalloc_fail = false;
+  assert_int_equal(ret, -ENOMEM);
+}
+
+
 static void write_inode1_does_not_corrupt_inode2(void **state)
 {
   (void)state;
@@ -147,9 +224,7 @@ static void write_inode1_does_not_corrupt_inode2(void **state)
   assert_int_equal(read_inode(&v, 1, &readback_a), 0);
   assert_int_equal(read_inode(&v, 2, &readback_b), 0);
 
-  /* Inode 1 must be intact after inode 2 was written. */
   assert_memory_equal(&readback_a, &a, sizeof(a));
-  /* Inode 2 must be intact. */
   assert_memory_equal(&readback_b, &b, sizeof(b));
 }
 
@@ -162,11 +237,9 @@ static void write_all_inodes_leaves_each_intact(void **state)
   for(u32 i = 0; i < 8; i++)
     make_inode(&src[i], i + 1);
 
-  /* Write all 8 inodes sequentially — each write is a RMW on the same block. */
   for(u32 i = 0; i < 8; i++)
     assert_int_equal(write_inode(&v, i + 1, &src[i]), 0);
 
-  /* Re-read all and verify none was corrupted by a later write. */
   for(u32 i = 0; i < 8; i++) {
     ext2_inode_t got;
     assert_int_equal(read_inode(&v, i + 1, &got), 0);
@@ -179,21 +252,17 @@ static void overwrite_inode_updates_only_target_fields(void **state)
   (void)state;
   ext2_volume_t v = make_vol();
 
-  /* Write initial inode 3 with one pattern, then overwrite with another. */
   ext2_inode_t first, second, readback;
   make_inode(&first,  3);
-  make_inode(&second, 33);   /* different sentinel */
+  make_inode(&second, 33);
 
   assert_int_equal(write_inode(&v, 3, &first),  0);
   assert_int_equal(write_inode(&v, 3, &second), 0);
   assert_int_equal(read_inode(&v,  3, &readback), 0);
 
-  /* Must reflect the second write, not the first. */
   assert_memory_equal(&readback, &second, sizeof(second));
 }
 
-/* Neighboring inodes must be byte-equal to what was originally written.
- * We write inodes 3, 4, 5, then overwrite 4, and verify 3 and 5 survive. */
 static void overwrite_middle_inode_preserves_neighbors(void **state)
 {
   (void)state;
@@ -221,11 +290,19 @@ static void overwrite_middle_inode_preserves_neighbors(void **state)
 int main(void)
 {
   const struct CMUnitTest tests[] = {
+      /* validation */
       cmocka_unit_test_setup(read_ino_zero_is_einval, reset),
       cmocka_unit_test_setup(read_ino_above_count_is_einval, reset),
       cmocka_unit_test_setup(read_ino_at_count_succeeds, reset),
       cmocka_unit_test_setup(write_ino_zero_is_einval, reset),
       cmocka_unit_test_setup(write_ino_above_count_is_einval, reset),
+      /* error paths */
+      cmocka_unit_test_setup(write_inode_read_fail_returns_eio, reset),
+      cmocka_unit_test_setup(write_inode_write_fail_returns_eio, reset),
+      cmocka_unit_test_setup(write_inode_kmalloc_fail_returns_enomem, reset),
+      cmocka_unit_test_setup(read_inode_read_fail_returns_eio, reset),
+      cmocka_unit_test_setup(read_inode_kmalloc_fail_returns_enomem, reset),
+      /* RMW correctness */
       cmocka_unit_test_setup(write_inode1_does_not_corrupt_inode2, reset),
       cmocka_unit_test_setup(write_all_inodes_leaves_each_intact, reset),
       cmocka_unit_test_setup(overwrite_inode_updates_only_target_fields, reset),
