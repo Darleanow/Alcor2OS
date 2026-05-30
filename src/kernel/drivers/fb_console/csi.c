@@ -9,6 +9,7 @@
  * @c sgr.c respectively.
  */
 
+#include <alcor2/kstdlib.h>
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
@@ -85,13 +86,10 @@ static void erase_rect(int y0, int x0, int y1, int x1)
       if(x < 0 || x >= fb_ctx.cols)
         continue;
       fb_cell_t *c = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols + (size_t)x];
-      if(c->cp == (u32)' ' && c->fg == fb_ctx.cur_fg &&
-         c->bg == fb_ctx.cur_bg && c->attr == 0)
-        continue;
-      c->cp   = (u32)' ';
-      c->fg   = fb_ctx.cur_fg;
-      c->bg   = fb_ctx.cur_bg;
-      c->attr = 0;
+      c->cp        = (u32)' ';
+      c->fg        = fb_ctx.cur_fg;
+      c->bg        = fb_ctx.cur_bg;
+      c->attr      = 0;
       if(fb_ctx.in_batch) {
         c->dirty = 1;
         if(y < fb_ctx.batch_r0)
@@ -319,6 +317,186 @@ static void csi_erase_chars(void)
 }
 
 /**
+ * @brief @c CSI @c r (DECSTBM) — set the top + bottom margins of the
+ * scrolling region.
+ *
+ * Empty params reset to "full screen" (top=0, bot=rows-1). On the wire the
+ * params are 1-based and inclusive: @c CSI@c 2;23r means rows 2..23 in
+ * 1-based — internally we store them 0-based, so 1..22 in cell coords.
+ *
+ * Out-of-range or swapped values silently clamp to the grid so a runaway
+ * @c stty rows can't desync the parser. The cursor is moved to @c (0, 0)
+ * (origin mode), matching xterm behaviour.
+ */
+static void csi_set_scroll_region(void)
+{
+  int pv[2];
+  int np  = csi_params(pv, 2);
+  int top = (np > 0 && pv[0] > 0) ? pv[0] - 1 : 0;
+  int bot = (np > 1 && pv[1] > 0) ? pv[1] - 1 : fb_ctx.rows - 1;
+
+  if(top < 0)
+    top = 0;
+  if(bot >= fb_ctx.rows)
+    bot = fb_ctx.rows - 1;
+  if(top >= bot) {
+    /* Invalid region — fall back to full screen rather than wedge. */
+    top = 0;
+    bot = fb_ctx.rows - 1;
+  }
+
+  fb_ctx.scroll_top = top;
+  fb_ctx.scroll_bot = bot;
+  fb_ctx.cx         = 0;
+  fb_ctx.cy         = 0;
+}
+
+/**
+ * @brief Grow the batch row range to cover @c [r0, r1] and mark every cell in
+ * those rows dirty.
+ *
+ * Used by IL / DL after shifting cell rows so the next @ref flush_batch
+ * repaints the moved region — the cells were already changed by the shift but
+ * @c commit_cell_at-style dirty bookkeeping was bypassed.
+ */
+static void mark_rows_dirty(int r0, int r1)
+{
+  if(r0 < 0)
+    r0 = 0;
+  if(r1 >= fb_ctx.rows)
+    r1 = fb_ctx.rows - 1;
+  for(int y = r0; y <= r1; y++) {
+    fb_cell_t *row = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols];
+    for(int x = 0; x < fb_ctx.cols; x++)
+      row[x].dirty = 1;
+  }
+  if(fb_ctx.in_batch) {
+    if(r0 < fb_ctx.batch_r0)
+      fb_ctx.batch_r0 = r0;
+    if(r1 > fb_ctx.batch_r1)
+      fb_ctx.batch_r1 = r1;
+  }
+}
+
+/**
+ * @brief Scroll the DECSTBM region down by one row.
+ *
+ * Shared by @c ESC@c M (RI) and any future scroll-on-RI logic. The shift is
+ * bottom-up so source rows are read before overwrite. Cells outside the
+ * region are untouched.
+ */
+void scroll_region_down(void)
+{
+  int top = fb_ctx.scroll_top;
+  int bot = fb_ctx.scroll_bot;
+  if(top < 0 || bot >= fb_ctx.rows || top >= bot)
+    return;
+
+  for(int y = bot; y > top; y--) {
+    fb_cell_t *dst = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols];
+    fb_cell_t *src = &fb_ctx.cells[(size_t)(y - 1) * (size_t)fb_ctx.cols];
+    kmemcpy(dst, src, (size_t)fb_ctx.cols * sizeof(fb_cell_t));
+  }
+  erase_rect(top, 0, top, fb_ctx.cols - 1);
+  if(fb_ctx.in_batch) {
+    mark_rows_dirty(top + 1, bot);
+  } else {
+    for(int y = top + 1; y <= bot; y++)
+      for(int x = 0; x < fb_ctx.cols; x++)
+        blit_cell(x, y);
+  }
+}
+
+/**
+ * @brief @c CSI @c L (IL) — insert Pn blank lines at the cursor row.
+ *
+ * Operates strictly inside the DECSTBM region: rows @c [cy, scroll_bot-n] are
+ * shifted down by @p n, the @p n rows starting at @c cy are blanked with the
+ * current SGR background, and rows that would slide past @c scroll_bot are
+ * discarded. A no-op when the cursor sits outside the region — matches xterm.
+ *
+ * Without this, ncurses' line-insert optimisation (used after a line split in
+ * an editor) emits the sequence and the kernel silently dropped it, leaving
+ * the screen out of sync with the application's idea of the grid.
+ */
+static void csi_insert_lines(void)
+{
+  int top = fb_ctx.scroll_top;
+  int bot = fb_ctx.scroll_bot;
+  if(fb_ctx.cy < top || fb_ctx.cy > bot)
+    return;
+
+  int n = csi_param1();
+  if(n < 1)
+    return;
+  int max = bot - fb_ctx.cy + 1;
+  if(n > max)
+    n = max;
+
+  /* Shift rows [cy, bot-n] down to [cy+n, bot]. Iterate from bottom up so we
+   * don't overwrite source rows before they have been copied. */
+  for(int y = bot; y >= fb_ctx.cy + n; y--) {
+    fb_cell_t *dst = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols];
+    fb_cell_t *src = &fb_ctx.cells[(size_t)(y - n) * (size_t)fb_ctx.cols];
+    kmemcpy(dst, src, (size_t)fb_ctx.cols * sizeof(fb_cell_t));
+  }
+  /* Blank the n rows the insert opened up at the cursor. erase_rect already
+   * grows batch_r0/r1 for the cleared cells. */
+  erase_rect(fb_ctx.cy, 0, fb_ctx.cy + n - 1, fb_ctx.cols - 1);
+  /* The shifted rows changed too: in batch mode mark them dirty so the next
+   * flush_batch repaints them; otherwise blit the moved cells right now. */
+  if(fb_ctx.in_batch) {
+    mark_rows_dirty(fb_ctx.cy + n, bot);
+  } else {
+    for(int y = fb_ctx.cy + n; y <= bot; y++)
+      for(int x = 0; x < fb_ctx.cols; x++)
+        blit_cell(x, y);
+  }
+}
+
+/**
+ * @brief @c CSI @c M (DL) — delete Pn lines at the cursor row.
+ *
+ * Operates strictly inside the DECSTBM region: rows @c [cy+n, scroll_bot] are
+ * shifted up to @c [cy, scroll_bot-n], and the @p n rows at the bottom of the
+ * region are blanked with the current SGR background. A no-op when the cursor
+ * sits outside the region. Symmetric of @ref csi_insert_lines.
+ */
+static void csi_delete_lines(void)
+{
+  int top = fb_ctx.scroll_top;
+  int bot = fb_ctx.scroll_bot;
+  if(fb_ctx.cy < top || fb_ctx.cy > bot)
+    return;
+
+  int n = csi_param1();
+  if(n < 1)
+    return;
+  int max = bot - fb_ctx.cy + 1;
+  if(n > max)
+    n = max;
+
+  /* Shift rows [cy+n, bot] up to [cy, bot-n]. Top-down iteration is safe
+   * here since src is always below dst. */
+  for(int y = fb_ctx.cy; y <= bot - n; y++) {
+    fb_cell_t *dst = &fb_ctx.cells[(size_t)y * (size_t)fb_ctx.cols];
+    fb_cell_t *src = &fb_ctx.cells[(size_t)(y + n) * (size_t)fb_ctx.cols];
+    kmemcpy(dst, src, (size_t)fb_ctx.cols * sizeof(fb_cell_t));
+  }
+  /* Blank the n rows that the delete vacated at the bottom of the region. */
+  erase_rect(bot - n + 1, 0, bot, fb_ctx.cols - 1);
+  /* The shifted rows changed too: in batch mode mark them dirty so the next
+   * flush_batch repaints them; otherwise blit the moved cells right now. */
+  if(fb_ctx.in_batch) {
+    mark_rows_dirty(fb_ctx.cy, bot - n);
+  } else {
+    for(int y = fb_ctx.cy; y <= bot - n; y++)
+      for(int x = 0; x < fb_ctx.cols; x++)
+        blit_cell(x, y);
+  }
+}
+
+/**
  * @brief @c CSI @c b (REP) — repeat the last emitted codepoint Pn times.
  *
  * No-op when no codepoint has been emitted yet — there is nothing to repeat.
@@ -388,6 +566,12 @@ void handle_csi(void)
   case 'K':
     csi_erase_line();
     break;
+  case 'L':
+    csi_insert_lines();
+    break;
+  case 'M':
+    csi_delete_lines();
+    break;
   case 'X':
     csi_erase_chars();
     break;
@@ -396,6 +580,9 @@ void handle_csi(void)
     break;
   case 'b':
     csi_repeat();
+    break;
+  case 'r':
+    csi_set_scroll_region();
     break;
   case 's':
     csi_save_cursor();
