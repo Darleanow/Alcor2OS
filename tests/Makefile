@@ -33,7 +33,8 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           ext2_alloc ext2_path ext2_dirent \
           ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc \
           elf signal pipe \
-          palette sgr sys_misc sys_mm
+          palette sgr sys_misc sys_mm \
+          kbd_layout fb_console_caret_cell
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_gdt       := $(SRC)/arch/x86_64/gdt.c
 SRC_idt       := $(SRC)/arch/x86_64/idt.c
@@ -69,8 +70,10 @@ SRC_palette  :=
 SRC_sgr      :=
 SRC_sys_misc :=
 SRC_sys_mm   :=
-SRC_signal :=
-SRC_pipe   :=
+SRC_signal             :=
+SRC_pipe               :=
+SRC_kbd_layout         :=
+SRC_fb_console_caret_cell :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 
