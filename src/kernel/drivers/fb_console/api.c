@@ -50,6 +50,8 @@ static void
   fb_ctx.cur_fg     = fb_ctx.default_fg;
   fb_ctx.cur_bg     = fb_ctx.default_bg;
   fb_ctx.cx = fb_ctx.cy = 0;
+  fb_ctx.scroll_top     = 0;
+  fb_ctx.scroll_bot     = fb_ctx.rows - 1;
   fb_ctx.utf8_rem       = 0;
   fb_ctx.blink_ticks    = FB_BLINK_PERIOD_TICKS;
   fb_ctx.blink_on       = 1;
