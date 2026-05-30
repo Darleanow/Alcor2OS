@@ -72,8 +72,18 @@ void vmm_init(u64 hhdm_offset)
 
   kzero(kernel_pml4, 512 * sizeof(u64));
 
+#ifndef TEST_ENV
+#ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
   const u64 *const old_pml4 = (const u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   for(int i = 256; i < 512; i++) {
@@ -95,8 +105,13 @@ void vmm_init(u64 hhdm_offset)
  */
 void vmm_map(u64 virt, u64 phys, u64 flags)
 {
+#ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   u64 *pdpt =
@@ -114,7 +129,9 @@ void vmm_map(u64 virt, u64 phys, u64 flags)
 
   pt[(virt >> 12) & PAGE_TABLE_INDEX_MASK] =
       (phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
+#ifndef TEST_ENV
   __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
+#endif
 }
 
 /**
@@ -135,8 +152,13 @@ void vmm_map(u64 virt, u64 phys, u64 flags)
  */
 bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
 {
+#ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   /* Cached pointers — invalidated when the corresponding index changes */
@@ -182,7 +204,9 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
 
     kzero(phys_to_virt((u64)phys), PAGE_SIZE);
     pt[pt_idx] = ((u64)phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
-    __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
+  #ifndef TEST_ENV
+  __asm__ volatile("invlpg (%0)" ::"r"(virt) : "memory");
+#endif
   }
   return true;
 }
@@ -198,8 +222,13 @@ bool vmm_map_range_alloc(u64 virt_start, u64 count, u64 flags)
 void vmm_unmap(u64 virt)
 {
   /* Get current PML4 (could be kernel or process PML4) */
+#ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
@@ -221,7 +250,9 @@ void vmm_unmap(u64 virt)
 
   pt[pt_idx] = 0;
 
+#ifndef TEST_ENV
   __asm__ volatile("invlpg (%0)" : : "r"(virt) : "memory");
+#endif
 }
 
 /**
@@ -237,8 +268,13 @@ void vmm_unmap(u64 virt)
 u64 vmm_get_phys(u64 virt)
 {
   /* Get current PML4 */
+#ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
   u64 *pml4 = (u64 *)phys_to_virt(cr3 & PAGE_FRAME_MASK);
 
   u64  pml4_idx = (virt >> 39) & PAGE_TABLE_INDEX_MASK;
@@ -273,7 +309,12 @@ u64 vmm_get_phys(u64 virt)
  */
 void vmm_switch(u64 pml4_phys)
 {
+#ifndef TEST_ENV
   __asm__ volatile("mov %0, %%cr3" : : "r"(pml4_phys) : "memory");
+#else
+  extern u64 fake_cr3;
+  fake_cr3 = pml4_phys;
+#endif
 }
 
 /**
@@ -328,7 +369,7 @@ u64 vmm_create_address_space(void)
  * @param phys Physical address to map to.
  * @param flags Page flags (VMM_PRESENT, VMM_WRITE, VMM_USER, etc.).
  */
-void vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags)
+bool vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags)
 {
   u64 *pml4 = (u64 *)phys_to_virt(pml4_phys);
 
@@ -339,17 +380,18 @@ void vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags)
 
   u64 *pdpt = get_next_level(pml4, pml4_idx, true, flags);
   if(!pdpt)
-    return;
+    return false;
 
   u64 *pd = get_next_level(pdpt, pdpt_idx, true, flags);
   if(!pd)
-    return;
+    return false;
 
   u64 *pt = get_next_level(pd, pd_idx, true, flags);
   if(!pt)
-    return;
+    return false;
 
   pt[pt_idx] = (phys & PAGE_FRAME_MASK) | flags | VMM_PRESENT;
+  return true;
 }
 
 /**
@@ -358,8 +400,13 @@ void vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags)
  */
 u64 vmm_get_current_pml4(void)
 {
+#ifndef TEST_ENV
   u64 cr3;
   __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+#else
+  extern u64 fake_cr3;
+  u64 cr3 = fake_cr3;
+#endif
   return cr3 & PAGE_FRAME_MASK;
 }
 
@@ -434,7 +481,10 @@ u64 vmm_clone_address_space(u64 src_pml4_phys)
           kmemcpy(dst_data, src_data, PAGE_SIZE);
 
           /* Map in destination address space */
-          vmm_map_in(dst_pml4_phys, virt, (u64)dst_page, flags);
+          if(!vmm_map_in(dst_pml4_phys, virt, (u64)dst_page, flags)) {
+            pmm_free(dst_page);
+            return 0;
+          }
         }
       }
     }
@@ -481,7 +531,9 @@ static void user_mappings_walk_and_free(u64 pml4_phys, bool zero_entries)
         for(int pt_idx = 0; pt_idx < 512; pt_idx++) {
           if(!(pt[pt_idx] & VMM_PRESENT))
             continue;
-          pmm_free((void *)(pt[pt_idx] & PAGE_FRAME_MASK));
+          if(!(pt[pt_idx] & VMM_MMIO)) {
+            pmm_free((void *)(pt[pt_idx] & PAGE_FRAME_MASK));
+          }
         }
         pmm_free((void *)(pd[pd_idx] & PAGE_FRAME_MASK));
       }
@@ -504,7 +556,12 @@ void vmm_clear_user_mappings(u64 pml4_phys)
 {
   user_mappings_walk_and_free(pml4_phys, true);
   /* Flush TLB so the now-cleared user mappings don't linger in cache. */
+#ifndef TEST_ENV
   __asm__ volatile("mov %0, %%cr3" : : "r"(pml4_phys) : "memory");
+#else
+  extern u64 fake_cr3;
+  fake_cr3 = pml4_phys;
+#endif
 }
 
 /**
