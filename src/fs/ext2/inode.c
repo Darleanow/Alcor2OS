@@ -97,7 +97,8 @@ i64 write_inode(const ext2_volume_t *vol, u32 ino, const ext2_inode_t *inode)
   }
 
   for(int i = 0; i < EXT2_MAX_FILES; i++) {
-    if(g_files[i].in_use && g_files[i].vol == vol && g_files[i].inode_num == ino) {
+    if(g_files[i].in_use && g_files[i].vol == vol &&
+       g_files[i].inode_num == ino) {
       g_files[i].inode = *inode;
     }
   }

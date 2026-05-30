@@ -361,7 +361,8 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
   if(file_inode.i_links_count == 0) {
     bool is_open = false;
     for(int i = 0; i < EXT2_MAX_FILES; i++) {
-      if(g_files[i].in_use && g_files[i].vol == vol && g_files[i].inode_num == file_ino) {
+      if(g_files[i].in_use && g_files[i].vol == vol &&
+         g_files[i].inode_num == file_ino) {
         is_open = true;
         break;
       }

@@ -682,14 +682,14 @@ i64 vfs_rename(const char *oldpath, const char *newpath)
     dst_m->ops->close(dst_fh);
     return -ENOMEM;
   }
-  
-  u64       off = 0;
-  i64       n;
+
+  u64 off = 0;
+  i64 n;
   while((n = src_m->ops->read(src_fh, rename_buf, RENAME_CHUNK, off)) > 0) {
     dst_m->ops->write(dst_fh, rename_buf, (u64)n, off);
     off += (u64)n;
   }
-  
+
   kfree(rename_buf);
 
   src_m->ops->close(src_fh);
