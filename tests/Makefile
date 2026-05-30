@@ -32,7 +32,8 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           mouse_ps2 pci pic pit \
           ext2_alloc ext2_path ext2_dirent \
           ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc \
-          elf signal pipe
+          elf signal pipe \
+          palette sgr sys_misc sys_mm
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_gdt       := $(SRC)/arch/x86_64/gdt.c
 SRC_idt       := $(SRC)/arch/x86_64/idt.c
@@ -63,7 +64,11 @@ SRC_vfs :=
 SRC_vmm := $(SRC)/lib/kstdlib.c
 SRC_heap := $(SRC)/lib/kstdlib.c
 SRC_proc   := $(SRC)/lib/kstdlib.c
-SRC_elf    :=
+SRC_elf      :=
+SRC_palette  :=
+SRC_sgr      :=
+SRC_sys_misc :=
+SRC_sys_mm   :=
 SRC_signal :=
 SRC_pipe   :=
 
