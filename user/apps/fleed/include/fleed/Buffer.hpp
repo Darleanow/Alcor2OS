@@ -1,9 +1,10 @@
 /**
  * @file fleed/Buffer.hpp
- * @brief Text buffer with file load/save.
+ * @brief Text buffer with file load/save and cursor-aware mutation.
  *
- * Currently a flat std::string; the API is the seam where richer
- * representations (gap buffer, rope, undo stack) will plug in later.
+ * Currently stores text as one @c std::string per line in a @c std::vector.
+ * The public API is the seam where richer representations (gap buffer, rope,
+ * undo stack) will plug in later.
  */
 #pragma once
 
@@ -14,9 +15,11 @@
 
 namespace fleed {
 
+/** @brief Cursor position in the buffer. */
 struct Cursor
 {
-  size_t y = 0, x = 0;
+  size_t y = 0; /**< Line index, 0-based. */
+  size_t x = 0; /**< Byte offset inside the line, 0-based. */
 };
 
 class Buffer
@@ -24,74 +27,83 @@ class Buffer
 public:
   /**
    * @brief Load a file's contents into the buffer.
-   * @param path File to read.
-   * @return @c true on success; @c false if the file cannot be opened
-   *         (the buffer is then left empty).
+   *
+   * The buffer always ends up with at least one (possibly empty) line on
+   * success — newline-terminated and empty files both produce a one-line
+   * empty buffer, so the caller does not have to special-case @c lineCount.
+   *
+   * @param path  File to read.
+   * @return      @c true on success; @c false if the file cannot be opened
+   *              (the buffer is then left empty).
    */
   bool load(const std::filesystem::path &path);
 
   /**
-   * @brief Truncate the file and write the buffer to it.
-   * @param path Destination file (overwritten).
-   * @return @c true on success, @c false on any I/O error.
+   * @brief Write the buffer back to disk, overwriting the target file.
+   *
+   * Each line is followed by @c '\n', including the last one.
+   *
+   * @param path  Destination file.
+   * @return      @c true on success, @c false on any I/O error.
    */
   bool save(const std::filesystem::path &path) const;
 
   /**
-   * @brief Append raw bytes at the end of the buffer.
-   * @param data Pointer to the bytes to copy.
-   * @param n length.
+   * @brief Insert @p n bytes at the cursor and advance the cursor past them.
+   *
+   * @param data  Pointer to the bytes to copy.
+   * @param n     Byte count.
    */
   void append(const char *data, size_t n);
 
   /**
-   * @brief Copies from cursor to next line.
+   * @brief Split the current line at the cursor and move the cursor to the
+   *        start of the new line below.
    */
   void newLine();
 
   /**
-   * @brief Remove the last byte of the buffer if any.
-   * @return @c true if a byte was removed, @c false if the buffer was empty.
+   * @brief Delete the byte to the left of the cursor, or fuse with the
+   *        previous line when the cursor is at column 0.
+   *
+   * @return @c true if anything was removed; @c false when the cursor was
+   *         already at the very start of the document.
    */
   bool popBack();
 
   /**
-   * @brief Get the line corresponding to the @c row.
-   * @param row Row index.
-   * @return the line of text.
+   * @brief Read-only access to one line.
+   *
+   * @param row  Line index. Must be < @ref lineCount.
+   * @return     The line's contents.
    */
   const std::string &line(size_t row) const;
 
-  /** @brief get total line count.
-   * @return total line count.
-   */
-  size_t lineCount() const;
+  /** @brief Total line count. */
+  size_t        lineCount() const;
 
-  /** @brief Whether the buffer holds any bytes. */
-  bool empty() const noexcept;
+  /** @brief @c true if the buffer holds no lines. */
+  bool          empty() const noexcept;
 
-  /** @brief Get the current cursor position.
-   * @return the current cursor position.
-   */
+  /** @brief Current cursor position. */
   const Cursor &cursor() const noexcept;
 
-  /** @brief Sets cursor position at @c y @c x
-   * @param y the Y coordinate
-   * @param x the X coordinate
+  /**
+   * @brief Set the cursor to an absolute position. No bounds checking.
+   *
+   * @param x  Byte offset inside the target line.
+   * @param y  Line index.
    */
-  void setCursorPos(size_t x, size_t y);
+  void          setCursorPos(size_t x, size_t y);
 
-  /** @brief Moves cursor Up if possible.*/
-  void cursorMoveUp();
-
-  /** @brief Moves the cursor Down if possible */
-  void cursorMoveDown();
-
-  /** @brief Moves the cursor Left if possible. */
-  void cursorMoveLeft();
-
-  /** @brief Moves the cursor Right if possible. */
-  void cursorMoveRight();
+  /** @brief Move the cursor one line up, clamping the column if needed. */
+  void          cursorMoveUp();
+  /** @brief Move the cursor one line down, clamping the column if needed. */
+  void          cursorMoveDown();
+  /** @brief Move the cursor one byte left, wrapping to the previous line. */
+  void          cursorMoveLeft();
+  /** @brief Move the cursor one byte right, wrapping to the next line. */
+  void          cursorMoveRight();
 
 private:
   std::vector<std::string> m_text;
