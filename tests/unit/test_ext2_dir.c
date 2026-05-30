@@ -150,6 +150,7 @@ u32 get_block_num(const ext2_volume_t *vol, const ext2_inode_t *inode, u32 file_
 }
 
 i64 read_inode(const ext2_volume_t *vol, u32 ino, ext2_inode_t *inode) {
+  (void)inode;
   check_expected_ptr(vol);
   check_expected(ino);
   return mock_type(i64);
