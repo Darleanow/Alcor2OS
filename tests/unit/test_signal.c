@@ -73,6 +73,7 @@ static int setup(void **state)
   return 0;
 }
 
+
 static void sig_default_ignore_known_signals(void **state)
 {
   (void)state;
@@ -90,6 +91,7 @@ static void sig_default_ignore_fatal_signals(void **state)
   assert_int_equal(sig_default_ignore(SIGTERM), 0);
   assert_int_equal(sig_default_ignore(1), 0);
 }
+
 
 static void proc_signal_sets_pending_bit(void **state)
 {
@@ -125,6 +127,7 @@ static void proc_signal_rejects_signum_nsig(void **state)
   proc_signal(g_proc.pid, NSIG);
   assert_int_equal(g_proc.sig_pending, 0);
 }
+
 
 static void sigprocmask_block(void **state)
 {
@@ -192,6 +195,7 @@ static void sigprocmask_bad_how(void **state)
   assert_int_equal((i64)ret, -EINVAL);
 }
 
+
 static void sys_kill_signal_zero_is_existence_check(void **state)
 {
   (void)state;
@@ -220,6 +224,70 @@ static void sys_kill_sends_signal(void **state)
   sys_kill(g_proc.pid, SIGUSR1, 0, 0, 0, 0);
   assert_true(g_proc.sig_pending & (1ULL << SIGUSR1));
 }
+
+static void sys_kill_pid_minus1_succeeds(void **state)
+{
+  (void)state;
+  /* pid=-1 broadcast is a silent success */
+  u64 ret = sys_kill((u64)-1LL, SIGUSR1, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+
+static void sys_tkill_sends_signal(void **state)
+{
+  (void)state;
+  u64 ret = sys_tkill(g_proc.pid, SIGUSR2, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_true(g_proc.sig_pending & (1ULL << SIGUSR2));
+}
+
+static void sys_tkill_unknown_tid_returns_esrch(void **state)
+{
+  (void)state;
+  u64 ret = sys_tkill(9999, SIGUSR1, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -ESRCH);
+}
+
+static void sys_tkill_invalid_sig_returns_einval(void **state)
+{
+  (void)state;
+  u64 ret = sys_tkill(g_proc.pid, NSIG, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+static void sys_tkill_signal_zero_existence_check(void **state)
+{
+  (void)state;
+  u64 ret = sys_tkill(g_proc.pid, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_int_equal(g_proc.sig_pending, 0);
+}
+
+
+static void sys_tgkill_sends_signal(void **state)
+{
+  (void)state;
+  /* tgkill(tgid, tid, sig) — we route on tgid */
+  u64 ret = sys_tgkill(g_proc.pid, g_proc.pid, SIGUSR1, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_true(g_proc.sig_pending & (1ULL << SIGUSR1));
+}
+
+static void sys_tgkill_unknown_tgid_returns_esrch(void **state)
+{
+  (void)state;
+  u64 ret = sys_tgkill(9999, 9999, SIGUSR1, 0, 0, 0);
+  assert_int_equal((i64)ret, -ESRCH);
+}
+
+static void sys_tgkill_invalid_sig_returns_einval(void **state)
+{
+  (void)state;
+  u64 ret = sys_tgkill(g_proc.pid, g_proc.pid, NSIG, 0, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
 
 static void sigaction_registers_handler(void **state)
 {
@@ -274,6 +342,7 @@ static void sigaction_rejects_bad_sigsetsize(void **state)
   assert_int_equal((i64)ret, -EINVAL);
 }
 
+
 static void sigaltstack_zeros_old_ss(void **state)
 {
   (void)state;
@@ -293,16 +362,15 @@ static void sigaltstack_no_old_ss_is_noop(void **state)
   assert_int_equal((i64)ret, 0);
 }
 
+
 static void proc_check_signals_delivers_pending(void **state)
 {
   (void)state;
-  /* Set up a handler for SIGUSR1 */
   g_proc.sig_actions[SIGUSR1].sa_handler  = 0x400000ULL;
   g_proc.sig_actions[SIGUSR1].sa_restorer = 0x400100ULL;
   g_proc.sig_pending                      = 1ULL << SIGUSR1;
   g_proc.sig_mask                         = 0;
 
-  /* Provide a fake syscall frame on the stack */
   u8 frame_buf[sizeof(sig_ucontext_t) + 64 + 128 + 8];
   memset(frame_buf, 0, sizeof(frame_buf));
   syscall_frame_t *frame = (syscall_frame_t *)frame_buf;
@@ -310,11 +378,8 @@ static void proc_check_signals_delivers_pending(void **state)
 
   proc_check_signals(frame);
 
-  /* Pending bit must be cleared */
   assert_false(g_proc.sig_pending & (1ULL << SIGUSR1));
-  /* rip redirected to handler */
   assert_int_equal(frame->rip, 0x400000ULL);
-  /* rdi = signal number */
   assert_int_equal(frame->rdi, SIGUSR1);
 }
 
@@ -349,13 +414,16 @@ static void proc_check_signals_masked_not_delivered(void **state)
 int main(void)
 {
   const struct CMUnitTest tests[] = {
+      /* sig_default_ignore */
       cmocka_unit_test_setup(sig_default_ignore_known_signals, setup),
       cmocka_unit_test_setup(sig_default_ignore_fatal_signals, setup),
+      /* proc_signal */
       cmocka_unit_test_setup(proc_signal_sets_pending_bit, setup),
       cmocka_unit_test_setup(proc_signal_wakes_blocked_proc, setup),
       cmocka_unit_test_setup(proc_signal_ignores_unknown_pid, setup),
       cmocka_unit_test_setup(proc_signal_rejects_signum_zero, setup),
       cmocka_unit_test_setup(proc_signal_rejects_signum_nsig, setup),
+      /* rt_sigprocmask */
       cmocka_unit_test_setup(sigprocmask_block, setup),
       cmocka_unit_test_setup(sigprocmask_unblock, setup),
       cmocka_unit_test_setup(sigprocmask_setmask, setup),
@@ -364,18 +432,32 @@ int main(void)
       cmocka_unit_test_setup(sigprocmask_wrong_sigsetsize, setup),
       cmocka_unit_test_setup(sigprocmask_saves_oldset, setup),
       cmocka_unit_test_setup(sigprocmask_bad_how, setup),
+      /* sys_kill */
       cmocka_unit_test_setup(sys_kill_signal_zero_is_existence_check, setup),
       cmocka_unit_test_setup(sys_kill_unknown_pid_returns_esrch, setup),
       cmocka_unit_test_setup(sys_kill_invalid_sig_returns_einval, setup),
       cmocka_unit_test_setup(sys_kill_sends_signal, setup),
+      cmocka_unit_test_setup(sys_kill_pid_minus1_succeeds, setup),
+      /* sys_tkill */
+      cmocka_unit_test_setup(sys_tkill_sends_signal, setup),
+      cmocka_unit_test_setup(sys_tkill_unknown_tid_returns_esrch, setup),
+      cmocka_unit_test_setup(sys_tkill_invalid_sig_returns_einval, setup),
+      cmocka_unit_test_setup(sys_tkill_signal_zero_existence_check, setup),
+      /* sys_tgkill */
+      cmocka_unit_test_setup(sys_tgkill_sends_signal, setup),
+      cmocka_unit_test_setup(sys_tgkill_unknown_tgid_returns_esrch, setup),
+      cmocka_unit_test_setup(sys_tgkill_invalid_sig_returns_einval, setup),
+      /* sigaction */
       cmocka_unit_test_setup(sigaction_registers_handler, setup),
       cmocka_unit_test_setup(sigaction_returns_old_action, setup),
       cmocka_unit_test_setup(sigaction_rejects_sigkill, setup),
       cmocka_unit_test_setup(sigaction_rejects_sigstop, setup),
       cmocka_unit_test_setup(sigaction_rejects_sig_zero, setup),
       cmocka_unit_test_setup(sigaction_rejects_bad_sigsetsize, setup),
+      /* sigaltstack */
       cmocka_unit_test_setup(sigaltstack_zeros_old_ss, setup),
       cmocka_unit_test_setup(sigaltstack_no_old_ss_is_noop, setup),
+      /* proc_check_signals */
       cmocka_unit_test_setup(proc_check_signals_delivers_pending, setup),
       cmocka_unit_test_setup(proc_check_signals_ignores_sig_ign, setup),
       cmocka_unit_test_setup(proc_check_signals_masked_not_delivered, setup),
