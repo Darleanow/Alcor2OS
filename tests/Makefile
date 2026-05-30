@@ -31,7 +31,8 @@ LDLIBS     := -lcmocka
 SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw  kstdlib gdt idt ktermios pixel_bpp ata keyboard klog console ext2_cache \
           mouse_ps2 pci pic pit \
           ext2_alloc ext2_path ext2_dirent \
-          ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc
+          ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc \
+          elf signal pipe
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_gdt       := $(SRC)/arch/x86_64/gdt.c
 SRC_idt       := $(SRC)/arch/x86_64/idt.c
@@ -61,7 +62,10 @@ SRC_ramfs :=
 SRC_vfs :=
 SRC_vmm := $(SRC)/lib/kstdlib.c
 SRC_heap := $(SRC)/lib/kstdlib.c
-SRC_proc := $(SRC)/lib/kstdlib.c
+SRC_proc   := $(SRC)/lib/kstdlib.c
+SRC_elf    :=
+SRC_signal :=
+SRC_pipe   :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 
