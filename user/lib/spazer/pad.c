@@ -33,25 +33,14 @@ struct spz_pad
   bool         frame_dirty; /**< Border needs to be re-drawn on next refresh. */
 };
 
-/**
- * @brief Maximum legal value of @c off_row given the current pad / viewport
- *        size — the viewport must not run past the bottom of the pad.
- *
- * @param p  Pad.
- * @return   Upper bound for @c off_row, never negative.
- */
+/** @brief Upper bound for @c off_row so the viewport stays inside the pad. */
 static int max_off_row(const spz_pad_t *p)
 {
   int m = p->virt_rows - p->inner.rows;
   return m < 0 ? 0 : m;
 }
 
-/**
- * @brief Maximum legal value of @c off_col, symmetric of @ref max_off_row.
- *
- * @param p  Pad.
- * @return   Upper bound for @c off_col, never negative.
- */
+/** @brief Upper bound for @c off_col. Symmetric of @ref max_off_row. */
 static int max_off_col(const spz_pad_t *p)
 {
   int m = p->virt_cols - p->inner.cols;
@@ -59,10 +48,7 @@ static int max_off_col(const spz_pad_t *p)
 }
 
 /**
- * @brief Slide @c off_row / @c off_col so @c (cur_row, cur_col) is inside the
- *        viewport, then clamp to the pad bounds.
- *
- * Idempotent: calling it twice in a row is a no-op once the cursor is visible.
+ * @brief Slide the viewport so the cursor is visible, then clamp to bounds.
  *
  * @param p  Pad.
  */
@@ -120,9 +106,7 @@ spz_pad_t *spz_pad_new(
   }
   wbkgd(p->frame, COLOR_PAIR(SPZ_PAIR_TEXT));
 
-  /* The pad must be at least as large as the viewport, otherwise
-   * @c pnoutrefresh clips the projection silently and the viewport shows
-   * stale cells from previous frames. */
+  /* Pad must be >= viewport, else pnoutrefresh clips silently. */
   int pad_rows = (virt.rows > p->inner.rows) ? virt.rows : p->inner.rows;
   int pad_cols = (virt.cols > p->inner.cols) ? virt.cols : p->inner.cols;
   p->body      = newpad(pad_rows, pad_cols);
@@ -183,30 +167,23 @@ void spz_pad_refresh(spz_pad_t *p)
     spz_border_draw(p->frame, p->outer.rows, p->outer.cols, p->title, p->border);
     p->frame_dirty = false;
   }
-  /* Touch the frame so @c wnoutrefresh re-emits the border even when ncurses
-   * believes @c curscr is already up to date — a transient @c newwin (status
-   * bar) can run a @c doupdate that pushes a stale @c curscr to screen. */
+  /* Transient newwins (status bar) can run doupdate against a stale curscr,
+   * so re-emit the border every frame. */
   touchwin(p->frame);
   wnoutrefresh(p->frame);
 
-  /* Position the pad's logical cursor before @c pnoutrefresh so the projected
-   * cursor lands at the right screen cell — @c pnoutrefresh propagates the
-   * pad cursor for us. */
+  /* pnoutrefresh propagates the pad cursor as the hardware cursor. */
   wmove(p->body, p->cur_row, p->cur_col);
-
-  /* @c redrawwin marks every line of the pad as dirty so @c pnoutrefresh
-   * re-projects the full source slice. @c touchwin alone leaves clean lines
-   * untouched, which is why an in-place @c werase + paint cycle can be
-   * silently dropped when the viewport offset has not moved. */
+  /* werase + paint inside a pad can be dropped when the viewport offset has
+   * not moved; redrawwin marks every line dirty so the projection is
+   * complete. */
   redrawwin(p->body);
 
-  /* Project the @c [off_row, off_col] window of the pad onto the inner rect.
-   * The destination range is inclusive in @c pnoutrefresh. */
-  int dst_y0 = p->inner.y;
-  int dst_x0 = p->inner.x;
-  int dst_y1 = dst_y0 + p->inner.rows - 1;
-  int dst_x1 = dst_x0 + p->inner.cols - 1;
-  pnoutrefresh(p->body, p->off_row, p->off_col, dst_y0, dst_x0, dst_y1, dst_x1);
+  int dst_y1 = p->inner.y + p->inner.rows - 1;
+  int dst_x1 = p->inner.x + p->inner.cols - 1;
+  pnoutrefresh(
+      p->body, p->off_row, p->off_col, p->inner.y, p->inner.x, dst_y1, dst_x1
+  );
 
   doupdate();
 }
@@ -223,8 +200,6 @@ int spz_pad_resize(spz_pad_t *p, int virt_rows, int virt_cols)
   if(new_rows == p->virt_rows && new_cols == p->virt_cols)
     return 0;
 
-  /* @c wresize on a pad keeps existing cells in place and zero-fills the new
-   * region with the pad's current background. */
   if(wresize(p->body, new_rows, new_cols) != OK)
     return -1;
   p->virt_rows = new_rows;
