@@ -15,7 +15,7 @@
  */
 static bool s_initialised = false;
 
-int spz_init(void)
+int         spz_init(void)
 {
   if(s_initialised)
     return 0;

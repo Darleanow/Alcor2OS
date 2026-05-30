@@ -15,7 +15,8 @@
  * a subwindow (@c derwin). @c title is owned by the panel and freed on
  * @ref spz_panel_del.
  */
-struct spz_panel {
+struct spz_panel
+{
   WINDOW      *frame;
   WINDOW      *body;
   spz_rect_t   rect;
@@ -86,7 +87,7 @@ spz_panel_t *spz_panel_new(spz_rect_t r, const char *title, spz_border_t b)
   p->title       = dup_title(title);
   p->frame_dirty = true;
 
-  p->frame       = newwin(r.rows, r.cols, r.y, r.x);
+  p->frame = newwin(r.rows, r.cols, r.y, r.x);
   if(!p->frame) {
     free(p->title);
     free(p);

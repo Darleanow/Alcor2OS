@@ -23,8 +23,8 @@ static void paint_row(
     WINDOW *body, int row, const char *item, int inner_w, bool selected
 )
 {
-  const char *txt   = item ? item : "";
-  int         tlen  = (int)strlen(txt);
+  const char *txt  = item ? item : "";
+  int         tlen = (int)strlen(txt);
 
   int         pair  = selected ? SPZ_PAIR_SELECT : SPZ_PAIR_TEXT;
   chtype      attrs = selected ? A_BOLD : 0;
@@ -77,7 +77,7 @@ int spz_menu_run(const spz_menu_t *m)
   notimeout(body, TRUE);
   int prev_curs = curs_set(0);
 
-  int sel = (m->initial < 0) ? 0
+  int sel = (m->initial < 0)             ? 0
             : (m->initial >= m->n_items) ? m->n_items - 1
                                          : m->initial;
 

@@ -59,7 +59,7 @@ extern "C"
    * @param max  Upper bound; values below 0 collapse the range to @c {0}.
    * @return     Clamped value.
    */
-  int   spz_clamp(int val, int max);
+  int spz_clamp(int val, int max);
 
   /**
    * @brief Clamp @p r to the visible screen so out-of-bounds geometry never

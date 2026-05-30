@@ -23,7 +23,8 @@ extern "C"
 {
 #endif
 
-  enum {
+  enum
+  {
     SPZ_PAIR_BORDER = 1,
     SPZ_PAIR_TITLE  = 2,
     SPZ_PAIR_TEXT   = 3,
@@ -33,7 +34,8 @@ extern "C"
     SPZ_PAIR_STATUS = 7,
   };
 
-  typedef enum {
+  typedef enum
+  {
     SPZ_STYLE_NORMAL = 0,
     SPZ_STYLE_TITLE  = 1,
     SPZ_STYLE_ACCENT = 2,
@@ -42,14 +44,16 @@ extern "C"
     SPZ_STYLE_STATUS = 5,
   } spz_style_t;
 
-  typedef enum {
+  typedef enum
+  {
     SPZ_BORDER_NONE   = 0,
     SPZ_BORDER_SINGLE = 1,
     SPZ_BORDER_DOUBLE = 2,
     SPZ_BORDER_HEAVY  = 3,
   } spz_border_t;
 
-  typedef struct {
+  typedef struct
+  {
     int y, x, rows, cols;
   } spz_rect_t;
 
@@ -62,7 +66,7 @@ extern "C"
    *
    * @return 0 on success, -1 if ncurses initialisation failed.
    */
-  int  spz_init(void);
+  int spz_init(void);
 
   /**
    * @brief Tear down the ncurses context.
@@ -70,7 +74,7 @@ extern "C"
    * Releases palette state. After this every handle still alive is invalid
    * and any further @c spz_* call is undefined behaviour.
    */
-  void spz_shutdown(void);
+  void                     spz_shutdown(void);
 
   typedef struct spz_panel spz_panel_t;
 
@@ -91,7 +95,7 @@ extern "C"
    *
    * @param p  Panel to destroy. NULL is a no-op.
    */
-  void         spz_panel_del(spz_panel_t *p);
+  void spz_panel_del(spz_panel_t *p);
 
   /**
    * @brief Body window — caller paints here.
@@ -101,7 +105,7 @@ extern "C"
    * @param p  Panel.
    * @return   Body @c WINDOW pointer, or NULL if @p p is NULL.
    */
-  WINDOW      *spz_panel_body(spz_panel_t *p);
+  WINDOW *spz_panel_body(spz_panel_t *p);
 
   /**
    * @brief Replace the title and force a frame repaint on next refresh.
@@ -109,7 +113,7 @@ extern "C"
    * @param p      Panel.
    * @param title  New title text, NULL to clear.
    */
-  void         spz_panel_set_title(spz_panel_t *p, const char *title);
+  void spz_panel_set_title(spz_panel_t *p, const char *title);
 
   /**
    * @brief Push the panel's frame + body to the screen.
@@ -118,7 +122,7 @@ extern "C"
    *
    * @param p  Panel.
    */
-  void         spz_panel_refresh(spz_panel_t *p);
+  void spz_panel_refresh(spz_panel_t *p);
 
   /**
    * @brief Mark the whole panel dirty so the next refresh repaints from
@@ -129,7 +133,7 @@ extern "C"
    *
    * @param p  Panel.
    */
-  void         spz_panel_invalidate(spz_panel_t *p);
+  void                   spz_panel_invalidate(spz_panel_t *p);
 
   typedef struct spz_pad spz_pad_t;
 
@@ -156,7 +160,7 @@ extern "C"
    *
    * @param p  Pad to destroy. NULL is a no-op.
    */
-  void       spz_pad_del(spz_pad_t *p);
+  void spz_pad_del(spz_pad_t *p);
 
   /**
    * @brief Pad @c WINDOW — caller paints with @c mvwaddstr /
@@ -167,7 +171,7 @@ extern "C"
    * @param p  Pad.
    * @return   Pad @c WINDOW pointer, or NULL if @p p is NULL.
    */
-  WINDOW    *spz_pad_buffer(spz_pad_t *p);
+  WINDOW *spz_pad_buffer(spz_pad_t *p);
 
   /**
    * @brief Set the top-left viewport offset into the pad.
@@ -179,7 +183,7 @@ extern "C"
    * @param row  Top-left row of the viewport, in pad coordinates.
    * @param col  Top-left column of the viewport, in pad coordinates.
    */
-  void       spz_pad_scroll_to(spz_pad_t *p, int row, int col);
+  void spz_pad_scroll_to(spz_pad_t *p, int row, int col);
 
   /**
    * @brief Set the cursor in pad-virtual coordinates and slide the viewport
@@ -189,14 +193,14 @@ extern "C"
    * @param row  Cursor row, in pad coordinates.
    * @param col  Cursor column, in pad coordinates.
    */
-  void       spz_pad_set_cursor(spz_pad_t *p, int row, int col);
+  void spz_pad_set_cursor(spz_pad_t *p, int row, int col);
 
   /**
    * @brief Push pad viewport + frame to the screen.
    *
    * @param p  Pad.
    */
-  void       spz_pad_refresh(spz_pad_t *p);
+  void spz_pad_refresh(spz_pad_t *p);
 
   /**
    * @brief Grow the underlying pad.
@@ -209,9 +213,10 @@ extern "C"
    * @param virt_cols  New column count; must be >= current.
    * @return           0 on success, -1 on allocation failure or invalid args.
    */
-  int        spz_pad_resize(spz_pad_t *p, int virt_rows, int virt_cols);
+  int spz_pad_resize(spz_pad_t *p, int virt_rows, int virt_cols);
 
-  typedef struct {
+  typedef struct
+  {
     const char *left;
     const char *center;
     const char *right;
@@ -234,7 +239,8 @@ extern "C"
    */
   void spz_headerbar(const spz_bar_t *bar);
 
-  typedef struct {
+  typedef struct
+  {
     spz_rect_t         rect;
     const char        *title;
     const char *const *items;
@@ -251,7 +257,7 @@ extern "C"
    * @param m  Menu spec. @c initial is clamped to @c [0, n_items).
    * @return   Selected index, or -1 on ESC / error.
    */
-  int  spz_menu_run(const spz_menu_t *m);
+  int spz_menu_run(const spz_menu_t *m);
 
   /**
    * @brief Draw a styled label at @p (y, x) in @p win.
@@ -262,9 +268,8 @@ extern "C"
    * @param text   UTF-8 text. NULL is a no-op.
    * @param style  Style preset; see @ref spz_style_t.
    */
-  void spz_label(
-      WINDOW *win, int y, int x, const char *text, spz_style_t style
-  );
+  void
+      spz_label(WINDOW *win, int y, int x, const char *text, spz_style_t style);
 
   /**
    * @brief Render a horizontal progress bar @p width cells wide.
@@ -289,14 +294,16 @@ extern "C"
    */
   void spz_clear_region(WINDOW *win, int y, int x, int rows, int cols);
 
-  typedef enum {
+  typedef enum
+  {
     SPZ_EV_NONE   = 0,
     SPZ_EV_KEY    = 1,
     SPZ_EV_RESIZE = 2,
     SPZ_EV_MOUSE  = 3,
   } spz_event_kind_t;
 
-  typedef enum {
+  typedef enum
+  {
     SPZ_KEY_NONE      = 0,
     SPZ_KEY_CHAR      = 1,
     SPZ_KEY_ENTER     = 2,
@@ -326,20 +333,24 @@ extern "C"
     SPZ_KEY_F12       = 111,
   } spz_key_kind_t;
 
-  typedef struct {
+  typedef struct
+  {
     spz_key_kind_t kind;
     wchar_t        ch;
     uint8_t        mods;
   } spz_key_t;
 
-  typedef struct {
+  typedef struct
+  {
     int y, x;
     int button;
   } spz_mouse_t;
 
-  typedef struct {
+  typedef struct
+  {
     spz_event_kind_t kind;
-    union {
+    union
+    {
       spz_key_t   key;
       spz_mouse_t mouse;
     };

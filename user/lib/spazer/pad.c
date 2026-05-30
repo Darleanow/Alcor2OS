@@ -25,7 +25,8 @@
  * @c off    top-left of the viewport in pad coordinates.
  * @c cur    current cursor position in pad coordinates.
  */
-struct spz_pad {
+struct spz_pad
+{
   WINDOW      *frame;
   WINDOW      *body;
   spz_rect_t   outer;
@@ -116,12 +117,12 @@ spz_pad_t *spz_pad_new(
   p->title       = dup_title(title);
   p->frame_dirty = true;
 
-  p->inner.y     = has_border ? outer.y + 1 : outer.y;
-  p->inner.x     = has_border ? outer.x + 1 : outer.x;
-  p->inner.rows  = has_border ? outer.rows - 2 : outer.rows;
-  p->inner.cols  = has_border ? outer.cols - 2 : outer.cols;
+  p->inner.y    = has_border ? outer.y + 1 : outer.y;
+  p->inner.x    = has_border ? outer.x + 1 : outer.x;
+  p->inner.rows = has_border ? outer.rows - 2 : outer.rows;
+  p->inner.cols = has_border ? outer.cols - 2 : outer.cols;
 
-  p->frame       = newwin(outer.rows, outer.cols, outer.y, outer.x);
+  p->frame = newwin(outer.rows, outer.cols, outer.y, outer.x);
   if(!p->frame) {
     free(p->title);
     free(p);
@@ -193,7 +194,9 @@ void spz_pad_refresh(spz_pad_t *p)
     return;
   if(p->frame_dirty) {
     werase(p->frame);
-    spz_border_draw(p->frame, p->outer.rows, p->outer.cols, p->title, p->border);
+    spz_border_draw(
+        p->frame, p->outer.rows, p->outer.cols, p->title, p->border
+    );
     p->frame_dirty = false;
   }
   /* touchwin so wnoutrefresh always re-emits the frame / body even when
@@ -216,12 +219,12 @@ void spz_pad_refresh(spz_pad_t *p)
 
   /* Project the [off_row, off_col] window of the pad onto the inner rect.
    * The src right/bottom is inclusive in pnoutrefresh. */
-  int src_y0  = p->off_row;
-  int src_x0  = p->off_col;
-  int dst_y0  = p->inner.y;
-  int dst_x0  = p->inner.x;
-  int dst_y1  = dst_y0 + p->inner.rows - 1;
-  int dst_x1  = dst_x0 + p->inner.cols - 1;
+  int src_y0 = p->off_row;
+  int src_x0 = p->off_col;
+  int dst_y0 = p->inner.y;
+  int dst_x0 = p->inner.x;
+  int dst_y1 = dst_y0 + p->inner.rows - 1;
+  int dst_x1 = dst_x0 + p->inner.cols - 1;
   pnoutrefresh(p->body, src_y0, src_x0, dst_y0, dst_x0, dst_y1, dst_x1);
 
   doupdate();
