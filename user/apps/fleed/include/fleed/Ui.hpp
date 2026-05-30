@@ -1,16 +1,17 @@
 /**
  * @file fleed/Ui.hpp
- * @brief ncurses + spazer wrapper for fleed's editor view.
+ * @brief Spazer-based view layer for the editor.
  *
- * Owns the SCREEN / panel and provides the only API the rest of the editor
- * uses to read keystrokes and update the display, so the input layer never
- * touches ncurses directly.
+ * Owns the ncurses SCREEN and a scrollable pad sized to the buffer. The rest
+ * of the editor never touches ncurses or spazer types directly — it gets
+ * decoded @ref spz_event_t events through @ref pollEvent and asks the view
+ * to repaint via @ref redraw / @ref redrawLine / @ref refreshCursor.
  */
 #pragma once
 
-#include <curses.h>
 #include <fleed/Buffer.hpp>
 #include <spazer/spazer.h>
+
 #include <string>
 
 namespace fleed {
@@ -25,57 +26,75 @@ public:
   Ui &operator=(const Ui &) = delete;
 
   /**
-   * @brief Bring up ncurses and create the editor panel.
-   * @param header Title shown in the panel's top border.
-   * @return @c true on success, @c false if the terminal or panel could not
-   *         be created (the UI is then fully torn down).
+   * @brief Bring up ncurses and create the editor pad.
+   * @param header  Title shown in the top border.
+   * @return @c true on success, @c false if the terminal or pad could not be
+   *         created (the UI is then fully torn down).
    */
   bool init(const std::string &header);
 
-  /** @brief Tear ncurses down. Idempotent and safe to call from the destructor.
-   */
+  /** @brief Tear ncurses down. Idempotent. */
   void shutdown();
 
   /**
-   * @brief Block until one keystroke is available.
-   * @param out Receives the keystroke (codepoint or KEY_* constant).
-   * @return @c OK for a regular character, @c KEY_CODE_YES for a function key,
-   *         @c ERR on failure.
+   * @brief Block until one decoded event is available.
+   * @param out  Receives the event.
+   * @return 1 on event, -1 on error.
    */
-  int readKey(wint_t &out);
+  int  pollEvent(spz_event_t &out);
 
   /**
-   * @brief Repaint the editor panel from scratch with the given text.
-   * @param buffer Full buffer contents to display.
+   * @brief Repaint the whole buffer into the pad and refresh.
+   *
+   * Resizes the pad if the buffer has grown taller or wider than the current
+   * virtual size.
+   *
+   * @param buffer  Buffer to project into the pad.
    */
   void redraw(const Buffer &buffer);
 
   /**
-   * @brief Replace the centre slot of the bottom status bar.
-   * @param text Status text, or @c nullptr to clear the slot.
-   */
-  void setStatus(const char *text);
-
-  /**
-   * @brief Redraw a single line in-place without flushing to screen.
-   *        Call redrawCursor() afterwards to trigger the actual update.
-   * @param buffer Buffer to read line content from.
-   * @param line_idx Absolute line index in the buffer.
+   * @brief Repaint a single line in the pad without refreshing.
+   *
+   * The caller pairs this with @ref refreshCursor to flush.
+   *
+   * @param buffer    Buffer to read line content from.
+   * @param line_idx  Absolute line index in the buffer.
    */
   void redrawLine(const Buffer &buffer, size_t line_idx);
 
   /**
-   * @brief Redraws cursor at current position and flushes to screen.
-   * @param buffer The text buffer containing the cursor.
+   * @brief Move the pad cursor to the buffer cursor and push to the screen.
+   *
+   * @param buffer  Buffer providing the cursor position and content size.
    */
-  void redrawCursor(const Buffer &buffer);
+  void refreshCursor(const Buffer &buffer);
+
+  /**
+   * @brief Replace the centre slot of the bottom status bar.
+   * @param text  Status text, or @c nullptr to clear.
+   */
+  void setStatus(const char *text);
 
 private:
-  void        refreshStatus(const Buffer &buffer);
+  /**
+   * @brief Ensure the pad is large enough to host @p rows lines and the
+   *        longest line of @p buffer.
+   *
+   * @param buffer  Source buffer for sizing.
+   */
+  void ensurePadSize(const Buffer &buffer);
 
-  SCREEN      *m_scr          = nullptr;
-  spz_panel_t *m_editor       = nullptr;
-  size_t       m_scroll_offset = 0;
+  /**
+   * @brief Repaint the status bar with the current cursor position.
+   *
+   * @param buffer  Buffer providing the cursor.
+   */
+  void refreshStatusBar(const Buffer &buffer);
+
+  SCREEN     *m_scr        = nullptr;
+  spz_pad_t  *m_pad        = nullptr;
+  std::string m_status_msg;
 };
 
 } /* namespace fleed */
