@@ -8,8 +8,8 @@
  */
 
 #include <alcor2/types.h>
-#include <kernel/drivers/fb_console/internal.h>
 #include <drivers/console/font.h>
+#include <kernel/drivers/fb_console/internal.h>
 
 /** @brief Bit offset of the red component inside a 16-bit RGB565 word.
  * R takes the top 5 bits of the 16-bit value. */
