@@ -43,6 +43,7 @@ bool pipe_poll_write_ready(const void *p) { (void)p; return false; }
 
 /* Dummy FS driver */
 static char g_last_rel_path[VFS_PATH_MAX];
+static i64 g_readdir_ret = 0;
 
 static fs_handle_t dummy_open(void *fs_data, const char *path, u32 flags) {
   (void)fs_data; (void)flags;
@@ -58,11 +59,17 @@ static i64 dummy_stat(const void *fs_data, const char *path, vfs_stat_t *st) {
   return 0;
 }
 
+static i64 dummy_readdir(fs_handle_t fh, u64 offset, char *name, vfs_stat_t *st) {
+  (void)fh; (void)offset; (void)name; (void)st;
+  return g_readdir_ret;
+}
+
 static void dummy_close(fs_handle_t fh) { (void)fh; }
 
 static const fs_ops_t dummy_ops = {
   .open = dummy_open,
   .stat = dummy_stat,
+  .readdir = dummy_readdir,
   .close = dummy_close
 };
 
@@ -135,13 +142,25 @@ static void vfs_mount_subdir_open_rel_path_has_slash(void **state) {
   assert_string_equal(g_last_rel_path, "/foo");
 }
 
+static void vfs_getdents_returns_error_on_first_failure(void **state) {
+  (void)state;
+  assert_int_equal(vfs_mount("dev", "/mnt", "dummy"), 0);
+  i64 fd = vfs_open("/mnt/dir", 0);
+  assert_true(fd >= 3);
+  
+  g_readdir_ret = -EIO;
+  u8 buf[1024];
+  assert_int_equal(vfs_getdents(fd, buf, sizeof(buf)), -EIO);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test_setup(vfs_normalize_removes_dots, setup_vfs),
-      cmocka_unit_test_setup(vfs_normalize_collapses_slashes, setup_vfs),
-      cmocka_unit_test_setup(vfs_normalize_handles_root_dotdots, setup_vfs),
+      cmocka_unit_test_setup(vfs_getdents_returns_error_on_first_failure, setup_vfs),
       cmocka_unit_test_setup(vfs_mount_root_open_rel_path_has_slash, setup_vfs),
       cmocka_unit_test_setup(vfs_mount_subdir_open_rel_path_has_slash, setup_vfs),
+      cmocka_unit_test_setup(vfs_normalize_collapses_slashes, setup_vfs),
+      cmocka_unit_test_setup(vfs_normalize_handles_root_dotdots, setup_vfs),
+      cmocka_unit_test_setup(vfs_normalize_removes_dots, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
