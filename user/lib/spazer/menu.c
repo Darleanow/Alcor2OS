@@ -75,11 +75,12 @@ int spz_menu_run(const spz_menu_t *m)
   WINDOW *body = spz_panel_body(p);
   keypad(body, TRUE);
   notimeout(body, TRUE);
-  int prev_curs = curs_set(0);
 
-  int sel = (m->initial < 0)             ? 0
-            : (m->initial >= m->n_items) ? m->n_items - 1
-                                         : m->initial;
+  /* The menu owns the cursor while it's modal — hide it and restore the
+   * caller's visibility on exit. */
+  int prev_curs = curs_set(0);
+  int result    = -1;
+  int sel       = spz_clamp(m->initial, m->n_items - 1);
 
   for(;;) {
     for(int i = 0; i < m->n_items; i++)
@@ -87,30 +88,21 @@ int spz_menu_run(const spz_menu_t *m)
     spz_panel_refresh(p);
 
     int ch = wgetch(body);
-    switch(ch) {
-    case KEY_UP:
-    case 'k':
+    if(ch == KEY_UP || ch == 'k') {
       if(sel > 0)
         sel--;
-      break;
-    case KEY_DOWN:
-    case 'j':
+    } else if(ch == KEY_DOWN || ch == 'j') {
       if(sel < m->n_items - 1)
         sel++;
+    } else if(ch == '\n' || ch == '\r' || ch == KEY_ENTER) {
+      result = sel;
       break;
-    case '\n':
-    case '\r':
-    case KEY_ENTER:
-      curs_set(prev_curs);
-      spz_panel_del(p);
-      return sel;
-    case 27:
-    case 'q':
-      curs_set(prev_curs);
-      spz_panel_del(p);
-      return -1;
-    default:
+    } else if(ch == 27 || ch == 'q') {
       break;
     }
   }
+
+  curs_set(prev_curs);
+  spz_panel_del(p);
+  return result;
 }
