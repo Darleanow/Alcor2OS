@@ -119,7 +119,7 @@ COV_SRCS := $(shell find $(SRC) -name '*.c')
 COV_BIN  := ../build/alcor2.elf
 
 ../build/alcor2.elf:
-	$(MAKE) -C .. iso-kernel COV=1 CC=clang
+	$(MAKE) -C .. build/alcor2.elf COV=1 CC=clang
 
 coverage: test ../build/alcor2.elf
 	$(LLVM_PROFDATA) merge -sparse $(COV)/*.profraw -o $(COV)/merged.profdata
