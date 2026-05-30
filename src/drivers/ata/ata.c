@@ -761,16 +761,14 @@ static void init_dma(void)
 /** @brief Initialize the ATA subsystem (channels, drives, IRQs, DMA). */
 void ata_init(void)
 {
-  channels[0] = (ata_channel_t
-  ) {.base  = ATA_PRIMARY_DATA,
-     .ctrl  = ATA_PRIMARY_CTRL,
-     .irq   = IRQ_ATA_PRIMARY,
-     .state = ATA_STATE_IDLE};
-  channels[1] = (ata_channel_t
-  ) {.base  = ATA_SECONDARY_DATA,
-     .ctrl  = ATA_SECONDARY_CTRL,
-     .irq   = IRQ_ATA_SECONDARY,
-     .state = ATA_STATE_IDLE};
+  channels[0] = (ata_channel_t) {.base  = ATA_PRIMARY_DATA,
+                                 .ctrl  = ATA_PRIMARY_CTRL,
+                                 .irq   = IRQ_ATA_PRIMARY,
+                                 .state = ATA_STATE_IDLE};
+  channels[1] = (ata_channel_t) {.base  = ATA_SECONDARY_DATA,
+                                 .ctrl  = ATA_SECONDARY_CTRL,
+                                 .irq   = IRQ_ATA_SECONDARY,
+                                 .state = ATA_STATE_IDLE};
 
   for(int i = 0; i < 4; i++) {
     drives[i].channel = &channels[i / 2];
