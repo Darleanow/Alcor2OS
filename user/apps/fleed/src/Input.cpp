@@ -1,5 +1,9 @@
 /**
  * @file fleed/src/Input.cpp
+ * @brief Map a decoded spazer key event to an editor-level @ref Command.
+ *
+ * Pure translation, no state. Anything not in the table degrades to
+ * @c Command::None so the event loop can ignore it cleanly.
  */
 
 #include <fleed/Input.hpp>
@@ -8,40 +12,39 @@
 
 namespace fleed {
 
-KeyAction classify(int kind, wint_t ch)
+KeyAction classify(const spz_event_t &ev)
 {
-  if(kind == KEY_CODE_YES) {
-    if(ch == static_cast<wint_t>(KEY_F(1)))
-      return {Command::Quit, 0};
-    if(ch == static_cast<wint_t>(KEY_F(2)))
-      return {Command::Save, 0};
-    if(ch == static_cast<wint_t>(KEY_BACKSPACE))
-      return {Command::Backspace, 0};
-    if(ch == static_cast<wint_t>(KEY_DOWN))
-      return {Command::ArrowDown, 0};
-    if(ch == static_cast<wint_t>(KEY_UP))
-      return {Command::ArrowUp, 0};
-    if(ch == static_cast<wint_t>(KEY_LEFT))
-      return {Command::ArrowLeft, 0};
-    if(ch == static_cast<wint_t>(KEY_RIGHT))
-      return {Command::ArrowRight, 0};
-    if(ch == static_cast<wint_t>(KEY_HOME))
-      return {Command::Home, 0};
-    if(ch == static_cast<wint_t>(KEY_END))
-      return {Command::End, 0};
-    if(ch == static_cast<wint_t>(KEY_ENTER))
-      return {Command::Enter, 0};
+  if(ev.kind != SPZ_EV_KEY)
+    return {Command::None, 0};
+
+  switch(ev.key.kind) {
+  case SPZ_KEY_F1:
+    return {Command::Quit, 0};
+  case SPZ_KEY_F2:
+    return {Command::Save, 0};
+  case SPZ_KEY_BACKSPACE:
+    return {Command::Backspace, 0};
+  case SPZ_KEY_UP:
+    return {Command::ArrowUp, 0};
+  case SPZ_KEY_DOWN:
+    return {Command::ArrowDown, 0};
+  case SPZ_KEY_LEFT:
+    return {Command::ArrowLeft, 0};
+  case SPZ_KEY_RIGHT:
+    return {Command::ArrowRight, 0};
+  case SPZ_KEY_HOME:
+    return {Command::Home, 0};
+  case SPZ_KEY_END:
+    return {Command::End, 0};
+  case SPZ_KEY_ENTER:
+    return {Command::Enter, 0};
+  case SPZ_KEY_CHAR:
+    if(std::iswprint(ev.key.ch))
+      return {Command::Insert, ev.key.ch};
+    return {Command::None, 0};
+  default:
     return {Command::None, 0};
   }
-
-  if(kind == OK) {
-    if(ch == L'\n')
-      return {Command::Enter, 0};
-    if(std::iswprint(ch))
-      return {Command::Insert, static_cast<wchar_t>(ch)};
-  };
-
-  return {Command::None, 0};
 }
 
 } /* namespace fleed */
