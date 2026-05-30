@@ -28,8 +28,9 @@ TESTCFLAGS := -std=gnu11 -g -O0 -Wall -Wextra -I$(INCLUDE) -I$(SRC) -I$(SUPPORT)
 LDLIBS     := -lcmocka
 
 # Suite registry: one entry per unit, with the sources it exercises.
-SUITES := kstdlib
+SUITES := kstdlib gdt
 SRC_kstdlib := $(SRC)/lib/kstdlib.c
+SRC_gdt     := $(SRC)/arch/x86_64/gdt.c
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 

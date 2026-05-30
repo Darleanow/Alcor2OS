@@ -5,6 +5,8 @@
 
 #include <alcor2/arch/gdt.h>
 
+#include "gdt_internal.h"
+
 /** @name GDT Access Flags */
 /**@{*/
 #define GDT_ACCESS_PRESENT (1 << 7)
@@ -56,7 +58,7 @@ static tss_t     tss;
  * @param access Access byte.
  * @param flags Flags nibble.
  */
-static void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
+void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
 {
   entry->limit_low   = 0xFFFF;
   entry->base_low    = 0;
@@ -71,7 +73,7 @@ static void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
  * @param entry TSS entry to configure.
  * @param base TSS base address.
  */
-static void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
+void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
 {
   entry->limit_low   = sizeof(tss_t) - 1;
   entry->base_low    = base & 0xFFFF;
