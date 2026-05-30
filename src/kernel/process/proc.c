@@ -728,7 +728,7 @@ void proc_schedule(void)
      * waking a sleeper. */
     for(;;) {
       cpu_enable_interrupts();
-      cpu_halt();
+      __asm__ volatile("hlt");
       cpu_disable_interrupts();
 
       for(int i = 0; i < PROC_MAX; i++) {
