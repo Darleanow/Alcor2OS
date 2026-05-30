@@ -28,7 +28,7 @@ TESTCFLAGS := -std=gnu11 -g -O0 -Wall -Wextra -I$(INCLUDE) -I$(SRC) -I$(SUPPORT)
 LDLIBS     := -lcmocka
 
 # Suite registry: one entry per unit, with the sources it exercises.
-SUITES := kstdlib gdt idt ktermios pixel_bpp ata keyboard
+SUITES := kstdlib gdt idt ktermios pixel_bpp ata keyboard klog
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_gdt       := $(SRC)/arch/x86_64/gdt.c
 SRC_idt       := $(SRC)/arch/x86_64/idt.c
@@ -36,6 +36,7 @@ SRC_ktermios  := $(SRC)/kernel/ktermios.c $(SRC)/lib/kstdlib.c
 SRC_pixel_bpp := $(SRC)/kernel/drivers/fb_console/pixel.c
 SRC_ata       := $(SRC)/drivers/ata/ata.c
 SRC_keyboard  := $(SRC)/drivers/keyboard/keyboard.c
+SRC_klog      :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 
