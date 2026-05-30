@@ -9,6 +9,7 @@
 
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
+#include <drivers/console/font.h>
 
 /** @brief Bit offset of the red component inside a 16-bit RGB565 word.
  * R takes the top 5 bits of the 16-bit value. */
@@ -117,4 +118,83 @@ void fb_put_pixel(u32 x, u32 y, u32 color)
   default:
     return;
   }
+}
+
+/**
+ * @brief Reads a pixel's color from the framebuffer.
+ *
+ * Silently clips against (@c width, @c height) and returns 0 if out-of-bounds.
+ *
+ * @param x Pixel column.
+ * @param y Pixel row.
+ * @return The 0xRRGGBB color of the pixel, stripped of alpha.
+ */
+u32 fb_get_pixel(u32 x, u32 y)
+{
+  if(!fb_ctx.base || x >= fb_ctx.width || y >= fb_ctx.height)
+    return 0;
+  volatile u8 *p =
+      fb_ctx.base + (u64)y * fb_ctx.pitch + (u64)x * fb_ctx.bytes_pp;
+  switch(fb_ctx.bytes_pp) {
+  case FB_BYTES_PER_PIXEL_32:
+    return (*(volatile u32 *)p) & 0xFFFFFF;
+  case FB_BYTES_PER_PIXEL_24:
+    return ((u32)p[BGR24_B]) | ((u32)p[BGR24_G] << BGRA_GREEN_SHIFT) |
+           ((u32)p[BGR24_R] << BGRA_RED_SHIFT);
+  case FB_BYTES_PER_PIXEL_16: {
+    u16 rgb565 = p[RGB565_LO] | ((u16)p[RGB565_HI] << BITS_PER_BYTE);
+    u32 r      = (rgb565 >> RGB565_R_SHIFT) & 0x1F;
+    u32 g      = (rgb565 >> RGB565_G_SHIFT) & 0x3F;
+    u32 b      = rgb565 & 0x1F;
+    return (r << (RGB565_R_LOSS + BGRA_RED_SHIFT)) |
+           (g << (RGB565_G_LOSS + BGRA_GREEN_SHIFT)) | (b << RGB565_B_LOSS);
+  }
+  default:
+    return 0;
+  }
+}
+
+/**
+ * @brief Draws a monochrome 8x16 glyph onto the framebuffer.
+ *
+ * Iterates through the 16 bytes of the glyph (one byte per row) and sets
+ * the pixel to @p fg if the bit is 1, and @p bg if the bit is 0.
+ *
+ * @param x     Top-left X coordinate.
+ * @param y     Top-left Y coordinate.
+ * @param glyph Pointer to the 16-byte glyph data.
+ * @param fg    Foreground color (0xRRGGBB).
+ * @param bg    Background color (0xRRGGBB).
+ */
+void fb_draw_glyph(u32 x, u32 y, const u8 *glyph, u32 fg, u32 bg)
+{
+  if(!glyph)
+    return;
+  for(u32 row = 0; row < FONT_H; row++) {
+    u8 row_data = glyph[row];
+    for(u32 col = 0; col < FONT_W; col++) {
+      u32 color = (row_data & (1 << (7 - col))) ? fg : bg;
+      fb_put_pixel(x + col, y + row, color);
+    }
+  }
+}
+
+/**
+ * @brief Draws a fallback character using the built-in VGA font.
+ *
+ * Looks up the character in the Latin-1 atlas. If not found, falls back to '?'.
+ *
+ * @param x  Top-left X coordinate.
+ * @param y  Top-left Y coordinate.
+ * @param c  The character to draw.
+ * @param fg Foreground color.
+ * @param bg Background color.
+ */
+void fb_draw_fallback_char(u32 x, u32 y, char c, u32 fg, u32 bg)
+{
+  int gi = font_glyph_index((u8)c);
+  if(gi < 0 || gi >= (int)FONT_GLYPHS)
+    gi = font_glyph_index((u8)'?');
+  const u8 *glyph = font_latin1[gi];
+  fb_draw_glyph(x, y, glyph, fg, bg);
 }
