@@ -338,3 +338,22 @@ ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)
   );
   return vol;
 }
+
+/**
+ * @brief Unmount an ext2 partition.
+ *
+ * Flushes metadata and frees the volume descriptor slot.
+ *
+ * @param vol Volume to unmount.
+ */
+void ext2_unmount(ext2_volume_t *vol)
+{
+  if(!vol || !vol->mounted)
+    return;
+  flush_metadata(vol);
+  if(vol->groups) {
+    kfree(vol->groups);
+    vol->groups = NULL;
+  }
+  vol->mounted = false;
+}
