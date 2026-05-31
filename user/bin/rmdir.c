@@ -34,7 +34,7 @@ static int remove_dir(const char *path, int verbose)
  *
  * @param path    Directory path to remove.
  * @param parents Non-zero to also remove ancestor directories.
- * @param verbose Non-zero to print a confirmation for each removed directory.
+ * @param verbose Non-zero to print a message before each removal attempt.
  * @return 0 on success, -1 on the first failure.
  */
 static int remove_with_parents(const char *path, int parents, int verbose)
