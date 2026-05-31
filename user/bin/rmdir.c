@@ -18,13 +18,13 @@
  */
 static int remove_dir(const char *path, int verbose)
 {
+  if(verbose)
+    (void)fprintf(stdout, "rmdir: removing directory '%s'\n", path);
   if(rmdir(path) < 0) {
     (void)fprintf(stderr, "rmdir: failed to remove '%s': %s\n", path,
                   strerror(errno));
     return -1;
   }
-  if(verbose)
-    (void)fprintf(stdout, "rmdir: removing directory '%s'\n", path);
   return 0;
 }
 
