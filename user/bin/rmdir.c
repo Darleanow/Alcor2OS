@@ -5,6 +5,7 @@
 
 #include <errno.h>
 #include <grendizer.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -13,7 +14,7 @@
  * @brief Remove a single empty directory, printing an error on failure.
  *
  * @param path    Directory path to remove.
- * @param verbose Non-zero to print a confirmation message on success.
+ * @param verbose Non-zero to print a message before attempting removal.
  * @return 0 on success, -1 on failure.
  */
 static int remove_dir(const char *path, int verbose)
@@ -38,7 +39,7 @@ static int remove_dir(const char *path, int verbose)
  */
 static int remove_with_parents(const char *path, int parents, int verbose)
 {
-  char buf[4096];
+  char buf[PATH_MAX];
   int  len = (int)strlen(path);
 
   if(len == 0 || len >= (int)sizeof(buf)) {
@@ -46,7 +47,7 @@ static int remove_with_parents(const char *path, int parents, int verbose)
     return -1;
   }
 
-  (void)memcpy(buf, path, (size_t)(len + 1));
+  memcpy(buf, path, (size_t)(len + 1));
 
   /* Strip trailing slashes, except for root. */
   while(len > 1 && buf[len - 1] == '/')
@@ -117,7 +118,9 @@ int main(int argc, char *argv[])
     return (rc == GR_HELP) ? 0 : 1;
 
   if(rest.argc == 0) {
-    (void)fprintf(stderr, "rmdir: missing operand\n");
+    (void)fprintf(stderr,
+                  "rmdir: missing operand\n"
+                  "Try 'rmdir --help' for more information.\n");
     return 1;
   }
 
