@@ -97,8 +97,9 @@ static int remove_with_parents(const char *path, int parents, int verbose)
  * @brief Entry point for the @c rmdir utility.
  *
  * Parses command-line flags (-p, -v) and removes each specified directory.
- * With @c -p, ancestor components are removed after the leaf.  Exits with
- * status 0 only if every removal succeeded.
+ * With @c -p, ancestor components are removed after the leaf; a non-empty
+ * ancestor stops the walk without error.  Exits with status 0 only if
+ * every leaf removal succeeded.
  *
  * @param argc Argument count from the shell.
  * @param argv Argument vector from the shell.
