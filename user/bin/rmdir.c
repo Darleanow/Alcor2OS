@@ -42,8 +42,12 @@ static int remove_with_parents(const char *path, int parents, int verbose)
   char buf[PATH_MAX];
   int  len = (int)strlen(path);
 
-  if(len == 0 || len >= (int)sizeof(buf)) {
-    (void)fprintf(stderr, "rmdir: invalid path\n");
+  if(len == 0) {
+    (void)fprintf(stderr, "rmdir: empty path\n");
+    return -1;
+  }
+  if(len >= (int)sizeof(buf)) {
+    (void)fprintf(stderr, "rmdir: path too long\n");
     return -1;
   }
 
@@ -102,7 +106,9 @@ int main(int argc, char *argv[])
           "a/b/c, a/b, then a)"
       ),
       GR_FLAG(
-          'v', "verbose", &verbose,
+          'v',
+          "verbose",
+          &verbose,
           "print a diagnostic for each directory processed"
       ),
       GR_END
