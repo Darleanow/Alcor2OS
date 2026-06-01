@@ -32,10 +32,14 @@ static int remove_dir(const char *path, int verbose)
 /**
  * @brief Remove a directory and optionally each successive parent component.
  *
+ * When @p parents is set, ancestor directories are removed after the leaf.
+ * A parent that is not empty (ENOTEMPTY / EEXIST) is silently skipped —
+ * it still has other children — and the walk stops there without error.
+ *
  * @param path    Directory path to remove.
  * @param parents Non-zero to also remove ancestor directories.
  * @param verbose Non-zero to print a message before each removal attempt.
- * @return 0 on success, -1 on the first failure.
+ * @return 0 on success, -1 on the first fatal failure.
  */
 static int remove_with_parents(const char *path, int parents, int verbose)
 {
@@ -74,8 +78,16 @@ static int remove_with_parents(const char *path, int parents, int verbose)
     buf[i] = '\0';
     len    = i;
 
-    if(remove_dir(buf, verbose) < 0)
+    if(verbose)
+      (void)fprintf(stdout, "rmdir: removing directory '%s'\n", buf);
+    if(rmdir(buf) < 0) {
+      /* Parent still has other children: stop silently, not an error. */
+      if(errno == ENOTEMPTY || errno == EEXIST)
+        break;
+      (void)fprintf(stderr, "rmdir: failed to remove '%s': %s\n", buf,
+                    strerror(errno));
       return -1;
+    }
   }
 
   return 0;
