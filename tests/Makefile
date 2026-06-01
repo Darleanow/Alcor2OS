@@ -35,7 +35,9 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           elf signal pipe \
           palette sgr sys_misc sys_mm \
           kbd_layout fb_console_caret_cell fb_console_pixel \
-          user_lib vega_sdk user_bin user_init
+          grendizer echo cat ls wc bin_misc kbd \
+          vega_fntab vega_expand vega_exec \
+          user_init
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_fb_console_pixel := 
 
@@ -77,9 +79,16 @@ SRC_signal             :=
 SRC_pipe               :=
 SRC_kbd_layout         :=
 SRC_fb_console_caret_cell :=
-SRC_user_lib           :=
-SRC_vega_sdk           :=
-SRC_user_bin           :=
+SRC_grendizer          :=
+SRC_echo               :=
+SRC_cat                :=
+SRC_ls                 :=
+SRC_wc                 :=
+SRC_bin_misc           :=
+SRC_kbd                :=
+SRC_vega_fntab         :=
+SRC_vega_expand        :=
+SRC_vega_exec          :=
 SRC_user_init          :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
