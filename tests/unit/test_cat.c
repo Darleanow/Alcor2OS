@@ -202,6 +202,13 @@ static void test_cat_help(void **state)
   assert_int_equal(cat_main(2, argv), 0);
 }
 
+static void test_cat_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"cat", "--no-such-option"};
+  assert_int_equal(cat_main(2, argv), 1);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -212,6 +219,7 @@ int main(void)
       cmocka_unit_test(test_cat_multi_chunk),
       cmocka_unit_test(test_cat_stdin),
       cmocka_unit_test(test_cat_help),
+      cmocka_unit_test(test_cat_bad_option),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
