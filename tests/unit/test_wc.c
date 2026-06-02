@@ -296,6 +296,13 @@ static void test_wc_help(void **state)
   assert_int_equal(wc_main(2, argv), 0);
 }
 
+static void test_wc_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"wc", "--no-such-option"};
+  assert_int_equal(wc_main(2, argv), 1);
+}
+
 static void test_wc_all_flags(void **state)
 {
   (void)state;
@@ -335,6 +342,7 @@ int main(void)
       cmocka_unit_test(test_wc_dash_reads_stdin),
       cmocka_unit_test(test_wc_multi_file_total),
       cmocka_unit_test(test_wc_help),
+      cmocka_unit_test(test_wc_bad_option),
       cmocka_unit_test(test_wc_all_flags),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
