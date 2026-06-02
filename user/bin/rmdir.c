@@ -40,7 +40,8 @@ static int remove_dir(const char *path, int verbose, int simulate)
 }
 
 /**
- * @brief Recursively remove all content of a directory, then the directory itself.
+ * @brief Recursively remove all content of a directory, then the
+ *        directory itself.
  *
  * Uses @c d_type to distinguish files from subdirectories without a @c stat
  * call, consistent with the rest of the userland tools.
