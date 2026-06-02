@@ -251,6 +251,13 @@ static void test_rm_help(void **state)
   assert_int_equal(rm_main(2, argv), 0);
 }
 
+static void test_rm_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"rm", "--no-such-option"};
+  assert_int_equal(rm_main(2, argv), 1);
+}
+
 static void test_mkdir_help(void **state)
 {
   (void)state;
@@ -260,6 +267,13 @@ static void test_mkdir_help(void **state)
   assert_int_equal(mkdir_main(2, argv), 0);
 }
 
+static void test_mkdir_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"mkdir", "--no-such-option"};
+  assert_int_equal(mkdir_main(2, argv), 1);
+}
+
 static void test_touch_help(void **state)
 {
   (void)state;
@@ -267,6 +281,13 @@ static void test_touch_help(void **state)
   expect_any_always(mock_fprintf, stream);
   expect_any_always(mock_fprintf, format);
   assert_int_equal(touch_main(2, argv), 0);
+}
+
+static void test_touch_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"touch", "--no-such-option"};
+  assert_int_equal(touch_main(2, argv), 1);
 }
 
 int main(void)
@@ -291,8 +312,11 @@ int main(void)
       cmocka_unit_test(test_touch_multi_partial_fail),
       cmocka_unit_test(test_pwd_does_not_use_grendizer),
       cmocka_unit_test(test_rm_help),
+      cmocka_unit_test(test_rm_bad_option),
       cmocka_unit_test(test_mkdir_help),
+      cmocka_unit_test(test_mkdir_bad_option),
       cmocka_unit_test(test_touch_help),
+      cmocka_unit_test(test_touch_bad_option),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
