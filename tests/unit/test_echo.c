@@ -77,6 +77,13 @@ static void test_echo_help(void **state)
   assert_int_equal(echo_main(2, argv), 0);
 }
 
+static void test_echo_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"echo", "--no-such-option"};
+  assert_int_equal(echo_main(2, argv), 1);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -85,6 +92,7 @@ int main(void)
       cmocka_unit_test(test_echo_multiple_args),
       cmocka_unit_test(test_echo_three_args),
       cmocka_unit_test(test_echo_help),
+      cmocka_unit_test(test_echo_bad_option),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
