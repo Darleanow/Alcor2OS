@@ -1,9 +1,11 @@
 #include "test_common.h"
 #include <dirent.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <termios.h>
 #include <unistd.h>
 
 int            mock_fprintf(FILE *stream, const char *format, ...);
@@ -54,7 +56,19 @@ int mock_closedir(DIR *dirp)
 int mock_ioctl(int fd, unsigned long request, ...)
 {
   check_expected(fd);
-  return mock_type(int);
+  int rc = mock_type(int);
+  if(rc == 0) {
+    /* Fill the winsize struct passed as the third argument */
+    va_list ap;
+    va_start(ap, request);
+    struct winsize *ws = va_arg(ap, struct winsize *);
+    va_end(ap);
+    if(ws) {
+      ws->ws_col = (unsigned short)mock_type(int);
+      ws->ws_row = 24;
+    }
+  }
+  return rc;
 }
 
 ssize_t mock_write(int fd, const void *buf, size_t count)
@@ -177,7 +191,8 @@ static void test_ls_mixed_entries(void **state)
   will_return(mock_closedir, 0);
 
   expect_value(mock_ioctl, fd, STDOUT_FILENO);
-  will_return(mock_ioctl, 80);
+  will_return(mock_ioctl, 0);
+  will_return(mock_ioctl, 80); /* ws_col */
 
   expect_value(mock_write, fd, STDOUT_FILENO);
 
@@ -254,7 +269,8 @@ static void test_ls_one_col_flag(void **state)
   will_return(mock_closedir, 0);
 
   expect_value(mock_ioctl, fd, STDOUT_FILENO);
-  will_return(mock_ioctl, 80);
+  will_return(mock_ioctl, 0);
+  will_return(mock_ioctl, 80); /* ws_col */
 
   expect_value(mock_write, fd, STDOUT_FILENO);
 
@@ -346,7 +362,8 @@ static void test_ls_name_wider_than_terminal(void **state)
   will_return(mock_closedir, 0);
 
   expect_value(mock_ioctl, fd, STDOUT_FILENO);
-  will_return(mock_ioctl, 80);
+  will_return(mock_ioctl, 0);
+  will_return(mock_ioctl, 80); /* ws_col */
 
   expect_value(mock_write, fd, STDOUT_FILENO);
 
