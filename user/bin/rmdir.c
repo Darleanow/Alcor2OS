@@ -230,11 +230,11 @@ int main(int argc, char *argv[])
       GR_END
   };
 
-  gr_spec spec = {
-      .program = "rmdir", .usage = "[options] <dir> [...]", .options = opts
-  };
+  gr_spec spec =
+      {.program = "rmdir", .usage = "[options] <dir> [...]", .options = opts};
 
   gr_rest rest;
+
   int     rc = gr_parse(&spec, argc, argv, &rest, NULL, 0);
   if(rc != GR_OK)
     return (rc == GR_HELP) ? 0 : 1;
