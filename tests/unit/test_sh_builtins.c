@@ -1,4 +1,5 @@
 #include "test_common.h"
+#include <setjmp.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -9,13 +10,15 @@ int  mock_sh_chdir(const char *path);
 char *mock_sh_getcwd(char *buf, size_t size);
 void mock_sh_clear(void);
 
+jmp_buf exit_jmp;
+void mock_exit(int code) { longjmp(exit_jmp, code + 1); }
+
 #define sh_puts     mock_sh_puts
 #define sh_putchar  mock_sh_putchar
 #define sh_chdir    mock_sh_chdir
 #define sh_getcwd   mock_sh_getcwd
 #define sh_clear    mock_sh_clear
-
-/* sh_putnum uses sh_putchar — already mocked */
+#define exit        mock_exit
 
 #include "../../user/apps/shell/platform/builtins.c"
 
@@ -147,6 +150,17 @@ static void test_cmd_clear(void **state)
   assert_int_equal(sh_run_builtin(1, argv), 0);
 }
 
+static void test_cmd_exit(void **state)
+{
+  (void)state;
+  char *argv[] = {"exit"};
+  int jumped = setjmp(exit_jmp);
+  if(jumped == 0)
+    sh_run_builtin(1, argv);
+  /* longjmp value = code + 1 = 0 + 1 = 1 */
+  assert_int_equal(jumped, 1);
+}
+
 static void test_cmd_unknown_returns_minus1(void **state)
 {
   (void)state;
@@ -168,6 +182,7 @@ int main(void)
       cmocka_unit_test(test_cmd_help),
       cmocka_unit_test(test_cmd_version),
       cmocka_unit_test(test_cmd_clear),
+      cmocka_unit_test(test_cmd_exit),
       cmocka_unit_test(test_cmd_unknown_returns_minus1),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
