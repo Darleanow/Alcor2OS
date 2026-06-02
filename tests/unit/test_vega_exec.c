@@ -144,6 +144,93 @@ static void test_exec_cmd_not_found(void **state)
   free(argv[0]);
 }
 
+static void test_exec_cmd_found_via_path_search(void **state)
+{
+  (void)state;
+  /* bare name → PATH search; stat succeeds on first dir → return 1 (line 216) */
+  char *argv[] = {strdup("mybin"), NULL};
+  ast_t n      = make_cmd(argv, 1);
+
+  will_return(mock_is_builtin, false);
+  will_return(mock_stat, 0); /* /init/mybin stat ok → found */
+
+  will_return(mock_fork, 77);
+  will_return(mock_waitpid, 0);
+  will_return(mock_waitpid, 77);
+
+  assert_int_equal(vega_exec(&n), 0);
+  free(argv[0]);
+}
+
+static void test_exec_stage_cmd_redir_fail_in_child(void **state)
+{
+  (void)state;
+  /* exec_stage_in_child: apply_redirs fails → _exit(1) (line 413)
+   * Use absolute path so resolve_path skips PATH and is_builtin is
+   * still called (fntab_get returns NULL for "/bin/echo_redir_test") */
+  char    *target = strdup("/no/such/path");
+  redir_t  r      = {REDIR_OUT, target, NULL};
+
+  ast_t *stage        = make_builtin_cmd("/bin/echo_redir_test");
+  stage->u.cmd.redirs = &r;
+
+  ast_t **stages = malloc(sizeof(ast_t *));
+  stages[0]      = stage;
+
+  ast_t n             = {0};
+  n.kind              = AST_PIPE;
+  n.u.pipeline.stages = stages;
+  n.u.pipeline.n      = 1;
+
+  will_return(mock_fork, 0);
+  /* apply_redirs is called before fntab/is_builtin in exec_stage_in_child */
+  will_return(mock_open, -1); /* REDIR_OUT open fails → _exit(1) */
+
+  if(setjmp(mock_exit_jmp) == 0)
+    vega_exec(&n);
+
+  free(stage->u.cmd.argv[0]); free(stage->u.cmd.argv); free(stage);
+  free(stages);
+  free(target);
+}
+
+static void test_exec_pipeline_middle_stage_child(void **state)
+{
+  (void)state;
+  /* 3-stage pipeline: stage 1 is child → dup2(pipe[0][0],0) + dup2(pipe[1][1],1) */
+  ast_t *s1 = make_builtin_cmd("echo");
+  ast_t *s2 = make_builtin_cmd("cat");
+  ast_t *s3 = make_builtin_cmd("wc");
+
+  ast_t **stages = malloc(3 * sizeof(ast_t *));
+  stages[0] = s1; stages[1] = s2; stages[2] = s3;
+
+  ast_t n             = {0};
+  n.kind              = AST_PIPE;
+  n.u.pipeline.stages = stages;
+  n.u.pipeline.n      = 3;
+
+  will_return(mock_pipe, 5); will_return(mock_pipe, 6); will_return(mock_pipe, 0);
+  will_return(mock_pipe, 7); will_return(mock_pipe, 8); will_return(mock_pipe, 0);
+
+  /* stage 0: parent */
+  will_return(mock_fork, 10);
+  /* stage 1: child → dup2 in AND out, then exec_stage_in_child → _exit */
+  will_return(mock_fork, 0);
+  will_return(mock_dup2, 0); /* dup2(pipes[0][0], 0) */
+  will_return(mock_dup2, 0); /* dup2(pipes[1][1], 1) */
+  will_return(mock_is_builtin, true);
+  will_return(mock_run_builtin, 0);
+
+  if(setjmp(mock_exit_jmp) == 0)
+    vega_exec(&n);
+
+  free(s1->u.cmd.argv[0]); free(s1->u.cmd.argv); free(s1);
+  free(s2->u.cmd.argv[0]); free(s2->u.cmd.argv); free(s2);
+  free(s3->u.cmd.argv[0]); free(s3->u.cmd.argv); free(s3);
+  free(stages);
+}
+
 static void test_exec_cmd_relative_path(void **state)
 {
   (void)state;
@@ -1247,6 +1334,9 @@ int main(void)
       cmocka_unit_test(test_exec_cmd_external_parent_wait),
       cmocka_unit_test(test_exec_cmd_external_success),
       cmocka_unit_test(test_exec_cmd_not_found),
+      cmocka_unit_test(test_exec_cmd_found_via_path_search),
+      cmocka_unit_test(test_exec_stage_cmd_redir_fail_in_child),
+      cmocka_unit_test(test_exec_pipeline_middle_stage_child),
       cmocka_unit_test(test_exec_cmd_relative_path),
       cmocka_unit_test(test_exec_cmd_relative_path_not_found),
       cmocka_unit_test(test_exec_and_left_succeeds),
