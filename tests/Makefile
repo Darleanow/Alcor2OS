@@ -24,7 +24,7 @@ LLVM_COV      ?= $(shell command -v llvm-cov-$(CLANG_VER) 2>/dev/null || command
 # links and runs as a normal host program.
 COV_FLAGS  := -fprofile-instr-generate -fcoverage-mapping
 CFLAGS     := -std=gnu11 -g -O0 -Wall -Wextra -Werror -Wno-unused-parameter -I$(INCLUDE) -I$(SRC)
-TESTCFLAGS := -std=gnu11 -g -O0 -Wall -Wextra -I$(INCLUDE) -I$(SRC) -I$(SUPPORT) -I$(ROOT)/user/include -I$(ROOT)/user/core/vega/include -I$(ROOT)/user/sdk/vega/include -I$(ROOT)/user/core/vega/include
+TESTCFLAGS := -std=gnu11 -g -O0 -Wall -Wextra -I$(INCLUDE) -I$(SRC) -I$(SUPPORT) -I$(ROOT)/user/include -I$(ROOT)/user/core/vega/include -I$(ROOT)/user/sdk/vega/include -I$(ROOT)/user/core/vega/include -I$(ROOT)/user/apps/shell/include
 LDLIBS     := -lcmocka
 
 # Suite registry: one entry per unit, with the sources it exercises.
@@ -37,6 +37,7 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           kbd_layout fb_console_caret_cell fb_console_pixel \
           grendizer echo cat ls wc bin_misc kbd \
           vega_fntab vega_expand vega_exec \
+          sh_history sh_builtins \
           user_init
 SRC_kstdlib   := $(SRC)/lib/kstdlib.c
 SRC_fb_console_pixel := 
@@ -89,6 +90,8 @@ SRC_kbd                :=
 SRC_vega_fntab         :=
 SRC_vega_expand        :=
 SRC_vega_exec          :=
+SRC_sh_history         :=
+SRC_sh_builtins        :=
 SRC_user_init          :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
