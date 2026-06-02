@@ -110,6 +110,13 @@ static void test_kbd_help(void **state)
   assert_int_equal(kbd_main(2, argv), 0);
 }
 
+static void test_kbd_bad_option(void **state)
+{
+  (void)state;
+  char *argv[] = {"kbd", "--no-such-option"};
+  assert_int_equal(kbd_main(2, argv), 1);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -120,6 +127,7 @@ int main(void)
       cmocka_unit_test(test_kbd_too_many_args),
       cmocka_unit_test(test_kbd_ioctl_fail),
       cmocka_unit_test(test_kbd_help),
+      cmocka_unit_test(test_kbd_bad_option),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
