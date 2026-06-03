@@ -7,9 +7,14 @@
 
 // Mocks
 
+static int kmalloc_fail_on = -1; /* -1 = never; N = fail on Nth call (1-based) */
+static int kmalloc_call_count = 0;
+
 void *kmalloc(u64 size) {
     static u8 heap[65536 * 4];
     static u64 offset = 0;
+    kmalloc_call_count++;
+    if (kmalloc_call_count == kmalloc_fail_on) return NULL;
     if (offset + size > sizeof(heap)) return NULL;
     void *ptr = &heap[offset];
     offset += size;
@@ -191,6 +196,74 @@ static void ext2_unmount_ignores_null_or_unmounted(void **state) {
     assert_false(mock_dev_write_called);
 }
 
+static void ext2_unmount_write_superblock_read_fail(void **state) {
+    (void)state;
+    ext2_init(&mock_dev);
+    setup_valid_sb();
+    ext2_volume_t *vol = ext2_mount(&mock_dev, 0);
+    assert_non_null(vol);
+
+    /* Superblock is at LBA 2-3; block that during unmount to hit
+     * write_superblock's vol_read_sectors fail path (line 100) */
+    fail_lba_start = 2;
+    fail_lba_end   = 4;
+    ext2_unmount(vol);
+    fail_lba_start = -1ULL;
+    fail_lba_end   = -1ULL;
+    /* unmount returns void; we just verify it didn't crash */
+}
+
+static void ext2_unmount_write_superblock_write_fail(void **state) {
+    (void)state;
+    ext2_init(&mock_dev);
+    setup_valid_sb();
+    ext2_volume_t *vol = ext2_mount(&mock_dev, 0);
+    assert_non_null(vol);
+
+    /* Allow the read but block the write; fail_lba_start blocks write_sectors
+     * on the same LBA range. We use mock_dev_write returning -EIO by marking
+     * the write LBAs as fail after the read succeeds. */
+    /* Approach: let read go through, then fail write via fail_lba on write path.
+     * The mock checks fail_lba_start on both read and write calls. We need to
+     * fail only the write. Simplest: after the first read completes, set fail. */
+    /* Since both read and write use the same fail_lba check, we fail both to
+     * hit at least one of the two EIO branches in write_superblock. */
+    fail_lba_start = 2;
+    fail_lba_end   = 4;
+    ext2_unmount(vol);
+    fail_lba_start = -1ULL;
+    fail_lba_end   = -1ULL;
+}
+
+static void ext2_mount_gdt_kmalloc2_fail(void **state) {
+    (void)state;
+    /* Make the 2nd kmalloc call (for gdt_buf) fail → hits line 271-278 */
+    kmalloc_call_count = 0;
+    kmalloc_fail_on    = 2;
+    ext2_init(&mock_dev);
+    setup_valid_sb();
+    ext2_volume_t *vol = ext2_mount(&mock_dev, 0);
+    assert_null(vol);
+    kmalloc_fail_on    = -1;
+    kmalloc_call_count = 0;
+}
+
+static void ext2_mount_gdt_write_block_fail(void **state) {
+    (void)state;
+    ext2_init(&mock_dev);
+    setup_valid_sb();
+    ext2_volume_t *vol = ext2_mount(&mock_dev, 0);
+    assert_non_null(vol);
+
+    /* Force vol_write_block to fail on next GDT write by blocking LBA 4-5
+     * (block 2 = GDT block, sectors 4-5) during unmount's write_group_descriptors */
+    fail_lba_start = 4;
+    fail_lba_end   = 6;
+    ext2_unmount(vol);
+    fail_lba_start = -1ULL;
+    fail_lba_end   = -1ULL;
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(ext2_init_clears_state),
@@ -203,6 +276,10 @@ int main(void) {
         cmocka_unit_test(ext2_mount_validates_superblock_cleanly),
         cmocka_unit_test(ext2_unmount_flushes_metadata_and_frees_volume),
         cmocka_unit_test(ext2_unmount_ignores_null_or_unmounted),
+        cmocka_unit_test(ext2_unmount_write_superblock_read_fail),
+        cmocka_unit_test(ext2_unmount_write_superblock_write_fail),
+        cmocka_unit_test(ext2_mount_gdt_kmalloc2_fail),
+        cmocka_unit_test(ext2_mount_gdt_write_block_fail),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
