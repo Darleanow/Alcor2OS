@@ -61,6 +61,7 @@ i64 vol_read_block(const ext2_volume_t *vol, u32 block_num, void *buf) {
     (void)vol; (void)block_num; (void)buf; return mock();
 }
 
+
 i64 vol_write_block(const ext2_volume_t *vol, u32 block_num, const void *buf) {
     (void)vol; (void)block_num; (void)buf; return mock();
 }
@@ -445,6 +446,41 @@ static void test_truncate_nonzero(void **state) {
     assert_int_equal(g_files[0].inode.i_size, 50);
 }
 
+/* claim_free_file_slot: all slots in use → ext2_open returns NULL (no resolve called) */
+static void test_open_all_slots_used_null(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true};
+    /* Mark all slots in use */
+    for(int i = 0; i < EXT2_MAX_FILES; i++)
+        g_files[i].in_use = true;
+    /* claim_free_file_slot returns NULL before resolve_path is called */
+    assert_null(ext2_open(&vol, "/f"));
+}
+
+/* ext2_read: run-length detection triggers read_run_chunk */
+static i64 mock_dev_read(void *ctx, u64 lba, u32 count, void *buf) {
+    (void)ctx; (void)lba; (void)count;
+    memset(buf, 0, count * 512);
+    return (i64)(count * 512);
+}
+static void test_read_run_chunk_success(void **state) {
+    (void)state;
+    static blockdev_t dev = {.read = mock_dev_read, .ctx = NULL};
+    ext2_volume_t vol = {.mounted = true, .block_size = 1024, .dev = &dev};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 3072; /* 3 blocks */
+
+    /* Read 2048 bytes: max_run = ceil(2048/1024) = 2 → detect runs up to 2 */
+    will_return(get_block_num, 10); /* file block 0 → disk block 10 */
+    will_return(get_block_num, 11); /* run[1]: 11=10+1 → contiguous, run=2, stop (max_run=2) */
+
+    char buf[2048];
+    i64 ret = ext2_read(&g_files[0], buf, 2048, 0);
+    assert_true(ret >= 0);
+}
+
 /* ext2_open: directory inode opens as is_dir=true */
 static void test_open_directory_inode(void **state) {
     (void)state;
@@ -491,6 +527,8 @@ int main(void) {
         cmocka_unit_test_setup(test_truncate_dir, setup_test),
         cmocka_unit_test_setup(test_truncate_nonzero, setup_test),
         cmocka_unit_test_setup(test_open_directory_inode, setup_test),
+        cmocka_unit_test_setup(test_open_all_slots_used_null, setup_test),
+        cmocka_unit_test_setup(test_read_run_chunk_success, setup_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
