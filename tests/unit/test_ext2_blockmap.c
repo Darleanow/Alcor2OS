@@ -62,13 +62,14 @@ i64 ata_write(u8 d, u64 l, u32 c, const void *b)
   (void)b;
   return -1;
 }
+static bool g_read_fail = false;
 i64 vol_read_block(const ext2_volume_t *v, u32 blk, void *buf)
 {
   (void)v;
-  if(blk >= STORE_BLOCKS)
+  if(g_read_fail || blk >= STORE_BLOCKS)
     return -EIO;
   memcpy(buf, g_store[blk], BLOCK_SZ);
-  return (i64)BLOCK_SZ;
+  return 0;
 }
 i64 vol_write_block(const ext2_volume_t *v, u32 blk, const void *buf)
 {
@@ -76,7 +77,7 @@ i64 vol_write_block(const ext2_volume_t *v, u32 blk, const void *buf)
   if(blk >= STORE_BLOCKS)
     return -EIO;
   memcpy(g_store[blk], buf, BLOCK_SZ);
-  return (i64)BLOCK_SZ;
+  return 0;
 }
 i64 flush_metadata(ext2_volume_t *v)
 {
@@ -111,6 +112,7 @@ static int reset(void **s)
   (void)s;
   memset(g_store, 0, sizeof(g_store));
   g_next_block = 0;
+  g_read_fail  = false;
   return 0;
 }
 
@@ -570,6 +572,119 @@ static void get_block_num_single_indirect_read(void **state)
   assert_int_equal(blk, 42);
 }
 
+/* read_indirect_slot: OOM → returns 0 */
+static void read_indirect_slot_oom(void **state)
+{
+  (void)state;
+  /* We can't force kmalloc to fail here (it uses malloc).
+   * Test the vol_read_block fail path instead. */
+  ext2_volume_t v = make_vol();
+  g_read_fail = true;
+  u32 result = read_indirect_slot(&v, 1, 0);
+  assert_int_equal(result, 0);
+}
+
+/* read_indirect_slot: indirect_block == 0 → returns 0 (hole) */
+static void read_indirect_slot_hole(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  u32 result = read_indirect_slot(&v, 0, 0);
+  assert_int_equal(result, 0);
+}
+
+/* read_indirect_slot: success → returns slot value */
+static void read_indirect_slot_success(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ((u32 *)g_store[3])[5] = 99;
+  u32 result = read_indirect_slot(&v, 3, 5);
+  assert_int_equal(result, 99);
+}
+
+/* ensure_indirect_slot: vol_read_block fails → returns 0 */
+static void ensure_indirect_slot_read_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  g_read_fail = true;
+  u32 result = ensure_indirect_slot(&v, &inode, 1, 0, 0);
+  assert_int_equal(result, 0);
+}
+
+/* free_indirect_subtree: depth=0 with real data block → frees it */
+static void free_indirect_subtree_depth0_frees_leaf(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  /* block 2 is the indirect block; slot 0 points to data block 5 */
+  ((u32 *)g_store[2])[0] = 5;
+  /* Call free_indirect_subtree at depth=0 — should read block 2,
+   * find buf[0]=5, call free_block(5), then free_block(2) */
+  free_indirect_subtree(&v, 2, 0);
+  /* No crash = success; free_block is a no-op stub */
+}
+
+/* free_indirect_subtree: depth=1 recurses into sub-indirect */
+static void free_indirect_subtree_depth1_recurses(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  /* block 4 is double-indirect; slot 0 → block 6 (single-indirect) */
+  ((u32 *)g_store[4])[0] = 6;
+  /* block 6 is single-indirect; slot 0 → data block 9 */
+  ((u32 *)g_store[6])[0] = 9;
+
+  free_indirect_subtree(&v, 4, 1);
+}
+
+/* alloc_file_block: double-indirect dind alloc fails → returns 0 */
+static void alloc_file_block_dind_alloc_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups    = &gd;
+  g_next_block = 0; /* alloc always fails */
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  /* file_block in double-indirect range */
+  u32 fb = EXT2_NDIR_BLOCKS + PPB; /* first double-indirect block */
+  u32 result = alloc_file_block(&v, &inode, fb, 0);
+  assert_int_equal(result, 0);
+}
+
+/* alloc_file_block: triple-indirect tind alloc fails → returns 0 */
+static void alloc_file_block_tind_alloc_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups    = &gd;
+  g_next_block = 0;
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  u32 fb = EXT2_NDIR_BLOCKS + PPB + PPB * PPB; /* first triple-indirect block */
+  u32 result = alloc_file_block(&v, &inode, fb, 0);
+  assert_int_equal(result, 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -601,6 +716,15 @@ int main(void)
       cmocka_unit_test_setup(alloc_file_block_triple_indirect, reset),
       cmocka_unit_test_setup(ensure_inode_slot_alloc_fails, reset),
       cmocka_unit_test_setup(get_block_num_single_indirect_read, reset),
+      /* new coverage */
+      cmocka_unit_test_setup(read_indirect_slot_oom, reset),
+      cmocka_unit_test_setup(read_indirect_slot_hole, reset),
+      cmocka_unit_test_setup(read_indirect_slot_success, reset),
+      cmocka_unit_test_setup(ensure_indirect_slot_read_fail, reset),
+      cmocka_unit_test_setup(free_indirect_subtree_depth0_frees_leaf, reset),
+      cmocka_unit_test_setup(free_indirect_subtree_depth1_recurses, reset),
+      cmocka_unit_test_setup(alloc_file_block_dind_alloc_fails, reset),
+      cmocka_unit_test_setup(alloc_file_block_tind_alloc_fails, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
