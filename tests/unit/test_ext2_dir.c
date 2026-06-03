@@ -676,6 +676,106 @@ static void ext2_unlink_frees_immediately_when_closed(void **state) {
   assert_int_equal(ret, 0);
 }
 
+/* ext2_readdir: null/not-in-use/not-dir guards */
+static void ext2_readdir_null_returns_einval(void **state) {
+  (void)state;
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_readdir(NULL, 0, &entry), -EINVAL);
+}
+
+static void ext2_readdir_not_in_use_returns_einval(void **state) {
+  (void)state;
+  ext2_file_t dir = {.in_use = false, .is_dir = true};
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_readdir(&dir, 0, &entry), -EINVAL);
+}
+
+static void ext2_readdir_not_dir_returns_einval(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  ext2_file_t dir = {.in_use = true, .is_dir = false, .vol = &vol};
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_readdir(&dir, 0, &entry), -EINVAL);
+}
+
+/* ext2_readdir: cache_get_block fails → -ENOMEM */
+static void ext2_readdir_no_cache_returns_enomem(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  ext2_file_t dir = {
+    .in_use = true, .is_dir = true, .vol = &vol,
+  };
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, NULL);
+
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_readdir(&dir, 0, &entry), -ENOMEM);
+}
+
+/* ext2_readdir: block is 0 (sparse) — skip it, return 0 (end of dir) */
+static void ext2_readdir_sparse_block_returns_zero(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  ext2_file_t dir = {
+    .in_use = true, .is_dir = true, .vol = &vol,
+  };
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, block_buf);
+  expect_any(get_block_num, vol);
+  expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0);
+  will_return(get_block_num, 0); /* sparse */
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 0, &entry);
+  assert_int_equal(ret, 0);
+}
+
+/* ext2_readdir: valid entry found at index 0 */
+static void ext2_readdir_returns_first_entry(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  memset(block_buf, 0, sizeof(block_buf));
+
+  /* Populate a minimal dirent at offset 0 */
+  ext2_dirent_t *de = (ext2_dirent_t *)block_buf;
+  de->inode    = 5;
+  de->rec_len  = 16;
+  de->name_len = 3;
+  de->file_type = EXT2_FT_REG_FILE;
+  de->name[0] = 'f'; de->name[1] = 'o'; de->name[2] = 'o';
+
+  ext2_file_t dir = {
+    .in_use = true, .is_dir = true, .vol = &vol,
+  };
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, block_buf);
+  expect_any(get_block_num, vol);
+  expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0);
+  will_return(get_block_num, 7);
+
+  expect_any(vol_read_block, vol);
+  expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf);
+  will_return(vol_read_block, 0);
+
+  /* fill_entry_from_dirent calls read_inode to get file size */
+  expect_any(read_inode, vol);
+  expect_value(read_inode, ino, 5);
+  will_return(read_inode, 0);
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 0, &entry);
+  assert_int_equal(ret, 1);
+  assert_int_equal(entry.inode, 5);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(ext2_mkdir_fails_alloc_block),
@@ -695,6 +795,13 @@ int main(void) {
       cmocka_unit_test(ext2_unlink_defers_free_when_file_open),
       cmocka_unit_test(ext2_unlink_fails_eisdir),
       cmocka_unit_test(ext2_unlink_frees_immediately_when_closed),
+      /* ext2_readdir */
+      cmocka_unit_test(ext2_readdir_null_returns_einval),
+      cmocka_unit_test(ext2_readdir_not_in_use_returns_einval),
+      cmocka_unit_test(ext2_readdir_not_dir_returns_einval),
+      cmocka_unit_test(ext2_readdir_no_cache_returns_enomem),
+      cmocka_unit_test(ext2_readdir_sparse_block_returns_zero),
+      cmocka_unit_test(ext2_readdir_returns_first_entry),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

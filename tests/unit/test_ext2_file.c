@@ -335,6 +335,132 @@ static void test_write_allocates_block(void **state) {
     assert_int_equal(ext2_write(&g_files[0], buf, 5, 0), 5);
 }
 
+/* ext2_read: null/is_dir/not-in-use guards */
+static void test_read_null_file(void **state) {
+    (void)state;
+    char buf[4];
+    assert_int_equal((i64)ext2_read(NULL, buf, 4, 0), -EINVAL);
+}
+
+static void test_read_dir_file(void **state) {
+    (void)state;
+    g_files[0].in_use = true;
+    g_files[0].is_dir = true;
+    char buf[4];
+    assert_int_equal((i64)ext2_read(&g_files[0], buf, 4, 0), -EINVAL);
+}
+
+static void test_read_not_in_use(void **state) {
+    (void)state;
+    g_files[0].in_use = false;
+    char buf[4];
+    assert_int_equal((i64)ext2_read(&g_files[0], buf, 4, 0), -EINVAL);
+}
+
+/* ext2_read: block is present (vol_read_block path) */
+static void test_read_from_block(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .block_size = 1024};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 5;
+
+    will_return(get_block_num, 7); /* block 7 exists */
+    will_return(vol_read_block, 0);
+
+    char buf[5];
+    assert_int_equal(ext2_read(&g_files[0], buf, 5, 0), 5);
+}
+
+/* ext2_write: null/is_dir guards */
+static void test_write_null_file(void **state) {
+    (void)state;
+    assert_int_equal((i64)ext2_write(NULL, "x", 1, 0), -EINVAL);
+}
+
+static void test_write_dir_file(void **state) {
+    (void)state;
+    g_files[0].in_use = true;
+    g_files[0].is_dir = true;
+    assert_int_equal((i64)ext2_write(&g_files[0], "x", 1, 0), -EINVAL);
+}
+
+static void test_write_zero_count(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    assert_int_equal(ext2_write(&g_files[0], "x", 0, 0), 0);
+}
+
+/* ext2_write: overwrite existing block */
+static void test_write_existing_block(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use    = true;
+    g_files[0].is_dir    = false;
+    g_files[0].vol       = &vol;
+    g_files[0].inode_num = 1;
+    g_files[0].inode.i_size = 1024;
+
+    will_return(get_block_num, 5); /* block exists */
+    will_return(vol_read_block, 0);
+    will_return(vol_write_block, 0);
+    /* write_inode not called: dirty stays false for existing block */
+
+    char buf[5] = "hello";
+    assert_int_equal(ext2_write(&g_files[0], buf, 5, 0), 5);
+}
+
+/* ext2_truncate: null guard */
+static void test_truncate_null(void **state) {
+    (void)state;
+    assert_int_equal((i64)ext2_truncate(NULL, 0), -EINVAL);
+}
+
+/* ext2_truncate: is_dir guard */
+static void test_truncate_dir(void **state) {
+    (void)state;
+    g_files[0].in_use = true;
+    g_files[0].is_dir = true;
+    assert_int_equal((i64)ext2_truncate(&g_files[0], 0), -EINVAL);
+}
+
+/* ext2_truncate: non-zero length (currently -ENOSYS in this impl) */
+static void test_truncate_nonzero(void **state) {
+    (void)state;
+    ext2_volume_t vol = {0};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 100;
+
+    will_return(write_inode, 0);
+    will_return(flush_metadata, 0);
+
+    /* truncate to length=50 — skips free_inode_blocks */
+    assert_int_equal(ext2_truncate(&g_files[0], 50), 0);
+    assert_int_equal(g_files[0].inode.i_size, 50);
+}
+
+/* ext2_open: directory inode opens as is_dir=true */
+static void test_open_directory_inode(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true};
+    ext2_inode_t inode = {0};
+    inode.i_mode = EXT2_S_IFDIR | 0755;
+
+    will_return(resolve_path, 0);
+    will_return(resolve_path, 10);
+    will_return(resolve_path, &inode);
+
+    ext2_file_t *f = ext2_open(&vol, "/dir");
+    assert_non_null(f);
+    assert_true(f->is_dir);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup(test_close_dirty, setup_test),
@@ -353,6 +479,18 @@ int main(void) {
         cmocka_unit_test_setup(test_read_sparse, setup_test),
         cmocka_unit_test_setup(test_truncate_shrink, setup_test),
         cmocka_unit_test_setup(test_write_allocates_block, setup_test),
+        cmocka_unit_test_setup(test_read_null_file, setup_test),
+        cmocka_unit_test_setup(test_read_dir_file, setup_test),
+        cmocka_unit_test_setup(test_read_not_in_use, setup_test),
+        cmocka_unit_test_setup(test_read_from_block, setup_test),
+        cmocka_unit_test_setup(test_write_null_file, setup_test),
+        cmocka_unit_test_setup(test_write_dir_file, setup_test),
+        cmocka_unit_test_setup(test_write_zero_count, setup_test),
+        cmocka_unit_test_setup(test_write_existing_block, setup_test),
+        cmocka_unit_test_setup(test_truncate_null, setup_test),
+        cmocka_unit_test_setup(test_truncate_dir, setup_test),
+        cmocka_unit_test_setup(test_truncate_nonzero, setup_test),
+        cmocka_unit_test_setup(test_open_directory_inode, setup_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
