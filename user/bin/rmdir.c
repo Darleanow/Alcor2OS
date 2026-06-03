@@ -55,9 +55,8 @@ static int remove_recursive(const char *path, int verbose, int simulate)
 {
   DIR *dir = opendir(path);
   if(!dir) {
-    (void)fprintf(
-        stderr, "rmdir: cannot open '%s': %s\n", path, strerror(errno)
-    );
+    (void
+    )fprintf(stderr, "rmdir: cannot open '%s': %s\n", path, strerror(errno));
     return -1;
   }
 
@@ -196,35 +195,27 @@ static int remove_with_parents(
  */
 int main(int argc, char *argv[])
 {
-  int parents = 0;
-  int verbose = 0;
-  int dry_run = 0;
-  int content = 0;
+  int    parents = 0;
+  int    verbose = 0;
+  int    dry_run = 0;
+  int    content = 0;
 
   gr_opt opts[] = {
       GR_FLAG(
-          'p',
-          "parents",
-          &parents,
+          'p', "parents", &parents,
           "remove directory and its ancestors (e.g. rmdir -p a/b/c removes "
           "a/b/c, a/b, then a)"
       ),
       GR_FLAG(
-          'v',
-          "verbose",
-          &verbose,
+          'v', "verbose", &verbose,
           "print a diagnostic for each directory processed"
       ),
       GR_FLAG(
-          'n',
-          "dry-run",
-          &dry_run,
+          'n', "dry-run", &dry_run,
           "show what would be removed and ask for confirmation before acting"
       ),
       GR_FLAG(
-          'c',
-          "content",
-          &content,
+          'c', "content", &content,
           "recursively remove directory content before removing the directory "
           "itself"
       ),
@@ -242,9 +233,8 @@ int main(int argc, char *argv[])
 
   if(rest.argc == 0) {
     (void)fprintf(
-        stderr,
-        "rmdir: missing operand\n"
-        "Try 'rmdir --help' for more information.\n"
+        stderr, "rmdir: missing operand\n"
+                "Try 'rmdir --help' for more information.\n"
     );
     return 1;
   }
