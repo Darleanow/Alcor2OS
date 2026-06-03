@@ -708,6 +708,68 @@ static void stat_directory_mode_in_buf(void **state) {
   assert_true((sb.st_mode & 0xF000) == 0040000); /* S_IFDIR */
 }
 
+/* sys_stat: /proc/self/exe returns symlink stat */
+static void stat_proc_self_exe(void **state) {
+  (void)state;
+  strncpy(g_proc.exe_path, "/bin/sh", sizeof(g_proc.exe_path));
+  char path[] = "/proc/self/exe";
+  struct stat_buf sb;
+  assert_int_equal(sys_stat((u64)path, (u64)&sb, 0, 0, 0, 0), 0);
+  assert_true((sb.st_mode & 0xF000) == S_IFLNK);
+}
+
+/* sys_fstat: FIFO type in stat_out */
+static void fstat_pipe_returns_fifo(void **state) {
+  (void)state;
+  g_vfs_stat_out.type = VFS_FIFO;
+  i64 fd = vfs_open("/pipe", O_RDONLY);
+  struct stat_buf sb;
+  assert_int_equal(sys_fstat(fd, (u64)&sb, 0, 0, 0, 0), 0);
+  assert_true((sb.st_mode & 0xF000) == S_IFIFO);
+}
+
+/* sys_readlink: result > bufsiz returns ERANGE */
+static void readlink_erange(void **state) {
+  (void)state;
+  char path[] = "/link";
+  char buf[3]; /* smaller than the 7 bytes readlink returns */
+  g_vfs_readlink_ret = 7;
+  assert_int_equal((i64)sys_readlink((u64)path, (u64)buf, 3, 0, 0, 0), -ERANGE);
+}
+
+/* sys_readlink: proc/self/exe with path too long returns ERANGE */
+static void readlink_proc_exe_erange(void **state) {
+  (void)state;
+  char path[] = "/proc/self/exe";
+  strncpy(g_proc.exe_path, "/a/very/long/path/to/binary", sizeof(g_proc.exe_path));
+  char buf[3]; /* way too small */
+  assert_int_equal((i64)sys_readlink((u64)path, (u64)buf, 3, 0, 0, 0), -ERANGE);
+}
+
+/* sys_pipe: pipe_alloc_obj returns NULL → ENOMEM */
+static void pipe_no_pipe_obj_enomem(void **state) {
+  (void)state;
+  g_pipe_obj = NULL;
+  int fds[2];
+  assert_int_equal((i64)sys_pipe((u64)fds, 0, 0, 0, 0, 0), -ENOMEM);
+}
+
+/* sys_pread64: seek fails → propagated */
+static void pread64_seek_fail(void **state) {
+  (void)state;
+  char buf[8];
+  g_vfs_seek_ret = -EBADF; /* seek fails */
+  assert_int_equal((i64)sys_pread64(3, (u64)buf, 8, 100, 0, 0), -EBADF);
+}
+
+/* sys_pwrite64: seek fails → propagated */
+static void pwrite64_seek_fail(void **state) {
+  (void)state;
+  char buf[8] = "hi";
+  g_vfs_seek_ret = -EBADF;
+  assert_int_equal((i64)sys_pwrite64(3, (u64)buf, 2, 100, 0, 0), -EBADF);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -789,6 +851,19 @@ int main(void)
       cmocka_unit_test_setup(fcntl_dupfd_stdio_returns_fd, setup),
       cmocka_unit_test_setup(fcntl_getfl_stdio_returns_rdwr, setup),
       cmocka_unit_test_setup(fcntl_setfl_stdio_returns_zero, setup),
+      /* sys_stat: proc/self/exe */
+      cmocka_unit_test_setup(stat_proc_self_exe, setup),
+      /* sys_fstat: for pipe fd → FIFO */
+      cmocka_unit_test_setup(fstat_pipe_returns_fifo, setup),
+      /* sys_readlink: ERANGE */
+      cmocka_unit_test_setup(readlink_erange, setup),
+      cmocka_unit_test_setup(readlink_proc_exe_erange, setup),
+      /* sys_pipe: pipe_alloc_obj fails → ENOMEM */
+      cmocka_unit_test_setup(pipe_no_pipe_obj_enomem, setup),
+      /* sys_pread64: seek fails → propagated */
+      cmocka_unit_test_setup(pread64_seek_fail, setup),
+      /* sys_pwrite64: seek fails → propagated */
+      cmocka_unit_test_setup(pwrite64_seek_fail, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
