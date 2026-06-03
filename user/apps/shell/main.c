@@ -96,22 +96,21 @@ int                   main(int argc, char *argv[])
   BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H   \
       BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H BD_H    \
           BD_H BD_H BD_H BD_H BD_H
-  sh_puts(
-      "\n"
-      "  " THEME_ANSI_DIM BD_TL_R BNR_H34 BD_TR_R THEME_ANSI_RESET "\n"
-      "  " THEME_ANSI_DIM BD_V THEME_ANSI_RESET
-      "            " THEME_ANSI_ACCENT_B "ALCOR2  OS" THEME_ANSI_RESET
-      "            " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "\n"
-      "  " THEME_ANSI_DIM BD_LT BNR_H34 BD_RT THEME_ANSI_RESET "\n"
-      "  " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "           " THEME_ANSI_SUBTEXT
-      "vega v" VEGA_VERSION THEME_ANSI_RESET
-      "            " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "\n"
-      "  " THEME_ANSI_DIM BD_BL_R BNR_H34 BD_BR_R THEME_ANSI_RESET "\n"
-      "\n"
-      "  " THEME_ANSI_SUCCESS_B "help" THEME_ANSI_DIM " " BD_ARROW_R
-      " " THEME_ANSI_RESET THEME_ANSI_SUBTEXT
-      "list available commands" THEME_ANSI_RESET "\n\n"
-  );
+  sh_puts("\n"
+          "  " THEME_ANSI_DIM BD_TL_R BNR_H34 BD_TR_R THEME_ANSI_RESET "\n"
+          "  " THEME_ANSI_DIM BD_V THEME_ANSI_RESET
+          "            " THEME_ANSI_ACCENT_B "ALCOR2  OS" THEME_ANSI_RESET
+          "            " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "\n"
+          "  " THEME_ANSI_DIM BD_LT BNR_H34 BD_RT THEME_ANSI_RESET "\n"
+          "  " THEME_ANSI_DIM BD_V THEME_ANSI_RESET
+          "           " THEME_ANSI_SUBTEXT
+          "vega v" VEGA_VERSION THEME_ANSI_RESET
+          "            " THEME_ANSI_DIM BD_V THEME_ANSI_RESET "\n"
+          "  " THEME_ANSI_DIM BD_BL_R BNR_H34 BD_BR_R THEME_ANSI_RESET "\n"
+          "\n"
+          "  " THEME_ANSI_SUCCESS_B "help" THEME_ANSI_DIM " " BD_ARROW_R
+          " " THEME_ANSI_RESET THEME_ANSI_SUBTEXT
+          "list available commands" THEME_ANSI_RESET "\n\n");
 #undef BNR_H34
 
   /* Source /home/.vconf if it exists — equivalent of .bashrc. Runs as a vega

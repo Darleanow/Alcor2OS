@@ -27,15 +27,15 @@
  */
 typedef struct
 {
-  uint64_t pixels_user;   /**< Userspace VA of the glyph atlas pixel data. */
-  uint32_t pixels_size;   /**< Total atlas bytes. */
-  uint32_t cell_w;        /**< Glyph cell width in pixels. */
-  uint32_t cell_h;        /**< Glyph cell height in pixels. */
-  uint32_t stride_bytes;  /**< Bytes per row of a single cell. */
-  uint32_t bpp;           /**< Atlas bpp — must match framebuffer. */
-  uint32_t n_glyphs;      /**< Total glyph slots in the atlas. */
-  uint64_t cp_map_user;   /**< Userspace VA of u32[n_cp] codepoint→glyph_idx. */
-  uint32_t n_cp;          /**< Size of cp_map (covers codepoints 0..n_cp-1). */
+  uint64_t pixels_user;  /**< Userspace VA of the glyph atlas pixel data. */
+  uint32_t pixels_size;  /**< Total atlas bytes. */
+  uint32_t cell_w;       /**< Glyph cell width in pixels. */
+  uint32_t cell_h;       /**< Glyph cell height in pixels. */
+  uint32_t stride_bytes; /**< Bytes per row of a single cell. */
+  uint32_t bpp;          /**< Atlas bpp — must match framebuffer. */
+  uint32_t n_glyphs;     /**< Total glyph slots in the atlas. */
+  uint64_t cp_map_user; /**< Userspace VA of u32[n_cp] codepoint→glyph_idx. */
+  uint32_t n_cp;        /**< Size of cp_map (covers codepoints 0..n_cp-1). */
   uint32_t fallback_idx;  /**< Glyph for unmapped codepoints. */
   uint32_t bold_offset;   /**< First bold glyph slot; 0 = no bold atlas. */
   uint32_t italic_offset; /**< First italic glyph slot; 0 = no italic atlas. */

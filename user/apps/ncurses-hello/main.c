@@ -206,9 +206,8 @@ static void screen_input(spz_panel_t *p)
     char line[64];
     if(ch >= 0x100) {
       const char *name = keyname(ch);
-      (void)snprintf(
-          line, sizeof line, "%-12s  code %d", name ? name : "?", ch
-      );
+      (void
+      )snprintf(line, sizeof line, "%-12s  code %d", name ? name : "?", ch);
     } else if(ch < 0x80) {
       const char *name = keyname(ch);
       (void)snprintf(line, sizeof line, "%-12s  0x%02x", name ? name : "?", ch);
