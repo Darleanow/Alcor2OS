@@ -357,7 +357,7 @@ static void test_vmm_map_range_already_present_skip(void **state)
   /* Map a page, then map_range over the same address — it should skip (line 175) */
   void *phys = pmm_alloc();
   vmm_map(0xD000, (u64)phys, VMM_PRESENT);
-  bool ok = vmm_map_range(0xD000, 1, VMM_PRESENT | VMM_WRITE);
+  bool ok = vmm_map_range_alloc(0xD000, 1, VMM_PRESENT | VMM_WRITE);
   assert_true(ok);
 }
 

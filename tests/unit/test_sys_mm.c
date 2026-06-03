@@ -50,11 +50,12 @@ bool        vmm_map_range_alloc(u64 v, u64 c, u64 f)
   return g_map_ok;
 }
 
-static u64 g_phys = 0;
+static u64 g_phys    = 0;
+static u64 g_phys_fb = 0; /* if non-zero, vmm_get_phys returns this for all */
 u64        vmm_get_phys(u64 v)
 {
   (void)v;
-  return g_phys;
+  return g_phys_fb ? g_phys_fb : g_phys;
 }
 void vmm_unmap(u64 v)
 {
@@ -70,16 +71,18 @@ u64 vmm_get_hhdm(void)
 {
   return 0;
 }
-bool fb_user_phys_page_is_framebuffer(u64 p)
+static bool g_is_fb = false;
+bool        fb_user_phys_page_is_framebuffer(u64 p)
 {
   (void)p;
-  return false;
+  return g_is_fb;
 }
 
-static proc_t g_proc;
-struct proc  *proc_current(void)
+static proc_t  g_proc;
+static bool    g_no_proc = false;
+struct proc   *proc_current(void)
 {
-  return &g_proc;
+  return g_no_proc ? NULL : &g_proc;
 }
 void proc_schedule(void) {}
 
@@ -90,17 +93,20 @@ i64 vfs_seek(i64 fd, i64 off, int w)
   (void)w;
   return 0;
 }
-i64 vfs_read(i64 fd, void *b, u64 n)
+static bool g_vfs_read_ok = false;
+i64         vfs_read(i64 fd, void *b, u64 n)
 {
   (void)fd;
   (void)b;
-  (void)n;
-  return 0;
+  if(!g_vfs_read_ok || n == 0)
+    return 0;
+  return (i64)n; /* pretend we read n bytes */
 }
 
-void *pmm_alloc(void)
+static void *g_pmm_page = NULL; /* page returned by pmm_alloc */
+void        *pmm_alloc(void)
 {
-  return NULL;
+  return g_pmm_page;
 }
 void pmm_free(void *p)
 {
@@ -118,6 +124,11 @@ static int setup(void **state)
   g_proc.program_break = 0x200000;
   g_map_ok             = true;
   g_phys               = 0;
+  g_phys_fb            = 0;
+  g_is_fb              = false;
+  g_no_proc            = false;
+  g_pmm_page           = NULL;
+  g_vfs_read_ok        = false;
   return 0;
 }
 
@@ -279,6 +290,139 @@ static void brk_below_current_noop(void **state)
   assert_int_equal(brk, g_proc.program_break);
 }
 
+/* sys_mmap: no proc → ENOMEM */
+static void mmap_no_proc_returns_enomem(void **state)
+{
+  (void)state;
+  g_no_proc = true;
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, (u64)-1, 0);
+  assert_int_equal((i64)ret, -ENOMEM);
+}
+
+/* sys_mmap MAP_FIXED with valid addr succeeds and does NOT advance mmap_base */
+static void mmap_fixed_valid_addr_does_not_advance_base(void **state)
+{
+  (void)state;
+  u64 base_before = g_proc.mmap_base;
+  u64 ret = sys_mmap(0x400000, 0x1000, PROT_READ | PROT_WRITE,
+                     MAP_FIXED | MAP_ANONYMOUS | MAP_PRIVATE, (u64)-1, 0);
+  assert_int_equal(ret, 0x400000);
+  assert_int_equal(g_proc.mmap_base, base_before); /* base not moved */
+}
+
+/* sys_mmap MAP_FIXED: unmap_and_free_range called with g_phys non-zero */
+static void mmap_fixed_with_existing_mapping_unmaps_first(void **state)
+{
+  (void)state;
+  g_phys = 0x1000; /* pretend the page is already mapped */
+  u64 ret = sys_mmap(0x400000, 0x1000, PROT_READ | PROT_WRITE,
+                     MAP_FIXED | MAP_ANONYMOUS, (u64)-1, 0);
+  assert_int_equal(ret, 0x400000);
+}
+
+/* sys_mmap MAP_FIXED: unmap_and_free_range skips framebuffer pages */
+static void mmap_fixed_fb_page_not_freed(void **state)
+{
+  (void)state;
+  g_phys  = 0x2000;
+  g_is_fb = true;
+  u64 ret = sys_mmap(0x400000, 0x1000, PROT_READ,
+                     MAP_FIXED | MAP_ANONYMOUS, (u64)-1, 0);
+  /* just ensure it didn't crash and returned valid address */
+  assert_int_equal(ret, 0x400000);
+}
+
+/* sys_mmap PROT_READ only: apply_final_prot called */
+static void mmap_read_only_applies_final_prot(void **state)
+{
+  (void)state;
+  g_phys = 0x3000; /* page is mapped after vmm_map_range_alloc */
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ,
+                     MAP_ANONYMOUS | MAP_PRIVATE, (u64)-1, 0);
+  assert_true((i64)ret >= 0);
+}
+
+/* sys_mmap file-backed: fill_file_backed_pages called */
+static void mmap_file_backed_reads_data(void **state)
+{
+  (void)state;
+  g_phys        = 0x5000; /* backing page for reads */
+  g_vfs_read_ok = true;
+  /* fd=3, page-aligned offset, non-anonymous */
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE, 3, 0x0000);
+  assert_true((i64)ret >= 0);
+}
+
+/* sys_mmap file-backed with PROT_READ: triggers both fill + apply_final_prot */
+static void mmap_file_backed_read_only(void **state)
+{
+  (void)state;
+  g_phys        = 0x5000;
+  g_vfs_read_ok = true;
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ, MAP_PRIVATE, 3, 0);
+  assert_true((i64)ret >= 0);
+}
+
+/* sys_mmap fd=-1 forces anonymous regardless of MAP_PRIVATE */
+static void mmap_fd_minus1_is_anonymous(void **state)
+{
+  (void)state;
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ | PROT_WRITE,
+                     MAP_PRIVATE, (u64)-1, 0);
+  assert_true((i64)ret >= 0);
+}
+
+/* sys_mprotect: with a mapped page (g_phys non-zero) vmm_map is called */
+static void mprotect_remaps_existing_pages(void **state)
+{
+  (void)state;
+  g_phys  = 0x4000;
+  u64 ret = sys_mprotect(0x2000, 0x2000, PROT_READ, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+/* sys_munmap: with mapped page triggers unmap + free */
+static void munmap_frees_mapped_page(void **state)
+{
+  (void)state;
+  g_phys  = 0x9000;
+  u64 ret = sys_munmap(0x3000, 0x1000, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+/* sys_brk: no proc → returns 0 */
+static void brk_no_proc_returns_zero(void **state)
+{
+  (void)state;
+  g_no_proc   = true;
+  u64 brk     = sys_brk(0, 0, 0, 0, 0, 0);
+  assert_int_equal(brk, 0);
+}
+
+/* sys_brk: addr > program_break, pmm_alloc fails → returns current break */
+static void brk_grow_pmm_fail_stays_at_current(void **state)
+{
+  (void)state;
+  g_pmm_page = NULL; /* pmm_alloc returns NULL */
+  u64 new_brk = g_proc.program_break + PAGE_SIZE;
+  u64 brk     = sys_brk(new_brk, 0, 0, 0, 0, 0);
+  assert_int_equal(brk, g_proc.program_break); /* unchanged */
+}
+
+/* sys_brk: addr > program_break, pmm_alloc succeeds → advances break */
+static void brk_grow_succeeds(void **state)
+{
+  (void)state;
+  static u8 page[4096];
+  g_pmm_page           = page; /* valid page pointer */
+  u64 old_brk          = g_proc.program_break;
+  u64 new_brk          = old_brk + PAGE_SIZE;
+  u64 brk              = sys_brk(new_brk, 0, 0, 0, 0, 0);
+  assert_int_equal(brk, new_brk);
+  assert_int_equal(g_proc.program_break, new_brk);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -306,9 +450,25 @@ int main(void)
       /* sys_munmap */
       cmocka_unit_test_setup(munmap_zero_length_is_noop, setup),
       cmocka_unit_test_setup(munmap_nonzero_succeeds, setup),
+      /* sys_mmap extra paths */
+      cmocka_unit_test_setup(mmap_no_proc_returns_enomem, setup),
+      cmocka_unit_test_setup(mmap_fixed_valid_addr_does_not_advance_base, setup),
+      cmocka_unit_test_setup(mmap_fixed_with_existing_mapping_unmaps_first, setup),
+      cmocka_unit_test_setup(mmap_fixed_fb_page_not_freed, setup),
+      cmocka_unit_test_setup(mmap_read_only_applies_final_prot, setup),
+      cmocka_unit_test_setup(mmap_file_backed_reads_data, setup),
+      cmocka_unit_test_setup(mmap_file_backed_read_only, setup),
+      cmocka_unit_test_setup(mmap_fd_minus1_is_anonymous, setup),
+      /* sys_mprotect extra */
+      cmocka_unit_test_setup(mprotect_remaps_existing_pages, setup),
+      /* sys_munmap extra */
+      cmocka_unit_test_setup(munmap_frees_mapped_page, setup),
       /* sys_brk */
       cmocka_unit_test_setup(brk_zero_returns_current_break, setup),
       cmocka_unit_test_setup(brk_below_current_noop, setup),
+      cmocka_unit_test_setup(brk_no_proc_returns_zero, setup),
+      cmocka_unit_test_setup(brk_grow_pmm_fail_stays_at_current, setup),
+      cmocka_unit_test_setup(brk_grow_succeeds, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

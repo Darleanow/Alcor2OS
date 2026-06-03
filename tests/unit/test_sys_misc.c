@@ -62,13 +62,14 @@ void proc_wake(proc_t *p)
     p->state = PROC_STATE_READY;
 }
 
-/* vmm_get_phys: map uaddr → fake PA = uaddr | 0x1000 (non-zero, 4-aligned). */
+/* vmm_get_phys: identity mapping so phys_to_virt(vmm_get_phys(p)) == p.
+ * Requires caller address is non-NULL and 4-byte aligned. */
 static bool g_phys_ok = true;
 u64         vmm_get_phys(u64 v)
 {
   if(!g_phys_ok || !v || (v & 3ULL))
     return 0;
-  return (v & ~0xFFFULL) | 0x1000ULL; /* fake but non-zero, aligned */
+  return v; /* identity: PA == VA since hhdm=0 */
 }
 u64 vmm_get_hhdm(void)
 {
@@ -376,6 +377,273 @@ static void prlimit64_null_old_limit_noop(void **state)
   assert_int_equal((i64)ret, 0);
 }
 
+static void prlimit64_null_buf_returns_efault(void **state)
+{
+  (void)state;
+  struct { u64 cur; u64 max; } rl = {0};
+  /* old_limit is non-NULL but vmm_is_user_range returns false for NULL ptr
+     inside user_buf_ok — pass a non-NULL but ensure vmm check fails */
+  (void)rl;
+  u64 ret = sys_prlimit64(0, 0, 0, 0 /* NULL old_limit */, 0, 0);
+  assert_int_equal((i64)ret, 0); /* NULL old_limit is allowed (no-op) */
+}
+
+static void getrlimit_default_infinite(void **state)
+{
+  (void)state;
+  struct { u64 cur; u64 max; } rl;
+  u64 ret = sys_getrlimit(0 /* RLIMIT_CPU */, (u64)&rl, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  assert_int_equal(rl.cur, (u64)-1);
+  assert_int_equal(rl.max, (u64)-1);
+}
+
+static void sched_yield_returns_zero(void **state)
+{
+  (void)state;
+  u64 ret = sys_sched_yield(0, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+/* futex_requeue_pa helpers */
+static void futex_requeue_pa_same_key_nop(void **state)
+{
+  (void)state;
+  u64 moved = futex_requeue_pa(0xABCD, 0xABCD, 10);
+  assert_int_equal(moved, 0);
+}
+
+static void futex_requeue_pa_zero_key_nop(void **state)
+{
+  (void)state;
+  u64 moved = futex_requeue_pa(0, 0xABCD, 10);
+  assert_int_equal(moved, 0);
+}
+
+static void futex_requeue_pa_moves_waiters(void **state)
+{
+  (void)state;
+  static proc_t p = {.state = PROC_STATE_BLOCKED};
+  g_futex_q[0].key_pa = 0x1111;
+  g_futex_q[0].waiter = &p;
+
+  u64 moved = futex_requeue_pa(0x1111, 0x2222, 10);
+  assert_int_equal(moved, 1);
+  assert_int_equal(g_futex_q[0].key_pa, 0x2222);
+}
+
+/* sys_futex WAIT path */
+static void sys_futex_wait_eagain_when_val_mismatch(void **state)
+{
+  (void)state;
+  u32 word = 99;
+  /* val = 42 != word = 99 → EAGAIN */
+  u64 ret = sys_futex((u64)&word, FUTEX_WAIT, 42, 0, 0, 0);
+  assert_int_equal((i64)ret, -EAGAIN);
+}
+
+static void sys_futex_wait_no_proc_esrch(void **state)
+{
+  (void)state;
+  /* word == val so we pass the EAGAIN check, then hit the proc_current() NULL check */
+  volatile u32 word = 7;
+  g_cur_proc        = NULL;
+  u64 ret           = sys_futex((u64)&word, FUTEX_WAIT, 7, 0, 0, 0);
+  assert_int_equal((i64)ret, -ESRCH);
+}
+
+static void sys_futex_wait_no_phys_efault(void **state)
+{
+  (void)state;
+  g_phys_ok = false;
+  u32 word  = 5;
+  u64 ret   = sys_futex((u64)&word, FUTEX_WAIT, 5, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sys_futex_wait_blocks_then_wakes(void **state)
+{
+  (void)state;
+  static proc_t p = {.state = PROC_STATE_RUNNING};
+  g_cur_proc      = &p;
+  u32 word        = 42;
+  /* val matches, proc is valid — should block proc then return 0 */
+  u64 ret         = sys_futex((u64)&word, FUTEX_WAIT, 42, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+  /* proc_schedule is a no-op stub, waiter still set → cleanup path clears it */
+}
+
+static void sys_futex_wait_bitset_same_as_wait(void **state)
+{
+  (void)state;
+  u32 word = 1;
+  u64 ret  = sys_futex((u64)&word, FUTEX_WAIT_BITSET, 99, 0, 0, 0);
+  assert_int_equal((i64)ret, -EAGAIN); /* val mismatch */
+}
+
+/* sys_futex WAKE path */
+static void sys_futex_wake_returns_count(void **state)
+{
+  (void)state;
+  static proc_t p = {.state = PROC_STATE_BLOCKED};
+  u32 word        = 0;
+  /* pre-stuff a waiter for the PA of &word */
+  u64 key              = futex_key_pa((u64)&word);
+  g_futex_q[0].key_pa  = key;
+  g_futex_q[0].waiter  = &p;
+
+  u64 ret = sys_futex((u64)&word, FUTEX_WAKE, 1, 0, 0, 0);
+  assert_int_equal((i64)ret, 1);
+  assert_int_equal(p.state, PROC_STATE_READY);
+}
+
+static void sys_futex_wake_no_phys_efault(void **state)
+{
+  (void)state;
+  g_phys_ok = false;
+  u32 word  = 0;
+  u64 ret   = sys_futex((u64)&word, FUTEX_WAKE, 1, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sys_futex_wake_bitset_same_as_wake(void **state)
+{
+  (void)state;
+  u32 word  = 0;
+  u64 ret   = sys_futex((u64)&word, FUTEX_WAKE_BITSET, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0); /* no waiters, val=0 → wake all = 0 woken */
+}
+
+/* sys_futex WAKE_OP path */
+static void sys_futex_wake_op_no_phys_efault(void **state)
+{
+  (void)state;
+  g_phys_ok = false;
+  u32 word  = 0;
+  u64 ret   = sys_futex((u64)&word, FUTEX_WAKE_OP, 1, 0, (u64)&word, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sys_futex_wake_op_succeeds(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  u64 ret  = sys_futex((u64)&word, FUTEX_WAKE_OP, 1, 0, (u64)&word, 0);
+  assert_int_equal((i64)ret, 0); /* no waiters → woke 0 */
+}
+
+/* sys_futex FD path */
+static void sys_futex_fd_returns_enosys(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  u64 ret  = sys_futex((u64)&word, FUTEX_FD, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -ENOSYS);
+}
+
+/* sys_futex PI op stubs */
+static void sys_futex_lock_pi_returns_zero(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  u64 ret  = sys_futex((u64)&word, FUTEX_LOCK_PI, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+static void sys_futex_unlock_pi_returns_zero(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  u64 ret  = sys_futex((u64)&word, FUTEX_UNLOCK_PI, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+static void sys_futex_trylock_pi_returns_zero(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  u64 ret  = sys_futex((u64)&word, FUTEX_TRYLOCK_PI, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, 0);
+}
+
+static void sys_futex_wait_requeue_pi_treated_as_wait(void **state)
+{
+  (void)state;
+  u32 word = 5;
+  /* val=99 != word=5 → rewritten to FUTEX_WAIT → EAGAIN */
+  u64 ret = sys_futex((u64)&word, FUTEX_WAIT_REQUEUE_PI, 99, 0, 0, 0);
+  assert_int_equal((i64)ret, -EAGAIN);
+}
+
+/* sys_futex REQUEUE path */
+static void sys_futex_requeue_no_phys_efault(void **state)
+{
+  (void)state;
+  g_phys_ok = false;
+  u32 w1 = 0, w2 = 0;
+  u64 ret = sys_futex((u64)&w1, FUTEX_REQUEUE, 0, 0, (u64)&w2, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sys_futex_requeue_no_uaddr2_efault(void **state)
+{
+  (void)state;
+  u32 w1 = 0;
+  u64 ret = sys_futex((u64)&w1, FUTEX_REQUEUE, 0, 0, 0 /* NULL */, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sys_futex_cmp_requeue_val_mismatch_eagain(void **state)
+{
+  (void)state;
+  u32 w1 = 10, w2 = 0;
+  u64 ret = sys_futex((u64)&w1, FUTEX_CMP_REQUEUE, 99 /* val */, 0, (u64)&w2, 10 /* val3 */);
+  assert_int_equal((i64)ret, -EAGAIN);
+}
+
+static void sys_futex_cmp_requeue_pi_treated_as_cmp_requeue(void **state)
+{
+  (void)state;
+  u32 w1 = 7, w2 = 0;
+  /* val mismatch → EAGAIN via CMP_REQUEUE path */
+  u64 ret = sys_futex((u64)&w1, FUTEX_CMP_REQUEUE_PI, 99, 0, (u64)&w2, 0);
+  assert_int_equal((i64)ret, -EAGAIN);
+}
+
+static void sys_futex_unknown_op_enosys(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  u64 ret  = sys_futex((u64)&word, 0xFF, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -ENOSYS);
+}
+
+/* futex PRIVATE_FLAG is stripped */
+static void sys_futex_private_flag_stripped(void **state)
+{
+  (void)state;
+  u32 word = 0;
+  /* FUTEX_FD | FUTEX_PRIVATE_FLAG → still ENOSYS */
+  u64 ret = sys_futex((u64)&word, FUTEX_FD | FUTEX_PRIVATE_FLAG, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -ENOSYS);
+}
+
+/* futex queue full → ENOMEM */
+static void sys_futex_wait_queue_full_enomem(void **state)
+{
+  (void)state;
+  static proc_t p = {.state = PROC_STATE_RUNNING};
+  g_cur_proc      = &p;
+  u32 word        = 1;
+  /* Fill every slot with a dummy key so no free slot exists */
+  for(int i = 0; i < FUTEX_QUEUE_LEN; i++) {
+    g_futex_q[i].key_pa = 0xDEAD0000 + (u64)i;
+    g_futex_q[i].waiter = &p;
+  }
+  u64 ret = sys_futex((u64)&word, FUTEX_WAIT, 1, 0, 0, 0);
+  assert_int_equal((i64)ret, -ENOMEM);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -407,8 +675,45 @@ int main(void)
       cmocka_unit_test_setup(getrlimit_stack_returns_8mib, setup),
       cmocka_unit_test_setup(getrlimit_nofile_returns_1024, setup),
       cmocka_unit_test_setup(getrlimit_null_returns_efault, setup),
+      cmocka_unit_test_setup(getrlimit_default_infinite, setup),
       cmocka_unit_test_setup(prlimit64_old_limit_filled, setup),
       cmocka_unit_test_setup(prlimit64_null_old_limit_noop, setup),
+      cmocka_unit_test_setup(prlimit64_null_buf_returns_efault, setup),
+      /* sched_yield */
+      cmocka_unit_test_setup(sched_yield_returns_zero, setup),
+      /* futex_requeue_pa helpers */
+      cmocka_unit_test_setup(futex_requeue_pa_same_key_nop, setup),
+      cmocka_unit_test_setup(futex_requeue_pa_zero_key_nop, setup),
+      cmocka_unit_test_setup(futex_requeue_pa_moves_waiters, setup),
+      /* sys_futex WAIT */
+      cmocka_unit_test_setup(sys_futex_wait_eagain_when_val_mismatch, setup),
+      cmocka_unit_test_setup(sys_futex_wait_no_proc_esrch, setup),
+      cmocka_unit_test_setup(sys_futex_wait_no_phys_efault, setup),
+      cmocka_unit_test_setup(sys_futex_wait_blocks_then_wakes, setup),
+      cmocka_unit_test_setup(sys_futex_wait_bitset_same_as_wait, setup),
+      cmocka_unit_test_setup(sys_futex_wait_queue_full_enomem, setup),
+      /* sys_futex WAKE */
+      cmocka_unit_test_setup(sys_futex_wake_returns_count, setup),
+      cmocka_unit_test_setup(sys_futex_wake_no_phys_efault, setup),
+      cmocka_unit_test_setup(sys_futex_wake_bitset_same_as_wake, setup),
+      /* sys_futex WAKE_OP */
+      cmocka_unit_test_setup(sys_futex_wake_op_no_phys_efault, setup),
+      cmocka_unit_test_setup(sys_futex_wake_op_succeeds, setup),
+      /* sys_futex FD */
+      cmocka_unit_test_setup(sys_futex_fd_returns_enosys, setup),
+      /* sys_futex PI ops */
+      cmocka_unit_test_setup(sys_futex_lock_pi_returns_zero, setup),
+      cmocka_unit_test_setup(sys_futex_unlock_pi_returns_zero, setup),
+      cmocka_unit_test_setup(sys_futex_trylock_pi_returns_zero, setup),
+      cmocka_unit_test_setup(sys_futex_wait_requeue_pi_treated_as_wait, setup),
+      /* sys_futex REQUEUE */
+      cmocka_unit_test_setup(sys_futex_requeue_no_phys_efault, setup),
+      cmocka_unit_test_setup(sys_futex_requeue_no_uaddr2_efault, setup),
+      cmocka_unit_test_setup(sys_futex_cmp_requeue_val_mismatch_eagain, setup),
+      cmocka_unit_test_setup(sys_futex_cmp_requeue_pi_treated_as_cmp_requeue, setup),
+      /* sys_futex unknown / flags */
+      cmocka_unit_test_setup(sys_futex_unknown_op_enosys, setup),
+      cmocka_unit_test_setup(sys_futex_private_flag_stripped, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

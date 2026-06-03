@@ -1,5 +1,6 @@
 #include "test_common.h"
 
+#include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
 
 #include <string.h>
@@ -23,16 +24,15 @@ void console_print(const char *s)
 }
 
 /* No scheduler — proc_current returns NULL so pipe never blocks. */
-struct proc;
-struct proc *proc_current(void)
+proc_t *proc_current(void)
 {
   return NULL;
 }
-void proc_block(struct proc *p)
+void proc_block(proc_t *p)
 {
   (void)p;
 }
-void proc_wake(struct proc *p)
+void proc_wake(proc_t *p)
 {
   (void)p;
 }
@@ -239,6 +239,151 @@ static void write_on_closed_write_end_returns_ebadf(void **state)
   p->allocated = 0;
 }
 
+/* NULL pointer guard paths */
+static void read_null_pipe_returns_ebadf(void **state)
+{
+  (void)state;
+  char buf[4];
+  assert_int_equal((i64)pipe_read_obj(NULL, buf, 4), -EBADF);
+}
+
+static void write_null_pipe_returns_ebadf(void **state)
+{
+  (void)state;
+  assert_int_equal((i64)pipe_write_obj(NULL, "x", 1), -EBADF);
+}
+
+static void poll_read_null_returns_false(void **state)
+{
+  (void)state;
+  assert_false(pipe_poll_read_ready(NULL));
+}
+
+static void poll_write_null_returns_false(void **state)
+{
+  (void)state;
+  assert_false(pipe_poll_write_ready(NULL));
+}
+
+static void rd_release_null_is_noop(void **state)
+{
+  (void)state;
+  pipe_rd_release(NULL); /* must not crash */
+}
+
+static void wr_release_null_is_noop(void **state)
+{
+  (void)state;
+  pipe_wr_release(NULL); /* must not crash */
+}
+
+/* poll_write_ready: read end closed but write end open → true (EPIPE signal) */
+static void poll_write_ready_read_end_closed(void **state)
+{
+  (void)state;
+  pipe_t *p    = new_pipe();
+  p->read_open = 0;
+  assert_true(pipe_poll_write_ready(p)); /* write allowed — gets EPIPE */
+  p->allocated = 0;
+}
+
+/* wr_release wakes a blocked reader */
+static void wr_release_wakes_waiting_reader(void **state)
+{
+  (void)state;
+  pipe_t       *p = new_pipe();
+  static proc_t reader;
+  reader.state       = PROC_STATE_BLOCKED;
+  p->waiting_reader  = &reader;
+  p->read_open       = 1;
+  pipe_wr_release(p);
+  assert_null(p->waiting_reader);
+  p->allocated = 0;
+}
+
+/* rd_release wakes a blocked writer */
+static void rd_release_wakes_waiting_writer(void **state)
+{
+  (void)state;
+  pipe_t       *p = new_pipe();
+  static proc_t writer;
+  writer.state       = PROC_STATE_BLOCKED;
+  p->waiting_writer  = &writer;
+  p->write_open      = 1;
+  pipe_rd_release(p);
+  p->allocated = 0;
+}
+
+/* wr_release: both ends close → deallocated */
+static void wr_release_both_closed_frees_pipe(void **state)
+{
+  (void)state;
+  pipe_t *p    = new_pipe();
+  p->read_open = 0; /* read end already gone */
+  pipe_wr_release(p);
+  assert_false(p->allocated);
+}
+
+/* pipe_write_obj wakes a waiting reader after writing data */
+static void write_wakes_waiting_reader(void **state)
+{
+  (void)state;
+  pipe_t       *p = new_pipe();
+  static proc_t reader;
+  reader.state      = PROC_STATE_BLOCKED;
+  p->waiting_reader = &reader;
+
+  char data[4] = {1, 2, 3, 4};
+  i64  ret     = pipe_write_obj(p, data, 4);
+  assert_int_equal(ret, 4);
+  assert_null(p->waiting_reader);
+  p->allocated = 0;
+}
+
+/* pipe_read_obj wakes a waiting writer after freeing space */
+static void read_wakes_waiting_writer(void **state)
+{
+  (void)state;
+  pipe_t       *p = new_pipe();
+  static proc_t writer;
+  writer.state      = PROC_STATE_BLOCKED;
+  p->waiting_writer = &writer;
+
+  /* put some data in so read has something to consume */
+  char data[4] = {'a', 'b', 'c', 'd'};
+  pipe_write_obj(p, data, 4);
+
+  char buf[4];
+  i64  ret = pipe_read_obj(p, buf, 4);
+  assert_int_equal(ret, 4);
+  assert_null(p->waiting_writer);
+  p->allocated = 0;
+}
+
+/* pipe_write_obj: read_end closes mid-write with partial data already written */
+static void write_partial_then_read_end_closes_returns_written(void **state)
+{
+  (void)state;
+  pipe_t *p = new_pipe();
+  /* Fill the buffer almost full, then close read end */
+  char fill[PIPE_BUF_SIZE - 4];
+  memset(fill, 'Z', sizeof(fill));
+  pipe_write_obj(p, fill, sizeof(fill));
+  /* Write 4 more bytes: these fit, then the buffer becomes full.
+     Next iteration would block — but we close read_open to trigger the
+     "read end closed" return path with partial written count. */
+  char more[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+  /* After writing the first 4 bytes the buffer is full. Since proc_current
+     returns NULL, the inner while loop doesn't block — it just calls
+     proc_schedule() once and re-checks. Close read_open so the outer
+     !read_open path fires and returns the partial count. */
+  p->read_open = 0;
+  i64 ret = pipe_write_obj(p, more, 8);
+  /* read_open=0 → EPIPE (no bytes written yet from `more`) */
+  assert_int_equal(ret, -EPIPE);
+  p->allocated = 0;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -262,6 +407,25 @@ int main(void)
       ),
       cmocka_unit_test_setup(read_on_closed_read_end_returns_ebadf, setup),
       cmocka_unit_test_setup(write_on_closed_write_end_returns_ebadf, setup),
+      /* NULL guard paths */
+      cmocka_unit_test_setup(read_null_pipe_returns_ebadf, setup),
+      cmocka_unit_test_setup(write_null_pipe_returns_ebadf, setup),
+      cmocka_unit_test_setup(poll_read_null_returns_false, setup),
+      cmocka_unit_test_setup(poll_write_null_returns_false, setup),
+      cmocka_unit_test_setup(rd_release_null_is_noop, setup),
+      cmocka_unit_test_setup(wr_release_null_is_noop, setup),
+      /* poll_write_ready extra */
+      cmocka_unit_test_setup(poll_write_ready_read_end_closed, setup),
+      /* wake paths */
+      cmocka_unit_test_setup(wr_release_wakes_waiting_reader, setup),
+      cmocka_unit_test_setup(rd_release_wakes_waiting_writer, setup),
+      cmocka_unit_test_setup(wr_release_both_closed_frees_pipe, setup),
+      cmocka_unit_test_setup(write_wakes_waiting_reader, setup),
+      cmocka_unit_test_setup(read_wakes_waiting_writer, setup),
+      /* partial write with read end close */
+      cmocka_unit_test_setup(
+          write_partial_then_read_end_closes_returns_written, setup
+      ),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

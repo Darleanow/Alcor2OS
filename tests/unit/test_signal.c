@@ -23,21 +23,26 @@ void kzero(void *d, u64 n)
 {
   memset(d, 0, n);
 }
+static bool g_vmm_user_range_fail = false;
 bool vmm_is_user_range(const void *p, u64 n)
 {
   (void)p;
   (void)n;
-  return true;
-}
-syscall_frame_t *syscall_get_current_frame(void)
-{
-  return NULL;
+  return !g_vmm_user_range_fail;
 }
 
-static proc_t g_proc;
+static syscall_frame_t g_frame;
+static bool g_return_frame = false;
+syscall_frame_t *syscall_get_current_frame(void)
+{
+  return g_return_frame ? &g_frame : NULL;
+}
+
+static proc_t  g_proc;
+static bool    g_no_proc = false;
 proc_t       *proc_current(void)
 {
-  return &g_proc;
+  return g_no_proc ? NULL : &g_proc;
 }
 proc_t *proc_get(u64 pid)
 {
@@ -67,9 +72,12 @@ static int setup(void **state)
 {
   (void)state;
   memset(&g_proc, 0, sizeof(g_proc));
-  g_proc.pid      = 1;
-  g_proc.state    = PROC_STATE_RUNNING;
-  g_proc.sig_mask = 0;
+  g_proc.pid             = 1;
+  g_proc.state           = PROC_STATE_RUNNING;
+  g_proc.sig_mask        = 0;
+  g_no_proc              = false;
+  g_vmm_user_range_fail  = false;
+  g_return_frame         = false;
   return 0;
 }
 
@@ -411,6 +419,71 @@ static void proc_check_signals_masked_not_delivered(void **state)
   assert_int_equal(frame.rip, old_rip);
 }
 
+static void sigaction_no_proc_returns_esrch(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  g_no_proc = true;
+  u64 ret = sys_rt_sigaction(SIGUSR1, (u64)&act, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -ESRCH);
+}
+
+static void sigaction_bad_oldact_ptr_returns_efault(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  g_vmm_user_range_fail = true;
+  /* oldact pointer fails user-range check */
+  u64 ret = sys_rt_sigaction(SIGUSR1, 0, (u64)&act, 8, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sigaction_bad_act_ptr_returns_efault(void **state)
+{
+  (void)state;
+  k_sigaction_t act = {0};
+  g_vmm_user_range_fail = true;
+  /* act pointer fails user-range check */
+  u64 ret = sys_rt_sigaction(SIGUSR1, (u64)&act, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sigprocmask_no_proc_returns_esrch(void **state)
+{
+  (void)state;
+  u64 set = 0;
+  g_no_proc = true;
+  u64 ret = sys_rt_sigprocmask(SIG_BLOCK, (u64)&set, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -ESRCH);
+}
+
+static void sigprocmask_bad_oldset_returns_efault(void **state)
+{
+  (void)state;
+  u64 old = 0;
+  g_vmm_user_range_fail = true;
+  u64 ret = sys_rt_sigprocmask(SIG_BLOCK, 0, (u64)&old, 8, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sigprocmask_bad_set_returns_efault(void **state)
+{
+  (void)state;
+  u64 set = 0;
+  g_vmm_user_range_fail = true;
+  u64 ret = sys_rt_sigprocmask(SIG_BLOCK, (u64)&set, 0, 8, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+static void sigreturn_no_frame_returns_einval(void **state)
+{
+  (void)state;
+  /* syscall_get_current_frame returns NULL → sys_rt_sigreturn returns -EINVAL */
+  g_return_frame = false;
+  u64 ret = sys_rt_sigreturn(0, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -461,6 +534,13 @@ int main(void)
       cmocka_unit_test_setup(proc_check_signals_delivers_pending, setup),
       cmocka_unit_test_setup(proc_check_signals_ignores_sig_ign, setup),
       cmocka_unit_test_setup(proc_check_signals_masked_not_delivered, setup),
+      cmocka_unit_test_setup(sigaction_no_proc_returns_esrch, setup),
+      cmocka_unit_test_setup(sigaction_bad_oldact_ptr_returns_efault, setup),
+      cmocka_unit_test_setup(sigaction_bad_act_ptr_returns_efault, setup),
+      cmocka_unit_test_setup(sigprocmask_no_proc_returns_esrch, setup),
+      cmocka_unit_test_setup(sigprocmask_bad_oldset_returns_efault, setup),
+      cmocka_unit_test_setup(sigprocmask_bad_set_returns_efault, setup),
+      cmocka_unit_test_setup(sigreturn_no_frame_returns_einval, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
