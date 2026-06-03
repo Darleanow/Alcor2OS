@@ -423,6 +423,158 @@ static void test_elf_copy_multi_page(void **state) {
   assert_int_equal(ret, 0);
 }
 
+/* elf_info_track_segment: vaddr < base with p_offset==0 → sets info->phdr */
+static void test_elf_info_phdr_tracked(void **state) {
+  (void)state;
+  u8 buf[1024];
+  build_elf(buf, sizeof(buf), NULL);
+
+  /* Add a second PT_LOAD at a lower vaddr with p_offset=0 */
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)buf;
+  ehdr->e_phnum = 2;
+  Elf64_Phdr *ph = (Elf64_Phdr *)(buf + sizeof(Elf64_Ehdr));
+  /* First segment at 0x400000 (from build_elf) */
+  /* Second segment at lower vaddr with p_offset==0 */
+  ph[1].p_type   = PT_LOAD;
+  ph[1].p_vaddr  = 0x200000; /* lower than 0x400000 */
+  ph[1].p_memsz  = 0x1000;
+  ph[1].p_filesz = 4;
+  ph[1].p_offset = 0; /* triggers info->phdr = vaddr + e_phoff */
+
+  elf_info_t info = {0};
+  will_return(vmm_map_range_alloc, true); /* first segment map */
+  static u8 pm0[4096];
+  will_return(vmm_get_phys, (u64)pm0);
+  will_return(vmm_get_hhdm, 0);
+  will_return(vmm_map_range_alloc, true); /* second segment map */
+  /* second segment filesz=4 → needs read+copy → vmm_get_phys */
+  static u8 pm1[4096];
+  will_return(vmm_get_phys, (u64)pm1);
+  will_return(vmm_get_hhdm, 0);
+
+  int ret = elf_load(buf, sizeof(buf), &info);
+  assert_int_equal(ret, 0);
+  assert_true(info.phdr != 0);
+}
+
+/* elf_load_fd: e_phnum == 0 → returns -1 */
+static void test_elf_load_fd_no_phnum(void **state) {
+  (void)state;
+  u8 buf[sizeof(Elf64_Ehdr)] = {0};
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)buf;
+  ehdr->e_ident[EI_MAG0]  = 0x7F;
+  ehdr->e_ident[EI_MAG1]  = 'E';
+  ehdr->e_ident[EI_MAG2]  = 'L';
+  ehdr->e_ident[EI_MAG3]  = 'F';
+  ehdr->e_ident[EI_CLASS] = ELFCLASS64;
+  ehdr->e_ident[EI_DATA]  = ELFDATA2LSB;
+  ehdr->e_type            = ET_EXEC;
+  ehdr->e_machine         = EM_X86_64;
+  ehdr->e_phoff           = sizeof(Elf64_Ehdr);
+  ehdr->e_phnum           = 0; /* no program headers */
+
+  elf_info_t info = {0};
+  will_return(vfs_read, buf);
+  will_return(vfs_read, (i64)sizeof(Elf64_Ehdr));
+  int ret = elf_load_fd(123, &info);
+  assert_int_equal(ret, -1);
+}
+
+/* elf_load_fd: read phdrs fails → returns -1 */
+static void test_elf_load_fd_read_phdrs_fail(void **state) {
+  (void)state;
+  u8 buf[sizeof(Elf64_Ehdr)] = {0};
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)buf;
+  ehdr->e_ident[EI_MAG0]  = 0x7F;
+  ehdr->e_ident[EI_MAG1]  = 'E';
+  ehdr->e_ident[EI_MAG2]  = 'L';
+  ehdr->e_ident[EI_MAG3]  = 'F';
+  ehdr->e_ident[EI_CLASS] = ELFCLASS64;
+  ehdr->e_ident[EI_DATA]  = ELFDATA2LSB;
+  ehdr->e_type            = ET_EXEC;
+  ehdr->e_machine         = EM_X86_64;
+  ehdr->e_phoff           = sizeof(Elf64_Ehdr);
+  ehdr->e_phnum           = 1;
+  ehdr->e_phentsize       = sizeof(Elf64_Phdr);
+
+  elf_info_t info = {0};
+  /* First read: ehdr — succeeds */
+  will_return(vfs_read, buf);
+  will_return(vfs_read, (i64)sizeof(Elf64_Ehdr));
+  /* Second read: phdrs — fails (returns 0) */
+  will_return(vfs_read, NULL);
+  will_return(vfs_read, 0);
+  int ret = elf_load_fd(123, &info);
+  assert_int_equal(ret, -1);
+}
+
+/* elf_load_fd: vmm_map_range_alloc fails → returns -1 */
+static void test_elf_load_fd_map_fail(void **state) {
+  (void)state;
+  u8 buf[1024] = {0};
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)buf;
+  ehdr->e_ident[EI_MAG0]  = 0x7F;
+  ehdr->e_ident[EI_MAG1]  = 'E';
+  ehdr->e_ident[EI_MAG2]  = 'L';
+  ehdr->e_ident[EI_MAG3]  = 'F';
+  ehdr->e_ident[EI_CLASS] = ELFCLASS64;
+  ehdr->e_ident[EI_DATA]  = ELFDATA2LSB;
+  ehdr->e_type            = ET_EXEC;
+  ehdr->e_machine         = EM_X86_64;
+  ehdr->e_phoff           = sizeof(Elf64_Ehdr);
+  ehdr->e_phnum           = 1;
+  ehdr->e_phentsize       = sizeof(Elf64_Phdr);
+  Elf64_Phdr *phdr = (Elf64_Phdr *)(buf + sizeof(Elf64_Ehdr));
+  phdr->p_type   = PT_LOAD;
+  phdr->p_memsz  = 0x1000;
+  phdr->p_filesz = 4;
+  phdr->p_vaddr  = 0x400000;
+
+  elf_info_t info = {0};
+  will_return(vfs_read, buf);
+  will_return(vfs_read, (i64)sizeof(Elf64_Ehdr));
+  will_return(vfs_read, buf + sizeof(Elf64_Ehdr));
+  will_return(vfs_read, (i64)sizeof(Elf64_Phdr));
+  will_return(vmm_map_range_alloc, false); /* map fails */
+  int ret = elf_load_fd(123, &info);
+  assert_int_equal(ret, -1);
+}
+
+/* elf_load_fd: vfs_read chunk returns 0 → break from loop */
+static void test_elf_load_fd_chunk_read_zero(void **state) {
+  (void)state;
+  u8 buf[1024] = {0};
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)buf;
+  ehdr->e_ident[EI_MAG0]  = 0x7F;
+  ehdr->e_ident[EI_MAG1]  = 'E';
+  ehdr->e_ident[EI_MAG2]  = 'L';
+  ehdr->e_ident[EI_MAG3]  = 'F';
+  ehdr->e_ident[EI_CLASS] = ELFCLASS64;
+  ehdr->e_ident[EI_DATA]  = ELFDATA2LSB;
+  ehdr->e_type            = ET_EXEC;
+  ehdr->e_machine         = EM_X86_64;
+  ehdr->e_phoff           = sizeof(Elf64_Ehdr);
+  ehdr->e_phnum           = 1;
+  ehdr->e_phentsize       = sizeof(Elf64_Phdr);
+  Elf64_Phdr *phdr = (Elf64_Phdr *)(buf + sizeof(Elf64_Ehdr));
+  phdr->p_type   = PT_LOAD;
+  phdr->p_memsz  = 0x1000;
+  phdr->p_filesz = 4; /* non-zero so read_buf is allocated */
+  phdr->p_vaddr  = 0x400000;
+
+  elf_info_t info = {0};
+  will_return(vfs_read, buf);
+  will_return(vfs_read, (i64)sizeof(Elf64_Ehdr));
+  will_return(vfs_read, buf + sizeof(Elf64_Ehdr));
+  will_return(vfs_read, (i64)sizeof(Elf64_Phdr));
+  will_return(vmm_map_range_alloc, true);
+  /* chunk read returns 0 → breaks loop */
+  will_return(vfs_read, NULL);
+  will_return(vfs_read, 0);
+  int ret = elf_load_fd(123, &info);
+  assert_int_equal(ret, 0); /* completes normally after break */
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_elf_validate_valid),
@@ -441,6 +593,12 @@ int main(void) {
         cmocka_unit_test(test_elf_load_map_fail),
         cmocka_unit_test(test_elf_load_skip_zero_memsz),
         cmocka_unit_test(test_elf_copy_multi_page),
+        /* new coverage */
+        cmocka_unit_test(test_elf_info_phdr_tracked),
+        cmocka_unit_test(test_elf_load_fd_no_phnum),
+        cmocka_unit_test(test_elf_load_fd_read_phdrs_fail),
+        cmocka_unit_test(test_elf_load_fd_map_fail),
+        cmocka_unit_test(test_elf_load_fd_chunk_read_zero),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
