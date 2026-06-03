@@ -776,6 +776,174 @@ static void ext2_readdir_returns_first_entry(void **state) {
   assert_int_equal(entry.inode, 5);
 }
 
+/* ext2_readdir: vol_read_block fails → -EIO */
+static void ext2_readdir_read_fails_eio(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  ext2_file_t dir = {.in_use = true, .is_dir = true, .vol = &vol};
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, block_buf);
+  expect_any(get_block_num, vol);
+  expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0);
+  will_return(get_block_num, 7); /* valid block */
+
+  expect_any(vol_read_block, vol);
+  expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf);
+  will_return(vol_read_block, -1); /* read fails */
+
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_readdir(&dir, 0, &entry), -EIO);
+}
+
+/* ext2_readdir: skip to second entry (index=1) */
+static void ext2_readdir_returns_second_entry(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  memset(block_buf, 0, sizeof(block_buf));
+
+  /* Populate two dirents in the block */
+  ext2_dirent_t *de0 = (ext2_dirent_t *)block_buf;
+  de0->inode    = 5;
+  de0->rec_len  = 16;
+  de0->name_len = 1;
+  de0->file_type = EXT2_FT_REG_FILE;
+  de0->name[0]  = 'a';
+
+  ext2_dirent_t *de1 = (ext2_dirent_t *)(block_buf + 16);
+  de1->inode    = 6;
+  de1->rec_len  = 16;
+  de1->name_len = 1;
+  de1->file_type = EXT2_FT_REG_FILE;
+  de1->name[0]  = 'b';
+
+  ext2_file_t dir = {.in_use = true, .is_dir = true, .vol = &vol};
+  dir.inode.i_size = 32; /* exactly 2 entries = 32 bytes, no more blocks needed */
+
+  will_return(cache_get_block, block_buf);
+  /* First iteration: file_block=0 */
+  expect_any(get_block_num, vol); expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0); will_return(get_block_num, 7);
+  expect_any(vol_read_block, vol); expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf); will_return(vol_read_block, 0);
+
+  /* no read_inode for inode 5 — fill_entry_from_dirent not called for skipped */
+
+  /* Second iteration: file_block=0 again (pos=16, 16/1024=0) */
+  expect_any(get_block_num, vol); expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0); will_return(get_block_num, 7);
+  expect_any(vol_read_block, vol); expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf); will_return(vol_read_block, 0);
+
+  /* read_inode for inode 6 (index 1 matches) */
+  expect_any(read_inode, vol); expect_value(read_inode, ino, 6);
+  will_return(read_inode, 0);
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 1, &entry);
+  assert_int_equal(ret, 1);
+  assert_int_equal(entry.inode, 6);
+}
+
+/* ext2_readdir: zero rec_len forces skip to next block */
+static void ext2_readdir_zero_rec_len_skips_block(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  memset(block_buf, 0, sizeof(block_buf)); /* rec_len=0 at start */
+
+  ext2_file_t dir = {.in_use = true, .is_dir = true, .vol = &vol};
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, block_buf);
+  expect_any(get_block_num, vol);
+  expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0);
+  will_return(get_block_num, 7);
+
+  expect_any(vol_read_block, vol);
+  expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf);
+  will_return(vol_read_block, 0);
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 0, &entry);
+  assert_int_equal(ret, 0); /* no entry found */
+}
+
+/* ext2_readdir: inode=0 entry (deleted) — not counted */
+static void ext2_readdir_skips_deleted_inode(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  memset(block_buf, 0, sizeof(block_buf));
+
+  /* Deleted entry (inode=0) followed by valid entry */
+  ext2_dirent_t *de0 = (ext2_dirent_t *)block_buf;
+  de0->inode    = 0; /* deleted */
+  de0->rec_len  = 16;
+  de0->name_len = 1;
+
+  ext2_dirent_t *de1 = (ext2_dirent_t *)(block_buf + 16);
+  de1->inode    = 9;
+  de1->rec_len  = 16;
+  de1->name_len = 1;
+  de1->file_type = EXT2_FT_REG_FILE;
+  de1->name[0]  = 'x';
+
+  ext2_file_t dir = {.in_use = true, .is_dir = true, .vol = &vol};
+  dir.inode.i_size = 32; /* 2 entries exactly */
+
+  will_return(cache_get_block, block_buf);
+  /* First iteration: file_block=0 for de0 (deleted, inode=0, not counted) */
+  expect_any(get_block_num, vol); expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0); will_return(get_block_num, 7);
+  expect_any(vol_read_block, vol); expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf); will_return(vol_read_block, 0);
+  /* deleted inode → not counted, pos+=16 */
+
+  /* Second iteration: file_block=0 for de1 */
+  expect_any(get_block_num, vol); expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0); will_return(get_block_num, 7);
+  expect_any(vol_read_block, vol); expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf); will_return(vol_read_block, 0);
+
+  expect_any(read_inode, vol); expect_value(read_inode, ino, 9);
+  will_return(read_inode, 0);
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 0, &entry);
+  assert_int_equal(ret, 1);
+  assert_int_equal(entry.inode, 9);
+}
+
+/* ext2_rmdir: returns -ENOENT when path not found */
+static void ext2_rmdir_enoent(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  expect_value(path_split, path, "/nonexistent");
+  will_return(path_split, "/");
+  will_return(path_split, "nonexistent");
+
+  expect_any(resolve_path, vol);
+  expect_string(resolve_path, path, "/");
+  will_return(resolve_path, 0);
+  will_return(resolve_path, EXT2_ROOT_INODE);
+  static ext2_inode_t root_inode = {.i_mode = EXT2_S_IFDIR | 0755};
+  will_return(resolve_path, &root_inode);
+
+  /* dir_find_entry fails → child not found */
+  expect_any(resolve_path, vol);
+  expect_string(resolve_path, path, "/nonexistent");
+  will_return(resolve_path, -ENOENT);
+
+  assert_int_equal((i64)ext2_rmdir(&vol, "/nonexistent"), -ENOENT);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(ext2_mkdir_fails_alloc_block),
@@ -802,6 +970,10 @@ int main(void) {
       cmocka_unit_test(ext2_readdir_no_cache_returns_enomem),
       cmocka_unit_test(ext2_readdir_sparse_block_returns_zero),
       cmocka_unit_test(ext2_readdir_returns_first_entry),
+      cmocka_unit_test(ext2_readdir_read_fails_eio),
+      cmocka_unit_test(ext2_readdir_returns_second_entry),
+      cmocka_unit_test(ext2_readdir_zero_rec_len_skips_block),
+      cmocka_unit_test(ext2_readdir_skips_deleted_inode),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
