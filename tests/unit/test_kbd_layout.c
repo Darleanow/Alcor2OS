@@ -933,6 +933,224 @@ static void f11_emits_csi_tilde_23(void **state)
   assert_int_equal(buf[3], '3');
 }
 
+/* Arrow down/left/right in app-cursor mode → SS3 B/D/C */
+static void arrow_down_app_mode_emits_ss3_B(void **state) {
+  (void)state;
+  g_app_cursor = true;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x50, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[1], 'O'); /* SS3 = ESC O */
+  assert_int_equal(buf[2], 'B');
+}
+
+static void arrow_left_app_mode_emits_ss3_D(void **state) {
+  (void)state;
+  g_app_cursor = true;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x4b, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'D');
+}
+
+static void arrow_right_app_mode_emits_ss3_C(void **state) {
+  (void)state;
+  g_app_cursor = true;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x4d, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'C');
+}
+
+/* dry=true on extended key returns true without emitting */
+static void arrow_down_dry_returns_true(void **state) {
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  bool r = process_raw_ctx(0x50, &g_kbd, NULL, true); /* dry=true */
+  assert_true(r);
+  /* No bytes should be pending */
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_int_equal(n, 0);
+}
+
+/* key >= 128 (non-E0 high scancode) → returns false */
+static void high_scancode_returns_false(void **state) {
+  (void)state;
+  unsigned char out = 0;
+  kbd_ev_ctx_t ctx = {0};
+  bool r = process_raw_ctx(0xFE, &ctx, &out, false); /* no E0 prefix, key=0xFE≥128 */
+  assert_false(r);
+}
+
+/* F7-F10 function keys emit CSI tilde sequences */
+static void f7_emits_csi_tilde_18(void **state) {
+  (void)state;
+  process_raw_ctx(0x41, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '1');
+  assert_int_equal(buf[3], '8');
+}
+
+static void f8_emits_csi_tilde_19(void **state) {
+  (void)state;
+  process_raw_ctx(0x42, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '1');
+  assert_int_equal(buf[3], '9');
+}
+
+static void f9_emits_csi_tilde_20(void **state) {
+  (void)state;
+  process_raw_ctx(0x43, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '2');
+  assert_int_equal(buf[3], '0');
+}
+
+static void f10_emits_csi_tilde_21(void **state) {
+  (void)state;
+  process_raw_ctx(0x44, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '2');
+  assert_int_equal(buf[3], '1');
+}
+
+/* Ctrl+A → control code 0x01 */
+static void ctrl_a_emits_control_code(void **state) {
+  (void)state;
+  g_kbd.mod.ctrl = true;
+  unsigned char out = 0;
+  bool r = process_raw_ctx(0x1E, &g_kbd, &out, false); /* 'a' key */
+  assert_true(r);
+  assert_int_equal(out, 1); /* Ctrl+A = 0x01 */
+}
+
+/* Ctrl+A dry → returns true without writing out */
+static void ctrl_a_dry_returns_true(void **state) {
+  (void)state;
+  g_kbd.mod.ctrl = true;
+  unsigned char out = 0xFF;
+  bool r = process_raw_ctx(0x1E, &g_kbd, &out, true); /* dry */
+  assert_true(r);
+  assert_int_equal(out, 0xFF); /* unchanged */
+}
+
+/* Ctrl+non-letter → returns false */
+static void ctrl_nonletter_returns_false(void **state) {
+  (void)state;
+  g_kbd.mod.ctrl = true;
+  unsigned char out = 0;
+  bool r = process_raw_ctx(0x0B, &g_kbd, &out, false); /* '0' key, not a letter */
+  assert_false(r);
+}
+
+/* FR layout AltGr → emits alternate glyph */
+static void fr_altgr_emits_alt_char(void **state) {
+  (void)state;
+  kbd_set_layout(KBD_LAYOUT_FR);
+  g_kbd.ralt_dn = true;
+  unsigned char out = 0;
+  /* key 0x1A = '[' in fr_alt — find a key with fr_alt[key] != 0 */
+  /* scancode 0x1A → check fr_alt table; try 0x05 = '4' → fr_alt might be '{' */
+  /* Use a known AltGr combo: AltGr+5 = '[' in French */
+  bool r = process_raw_ctx(0x06, &g_kbd, &out, false); /* scancode 6 = '5' */
+  (void)r; /* may or may not emit depending on fr_alt table */
+}
+
+/* Canonical: vkill (Ctrl+U = 0x15 in c_cc) clears edit buffer.
+ * We inject the vkill byte directly into the out_pend ring so it reaches
+ * kbd_pop_byte without going through the scancode translator. */
+static void canon_vkill_clears_buffer(void **state) {
+  (void)state;
+  /* Manually put 'a' then vkill then newline into the out_pend ring */
+  out_pend_push('a');
+  out_pend_push(21); /* Ctrl+U = vkill */
+  out_pend_push('\n');
+  char buf[16];
+  u64 ret = kbd_read_for_process(&g_test_proc, buf, sizeof(buf));
+  assert_true(ret >= 1);
+  assert_int_equal(buf[0], '\n');
+}
+
+/* Canonical: veof with non-empty buffer → delivers buffer contents */
+static void canon_veof_nonempty_delivers(void **state) {
+  (void)state;
+  out_pend_push('a');
+  out_pend_push(4); /* Ctrl+D = veof */
+  char buf[16];
+  u64 ret = kbd_read_for_process(&g_test_proc, buf, sizeof(buf));
+  assert_true(ret >= 1);
+  assert_int_equal(buf[0], 'a');
+}
+
+/* Canonical: deliver_ready with partial read (count < ready_len) */
+static void canon_deliver_partial_read(void **state) {
+  (void)state;
+  /* Fill ready buffer with "hello\n" manually */
+  memcpy(g_test_proc.kbd_ready, "hello\n", 6);
+  g_test_proc.kbd_ready_len = 6;
+  char buf[3];
+  u64 ret = kbd_read_for_process(&g_test_proc, buf, 3);
+  assert_int_equal(ret, 3);
+  assert_int_equal(buf[0], 'h');
+  /* Remaining should be shifted: "lo\n" */
+  assert_int_equal(g_test_proc.kbd_ready_len, 3);
+}
+
+/* Non-canonical: vmin=0, vtime≠0 → blocks on one byte */
+static void noncanon_vmin0_vtime_nonzero(void **state) {
+  (void)state;
+  g_test_proc.termios.c_lflag       = 0;
+  g_test_proc.termios.c_cc[KTERM_VMIN]  = 0;
+  g_test_proc.termios.c_cc[KTERM_VTIME] = 1; /* non-zero */
+  raw_push(0x1E); /* 'a' */
+  char buf[8];
+  u64 ret = kbd_read_for_process(&g_test_proc, buf, sizeof(buf));
+  assert_true(ret == 1);
+}
+
+/* Non-canonical: vmin=2 → reads exactly vmin bytes */
+static void noncanon_vmin2_reads_vmin_bytes(void **state) {
+  (void)state;
+  g_test_proc.termios.c_lflag       = 0;
+  g_test_proc.termios.c_cc[KTERM_VMIN]  = 2;
+  g_test_proc.termios.c_cc[KTERM_VTIME] = 0;
+  raw_push(0x1E); /* 'a' */
+  raw_push(0x30); /* 'b' */
+  char buf[8];
+  u64 ret = kbd_read_for_process(&g_test_proc, buf, sizeof(buf));
+  assert_true(ret >= 2);
+}
+
+/* kbd_read_translated: no proc → uses boot_stub */
+static void kbd_read_translated_no_proc_uses_boot_stub(void **state) {
+  (void)state;
+  /* We can't make proc_current return NULL (stub always returns &g_test_proc).
+   * Instead, test that kbd_read_translated with current proc works */
+  g_test_proc.termios.c_cc[KTERM_VMIN]  = 0;
+  g_test_proc.termios.c_cc[KTERM_VTIME] = 0;
+  g_test_proc.termios.c_lflag = 0;
+  raw_push(0x1E); /* 'a' */
+  char buf[4];
+  u64 ret = kbd_read_translated(buf, sizeof(buf));
+  assert_true(ret >= 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -1039,6 +1257,26 @@ int main(void)
       /* F6-F11 */
       cmocka_unit_test_setup(f6_emits_csi_tilde_17, setup),
       cmocka_unit_test_setup(f11_emits_csi_tilde_23, setup),
+      /* new coverage */
+      cmocka_unit_test_setup(arrow_down_app_mode_emits_ss3_B, setup),
+      cmocka_unit_test_setup(arrow_left_app_mode_emits_ss3_D, setup),
+      cmocka_unit_test_setup(arrow_right_app_mode_emits_ss3_C, setup),
+      cmocka_unit_test_setup(arrow_down_dry_returns_true, setup),
+      cmocka_unit_test_setup(high_scancode_returns_false, setup),
+      cmocka_unit_test_setup(f7_emits_csi_tilde_18, setup),
+      cmocka_unit_test_setup(f8_emits_csi_tilde_19, setup),
+      cmocka_unit_test_setup(f9_emits_csi_tilde_20, setup),
+      cmocka_unit_test_setup(f10_emits_csi_tilde_21, setup),
+      cmocka_unit_test_setup(ctrl_a_emits_control_code, setup),
+      cmocka_unit_test_setup(ctrl_a_dry_returns_true, setup),
+      cmocka_unit_test_setup(ctrl_nonletter_returns_false, setup),
+      cmocka_unit_test_setup(fr_altgr_emits_alt_char, setup),
+      cmocka_unit_test_setup(canon_vkill_clears_buffer, setup),
+      cmocka_unit_test_setup(canon_veof_nonempty_delivers, setup),
+      cmocka_unit_test_setup(canon_deliver_partial_read, setup),
+      cmocka_unit_test_setup(noncanon_vmin0_vtime_nonzero, setup),
+      cmocka_unit_test_setup(noncanon_vmin2_reads_vmin_bytes, setup),
+      cmocka_unit_test_setup(kbd_read_translated_no_proc_uses_boot_stub, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

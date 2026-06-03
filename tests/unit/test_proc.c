@@ -32,10 +32,11 @@ bool vmm_map_in(u64 cr3, u64 virt, u64 phys, u64 flags)
   (void)flags;
   return true;
 }
+static bool g_vmm_clone_fail = false;
 u64 vmm_clone_address_space(u64 cr3)
 {
   (void)cr3;
-  return 0x2000;
+  return g_vmm_clone_fail ? 0 : 0x2000;
 }
 
 void *pmm_alloc_pages(u64 count) { return malloc(count * 4096); }
@@ -141,6 +142,7 @@ static int setup(void **state)
   next_pid            = 1;
   need_resched        = false;
   g_context_switch_cb = NULL;
+  g_vmm_clone_fail    = false;
   return 0;
 }
 
@@ -1006,6 +1008,88 @@ static void test_proc_signal_unknown_pid_noop(void **state)
   proc_signal(9999, SIGUSR1);
 }
 
+/* proc_exec_replace_image: replaces image on current proc */
+static void test_proc_exec_replace_image(void **state)
+{
+  (void)state;
+  char *argv[] = {(char *)"shell", NULL};
+  char *envp[] = {(char *)"PATH=/bin", NULL};
+  proc_create_mem("init", NULL, 0, argv, envp);
+  current_proc = &proc_table[0];
+  /* elf_load_fd stub always succeeds */
+  i64 ret = proc_exec_replace_image(current_proc, "newprog", 3, argv, envp);
+  assert_int_equal(ret, 0);
+  assert_string_equal(current_proc->name, "newprog");
+}
+
+/* proc_setup_image: with real argv and envp → pushes strings onto stack */
+static void test_proc_setup_image_with_argv(void **state)
+{
+  (void)state;
+  char *argv[] = {(char *)"prog", (char *)"arg1", NULL};
+  char *envp[] = {(char *)"HOME=/", NULL};
+  u64 ret = proc_create_mem("prog", NULL, 0, argv, envp);
+  assert_true(ret > 0); /* returns pid */
+}
+
+/* proc_fork_impl: no current_proc → -ESRCH */
+static void test_proc_fork_no_current_esrch(void **state)
+{
+  (void)state;
+  current_proc = NULL;
+  syscall_frame_t frame = {0};
+  i64 ret = proc_fork(&frame);
+  assert_int_equal(ret, -ESRCH);
+}
+
+/* proc_fork_impl: vmm_clone_address_space fails → -ENOMEM */
+static void test_proc_fork_clone_fail_enomem(void **state)
+{
+  (void)state;
+  char *argv[] = {(char *)"init", NULL};
+  proc_create_mem("init", NULL, 0, argv, argv);
+  current_proc     = &proc_table[0];
+  g_vmm_clone_fail = true;
+  syscall_frame_t frame = {0};
+  i64 ret = proc_fork(&frame);
+  assert_int_equal(ret, -ENOMEM);
+  g_vmm_clone_fail = false;
+}
+
+/* proc_waitpid: no current proc → -1 */
+static void test_proc_waitpid_no_current(void **state)
+{
+  (void)state;
+  current_proc = NULL;
+  i64 ret = proc_waitpid(-1, NULL, WNOHANG);
+  assert_int_equal(ret, -1);
+}
+
+/* proc_waitpid: specific pid not a child → -ECHILD */
+static void test_proc_waitpid_specific_no_child_echild(void **state)
+{
+  (void)state;
+  char *argv[] = {(char *)"init", NULL};
+  proc_create_mem("init", NULL, 0, argv, argv);
+  current_proc = &proc_table[0];
+  /* pid 99 doesn't exist */
+  i64 ret = proc_waitpid(99, NULL, WNOHANG);
+  assert_int_equal(ret, -ECHILD);
+}
+
+/* proc_create_mem: with real argv and envp to exercise push_string paths */
+static void test_proc_create_mem_with_argv_envp(void **state)
+{
+  (void)state;
+  char *argv[] = {(char *)"myapp", (char *)"--flag", NULL};
+  char *envp[] = {(char *)"VAR=val", (char *)"X=1", NULL};
+  u64 pid = proc_create_mem("myapp", NULL, 0, argv, envp);
+  assert_true(pid > 0);
+  proc_t *p = proc_get(pid);
+  assert_non_null(p);
+  assert_string_equal(p->name, "myapp");
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -1066,6 +1150,14 @@ int main(void)
       cmocka_unit_test_setup_teardown(test_waitpid_specific_child_disappears_after_schedule, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_signal_valid_pid_noop, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_signal_unknown_pid_noop, setup, teardown),
+      /* new coverage */
+      cmocka_unit_test_setup_teardown(test_proc_exec_replace_image, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_setup_image_with_argv, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_fork_no_current_esrch, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_fork_clone_fail_enomem, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_waitpid_no_current, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_waitpid_specific_no_child_echild, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_create_mem_with_argv_envp, setup, teardown),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
