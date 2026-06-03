@@ -486,6 +486,69 @@ static void split_path_ends_at_slash(void **state)
   assert_string_equal(name, "c");
 }
 
+/* read_symlink_target: zero-size symlink returns -EINVAL */
+static void test_read_symlink_zero_size(void **state)
+{
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* Symlink with size=0 */
+  mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK,
+                           EXT2_S_IFLNK | 0777, 0 /* size=0 */);
+  (void)e;
+  char buf[64];
+  i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+  /* read_symlink_target: len==0 → -EINVAL → ext2_readlink returns -EIO */
+  assert_int_equal(ret, -EIO);
+}
+
+/* read_symlink_target: slow symlink (size > 60) with cache_get_block returning NULL */
+static void test_read_symlink_slow_oom(void **state)
+{
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* Symlink with size=65 (> 60 = EXT2_FAST_SYMLINK_MAX) */
+  mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK,
+                           EXT2_S_IFLNK | 0777, 65);
+  (void)e;
+  /* cache_get_block returns NULL → -ENOMEM */
+  char buf[128];
+  i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+  /* cache_get_block returns NULL → read_symlink_target returns -ENOMEM
+     → ext2_readlink propagates as -EIO */
+  assert_int_equal(ret, -EIO);
+}
+
+/* build_symlink_path: relative symlink joined to base directory */
+static void test_build_symlink_path_relative(void **state)
+{
+  (void)state;
+  char out[256];
+  /* base="/foo/bar", relative target="baz" → out should be "/foo/baz" */
+  build_symlink_path("/foo/bar", "baz", out, sizeof(out));
+  assert_string_equal(out, "/foo/baz");
+}
+
+/* build_symlink_path: absolute target used directly */
+static void test_build_symlink_path_absolute(void **state)
+{
+  (void)state;
+  char out[256];
+  build_symlink_path("/foo/bar", "/abs/target", out, sizeof(out));
+  assert_string_equal(out, "/abs/target");
+}
+
+/* build_symlink_path: no slash in base → target used directly */
+static void test_build_symlink_path_no_slash_base(void **state)
+{
+  (void)state;
+  char out[256];
+  /* base with no slash → last_slash=0 → kstrncpy target into out */
+  build_symlink_path("nodir", "rel", out, sizeof(out));
+  assert_string_equal(out, "rel");
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -531,6 +594,13 @@ int main(void)
       cmocka_unit_test(test_resolve_path_file_as_dir),
       /* path_split extra */
       cmocka_unit_test(split_path_ends_at_slash),
+      /* read_symlink_target paths */
+      cmocka_unit_test(test_read_symlink_zero_size),
+      cmocka_unit_test(test_read_symlink_slow_oom),
+      /* build_symlink_path */
+      cmocka_unit_test(test_build_symlink_path_relative),
+      cmocka_unit_test(test_build_symlink_path_absolute),
+      cmocka_unit_test(test_build_symlink_path_no_slash_base),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

@@ -499,6 +499,27 @@ static void blit_atlas_32bpp_small_glyph_prefills(void **state)
   /* Pre-fill + glyph blit happened — just verify no crash */
 }
 
+/* caret_paint: cx >= cols is clamped to cols-1 */
+static void caret_paint_cx_oob_clamped(void **state)
+{
+  (void)state;
+  fb_ctx.cx = COLS; /* out of range */
+  fb_ctx.cy = 0;
+  g_pixel_count = 0;
+  caret_paint(); /* should clamp and paint at col COLS-1 */
+  /* Either paints (at clamped col) or returns early — no crash */
+}
+
+/* caret_paint: cy >= rows is clamped to rows-1 */
+static void caret_paint_cy_oob_clamped(void **state)
+{
+  (void)state;
+  fb_ctx.cx = 0;
+  fb_ctx.cy = ROWS; /* out of range */
+  g_pixel_count = 0;
+  caret_paint(); /* should clamp and paint at row ROWS-1 */
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -535,6 +556,9 @@ int main(void)
       cmocka_unit_test_setup(blend_atlas_pixel_transparent, setup),
       cmocka_unit_test_setup(blend_atlas_pixel_partial_alpha, setup),
       cmocka_unit_test_setup(blit_atlas_32bpp_small_glyph_prefills, setup),
+      /* caret clamping */
+      cmocka_unit_test_setup(caret_paint_cx_oob_clamped, setup),
+      cmocka_unit_test_setup(caret_paint_cy_oob_clamped, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
