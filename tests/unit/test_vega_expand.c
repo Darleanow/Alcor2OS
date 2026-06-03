@@ -386,6 +386,22 @@ static void test_expand_pid_buf_lazy_second_call(void **state)
   free(r2);
 }
 
+/* buf_append: value large enough to trigger capacity doubling (line 109) */
+static void test_expand_var_long_value_triggers_realloc(void **state) {
+  (void)state;
+  /* Reset global var state to ensure we can add a variable */
+  var_count = 0;
+  /* Set a variable with a very long value (>64 chars to force multiple doublings) */
+  char long_value[256];
+  memset(long_value, 'A', sizeof(long_value) - 1);
+  long_value[255] = '\0';
+  vega_setvar("LONGVAR", long_value);
+  char *r = expand_word("$LONGVAR");
+  assert_non_null(r);
+  assert_int_equal(strlen(r), 255);
+  free(r);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -424,6 +440,8 @@ int main(void)
       cmocka_unit_test(test_expand_dollar_brace_long_name_capped),
       cmocka_unit_test(test_expand_dollar_name_long_capped),
       cmocka_unit_test(test_expand_pid_buf_lazy_second_call),
+      /* new coverage */
+      cmocka_unit_test(test_expand_var_long_value_triggers_realloc),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

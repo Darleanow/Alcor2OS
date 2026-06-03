@@ -854,6 +854,43 @@ static void test_gr_dispatch_help_walk_no_arg(void **state)
   assert_int_equal(gr_dispatch(&app, 3, argv), 0);
 }
 
+/* gr__apply_flag: null storage → GR_ERR */
+static void test_gr_apply_flag_null_storage(void **state) {
+  (void)state;
+  gr_opt o = {.kind = GR_KIND_FLAG, .storage = NULL};
+  char buf[64];
+  int r = gr__apply_flag(&o, buf, sizeof(buf));
+  assert_int_equal(r, GR_ERR);
+}
+
+/* gr__apply_count: null storage → GR_ERR */
+static void test_gr_apply_count_null_storage(void **state) {
+  (void)state;
+  gr_opt o = {.kind = GR_KIND_COUNT, .storage = NULL};
+  char buf[64];
+  int r = gr__apply_count(&o, buf, sizeof(buf));
+  assert_int_equal(r, GR_ERR);
+}
+
+/* gr__apply_value: GR_KIND_STR with null storage → GR_ERR */
+static void test_gr_apply_val_null_storage(void **state) {
+  (void)state;
+  gr_opt o = {.kind = GR_KIND_STR, .storage = NULL};
+  char buf[64];
+  int r = gr__apply_value(&o, "val", buf, sizeof(buf), "opt");
+  assert_int_equal(r, GR_ERR);
+}
+
+/* gr__apply_value: unknown kind → GR_ERR */
+static void test_gr_apply_val_unknown_kind(void **state) {
+  (void)state;
+  int storage = 0;
+  gr_opt o = {.kind = 99, .storage = &storage}; /* unknown kind */
+  char buf[64];
+  int r = gr__apply_value(&o, "val", buf, sizeof(buf), "opt");
+  assert_int_equal(r, GR_ERR);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -934,6 +971,11 @@ int main(void)
       cmocka_unit_test(test_gr_print_group_null_name_skipped),
       cmocka_unit_test(test_gr_dispatch_parent_help_flag_argc1),
       cmocka_unit_test(test_gr_dispatch_help_walk_no_arg),
+      /* new coverage */
+      cmocka_unit_test(test_gr_apply_flag_null_storage),
+      cmocka_unit_test(test_gr_apply_count_null_storage),
+      cmocka_unit_test(test_gr_apply_val_null_storage),
+      cmocka_unit_test(test_gr_apply_val_unknown_kind),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
