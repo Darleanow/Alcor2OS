@@ -14,11 +14,16 @@
 static void *mock_pmm_pages[8192];
 static int   mock_pmm_count     = 0;
 static bool  mock_pmm_fail      = false;
+static int   mock_pmm_fail_on   = -1; /* -1=never; N=fail on Nth call */
+static int   mock_pmm_call_count = 0;
 static int   mock_pmm_free_count = 0;
 
 void *pmm_alloc(void)
 {
+  mock_pmm_call_count++;
   if(mock_pmm_fail)
+    return NULL;
+  if(mock_pmm_fail_on > 0 && mock_pmm_call_count == mock_pmm_fail_on)
     return NULL;
   void *ptr = aligned_alloc(4096, 4096);
   if(!ptr)
@@ -52,9 +57,11 @@ void cpu_invlpg(u64 virt) { (void)virt; }
 static int setup(void **state)
 {
   (void)state;
-  mock_pmm_count      = 0;
-  mock_pmm_fail       = false;
-  mock_pmm_free_count = 0;
+  mock_pmm_count       = 0;
+  mock_pmm_fail        = false;
+  mock_pmm_fail_on     = -1;
+  mock_pmm_call_count  = 0;
+  mock_pmm_free_count  = 0;
   fake_cr3            = 0;
   kernel_pml4         = NULL;
   hhdm                = 0;
@@ -241,6 +248,119 @@ static void test_vmm_unmap(void **state)
   vmm_unmap(0x3000);
 }
 
+static void test_vmm_map_pd_fail(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  /* Fail on 2nd pmm_alloc (pd allocation) → vmm_map hits line 108 */
+  mock_pmm_fail_on = 2;
+  mock_pmm_call_count = 0;
+  vmm_map(0x8000, 0x1234000, VMM_PRESENT);
+  mock_pmm_fail_on = -1;
+
+  assert_int_equal(vmm_get_phys(0x8000), 0);
+}
+
+static void test_vmm_map_pt_fail(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  /* Fail on 3rd pmm_alloc (pt allocation) → vmm_map hits line 112 */
+  mock_pmm_fail_on = 3;
+  mock_pmm_call_count = 0;
+  vmm_map(0x9000, 0x1234000, VMM_PRESENT);
+  mock_pmm_fail_on = -1;
+
+  assert_int_equal(vmm_get_phys(0x9000), 0);
+}
+
+static void test_vmm_unmap_partial_walk_pdpt_missing(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  /* Unmap an address that was never mapped — walk hits missing pdpt → return (line 209) */
+  vmm_unmap(0xABCD000);
+}
+
+static void test_vmm_get_phys_pd_missing(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+
+  /* Map only one page so pdpt exists but pd is missing for another address */
+  void *phys = pmm_alloc();
+  vmm_map(0x1000, (u64)phys, VMM_PRESENT);
+  fake_cr3 = (u64)kernel_pml4;
+
+  /* A different pd_idx → get_next_level(pdpt, pdpt_idx, false) = NULL → return 0 (line 250) */
+  u64 r = vmm_get_phys(0x40000000); /* different pdpt entry */
+  assert_int_equal(r, 0);
+}
+
+static void test_vmm_create_address_space_oom(void **state)
+{
+  (void)state;
+  mock_pmm_fail = true;
+  u64 r = vmm_create_address_space();
+  assert_int_equal(r, 0);
+  mock_pmm_fail = false;
+}
+
+static void test_vmm_map_in_pd_fail(void **state)
+{
+  (void)state;
+  u64 pml4_phys = (u64)pmm_alloc();
+
+  /* pdpt succeeds (call 1), pd fails (call 2) → vmm_map_in returns false (line 162) */
+  mock_pmm_fail_on = 2;
+  mock_pmm_call_count = 0;
+  bool ok = vmm_map_in(pml4_phys, 0xB000, 0x5678000, VMM_PRESENT);
+  assert_false(ok);
+  mock_pmm_fail_on = -1;
+}
+
+static void test_vmm_map_in_pt_fail(void **state)
+{
+  (void)state;
+  u64 pml4_phys = (u64)pmm_alloc();
+
+  /* pdpt ok (1), pd ok (2), pt fails (3) → returns false (line 169) */
+  mock_pmm_fail_on = 3;
+  mock_pmm_call_count = 0;
+  bool ok = vmm_map_in(pml4_phys, 0xC000, 0x9ABC000, VMM_PRESENT);
+  assert_false(ok);
+  mock_pmm_fail_on = -1;
+}
+
+static void test_vmm_map_range_already_present_skip(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  /* Map a page, then map_range over the same address — it should skip (line 175) */
+  void *phys = pmm_alloc();
+  vmm_map(0xD000, (u64)phys, VMM_PRESENT);
+  bool ok = vmm_map_range(0xD000, 1, VMM_PRESENT | VMM_WRITE);
+  assert_true(ok);
+}
+
 static void test_vmm_get_next_level_no_create_missing(void **state)
 {
   (void)state;
@@ -311,6 +431,14 @@ int main(void)
       cmocka_unit_test_setup(test_vmm_get_next_level_no_create_missing, setup),
       cmocka_unit_test_setup(test_vmm_map_promotes_to_user, setup),
       cmocka_unit_test_setup(test_vmm_map_pmm_fail_mid_walk, setup),
+      cmocka_unit_test_setup(test_vmm_map_pd_fail, setup),
+      cmocka_unit_test_setup(test_vmm_map_pt_fail, setup),
+      cmocka_unit_test_setup(test_vmm_unmap_partial_walk_pdpt_missing, setup),
+      cmocka_unit_test_setup(test_vmm_get_phys_pd_missing, setup),
+      cmocka_unit_test_setup(test_vmm_create_address_space_oom, setup),
+      cmocka_unit_test_setup(test_vmm_map_in_pd_fail, setup),
+      cmocka_unit_test_setup(test_vmm_map_in_pt_fail, setup),
+      cmocka_unit_test_setup(test_vmm_map_range_already_present_skip, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
