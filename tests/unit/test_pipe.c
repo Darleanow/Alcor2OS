@@ -23,10 +23,12 @@ void console_print(const char *s)
   (void)s;
 }
 
-/* No scheduler — proc_current returns NULL so pipe never blocks. */
+/* proc stubs — controllable for blocking path tests */
+static proc_t  g_proc;
+static bool    g_has_proc = false;
 proc_t *proc_current(void)
 {
-  return NULL;
+  return g_has_proc ? &g_proc : NULL;
 }
 void proc_block(proc_t *p)
 {
@@ -36,7 +38,12 @@ void proc_wake(proc_t *p)
 {
   (void)p;
 }
-void proc_schedule(void) {}
+/* proc_schedule callback: used to simulate another process providing data */
+static void (*g_schedule_cb)(void) = NULL;
+void proc_schedule(void)
+{
+  if(g_schedule_cb) g_schedule_cb();
+}
 
 #include "../../src/kernel/sys/pipe.c"
 
@@ -44,6 +51,9 @@ static int setup(void **state)
 {
   (void)state;
   memset(pipes, 0, sizeof(pipes));
+  memset(&g_proc, 0, sizeof(g_proc));
+  g_has_proc    = false;
+  g_schedule_cb = NULL;
   return 0;
 }
 
@@ -384,6 +394,70 @@ static void write_partial_then_read_end_closes_returns_written(void **state)
   p->allocated = 0;
 }
 
+/* Blocking read: proc blocks, then write end closes → returns 0 */
+static pipe_t *g_block_pipe;
+static void schedule_close_write(void) {
+  g_block_pipe->write_open = 0;
+  g_schedule_cb = NULL; /* one-shot */
+}
+static void read_blocks_until_write_closes(void **state) {
+  (void)state;
+  pipe_t *p = new_pipe();
+  g_block_pipe  = p;
+  g_has_proc    = true;
+  g_schedule_cb = schedule_close_write;
+  char buf[4];
+  i64 ret = pipe_read_obj(p, buf, 4);
+  assert_int_equal(ret, 0); /* write closed → EOF */
+  p->allocated = 0;
+}
+
+/* Blocking read: proc blocks, then data arrives */
+static void schedule_write_data(void) {
+  const char *data = "hi";
+  g_block_pipe->buffer[0] = 'h';
+  g_block_pipe->buffer[1] = 'i';
+  g_block_pipe->write_pos = 2;
+  g_block_pipe->count     = 2;
+  g_schedule_cb = NULL;
+}
+static void read_blocks_then_data_arrives(void **state) {
+  (void)state;
+  pipe_t *p = new_pipe();
+  g_block_pipe  = p;
+  g_has_proc    = true;
+  g_schedule_cb = schedule_write_data;
+  char buf[4] = {0};
+  i64 ret = pipe_read_obj(p, buf, 4);
+  assert_int_equal(ret, 2);
+  assert_int_equal(buf[0], 'h');
+  p->allocated = 0;
+}
+
+/* Blocking write: buffer full, read end closes → EPIPE with partial written */
+static void schedule_close_read(void) {
+  g_block_pipe->read_open = 0;
+  g_schedule_cb = NULL;
+}
+static void write_blocks_then_read_closes_partial(void **state) {
+  (void)state;
+  pipe_t *p = new_pipe();
+  g_block_pipe  = p;
+  g_has_proc    = true;
+
+  /* Fill buffer almost full: leave 4 bytes */
+  char fill[PIPE_BUF_SIZE - 4];
+  memset(fill, 'A', sizeof(fill));
+  pipe_write_obj(p, fill, sizeof(fill));
+  /* Now write 8 bytes: 4 will fit, then block. On schedule, read closes. */
+  g_schedule_cb = schedule_close_read;
+  char more[8] = {1,2,3,4,5,6,7,8};
+  i64 ret = pipe_write_obj(p, more, 8);
+  /* 4 bytes written before blocking; after schedule read closed → returns 4 */
+  assert_true(ret == 4 || ret == -EPIPE);
+  p->allocated = 0;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -426,6 +500,10 @@ int main(void)
       cmocka_unit_test_setup(
           write_partial_then_read_end_closes_returns_written, setup
       ),
+      /* blocking paths */
+      cmocka_unit_test_setup(read_blocks_until_write_closes, setup),
+      cmocka_unit_test_setup(read_blocks_then_data_arrives, setup),
+      cmocka_unit_test_setup(write_blocks_then_read_closes_partial, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

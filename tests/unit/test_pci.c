@@ -271,6 +271,70 @@ static void find_capability_no_cap_list(void **state)
   assert_false(pci_find_capability(&dev, 0x05, NULL));
 }
 
+/* pci_find_capability_next: walk from a given cap to find the next one */
+static void find_capability_next_present(void **state)
+{
+  (void)state;
+  cfgspace[PCI_VENDOR_ID / 4] = 0x00018086u;
+  /* cap at 0x40: id=0x04, next=0x50 */
+  cfgspace[0x40 / 4] = 0x5004; /* next=0x50, id=0x04 */
+  /* cap at 0x50: id=0x05, next=0x00 */
+  cfgspace[0x50 / 4] = 0x0005;
+
+  pci_device_t dev = {.bus=0, .slot=0, .func=0};
+  u8 off = 0;
+  /* Start walking from 0x40 looking for id=0x05 */
+  assert_true(pci_find_capability_next(&dev, 0x40, 0x05, &off));
+  assert_int_equal(off, 0x50);
+}
+
+static void find_capability_next_absent(void **state)
+{
+  (void)state;
+  cfgspace[0x40 / 4] = 0x0004; /* id=0x04, next=0x00 */
+  pci_device_t dev = {.bus=0, .slot=0, .func=0};
+  assert_false(pci_find_capability_next(&dev, 0x40, 0x05, NULL));
+}
+
+/* pci_enable_bus_master: sets bus master + I/O + memory bits in CMD */
+static void enable_bus_master_sets_bits(void **state)
+{
+  (void)state;
+  cfgspace[PCI_VENDOR_ID / 4] = 0x00018086u;
+  cfgspace[PCI_COMMAND / 4]   = 0; /* no bits set */
+  pci_device_t dev = {.bus=0, .slot=0, .func=0};
+  pci_enable_bus_master(&dev);
+  u16 cmd = pci_read16(dev.bus, dev.slot, dev.func, PCI_COMMAND);
+  assert_true(cmd & PCI_CMD_MASTER);
+  assert_true(cmd & PCI_CMD_IO);
+  assert_true(cmd & PCI_CMD_MEMORY);
+}
+
+/* pci_find_device: class match found */
+static void find_device_by_class_found(void **state)
+{
+  (void)state;
+  /* Set vendor=0x8086, device=0x1234 in slot 0 */
+  cfgspace[PCI_VENDOR_ID / 4] = 0x12348086u;
+  /* Set class=0x0101 (IDE), subclass in bits[23:16] */
+  /* class code at offset 0x0A (bits 31:16 of dword 0x08) */
+  cfgspace[0x08 / 4] = (0x01u << 24) | (0x01u << 16); /* class=0x01, sub=0x01 */
+
+  pci_device_t dev;
+  assert_true(pci_find_device(0x01, 0x01, &dev));
+}
+
+/* pci_find_device: all 0xFFFF — device absent */
+static void find_device_all_ff_not_found(void **state)
+{
+  (void)state;
+  /* All cfgspace is 0 which means vendor=0 → pci_for_each skips 0 too.
+     Set vendor to 0xFFFF to simulate absent device. */
+  cfgspace[PCI_VENDOR_ID / 4] = 0xFFFFFFFFu;
+  pci_device_t dev;
+  assert_false(pci_find_device(0x01, 0x01, &dev));
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -296,6 +360,11 @@ int main(void)
       cmocka_unit_test_setup(find_capability_present, reset),
       cmocka_unit_test_setup(find_capability_absent, reset),
       cmocka_unit_test_setup(find_capability_no_cap_list, reset),
+      cmocka_unit_test_setup(find_capability_next_present, reset),
+      cmocka_unit_test_setup(find_capability_next_absent, reset),
+      cmocka_unit_test_setup(enable_bus_master_sets_bits, reset),
+      cmocka_unit_test_setup(find_device_by_class_found, reset),
+      cmocka_unit_test_setup(find_device_all_ff_not_found, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
