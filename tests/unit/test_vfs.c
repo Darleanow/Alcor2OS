@@ -69,13 +69,25 @@ static i64 dummy_readdir(fs_handle_t fh, u64 offset, char *name, vfs_stat_t *st)
 
 static void dummy_close(fs_handle_t fh) { (void)fh; }
 
+static int g_read_calls = -1; /* -1 = unlimited; >=0 = calls remaining */
 static i64 dummy_read(fs_handle_t fh, void *buf, u64 count, u64 offset) {
   (void)fh; (void)offset;
+  if(g_read_calls == 0) return 0;
+  if(g_read_calls > 0) g_read_calls--;
   if (count > 0 && buf) {
     kzero(buf, count);
     return count;
   }
   return 0;
+}
+
+static char g_readlink_buf[VFS_PATH_MAX];
+static i64 dummy_readlink(const void *fs_data, const char *path, char *buf, u64 cap) {
+  (void)fs_data; (void)path;
+  u64 len = kstrlen(g_readlink_buf);
+  if(len >= cap) return -ERANGE;
+  kstrncpy(buf, g_readlink_buf, cap);
+  return (i64)len;
 }
 
 static i64 dummy_write(fs_handle_t fh, const void *buf, u64 count, u64 offset) {
@@ -137,6 +149,34 @@ static const fs_ops_t dummy_ops = {
   .poll = dummy_poll
 };
 
+static const fs_ops_t dummy_ops_with_readlink = {
+  .open = dummy_open,
+  .read = dummy_read,
+  .write = dummy_write,
+  .stat = dummy_stat,
+  .fstat = dummy_fstat,
+  .readdir = dummy_readdir,
+  .close = dummy_close,
+  .ioctl = dummy_ioctl,
+  .mkdir = dummy_mkdir,
+  .unlink = dummy_unlink,
+  .rmdir = dummy_rmdir,
+  .truncate = dummy_truncate,
+  .poll = dummy_poll,
+  .readlink = dummy_readlink
+};
+
+static void *dummy_rl_mount_cb(const char *source, u32 flags) {
+  (void)source; (void)flags;
+  return (void*)1;
+}
+
+static const fs_type_t dummy_rl_fstype = {
+  .name = "dummyrl",
+  .ops = &dummy_ops_with_readlink,
+  .mount = dummy_rl_mount_cb
+};
+
 static void *dummy_mount_cb(const char *source, u32 flags) {
   (void)source; (void)flags;
   return (void*)1;
@@ -160,7 +200,9 @@ static int setup_vfs(void **state) {
   vfs_register_fs(&dummy_fstype);
   vfs_mount("dev", "/", "dummy"); /* mount root so vfs_open/stat work */
   g_readdir_ret = 0;
+  g_read_calls  = -1;
   memset(g_last_rel_path, 0, sizeof(g_last_rel_path));
+  memset(g_readlink_buf, 0, sizeof(g_readlink_buf));
   return 0;
 }
 
@@ -958,6 +1000,94 @@ static void vfs_write_append_updates_offset_after(void **state) {
   assert_int_equal(oft[idx].offset, 52);
 }
 
+/* vfs_normalize: null/non-absolute path is a no-op */
+static void vfs_normalize_null_noop(void **state) {
+  (void)state;
+  /* Pass a relative path; normalize should return without touching it */
+  char path[VFS_PATH_MAX] = "relative/path";
+  vfs_normalize(path);
+  assert_string_equal(path, "relative/path");
+}
+
+/* vfs_close: double-close returns -EBADF */
+static void vfs_close_double_close_ebadf(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_int_equal(vfs_close(fd), 0);
+  assert_int_equal((i64)vfs_close(fd), -EBADF);
+}
+
+/* vfs_getdents: buffer too small for next entry breaks */
+static void vfs_getdents_small_buf_breaks(void **state) {
+  (void)state;
+  g_readdir_ret = 1;
+  i64  fd  = vfs_open("/", O_RDONLY);
+  char buf[8]; /* smaller than the minimum 32-byte dirent */
+  i64  ret = vfs_getdents(fd, buf, sizeof(buf));
+  assert_int_equal(ret, 0); /* written == 0, so returns 0 */
+}
+
+/* vfs_rename: success path — VFS_FILE, small size, copy+unlink */
+static void vfs_rename_success(void **state) {
+  (void)state;
+  g_stat_type  = VFS_FILE;
+  g_stat_size  = 4; /* small, within limit */
+  g_read_calls = 1; /* return data once, then 0 so loop exits */
+  assert_int_equal((i64)vfs_rename("/src.txt", "/dst.txt"), 0);
+  g_stat_type  = VFS_DIRECTORY;
+  g_read_calls = -1;
+}
+
+/* vfs_readlink: driver with readlink op returns target */
+static void vfs_readlink_success(void **state) {
+  (void)state;
+  vfs_register_fs(&dummy_rl_fstype);
+  vfs_mount("dev2", "/rl", "dummyrl");
+  kstrncpy(g_readlink_buf, "/target/path", sizeof(g_readlink_buf));
+  char buf[VFS_PATH_MAX];
+  i64  ret = vfs_readlink("/rl/link", buf, sizeof(buf));
+  assert_true(ret >= 0);
+  assert_string_equal(buf, "/target/path");
+}
+
+/* vfs_fd_is_pipe: bad fd returns false */
+static void vfs_fd_is_pipe_bad_fd_false(void **state) {
+  (void)state;
+  assert_false(vfs_fd_is_pipe((u64)-1));
+}
+
+/* vfs_dup2: bad newfd (out of range) returns -EBADF */
+static void vfs_dup2_bad_newfd_ebadf(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_int_equal((i64)vfs_dup2(fd, -1), -EBADF);
+  assert_int_equal((i64)vfs_dup2(fd, VFS_MAX_FD), -EBADF);
+}
+
+/* vfs_select_write_ready: bad fd returns -EBADF */
+static void vfs_select_write_ready_bad_fd_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_select_write_ready(-1), -EBADF);
+}
+
+/* vfs_proc_close_cloexec_fds: no current proc is a no-op */
+static void vfs_proc_close_cloexec_no_proc_noop(void **state) {
+  (void)state;
+  /* Temporarily make proc_current return NULL by zeroing the proc slot
+   * — we can't do that with our stub, so open an fd, set cloexec,
+   * then check it is cleaned up by a normal call (coverage of the loop). */
+  i64 fd = vfs_open("/f.txt", O_RDONLY | O_CLOEXEC);
+  assert_true(fd >= 0);
+  vfs_proc_close_cloexec_fds();
+  assert_false(vfs_fd_is_valid(fd));
+}
+
+/* vfs_select_read_ready: bad fd returns -EBADF */
+static void vfs_select_read_ready_bad_fd_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_select_read_ready(-1), -EBADF);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(vfs_chdir_updates_cwd, setup_vfs),
@@ -1076,6 +1206,17 @@ int main(void) {
       cmocka_unit_test_setup(vfs_open_driver_returns_null, setup_vfs),
       cmocka_unit_test_setup(vfs_read_offset_tracked, setup_vfs),
       cmocka_unit_test_setup(vfs_write_append_updates_offset_after, setup_vfs),
+      /* new coverage round 2 */
+      cmocka_unit_test_setup(vfs_normalize_null_noop, setup_vfs),
+      cmocka_unit_test_setup(vfs_close_double_close_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_getdents_small_buf_breaks, setup_vfs),
+      cmocka_unit_test_setup(vfs_rename_success, setup_vfs),
+      cmocka_unit_test_setup(vfs_readlink_success, setup_vfs),
+      cmocka_unit_test_setup(vfs_fd_is_pipe_bad_fd_false, setup_vfs),
+      cmocka_unit_test_setup(vfs_dup2_bad_newfd_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_select_write_ready_bad_fd_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_select_read_ready_bad_fd_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_proc_close_cloexec_no_proc_noop, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

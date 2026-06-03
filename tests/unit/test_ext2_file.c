@@ -571,6 +571,209 @@ static void test_create_link_fails_rollback(void **state) {
     assert_null(f);
 }
 
+/* ext2_open: null vol → NULL */
+static void test_open_null_vol(void **state) {
+    (void)state;
+    assert_null(ext2_open(NULL, "/f"));
+}
+
+/* ext2_open: unmounted vol → NULL */
+static void test_open_unmounted(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = false};
+    assert_null(ext2_open(&vol, "/f"));
+}
+
+/* ext2_close: null → no-op, no crash */
+static void test_close_null(void **state) {
+    (void)state;
+    ext2_close(NULL); /* should not crash */
+}
+
+/* ext2_close: !in_use → no-op */
+static void test_close_not_in_use(void **state) {
+    (void)state;
+    g_files[0].in_use = false;
+    ext2_close(&g_files[0]); /* should not crash */
+}
+
+/* ext2_write: alloc_file_block fails → -ENOSPC */
+static void test_write_alloc_fails_enospc(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use    = true;
+    g_files[0].is_dir    = false;
+    g_files[0].vol       = &vol;
+    g_files[0].inode_num = 1;
+    g_files[0].inode.i_size = 0;
+
+    will_return(get_block_num, 0);    /* no existing block */
+    will_return(alloc_file_block, 0); /* alloc fails */
+
+    char buf[4] = "test";
+    i64 ret = ext2_write(&g_files[0], buf, 4, 0);
+    assert_int_equal(ret, -ENOSPC);
+}
+
+/* ext2_write: vol_read_block fails during partial r-m-w → -EIO */
+static void test_write_read_rmw_fail_eio(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use    = true;
+    g_files[0].is_dir    = false;
+    g_files[0].vol       = &vol;
+    g_files[0].inode_num = 1;
+    g_files[0].inode.i_size = 1024;
+
+    /* Write 4 bytes at offset 0 (partial → needs r-m-w) */
+    will_return(get_block_num, 5);      /* block exists */
+    will_return(vol_read_block, -1);    /* read fails */
+
+    char buf[4] = "test";
+    assert_int_equal((i64)ext2_write(&g_files[0], buf, 4, 0), -EIO);
+}
+
+/* ext2_write: vol_write_block fails → -EIO */
+static void test_write_write_block_fail_eio(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use    = true;
+    g_files[0].is_dir    = false;
+    g_files[0].vol       = &vol;
+    g_files[0].inode_num = 1;
+    g_files[0].inode.i_size = 1024;
+
+    will_return(get_block_num, 5);   /* block exists */
+    will_return(vol_read_block, 0);  /* read ok */
+    will_return(vol_write_block, -1);/* write fails */
+
+    char buf[4] = "test";
+    assert_int_equal((i64)ext2_write(&g_files[0], buf, 4, 0), -EIO);
+}
+
+/* ext2_write: partial write then error → return bytes already written */
+static void test_write_partial_then_error(void **state) {
+    (void)state;
+    /* Write 2*block_size bytes: first block succeeds, second fails → return 1024 */
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use    = true;
+    g_files[0].is_dir    = false;
+    g_files[0].vol       = &vol;
+    g_files[0].inode_num = 1;
+    g_files[0].inode.i_size = 2048;
+
+    /* First block (offset=0, full block): exists, no r-m-w, write succeeds */
+    will_return(get_block_num, 5);
+    will_return(vol_write_block, 0);
+    /* Second block (offset=1024, full block): exists, write fails */
+    will_return(get_block_num, 6);
+    will_return(vol_write_block, -1);
+
+    char buf[2048];
+    i64 ret = ext2_write(&g_files[0], buf, 2048, 0);
+    assert_int_equal(ret, 1024); /* partial: first block succeeded */
+}
+
+/* create_file_inode_and_link: alloc_inode returns 0 → ext2_create returns NULL */
+static void test_create_alloc_inode_fails(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .inodes_per_group = 100};
+
+    will_return(resolve_path, -ENOENT); /* file doesn't exist */
+
+    will_return(path_split, "/");
+    will_return(path_split, "newfile");
+
+    static ext2_inode_t parent = {.i_mode = EXT2_S_IFDIR | 0755};
+    will_return(resolve_path, 0);
+    will_return(resolve_path, (u32)2);
+    will_return(resolve_path, &parent);
+
+    will_return(alloc_inode, 0); /* fails */
+
+    assert_null(ext2_create(&vol, "/newfile"));
+}
+
+/* ext2_create: null vol → NULL */
+static void test_create_null_vol(void **state) {
+    (void)state;
+    assert_null(ext2_create(NULL, "/f"));
+}
+
+/* ext2_create: all file slots in use → NULL (claim_free_file_slot fails) */
+static void test_create_all_slots_used(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .inodes_per_group = 100};
+
+    will_return(resolve_path, -ENOENT); /* file doesn't exist */
+
+    for(int i = 0; i < EXT2_MAX_FILES; i++)
+        g_files[i].in_use = true; /* all slots taken → claim returns NULL */
+
+    assert_null(ext2_create(&vol, "/newfile"));
+}
+
+/* ext2_create: empty filename → NULL */
+static void test_create_empty_filename(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .inodes_per_group = 100};
+
+    will_return(resolve_path, -ENOENT);
+
+    will_return(path_split, "/");
+    will_return(path_split, ""); /* empty name */
+
+    assert_null(ext2_create(&vol, "/"));
+}
+
+/* ext2_truncate: write_inode fails → -EIO */
+static void test_truncate_write_inode_fail(void **state) {
+    (void)state;
+    ext2_volume_t vol = {0};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 100;
+
+    will_return(write_inode, -1); /* fails */
+
+    assert_int_equal((i64)ext2_truncate(&g_files[0], 50), -EIO);
+}
+
+/* ext2_flush: !in_use → -EINVAL */
+static void test_flush_not_in_use(void **state) {
+    (void)state;
+    g_files[0].in_use = false;
+    assert_int_equal((i64)ext2_flush(&g_files[0]), -EINVAL);
+}
+
+/* ext2_flush: write_inode fails → -EIO */
+static void test_flush_write_inode_fail(void **state) {
+    (void)state;
+    ext2_volume_t vol = {0};
+    g_files[0].in_use = true;
+    g_files[0].dirty  = true;
+    g_files[0].vol    = &vol;
+
+    will_return(write_inode, -1);
+
+    assert_int_equal((i64)ext2_flush(&g_files[0]), -EIO);
+}
+
+/* ext2_flush: flush_metadata fails → -EIO */
+static void test_flush_metadata_fail(void **state) {
+    (void)state;
+    ext2_volume_t vol = {0};
+    g_files[0].in_use = true;
+    g_files[0].dirty  = true;
+    g_files[0].vol    = &vol;
+
+    will_return(write_inode, 0);
+    will_return(flush_metadata, -1);
+
+    assert_int_equal((i64)ext2_flush(&g_files[0]), -EIO);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup(test_close_dirty, setup_test),
@@ -607,6 +810,23 @@ int main(void) {
         cmocka_unit_test_setup(test_read_io_error, setup_test),
         cmocka_unit_test_setup(test_write_no_cache_enomem, setup_test),
         cmocka_unit_test_setup(test_create_link_fails_rollback, setup_test),
+        /* new coverage */
+        cmocka_unit_test_setup(test_open_null_vol, setup_test),
+        cmocka_unit_test_setup(test_open_unmounted, setup_test),
+        cmocka_unit_test_setup(test_close_null, setup_test),
+        cmocka_unit_test_setup(test_close_not_in_use, setup_test),
+        cmocka_unit_test_setup(test_write_alloc_fails_enospc, setup_test),
+        cmocka_unit_test_setup(test_write_read_rmw_fail_eio, setup_test),
+        cmocka_unit_test_setup(test_write_write_block_fail_eio, setup_test),
+        cmocka_unit_test_setup(test_write_partial_then_error, setup_test),
+        cmocka_unit_test_setup(test_create_alloc_inode_fails, setup_test),
+        cmocka_unit_test_setup(test_create_null_vol, setup_test),
+        cmocka_unit_test_setup(test_create_all_slots_used, setup_test),
+        cmocka_unit_test_setup(test_create_empty_filename, setup_test),
+        cmocka_unit_test_setup(test_truncate_write_inode_fail, setup_test),
+        cmocka_unit_test_setup(test_flush_not_in_use, setup_test),
+        cmocka_unit_test_setup(test_flush_write_inode_fail, setup_test),
+        cmocka_unit_test_setup(test_flush_metadata_fail, setup_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
