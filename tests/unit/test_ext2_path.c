@@ -549,6 +549,41 @@ static void test_build_symlink_path_no_slash_base(void **state)
   assert_string_equal(out, "rel");
 }
 
+/* build_symlink_path: last_slash >= outsz → fallback to target copy (line 110) */
+static void test_build_symlink_path_tiny_outsz(void **state) {
+  (void)state;
+  char out[4];
+  /* base="/foo/bar/baz" has last_slash=9; outsz=4 < 9 → kstrncpy target */
+  build_symlink_path("/foo/bar/baz", "rel", out, 4);
+  /* out should contain "rel\0" (target copied directly) */
+  assert_string_equal(out, "rel");
+}
+
+/* resolve_path: symlink with remaining path → concat (lines 212-215) */
+static void test_resolve_path_symlink_with_rest(void **state) {
+  (void)state;
+  fs_reset();
+  /* Set up: root → dir "a" → symlink "lnk" → dir "b" (absolute) */
+  /* /a/lnk is a symlink to /b; resolve /a/lnk/file should follow lnk then file */
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* dir "a" under root */
+  fs_add(10, EXT2_ROOT_INODE, "a", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* symlink "lnk" under a → points to "/b" (fast symlink) */
+  mock_entry_t *sym = fs_add(11, 10, "lnk", EXT2_FT_SYMLINK, EXT2_S_IFLNK | 0777, 2);
+  memcpy(sym->inode.i_block, "/b", 2);
+  /* dir "b" under root */
+  fs_add(12, EXT2_ROOT_INODE, "b", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* file "file" under b */
+  fs_add(13, 12, "file", EXT2_FT_REG_FILE, EXT2_S_IFREG | 0644, 100);
+
+  u32          ino;
+  ext2_inode_t inode;
+  /* resolve /a/lnk/file → follows lnk to /b, then resolves /file under b */
+  i64 ret = resolve_path(&dummy_vol, "/a/lnk/file", &ino, &inode);
+  assert_int_equal(ret, 0);
+  assert_int_equal(ino, 13);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -601,6 +636,9 @@ int main(void)
       cmocka_unit_test(test_build_symlink_path_relative),
       cmocka_unit_test(test_build_symlink_path_absolute),
       cmocka_unit_test(test_build_symlink_path_no_slash_base),
+      /* new coverage */
+      cmocka_unit_test(test_build_symlink_path_tiny_outsz),
+      cmocka_unit_test(test_resolve_path_symlink_with_rest),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

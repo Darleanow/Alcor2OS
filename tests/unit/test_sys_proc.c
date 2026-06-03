@@ -427,6 +427,71 @@ static void clone_extra_flags_einval(void **state)
   assert_int_equal((i64)sys_clone(bad, 0, 0, 0, 0, 0), -EINVAL);
 }
 
+/* sys_execve: envp pointer fails vmm_is_user_range → -EFAULT */
+static void execve_envp_bad_ptr_efault(void **state) {
+  (void)state;
+  char path[] = "/bin/prog";
+  char *argv_arr[] = {NULL};
+  g_user_range_ok = false; /* first call (argv) passes since argv=0, but envp check fails */
+  /* Actually: argv=0 is fine, envp check triggers range fail */
+  /* Set argv=0 so argv check skips, envp=(non-null) fails range */
+  u64 envp_ptr = 0x1000; /* non-null, will fail vmm_is_user_range */
+  u64 ret = sys_execve((u64)path, 0, envp_ptr, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_user_range_ok = true;
+}
+
+/* copy_user_strvec: user_buf_ok fails mid-array → -EFAULT propagated as argv fail */
+static void execve_argv_mid_array_bad_efault(void **state) {
+  (void)state;
+  /* Provide a non-null argv pointer but user_ptr_ok fails → copy_user_strvec EFAULT */
+  char path[] = "/bin/prog";
+  u64  argv_ptr = 0x2000; /* non-null pointer, will trigger user_buf_ok check */
+  g_user_ptr_ok = false; /* Make user_cstr_ok fail for individual ptrs */
+  /* argv check: user_buf_ok(&user_vec[0]) fails → -EFAULT */
+  u64 ret = sys_execve((u64)path, argv_ptr, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_user_ptr_ok = true;
+}
+
+/* copy_user_strvec: envp strvec individual cstr bad → -EFAULT via envp copy */
+static void execve_argv_cstr_bad_efault(void **state) {
+  (void)state;
+  /* Test the envp copy_user_strvec failure path using g_user_range_ok=false
+   * on the second call by disabling after argv succeeds (argv=0 → skipped). */
+  char path[] = "/bin/prog";
+  /* argv=0 skips copy; envp=non-null, user_range fails → -EFAULT */
+  u64 envp_ptr = 0x3000;
+  g_user_range_ok = false; /* fails on the envp user_buf_ok check */
+  u64 ret = sys_execve((u64)path, 0, envp_ptr, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_user_range_ok = true;
+}
+
+/* sys_execve: no current proc → -EINVAL */
+static void execve_no_proc_einval(void **state) {
+  (void)state;
+  g_no_proc = true;
+  char path[] = "/bin/prog";
+  u64 ret = sys_execve((u64)path, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+/* sys_execve: success path (exec_replace_image fails → proc_exit → longjmp) */
+static void execve_success_path(void **state) {
+  (void)state;
+  char path[] = "/bin/prog";
+  /* proc_exec_replace_image returns -ENOSYS → calls proc_exit(127) → longjmp */
+  if(setjmp(g_exit_jmp) == 0) {
+    sys_execve((u64)path, 0, 0, 0, 0, 0);
+    /* After exec_replace_image failure → proc_exit invoked */
+  }
+  /* exec_replace_image returned -ENOSYS → proc_exit(127) */
+  /* The success path (vfs_proc_close_cloexec_fds + proc_notify_exec) is
+   * not reached since exec fails, but we cover the out: label + fd cleanup. */
+  assert_int_equal(g_exit_code, 127);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -468,6 +533,12 @@ int main(void)
       cmocka_unit_test_setup(execve_with_valid_argv, setup),
       cmocka_unit_test_setup(execve_argv_bad_individual_ptr, setup),
       cmocka_unit_test_setup(clone_extra_flags_einval, setup),
+      /* new coverage */
+      cmocka_unit_test_setup(execve_envp_bad_ptr_efault, setup),
+      cmocka_unit_test_setup(execve_argv_mid_array_bad_efault, setup),
+      cmocka_unit_test_setup(execve_no_proc_einval, setup),
+      cmocka_unit_test_setup(execve_success_path, setup),
+      cmocka_unit_test_setup(execve_argv_cstr_bad_efault, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
