@@ -445,6 +445,45 @@ static void ram_mkdir_already_exists(void **state) {
   assert_int_equal((i64)ram_mkdir(NULL, "/existdir"), -EEXIST);
 }
 
+/* ram_read: count > available bytes — truncated to avail */
+static void ram_read_count_clamped_to_avail(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/clamp", O_CREAT | O_WRONLY);
+  ram_write(fh, "hi", 2, 0);
+  char buf[16] = {0};
+  /* Ask for 16 bytes but only 2 available */
+  i64 ret = ram_read(fh, buf, 16, 0);
+  assert_int_equal(ret, 2);
+  assert_memory_equal(buf, "hi", 2);
+}
+
+/* ram_unlink: removes non-first child from list (prev->next path) */
+static void ram_rmdir_non_first_child(void **state) {
+  (void)state;
+  ram_mkdir(NULL, "/sub1");
+  ram_mkdir(NULL, "/sub2");
+  /* sub2 is after sub1 in root's children */
+  assert_int_equal(ram_rmdir(NULL, "/sub2"), 0);
+  assert_null(ram__resolve("/sub2"));
+  assert_non_null(ram__resolve("/sub1"));
+}
+
+/* ram_mkdir: no last slash → -EINVAL */
+static void ram_mkdir_no_slash_einval(void **state) {
+  (void)state;
+  /* Path with no slash at all is caught by the no-last-slash guard */
+  assert_int_equal((i64)ram_mkdir(NULL, "nodir"), -EINVAL);
+}
+
+/* ram_write: near u64 overflow returns -EFBIG */
+static void ram_write_near_overflow_efbig(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/of2", O_CREAT | O_WRONLY);
+  /* offset + count overflows: use (u64)-1 - 3 + 10 */
+  u64 big_offset = (u64)-1 - 3;
+  assert_int_equal((i64)ram_write(fh, "x", 10, big_offset), -EFBIG);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(ram_mkdir_creates_directory, reset_ramfs),
@@ -506,6 +545,10 @@ int main(void) {
       cmocka_unit_test_setup(ram_truncate_dir_returns_eisdir, reset_ramfs),
       /* ram_mkdir extra */
       cmocka_unit_test_setup(ram_mkdir_already_exists, reset_ramfs),
+      cmocka_unit_test_setup(ram_read_count_clamped_to_avail, reset_ramfs),
+      cmocka_unit_test_setup(ram_rmdir_non_first_child, reset_ramfs),
+      cmocka_unit_test_setup(ram_mkdir_no_slash_einval, reset_ramfs),
+      cmocka_unit_test_setup(ram_write_near_overflow_efbig, reset_ramfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

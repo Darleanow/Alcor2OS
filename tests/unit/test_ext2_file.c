@@ -14,7 +14,8 @@
 void *kmalloc(u64 n) { return malloc(n); }
 void kfree(void *p) { if(p) free(p); }
 
-u8 *cache_get_block(u32 s) { return malloc(s); }
+static bool g_cache_fail = false;
+u8 *cache_get_block(u32 s) { return g_cache_fail ? NULL : malloc(s); }
 void cache_put_block(u8 *p) { if(p) free(p); }
 
 /* Mocks */
@@ -89,6 +90,7 @@ static int setup_test(void **state) {
         g_files[i].dirty = false;
         g_files[i].vol = NULL;
     }
+    g_cache_fail = false;
     return 0;
 }
 
@@ -497,6 +499,78 @@ static void test_open_directory_inode(void **state) {
     assert_true(f->is_dir);
 }
 
+/* ext2_read: cache_get_block fails → -ENOMEM */
+static void test_read_no_cache_enomem(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .block_size = 1024};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 100;
+    g_cache_fail = true; /* cache_get_block returns NULL */
+    char buf[10];
+    assert_int_equal((i64)ext2_read(&g_files[0], buf, 10, 0), -ENOMEM);
+}
+
+/* ext2_read: vol_read_block fails → -EIO */
+static void test_read_io_error(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .block_size = 1024};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 1024;
+
+    will_return(get_block_num, 5); /* block exists */
+    will_return(vol_read_block, -1); /* read fails */
+
+    char buf[512];
+    assert_int_equal((i64)ext2_read(&g_files[0], buf, 512, 0), -EIO);
+}
+
+/* ext2_write: cache_get_block fails → -ENOMEM */
+static void test_write_no_cache_enomem(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.block_size = 1024, .inodes_per_group = 100};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode_num = 1;
+    g_files[0].inode.i_size = 0;
+    g_cache_fail = true;
+    char buf[4] = "hi";
+    assert_int_equal((i64)ext2_write(&g_files[0], buf, 2, 0), -ENOMEM);
+}
+
+/* ext2_create: dir_add_entry fails → rollback inode */
+static void test_create_link_fails_rollback(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true, .inodes_per_group = 100};
+
+    /* 1. resolve_path(path): file doesn't exist yet */
+    will_return(resolve_path, -ENOENT);
+
+    /* 2. path_split */
+    will_return(path_split, "/");
+    will_return(path_split, "newfile");
+
+    /* 3. validate_parent_for_create → resolve_path(parent) succeeds */
+    static ext2_inode_t parent = {.i_mode = EXT2_S_IFDIR | 0755};
+    will_return(resolve_path, 0);
+    will_return(resolve_path, (u32)2);
+    will_return(resolve_path, &parent);
+
+    /* 4. create_file_inode_and_link */
+    will_return(alloc_inode, 10);
+    will_return(write_inode, 0);
+    /* dir_add_entry fails → rollback */
+    will_return(dir_add_entry, -EIO);
+    will_return(free_inode, 0);
+
+    ext2_file_t *f = ext2_create(&vol, "/newfile");
+    assert_null(f);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup(test_close_dirty, setup_test),
@@ -529,6 +603,10 @@ int main(void) {
         cmocka_unit_test_setup(test_open_directory_inode, setup_test),
         cmocka_unit_test_setup(test_open_all_slots_used_null, setup_test),
         cmocka_unit_test_setup(test_read_run_chunk_success, setup_test),
+        cmocka_unit_test_setup(test_read_no_cache_enomem, setup_test),
+        cmocka_unit_test_setup(test_read_io_error, setup_test),
+        cmocka_unit_test_setup(test_write_no_cache_enomem, setup_test),
+        cmocka_unit_test_setup(test_create_link_fails_rollback, setup_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
