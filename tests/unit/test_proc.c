@@ -101,10 +101,15 @@ void    cpu_enable_interrupts(void) {}
 
 void proc_enter_first_time(void) {}
 void proc_fork_child_entry(void) {}
+static void (*g_context_switch_cb)(void) = NULL;
 void context_switch(u64 *old_rsp, u64 new_rsp)
 {
   (void)old_rsp;
   (void)new_rsp;
+  if(g_context_switch_cb) {
+    g_context_switch_cb();
+    g_context_switch_cb = NULL; /* one-shot */
+  }
 }
 void context_switch_first(u64 new_rsp) { (void)new_rsp; }
 
@@ -132,9 +137,10 @@ static int setup(void **state)
       PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0
   );
   proc_init();
-  current_proc = NULL;
-  next_pid     = 1;
-  need_resched = false;
+  current_proc        = NULL;
+  next_pid            = 1;
+  need_resched        = false;
+  g_context_switch_cb = NULL;
   return 0;
 }
 
@@ -856,6 +862,73 @@ static void test_proc_exit_parent_waiting_for_other_not_woken(void **state)
   assert_int_equal(parent->state, PROC_STATE_BLOCKED);
 }
 
+/* proc_clone: delegates to proc_fork_impl */
+static void test_proc_clone_delegates(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame = {0};
+  i64 child_pid = proc_clone(&frame, 0, 0);
+  assert_true(child_pid > 0);
+}
+
+/* proc_waitpid any-child blocking loop: child not zombie at first scan,
+   becomes zombie inside context_switch callback */
+static proc_t *g_blocking_child;
+static void make_child_zombie(void)
+{
+  if(g_blocking_child)
+    g_blocking_child->state = PROC_STATE_ZOMBIE;
+}
+
+static void test_waitpid_any_child_enters_blocking_loop(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame = {0};
+  i64 child_pid         = proc_fork(&frame);
+  proc_t *child         = proc_get(child_pid);
+
+  /* Child is READY (not zombie) so initial scan finds a non-zombie child */
+  child->state        = PROC_STATE_READY;
+  child->exit_code    = 11;
+  g_blocking_child    = child;
+  /* context_switch callback makes child zombie so loop exits */
+  g_context_switch_cb = make_child_zombie;
+
+  i32 status = 0;
+  i64 ret    = proc_waitpid(-1, &status, 0);
+  assert_int_equal(ret, child_pid);
+}
+
+/* proc_waitpid specific-child blocking: loop runs, child becomes zombie */
+static void test_waitpid_specific_blocking_loop(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame = {0};
+  i64 child_pid         = proc_fork(&frame);
+  proc_t *child         = proc_get(child_pid);
+
+  /* Child is READY — not zombie — so blocking while loop will be entered */
+  child->state        = PROC_STATE_READY;
+  child->exit_code    = 5;
+  g_blocking_child    = child;
+  g_context_switch_cb = make_child_zombie;
+
+  i64 ret = proc_waitpid(child_pid, NULL, 0);
+  assert_int_equal(ret, child_pid);
+}
+
 /* proc_alloc exhaustion: filling all slots returns 0 from proc_create_mem */
 static void test_proc_alloc_exhaustion_returns_zero(void **state)
 {
@@ -985,6 +1058,9 @@ int main(void)
       cmocka_unit_test_setup_teardown(test_waitpid_any_child_zombie_found_in_loop, setup, teardown),
       cmocka_unit_test_setup_teardown(test_waitpid_specific_child_found_zombie_after_schedule, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_exit_parent_waiting_for_other_not_woken, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_clone_delegates, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_any_child_enters_blocking_loop, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_specific_blocking_loop, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_alloc_exhaustion_returns_zero, setup, teardown),
       cmocka_unit_test_setup_teardown(test_waitpid_any_child_blocking_loop, setup, teardown),
       cmocka_unit_test_setup_teardown(test_waitpid_specific_child_disappears_after_schedule, setup, teardown),

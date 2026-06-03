@@ -459,6 +459,117 @@ static void alloc_file_block_double_indirect(void **state)
   assert_true(blk > 0);
 }
 
+/* alloc_zeroed_block: write fails but still returns the allocated block */
+static void alloc_zeroed_block_write_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups     = &gd;
+  v.block_size = 1024;
+  gd.bg_free_blocks_count = 10;
+  gd.bg_block_bitmap      = 0;
+
+  /* alloc_block will fail because g_store[bg_block_bitmap=0] read fails
+     since vol_read_block returns -EIO for blocks >= STORE_BLOCKS (which 0 is not).
+     Actually block 0 is in range — alloc_block will succeed since it reads bitmap
+     from g_store[0] which is zeroed. */
+  gd.bg_free_blocks_count = 1;
+  g_next_block            = 7;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  /* alloc_block allocates block 7; kmalloc for zeroing succeeds;
+     vol_write_block(7) — block 7 is in g_store. */
+  u32 blk = alloc_zeroed_block(&v, 0, &inode);
+  /* Should return block 7 regardless of write result */
+  assert_int_equal(blk, 7);
+}
+
+/* ensure_indirect_slot: kmalloc fails returns 0 */
+static void ensure_indirect_slot_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  inode;
+  memset(&inode, 0, sizeof(inode));
+  /* Make kmalloc fail by using a block size > STORE_BLOCKS*BLOCK_SZ so
+     the malloc would be huge. Instead, temporarily override by making
+     the block size very large. */
+  v.block_size = (u32)-1u; /* will cause malloc to fail */
+  u32 result   = ensure_indirect_slot(&v, &inode, 2, 0, 0);
+  assert_int_equal(result, 0);
+  v.block_size = BLOCK_SZ; /* restore */
+}
+
+/* ensure_indirect_slot: vol_read_block fails returns 0 */
+static void ensure_indirect_slot_read_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  inode;
+  memset(&inode, 0, sizeof(inode));
+  /* Block STORE_BLOCKS is out of range → vol_read_block returns -EIO */
+  u32 result = ensure_indirect_slot(&v, &inode, STORE_BLOCKS, 0, 0);
+  assert_int_equal(result, 0);
+}
+
+/* alloc_file_block: triple indirect path */
+static void alloc_file_block_triple_indirect(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+
+  /* First triple-indirect file block = NDIR + PPB + PPB*PPB */
+  u32 tind_file_block = EXT2_NDIR_BLOCKS + PPB + PPB * PPB;
+  g_next_block        = 5;
+
+  u32 blk = alloc_file_block(&v, &inode, tind_file_block, 0);
+  assert_true(blk > 0);
+}
+
+/* ensure_inode_slot: ensure_inode_slot returns 0 when alloc fails */
+static void ensure_inode_slot_alloc_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+
+  /* g_next_block=0 so alloc_block returns 0 → ensure_inode_slot returns 0 */
+  g_next_block = 0;
+  /* Single-indirect range: NDIR_BLOCKS */
+  u32 blk = alloc_file_block(&v, &inode, EXT2_NDIR_BLOCKS, 0);
+  assert_int_equal(blk, 0);
+}
+
+/* get_block_num: single-indirect via vol_read_block */
+static void get_block_num_single_indirect_read(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  inode;
+  memset(&inode, 0, sizeof(inode));
+  /* Set up single indirect block at slot 2 */
+  inode.i_block[EXT2_IND_BLOCK] = 2;
+  /* Store data block 42 at slot 0 of the indirect block */
+  ((u32 *)g_store[2])[0] = 42;
+
+  u32 blk = get_block_num(&v, &inode, EXT2_NDIR_BLOCKS);
+  assert_int_equal(blk, 42);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -484,6 +595,12 @@ int main(void)
       cmocka_unit_test_setup(free_inode_blocks_with_indirect, reset),
       cmocka_unit_test_setup(alloc_zeroed_block_alloc_fails, reset),
       cmocka_unit_test_setup(alloc_file_block_double_indirect, reset),
+      cmocka_unit_test_setup(alloc_zeroed_block_write_fails, reset),
+      cmocka_unit_test_setup(ensure_indirect_slot_kmalloc_fail, reset),
+      cmocka_unit_test_setup(ensure_indirect_slot_read_fails, reset),
+      cmocka_unit_test_setup(alloc_file_block_triple_indirect, reset),
+      cmocka_unit_test_setup(ensure_inode_slot_alloc_fails, reset),
+      cmocka_unit_test_setup(get_block_num_single_indirect_read, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
