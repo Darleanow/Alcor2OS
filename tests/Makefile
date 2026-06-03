@@ -33,7 +33,7 @@ SUITES := ext2_super ext2_dir vfs  ramfs  initfs  ext2_dir_block  ext2_alloc_rw 
           ext2_alloc ext2_path ext2_dirent \
           ext2_blockmap ext2_inode compiler_abi ext2_file pmm vmm heap proc \
           elf signal pipe \
-          palette sgr sys_misc sys_mm sys_proc sys_io sys_fs \
+          palette sgr sys_misc sys_mm sys_proc sys_io sys_fs ext2_ops \
           kbd_layout fb_console_caret_cell fb_console_pixel \
           grendizer echo cat ls wc bin_misc kbd \
           vega_fntab vega_expand vega_exec \
@@ -79,6 +79,7 @@ SRC_sys_mm   :=
 SRC_sys_proc           :=
 SRC_sys_io             :=
 SRC_sys_fs             :=
+SRC_ext2_ops           :=
 SRC_signal             :=
 SRC_pipe               :=
 SRC_kbd_layout         :=
