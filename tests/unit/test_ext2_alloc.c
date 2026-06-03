@@ -14,9 +14,10 @@
 #include <fs/ext2/internal.h>
 
 #include <stdlib.h>
-static bool g_io_ok       = false; /* default: I/O fails */
-static bool g_kmalloc_ok  = false; /* default: alloc fails */
-static u8   g_bitmap_buf[1024];    /* shared bitmap buffer for tests */
+static bool g_io_ok        = false; /* default: I/O fails */
+static bool g_write_fail   = false; /* override: make write fail even when io_ok */
+static bool g_kmalloc_ok   = false; /* default: alloc fails */
+static u8   g_bitmap_buf[1024];     /* shared bitmap buffer for tests */
 void *kmalloc(u64 n) { return g_kmalloc_ok ? calloc(1, n) : NULL; }
 void  kfree(void *p) { free(p); }
 void *kmemcpy(void *d, const void *s, u64 n) { return memcpy(d, s, n); }
@@ -47,7 +48,7 @@ i64 vol_read_block(const ext2_volume_t *v, u32 b, void *buf)
 i64 vol_write_block(const ext2_volume_t *v, u32 b, const void *buf)
 {
   (void)v; (void)b;
-  if(!g_io_ok) return -1;
+  if(!g_io_ok || g_write_fail) return -1;
   memcpy(g_bitmap_buf, buf, 1024);
   return 0;
 }
@@ -370,6 +371,94 @@ static void free_inode_dir_decrements_dir_count(void **state)
   assert_int_equal(vol.groups[0].bg_used_dirs_count, 1);
 }
 
+/* alloc_block_in_group: bitmap full (all bits set) → bitmap_find_clear returns -1 */
+static void alloc_block_bitmap_full(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0xFF, sizeof(g_bitmap_buf)); /* all blocks allocated */
+  assert_int_equal(alloc_block_in_group(&vol, 0), 0);
+}
+
+/* alloc_block_in_group: vol_write_block fails → returns 0 */
+static void alloc_block_write_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  g_write_fail = true; /* make write fail */
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf));
+  assert_int_equal(alloc_block_in_group(&vol, 0), 0);
+  g_write_fail = false;
+}
+
+/* alloc_block: fallback to second group when preferred is full */
+static void alloc_block_fallback_group(void **state)
+{
+  (void)state;
+  /* Build a volume with 2 groups */
+  ext2_volume_t vol;
+  memset(&vol, 0, sizeof(vol));
+  vol.block_size       = 1024;
+  vol.blocks_per_group = 1024 * 8;
+  vol.groups_count     = 2;
+  vol.first_data_block = 1;
+  vol.blocks_count     = vol.first_data_block + 2 * vol.blocks_per_group;
+  vol.inodes_per_group = 1024;
+  vol.inodes_count     = 2048;
+  vol.sb.s_free_blocks_count = vol.blocks_per_group;
+
+  static ext2_group_desc_t gds[2];
+  memset(gds, 0, sizeof(gds));
+  gds[0].bg_block_bitmap      = 2; /* group 0: full */
+  gds[0].bg_free_blocks_count = 0; /* group 0 has no free blocks */
+  gds[1].bg_block_bitmap      = 4; /* group 1: has free blocks */
+  gds[1].bg_free_blocks_count = vol.blocks_per_group;
+  vol.groups = gds;
+
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf)); /* group 1 bitmap: free */
+
+  /* preferred_group=0 is full → should fall back to group 1 */
+  u32 block = alloc_block(&vol, 0);
+  assert_true(block > 0);
+  /* block should be in group 1's range */
+  assert_true(block >= vol.first_data_block + vol.blocks_per_group);
+}
+
+/* alloc_inode_in_group: bitmap full returns 0 */
+static void alloc_inode_bitmap_full(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0xFF, sizeof(g_bitmap_buf)); /* all inodes allocated */
+  u32 ino = alloc_inode(&vol, 0, false);
+  assert_int_equal(ino, 0);
+}
+
+/* free_block: write I/O failure returns -EIO */
+static void free_block_write_io_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  g_write_fail = true; /* read succeeds, write fails */
+  memset(g_bitmap_buf, 0xFF, sizeof(g_bitmap_buf));
+  assert_int_equal((i64)free_block(&vol, vol.first_data_block), -EIO);
+  g_write_fail = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -402,6 +491,12 @@ int main(void)
       cmocka_unit_test(alloc_inode_dir_bumps_dir_count),
       cmocka_unit_test(free_inode_zero_einval),
       cmocka_unit_test(free_inode_dir_decrements_dir_count),
+      /* new coverage */
+      cmocka_unit_test(alloc_block_bitmap_full),
+      cmocka_unit_test(alloc_block_write_fails),
+      cmocka_unit_test(alloc_block_fallback_group),
+      cmocka_unit_test(alloc_inode_bitmap_full),
+      cmocka_unit_test(free_block_write_io_fail),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

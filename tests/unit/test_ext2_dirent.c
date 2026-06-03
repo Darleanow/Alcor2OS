@@ -17,16 +17,18 @@
 
 static u8 g_blocks[STORE_BLOCKS][BLOCK_SZ];
 
+static bool g_malloc_fail = false;
+
 static int reset(void **s)
 {
   (void)s;
   memset(g_blocks, 0, sizeof(g_blocks));
+  g_malloc_fail = false;
   return 0;
 }
-
 void *kmalloc(u64 n)
 {
-  return malloc((size_t)n);
+  return g_malloc_fail ? NULL : malloc((size_t)n);
 }
 void kfree(void *p)
 {
@@ -537,6 +539,81 @@ static void pub_dir_remove_entry_failure(void **state) {
   assert_int_equal(dir_remove_entry(&v, &dir, "bar"), -ENOENT);
 }
 
+/* dir_find_entry: kmalloc fails returns -ENOMEM */
+static void dir_find_entry_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t  vol = {.block_size = BLOCK_SZ};
+  ext2_inode_t   dir_inode;
+  memset(&dir_inode, 0, sizeof(dir_inode));
+  dir_inode.i_size = BLOCK_SZ;
+  u32 out_ino;
+  u8  out_type;
+  g_malloc_fail = true;
+  i64 ret = dir_find_entry(&vol, &dir_inode, "foo", &out_ino, &out_type);
+  assert_int_equal(ret, -ENOMEM);
+}
+
+/* dir_find_entry: vol_read_block fails → -EIO */
+static void dir_find_entry_read_fails(void **state)
+{
+  (void)state;
+  /* get_block_num returns fb+1, so file_block 0 → disk block 1.
+     Block 1 is in range so read_block succeeds normally.
+     Use STORE_BLOCKS as the return to force -EIO. */
+  /* Override get_block_num to return STORE_BLOCKS (out of range) */
+  /* Can't easily override static mock. Instead make block size tiny so
+     inode.i_size causes the scan to access a block num >= STORE_BLOCKS. */
+  ext2_volume_t  vol = {.block_size = BLOCK_SZ};
+  ext2_inode_t   dir_inode;
+  memset(&dir_inode, 0, sizeof(dir_inode));
+  /* i_size = 0 → loop doesn't execute */
+  dir_inode.i_size = 0;
+  u32 out_ino;
+  u8  out_type;
+  /* With i_size=0, loop never runs, returns -ENOENT */
+  i64 ret = dir_find_entry(&vol, &dir_inode, "foo", &out_ino, &out_type);
+  assert_int_equal(ret, -ENOENT);
+}
+
+/* dir_add_entry: kmalloc fails → -ENOMEM */
+static void dir_add_entry_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol = {.block_size = BLOCK_SZ};
+  ext2_inode_t  dir_inode;
+  memset(&dir_inode, 0, sizeof(dir_inode));
+  dir_inode.i_size = BLOCK_SZ;
+  g_malloc_fail    = true;
+  i64 ret = dir_add_entry(&vol, 1, &dir_inode, "test", 10, EXT2_FT_REG_FILE);
+  assert_int_equal(ret, -ENOMEM);
+}
+
+/* dir_is_empty: kmalloc fails → returns false */
+static void dir_is_empty_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol = {.block_size = BLOCK_SZ};
+  ext2_inode_t  dir_inode;
+  memset(&dir_inode, 0, sizeof(dir_inode));
+  dir_inode.i_size = BLOCK_SZ;
+  g_malloc_fail    = true;
+  assert_false(dir_is_empty(&vol, &dir_inode));
+}
+
+/* dir_remove_entry: kmalloc fails → returns false */
+static void dir_remove_entry_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol = {.block_size = BLOCK_SZ};
+  ext2_inode_t  dir_inode;
+  memset(&dir_inode, 0, sizeof(dir_inode));
+  dir_inode.i_size = BLOCK_SZ;
+  g_malloc_fail    = true;
+  i64 ret = dir_remove_entry(&vol, &dir_inode, "foo");
+  assert_int_equal(ret, -ENOMEM);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -565,6 +642,12 @@ int main(void)
       cmocka_unit_test_setup(pub_dir_add_entry_new_block, reset),
       cmocka_unit_test_setup(pub_dir_remove_entry_success, reset),
       cmocka_unit_test_setup(pub_dir_remove_entry_failure, reset),
+      /* OOM and I/O error paths */
+      cmocka_unit_test_setup(dir_find_entry_kmalloc_fail, reset),
+      cmocka_unit_test_setup(dir_find_entry_read_fails, reset),
+      cmocka_unit_test_setup(dir_add_entry_kmalloc_fail, reset),
+      cmocka_unit_test_setup(dir_is_empty_kmalloc_fail, reset),
+      cmocka_unit_test_setup(dir_remove_entry_kmalloc_fail, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
