@@ -371,6 +371,94 @@ static void alloc_file_block_returns_zero_when_alloc_fails(void **state)
   assert_int_equal(blk, 0);
 }
 
+/* free_indirect_subtree: with a real singly-indirect block */
+static void free_indirect_subtree_single(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  /* Store an indirect block at slot 5 pointing to data block 7 */
+  ((u32 *)g_store[5])[0] = 7;
+  /* free_indirect_subtree at depth=0 should free data block 7, then block 5 */
+  free_indirect_subtree(&v, 5, 0);
+  /* After freeing, the block entries are cleared via free_block (noop stub) */
+  /* Just verify no crash and the function completes */
+}
+
+/* free_indirect_subtree: depth=1 walks double-indirect */
+static void free_indirect_subtree_double(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  /* dind[4] points to an indirect block at slot 8 */
+  ((u32 *)g_store[4])[0] = 8;
+  /* ind block 8 points to data block 12 */
+  ((u32 *)g_store[8])[0] = 12;
+
+  free_indirect_subtree(&v, 4, 1); /* depth=1 → double indirect */
+}
+
+/* free_inode_blocks: with indirect blocks set — walks and clears them */
+static void free_inode_blocks_with_indirect(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  inode.i_block[0]             = 2;  /* direct */
+  inode.i_block[EXT2_IND_BLOCK] = 3; /* single indirect pointing to nothing */
+
+  assert_int_equal(free_inode_blocks(&v, &inode), 0);
+  assert_int_equal(inode.i_block[0], 0);
+  assert_int_equal(inode.i_block[EXT2_IND_BLOCK], 0);
+}
+
+/* alloc_zeroed_block: alloc_block fails returns 0 */
+static void alloc_zeroed_block_alloc_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  g_next_block = 0; /* alloc_block returns 0 = failure */
+  assert_int_equal(alloc_zeroed_block(&v, 0, &inode), 0);
+}
+
+/* alloc_file_block: double indirect */
+static void alloc_file_block_double_indirect(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+
+  /* file_block = EXT2_NDIR_BLOCKS + PPB (first double-indirect block) */
+  u32 dind_file_block = EXT2_NDIR_BLOCKS + PPB;
+  g_next_block        = 5; /* alloc returns 5, 6, 7, ... */
+
+  u32 blk = alloc_file_block(&v, &inode, dind_file_block, 0);
+  assert_true(blk > 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -391,6 +479,11 @@ int main(void)
       cmocka_unit_test_setup(
           alloc_file_block_returns_zero_when_alloc_fails, reset
       ),
+      cmocka_unit_test_setup(free_indirect_subtree_single, reset),
+      cmocka_unit_test_setup(free_indirect_subtree_double, reset),
+      cmocka_unit_test_setup(free_inode_blocks_with_indirect, reset),
+      cmocka_unit_test_setup(alloc_zeroed_block_alloc_fails, reset),
+      cmocka_unit_test_setup(alloc_file_block_double_indirect, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

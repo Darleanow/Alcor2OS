@@ -13,8 +13,12 @@
 #include <alcor2/types.h>
 #include <fs/ext2/internal.h>
 
-void *kmalloc(u64 n) { (void)n; return NULL; }
-void  kfree(void *p) { (void)p; }
+#include <stdlib.h>
+static bool g_io_ok       = false; /* default: I/O fails */
+static bool g_kmalloc_ok  = false; /* default: alloc fails */
+static u8   g_bitmap_buf[1024];    /* shared bitmap buffer for tests */
+void *kmalloc(u64 n) { return g_kmalloc_ok ? calloc(1, n) : NULL; }
+void  kfree(void *p) { free(p); }
 void *kmemcpy(void *d, const void *s, u64 n) { return memcpy(d, s, n); }
 void  kzero(void *d, u64 n) { memset(d, 0, n); }
 u64   kstrlen(const char *s) { u64 n=0; while(s[n]) n++; return n; }
@@ -32,15 +36,20 @@ i64 write_inode(const ext2_volume_t *v, u32 i, const ext2_inode_t *n)
 {
   (void)v; (void)i; (void)n; return -1;
 }
-/* vol_read_block / vol_write_block live in super.c — stub as always-failing
- * I/O so the bitmap unit tests (pure bit-manipulation) link and run. */
+/* vol_read_block / vol_write_block: controllable for alloc tests */
 i64 vol_read_block(const ext2_volume_t *v, u32 b, void *buf)
 {
-  (void)v; (void)b; (void)buf; return -1;
+  (void)v; (void)b;
+  if(!g_io_ok) return -1;
+  memcpy(buf, g_bitmap_buf, 1024);
+  return 0;
 }
 i64 vol_write_block(const ext2_volume_t *v, u32 b, const void *buf)
 {
-  (void)v; (void)b; (void)buf; return -1;
+  (void)v; (void)b;
+  if(!g_io_ok) return -1;
+  memcpy(g_bitmap_buf, buf, 1024);
+  return 0;
 }
 i64 flush_metadata(ext2_volume_t *v)
 {
@@ -159,6 +168,208 @@ static void find_clear_middle_of_byte(void **state)
   assert_int_equal(bitmap_find_clear(bm, 8), 3);
 }
 
+/* Helper: build a minimal ext2_volume_t with one group */
+static void build_vol(ext2_volume_t *vol, u32 block_size)
+{
+  memset(vol, 0, sizeof(*vol));
+  vol->block_size         = block_size;
+  vol->blocks_per_group   = block_size * 8; /* one bitmap byte per block */
+  vol->groups_count       = 1;
+  vol->first_data_block   = 1;
+  vol->blocks_count       = vol->first_data_block + vol->blocks_per_group;
+  vol->inodes_per_group   = block_size * 8;
+  vol->inodes_count       = vol->inodes_per_group; /* one group of inodes */
+  vol->sb.s_free_blocks_count = vol->blocks_per_group;
+  vol->sb.s_free_inodes_count = vol->inodes_per_group;
+  /* Set up single group descriptor */
+  static ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  gd.bg_block_bitmap      = 2;
+  gd.bg_inode_bitmap      = 3;
+  gd.bg_free_blocks_count = vol->blocks_per_group;
+  gd.bg_free_inodes_count = vol->inodes_per_group;
+  vol->groups = &gd;
+}
+
+/* alloc_block_in_group: group out of range returns 0 */
+static void alloc_block_in_group_bad_group(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  /* group=1 >= groups_count=1 */
+  assert_int_equal(alloc_block_in_group(&vol, 1), 0);
+}
+
+/* alloc_block_in_group: no free blocks returns 0 */
+static void alloc_block_in_group_no_free(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  vol.groups[0].bg_free_blocks_count = 0;
+  assert_int_equal(alloc_block_in_group(&vol, 0), 0);
+}
+
+/* alloc_block_in_group: kmalloc failure returns 0 */
+static void alloc_block_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = false;
+  assert_int_equal(alloc_block_in_group(&vol, 0), 0);
+}
+
+/* alloc_block_in_group: I/O failure returns 0 */
+static void alloc_block_io_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = false;
+  assert_int_equal(alloc_block_in_group(&vol, 0), 0);
+}
+
+/* alloc_block_in_group: success allocates block 1 (first data block) */
+static void alloc_block_in_group_success(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf)); /* all blocks free */
+
+  u32 block = alloc_block_in_group(&vol, 0);
+  assert_true(block > 0);
+  /* group 0, bit 0: first_data_block + 0 */
+  assert_int_equal(block, vol.first_data_block);
+  /* free count decremented */
+  assert_int_equal(vol.groups[0].bg_free_blocks_count,
+                   vol.blocks_per_group - 1);
+}
+
+/* alloc_block: prefers preferred group, falls back on failure */
+static void alloc_block_fallback(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  /* Two groups; preferred_group=1 is out of range so falls back to group 0 */
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf));
+  u32 block = alloc_block(&vol, 1); /* preferred=1, falls back to g=0 */
+  assert_true(block > 0);
+}
+
+/* free_block: out-of-range block returns -EINVAL */
+static void free_block_out_of_range(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  /* block 0 is below first_data_block=1 */
+  assert_int_equal((i64)free_block(&vol, 0), -EINVAL);
+  /* block at blocks_count is also out of range */
+  assert_int_equal((i64)free_block(&vol, vol.blocks_count), -EINVAL);
+}
+
+/* free_block: kmalloc failure returns -ENOMEM */
+static void free_block_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = false;
+  assert_int_equal((i64)free_block(&vol, vol.first_data_block), -ENOMEM);
+}
+
+/* free_block: read I/O failure returns -EIO */
+static void free_block_read_io_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = false;
+  assert_int_equal((i64)free_block(&vol, vol.first_data_block), -EIO);
+}
+
+/* free_block: success increments free count */
+static void free_block_success(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0xFF, sizeof(g_bitmap_buf)); /* all used */
+  vol.groups[0].bg_free_blocks_count = 0;
+  vol.sb.s_free_blocks_count = 0;
+
+  assert_int_equal(free_block(&vol, vol.first_data_block), 0);
+  assert_int_equal(vol.groups[0].bg_free_blocks_count, 1);
+  assert_int_equal(vol.sb.s_free_blocks_count, 1);
+}
+
+/* alloc_inode: success */
+static void alloc_inode_success(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf));
+
+  u32 ino = alloc_inode(&vol, 0, false);
+  assert_true(ino > 0);
+}
+
+/* alloc_inode: is_dir bumps dir count */
+static void alloc_inode_dir_bumps_dir_count(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf));
+  u32 before = vol.groups[0].bg_used_dirs_count;
+  u32 ino    = alloc_inode(&vol, 0, true);
+  assert_true(ino > 0);
+  assert_int_equal(vol.groups[0].bg_used_dirs_count, before + 1);
+}
+
+/* free_inode: out-of-range returns -EINVAL */
+static void free_inode_zero_einval(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  assert_int_equal((i64)free_inode(&vol, 0, false), -EINVAL);
+}
+
+/* free_inode: success decrements used_dirs for dir */
+static void free_inode_dir_decrements_dir_count(void **state)
+{
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0xFF, sizeof(g_bitmap_buf));
+  vol.groups[0].bg_used_dirs_count = 2;
+  vol.sb.s_free_inodes_count       = 0;
+  vol.groups[0].bg_free_inodes_count = 0;
+  /* inode 1 is in group 0 */
+  assert_int_equal(free_inode(&vol, 1, true), 0);
+  assert_int_equal(vol.groups[0].bg_used_dirs_count, 1);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -175,6 +386,22 @@ int main(void)
       cmocka_unit_test(find_clear_respects_size_boundary),
       cmocka_unit_test(find_clear_after_partial_byte),
       cmocka_unit_test(find_clear_middle_of_byte),
+      /* alloc_block / free_block */
+      cmocka_unit_test(alloc_block_in_group_bad_group),
+      cmocka_unit_test(alloc_block_in_group_no_free),
+      cmocka_unit_test(alloc_block_kmalloc_fail),
+      cmocka_unit_test(alloc_block_io_fail),
+      cmocka_unit_test(alloc_block_in_group_success),
+      cmocka_unit_test(alloc_block_fallback),
+      cmocka_unit_test(free_block_out_of_range),
+      cmocka_unit_test(free_block_kmalloc_fail),
+      cmocka_unit_test(free_block_read_io_fail),
+      cmocka_unit_test(free_block_success),
+      /* alloc_inode / free_inode */
+      cmocka_unit_test(alloc_inode_success),
+      cmocka_unit_test(alloc_inode_dir_bumps_dir_count),
+      cmocka_unit_test(free_inode_zero_einval),
+      cmocka_unit_test(free_inode_dir_decrements_dir_count),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
