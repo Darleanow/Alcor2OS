@@ -30,7 +30,8 @@ i64 vfs_seek(i64 fd, i64 off, i32 w)             { (void)fd; (void)off; (void)w;
 i64 vfs_ioctl(i64 fd, u64 req, u64 arg)          { (void)fd; (void)req; (void)arg; return g_vfs_ioctl_ret; }
 i32 vfs_select_read_ready(i64 fd)                { (void)fd; return (i32)g_vfs_sel_read; }
 i32 vfs_select_write_ready(i64 fd)               { (void)fd; return (i32)g_vfs_sel_write; }
-bool vfs_fd_is_valid(i64 fd)                     { (void)fd; return true; }
+static bool g_vfs_fd_valid = true;
+bool vfs_fd_is_valid(i64 fd)                     { (void)fd; return g_vfs_fd_valid; }
 
 /* proc stubs */
 static proc_t g_proc;
@@ -61,6 +62,7 @@ static int setup(void **state)
   g_vfs_ioctl_ret = 0;
   g_vfs_sel_read  = 1;
   g_vfs_sel_write = 1;
+  g_vfs_fd_valid  = true;
   g_pit_ns        = 0;
   return 0;
 }
@@ -616,12 +618,111 @@ static void poll_fill_pri_ready(void **state)
 static void poll_nfds_zero_with_ticks(void **state)
 {
   (void)state;
-  g_pit_freq = 100;
-  /* timeout=10ms → ticks_rem=1 → loop runs once via sel_hlt_slice
-     But sel_hlt_slice calls hlt which is stubbed to noop here */
-  /* Since hlt is a real instruction that would halt — skip this test
-     by just verifying nfds=0 immediate returns 0 */
+  /* timeout=0  immediate, nfds=0 returns 0 without sleeping */
   assert_int_equal(sys_poll(0, 0, 0, 0, 0, 0), 0);
+}
+
+/* readv: first read returns < len → partial read breaks early */
+static void readv_partial_first_iov_breaks(void **state)
+{
+  (void)state;
+  char buf1[4], buf2[4];
+  struct test_iovec v[2] = {{buf1, 4}, {buf2, 4}};
+  g_vfs_read_ret = 2; /* returns 2 < 4 → break early (partial) */
+  i64 ret = (i64)sys_readv(3, (u64)v, 2, 0, 0, 0);
+  assert_int_equal(ret, 2); /* only first iov partial result */
+}
+
+/* select_scan: read fd returns error (negative) */
+static void select_scan_read_error(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = -EBADF;
+  unsigned long rin[16], win[16], rout[16], wout[16], eout[16];
+  kzero(rin, sizeof(rin)); kzero(win, sizeof(win));
+  rin[0] = 1UL; /* fd 0 in read set */
+  int total = 0;
+  i32 ret = select_scan(1, rin, win, rout, wout, eout, &total);
+  assert_int_equal(ret, -EBADF);
+}
+
+/* select_scan: write fd returns error (negative) */
+static void select_scan_write_error(void **state)
+{
+  (void)state;
+  g_vfs_sel_write = -EBADF;
+  unsigned long rin[16], win[16], rout[16], wout[16], eout[16];
+  kzero(rin, sizeof(rin)); kzero(win, sizeof(win));
+  win[0] = 1UL; /* fd 0 in write set */
+  int total = 0;
+  i32 ret = select_scan(1, rin, win, rout, wout, eout, &total);
+  assert_int_equal(ret, -EBADF);
+}
+
+/* sys_select: no fds ready, immediate poll mode → returns 0 with zeroed sets */
+static void select_timeout_exhausted_returns_zero(void **state)
+{
+  (void)state;
+  g_vfs_sel_read  = 0; /* nothing ready */
+  g_vfs_sel_write = 0;
+  unsigned long rset[16];
+  kzero(rset, sizeof(rset));
+  rset[0] = 1UL; /* fd 0 in read set */
+  /* timeout: sec=0, usec=0 → poll_mode=true → scans once, no ready → total=0
+   * → copies rout (cleared) back and returns 0 */
+  struct { i64 sec; i64 usec; } tv = {0, 0};
+  u64 ret = sys_select(1, (u64)rset, 0, 0, (u64)&tv, 0);
+  assert_int_equal(ret, 0);
+  assert_int_equal(rset[0], 0); /* cleared because fd 0 not ready */
+}
+
+/* sys_select: writefds EFAULT */
+static void select_writefds_efault(void **state)
+{
+  (void)state;
+  g_user_range_ok = false;
+  unsigned long wset[16];
+  kzero(wset, sizeof(wset));
+  wset[0] = 1UL;
+  struct { i64 sec; i64 usec; } tv = {0, 0};
+  /* writefds pointer fails vmm check */
+  assert_int_equal((i64)sys_select(1, 0, (u64)wset, 0, (u64)&tv, 0), -EFAULT);
+}
+
+/* poll__fill_one: fd valid but vfs_fd_is_valid returns false → POLL_NVAL */
+static void poll_fill_fd_valid_but_closed_nval(void **state)
+{
+  (void)state;
+  g_vfs_fd_valid = false;
+  poll_entry_t e = {.fd = 3, .events = 0x001};
+  assert_true(poll__fill_one((void *)&e));
+  assert_true(e.revents & 0x020); /* POLL__NVAL */
+  g_vfs_fd_valid = true;
+}
+
+/* sys_poll: immediate poll with no ready fds → returns 0 with zeroed revents */
+static void poll_timeout_exhausted_returns_zero(void **state)
+{
+  (void)state;
+  g_vfs_sel_read  = 0;
+  g_vfs_sel_write = 0;
+  poll_entry_t e = {.fd = 3, .events = 0x001, .revents = 0xFF};
+  /* timeout=0 → immediate → scans once, no ready → copies back revents=0 */
+  u64 ret = sys_poll((u64)&e, 1, 0, 0, 0, 0);
+  assert_int_equal(ret, 0);
+  assert_int_equal(e.revents, 0);
+}
+
+/* sys_select: nlongs > SEL_FDSET_LONG → -EINVAL */
+static void select_nlongs_too_large_einval(void **state)
+{
+  (void)state;
+  unsigned long rset[16];
+  kzero(rset, sizeof(rset));
+  rset[0] = 1UL;
+  struct { i64 sec; i64 usec; } tv = {0, 0};
+  /* nfds = 1025 → nlongs = ceil(1025/64) = 17 > SEL_FDSET_LONG=16 */
+  assert_int_equal((i64)sys_select(1025, (u64)rset, 0, 0, (u64)&tv, 0), -EINVAL);
 }
 
 int main(void)
@@ -701,6 +802,15 @@ int main(void)
       cmocka_unit_test_setup(select_with_exceptfds_efault, setup),
       /* poll extras */
       cmocka_unit_test_setup(poll_nfds_zero_with_ticks, setup),
+      /* new coverage */
+      cmocka_unit_test_setup(readv_partial_first_iov_breaks, setup),
+      cmocka_unit_test_setup(select_scan_read_error, setup),
+      cmocka_unit_test_setup(select_scan_write_error, setup),
+      cmocka_unit_test_setup(select_timeout_exhausted_returns_zero, setup),
+      cmocka_unit_test_setup(select_writefds_efault, setup),
+      cmocka_unit_test_setup(poll_fill_fd_valid_but_closed_nval, setup),
+      cmocka_unit_test_setup(poll_timeout_exhausted_returns_zero, setup),
+      cmocka_unit_test_setup(select_nlongs_too_large_einval, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
