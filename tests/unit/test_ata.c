@@ -99,10 +99,10 @@ void console_printf(const char *fmt, ...) { (void)fmt; }
 void cpu_pause(void) {}
 void cpu_disable_interrupts(void) {}
 void cpu_enable_interrupts(void) {}
-struct proc;
-struct proc *proc_current(void) { return NULL; }
-void proc_block(struct proc *p) { (void)p; }
-void proc_wake(struct proc *p) { (void)p; }
+#include <alcor2/proc/proc.h>
+proc_t *proc_current(void) { return NULL; }
+void proc_block(proc_t *p) { (void)p; }
+void proc_wake(proc_t *p)  { (void)p; }
 void proc_schedule(void) {}
 u64 pit_get_ticks(void) { return 0; }
 void pic_unmask(u8 irq) { (void)irq; }
@@ -114,9 +114,20 @@ void pmm_free_pages(void *p, u64 n) { (void)p; (void)n; }
 
 #include "../../src/drivers/ata/ata.c"
 
+static int setup(void **state)
+{
+  (void)state;
+  ata_init();
+  /* Reset cache between tests */
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++)
+    g_ata_cache[i].block_lba = CACHE_INVALID_LBA;
+  g_cache_inited  = 0;
+  g_cache_counter = 0;
+  return 0;
+}
+
 static void test_ata_init(void **state) {
     (void)state;
-    ata_init();
     ata_drive_t *d = ata_get_drive(0);
     assert_non_null(d);
     assert_true(d->present);
@@ -137,11 +148,273 @@ static void test_ata_write(void **state) {
     assert_int_equal(res, 0);
 }
 
+/* trim_string */
+static void trim_string_trailing_spaces(void **state) {
+  (void)state;
+  char s[16];
+  memcpy(s, "hello   ", 8);
+  trim_string(s, 8);
+  assert_string_equal(s, "hello");
+}
+
+static void trim_string_all_spaces(void **state) {
+  (void)state;
+  char s[8];
+  memset(s, ' ', 8);
+  trim_string(s, 8);
+  assert_int_equal(s[0], '\0');
+}
+
+static void trim_string_no_trailing(void **state) {
+  (void)state;
+  char s[8] = "abc";
+  trim_string(s, 3);
+  assert_string_equal(s, "abc");
+}
+
+static void trim_string_null_bytes(void **state) {
+  (void)state;
+  char s[8] = "ab\0\0\0\0\0";
+  trim_string(s, 7);
+  assert_string_equal(s, "ab");
+}
+
+/* ata_read error paths */
+static void ata_read_bad_drive_einval(void **state) {
+  (void)state;
+  u8 buf[512];
+  assert_int_equal((i64)ata_read(4, 0, 1, buf), -EINVAL);
+}
+
+static void ata_read_null_buf_einval(void **state) {
+  (void)state;
+  assert_int_equal((i64)ata_read(0, 0, 1, NULL), -EINVAL);
+}
+
+static void ata_read_zero_count_einval(void **state) {
+  (void)state;
+  u8 buf[512];
+  assert_int_equal((i64)ata_read(0, 0, 0, buf), -EINVAL);
+}
+
+static void ata_read_lba_beyond_sectors_einval(void **state) {
+  (void)state;
+  u8 buf[512];
+  /* drive 0 has 1000 sectors; lba=999, count=2 overflows */
+  assert_int_equal((i64)ata_read(0, 999, 2, buf), -EINVAL);
+}
+
+static void ata_read_drive_not_present_enodev(void **state) {
+  (void)state;
+  u8 buf[512];
+  /* drive 2 is on secondary channel (0x177 returns 0xFF = absent) */
+  assert_int_equal((i64)ata_read(2, 0, 1, buf), -ENODEV);
+}
+
+/* ata_write error paths */
+static void ata_write_bad_drive_einval(void **state) {
+  (void)state;
+  u8 buf[512] = {0};
+  assert_int_equal((i64)ata_write(5, 0, 1, buf), -EINVAL);
+}
+
+static void ata_write_null_buf_einval(void **state) {
+  (void)state;
+  assert_int_equal((i64)ata_write(0, 0, 1, NULL), -EINVAL);
+}
+
+static void ata_write_zero_count_einval(void **state) {
+  (void)state;
+  u8 buf[512] = {0};
+  assert_int_equal((i64)ata_write(0, 0, 0, buf), -EINVAL);
+}
+
+static void ata_write_lba_beyond_sectors_einval(void **state) {
+  (void)state;
+  u8 buf[512] = {0};
+  assert_int_equal((i64)ata_write(0, 1000, 1, buf), -EINVAL);
+}
+
+static void ata_write_drive_not_present_enodev(void **state) {
+  (void)state;
+  u8 buf[512] = {0};
+  assert_int_equal((i64)ata_write(2, 0, 1, buf), -ENODEV);
+}
+
+/* ata_get_drive: secondary channel drives not present — returns NULL */
+static void ata_get_drive_secondary_null(void **state) {
+  (void)state;
+  /* drive 2 on secondary channel was not detected */
+  assert_null(ata_get_drive(2));
+  /* out of range */
+  assert_null(ata_get_drive(4));
+}
+
+/* cache functions */
+static void cache_init_once_idempotent(void **state) {
+  (void)state;
+  cache_init_once();
+  cache_init_once(); /* second call is noop */
+  assert_int_equal(g_cache_inited, 1);
+}
+
+static void cache_lookup_miss(void **state) {
+  (void)state;
+  cache_init_once();
+  assert_null(cache_lookup(0, 42));
+}
+
+static void cache_lookup_hit(void **state) {
+  (void)state;
+  cache_init_once();
+  g_ata_cache[0].block_lba = 8;
+  g_ata_cache[0].drive     = 0;
+  g_ata_cache[0].last_used = 1;
+  ata_cache_entry_t *e = cache_lookup(0, 8);
+  assert_non_null(e);
+  assert_int_equal(e->block_lba, 8);
+}
+
+static void cache_alloc_prefers_free_slot(void **state) {
+  (void)state;
+  cache_init_once();
+  ata_cache_entry_t *e = cache_alloc();
+  assert_non_null(e);
+  assert_int_equal(e->block_lba, CACHE_INVALID_LBA);
+}
+
+static void cache_alloc_evicts_lru_when_full(void **state) {
+  (void)state;
+  cache_init_once();
+  /* Fill all entries with different last_used values */
+  for(int i = 0; i < CACHE_NUM_ENTRIES; i++) {
+    g_ata_cache[i].block_lba = (u64)(i + 1);
+    g_ata_cache[i].drive     = 0;
+    g_ata_cache[i].last_used = (u64)(i + 1);
+  }
+  ata_cache_entry_t *e = cache_alloc();
+  assert_non_null(e);
+  /* Should evict entry with last_used=1 (oldest) */
+  assert_int_equal(e->block_lba, 1);
+}
+
+static void cache_invalidate_range_invalidates_overlap(void **state) {
+  (void)state;
+  cache_init_once();
+  g_ata_cache[0].block_lba = 0;
+  g_ata_cache[0].drive     = 0;
+  /* Invalidate range overlapping block_lba=0 */
+  cache_invalidate_range(0, 0, CACHE_BLOCK_SECTORS);
+  assert_int_equal(g_ata_cache[0].block_lba, CACHE_INVALID_LBA);
+}
+
+static void cache_invalidate_range_skips_different_drive(void **state) {
+  (void)state;
+  cache_init_once();
+  g_ata_cache[0].block_lba = 0;
+  g_ata_cache[0].drive     = 1; /* different drive */
+  cache_invalidate_range(0, 0, CACHE_BLOCK_SECTORS);
+  /* Should not be invalidated */
+  assert_int_equal(g_ata_cache[0].block_lba, 0);
+}
+
+static void cache_invalidate_range_skips_non_overlapping(void **state) {
+  (void)state;
+  cache_init_once();
+  g_ata_cache[0].block_lba = 1000; /* far away */
+  g_ata_cache[0].drive     = 0;
+  cache_invalidate_range(0, 0, 1); /* only lba 0 */
+  assert_int_equal(g_ata_cache[0].block_lba, 1000);
+}
+
+/* ata_irq */
+static void ata_irq_clears_state(void **state) {
+  (void)state;
+  channels[0].state  = ATA_STATE_PENDING;
+  channels[0].waiter = NULL;
+  ata_irq(0);
+  assert_int_equal(channels[0].state, ATA_STATE_IDLE);
+}
+
+static void ata_irq_out_of_range_noop(void **state) {
+  (void)state;
+  /* channel 2 is invalid — must not crash */
+  ata_irq(2);
+}
+
+static void ata_irq_wakes_waiter(void **state) {
+  (void)state;
+  static proc_t p;
+  channels[0].state  = ATA_STATE_PENDING;
+  channels[0].waiter = &p;
+  ata_irq(0);
+  assert_null(channels[0].waiter);
+  assert_int_equal(channels[0].state, ATA_STATE_IDLE);
+}
+
+/* ata_read: cache hit on second read */
+static void ata_read_cache_hit_on_second_read(void **state) {
+  (void)state;
+  u8 buf1[512] = {0};
+  u8 buf2[512] = {0};
+  /* First read populates cache */
+  assert_int_equal(ata_read(0, 0, 1, buf1), 0);
+  /* Second read should hit cache */
+  assert_int_equal(ata_read(0, 0, 1, buf2), 0);
+}
+
+/* ata_write invalidates cache then writes */
+static void ata_write_invalidates_cache(void **state) {
+  (void)state;
+  u8 rbuf[512] = {0};
+  u8 wbuf[512] = {1};
+  /* Populate cache */
+  ata_read(0, 0, 1, rbuf);
+  assert_non_null(cache_lookup(0, 0)); /* should be cached */
+  /* Write invalidates it */
+  ata_write(0, 0, 1, wbuf);
+  /* Cache entry should be gone now */
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_ata_init),
-        cmocka_unit_test(test_ata_read),
-        cmocka_unit_test(test_ata_write),
+        cmocka_unit_test_setup(test_ata_init, setup),
+        cmocka_unit_test_setup(test_ata_read, setup),
+        cmocka_unit_test_setup(test_ata_write, setup),
+        /* trim_string */
+        cmocka_unit_test(trim_string_trailing_spaces),
+        cmocka_unit_test(trim_string_all_spaces),
+        cmocka_unit_test(trim_string_no_trailing),
+        cmocka_unit_test(trim_string_null_bytes),
+        /* ata_read error paths */
+        cmocka_unit_test_setup(ata_read_bad_drive_einval, setup),
+        cmocka_unit_test_setup(ata_read_null_buf_einval, setup),
+        cmocka_unit_test_setup(ata_read_zero_count_einval, setup),
+        cmocka_unit_test_setup(ata_read_lba_beyond_sectors_einval, setup),
+        cmocka_unit_test_setup(ata_read_drive_not_present_enodev, setup),
+        /* ata_write error paths */
+        cmocka_unit_test_setup(ata_write_bad_drive_einval, setup),
+        cmocka_unit_test_setup(ata_write_null_buf_einval, setup),
+        cmocka_unit_test_setup(ata_write_zero_count_einval, setup),
+        cmocka_unit_test_setup(ata_write_lba_beyond_sectors_einval, setup),
+        cmocka_unit_test_setup(ata_write_drive_not_present_enodev, setup),
+        cmocka_unit_test_setup(ata_get_drive_secondary_null, setup),
+        /* cache */
+        cmocka_unit_test_setup(cache_init_once_idempotent, setup),
+        cmocka_unit_test_setup(cache_lookup_miss, setup),
+        cmocka_unit_test_setup(cache_lookup_hit, setup),
+        cmocka_unit_test_setup(cache_alloc_prefers_free_slot, setup),
+        cmocka_unit_test_setup(cache_alloc_evicts_lru_when_full, setup),
+        cmocka_unit_test_setup(cache_invalidate_range_invalidates_overlap, setup),
+        cmocka_unit_test_setup(cache_invalidate_range_skips_different_drive, setup),
+        cmocka_unit_test_setup(cache_invalidate_range_skips_non_overlapping, setup),
+        /* ata_irq */
+        cmocka_unit_test_setup(ata_irq_clears_state, setup),
+        cmocka_unit_test_setup(ata_irq_out_of_range_noop, setup),
+        cmocka_unit_test_setup(ata_irq_wakes_waiter, setup),
+        /* cache integration */
+        cmocka_unit_test_setup(ata_read_cache_hit_on_second_read, setup),
+        cmocka_unit_test_setup(ata_write_invalidates_cache, setup),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

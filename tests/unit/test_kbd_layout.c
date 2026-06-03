@@ -439,6 +439,350 @@ static void kbd_read_translated_canon_handles_backspace(void **state)
   assert_string_equal(buf, "hi\n");
 }
 
+/* Helper: push an E0 extended scancode and read resulting bytes */
+static void push_e0(u8 ext)
+{
+  raw_push(0xE0);
+  raw_push(ext);
+}
+
+static int get_pend_bytes(unsigned char *out, int max)
+{
+  int n = 0;
+  unsigned char c;
+  while(n < max && out_pend_take(&c))
+    out[n++] = c;
+  return n;
+}
+
+/* Arrow keys emit CSI sequences */
+static void arrow_up_emits_csi_A(void **state)
+{
+  (void)state;
+  push_e0(0x48);
+  unsigned char out[4];
+  int r = process_raw_ctx(0xE0, &g_kbd, out, false);
+  (void)r;
+  r = process_raw_ctx(0x48, &g_kbd, out, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[0], '\x1b');
+  assert_int_equal(buf[1], '[');
+  assert_int_equal(buf[2], 'A');
+}
+
+static void arrow_down_emits_csi_B(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x50, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'B');
+}
+
+static void arrow_left_emits_csi_D(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x4b, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'D');
+}
+
+static void arrow_right_emits_csi_C(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x4d, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'C');
+}
+
+/* Home / End */
+static void home_emits_ss3_H(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x47, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'H');
+}
+
+static void end_emits_ss3_F(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x4f, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[2], 'F');
+}
+
+/* Page Up / Page Down */
+static void page_up_emits_csi_tilde_5(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x49, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 4);
+  assert_int_equal(buf[0], '\x1b');
+  assert_int_equal(buf[1], '[');
+  assert_int_equal(buf[2], '5');
+  assert_int_equal(buf[3], '~');
+}
+
+static void page_down_emits_csi_tilde_6(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x51, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 4);
+  assert_int_equal(buf[2], '6');
+}
+
+/* Insert / Delete */
+static void insert_emits_csi_tilde_2(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x52, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 4);
+  assert_int_equal(buf[2], '2');
+}
+
+static void delete_emits_csi_tilde_3(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x53, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 4);
+  assert_int_equal(buf[2], '3');
+}
+
+/* E0-released key produces no output */
+static void e0_release_no_output(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x48 | 0x80, &g_kbd, NULL, false); /* release up-arrow */
+  unsigned char buf[4];
+  assert_int_equal(get_pend_bytes(buf, 4), 0);
+}
+
+/* E0-RAlt down/up sets mod.alt */
+static void e0_ralt_sets_alt_mod(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x38, &g_kbd, NULL, false); /* RAlt down */
+  assert_true(g_kbd.mod.alt);
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x38 | 0x80, &g_kbd, NULL, false); /* RAlt up */
+  assert_false(g_kbd.mod.alt);
+}
+
+/* Function keys F1-F4 → SS3, F5-F12 → CSI tilde */
+static void f1_emits_ss3_P(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x3b, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[0], '\x1b');
+  assert_int_equal(buf[1], 'O');
+  assert_int_equal(buf[2], 'P');
+}
+
+static void f2_emits_ss3_Q(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x3c, &g_kbd, NULL, false);
+  unsigned char buf[4];
+  get_pend_bytes(buf, 4);
+  assert_int_equal(buf[2], 'Q');
+}
+
+static void f3_emits_ss3_R(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x3d, &g_kbd, NULL, false);
+  unsigned char buf[4];
+  get_pend_bytes(buf, 4);
+  assert_int_equal(buf[2], 'R');
+}
+
+static void f4_emits_ss3_S(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x3e, &g_kbd, NULL, false);
+  unsigned char buf[4];
+  get_pend_bytes(buf, 4);
+  assert_int_equal(buf[2], 'S');
+}
+
+static void f5_emits_csi_tilde_15(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x3f, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  /* ESC [ 1 5 ~ */
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '1');
+  assert_int_equal(buf[3], '5');
+}
+
+static void f12_emits_csi_tilde_24(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x58, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '2');
+  assert_int_equal(buf[3], '4');
+}
+
+/* Ctrl modifier */
+static void ctrl_modifier_tracked(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x1d, &g_kbd, NULL, false); /* LCtrl down */
+  assert_true(g_kbd.mod.ctrl);
+  process_raw_ctx(0x1d | 0x80, &g_kbd, NULL, false); /* LCtrl up */
+  assert_false(g_kbd.mod.ctrl);
+}
+
+/* Caps-lock toggles */
+static void capslock_toggles(void **state)
+{
+  (void)state;
+  assert_false(g_kbd.mod.capslock);
+  process_raw_ctx(0x3a, &g_kbd, NULL, false); /* CapsLock press */
+  assert_true(g_kbd.mod.capslock);
+  process_raw_ctx(0x3a, &g_kbd, NULL, false); /* second press toggles off */
+  assert_false(g_kbd.mod.capslock);
+}
+
+/* Capslock only toggles on press, not release */
+static void capslock_release_no_toggle(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x3a, &g_kbd, NULL, false);
+  assert_true(g_kbd.mod.capslock);
+  process_raw_ctx(0x3a | 0x80, &g_kbd, NULL, false); /* release */
+  assert_true(g_kbd.mod.capslock); /* unchanged */
+}
+
+/* Release events: key-up emits \x00+char */
+static void release_events_emits_sentinel(void **state)
+{
+  (void)state;
+  kbd_set_release_events(true);
+  /* Press 'a' (scancode 0x1e) then release */
+  unsigned char dummy[4] = {0};
+  process_raw_ctx(0x1e, &g_kbd, dummy, false); /* press */
+  out_pend_w = out_pend_r = 0;   /* discard press output */
+  process_raw_ctx(0x1e | 0x80, &g_kbd, dummy, false); /* release */
+  unsigned char buf[4];
+  int n = get_pend_bytes(buf, 4);
+  assert_true(n >= 2);
+  assert_int_equal(buf[0], 0x00); /* sentinel */
+  assert_int_equal(buf[1], 'a');  /* unshifted char */
+}
+
+/* Release events off: no sentinel on key-up */
+static void release_events_off_no_sentinel(void **state)
+{
+  (void)state;
+  kbd_set_release_events(false);
+  unsigned char dummy[4] = {0};
+  process_raw_ctx(0x1e, &g_kbd, dummy, false);
+  out_pend_w = out_pend_r = 0;
+  process_raw_ctx(0x1e | 0x80, &g_kbd, dummy, false);
+  unsigned char buf[4];
+  assert_int_equal(get_pend_bytes(buf, 4), 0);
+}
+
+/* kbd_set_release_events/kbd_get_release_events */
+static void release_events_getter_setter(void **state)
+{
+  (void)state;
+  kbd_set_release_events(true);
+  assert_true(kbd_get_release_events());
+  kbd_set_release_events(false);
+  assert_false(kbd_get_release_events());
+}
+
+/* FR layout: process 'a' scancode (0x1e) gives 'q' */
+static void fr_process_raw_q_scan_gives_a(void **state)
+{
+  (void)state;
+  kbd_set_layout(KBD_LAYOUT_FR);
+  unsigned char out[4] = {0};
+  bool r = process_raw_ctx(0x10, &g_kbd, out, false); /* 0x10 = 'q' scan in US = 'a' in FR */
+  (void)r;
+  unsigned char buf[4];
+  get_pend_bytes(buf, 4);
+}
+
+/* fr_caps_scan: letter key returns true */
+static void fr_caps_scan_letter_true(void **state)
+{
+  (void)state;
+  assert_true(fr_caps_scan(0x1e)); /* 'a' scan */
+}
+
+/* fr_caps_scan: non-letter returns false */
+static void fr_caps_scan_non_letter_false(void **state)
+{
+  (void)state;
+  assert_false(fr_caps_scan(0x01)); /* ESC scan — not a letter */
+}
+
+/* kbd_set_layout out of range */
+static void kbd_set_layout_resets_state(void **state)
+{
+  (void)state;
+  /* Prime some state */
+  g_kbd.pend_e0 = true;
+  g_kbd.lalt_dn = true;
+  kbd_set_layout(KBD_LAYOUT_US);
+  assert_false(g_kbd.pend_e0);
+  assert_false(g_kbd.lalt_dn);
+}
+
+/* dry=true: process_raw_ctx doesn't modify out_pend */
+static void process_raw_dry_no_side_effect(void **state)
+{
+  (void)state;
+  u32 w_before = out_pend_w;
+  unsigned char out[4];
+  process_raw_ctx(0xE0, &g_kbd, out, true);
+  process_raw_ctx(0x48, &g_kbd, out, true); /* arrow up in dry mode */
+  /* dry mode must not push to out_pend */
+  assert_int_equal(out_pend_w, w_before);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -488,6 +832,42 @@ int main(void)
       /* TTY Queue */
       cmocka_unit_test_setup(kbd_read_translated_canon_echoes_and_blocks_until_newline, setup),
       cmocka_unit_test_setup(kbd_read_translated_canon_handles_backspace, setup),
+      /* E0 extended keys */
+      cmocka_unit_test_setup(arrow_up_emits_csi_A, setup),
+      cmocka_unit_test_setup(arrow_down_emits_csi_B, setup),
+      cmocka_unit_test_setup(arrow_left_emits_csi_D, setup),
+      cmocka_unit_test_setup(arrow_right_emits_csi_C, setup),
+      cmocka_unit_test_setup(home_emits_ss3_H, setup),
+      cmocka_unit_test_setup(end_emits_ss3_F, setup),
+      cmocka_unit_test_setup(page_up_emits_csi_tilde_5, setup),
+      cmocka_unit_test_setup(page_down_emits_csi_tilde_6, setup),
+      cmocka_unit_test_setup(insert_emits_csi_tilde_2, setup),
+      cmocka_unit_test_setup(delete_emits_csi_tilde_3, setup),
+      cmocka_unit_test_setup(e0_release_no_output, setup),
+      cmocka_unit_test_setup(e0_ralt_sets_alt_mod, setup),
+      /* Function keys */
+      cmocka_unit_test_setup(f1_emits_ss3_P, setup),
+      cmocka_unit_test_setup(f2_emits_ss3_Q, setup),
+      cmocka_unit_test_setup(f3_emits_ss3_R, setup),
+      cmocka_unit_test_setup(f4_emits_ss3_S, setup),
+      cmocka_unit_test_setup(f5_emits_csi_tilde_15, setup),
+      cmocka_unit_test_setup(f12_emits_csi_tilde_24, setup),
+      /* Modifiers */
+      cmocka_unit_test_setup(ctrl_modifier_tracked, setup),
+      cmocka_unit_test_setup(capslock_toggles, setup),
+      cmocka_unit_test_setup(capslock_release_no_toggle, setup),
+      /* Release events */
+      cmocka_unit_test_setup(release_events_emits_sentinel, setup),
+      cmocka_unit_test_setup(release_events_off_no_sentinel, setup),
+      cmocka_unit_test_setup(release_events_getter_setter, setup),
+      /* FR layout */
+      cmocka_unit_test_setup(fr_process_raw_q_scan_gives_a, setup),
+      cmocka_unit_test_setup(fr_caps_scan_letter_true, setup),
+      cmocka_unit_test_setup(fr_caps_scan_non_letter_false, setup),
+      /* kbd_set_layout side effects */
+      cmocka_unit_test_setup(kbd_set_layout_resets_state, setup),
+      /* dry mode */
+      cmocka_unit_test_setup(process_raw_dry_no_side_effect, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
