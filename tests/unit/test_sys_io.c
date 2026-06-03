@@ -211,6 +211,274 @@ static void writev_skips_null_base(void **state)
   assert_int_equal(sys_writev(1, (u64)v, 2, 0, 0, 0), 0);
 }
 
+/* io__ms_to_hlt_ticks */
+static void ms_to_ticks_basic(void **state)
+{
+  (void)state;
+  g_pit_freq = 100; /* 100 Hz = 10ms per tick */
+  u64 t = io__ms_to_hlt_ticks(10);
+  assert_true(t >= 1);
+}
+
+static void ms_to_ticks_zero_ms_tick_fallback(void **state)
+{
+  (void)state;
+  g_pit_freq = 2000; /* 2000 Hz: ms_tick = 1000/2000 = 0 → forced to 1 */
+  u64 t = io__ms_to_hlt_ticks(1);
+  assert_true(t >= 1);
+}
+
+/* io__timeout_calc */
+static void timeout_calc_negative_is_infinite(void **state)
+{
+  (void)state;
+  bool immediate, infinite;
+  u64 ticks;
+  io__timeout_calc(-1, &immediate, &infinite, &ticks);
+  assert_false(immediate);
+  assert_true(infinite);
+}
+
+static void timeout_calc_zero_is_immediate(void **state)
+{
+  (void)state;
+  bool immediate, infinite;
+  u64 ticks;
+  io__timeout_calc(0, &immediate, &infinite, &ticks);
+  assert_true(immediate);
+  assert_false(infinite);
+}
+
+static void timeout_calc_positive(void **state)
+{
+  (void)state;
+  g_pit_freq = 100;
+  bool immediate, infinite;
+  u64 ticks;
+  io__timeout_calc(100, &immediate, &infinite, &ticks);
+  assert_false(immediate);
+  assert_false(infinite);
+  assert_true(ticks >= 1);
+}
+
+/* poll__fd_is_open */
+static void poll_fd_negative_not_open(void **state)
+{
+  (void)state;
+  assert_false(poll__fd_is_open(-1));
+}
+
+static void poll_fd_valid_is_open(void **state)
+{
+  (void)state;
+  /* vfs_fd_is_valid returns true */
+  assert_true(poll__fd_is_open(3));
+}
+
+/* poll__fill_one */
+typedef struct { i32 fd; i16 events; i16 revents; } poll_entry_t;
+
+static void poll_fill_negative_fd_zero(void **state)
+{
+  (void)state;
+  poll_entry_t e = {.fd = -1, .events = 0x001};
+  assert_int_equal(poll__fill_one((void *)&e), 0);
+  assert_int_equal(e.revents, 0);
+}
+
+static void poll_fill_read_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 1;
+  poll_entry_t e = {.fd = 3, .events = 0x001 /* POLL__IN */};
+  assert_true(poll__fill_one((void *)&e));
+  assert_true(e.revents & 0x001);
+}
+
+static void poll_fill_write_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_write = 1;
+  poll_entry_t e = {.fd = 3, .events = 0x004 /* POLL__OUT */};
+  assert_true(poll__fill_one((void *)&e));
+  assert_true(e.revents & 0x004);
+}
+
+static void poll_fill_not_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 0;
+  poll_entry_t e = {.fd = 3, .events = 0x001};
+  assert_int_equal(poll__fill_one((void *)&e), 0);
+  assert_int_equal(e.revents, 0);
+}
+
+/* parse_timeval */
+static void parse_timeval_efault_on_bad_ptr(void **state)
+{
+  (void)state;
+  g_user_range_ok = false;
+  bool imm;
+  u64 ticks;
+  assert_int_equal(parse_timeval(0x1000, &imm, &ticks), -EFAULT);
+}
+
+static void parse_timeval_zero_is_immediate(void **state)
+{
+  (void)state;
+  struct { i64 sec; i64 usec; } tv = {0, 0};
+  bool imm;
+  u64 ticks;
+  assert_int_equal(parse_timeval((u64)&tv, &imm, &ticks), 0);
+  assert_true(imm);
+}
+
+static void parse_timeval_negative_sec_einval(void **state)
+{
+  (void)state;
+  struct { i64 sec; i64 usec; } tv = {-1, 0};
+  bool imm;
+  u64 ticks;
+  assert_int_equal(parse_timeval((u64)&tv, &imm, &ticks), -EINVAL);
+}
+
+static void parse_timeval_bad_usec_einval(void **state)
+{
+  (void)state;
+  struct { i64 sec; i64 usec; } tv = {0, 2000000LL};
+  bool imm;
+  u64 ticks;
+  assert_int_equal(parse_timeval((u64)&tv, &imm, &ticks), -EINVAL);
+}
+
+/* select_scan */
+static void select_scan_read_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 1;
+  unsigned long rin[16], win[16], rout[16], wout[16], eout[16];
+  kzero(rin, sizeof(rin)); kzero(win, sizeof(win));
+  rin[0] = 1UL; /* fd 0 in read set */
+  int total = 0;
+  assert_int_equal(select_scan(1, rin, win, rout, wout, eout, &total), 0);
+  assert_int_equal(total, 1);
+}
+
+static void select_scan_not_ready_clears_bit(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 0;
+  unsigned long rin[16], win[16], rout[16], wout[16], eout[16];
+  kzero(rin, sizeof(rin)); kzero(win, sizeof(win));
+  rin[0] = 1UL;
+  int total = 0;
+  select_scan(1, rin, win, rout, wout, eout, &total);
+  assert_int_equal(total, 0);
+  assert_int_equal(rout[0], 0); /* bit cleared */
+}
+
+/* sys_select: error paths */
+static void select_nfds_too_large(void **state)
+{
+  (void)state;
+  assert_int_equal((i64)sys_select(2000, 0, 0, 0, 0, 0), -EINVAL);
+}
+
+static void select_nfds_nonzero_no_sets_einval(void **state)
+{
+  (void)state;
+  assert_int_equal((i64)sys_select(1, 0, 0, 0, 0, 0), -EINVAL);
+}
+
+static void select_efault_on_bad_readfds(void **state)
+{
+  (void)state;
+  g_user_range_ok = false;
+  unsigned long rset[16];
+  assert_int_equal((i64)sys_select(1, (u64)rset, 0, 0, 0, 0), -EFAULT);
+}
+
+/* sys_select: immediate poll — read fd 0 ready */
+static void select_poll_read_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 1;
+  unsigned long rset[16];
+  kzero(rset, sizeof(rset));
+  rset[0] = 1UL; /* fd 0 in read set */
+  struct { i64 sec; i64 usec; } tv = {0, 0}; /* immediate */
+  u64 ret = sys_select(1, (u64)rset, 0, 0, (u64)&tv, 0);
+  assert_int_equal(ret, 1);
+}
+
+/* sys_select: nfds=0 with zero timeout returns 0 immediately */
+static void select_nfds_zero_immediate_returns_zero(void **state)
+{
+  (void)state;
+  struct { i64 sec; i64 usec; } tv = {0, 0};
+  assert_int_equal(sys_select(0, 0, 0, 0, (u64)&tv, 0), 0);
+}
+
+/* sys_select: one-tick timeout with no ready fds returns 0 */
+static void select_timeout_no_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 0;
+  g_pit_freq     = 100;
+  unsigned long rset[16];
+  kzero(rset, sizeof(rset));
+  rset[0] = 1UL;
+  /* timeout = 0ms = immediate → poll_mode=true → returns total (0) */
+  struct { i64 sec; i64 usec; } tv = {0, 0};
+  u64 ret = sys_select(1, (u64)rset, 0, 0, (u64)&tv, 0);
+  assert_int_equal(ret, 0);
+}
+
+/* sys_poll: error paths */
+static void poll_nfds_too_large(void **state)
+{
+  (void)state;
+  assert_int_equal((i64)sys_poll(0, VFS_MAX_FD + 1, 0, 0, 0, 0), -EINVAL);
+}
+
+static void poll_efault_on_bad_fds(void **state)
+{
+  (void)state;
+  g_user_range_ok = false;
+  poll_entry_t p[1] = {{3, 0x001, 0}};
+  assert_int_equal((i64)sys_poll((u64)p, 1, 0, 0, 0, 0), -EFAULT);
+}
+
+/* sys_poll: nfds=0 immediate returns 0 */
+static void poll_nfds_zero_immediate(void **state)
+{
+  (void)state;
+  assert_int_equal(sys_poll(0, 0, 0 /* timeout=0=immediate */, 0, 0, 0), 0);
+}
+
+/* sys_poll: fd ready on first scan */
+static void poll_fd_ready_returns_count(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 1;
+  poll_entry_t p[1] = {{3, 0x001 /* POLL__IN */, 0}};
+  u64 ret = sys_poll((u64)p, 1, 0 /* immediate */, 0, 0, 0);
+  assert_int_equal(ret, 1);
+  assert_true(p[0].revents & 0x001);
+}
+
+/* sys_poll: timeout with no ready fds */
+static void poll_timeout_no_ready(void **state)
+{
+  (void)state;
+  g_vfs_sel_read = 0;
+  poll_entry_t p[1] = {{3, 0x001, 0}};
+  /* timeout=0 = immediate poll */
+  u64 ret = sys_poll((u64)p, 1, 0, 0, 0, 0);
+  assert_int_equal(ret, 0);
+  assert_int_equal(p[0].revents, 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -233,6 +501,42 @@ int main(void)
       cmocka_unit_test_setup(writev_null_iov_efault, setup),
       cmocka_unit_test_setup(writev_writes_single_iov, setup),
       cmocka_unit_test_setup(writev_skips_null_base, setup),
+      /* io__ms_to_hlt_ticks */
+      cmocka_unit_test_setup(ms_to_ticks_basic, setup),
+      cmocka_unit_test_setup(ms_to_ticks_zero_ms_tick_fallback, setup),
+      /* io__timeout_calc */
+      cmocka_unit_test_setup(timeout_calc_negative_is_infinite, setup),
+      cmocka_unit_test_setup(timeout_calc_zero_is_immediate, setup),
+      cmocka_unit_test_setup(timeout_calc_positive, setup),
+      /* poll__fd_is_open */
+      cmocka_unit_test_setup(poll_fd_negative_not_open, setup),
+      cmocka_unit_test_setup(poll_fd_valid_is_open, setup),
+      /* poll__fill_one */
+      cmocka_unit_test_setup(poll_fill_negative_fd_zero, setup),
+      cmocka_unit_test_setup(poll_fill_read_ready, setup),
+      cmocka_unit_test_setup(poll_fill_write_ready, setup),
+      cmocka_unit_test_setup(poll_fill_not_ready, setup),
+      /* parse_timeval */
+      cmocka_unit_test_setup(parse_timeval_efault_on_bad_ptr, setup),
+      cmocka_unit_test_setup(parse_timeval_zero_is_immediate, setup),
+      cmocka_unit_test_setup(parse_timeval_negative_sec_einval, setup),
+      cmocka_unit_test_setup(parse_timeval_bad_usec_einval, setup),
+      /* select_scan */
+      cmocka_unit_test_setup(select_scan_read_ready, setup),
+      cmocka_unit_test_setup(select_scan_not_ready_clears_bit, setup),
+      /* sys_select */
+      cmocka_unit_test_setup(select_nfds_too_large, setup),
+      cmocka_unit_test_setup(select_nfds_nonzero_no_sets_einval, setup),
+      cmocka_unit_test_setup(select_efault_on_bad_readfds, setup),
+      cmocka_unit_test_setup(select_poll_read_ready, setup),
+      cmocka_unit_test_setup(select_nfds_zero_immediate_returns_zero, setup),
+      cmocka_unit_test_setup(select_timeout_no_ready, setup),
+      /* sys_poll */
+      cmocka_unit_test_setup(poll_nfds_too_large, setup),
+      cmocka_unit_test_setup(poll_efault_on_bad_fds, setup),
+      cmocka_unit_test_setup(poll_nfds_zero_immediate, setup),
+      cmocka_unit_test_setup(poll_fd_ready_returns_count, setup),
+      cmocka_unit_test_setup(poll_timeout_no_ready, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

@@ -6,10 +6,12 @@
 #include <alcor2/types.h>
 
 #include <setjmp.h>
+#include <stdlib.h>
 #include <string.h>
 
-void *kmalloc(u64 n) { (void)n; return NULL; }
-void  kfree(void *p) { (void)p; }
+static bool g_kmalloc_fail = false;
+void *kmalloc(u64 n) { return g_kmalloc_fail ? NULL : malloc(n); }
+void  kfree(void *p) { free(p); }
 void *kmemcpy(void *d, const void *s, u64 n) { return memcpy(d, s, n); }
 void  kzero(void *d, u64 n) { memset(d, 0, n); }
 char *kstrncpy(char *d, const char *s, u64 m) {
@@ -73,10 +75,13 @@ syscall_frame_t *syscall_get_current_frame(void) {
   return g_no_frame ? NULL : &g_frame;
 }
 
-/* vfs stubs (needed by sys_execve internals but we don't test exec here) */
-i64 vfs_open(const char *p, u32 f)   { (void)p; (void)f; return -1; }
-i64 vfs_close(i64 fd)                { (void)fd; return 0; }
-i64 vfs_stat(const char *p, vfs_stat_t *s) { (void)p; (void)s; return -1; }
+/* vfs stubs */
+static i64        g_vfs_open_ret  = 3;
+static i64        g_vfs_stat_ret  = 0;
+static vfs_stat_t g_vfs_stat_out;
+i64 vfs_open(const char *p, u32 f)           { (void)p; (void)f; return g_vfs_open_ret; }
+i64 vfs_close(i64 fd)                        { (void)fd; return 0; }
+i64 vfs_stat(const char *p, vfs_stat_t *s)   { (void)p; if(s) *s = g_vfs_stat_out; return g_vfs_stat_ret; }
 void vfs_proc_close_cloexec_fds(void) {}
 i64 proc_exec_replace_image(proc_t *p, const char *n, i64 fd, char *const argv[], char *const envp[]) {
   (void)p; (void)n; (void)fd; (void)argv; (void)envp; return -ENOSYS;
@@ -102,6 +107,11 @@ static int setup(void **state)
   g_waitpid_status  = 0;
   g_fs_base         = 0;
   g_gs_base         = 0;
+  g_kmalloc_fail    = false;
+  g_vfs_open_ret    = 3;
+  g_vfs_stat_ret    = 0;
+  memset(&g_vfs_stat_out, 0, sizeof(g_vfs_stat_out));
+  g_vfs_stat_out.type = VFS_FILE;
   return 0;
 }
 
@@ -317,6 +327,59 @@ static void arch_prctl_unknown_returns_einval(void **state)
   assert_int_equal((i64)sys_arch_prctl(0xDEAD, 0, 0, 0, 0, 0), -EINVAL);
 }
 
+/* sys_execve */
+static void execve_efault_on_bad_path(void **state)
+{
+  (void)state;
+  g_user_ptr_ok = false;
+  assert_int_equal((i64)sys_execve(0x1000, 0, 0, 0, 0, 0), -EFAULT);
+}
+
+static void execve_enoent_when_stat_fails(void **state)
+{
+  (void)state;
+  char path[] = "/nope";
+  g_vfs_stat_ret = -ENOENT;
+  assert_int_equal((i64)sys_execve((u64)path, 0, 0, 0, 0, 0), -ENOENT);
+}
+
+static void execve_eacces_when_not_file(void **state)
+{
+  (void)state;
+  char path[] = "/dir";
+  g_vfs_stat_out.type = VFS_DIRECTORY;
+  assert_int_equal((i64)sys_execve((u64)path, 0, 0, 0, 0, 0), -EACCES);
+}
+
+static void execve_enomem_when_alloc_fails(void **state)
+{
+  (void)state;
+  char path[] = "/bin/sh";
+  g_kmalloc_fail = true;
+  assert_int_equal((i64)sys_execve((u64)path, 0, 0, 0, 0, 0), -ENOMEM);
+}
+
+static void execve_enoent_when_open_fails(void **state)
+{
+  (void)state;
+  char path[] = "/bin/sh";
+  g_vfs_open_ret = -ENOENT;
+  assert_int_equal((i64)sys_execve((u64)path, 0, 0, 0, 0, 0), -ENOENT);
+}
+
+/* copy_user_strvec: argv pointer in bad range */
+static void execve_efault_on_bad_argv(void **state)
+{
+  (void)state;
+  char path[] = "/bin/sh";
+  /* Pass a non-NULL argv but mark range checks as failing */
+  g_user_range_ok = false;
+  /* user_cstr_ok(path) still uses user_ptr_ok which is still true,
+     but user_buf_ok(argv, sizeof(char*)) uses user_range_ok */
+  char *fake_argv = (char *)0x1234;
+  assert_int_equal((i64)sys_execve((u64)path, (u64)&fake_argv, 0, 0, 0, 0), -EFAULT);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -348,6 +411,13 @@ int main(void)
       cmocka_unit_test_setup(arch_prctl_get_gs, setup),
       cmocka_unit_test_setup(arch_prctl_get_gs_null_returns_efault, setup),
       cmocka_unit_test_setup(arch_prctl_unknown_returns_einval, setup),
+      /* sys_execve */
+      cmocka_unit_test_setup(execve_efault_on_bad_path, setup),
+      cmocka_unit_test_setup(execve_enoent_when_stat_fails, setup),
+      cmocka_unit_test_setup(execve_eacces_when_not_file, setup),
+      cmocka_unit_test_setup(execve_enomem_when_alloc_fails, setup),
+      cmocka_unit_test_setup(execve_enoent_when_open_fails, setup),
+      cmocka_unit_test_setup(execve_efault_on_bad_argv, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

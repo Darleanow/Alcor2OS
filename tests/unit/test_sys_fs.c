@@ -557,6 +557,157 @@ static void pwrite64_stdio_fd_writes_directly(void **state) {
   assert_int_equal(sys_pwrite64(1, (u64)buf, 2, 0, 0, 0), 2);
 }
 
+/* sys_pread64: regular fd saves/restores seek */
+static void pread64_regular_fd_saves_seek(void **state) {
+  (void)state;
+  char buf[8];
+  g_vfs_read_ret = 4;
+  assert_int_equal(sys_pread64(3, (u64)buf, 8, 100, 0, 0), 4);
+}
+
+/* sys_pwrite64: regular fd saves/restores seek */
+static void pwrite64_regular_fd_saves_seek(void **state) {
+  (void)state;
+  char buf[8] = "hi";
+  g_vfs_write_ret = 2;
+  assert_int_equal(sys_pwrite64(3, (u64)buf, 2, 100, 0, 0), 2);
+}
+
+/* sys_stat: FIFO type in stat_buf */
+static void stat_fifo_type_in_buf(void **state) {
+  (void)state;
+  char path[] = "/pipe";
+  g_vfs_stat_out.type = VFS_FIFO;
+  g_vfs_stat_out.size = 0;
+  struct stat_buf sb;
+  assert_int_equal(sys_stat((u64)path, (u64)&sb, 0, 0, 0, 0), 0);
+  /* VFS_FIFO maps to S_IFIFO in mode */
+  assert_true((sb.st_mode & 0xF000) == 0010000); /* S_IFIFO = 0010000 */
+}
+
+/* sys_access: proc/self/exe with no exe_path */
+static void access_proc_self_exe_no_path(void **state) {
+  (void)state;
+  char path[] = "/proc/self/exe";
+  g_proc.exe_path[0] = '\0';
+  assert_int_equal((i64)sys_access((u64)path, 0, 0, 0, 0, 0), -ENOENT);
+}
+
+/* sys_access: proc/self/exe success */
+static void access_proc_self_exe_success(void **state) {
+  (void)state;
+  char path[] = "/proc/self/exe";
+  strncpy(g_proc.exe_path, "/bin/sh", sizeof(g_proc.exe_path));
+  assert_int_equal(sys_access((u64)path, 0, 0, 0, 0, 0), 0);
+}
+
+/* sys_access: stat fails → ENOENT */
+static void access_stat_fails_enoent(void **state) {
+  (void)state;
+  char path[] = "/missing";
+  g_vfs_stat_ret = -ENOENT;
+  assert_int_equal((i64)sys_access((u64)path, 0, 0, 0, 0, 0), -ENOENT);
+}
+
+/* sys_faccessat */
+static void faccessat_efault_on_bad_path(void **state) {
+  (void)state;
+  g_user_ptr_ok = false;
+  assert_int_equal((i64)sys_faccessat(0, 0x1000, 0, 0, 0, 0), -EFAULT);
+}
+
+static void faccessat_at_fdcwd_delegates(void **state) {
+  (void)state;
+  char path[] = "/f";
+  assert_int_equal(sys_faccessat((u64)-100LL, (u64)path, 0, 0, 0, 0), 0);
+}
+
+static void faccessat_relative_non_fdcwd_enosys(void **state) {
+  (void)state;
+  char path[] = "relative"; /* no leading / */
+  assert_int_equal((i64)sys_faccessat(4, (u64)path, 0, 0, 0, 0), -ENOSYS);
+}
+
+/* sys_newfstatat */
+static void newfstatat_empty_path_enosys(void **state) {
+  (void)state;
+  char path[] = "/f";
+  struct stat_buf sb;
+  /* AT_EMPTY_PATH = 0x1000 */
+  assert_int_equal((i64)sys_newfstatat(0, (u64)path, (u64)&sb, 0x1000, 0, 0), -ENOSYS);
+}
+
+static void newfstatat_bad_flags_einval(void **state) {
+  (void)state;
+  char path[] = "/f";
+  struct stat_buf sb;
+  /* flags outside allowed mask */
+  assert_int_equal((i64)sys_newfstatat(0, (u64)path, (u64)&sb, 0xFF0000, 0, 0), -EINVAL);
+}
+
+static void newfstatat_at_fdcwd_delegates_to_stat(void **state) {
+  (void)state;
+  char path[] = "/f";
+  g_vfs_stat_out.size = 42;
+  g_vfs_stat_out.type = VFS_FILE;
+  struct stat_buf sb;
+  assert_int_equal(sys_newfstatat((u64)-100LL, (u64)path, (u64)&sb, 0, 0, 0), 0);
+  assert_int_equal(sb.st_size, 42);
+}
+
+/* sys_getdents64: delegates to getdents */
+static void getdents64_delegates(void **state) {
+  (void)state;
+  char buf[128];
+  assert_int_equal(sys_getdents64(3, (u64)buf, 128, 0, 0, 0), 64);
+}
+
+/* sys_pipe2: with O_CLOEXEC sets cloexec bits */
+static void pipe2_ocloexec_sets_cloexec(void **state) {
+  (void)state;
+  int fds[2] = {-1, -1};
+  /* O_CLOEXEC = 0x80000 */
+  assert_int_equal(sys_pipe2((u64)fds, 0x80000, 0, 0, 0, 0), 0);
+  assert_int_equal(fds[0], 3);
+  assert_int_equal(fds[1], 4);
+  assert_int_equal(g_proc.fd_cloexec[3], 1);
+  assert_int_equal(g_proc.fd_cloexec[4], 1);
+}
+
+static void pipe2_no_cloexec(void **state) {
+  (void)state;
+  int fds[2] = {-1, -1};
+  assert_int_equal(sys_pipe2((u64)fds, 0, 0, 0, 0, 0), 0);
+}
+
+/* sys_fcntl: F_DUPFD on stdio fd returns fd itself */
+static void fcntl_dupfd_stdio_returns_fd(void **state) {
+  (void)state;
+  assert_int_equal(sys_fcntl(1, 0 /*F_DUPFD*/, 0, 0, 0, 0), 1);
+}
+
+/* sys_fcntl: F_GETFL on stdio fd returns O_RDWR */
+static void fcntl_getfl_stdio_returns_rdwr(void **state) {
+  (void)state;
+  assert_int_equal(sys_fcntl(1, 3 /*F_GETFL*/, 0, 0, 0, 0), 2 /*O_RDWR*/);
+}
+
+/* sys_fcntl: F_SETFL on stdio fd returns 0 */
+static void fcntl_setfl_stdio_returns_zero(void **state) {
+  (void)state;
+  assert_int_equal(sys_fcntl(1, 4 /*F_SETFL*/, 0, 0, 0, 0), 0);
+}
+
+/* sys_creat: stat shows file is VFS_FILE */
+static void stat_directory_mode_in_buf(void **state) {
+  (void)state;
+  char path[] = "/dir";
+  g_vfs_stat_out.type = VFS_DIRECTORY;
+  struct stat_buf sb;
+  sys_stat((u64)path, (u64)&sb, 0, 0, 0, 0);
+  assert_true((sb.st_mode & 0xF000) == 0040000); /* S_IFDIR */
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -619,6 +770,25 @@ int main(void)
       cmocka_unit_test_setup(pread64_stdio_fd_reads_directly, setup),
       cmocka_unit_test_setup(pwrite64_efault, setup),
       cmocka_unit_test_setup(pwrite64_stdio_fd_writes_directly, setup),
+      cmocka_unit_test_setup(pread64_regular_fd_saves_seek, setup),
+      cmocka_unit_test_setup(pwrite64_regular_fd_saves_seek, setup),
+      cmocka_unit_test_setup(stat_fifo_type_in_buf, setup),
+      cmocka_unit_test_setup(stat_directory_mode_in_buf, setup),
+      cmocka_unit_test_setup(access_proc_self_exe_no_path, setup),
+      cmocka_unit_test_setup(access_proc_self_exe_success, setup),
+      cmocka_unit_test_setup(access_stat_fails_enoent, setup),
+      cmocka_unit_test_setup(faccessat_efault_on_bad_path, setup),
+      cmocka_unit_test_setup(faccessat_at_fdcwd_delegates, setup),
+      cmocka_unit_test_setup(faccessat_relative_non_fdcwd_enosys, setup),
+      cmocka_unit_test_setup(newfstatat_empty_path_enosys, setup),
+      cmocka_unit_test_setup(newfstatat_bad_flags_einval, setup),
+      cmocka_unit_test_setup(newfstatat_at_fdcwd_delegates_to_stat, setup),
+      cmocka_unit_test_setup(getdents64_delegates, setup),
+      cmocka_unit_test_setup(pipe2_ocloexec_sets_cloexec, setup),
+      cmocka_unit_test_setup(pipe2_no_cloexec, setup),
+      cmocka_unit_test_setup(fcntl_dupfd_stdio_returns_fd, setup),
+      cmocka_unit_test_setup(fcntl_getfl_stdio_returns_rdwr, setup),
+      cmocka_unit_test_setup(fcntl_setfl_stdio_returns_zero, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
