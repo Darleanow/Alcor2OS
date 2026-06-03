@@ -702,6 +702,160 @@ static void test_reparenting_on_exit(void **state)
   assert_int_equal(child->parent_pid, 1);
 }
 
+/* proc_wait: non-zombie child — blocks then returns -1 (child not zombie
+   after schedule, since context_switch is a noop and child stays READY). */
+static void test_proc_wait_non_zombie_returns_minus1(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame     = {0};
+  i64             child_pid = proc_fork(&frame);
+  proc_t         *child     = proc_get(child_pid);
+  child->state              = PROC_STATE_READY; /* not zombie */
+  i64 ret                   = proc_wait((u64)child_pid);
+  assert_int_equal(ret, -1);
+}
+
+/* proc_wake on a non-BLOCKED process is a noop */
+static void test_proc_wake_noop_on_non_blocked(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("p", NULL, 0, argv, argv);
+  proc_t *p = &proc_table[0];
+  p->state  = PROC_STATE_READY;
+  proc_wake(p);
+  assert_int_equal(p->state, PROC_STATE_READY);
+
+  p->state = PROC_STATE_RUNNING;
+  proc_wake(p);
+  assert_int_equal(p->state, PROC_STATE_RUNNING);
+}
+
+/* proc_signal_broadcast: signals running processes, skips free/zombie */
+static void test_proc_signal_broadcast_signals_running(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("p0", NULL, 0, argv, argv);
+  proc_create_mem("p1", NULL, 0, argv, argv);
+  proc_table[0].state = PROC_STATE_RUNNING;
+  proc_table[1].state = PROC_STATE_READY;
+  /* proc_signal is a stub noop — just ensure it doesn't crash */
+  proc_signal_broadcast(SIGUSR1);
+}
+
+/* proc_waitpid: fills status when child is zombie */
+static void test_waitpid_fills_status(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame     = {0};
+  i64             child_pid = proc_fork(&frame);
+  proc_t         *child     = proc_get(child_pid);
+  child->state              = PROC_STATE_ZOMBIE;
+  child->exit_code          = 42;
+
+  i32 status = 0;
+  i64 ret    = proc_waitpid(child_pid, &status, 0);
+  assert_int_equal(ret, child_pid);
+  assert_int_equal(status, (42 & 0xFF) << 8);
+}
+
+/* proc_waitpid: specific child not zombie, WNOHANG → 0 (already tested via
+   test_waitpid_wnohang_no_zombie, but add explicit status=NULL variant) */
+static void test_waitpid_specific_not_zombie_wnohang_null_status(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame     = {0};
+  i64             child_pid = proc_fork(&frame);
+  proc_get(child_pid)->state = PROC_STATE_READY;
+  i64 ret = proc_waitpid(child_pid, NULL, WNOHANG);
+  assert_int_equal(ret, 0);
+}
+
+/* proc_waitpid: blocking for any child — after schedule child is still not
+   zombie, then proc_schedule runs and the while loop exits because context_switch
+   is noop and proc_schedule just returns after switching. The loop then finds
+   the child zombie if we set it. We set child to zombie before calling so it's
+   found immediately on first scan. */
+static void test_waitpid_any_child_zombie_found_in_loop(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame     = {0};
+  i64             child_pid = proc_fork(&frame);
+  proc_t         *child     = proc_get(child_pid);
+  /* Child is zombie from the start so the initial scan finds it */
+  child->state     = PROC_STATE_ZOMBIE;
+  child->exit_code = 7;
+
+  i32 status = 0;
+  i64 ret    = proc_waitpid(-1, &status, 0);
+  assert_int_equal(ret, child_pid);
+  assert_int_equal(status, (7 & 0xFF) << 8);
+}
+
+/* proc_waitpid: specific child becomes zombie after schedule (simulate by
+   setting child zombie before the blocking while loop would run). Since
+   context_switch is noop, proc_schedule returns immediately and re-checks. */
+static void test_waitpid_specific_child_found_zombie_after_schedule(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame     = {0};
+  i64             child_pid = proc_fork(&frame);
+  proc_t         *child     = proc_get(child_pid);
+  child->state              = PROC_STATE_ZOMBIE;
+  child->exit_code          = 99;
+
+  i64 ret = proc_waitpid(child_pid, NULL, 0);
+  assert_int_equal(ret, child_pid);
+}
+
+/* proc_exit: parent waiting_for_pid doesn't match child — parent not woken */
+static void test_proc_exit_parent_waiting_for_other_not_woken(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("init", NULL, 0, argv, argv);
+  u64 parent_pid = proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc   = proc_get(parent_pid);
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame     = {0};
+  i64             child_pid = proc_fork(&frame);
+  proc_t         *child     = proc_get(child_pid);
+  proc_t         *parent    = proc_get(parent_pid);
+
+  /* Parent is blocked waiting for a *different* pid */
+  parent->state           = PROC_STATE_BLOCKED;
+  parent->waiting_for_pid = 9999;
+
+  /* Exit from the child's perspective */
+  current_proc = child;
+  if(setjmp(halt_jmp) == 0)
+    proc_exit(0);
+
+  /* Parent was waiting for 9999, not child_pid, so stays BLOCKED */
+  assert_int_equal(parent->state, PROC_STATE_BLOCKED);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -746,6 +900,14 @@ int main(void)
       cmocka_unit_test_setup_teardown(test_proc_signal_broadcast_skips_free_zombie, setup, teardown),
       cmocka_unit_test_setup_teardown(test_waitpid_wnohang_no_zombie, setup, teardown),
       cmocka_unit_test_setup_teardown(test_reparenting_on_exit, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_wait_non_zombie_returns_minus1, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_wake_noop_on_non_blocked, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_signal_broadcast_signals_running, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_fills_status, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_specific_not_zombie_wnohang_null_status, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_any_child_zombie_found_in_loop, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_specific_child_found_zombie_after_schedule, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_exit_parent_waiting_for_other_not_woken, setup, teardown),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

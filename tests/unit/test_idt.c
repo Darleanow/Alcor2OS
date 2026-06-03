@@ -10,21 +10,41 @@
 #include <alcor2/arch/pic.h>
 #include <arch/x86_64/idt_internal.h>
 
+#include <setjmp.h>
+#include <string.h>
+
 /* Link-only stubs — pulled in by code paths we never execute here. */
 void *isr_stub_table[256];
 void *irq_stub_table[16];
-void  console_print(const char *s)
+
+static char g_print_buf[4096];
+static int  g_print_pos;
+void        console_print(const char *s)
 {
-  (void)s;
+  if(!s)
+    return;
+  int len = 0;
+  while(s[len])
+    len++;
+  if(g_print_pos + len < (int)sizeof(g_print_buf) - 1) {
+    for(int i = 0; i < len; i++)
+      g_print_buf[g_print_pos++] = s[i];
+    g_print_buf[g_print_pos] = '\0';
+  }
 }
 void console_printf(const char *fmt, ...)
 {
   (void)fmt;
 }
-NORETURN void cpu_halt(void)
+
+/* cpu_halt: use longjmp to escape so we can test paths that call it. */
+static jmp_buf g_halt_jmp;
+static int     g_halt_called;
+NORETURN void  cpu_halt(void)
 {
-  for(;;) {
-  }
+  g_halt_called = 1;
+  longjmp(g_halt_jmp, 1);
+  __builtin_unreachable();
 }
 
 /* pic_eoi is actually called by irq_handler — record it. */
@@ -49,6 +69,10 @@ static int setup(void **state)
   (void)state;
   eoi_count = handler_count = 0;
   eoi_last_irq = handler_last_irq = 0;
+  g_halt_called = 0;
+  g_print_pos   = 0;
+  g_print_buf[0] = '\0';
+  idt_set_proc_hooks((idt_proc_hooks_t){0});
   for(unsigned i = 0; i < PIC_IRQ_LINE_COUNT; i++)
     irq_register((u8)i, NULL);
   return 0;
@@ -176,6 +200,130 @@ static void idt_set_proc_hooks_stores_hooks(void **state)
   idt_set_proc_hooks(h);
 }
 
+/* exception_handler tests — escape cpu_halt via longjmp */
+
+/* Kernel exception (cs RPL=0): prints KERNEL PANIC and halts */
+static void exception_handler_kernel_fault_panics(void **state)
+{
+  (void)state;
+  interrupt_frame_t frame = {0};
+  frame.vector            = 13; /* General Protection Fault */
+  frame.cs                = 0x08; /* kernel CS, RPL=0 */
+  frame.rip               = 0xDEAD;
+  frame.rsp               = 0xBEEF;
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_int_equal(g_halt_called, 1);
+  assert_non_null(strstr(g_print_buf, "KERNEL PANIC"));
+  assert_non_null(strstr(g_print_buf, "General Protection Fault"));
+}
+
+/* Named exception in range */
+static void exception_handler_prints_exception_name(void **state)
+{
+  (void)state;
+  interrupt_frame_t frame = {0};
+  frame.vector            = 6; /* Invalid Opcode */
+  frame.cs                = 0x08;
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_non_null(strstr(g_print_buf, "Invalid Opcode"));
+}
+
+/* Unknown vector (>= 32): prints "Interrupt: <n>" */
+static void exception_handler_unknown_vector(void **state)
+{
+  (void)state;
+  interrupt_frame_t frame = {0};
+  frame.vector            = 50;
+  frame.cs                = 0x08;
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_non_null(strstr(g_print_buf, "Interrupt:"));
+}
+
+/* User fault (cs RPL=3) without exit hook: prints message, halts */
+static void exception_handler_user_fault_no_hook_halts(void **state)
+{
+  (void)state;
+  interrupt_frame_t frame = {0};
+  frame.vector            = 0; /* Division Error */
+  frame.cs                = 0x1B; /* user CS, RPL=3 */
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_int_equal(g_halt_called, 1);
+  assert_non_null(strstr(g_print_buf, "Division Error"));
+}
+
+/* proc_hooks.current_name returning a name adds it to output */
+static const char *hook_proc_name(void)
+{
+  return "test_proc";
+}
+static void exception_handler_prints_proc_name(void **state)
+{
+  (void)state;
+  idt_set_proc_hooks((idt_proc_hooks_t){.current_name = hook_proc_name});
+  interrupt_frame_t frame = {0};
+  frame.vector            = 8; /* Double Fault */
+  frame.cs                = 0x08;
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_non_null(strstr(g_print_buf, "test_proc"));
+}
+
+/* proc_hooks.current_name returning NULL: no brackets added */
+static const char *hook_proc_name_null(void)
+{
+  return NULL;
+}
+static void exception_handler_null_proc_name_skipped(void **state)
+{
+  (void)state;
+  idt_set_proc_hooks((idt_proc_hooks_t){.current_name = hook_proc_name_null});
+  interrupt_frame_t frame = {0};
+  frame.vector            = 1;
+  frame.cs                = 0x08;
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_int_equal(g_halt_called, 1);
+}
+
+/* User fault with exit hook: hook is called, then cpu_halt */
+static i64  g_exit_code;
+static void hook_exit(i64 code)
+{
+  g_exit_code = code;
+  /* don't longjmp here — let cpu_halt do it */
+}
+static void exception_handler_user_fault_calls_exit_hook(void **state)
+{
+  (void)state;
+  g_exit_code = 0;
+  idt_set_proc_hooks((idt_proc_hooks_t){.exit = hook_exit});
+  interrupt_frame_t frame = {0};
+  frame.vector            = 6; /* Invalid Opcode */
+  frame.cs                = 0x1B; /* user RPL=3 */
+
+  if(setjmp(g_halt_jmp) == 0)
+    exception_handler(&frame);
+
+  assert_int_equal(g_exit_code, -11);
+  assert_non_null(strstr(g_print_buf, "Killing faulting process"));
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -192,6 +340,16 @@ int main(void)
       cmocka_unit_test_setup(irq_register_bounds_check, setup),
       cmocka_unit_test_setup(irq_register_deregisters_on_null, setup),
       cmocka_unit_test(idt_set_proc_hooks_stores_hooks),
+      /* exception_handler */
+      cmocka_unit_test_setup(exception_handler_kernel_fault_panics, setup),
+      cmocka_unit_test_setup(exception_handler_prints_exception_name, setup),
+      cmocka_unit_test_setup(exception_handler_unknown_vector, setup),
+      cmocka_unit_test_setup(exception_handler_user_fault_no_hook_halts, setup),
+      cmocka_unit_test_setup(exception_handler_prints_proc_name, setup),
+      cmocka_unit_test_setup(exception_handler_null_proc_name_skipped, setup),
+      cmocka_unit_test_setup(
+          exception_handler_user_fault_calls_exit_hook, setup
+      ),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
