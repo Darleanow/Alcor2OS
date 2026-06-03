@@ -108,6 +108,16 @@ static i64 dummy_rmdir(void *fs_data, const char *path) {
   return 0;
 }
 
+static i64 dummy_truncate(fs_handle_t fh, u64 length) {
+  (void)fh; (void)length;
+  return 0;
+}
+
+static u32 dummy_poll(fs_handle_t fh, u32 events) {
+  (void)fh;
+  return events;
+}
+
 static const fs_ops_t dummy_ops = {
   .open = dummy_open,
   .read = dummy_read,
@@ -119,7 +129,9 @@ static const fs_ops_t dummy_ops = {
   .ioctl = dummy_ioctl,
   .mkdir = dummy_mkdir,
   .unlink = dummy_unlink,
-  .rmdir = dummy_rmdir
+  .rmdir = dummy_rmdir,
+  .truncate = dummy_truncate,
+  .poll = dummy_poll
 };
 
 static void *dummy_mount_cb(const char *source, u32 flags) {
@@ -141,6 +153,8 @@ static int setup_vfs(void **state) {
   vfs_init();
   fs_registry_count = 0;
   vfs_register_fs(&dummy_fstype);
+  vfs_mount("dev", "/", "dummy"); /* mount root so vfs_open/stat work */
+  g_readdir_ret = 0;
   memset(g_last_rel_path, 0, sizeof(g_last_rel_path));
   return 0;
 }
@@ -503,6 +517,216 @@ static void vfs_write_fails_on_pipe_rd(void **state) {
   assert_int_equal(vfs_write(fd, buf, 10), -EBADF);
 }
 
+/* vfs_stat */
+static void vfs_stat_dispatches_to_driver(void **state) {
+  (void)state;
+  vfs_stat_t st;
+  assert_int_equal(vfs_stat("/", &st), 0);
+  assert_int_equal(st.type, VFS_DIRECTORY);
+}
+
+static void vfs_stat_returns_driver_result(void **state) {
+  (void)state;
+  vfs_stat_t st;
+  /* root mount covers all paths; dummy_stat returns VFS_DIRECTORY */
+  assert_int_equal(vfs_stat("/anypath", &st), 0);
+  assert_int_equal(st.type, VFS_DIRECTORY);
+}
+
+/* vfs_fstat */
+static void vfs_fstat_on_file(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/file.txt", O_RDONLY);
+  vfs_stat_t st;
+  assert_int_equal(vfs_fstat(fd, &st), 0);
+  assert_int_equal(st.type, VFS_FILE);
+  assert_int_equal(st.size, 1024);
+}
+
+static void vfs_fstat_on_pipe(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  vfs_stat_t st;
+  assert_int_equal(vfs_fstat(fd, &st), 0);
+  assert_int_equal(st.type, VFS_FIFO);
+}
+
+static void vfs_fstat_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  vfs_stat_t st;
+  assert_int_equal((i64)vfs_fstat(-1, &st), -EBADF);
+}
+
+/* vfs_ftruncate */
+static void vfs_ftruncate_dispatches_to_driver(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_WRONLY);
+  assert_int_equal(vfs_ftruncate(fd, 100), 0);
+}
+
+static void vfs_ftruncate_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_ftruncate(-1, 0), -EBADF);
+}
+
+static void vfs_ftruncate_pipe_returns_einval(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  assert_int_equal((i64)vfs_ftruncate(fd, 0), -EINVAL);
+}
+
+/* vfs_get_flags / vfs_set_flags */
+static void vfs_get_flags_returns_open_flags(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  i64 flags = vfs_get_flags(fd);
+  assert_int_equal(flags, O_RDONLY);
+}
+
+static void vfs_set_flags_updates_flags(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_int_equal(vfs_set_flags(fd, O_RDWR), 0);
+  assert_int_equal(vfs_get_flags(fd), O_RDWR);
+}
+
+static void vfs_get_flags_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_get_flags(-1), -EBADF);
+}
+
+static void vfs_set_flags_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_set_flags(-1, 0), -EBADF);
+}
+
+/* vfs_readlink: no readlink op in driver returns -ENOSYS */
+static void vfs_readlink_returns_enosys(void **state) {
+  (void)state;
+  char buf[64];
+  assert_int_equal((i64)vfs_readlink("/link", buf, 64), -ENOSYS);
+}
+
+/* vfs_ioctl: bad fd returns -EBADF */
+static void vfs_ioctl_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_ioctl(-1, 0, 0), -EBADF);
+}
+
+/* vfs_ioctl: pipe returns -ENOTTY */
+static void vfs_ioctl_pipe_returns_enotty(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  assert_int_equal((i64)vfs_ioctl(fd, 0, 0), -ENOTTY);
+}
+
+/* vfs_rename: copies src to dst then unlinks src */
+static void vfs_rename_copies_and_unlinks(void **state) {
+  (void)state;
+  /* dummy stat returns VFS_DIRECTORY which makes rename return -EISDIR */
+  vfs_stat_t st;
+  st.type = VFS_FILE;
+  st.size = 0;
+  /* The dummy_stat returns VFS_DIRECTORY, so rename returns -EISDIR */
+  assert_int_equal((i64)vfs_rename("/src.txt", "/dst.txt"), -EISDIR);
+}
+
+/* vfs_rename: source is a directory (stat returns VFS_DIRECTORY) */
+static void vfs_rename_src_dir_returns_eisdir(void **state) {
+  (void)state;
+  /* dummy_stat always returns VFS_DIRECTORY, so rename returns -EISDIR */
+  assert_int_equal((i64)vfs_rename("/src.txt", "/dst.txt"), -EISDIR);
+}
+
+/* vfs_oft_retain and vfs_oft_release: retain bumps refcount, release decrements */
+static void vfs_oft_retain_release_refcount(void **state) {
+  (void)state;
+  i64 fd      = vfs_open("/f.txt", O_RDONLY);
+  i32 oft_idx = fd_to_oft(fd);
+  int before  = oft[oft_idx].refcount;
+  vfs_oft_retain(oft_idx);
+  assert_int_equal(oft[oft_idx].refcount, before + 1);
+  vfs_oft_release(oft_idx);
+  assert_int_equal(oft[oft_idx].refcount, before);
+}
+
+/* vfs_close: bad fd returns -EBADF */
+static void vfs_close_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_close(-1), -EBADF);
+}
+
+/* vfs_read: bad fd returns -EBADF */
+static void vfs_read_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  char buf[4];
+  assert_int_equal((i64)vfs_read(-1, buf, 4), -EBADF);
+}
+
+/* vfs_write: bad fd returns -EBADF */
+static void vfs_write_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  char buf[4];
+  assert_int_equal((i64)vfs_write(-1, buf, 4), -EBADF);
+}
+
+/* vfs_seek: bad fd returns -EBADF */
+static void vfs_seek_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_seek(-1, 0, SEEK_SET), -EBADF);
+}
+
+/* vfs_mkdir: dispatches through mounted driver */
+static void vfs_mkdir_succeeds(void **state) {
+  (void)state;
+  assert_int_equal(vfs_mkdir("/newdir"), 0);
+}
+
+/* vfs_unlink: dispatches through mounted driver */
+static void vfs_unlink_succeeds(void **state) {
+  (void)state;
+  assert_int_equal(vfs_unlink("/somefile"), 0);
+}
+
+/* vfs_rmdir: dispatches through mounted driver */
+static void vfs_rmdir_succeeds(void **state) {
+  (void)state;
+  assert_int_equal(vfs_rmdir("/somedir"), 0);
+}
+
+/* vfs_chdir: nonexistent returns error */
+static void vfs_chdir_nonexistent_returns_error(void **state) {
+  (void)state;
+  /* dummy_stat always returns VFS_DIRECTORY and 0, so chdir to anything on root succeeds */
+  assert_int_equal(vfs_chdir("/somedir"), 0);
+}
+
+/* vfs_getdents: returns entries when readdir succeeds */
+static void vfs_getdents_returns_entries(void **state) {
+  (void)state;
+  g_readdir_ret = 1; /* readdir returns 1 entry */
+  i64 fd = vfs_open("/", O_RDONLY);
+  char buf[512];
+  /* getdents fills buf with dirent entries */
+  i64 ret = vfs_getdents(fd, buf, sizeof(buf));
+  assert_true(ret >= 0);
+}
+
+/* vfs_dup: bad fd returns -EBADF */
+static void vfs_dup_bad_fd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_dup(-1), -EBADF);
+}
+
+/* vfs_dup2: bad oldfd returns -EBADF */
+static void vfs_dup2_bad_oldfd_returns_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_dup2(-1, 5), -EBADF);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(vfs_chdir_updates_cwd, setup_vfs),
@@ -547,6 +771,44 @@ int main(void) {
       cmocka_unit_test_setup(vfs_write_advances_offset, setup_vfs),
       cmocka_unit_test_setup(vfs_write_append_updates_offset, setup_vfs),
       cmocka_unit_test_setup(vfs_write_fails_on_pipe_rd, setup_vfs),
+      /* vfs_stat */
+      cmocka_unit_test_setup(vfs_stat_dispatches_to_driver, setup_vfs),
+      cmocka_unit_test_setup(vfs_stat_returns_driver_result, setup_vfs),
+      /* vfs_fstat */
+      cmocka_unit_test_setup(vfs_fstat_on_file, setup_vfs),
+      cmocka_unit_test_setup(vfs_fstat_on_pipe, setup_vfs),
+      cmocka_unit_test_setup(vfs_fstat_bad_fd_returns_ebadf, setup_vfs),
+      /* vfs_ftruncate */
+      cmocka_unit_test_setup(vfs_ftruncate_dispatches_to_driver, setup_vfs),
+      cmocka_unit_test_setup(vfs_ftruncate_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_ftruncate_pipe_returns_einval, setup_vfs),
+      /* vfs_get_flags / vfs_set_flags */
+      cmocka_unit_test_setup(vfs_get_flags_returns_open_flags, setup_vfs),
+      cmocka_unit_test_setup(vfs_set_flags_updates_flags, setup_vfs),
+      cmocka_unit_test_setup(vfs_get_flags_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_set_flags_bad_fd_returns_ebadf, setup_vfs),
+      /* vfs_readlink */
+      cmocka_unit_test_setup(vfs_readlink_returns_enosys, setup_vfs),
+      /* vfs_ioctl extra */
+      cmocka_unit_test_setup(vfs_ioctl_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_ioctl_pipe_returns_enotty, setup_vfs),
+      /* vfs_rename */
+      cmocka_unit_test_setup(vfs_rename_copies_and_unlinks, setup_vfs),
+      cmocka_unit_test_setup(vfs_rename_src_dir_returns_eisdir, setup_vfs),
+      /* vfs_oft_retain/release */
+      cmocka_unit_test_setup(vfs_oft_retain_release_refcount, setup_vfs),
+      /* error paths */
+      cmocka_unit_test_setup(vfs_close_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_read_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_write_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_seek_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_mkdir_succeeds, setup_vfs),
+      cmocka_unit_test_setup(vfs_unlink_succeeds, setup_vfs),
+      cmocka_unit_test_setup(vfs_rmdir_succeeds, setup_vfs),
+      cmocka_unit_test_setup(vfs_chdir_nonexistent_returns_error, setup_vfs),
+      cmocka_unit_test_setup(vfs_getdents_returns_entries, setup_vfs),
+      cmocka_unit_test_setup(vfs_dup_bad_fd_returns_ebadf, setup_vfs),
+      cmocka_unit_test_setup(vfs_dup2_bad_oldfd_returns_ebadf, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
