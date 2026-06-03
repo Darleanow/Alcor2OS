@@ -13,8 +13,18 @@ void  kzero(void *d, u64 n) { memset(d, 0, (size_t)n); }
 u64   kstrlen(const char *s) { return strlen(s); }
 bool  kstreq(const char *a, const char *b) { return strcmp(a, b) == 0; }
 char *kstrncpy(char *d, const char *s, u64 m) { if(!m) return d; u64 i; for(i=0;i<m-1&&s[i];i++) d[i]=s[i]; d[i]='\0'; return d; }
-void *kzalloc(u64 n) { return calloc(1, (size_t)n); }
-void *krealloc(void *ptr, u64 size) { return realloc(ptr, (size_t)size); }
+static int g_kzalloc_fail_after = -1; /* -1 = never fail */
+void *kzalloc(u64 n) {
+  if(g_kzalloc_fail_after == 0) return NULL;
+  if(g_kzalloc_fail_after > 0) g_kzalloc_fail_after--;
+  return calloc(1, (size_t)n);
+}
+static int g_krealloc_fail_after = -1;
+void *krealloc(void *ptr, u64 size) {
+  if(g_krealloc_fail_after == 0) return NULL;
+  if(g_krealloc_fail_after > 0) g_krealloc_fail_after--;
+  return realloc(ptr, (size_t)size);
+}
 
 char *kstrrchr(const char *s, int c) {
   return strrchr(s, c);
@@ -31,15 +41,9 @@ i64 vfs_register_fs(const fs_type_t *fstype) {
 
 static int reset_ramfs(void **state) {
   (void)state;
-  /* Simple brute-force reset for testing */
-  if (root) {
-    /* To fully clean up we'd need a recursive free, but for unit tests
-       in a short-lived process, just nulling root and calling init is 
-       often enough, or we can just leak if cmocka doesn't strictly check.
-       Actually, let's just do a proper teardown if possible, or 
-       just reset root. */
-    root = NULL;
-  }
+  g_kzalloc_fail_after  = -1;
+  g_krealloc_fail_after = -1;
+  if(root) root = NULL;
   ramfs_init();
   return 0;
 }
@@ -484,6 +488,55 @@ static void ram_write_near_overflow_efbig(void **state) {
   assert_int_equal((i64)ram_write(fh, "x", 10, big_offset), -EFBIG);
 }
 
+/* ram__create_node OOM → ram_open O_CREAT returns NULL */
+static void ram_open_creat_oom(void **state) {
+  (void)state;
+  /* root node consumed 1 kzalloc in ramfs_init; next kzalloc fails */
+  g_kzalloc_fail_after = 0;
+  fs_handle_t fh = ram_open(NULL, "/newfile", O_CREAT | O_WRONLY);
+  assert_null(fh);
+}
+
+/* ram_open O_TRUNC on existing file resets size */
+static void ram_open_trunc_resets_size(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/f", O_CREAT | O_WRONLY);
+  const char *data = "hello";
+  ram_write(fh, data, 5, 0);
+  /* Re-open with O_TRUNC */
+  fh = ram_open(NULL, "/f", O_WRONLY | O_TRUNC);
+  assert_non_null(fh);
+  ram_node_t *node = ram__resolve("/f");
+  assert_int_equal(node->size, 0);
+}
+
+/* ram_write: krealloc fails when capacity needs to grow → -ENOMEM */
+static void ram_write_krealloc_fail_enomem(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/f", O_CREAT | O_WRONLY);
+  g_krealloc_fail_after = 0;
+  char buf[64];
+  /* Write past current capacity (0) → krealloc needed → fails */
+  assert_int_equal((i64)ram_write(fh, buf, 64, 0), -ENOMEM);
+}
+
+/* ram_mkdir: ram__create_node OOM → -ENOMEM */
+static void ram_mkdir_oom(void **state) {
+  (void)state;
+  g_kzalloc_fail_after = 0;
+  assert_int_equal((i64)ram_mkdir(NULL, "/newdir"), -ENOMEM);
+}
+
+/* ram__resolve: path with trailing slash component → breaks cleanly */
+static void ram_resolve_trailing_slash(void **state) {
+  (void)state;
+  /* "/testdir/" — the trailing slash creates an empty component after split */
+  ram_mkdir(NULL, "/testdir");
+  ram_node_t *node = ram__resolve("/testdir/");
+  /* Should return the directory node */
+  assert_non_null(node);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(ram_mkdir_creates_directory, reset_ramfs),
@@ -549,6 +602,12 @@ int main(void) {
       cmocka_unit_test_setup(ram_rmdir_non_first_child, reset_ramfs),
       cmocka_unit_test_setup(ram_mkdir_no_slash_einval, reset_ramfs),
       cmocka_unit_test_setup(ram_write_near_overflow_efbig, reset_ramfs),
+      /* new coverage */
+      cmocka_unit_test_setup(ram_open_creat_oom, reset_ramfs),
+      cmocka_unit_test_setup(ram_open_trunc_resets_size, reset_ramfs),
+      cmocka_unit_test_setup(ram_write_krealloc_fail_enomem, reset_ramfs),
+      cmocka_unit_test_setup(ram_mkdir_oom, reset_ramfs),
+      cmocka_unit_test_setup(ram_resolve_trailing_slash, reset_ramfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

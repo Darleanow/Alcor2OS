@@ -247,6 +247,68 @@ static void test_heap_init_pmm_fail(void **state) {
     heap_size = 0;
 }
 
+/* heap_init: success path hits console_printf */
+static void test_heap_init_success(void **state) {
+    (void)state;
+    heap_init(); /* should succeed and call console_printf */
+    assert_non_null(heap_start);
+}
+
+/* kmalloc(0) → NULL */
+static void test_kmalloc_zero_returns_null(void **state) {
+    (void)state;
+    heap_expand(1);
+    assert_null(kmalloc(0));
+}
+
+/* kfree: double free detected (no crash) */
+static void test_kfree_double_free(void **state) {
+    (void)state;
+    heap_expand(1);
+    void *p = kmalloc(32);
+    kfree(p);
+    kfree(p); /* second free — hits "Double free detected" path */
+}
+
+/* krealloc: ptr == NULL → kmalloc */
+static void test_krealloc_null_ptr_acts_as_malloc(void **state) {
+    (void)state;
+    heap_expand(1);
+    void *p = krealloc(NULL, 32);
+    assert_non_null(p);
+    kfree(p);
+}
+
+/* krealloc: new_size == 0 → kfree + NULL */
+static void test_krealloc_zero_size_acts_as_free(void **state) {
+    (void)state;
+    heap_expand(1);
+    void *p = kmalloc(32);
+    void *r = krealloc(p, 0);
+    assert_null(r);
+}
+
+/* split_block: block->next != NULL → next->prev updated (line 112) */
+static void test_split_block_next_prev_updated(void **state) {
+    (void)state;
+    heap_expand(2);
+    /* Allocate three blocks to have a chain */
+    void *p1 = kmalloc(64);
+    void *p2 = kmalloc(64);
+    void *p3 = kmalloc(64);
+    /* Free p1 and p3, keep p2 allocated as a separator */
+    kfree(p1);
+    kfree(p3);
+    /* Now alloc a small block in p1's space — split triggers with block->next=p2's header */
+    void *p4 = kmalloc(16);
+    heap_block_t *b4   = (heap_block_t *)((u8 *)p4 - HEAP_HEADER_SIZE);
+    heap_block_t *bnxt = b4->next;
+    /* If split happened and block->next != NULL, bnxt->prev should be the new split block */
+    if(bnxt) assert_ptr_equal(bnxt->prev, b4);
+    kfree(p2);
+    kfree(p4);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(test_kmalloc_basic, setup_empty, teardown),
@@ -262,6 +324,13 @@ int main(void) {
         cmocka_unit_test_setup_teardown(test_kfree_bad_magic_is_noop, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_split_block_updates_next_prev, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_heap_init_pmm_fail, setup_empty, teardown),
+        /* new coverage */
+        cmocka_unit_test_setup_teardown(test_heap_init_success, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_kmalloc_zero_returns_null, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_kfree_double_free, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_krealloc_null_ptr_acts_as_malloc, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_krealloc_zero_size_acts_as_free, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_split_block_next_prev_updated, setup_empty, teardown),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
