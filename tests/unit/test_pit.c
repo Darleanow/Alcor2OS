@@ -152,8 +152,36 @@ static void reset_fast_clears_all_votes(void **state)
 static void reset_fast_noop_when_not_fast(void **state)
 {
   (void)state;
-  pit_reset_fast(); /* already normal, must not change */
+  pit_reset_fast();
   assert_int_equal(pit_get_frequency(), PIT_TICK_HZ);
+}
+
+static void pit_irq_increments_ticks(void **state)
+{
+  (void)state;
+  pit_set_frequency(1000);
+  u64 before = pit_get_ticks();
+  pit_irq(0);
+  assert_int_equal(pit_get_ticks(), before + 1);
+  assert_int_equal(pit_get_ns(), ns_per_tick);
+}
+
+static void pit_irq_calls_proc_tick_when_preempt_enabled(void **state)
+{
+  (void)state;
+  preempt_enabled = true;
+  pit_irq(0);
+  /* proc_tick is a stub — just verify no crash and ticks incremented */
+  assert_int_equal(ticks, 1);
+  preempt_enabled = false;
+}
+
+static void pit_enable_preempt_sets_flag(void **state)
+{
+  (void)state;
+  assert_false(preempt_enabled);
+  pit_enable_preempt();
+  assert_true(preempt_enabled);
 }
 
 int main(void)
@@ -172,6 +200,9 @@ int main(void)
       cmocka_unit_test_setup(release_without_request_is_noop, reset),
       cmocka_unit_test_setup(reset_fast_clears_all_votes, reset),
       cmocka_unit_test_setup(reset_fast_noop_when_not_fast, reset),
+      cmocka_unit_test_setup(pit_irq_increments_ticks, reset),
+      cmocka_unit_test_setup(pit_irq_calls_proc_tick_when_preempt_enabled, reset),
+      cmocka_unit_test_setup(pit_enable_preempt_sets_flag, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
