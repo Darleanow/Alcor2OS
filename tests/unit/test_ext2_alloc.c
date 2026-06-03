@@ -459,6 +459,115 @@ static void free_block_write_io_fail(void **state)
   g_write_fail = false;
 }
 
+/* alloc_inode_in_group: group out of range → 0 */
+static void alloc_inode_group_oob(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  assert_int_equal(alloc_inode_in_group(&vol, 1, false), 0);
+}
+
+/* alloc_inode_in_group: no free inodes → 0 */
+static void alloc_inode_no_free(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  vol.groups[0].bg_free_inodes_count = 0;
+  assert_int_equal(alloc_inode_in_group(&vol, 0, false), 0);
+}
+
+/* alloc_inode_in_group: kmalloc fail → 0 */
+static void alloc_inode_kmalloc_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = false;
+  assert_int_equal(alloc_inode_in_group(&vol, 0, false), 0);
+}
+
+/* alloc_inode_in_group: read fail → 0 */
+static void alloc_inode_read_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = false;
+  assert_int_equal(alloc_inode_in_group(&vol, 0, false), 0);
+}
+
+/* alloc_inode_in_group: write fail → 0 */
+static void alloc_inode_write_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  g_write_fail = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf));
+  assert_int_equal(alloc_inode_in_group(&vol, 0, false), 0);
+  g_write_fail = false;
+}
+
+/* alloc_inode: preferred group full, fallback succeeds in group 1 */
+static void alloc_inode_fallback_group(void **state) {
+  (void)state;
+  ext2_volume_t      vol;
+  static ext2_group_desc_t gds[2];
+  memset(&vol, 0, sizeof(vol));
+  vol.block_size         = 1024;
+  vol.blocks_per_group   = 1024 * 8;
+  vol.inodes_per_group   = 1024;
+  vol.groups_count       = 2;
+  vol.inodes_count       = 2048;
+  memset(gds, 0, sizeof(gds));
+  gds[0].bg_inode_bitmap      = 3;
+  gds[0].bg_free_inodes_count = 0; /* preferred group empty */
+  gds[1].bg_inode_bitmap      = 5;
+  gds[1].bg_free_inodes_count = 1024;
+  vol.groups = gds;
+
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  memset(g_bitmap_buf, 0, sizeof(g_bitmap_buf));
+
+  u32 ino = alloc_inode(&vol, 0, false);
+  assert_true(ino > 0);
+  /* ino should be in group 1 range */
+  assert_true(ino > vol.inodes_per_group);
+}
+
+/* free_inode: kmalloc fail → -ENOMEM */
+static void free_inode_kmalloc_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = false;
+  assert_int_equal((i64)free_inode(&vol, 1, false), -ENOMEM);
+}
+
+/* free_inode: read fail → -EIO */
+static void free_inode_read_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = false;
+  assert_int_equal((i64)free_inode(&vol, 1, false), -EIO);
+}
+
+/* free_inode: write fail → -EIO */
+static void free_inode_write_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol;
+  build_vol(&vol, 1024);
+  g_kmalloc_ok = true;
+  g_io_ok      = true;
+  g_write_fail = true;
+  memset(g_bitmap_buf, 0xFF, sizeof(g_bitmap_buf));
+  assert_int_equal((i64)free_inode(&vol, 1, false), -EIO);
+  g_write_fail = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -497,6 +606,17 @@ int main(void)
       cmocka_unit_test(alloc_block_fallback_group),
       cmocka_unit_test(alloc_inode_bitmap_full),
       cmocka_unit_test(free_block_write_io_fail),
+      /* alloc_inode_in_group error paths */
+      cmocka_unit_test(alloc_inode_group_oob),
+      cmocka_unit_test(alloc_inode_no_free),
+      cmocka_unit_test(alloc_inode_kmalloc_fail),
+      cmocka_unit_test(alloc_inode_read_fail),
+      cmocka_unit_test(alloc_inode_write_fail),
+      cmocka_unit_test(alloc_inode_fallback_group),
+      /* free_inode error paths */
+      cmocka_unit_test(free_inode_kmalloc_fail),
+      cmocka_unit_test(free_inode_read_fail),
+      cmocka_unit_test(free_inode_write_fail),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

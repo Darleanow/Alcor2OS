@@ -18,12 +18,20 @@
 static u8 g_blocks[STORE_BLOCKS][BLOCK_SZ];
 
 static bool g_malloc_fail = false;
+static bool g_read_fail   = false;
+static bool g_write_fail  = false;
+static bool g_sparse      = false;
+static bool g_alloc_fail  = false;
 
 static int reset(void **s)
 {
   (void)s;
   memset(g_blocks, 0, sizeof(g_blocks));
   g_malloc_fail = false;
+  g_read_fail   = false;
+  g_write_fail  = false;
+  g_sparse      = false;
+  g_alloc_fail  = false;
   return 0;
 }
 void *kmalloc(u64 n)
@@ -102,31 +110,31 @@ i64 write_inode(const ext2_volume_t *v, u32 i, const ext2_inode_t *n)
 i64 vol_read_block(const ext2_volume_t *v, u32 b, void *buf)
 {
   (void)v;
-  if(b >= STORE_BLOCKS)
+  if(g_read_fail || b >= STORE_BLOCKS)
     return -1;
   memcpy(buf, g_blocks[b], BLOCK_SZ);
-  return BLOCK_SZ;
+  return 0;
 }
 i64 vol_write_block(const ext2_volume_t *v, u32 b, const void *buf)
 {
   (void)v;
-  if(b >= STORE_BLOCKS)
+  if(g_write_fail || b >= STORE_BLOCKS)
     return -1;
   memcpy(g_blocks[b], buf, BLOCK_SZ);
-  return BLOCK_SZ;
+  return 0;
 }
 u32 get_block_num(const ext2_volume_t *v, const ext2_inode_t *inode, u32 fb)
 {
   (void)v;
   (void)inode;
-  return fb + 1;
+  return g_sparse ? 0 : fb + 1;
 }
 u32 alloc_file_block(ext2_volume_t *v, ext2_inode_t *inode, u32 fb, u32 grp)
 {
   (void)v;
   (void)inode;
   (void)grp;
-  return fb + 1;
+  return g_alloc_fail ? 0 : fb + 1;
 }
 i64 flush_metadata(ext2_volume_t *v)
 {
@@ -614,6 +622,150 @@ static void dir_remove_entry_kmalloc_fail(void **state)
   assert_int_equal(ret, -ENOMEM);
 }
 
+/* Helper: build a minimal volume */
+static ext2_volume_t make_dirent_vol(void) {
+  ext2_volume_t vol;
+  memset(&vol, 0, sizeof(vol));
+  vol.block_size       = BLOCK_SZ;
+  vol.inodes_per_group = 1024;
+  return vol;
+}
+
+/* dir_block_try_insert: rec_len == 0 → return false (line 174) */
+static void dir_block_try_insert_zero_rec_len(void **state) {
+  (void)state;
+  u8 block[BLOCK_SZ];
+  memset(block, 0, sizeof(block)); /* all zero → first rec_len=0 → return false */
+  bool r = dir_block_try_insert(block, BLOCK_SZ, "file", 4, 5, EXT2_FT_REG_FILE);
+  assert_false(r);
+}
+
+/* dir_find_entry: sparse block (block_num=0) → continue */
+static void dir_find_entry_sparse_block(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  g_sparse   = true; /* get_block_num returns 0 → continue */
+  u32 ino; u8 type;
+  i64 ret = dir_find_entry(&vol, &dir, "x", &ino, &type);
+  assert_int_equal(ret, -ENOENT);
+}
+
+/* dir_find_entry: read fail → -EIO */
+static void dir_find_entry_read_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size  = BLOCK_SZ;
+  g_read_fail = true;
+  u32 ino; u8 type;
+  i64 ret = dir_find_entry(&vol, &dir, "x", &ino, &type);
+  assert_int_equal(ret, -EIO);
+}
+
+/* dir_try_insert_into_existing: sparse block → continue */
+static void dir_try_insert_sparse_block(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  g_sparse   = true;
+  u8 block_buf[BLOCK_SZ];
+  /* sparse → skipped → returns -ENOENT (no block to insert into) */
+  i64 ret = dir_try_insert_into_existing(&vol, &dir, "f", 1, 5, EXT2_FT_REG_FILE, block_buf);
+  assert_int_equal(ret, -ENOENT);
+}
+
+/* dir_try_insert_into_existing: read fail → continue */
+static void dir_try_insert_read_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size  = BLOCK_SZ;
+  g_read_fail = true;
+  u8 block_buf[BLOCK_SZ];
+  i64 ret = dir_try_insert_into_existing(&vol, &dir, "f", 1, 5, EXT2_FT_REG_FILE, block_buf);
+  assert_int_equal(ret, -ENOENT); /* read failed → continue → -ENOENT */
+}
+
+/* dir_grow_with_entry: alloc_file_block fails → -ENOSPC */
+static void dir_grow_alloc_fail_enospc(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size   = BLOCK_SZ;
+  g_alloc_fail = true;
+  u8 block_buf[BLOCK_SZ];
+  i64 ret = dir_grow_with_entry(&vol, 2, &dir, "f", 1, 5, EXT2_FT_REG_FILE, block_buf);
+  assert_int_equal(ret, -ENOSPC);
+}
+
+/* dir_grow_with_entry: vol_write_block fails → -EIO */
+static void dir_grow_write_fail_eio(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size   = BLOCK_SZ;
+  g_write_fail = true;
+  u8 block_buf[BLOCK_SZ];
+  i64 ret = dir_grow_with_entry(&vol, 2, &dir, "f", 1, 5, EXT2_FT_REG_FILE, block_buf);
+  assert_int_equal(ret, -EIO);
+}
+
+/* dir_remove_entry: sparse block → continue */
+static void dir_remove_entry_sparse_block(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  g_sparse   = true;
+  i64 ret = dir_remove_entry(&vol, &dir, "x");
+  assert_int_equal(ret, -ENOENT);
+}
+
+/* dir_remove_entry: read fail → -EIO */
+static void dir_remove_entry_read_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size  = BLOCK_SZ;
+  g_read_fail = true;
+  i64 ret = dir_remove_entry(&vol, &dir, "x");
+  assert_int_equal(ret, -EIO);
+}
+
+/* dir_is_empty: sparse block → continue */
+static void dir_is_empty_sparse_block(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size = BLOCK_SZ;
+  g_sparse   = true;
+  /* All blocks sparse → no entries scanned → returns true */
+  assert_true(dir_is_empty(&vol, &dir));
+}
+
+/* dir_is_empty: read fail → return false */
+static void dir_is_empty_read_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol = make_dirent_vol();
+  ext2_inode_t  dir;
+  memset(&dir, 0, sizeof(dir));
+  dir.i_size  = BLOCK_SZ;
+  g_read_fail = true;
+  assert_false(dir_is_empty(&vol, &dir));
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -648,6 +800,18 @@ int main(void)
       cmocka_unit_test_setup(dir_add_entry_kmalloc_fail, reset),
       cmocka_unit_test_setup(dir_is_empty_kmalloc_fail, reset),
       cmocka_unit_test_setup(dir_remove_entry_kmalloc_fail, reset),
+      /* new coverage */
+      cmocka_unit_test_setup(dir_block_try_insert_zero_rec_len, reset),
+      cmocka_unit_test_setup(dir_find_entry_sparse_block, reset),
+      cmocka_unit_test_setup(dir_find_entry_read_fail, reset),
+      cmocka_unit_test_setup(dir_try_insert_sparse_block, reset),
+      cmocka_unit_test_setup(dir_try_insert_read_fail, reset),
+      cmocka_unit_test_setup(dir_grow_alloc_fail_enospc, reset),
+      cmocka_unit_test_setup(dir_grow_write_fail_eio, reset),
+      cmocka_unit_test_setup(dir_remove_entry_sparse_block, reset),
+      cmocka_unit_test_setup(dir_remove_entry_read_fail, reset),
+      cmocka_unit_test_setup(dir_is_empty_sparse_block, reset),
+      cmocka_unit_test_setup(dir_is_empty_read_fail, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

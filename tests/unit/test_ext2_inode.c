@@ -287,6 +287,31 @@ static void overwrite_middle_inode_preserves_neighbors(void **state)
   assert_memory_equal(&got5, &i5, sizeof(i5));
 }
 
+/* write_inode: open file handle with matching vol+inode_num gets inode updated */
+static void write_inode_updates_open_file_handle(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+
+  /* Set up an open file handle pointing to inode 1 on this volume */
+  memset(g_files, 0, sizeof(g_files));
+  g_files[0].in_use    = true;
+  g_files[0].vol       = &v;
+  g_files[0].inode_num = 1;
+  g_files[0].inode.i_size = 0;
+
+  ext2_inode_t new_inode;
+  make_inode(&new_inode, 1);
+  new_inode.i_size = 4096;
+
+  i64 ret = write_inode(&v, 1, &new_inode);
+  assert_int_equal(ret, 0);
+  /* g_files[0].inode should be updated */
+  assert_int_equal(g_files[0].inode.i_size, 4096);
+
+  /* Cleanup */
+  memset(g_files, 0, sizeof(g_files));
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -307,6 +332,8 @@ int main(void)
       cmocka_unit_test_setup(write_all_inodes_leaves_each_intact, reset),
       cmocka_unit_test_setup(overwrite_inode_updates_only_target_fields, reset),
       cmocka_unit_test_setup(overwrite_middle_inode_preserves_neighbors, reset),
+      /* new coverage */
+      cmocka_unit_test_setup(write_inode_updates_open_file_handle, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

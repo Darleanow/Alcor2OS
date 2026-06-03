@@ -70,6 +70,60 @@ static void test_fb_draw_fallback_char(void **state) {
     assert_true(changed);
 }
 
+/* fb_put_pixel: no base → no-op (line 95) */
+static void test_fb_put_pixel_no_base(void **state) {
+  (void)state;
+  fb_ctx.base = NULL;
+  fb_put_pixel(0, 0, 0xFF0000); /* must not crash */
+}
+
+/* fb_put_pixel: out-of-bounds → no-op */
+static void test_fb_put_pixel_oob(void **state) {
+  (void)state;
+  setup_fb(32);
+  fb_put_pixel(800, 0, 0xFF0000); /* x == width → out-of-bounds */
+  assert_int_equal(fb_get_pixel(799, 0), 0); /* unchanged */
+}
+
+/* fb_put_pixel: unknown bytes_pp → default: return (line 119) */
+static void test_fb_put_pixel_unknown_bpp(void **state) {
+  (void)state;
+  setup_fb(32);
+  fb_ctx.bytes_pp = 5; /* unsupported */
+  fb_put_pixel(0, 0, 0xFF0000); /* hits default: return */
+}
+
+/* fb_get_pixel: no base → 0 (line 135) */
+static void test_fb_get_pixel_no_base(void **state) {
+  (void)state;
+  fb_ctx.base = NULL;
+  assert_int_equal(fb_get_pixel(0, 0), 0);
+}
+
+/* fb_get_pixel: unknown bytes_pp → default: return 0 (line 153) */
+static void test_fb_get_pixel_unknown_bpp(void **state) {
+  (void)state;
+  setup_fb(32);
+  fb_ctx.bytes_pp = 5;
+  assert_int_equal(fb_get_pixel(0, 0), 0);
+}
+
+/* fb_draw_glyph: null glyph → no-op (line 172) */
+static void test_fb_draw_glyph_null(void **state) {
+  (void)state;
+  setup_fb(32);
+  fb_draw_glyph(0, 0, NULL, 0xFF0000, 0x000000); /* must not crash */
+}
+
+/* fb_draw_fallback_char: non-printable char → falls back to '?' (line 197) */
+static void test_fb_draw_fallback_char_nonprintable(void **state) {
+  (void)state;
+  setup_fb(32);
+  /* 0x01 is likely not in the atlas → font_glyph_index returns <0 → '?' */
+  fb_draw_fallback_char(0, 0, '\x01', 0xFFFFFF, 0x000000);
+  /* Just verify no crash — some pixels should be set */
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_fb_put_get_pixel_32),
@@ -77,6 +131,14 @@ int main(void) {
         cmocka_unit_test(test_fb_put_get_pixel_16),
         cmocka_unit_test(test_fb_draw_glyph),
         cmocka_unit_test(test_fb_draw_fallback_char),
+        /* new coverage */
+        cmocka_unit_test(test_fb_put_pixel_no_base),
+        cmocka_unit_test(test_fb_put_pixel_oob),
+        cmocka_unit_test(test_fb_put_pixel_unknown_bpp),
+        cmocka_unit_test(test_fb_get_pixel_no_base),
+        cmocka_unit_test(test_fb_get_pixel_unknown_bpp),
+        cmocka_unit_test(test_fb_draw_glyph_null),
+        cmocka_unit_test(test_fb_draw_fallback_char_nonprintable),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
