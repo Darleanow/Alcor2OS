@@ -12,7 +12,7 @@
 /* io.h stubs — inb feeds from a scripted sequence, outb is silent. */
 #define ALCOR2_IO_H
 
-static u8  inb_seq[16];
+static u8  inb_seq[64];
 static int inb_idx;
 static int inb_len;
 
@@ -198,6 +198,110 @@ static void non_aux_byte_ignored(void **state)
   assert_int_equal(ev_count, 0);
 }
 
+/* irq: status OUTPUT_FULL not set — early return, phase unchanged */
+static void irq_no_output_full_ignored(void **state)
+{
+  (void)state;
+  call_irq(0x00, 0x08); /* OUTPUT_FULL bit clear */
+  assert_int_equal(s_phase, 0);
+  assert_int_equal(ev_count, 0);
+}
+
+/* irq: second phase byte (phase=1) stores correctly */
+static void irq_second_byte_increments_phase(void **state)
+{
+  (void)state;
+  /* Feed first byte (flags with bit3) */
+  call_irq(STATUS_MOUSE_READY, 0x08);
+  assert_int_equal(s_phase, 1);
+  /* Feed second byte */
+  call_irq(STATUS_MOUSE_READY, 5);
+  assert_int_equal(s_phase, 2);
+  /* Third byte completes packet */
+  call_irq(STATUS_MOUSE_READY, 0);
+  assert_int_equal(s_phase, 0);
+  assert_int_equal(ev_count, 1);
+}
+
+/* Helper: fill inb_seq to simulate init — status alternates between
+ * input-clear (0x00) for wait_input, output-full (0x01) for wait_output,
+ * and ACK (0xFA) as data bytes for mouse commands.
+ * Layout: for each wait_input_clear call: one 0x00 byte.
+ *         for each ps2_read_data call: one 0x01 (status) then data byte.
+ * Sequence for mouse_ps2_init:
+ *   1. ps2_cmd(ENABLE_AUX)         -> wait_input_clear: status=0x00
+ *   2. ps2_cmd(READ_CONFIG)        -> wait_input_clear: status=0x00
+ *   3. ps2_read_data (config)      -> wait_output_full: 0x01, data=0x00
+ *   4. ps2_cmd(WRITE_CONFIG)       -> wait_input_clear: 0x00
+ *   5. ps2_write_data(cfg)         -> wait_input_clear: 0x00
+ *   6. mouse_cmd(SET_DEFAULTS):
+ *      ps2_cmd(WRITE_AUX)         -> wait_input_clear: 0x00
+ *      ps2_write_data(cmd)        -> wait_input_clear: 0x00
+ *      ps2_read_data (ACK)        -> wait_output_full: 0x01, data=0xFA
+ *   7. mouse_cmd(SET_SAMPLE):
+ *      ...same 4 bytes...
+ *   8. mouse_cmd(MOUSE_SAMPLE_RATE=200):
+ *      ...4 bytes, ACK=0xFA...
+ *   9. mouse_cmd(ENABLE):
+ *      ...4 bytes, ACK=0xFA...
+ */
+static void setup_init_seq(u8 defaults_ack, u8 enable_ack)
+{
+  int i = 0;
+  /* ps2_cmd(ENABLE_AUX): wait_input_clear */
+  inb_seq[i++] = 0x00;
+  /* ps2_cmd(READ_CONFIG): wait_input_clear */
+  inb_seq[i++] = 0x00;
+  /* ps2_read_data: wait_output_full + config byte */
+  inb_seq[i++] = 0x01; inb_seq[i++] = 0x00;
+  /* ps2_cmd(WRITE_CONFIG): wait_input_clear */
+  inb_seq[i++] = 0x00;
+  /* ps2_write_data(cfg): wait_input_clear */
+  inb_seq[i++] = 0x00;
+  /* mouse_cmd(SET_DEFAULTS): 2x wait_input_clear + wait_output_full + ACK */
+  inb_seq[i++] = 0x00; inb_seq[i++] = 0x00;
+  inb_seq[i++] = 0x01; inb_seq[i++] = defaults_ack;
+  /* mouse_cmd(SET_SAMPLE): same */
+  inb_seq[i++] = 0x00; inb_seq[i++] = 0x00;
+  inb_seq[i++] = 0x01; inb_seq[i++] = 0xFA; /* SET_SAMPLE always ACKs */
+  /* mouse_cmd(200): same */
+  inb_seq[i++] = 0x00; inb_seq[i++] = 0x00;
+  inb_seq[i++] = 0x01; inb_seq[i++] = 0xFA;
+  /* mouse_cmd(ENABLE): same */
+  inb_seq[i++] = 0x00; inb_seq[i++] = 0x00;
+  inb_seq[i++] = 0x01; inb_seq[i++] = enable_ack;
+  inb_len = i;
+  inb_idx = 0;
+}
+
+/* mouse_ps2_init: success path */
+static void mouse_ps2_init_success(void **state)
+{
+  (void)state;
+  setup_init_seq(0xFA, 0xFA);
+  bool ok = mouse_ps2_init();
+  assert_true(ok);
+  assert_int_equal(s_phase, 0);
+}
+
+/* mouse_ps2_init: SET_DEFAULTS NACK returns false */
+static void mouse_ps2_init_no_defaults_ack(void **state)
+{
+  (void)state;
+  setup_init_seq(0x00, 0xFA); /* SET_DEFAULTS returns non-ACK */
+  bool ok = mouse_ps2_init();
+  assert_false(ok);
+}
+
+/* mouse_ps2_init: ENABLE NACK returns false */
+static void mouse_ps2_init_no_enable_ack(void **state)
+{
+  (void)state;
+  setup_init_seq(0xFA, 0x00); /* ENABLE returns non-ACK */
+  bool ok = mouse_ps2_init();
+  assert_false(ok);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -212,6 +316,11 @@ int main(void)
       cmocka_unit_test_setup(right_button_mapped, reset),
       cmocka_unit_test_setup(middle_button_mapped, reset),
       cmocka_unit_test_setup(non_aux_byte_ignored, reset),
+      cmocka_unit_test_setup(irq_no_output_full_ignored, reset),
+      cmocka_unit_test_setup(irq_second_byte_increments_phase, reset),
+      cmocka_unit_test_setup(mouse_ps2_init_success, reset),
+      cmocka_unit_test_setup(mouse_ps2_init_no_defaults_ack, reset),
+      cmocka_unit_test_setup(mouse_ps2_init_no_enable_ack, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

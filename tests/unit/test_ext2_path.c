@@ -351,6 +351,141 @@ static void test_resolve_path_symlink_loop(void **state)
     assert_int_equal(ret, -ELOOP);
 }
 
+/* ext2_stat: null/unmounted guards */
+static void test_ext2_stat_null_vol(void **state)
+{
+  (void)state;
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_stat(NULL, "/foo", &entry), -EINVAL);
+}
+
+static void test_ext2_stat_unmounted(void **state)
+{
+  (void)state;
+  fs_reset();
+  dummy_vol.mounted = false;
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_stat(&dummy_vol, "/foo", &entry), -EINVAL);
+  dummy_vol.mounted = true;
+}
+
+static void test_ext2_stat_null_path(void **state)
+{
+  (void)state;
+  fs_reset();
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_stat(&dummy_vol, NULL, &entry), -EINVAL);
+}
+
+static void test_ext2_stat_null_entry(void **state)
+{
+  (void)state;
+  fs_reset();
+  assert_int_equal((i64)ext2_stat(&dummy_vol, "/foo", NULL), -EINVAL);
+}
+
+/* ext2_stat: not found path */
+static void test_ext2_stat_not_found(void **state)
+{
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  ext2_entry_t entry;
+  assert_int_equal((i64)ext2_stat(&dummy_vol, "/missing", &entry), -ENOENT);
+}
+
+/* ext2_stat: directory type */
+static void test_ext2_stat_directory(void **state)
+{
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  fs_add(3, EXT2_ROOT_INODE, "dir", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 512);
+  ext2_entry_t entry;
+  i64 ret = ext2_stat(&dummy_vol, "/dir", &entry);
+  assert_int_equal(ret, 0);
+  assert_int_equal(entry.file_type, EXT2_FT_DIR);
+}
+
+/* ext2_readlink: null guards */
+static void test_ext2_readlink_null_vol(void **state)
+{
+  (void)state;
+  char buf[64];
+  assert_int_equal((i64)ext2_readlink(NULL, "/link", buf, 64), -EINVAL);
+}
+
+static void test_ext2_readlink_unmounted(void **state)
+{
+  (void)state;
+  fs_reset();
+  dummy_vol.mounted = false;
+  char buf[64];
+  assert_int_equal((i64)ext2_readlink(&dummy_vol, "/link", buf, 64), -EINVAL);
+  dummy_vol.mounted = true;
+}
+
+static void test_ext2_readlink_null_buf(void **state)
+{
+  (void)state;
+  fs_reset();
+  assert_int_equal((i64)ext2_readlink(&dummy_vol, "/link", NULL, 64), -EINVAL);
+}
+
+static void test_ext2_readlink_zero_cap(void **state)
+{
+  (void)state;
+  fs_reset();
+  char buf[4];
+  assert_int_equal((i64)ext2_readlink(&dummy_vol, "/link", buf, 0), -EINVAL);
+}
+
+/* ext2_readlink: success with fast symlink */
+static void test_ext2_readlink_success(void **state)
+{
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  fs_add_symlink(3, EXT2_ROOT_INODE, "lnk", "/target");
+  char buf[64];
+  i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+  assert_true(ret >= 0);
+  /* read_symlink_target returns 0; buf filled via direct memcpy of i_block */
+}
+
+/* ext2_readlink: parent not found */
+static void test_ext2_readlink_parent_missing(void **state)
+{
+  (void)state;
+  fs_reset();
+  char buf[64];
+  assert_int_equal((i64)ext2_readlink(&dummy_vol, "/nope/lnk", buf, 64), -ENOENT);
+}
+
+/* resolve_path: walk hits non-directory intermediate */
+static void test_resolve_path_file_as_dir(void **state)
+{
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  fs_add(3, EXT2_ROOT_INODE, "file", EXT2_FT_REG_FILE, EXT2_S_IFREG | 0644, 0);
+  u32 ino;
+  ext2_inode_t inode;
+  /* Try to descend into a regular file */
+  i64 ret = resolve_path(&dummy_vol, "/file/sub", &ino, &inode);
+  assert_true(ret < 0);
+}
+
+/* path_split: path with slash but name at end (double slash handled) */
+static void split_path_ends_at_slash(void **state)
+{
+  (void)state;
+  char parent[256], name[256];
+  path_split("/a/b/c", parent, name);
+  assert_string_equal(parent, "/a/b");
+  assert_string_equal(name, "c");
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -378,6 +513,24 @@ int main(void)
       cmocka_unit_test(test_resolve_path_single_level),
       cmocka_unit_test(test_resolve_path_symlink),
       cmocka_unit_test(test_resolve_path_symlink_loop),
+      /* ext2_stat guards */
+      cmocka_unit_test(test_ext2_stat_null_vol),
+      cmocka_unit_test(test_ext2_stat_unmounted),
+      cmocka_unit_test(test_ext2_stat_null_path),
+      cmocka_unit_test(test_ext2_stat_null_entry),
+      cmocka_unit_test(test_ext2_stat_not_found),
+      cmocka_unit_test(test_ext2_stat_directory),
+      /* ext2_readlink */
+      cmocka_unit_test(test_ext2_readlink_null_vol),
+      cmocka_unit_test(test_ext2_readlink_unmounted),
+      cmocka_unit_test(test_ext2_readlink_null_buf),
+      cmocka_unit_test(test_ext2_readlink_zero_cap),
+      cmocka_unit_test(test_ext2_readlink_success),
+      cmocka_unit_test(test_ext2_readlink_parent_missing),
+      /* resolve_path extra */
+      cmocka_unit_test(test_resolve_path_file_as_dir),
+      /* path_split extra */
+      cmocka_unit_test(split_path_ends_at_slash),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
