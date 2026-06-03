@@ -484,6 +484,41 @@ static void sigreturn_no_frame_returns_einval(void **state)
   assert_int_equal((i64)ret, -EINVAL);
 }
 
+/* sig_ucontext_t needs a matching struct layout — look at signal.h */
+#include <alcor2/proc/signal.h>
+
+/* sigreturn: frame valid but ctx vmm check fails → -EFAULT */
+static void sigreturn_bad_ctx_returns_efault(void **state) {
+  (void)state;
+  g_return_frame = true;
+  g_frame.rsp    = 0x1000; /* any value */
+  g_vmm_user_range_fail = true; /* vmm_is_user_range fails for ctx */
+  u64 ret = sys_rt_sigreturn(0, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+}
+
+/* sigreturn: frame valid, ctx valid → restores signal mask and returns ctx->rax */
+static void sigreturn_restores_registers(void **state) {
+  (void)state;
+  g_return_frame = true;
+
+  static sig_ucontext_t ctx;
+  memset(&ctx, 0, sizeof(ctx));
+  ctx.sig_mask = 0xAB;
+  /* rax is at offset 14*8 = 112 bytes from start of ctx:
+   * r15,r14,r13,r12,r11,r10,r9,r8 (8×8=64), rbp,rdi,rsi,rdx,rcx,rbx (6×8=48), rax
+   * So index [14] in a u64 array gives rax */
+  ((u64 *)&ctx)[14] = 0x1111; /* ctx.rax = 0x1111 */
+
+  g_frame.rsp = (u64)&ctx; /* frame->rsp → ctx */
+
+  u64 ret = sys_rt_sigreturn(0, 0, 0, 0, 0, 0);
+  /* sys_rt_sigreturn returns ctx->rax */
+  assert_int_equal(ret, 0x1111);
+  /* sig_mask restored */
+  assert_int_equal(g_proc.sig_mask, 0xAB);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -541,6 +576,9 @@ int main(void)
       cmocka_unit_test_setup(sigprocmask_bad_oldset_returns_efault, setup),
       cmocka_unit_test_setup(sigprocmask_bad_set_returns_efault, setup),
       cmocka_unit_test_setup(sigreturn_no_frame_returns_einval, setup),
+      /* new coverage */
+      cmocka_unit_test_setup(sigreturn_bad_ctx_returns_efault, setup),
+      cmocka_unit_test_setup(sigreturn_restores_registers, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

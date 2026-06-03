@@ -520,6 +520,45 @@ static void caret_paint_cy_oob_clamped(void **state)
   caret_paint(); /* should clamp and paint at row ROWS-1 */
 }
 
+/* blit_atlas_32bpp: glyph miss (ATLAS_NO_GLYPH) → returns false (line 172) */
+static void blit_atlas_32bpp_glyph_miss_returns_false(void **state) {
+  (void)state;
+  setup_fb();
+  fb_ctx.atlas_active   = true;
+  fb_ctx.atlas_n_glyphs = 1;
+  fb_ctx.bytes_pp       = FB_BYTES_PER_PIXEL_32;
+  g_atlas_glyph_idx     = ATLAS_NO_GLYPH; /* miss */
+
+  fb_cell_t c = {.cp = 'X', .fg = 0xFF0000, .bg = 0x000000, .attr = 0};
+  bool r = blit_atlas_32bpp(&c, 0, 0, 0xFF0000, 0x000000);
+  assert_false(r);
+}
+
+/* blit_atlas_slow: glyph miss → returns false (line 247) */
+static void blit_atlas_slow_glyph_miss_returns_false(void **state) {
+  (void)state;
+  setup_fb();
+  fb_ctx.atlas_active   = true;
+  fb_ctx.atlas_n_glyphs = 1;
+  fb_ctx.bytes_pp       = 1; /* non-32-bpp → slow path */
+  g_atlas_glyph_idx     = ATLAS_NO_GLYPH;
+
+  fb_cell_t c = {.cp = 'Y', .fg = 0xFF0000, .bg = 0x000000, .attr = 0};
+  bool r = blit_atlas_slow(&c, 0, 0, 0xFF0000, 0x000000);
+  assert_false(r);
+}
+
+/* blit_cell_data_fallback: non-printable char (e.g. 0x01) → '?' fallback (line 290) */
+static void blit_cell_data_fallback_nonprintable(void **state) {
+  (void)state;
+  setup_fb();
+  fb_ctx.atlas_active = false; /* force fallback path */
+  g_pixel_count = 0;
+  fb_cell_t c = {.cp = 0x01, .fg = 0xFFFFFF, .bg = 0x000000, .attr = 0};
+  blit_cell_data(&c, 0, 0);
+  /* Should have drawn some pixels (fallback to '?') without crashing */
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -559,6 +598,10 @@ int main(void)
       /* caret clamping */
       cmocka_unit_test_setup(caret_paint_cx_oob_clamped, setup),
       cmocka_unit_test_setup(caret_paint_cy_oob_clamped, setup),
+      /* new coverage */
+      cmocka_unit_test_setup(blit_atlas_32bpp_glyph_miss_returns_false, setup),
+      cmocka_unit_test_setup(blit_atlas_slow_glyph_miss_returns_false, setup),
+      cmocka_unit_test_setup(blit_cell_data_fallback_nonprintable, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
