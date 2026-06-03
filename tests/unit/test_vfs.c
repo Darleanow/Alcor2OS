@@ -52,10 +52,13 @@ static fs_handle_t dummy_open(void *fs_data, const char *path, u32 flags) {
   return (fs_handle_t)1;
 }
 
+static u8  g_stat_type = VFS_DIRECTORY;
+static u64 g_stat_size = 0;
 static i64 dummy_stat(const void *fs_data, const char *path, vfs_stat_t *st) {
   (void)fs_data; (void)path;
   kzero(st, sizeof(*st));
-  st->type = VFS_DIRECTORY;
+  st->type = g_stat_type;
+  st->size = g_stat_size;
   return 0;
 }
 
@@ -150,6 +153,8 @@ static int setup_vfs(void **state) {
   memset(&g_proc, 0, sizeof(g_proc));
   for (int i = 0; i < VFS_MAX_FD; i++) g_proc.fds[i] = -1;
   strcpy(g_proc.cwd, "/");
+  g_stat_type = VFS_DIRECTORY;
+  g_stat_size = 0;
   vfs_init();
   fs_registry_count = 0;
   vfs_register_fs(&dummy_fstype);
@@ -799,6 +804,77 @@ static void vfs_find_mount_no_match_returns_null(void **state) {
   assert_int_equal((i64)vfs_stat("/anything", &st), -ENOENT);
 }
 
+/* vfs_read: pipe read dispatches to pipe_read_obj */
+static void vfs_read_pipe_dispatches(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  char buf[4];
+  /* pipe_read_obj stub returns 0 — just ensure dispatch happens */
+  assert_int_equal(vfs_read(fd, buf, 4), 0);
+}
+
+/* vfs_write: pipe write dispatches to pipe_write_obj */
+static void vfs_write_pipe_dispatches(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_WR, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  assert_int_equal(vfs_write(fd, "hi", 2), 0);
+}
+
+/* vfs_select_read_ready: pipe rd ready when data available */
+static void vfs_select_read_ready_pipe_ready(void **state) {
+  (void)state;
+  /* pipe_poll_read_ready returns false by default (stub) */
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  /* With our stub returning false, select_read_ready returns 0 */
+  assert_int_equal(vfs_select_read_ready(fd), 0);
+}
+
+/* vfs_select_write_ready: pipe wr checks poll */
+static void vfs_select_write_ready_pipe(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_WR, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  assert_int_equal(vfs_select_write_ready(fd), 0);
+}
+
+/* vfs_seek: pipe returns -ESPIPE */
+static void vfs_seek_pipe_espipe(void **state) {
+  (void)state;
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  i64 fd      = vfs_install_fd(oft_idx);
+  assert_int_equal((i64)vfs_seek(fd, 0, SEEK_SET), -ESPIPE);
+}
+
+/* vfs_rename: stat is VFS_FILE but size > max → -ENOSYS */
+static void vfs_rename_large_file_enosys(void **state) {
+  (void)state;
+  g_stat_type = VFS_FILE;
+  g_stat_size = 32ULL * 1024 * 1024; /* > 16 MiB limit */
+  assert_int_equal((i64)vfs_rename("/src.txt", "/dst.txt"), -ENOSYS);
+  g_stat_type = VFS_DIRECTORY;
+}
+
+/* vfs_fd_is_valid: valid OFT entry */
+static void vfs_fd_is_valid_after_open(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_true(vfs_fd_is_valid(fd));
+}
+
+/* vfs_table_index: maps OFT to its index */
+static void vfs_proc_close_cloexec_handles_stdin(void **state) {
+  (void)state;
+  /* Set fd 0 as cloexec to exercise that path */
+  g_proc.fd_cloexec[0] = 1;
+  g_proc.fds[0]        = 0; /* valid OFT */
+  vfs_proc_close_cloexec_fds();
+  /* Should have closed it */
+  assert_int_equal(g_proc.fds[0], -1);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(vfs_chdir_updates_cwd, setup_vfs),
@@ -891,6 +967,18 @@ int main(void) {
       cmocka_unit_test_setup(vfs_getcwd_returns_cwd, setup_vfs),
       cmocka_unit_test_setup(vfs_chdir_sets_cwd, setup_vfs),
       cmocka_unit_test_setup(vfs_find_mount_no_match_returns_null, setup_vfs),
+      /* pipe dispatch */
+      cmocka_unit_test_setup(vfs_read_pipe_dispatches, setup_vfs),
+      cmocka_unit_test_setup(vfs_write_pipe_dispatches, setup_vfs),
+      cmocka_unit_test_setup(vfs_select_read_ready_pipe_ready, setup_vfs),
+      cmocka_unit_test_setup(vfs_select_write_ready_pipe, setup_vfs),
+      cmocka_unit_test_setup(vfs_seek_pipe_espipe, setup_vfs),
+      /* rename enosys for large files */
+      cmocka_unit_test_setup(vfs_rename_large_file_enosys, setup_vfs),
+      /* fd_is_valid */
+      cmocka_unit_test_setup(vfs_fd_is_valid_after_open, setup_vfs),
+      /* cloexec with valid fd */
+      cmocka_unit_test_setup(vfs_proc_close_cloexec_handles_stdin, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
