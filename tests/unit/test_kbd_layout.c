@@ -31,10 +31,13 @@ void console_print(const char *s)  { (void)s; }
 void console_printf(const char *fmt, ...) { (void)fmt; }
 
 /* fb_console stubs */
-bool fb_console_app_cursor_keys(void) { return false; }
+static bool g_app_cursor = false;
+static int  g_scrollback_up_count   = 0;
+static int  g_scrollback_down_count = 0;
+bool fb_console_app_cursor_keys(void) { return g_app_cursor; }
 void fb_console_write(const void *buf, size_t len) { (void)buf; (void)len; }
-void fb_console_scrollback_up(int n)   { (void)n; }
-void fb_console_scrollback_down(int n) { (void)n; }
+void fb_console_scrollback_up(int n)   { g_scrollback_up_count   += n; }
+void fb_console_scrollback_down(int n) { g_scrollback_down_count += n; }
 
 /* keyboard driver stubs */
 static u8    g_raw_buf[256];
@@ -102,6 +105,9 @@ static int setup(void **state)
   
   memset(&g_test_proc, 0, sizeof(g_test_proc));
   ktermios_init_default(&g_test_proc.termios);
+  g_app_cursor          = false;
+  g_scrollback_up_count   = 0;
+  g_scrollback_down_count = 0;
   return 0;
 }
 
@@ -783,6 +789,150 @@ static void process_raw_dry_no_side_effect(void **state)
   assert_int_equal(out_pend_w, w_before);
 }
 
+/* App cursor mode: SS3 instead of CSI for arrow up */
+static void arrow_up_app_mode_emits_ss3_A(void **state)
+{
+  (void)state;
+  g_app_cursor = true;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  unsigned char dummy[4] = {0};
+  process_raw_ctx(0x48, &g_kbd, dummy, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 3);
+  assert_int_equal(buf[0], '\x1b');
+  assert_int_equal(buf[1], 'O'); /* SS3 = ESC O */
+  assert_int_equal(buf[2], 'A');
+}
+
+/* Shift modifier */
+static void shift_modifier_tracked(void **state)
+{
+  (void)state;
+  unsigned char dummy[4] = {0};
+  process_raw_ctx(0x2a, &g_kbd, dummy, false); /* LShift press */
+  assert_true(g_kbd.mod.shift);
+  process_raw_ctx(0x2a | 0x80, &g_kbd, dummy, false); /* LShift release */
+  assert_false(g_kbd.mod.shift);
+}
+
+/* LAlt modifier */
+static void lalt_modifier_tracked(void **state)
+{
+  (void)state;
+  unsigned char dummy[4] = {0};
+  process_raw_ctx(0x38, &g_kbd, dummy, false); /* LAlt press */
+  assert_true(g_kbd.mod.alt);
+  process_raw_ctx(0x38 | 0x80, &g_kbd, dummy, false); /* LAlt release */
+  assert_false(g_kbd.mod.alt);
+}
+
+/* Shift+PageUp triggers scrollback */
+static void shift_page_up_scrollback(void **state)
+{
+  (void)state;
+  unsigned char dummy[4] = {0};
+  /* Press shift first */
+  process_raw_ctx(0x2a, &g_kbd, dummy, false);
+  /* Then E0+PageUp */
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x49, &g_kbd, NULL, false); /* PageUp */
+  assert_int_equal(g_scrollback_up_count, 10);
+}
+
+/* Shift+PageDown triggers scrollback */
+static void shift_page_down_scrollback(void **state)
+{
+  (void)state;
+  unsigned char dummy[4] = {0};
+  process_raw_ctx(0x2a, &g_kbd, dummy, false); /* shift */
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x51, &g_kbd, NULL, false); /* PageDown */
+  assert_int_equal(g_scrollback_down_count, 10);
+}
+
+/* E0 unknown extension falls through without output */
+static void e0_unknown_ext_no_output(void **state)
+{
+  (void)state;
+  process_raw_ctx(0xE0, &g_kbd, NULL, false);
+  process_raw_ctx(0x7F, &g_kbd, NULL, false); /* unknown E0 ext */
+  unsigned char buf[4];
+  assert_int_equal(get_pend_bytes(buf, 4), 0);
+}
+
+/* out_pend_push returns false when buffer is full */
+static void out_pend_push_full_returns_false(void **state)
+{
+  (void)state;
+  /* Fill the buffer */
+  while(out_pend_push('x'))
+    ; /* keep pushing until full */
+  /* One more push must fail */
+  assert_false(out_pend_push('y'));
+}
+
+/* kbd_select_read_ready: with proc in non-canonical mode */
+static void kbd_select_read_ready_with_proc(void **state)
+{
+  (void)state;
+  /* Non-canonical: no ICANON */
+  g_test_proc.termios.c_lflag = 0;
+  /* No raw bytes pending */
+  assert_false(kbd_select_read_ready(&g_test_proc));
+  /* Push a byte */
+  raw_push(0x1e); /* 'a' press */
+  assert_true(kbd_select_read_ready(&g_test_proc));
+}
+
+/* kbd_select_read_ready: no proc → delegates to kbd_raw_pending */
+static void kbd_select_read_ready_no_proc(void **state)
+{
+  (void)state;
+  assert_false(kbd_select_read_ready(NULL));
+  raw_push(0x1e);
+  assert_true(kbd_select_read_ready(NULL));
+}
+
+/* Non-canonical read: vmin=0, vtime=0 — returns available bytes immediately */
+static void kbd_read_noncanon_vmin0_vtime0(void **state)
+{
+  (void)state;
+  g_test_proc.termios.c_lflag       = 0; /* no ICANON */
+  g_test_proc.termios.c_cc[KTERM_VMIN]  = 0;
+  g_test_proc.termios.c_cc[KTERM_VTIME] = 0;
+  /* Push a printable key press */
+  raw_push(0x1e); /* 'a' */
+  char buf[8] = {0};
+  i64 ret = kbd_read_for_process(&g_test_proc, buf, sizeof(buf));
+  /* Should return immediately with the translated character */
+  assert_true(ret >= 0);
+}
+
+/* F6 */
+static void f6_emits_csi_tilde_17(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x40, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '1');
+  assert_int_equal(buf[3], '7');
+}
+
+/* F11 */
+static void f11_emits_csi_tilde_23(void **state)
+{
+  (void)state;
+  process_raw_ctx(0x57, &g_kbd, NULL, false);
+  unsigned char buf[8];
+  int n = get_pend_bytes(buf, 8);
+  assert_true(n >= 5);
+  assert_int_equal(buf[2], '2');
+  assert_int_equal(buf[3], '3');
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -868,6 +1018,27 @@ int main(void)
       cmocka_unit_test_setup(kbd_set_layout_resets_state, setup),
       /* dry mode */
       cmocka_unit_test_setup(process_raw_dry_no_side_effect, setup),
+      /* app cursor keys (SS3 mode) */
+      cmocka_unit_test_setup(arrow_up_app_mode_emits_ss3_A, setup),
+      /* shift modifier */
+      cmocka_unit_test_setup(shift_modifier_tracked, setup),
+      /* lalt modifier */
+      cmocka_unit_test_setup(lalt_modifier_tracked, setup),
+      /* shift+pageup triggers scrollback */
+      cmocka_unit_test_setup(shift_page_up_scrollback, setup),
+      cmocka_unit_test_setup(shift_page_down_scrollback, setup),
+      /* e0 unknown extension falls through */
+      cmocka_unit_test_setup(e0_unknown_ext_no_output, setup),
+      /* out_pend overflow */
+      cmocka_unit_test_setup(out_pend_push_full_returns_false, setup),
+      /* kbd_select_read_ready */
+      cmocka_unit_test_setup(kbd_select_read_ready_with_proc, setup),
+      cmocka_unit_test_setup(kbd_select_read_ready_no_proc, setup),
+      /* non-canonical read: vmin=0, vtime=0 */
+      cmocka_unit_test_setup(kbd_read_noncanon_vmin0_vtime0, setup),
+      /* F6-F11 */
+      cmocka_unit_test_setup(f6_emits_csi_tilde_17, setup),
+      cmocka_unit_test_setup(f11_emits_csi_tilde_23, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
