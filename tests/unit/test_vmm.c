@@ -241,6 +241,59 @@ static void test_vmm_unmap(void **state)
   vmm_unmap(0x3000);
 }
 
+static void test_vmm_get_next_level_no_create_missing(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  /* Look up an address that has never been mapped with create=false →
+   * get_next_level returns 0 (line 40) and vmm_get_phys returns 0 */
+  u64 phys = vmm_get_phys(0xDEAD000);
+  assert_int_equal(phys, 0);
+}
+
+static void test_vmm_map_promotes_to_user(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  void *phys = pmm_alloc();
+
+  /* First map without VMM_USER */
+  vmm_map(0x5000, (u64)phys, VMM_PRESENT | VMM_WRITE);
+
+  /* Second map on same address with VMM_USER — get_next_level hits
+   * the existing entry and ORs in VMM_USER (line 34) */
+  vmm_map(0x5000, (u64)phys, VMM_PRESENT | VMM_WRITE | VMM_USER);
+
+  u64 resolved = vmm_get_phys(0x5000);
+  assert_int_equal(resolved, (u64)phys);
+}
+
+static void test_vmm_map_pmm_fail_mid_walk(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3       = (u64)kernel_pml4;
+
+  /* Fail pmm_alloc on next call — vmm_map's get_next_level will return NULL
+   * and vmm_map early-returns (lines 104/108/112) */
+  mock_pmm_fail = true;
+  vmm_map(0x7000, 0x1234000, VMM_PRESENT);
+  mock_pmm_fail = false;
+
+  /* Address should not be mapped */
+  assert_int_equal(vmm_get_phys(0x7000), 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -255,6 +308,9 @@ int main(void)
       cmocka_unit_test_setup(test_vmm_map_in_fail, setup),
       cmocka_unit_test_setup(test_vmm_map_range_alloc, setup),
       cmocka_unit_test_setup(test_vmm_unmap, setup),
+      cmocka_unit_test_setup(test_vmm_get_next_level_no_create_missing, setup),
+      cmocka_unit_test_setup(test_vmm_map_promotes_to_user, setup),
+      cmocka_unit_test_setup(test_vmm_map_pmm_fail_mid_walk, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
