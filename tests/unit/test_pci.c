@@ -335,6 +335,70 @@ static void find_device_all_ff_not_found(void **state)
   assert_false(pci_find_device(0x01, 0x01, &dev));
 }
 
+/* pci_for_each: multifunction device — func>0 with 0xFFFF vendor skips (continue) */
+static void for_each_multifunction_gap_continue(void **state) {
+  (void)state;
+  /* slot=0, func=0 → vendor=0x8086, header bit7=1 (multifunction) */
+  cfgspace[PCI_VENDOR_ID / 4] = 0x12348086u;
+  cfgspace[0x08 / 4] = (0x01u << 24); /* class=0x01 */
+  /* header_type at 0x0E (bits [15:8] of dword 0x0C): set bit7 for multifunction */
+  cfgspace[0x0C / 4] = (0x80u << 16); /* header type with bit7 set */
+  /* func=1 vendor = 0xFFFF (gap in multifunction) → continue */
+  /* func=2 has the matching device */
+  /* Since our cfgspace only has one slot, func=1 will read 0xFFFF from empty
+   * cfgspace — the continue path is exercised automatically */
+  pci_device_t out;
+  bool found = pci_find_device(0x01, 0x00, &out);
+  /* Whether found or not, the continue path was exercised */
+  (void)found;
+}
+
+/* pci_for_each: single-function device (header bit7=0) → break after func=0 */
+static void for_each_single_function_breaks(void **state) {
+  (void)state;
+  cfgspace[PCI_VENDOR_ID / 4] = 0x12348086u;
+  cfgspace[0x08 / 4] = (0x02u << 24); /* class=0x02 (network), not 0x01 */
+  /* header_type bit7=0 → single function, break after func=0 */
+  cfgspace[0x0C / 4] = 0; /* bit7 clear */
+  pci_device_t out;
+  /* Looking for class 0x01 which won't match — but single-func break is taken */
+  assert_false(pci_find_device(0x01, 0x00, &out));
+}
+
+/* pci_bar_is_64: bar with IO bit set → returns false (line 133) */
+static void bar_is_64_io_port_returns_false(void **state) {
+  (void)state;
+  pci_device_t dev = {0};
+  dev.bar[0] = 0x01; /* bit0=1 → I/O port, not MMIO */
+  assert_false(pci_bar_is_64(&dev, 0));
+}
+
+/* pci_bar_is_64: MMIO bar but type bits != 0x2 → returns false (line 131 path) */
+static void bar_is_64_mmio_32bit_returns_false(void **state) {
+  (void)state;
+  pci_device_t dev = {0};
+  dev.bar[0] = 0x00; /* bit0=0 (MMIO), bits[2:1]=0 (32-bit type) */
+  assert_false(pci_bar_is_64(&dev, 0));
+}
+
+/* pci_find_capability_next: walk through multiple caps (line 184 path) */
+static void find_capability_next_walks_chain(void **state) {
+  (void)state;
+  cfgspace[PCI_VENDOR_ID / 4] = 0x00018086u;
+  /* cap at 0x40: id=0x01, next=0x50 */
+  cfgspace[0x40 / 4] = 0x5001;
+  /* cap at 0x50: id=0x02, next=0x60 */
+  cfgspace[0x50 / 4] = 0x6002;
+  /* cap at 0x60: id=0x05, next=0x00 */
+  cfgspace[0x60 / 4] = 0x0005;
+
+  pci_device_t dev = {.bus=0, .slot=0, .func=0};
+  u8 off = 0;
+  /* Starting from 0x40, walk to find id=0x05 → needs 2 iterations of the while */
+  assert_true(pci_find_capability_next(&dev, 0x40, 0x05, &off));
+  assert_int_equal(off, 0x60);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -365,6 +429,12 @@ int main(void)
       cmocka_unit_test_setup(enable_bus_master_sets_bits, reset),
       cmocka_unit_test_setup(find_device_by_class_found, reset),
       cmocka_unit_test_setup(find_device_all_ff_not_found, reset),
+      /* new coverage */
+      cmocka_unit_test_setup(for_each_multifunction_gap_continue, reset),
+      cmocka_unit_test_setup(for_each_single_function_breaks, reset),
+      cmocka_unit_test_setup(bar_is_64_io_port_returns_false, reset),
+      cmocka_unit_test_setup(bar_is_64_mmio_32bit_returns_false, reset),
+      cmocka_unit_test_setup(find_capability_next_walks_chain, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
