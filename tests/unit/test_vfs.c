@@ -727,6 +727,78 @@ static void vfs_dup2_bad_oldfd_returns_ebadf(void **state) {
   assert_int_equal((i64)vfs_dup2(-1, 5), -EBADF);
 }
 
+/* vfs_make_absolute: relative path prepends cwd */
+static void vfs_open_relative_path_uses_cwd(void **state) {
+  (void)state;
+  strcpy(g_proc.cwd, "/home");
+  /* Open a relative path — vfs_make_absolute joins cwd + path */
+  i64 fd = vfs_open("file.txt", O_RDONLY);
+  assert_true(fd >= 0);
+}
+
+/* vfs_register_fs: duplicate name returns -EEXIST */
+static void vfs_register_fs_duplicate_eexist(void **state) {
+  (void)state;
+  /* dummy_fstype is already registered in setup_vfs */
+  assert_int_equal((i64)vfs_register_fs(&dummy_fstype), -EEXIST);
+}
+
+/* vfs_mount: unknown fstype returns -ENODEV */
+static void vfs_mount_unknown_fstype_enodev(void **state) {
+  (void)state;
+  assert_int_equal((i64)vfs_mount("dev", "/", "nonexistent"), -ENODEV);
+}
+
+/* vfs_oft_release: pipe endpoint releases pipe */
+static void vfs_oft_release_pipe_rd(void **state) {
+  (void)state;
+  static int pipe_obj = 0;
+  i32 idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, &pipe_obj);
+  /* Release should call pipe_rd_release (stub) without crashing */
+  vfs_oft_release(idx);
+}
+
+static void vfs_oft_release_pipe_wr(void **state) {
+  (void)state;
+  static int pipe_obj = 0;
+  i32 idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_WR, &pipe_obj);
+  vfs_oft_release(idx);
+}
+
+/* vfs_install_fd: all fds used returns -EMFILE */
+static void vfs_install_fd_all_used_emfile(void **state) {
+  (void)state;
+  /* Fill all fds */
+  for(int i = 0; i < VFS_MAX_FD; i++)
+    g_proc.fds[i] = 0; /* mark as used */
+  i32 oft_idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  assert_int_equal((i64)vfs_install_fd(oft_idx), -EMFILE);
+}
+
+/* vfs_getcwd: returns "/" after init */
+static void vfs_getcwd_returns_cwd(void **state) {
+  (void)state;
+  assert_string_equal(vfs_getcwd(), "/");
+}
+
+/* vfs_chdir: updates and normalizes cwd */
+static void vfs_chdir_sets_cwd(void **state) {
+  (void)state;
+  /* dummy_stat returns VFS_DIRECTORY so chdir succeeds */
+  assert_int_equal(vfs_chdir("/usr/bin"), 0);
+  assert_string_equal(vfs_getcwd(), "/usr/bin");
+}
+
+/* vfs_path_starts_with: used by vfs_find_mount */
+static void vfs_find_mount_no_match_returns_null(void **state) {
+  (void)state;
+  /* Unmount everything by re-init'ing without mounting */
+  vfs_init();
+  /* Now no mounts — any path should return NULL from vfs_find_mount */
+  vfs_stat_t st;
+  assert_int_equal((i64)vfs_stat("/anything", &st), -ENOENT);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(vfs_chdir_updates_cwd, setup_vfs),
@@ -809,6 +881,16 @@ int main(void) {
       cmocka_unit_test_setup(vfs_getdents_returns_entries, setup_vfs),
       cmocka_unit_test_setup(vfs_dup_bad_fd_returns_ebadf, setup_vfs),
       cmocka_unit_test_setup(vfs_dup2_bad_oldfd_returns_ebadf, setup_vfs),
+      /* new coverage */
+      cmocka_unit_test_setup(vfs_open_relative_path_uses_cwd, setup_vfs),
+      cmocka_unit_test_setup(vfs_register_fs_duplicate_eexist, setup_vfs),
+      cmocka_unit_test_setup(vfs_mount_unknown_fstype_enodev, setup_vfs),
+      cmocka_unit_test_setup(vfs_oft_release_pipe_rd, setup_vfs),
+      cmocka_unit_test_setup(vfs_oft_release_pipe_wr, setup_vfs),
+      cmocka_unit_test_setup(vfs_install_fd_all_used_emfile, setup_vfs),
+      cmocka_unit_test_setup(vfs_getcwd_returns_cwd, setup_vfs),
+      cmocka_unit_test_setup(vfs_chdir_sets_cwd, setup_vfs),
+      cmocka_unit_test_setup(vfs_find_mount_no_match_returns_null, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

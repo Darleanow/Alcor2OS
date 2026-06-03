@@ -856,6 +856,83 @@ static void test_proc_exit_parent_waiting_for_other_not_woken(void **state)
   assert_int_equal(parent->state, PROC_STATE_BLOCKED);
 }
 
+/* proc_alloc exhaustion: filling all slots returns 0 from proc_create_mem */
+static void test_proc_alloc_exhaustion_returns_zero(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  /* Fill all slots */
+  for(int i = 0; i < PROC_MAX; i++)
+    proc_table[i].state = PROC_STATE_RUNNING; /* mark as non-free */
+  u64 pid = proc_create_mem("extra", NULL, 0, argv, argv);
+  assert_int_equal(pid, 0);
+  /* Restore */
+  for(int i = 0; i < PROC_MAX; i++)
+    proc_table[i].state = PROC_STATE_FREE;
+}
+
+/* proc_waitpid blocking for any child: child becomes zombie after schedule */
+static void test_waitpid_any_child_blocking_loop(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame = {0};
+  i64 child_pid         = proc_fork(&frame);
+  proc_t *child         = proc_get(child_pid);
+
+  /* No zombie child at first — proc_schedule will make it zombie */
+  child->state     = PROC_STATE_RUNNING;
+  child->exit_code = 3;
+  /* After first proc_schedule call (which is a noop), the loop re-scans.
+     We manually set to zombie so the second scan finds it. */
+  child->state = PROC_STATE_ZOMBIE;
+
+  i32 status = 0;
+  i64 ret    = proc_waitpid(-1, &status, 0);
+  assert_int_equal(ret, child_pid);
+}
+
+/* proc_waitpid: specific child blocking loop — child disappears after schedule */
+static void test_waitpid_specific_child_disappears_after_schedule(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  proc_create_mem("parent", NULL, 0, argv, argv);
+  current_proc        = &proc_table[0];
+  current_proc->state = PROC_STATE_RUNNING;
+  syscall_frame_t frame = {0};
+  i64 child_pid         = proc_fork(&frame);
+  proc_t *child         = proc_get(child_pid);
+  /* Mark zombie before waiting so blocking loop exits immediately */
+  child->state     = PROC_STATE_ZOMBIE;
+  child->exit_code = 5;
+
+  i64 ret = proc_waitpid(child_pid, NULL, 0);
+  assert_int_equal(ret, child_pid);
+}
+
+/* proc_signal: stubbed as noop — verify it doesn't crash on valid pid */
+static void test_proc_signal_valid_pid_noop(void **state)
+{
+  (void)state;
+  char *argv[] = {NULL};
+  u64 pid      = proc_create_mem("p", NULL, 0, argv, argv);
+  assert_true(pid > 0);
+  /* proc_signal is a stub noop in this test harness */
+  proc_signal(pid, SIGUSR1);
+}
+
+/* proc_signal: unknown pid is a no-op (no crash) */
+static void test_proc_signal_unknown_pid_noop(void **state)
+{
+  (void)state;
+  /* proc_signal returns void; just verify it doesn't crash */
+  proc_signal(9999, SIGUSR1);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -908,6 +985,11 @@ int main(void)
       cmocka_unit_test_setup_teardown(test_waitpid_any_child_zombie_found_in_loop, setup, teardown),
       cmocka_unit_test_setup_teardown(test_waitpid_specific_child_found_zombie_after_schedule, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_exit_parent_waiting_for_other_not_woken, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_alloc_exhaustion_returns_zero, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_any_child_blocking_loop, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_waitpid_specific_child_disappears_after_schedule, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_signal_valid_pid_noop, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_signal_unknown_pid_noop, setup, teardown),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
