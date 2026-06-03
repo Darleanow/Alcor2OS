@@ -163,6 +163,288 @@ static void ram_resolve_rejects_long_name(void **state) {
   assert_null(ram__resolve(path));
 }
 
+/* ram_open: missing file without O_CREAT returns NULL */
+static void ram_open_missing_no_creat_returns_null(void **state) {
+  (void)state;
+  assert_null(ram_open(NULL, "/nonexistent", O_RDONLY));
+}
+
+/* ram_open: open existing file */
+static void ram_open_existing_file(void **state) {
+  (void)state;
+  ram_open(NULL, "/myfile", O_CREAT | O_WRONLY);
+  fs_handle_t fh = ram_open(NULL, "/myfile", O_RDONLY);
+  assert_non_null(fh);
+}
+
+/* ram_open: open a directory */
+static void ram_open_directory(void **state) {
+  (void)state;
+  ram_mkdir(NULL, "/mydir");
+  fs_handle_t fh = ram_open(NULL, "/mydir", O_RDONLY);
+  assert_non_null(fh);
+}
+
+/* ram_close: does not crash */
+static void ram_close_is_noop(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/f", O_CREAT | O_WRONLY);
+  ram_close(fh);
+}
+
+/* ram_read: offset past end returns 0 */
+static void ram_read_past_eof_returns_zero(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/eof", O_CREAT | O_WRONLY);
+  ram_write(fh, "hi", 2, 0);
+  char buf[4];
+  assert_int_equal(ram_read(fh, buf, 4, 100), 0);
+}
+
+/* ram_read: on a directory returns -EISDIR */
+static void ram_read_on_dir_returns_eisdir(void **state) {
+  (void)state;
+  ram_mkdir(NULL, "/d");
+  fs_handle_t fh = ram_open(NULL, "/d", O_RDONLY);
+  char buf[4];
+  assert_int_equal((i64)ram_read(fh, buf, 4, 0), -EISDIR);
+}
+
+/* ram_write: on a directory returns -EISDIR */
+static void ram_write_on_dir_returns_eisdir(void **state) {
+  (void)state;
+  ram_mkdir(NULL, "/wd");
+  fs_handle_t fh = ram_open(NULL, "/wd", O_RDONLY);
+  assert_int_equal((i64)ram_write(fh, "x", 1, 0), -EISDIR);
+}
+
+/* ram_write: krealloc-based expansion with write into existing capacity */
+static void ram_write_within_capacity(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/cap", O_CREAT | O_WRONLY);
+  /* First write: allocates capacity */
+  assert_int_equal(ram_write(fh, "hello", 5, 0), 5);
+  /* Second write: within existing capacity */
+  assert_int_equal(ram_write(fh, "world", 5, 0), 5);
+}
+
+/* ram_stat: existing file */
+static void ram_stat_existing_file(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/sf", O_CREAT | O_WRONLY);
+  ram_write(fh, "data", 4, 0);
+  vfs_stat_t st;
+  assert_int_equal(ram_stat(NULL, "/sf", &st), 0);
+  assert_int_equal(st.size, 4);
+  assert_int_equal(st.type, VFS_FILE);
+}
+
+/* ram_stat: nonexistent returns -ENOENT */
+static void ram_stat_missing_returns_enoent(void **state) {
+  (void)state;
+  vfs_stat_t st;
+  assert_int_equal((i64)ram_stat(NULL, "/nosuchfile", &st), -ENOENT);
+}
+
+/* ram_fstat */
+static void ram_fstat_fills_stat(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/fst", O_CREAT | O_WRONLY);
+  ram_write(fh, "abc", 3, 0);
+  vfs_stat_t st;
+  assert_int_equal(ram_fstat(fh, &st), 0);
+  assert_int_equal(st.size, 3);
+  assert_int_equal(st.type, VFS_FILE);
+}
+
+/* ram_readdir: iterates children */
+static void ram_readdir_returns_children(void **state) {
+  (void)state;
+  ram_mkdir(NULL, "/parent");
+  ram_open(NULL, "/parent/child1", O_CREAT | O_WRONLY);
+  ram_open(NULL, "/parent/child2", O_CREAT | O_WRONLY);
+  fs_handle_t fh = ram_open(NULL, "/parent", O_RDONLY);
+  char name[64];
+  vfs_stat_t st;
+  assert_int_equal(ram_readdir(fh, 0, name, &st), 1);
+  assert_int_equal(ram_readdir(fh, 1, name, &st), 1);
+  assert_int_equal(ram_readdir(fh, 2, name, NULL), 0); /* past end */
+}
+
+/* ram_readdir: on non-directory returns -ENOTDIR */
+static void ram_readdir_on_file_returns_enotdir(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/rd_file", O_CREAT | O_WRONLY);
+  char name[64];
+  assert_int_equal((i64)ram_readdir(fh, 0, name, NULL), -ENOTDIR);
+}
+
+/* ram_ioctl: no chardev returns -ENOTTY */
+static void ram_ioctl_no_chardev_returns_enotty(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/ioctl_f", O_CREAT | O_WRONLY);
+  assert_int_equal((i64)ram_ioctl(fh, 1, 0), -ENOTTY);
+}
+
+/* ram_ioctl: chardev with ioctl handler */
+static i64 mock_ioctl(void *ctx, u64 req, u64 arg) {
+  (void)ctx; (void)req; (void)arg;
+  return 42;
+}
+static void ram_ioctl_chardev_calls_handler(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {.ioctl = mock_ioctl};
+  ramfs_chardev_register("/cdev_ioctl", &cops, NULL);
+  fs_handle_t fh = ram_open(NULL, "/cdev_ioctl", O_RDONLY);
+  assert_int_equal(ram_ioctl(fh, 99, 0), 42);
+}
+
+/* ram_poll: regular file returns events as-is */
+static void ram_poll_regular_file(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/pf", O_CREAT | O_WRONLY);
+  assert_int_equal(ram_poll(fh, POLL_IN | POLL_OUT), POLL_IN | POLL_OUT);
+  assert_int_equal(ram_poll(fh, POLL_IN), POLL_IN);
+}
+
+/* ram_poll: chardev with poll handler */
+static u32 mock_poll(void *ctx, u32 events) {
+  (void)ctx;
+  return events & POLL_OUT; /* only write-ready */
+}
+static void ram_poll_chardev_delegates(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {.poll = mock_poll};
+  ramfs_chardev_register("/cdev_poll", &cops, NULL);
+  fs_handle_t fh = ram_open(NULL, "/cdev_poll", O_RDONLY);
+  assert_int_equal(ram_poll(fh, POLL_IN | POLL_OUT), POLL_OUT);
+}
+
+/* ram_unlink: nonexistent file */
+static void ram_unlink_nonexistent(void **state) {
+  (void)state;
+  assert_int_equal((i64)ram_unlink(NULL, "/no_such"), -EISDIR);
+}
+
+/* ram_unlink: chardev returns -EBUSY */
+static void ram_unlink_chardev_returns_ebusy(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {0};
+  ramfs_chardev_register("/busy_dev", &cops, NULL);
+  assert_int_equal((i64)ram_unlink(NULL, "/busy_dev"), -EBUSY);
+}
+
+/* ram_unlink: removes non-first child from parent's list */
+static void ram_unlink_non_first_child(void **state) {
+  (void)state;
+  ram_open(NULL, "/f1", O_CREAT | O_WRONLY);
+  ram_open(NULL, "/f2", O_CREAT | O_WRONLY);
+  /* f2 is after f1 in children list */
+  assert_int_equal(ram_unlink(NULL, "/f2"), 0);
+  assert_null(ram__resolve("/f2"));
+}
+
+/* ram_rmdir: root directory returns -EBUSY */
+static void ram_rmdir_root_returns_ebusy(void **state) {
+  (void)state;
+  assert_int_equal((i64)ram_rmdir(NULL, "/"), -EBUSY);
+}
+
+/* ram_rmdir: non-directory returns -ENOTDIR */
+static void ram_rmdir_on_file_returns_enotdir(void **state) {
+  (void)state;
+  ram_open(NULL, "/rdf", O_CREAT | O_WRONLY);
+  assert_int_equal((i64)ram_rmdir(NULL, "/rdf"), -ENOTDIR);
+}
+
+/* ram_rmdir: nonexistent returns -ENOENT */
+static void ram_rmdir_nonexistent(void **state) {
+  (void)state;
+  assert_int_equal((i64)ram_rmdir(NULL, "/nosuchdir"), -ENOENT);
+}
+
+/* ram_truncate: zero length frees data */
+static void ram_truncate_zero_length(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/tz", O_CREAT | O_WRONLY);
+  ram_write(fh, "hello", 5, 0);
+  assert_int_equal(ram_truncate(fh, 0), 0);
+  ram_node_t *node = (ram_node_t *)fh;
+  assert_int_equal(node->size, 0);
+  assert_null(node->data);
+}
+
+/* ram_truncate: length > size returns -ENOSYS */
+static void ram_truncate_extend_returns_enosys(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/te", O_CREAT | O_WRONLY);
+  ram_write(fh, "hi", 2, 0);
+  assert_int_equal((i64)ram_truncate(fh, 100), -ENOSYS);
+}
+
+/* ram_truncate: on directory returns -EISDIR */
+static void ram_truncate_dir_returns_eisdir(void **state) {
+  (void)state;
+  ram_mkdir(NULL, "/tdir");
+  fs_handle_t fh = ram_open(NULL, "/tdir", O_RDONLY);
+  assert_int_equal((i64)ram_truncate(fh, 5), -EISDIR);
+}
+
+/* chardev read: delegates to cops->read */
+static i64 mock_read(void *ctx, void *buf, u64 n, u64 off) {
+  (void)ctx; (void)off;
+  *(char *)buf = 'X';
+  return (i64)(n > 0 ? 1 : 0);
+}
+static void ram_read_chardev_calls_handler(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {.read = mock_read};
+  ramfs_chardev_register("/cdev_r", &cops, NULL);
+  fs_handle_t fh = ram_open(NULL, "/cdev_r", O_RDONLY);
+  char buf = 0;
+  assert_int_equal(ram_read(fh, &buf, 1, 0), 1);
+  assert_int_equal(buf, 'X');
+}
+
+/* chardev read: no read handler returns -EINVAL */
+static void ram_read_chardev_no_handler(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {0};
+  ramfs_chardev_register("/cdev_nr", &cops, NULL);
+  fs_handle_t fh = ram_open(NULL, "/cdev_nr", O_RDONLY);
+  char buf;
+  assert_int_equal((i64)ram_read(fh, &buf, 1, 0), -EINVAL);
+}
+
+/* chardev write: delegates to cops->write */
+static i64 mock_write(void *ctx, const void *buf, u64 n, u64 off) {
+  (void)ctx; (void)buf; (void)off;
+  return (i64)n;
+}
+static void ram_write_chardev_calls_handler(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {.write = mock_write};
+  ramfs_chardev_register("/cdev_w", &cops, NULL);
+  fs_handle_t fh = ram_open(NULL, "/cdev_w", O_WRONLY);
+  assert_int_equal(ram_write(fh, "hi", 2, 0), 2);
+}
+
+/* chardev write: no write handler returns -EINVAL */
+static void ram_write_chardev_no_handler(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {0};
+  ramfs_chardev_register("/cdev_nw", &cops, NULL);
+  fs_handle_t fh = ram_open(NULL, "/cdev_nw", O_WRONLY);
+  assert_int_equal((i64)ram_write(fh, "x", 1, 0), -EINVAL);
+}
+
+/* ram_mkdir: already exists returns -EEXIST */
+static void ram_mkdir_already_exists(void **state) {
+  (void)state;
+  assert_int_equal(ram_mkdir(NULL, "/existdir"), 0);
+  assert_int_equal((i64)ram_mkdir(NULL, "/existdir"), -EEXIST);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(ram_mkdir_creates_directory, reset_ramfs),
@@ -180,6 +462,50 @@ int main(void) {
       cmocka_unit_test_setup(ramfs_chardev_register_missing_parent, reset_ramfs),
       cmocka_unit_test_setup(ramfs_chardev_register_notdir_parent, reset_ramfs),
       cmocka_unit_test_setup(ramfs_chardev_register_works, reset_ramfs),
+      /* ram_open extra */
+      cmocka_unit_test_setup(ram_open_missing_no_creat_returns_null, reset_ramfs),
+      cmocka_unit_test_setup(ram_open_existing_file, reset_ramfs),
+      cmocka_unit_test_setup(ram_open_directory, reset_ramfs),
+      /* ram_close */
+      cmocka_unit_test_setup(ram_close_is_noop, reset_ramfs),
+      /* ram_read extra */
+      cmocka_unit_test_setup(ram_read_past_eof_returns_zero, reset_ramfs),
+      cmocka_unit_test_setup(ram_read_on_dir_returns_eisdir, reset_ramfs),
+      cmocka_unit_test_setup(ram_read_chardev_calls_handler, reset_ramfs),
+      cmocka_unit_test_setup(ram_read_chardev_no_handler, reset_ramfs),
+      /* ram_write extra */
+      cmocka_unit_test_setup(ram_write_on_dir_returns_eisdir, reset_ramfs),
+      cmocka_unit_test_setup(ram_write_within_capacity, reset_ramfs),
+      cmocka_unit_test_setup(ram_write_chardev_calls_handler, reset_ramfs),
+      cmocka_unit_test_setup(ram_write_chardev_no_handler, reset_ramfs),
+      /* ram_stat */
+      cmocka_unit_test_setup(ram_stat_existing_file, reset_ramfs),
+      cmocka_unit_test_setup(ram_stat_missing_returns_enoent, reset_ramfs),
+      /* ram_fstat */
+      cmocka_unit_test_setup(ram_fstat_fills_stat, reset_ramfs),
+      /* ram_readdir */
+      cmocka_unit_test_setup(ram_readdir_returns_children, reset_ramfs),
+      cmocka_unit_test_setup(ram_readdir_on_file_returns_enotdir, reset_ramfs),
+      /* ram_ioctl */
+      cmocka_unit_test_setup(ram_ioctl_no_chardev_returns_enotty, reset_ramfs),
+      cmocka_unit_test_setup(ram_ioctl_chardev_calls_handler, reset_ramfs),
+      /* ram_poll */
+      cmocka_unit_test_setup(ram_poll_regular_file, reset_ramfs),
+      cmocka_unit_test_setup(ram_poll_chardev_delegates, reset_ramfs),
+      /* ram_unlink extra */
+      cmocka_unit_test_setup(ram_unlink_nonexistent, reset_ramfs),
+      cmocka_unit_test_setup(ram_unlink_chardev_returns_ebusy, reset_ramfs),
+      cmocka_unit_test_setup(ram_unlink_non_first_child, reset_ramfs),
+      /* ram_rmdir extra */
+      cmocka_unit_test_setup(ram_rmdir_root_returns_ebusy, reset_ramfs),
+      cmocka_unit_test_setup(ram_rmdir_on_file_returns_enotdir, reset_ramfs),
+      cmocka_unit_test_setup(ram_rmdir_nonexistent, reset_ramfs),
+      /* ram_truncate extra */
+      cmocka_unit_test_setup(ram_truncate_zero_length, reset_ramfs),
+      cmocka_unit_test_setup(ram_truncate_extend_returns_enosys, reset_ramfs),
+      cmocka_unit_test_setup(ram_truncate_dir_returns_eisdir, reset_ramfs),
+      /* ram_mkdir extra */
+      cmocka_unit_test_setup(ram_mkdir_already_exists, reset_ramfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
