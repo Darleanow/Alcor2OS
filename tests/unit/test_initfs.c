@@ -13,7 +13,11 @@ void  kzero(void *d, u64 n) { memset(d, 0, (size_t)n); }
 u64   kstrlen(const char *s) { return strlen(s); }
 bool  kstreq(const char *a, const char *b) { return strcmp(a, b) == 0; }
 char *kstrncpy(char *d, const char *s, u64 m) { if(!m) return d; u64 i; for(i=0;i<m-1&&s[i];i++) d[i]=s[i]; d[i]='\0'; return d; }
-void *kzalloc(u64 n) { return calloc(1, (size_t)n); }
+static int kzalloc_fail_next = 0;
+void *kzalloc(u64 n) {
+  if(kzalloc_fail_next) { kzalloc_fail_next = 0; return NULL; }
+  return calloc(1, (size_t)n);
+}
 
 #include <alcor2/fs/vfs.h>
 
@@ -249,6 +253,47 @@ static void strip_slash_root_gives_empty(void **state) {
   assert_string_equal(strip_slash(s), "");
 }
 
+static void initfs_close_is_noop(void **state) {
+  (void)state;
+  /* init_close is a no-op; calling it should not crash */
+  init_close(INITFS_ROOT_HANDLE);
+  init_close(NULL);
+}
+
+static void initfs_init_is_idempotent(void **state) {
+  (void)state;
+  /* Calling initfs_init twice must not re-register — the static guard
+   * absorbs the second call silently */
+  initfs_init();
+  initfs_init();
+}
+
+static void initfs_mount_cb_returns_nonnull(void **state) {
+  (void)state;
+  /* init_mount_cb ignores its arguments and returns a sentinel non-NULL */
+  void *r = init_mount_cb("device", 0);
+  assert_non_null(r);
+}
+
+static void initfs_register_kzalloc_fail_returns_enomem(void **state) {
+  (void)state;
+  kzalloc_fail_next = 1;
+  i64 rc = initfs_register("willnomem", "data", 4);
+  assert_int_equal(rc, -ENOMEM);
+}
+
+static void initfs_readdir_with_stat_fills_stat(void **state) {
+  (void)state;
+  assert_int_equal(initfs_register("statme", "hello", 5), 0);
+  vfs_stat_t st;
+  char name[VFS_NAME_MAX];
+  /* readdir at index 0 with a stat buffer — covers fill_stat branch */
+  i64 rc = init_readdir(INITFS_ROOT_HANDLE, 0, name, &st);
+  assert_int_equal(rc, 1);
+  assert_int_equal(st.type, VFS_FILE);
+  assert_int_equal(st.size, 5);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(init_fstat_directory_has_vfs_directory_type, reset_files),
@@ -282,6 +327,11 @@ int main(void) {
       cmocka_unit_test_setup(strip_slash_null_returns_null, reset_files),
       cmocka_unit_test_setup(strip_slash_removes_leading_slash, reset_files),
       cmocka_unit_test_setup(strip_slash_root_gives_empty, reset_files),
+      cmocka_unit_test_setup(initfs_close_is_noop, reset_files),
+      cmocka_unit_test_setup(initfs_init_is_idempotent, reset_files),
+      cmocka_unit_test_setup(initfs_mount_cb_returns_nonnull, reset_files),
+      cmocka_unit_test_setup(initfs_register_kzalloc_fail_returns_enomem, reset_files),
+      cmocka_unit_test_setup(initfs_readdir_with_stat_fills_stat, reset_files),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
