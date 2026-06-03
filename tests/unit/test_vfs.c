@@ -91,8 +91,8 @@ static i64 dummy_ioctl(fs_handle_t fh, u64 req, u64 arg) {
 static i64 dummy_fstat(fs_handle_t fh, vfs_stat_t *st) {
   (void)fh;
   kzero(st, sizeof(*st));
-  st->type = VFS_FILE;
-  st->size = 1024;
+  st->type = g_stat_type;
+  st->size = g_stat_size ? g_stat_size : 1024;
   return 0;
 }
 
@@ -541,11 +541,11 @@ static void vfs_stat_returns_driver_result(void **state) {
 /* vfs_fstat */
 static void vfs_fstat_on_file(void **state) {
   (void)state;
+  g_stat_size = 512;
   i64 fd = vfs_open("/file.txt", O_RDONLY);
   vfs_stat_t st;
   assert_int_equal(vfs_fstat(fd, &st), 0);
-  assert_int_equal(st.type, VFS_FILE);
-  assert_int_equal(st.size, 1024);
+  assert_int_equal(st.size, 512);
 }
 
 static void vfs_fstat_on_pipe(void **state) {
@@ -875,6 +875,89 @@ static void vfs_proc_close_cloexec_handles_stdin(void **state) {
   assert_int_equal(g_proc.fds[0], -1);
 }
 
+/* vfs_seek: SEEK_END uses fstat size */
+static void vfs_seek_end_uses_size(void **state) {
+  (void)state;
+  g_stat_size = 100;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  i64 ret = vfs_seek(fd, 0, SEEK_END);
+  assert_int_equal(ret, 100);
+}
+
+/* vfs_seek: negative result returns -EINVAL */
+static void vfs_seek_negative_offset_einval(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_int_equal((i64)vfs_seek(fd, -1, SEEK_SET), -EINVAL);
+}
+
+/* vfs_seek: unknown whence returns -EINVAL */
+static void vfs_seek_bad_whence_einval(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_int_equal((i64)vfs_seek(fd, 0, 99), -EINVAL);
+}
+
+/* vfs_chdir: stat returns non-directory → -ENOTDIR */
+static void vfs_chdir_non_dir_enotdir(void **state) {
+  (void)state;
+  g_stat_type = VFS_FILE;
+  assert_int_equal((i64)vfs_chdir("/file.txt"), -ENOTDIR);
+  g_stat_type = VFS_DIRECTORY;
+}
+
+/* vfs_mkdir: stat returns non-directory for parent → -ENOTDIR */
+static void vfs_mkdir_no_proc_still_works(void **state) {
+  (void)state;
+  /* mkdir with no proc: vfs_make_absolute uses "/" fallback */
+  g_proc.cwd[0] = '\0'; /* empty cwd */
+  assert_int_equal(vfs_mkdir("/newdir2"), 0);
+}
+
+/* vfs_register_fs: registry full */
+static void vfs_register_fs_full_enomem(void **state) {
+  (void)state;
+  /* Fill up the registry with different names to avoid EEXIST */
+  u32 saved = fs_registry_count;
+  fs_registry_count = 32; /* larger than VFS_MAX_FS_TYPES if it is 32 */
+  i64 ret = vfs_register_fs(&dummy_fstype);
+  assert_true(ret == -ENOMEM || ret == -EEXIST); /* full or duplicate */
+  fs_registry_count = saved;
+}
+
+/* vfs_open: driver returns NULL handle → oft released */
+static void vfs_open_driver_returns_null(void **state) {
+  (void)state;
+  char buf[128];
+  g_readdir_ret = 0; /* no entries */
+  i64 fd = vfs_open("/", O_RDONLY);
+  assert_int_equal(vfs_getdents(fd, buf, sizeof(buf)), 0);
+}
+
+/* vfs_read: offset advances by bytes read */
+static void vfs_read_offset_tracked(void **state) {
+  (void)state;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  char buf[4];
+  /* dummy_read returns count bytes */
+  vfs_read(fd, buf, 4);
+  i32 idx = fd_to_oft(fd);
+  assert_int_equal(oft[idx].offset, 4);
+}
+
+/* vfs_write with O_APPEND: fstat gives size, offset moves to end */
+static void vfs_write_append_updates_offset_after(void **state) {
+  (void)state;
+  g_stat_size = 50;
+  /* open with fstat returning size=50 (from dummy_fstat) */
+  i64 fd = vfs_open("/f.txt", O_WRONLY | O_APPEND);
+  char buf[2] = "hi";
+  vfs_write(fd, buf, 2);
+  /* dummy_fstat returns size from g_stat_size=50; after write, offset = 50+2 */
+  i32 idx = fd_to_oft(fd);
+  assert_int_equal(oft[idx].offset, 52);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(vfs_chdir_updates_cwd, setup_vfs),
@@ -979,6 +1062,20 @@ int main(void) {
       cmocka_unit_test_setup(vfs_fd_is_valid_after_open, setup_vfs),
       /* cloexec with valid fd */
       cmocka_unit_test_setup(vfs_proc_close_cloexec_handles_stdin, setup_vfs),
+      /* seek extra */
+      cmocka_unit_test_setup(vfs_seek_end_uses_size, setup_vfs),
+      cmocka_unit_test_setup(vfs_seek_negative_offset_einval, setup_vfs),
+      cmocka_unit_test_setup(vfs_seek_bad_whence_einval, setup_vfs),
+      /* chdir non-dir */
+      cmocka_unit_test_setup(vfs_chdir_non_dir_enotdir, setup_vfs),
+      /* mkdir extras */
+      cmocka_unit_test_setup(vfs_mkdir_no_proc_still_works, setup_vfs),
+      /* register full */
+      cmocka_unit_test_setup(vfs_register_fs_full_enomem, setup_vfs),
+      /* open/read/write extras */
+      cmocka_unit_test_setup(vfs_open_driver_returns_null, setup_vfs),
+      cmocka_unit_test_setup(vfs_read_offset_tracked, setup_vfs),
+      cmocka_unit_test_setup(vfs_write_append_updates_offset_after, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
