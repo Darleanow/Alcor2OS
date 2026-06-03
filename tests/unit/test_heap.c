@@ -10,7 +10,10 @@
 #include <alcor2/mm/vmm.h>
 
 /* Mock PMM and VMM */
+static bool pmm_fail = false;
+
 void *pmm_alloc_pages(u64 count) {
+    if(pmm_fail) return NULL;
     void *ptr = aligned_alloc(4096, count * 4096);
     memset(ptr, 0, count * 4096);
     return ptr;
@@ -181,6 +184,69 @@ static void test_heap_merge_free_blocks(void **state) {
     kfree(ptr4);
 }
 
+static void test_heap_expand_zero_pages(void **state) {
+    (void)state;
+    /* heap_expand(0) must clamp to 1 and succeed */
+    int rc = heap_expand(0);
+    assert_int_equal(rc, 0);
+    assert_non_null(heap_start);
+}
+
+static void test_heap_expand_pmm_fail(void **state) {
+    (void)state;
+    pmm_fail = true;
+    int rc = heap_expand(1);
+    assert_int_equal(rc, -1);
+    pmm_fail = false;
+}
+
+static void test_heap_expand_twice_links_blocks(void **state) {
+    (void)state;
+    /* Second expand appends a new block — exercises heap_end->next = block */
+    heap_expand(1);
+    heap_block_t *first = heap_start;
+    heap_expand(1);
+    assert_non_null(first->next);
+}
+
+static void test_kfree_null_is_noop(void **state) {
+    (void)state;
+    heap_expand(1);
+    kfree(NULL); /* must not crash */
+}
+
+static void test_kfree_bad_magic_is_noop(void **state) {
+    (void)state;
+    heap_expand(1);
+    /* Corrupt a fake block with wrong magic */
+    static heap_block_t fake = {0};
+    fake.magic = 0xDEAD;
+    kfree((void *)((u8 *)&fake + HEAP_HEADER_SIZE)); /* must not crash */
+}
+
+static void test_split_block_updates_next_prev(void **state) {
+    (void)state;
+    /* Allocate two chunks so split_block has a following block (line 112) */
+    heap_expand(2);
+    void *p1 = kmalloc(32);
+    void *p2 = kmalloc(32);
+    kfree(p1);
+    /* Reallocate p1 with a smaller size — forces split with block->next != NULL */
+    void *p3 = kmalloc(16);
+    (void)p2; (void)p3;
+}
+
+static void test_heap_init_pmm_fail(void **state) {
+    (void)state;
+    pmm_fail = true;
+    heap_init(); /* hits the "Init failed!" console_print path */
+    pmm_fail = false;
+    /* Reinit for teardown */
+    heap_start = NULL;
+    heap_end = NULL;
+    heap_size = 0;
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(test_kmalloc_basic, setup_empty, teardown),
@@ -189,6 +255,13 @@ int main(void) {
         cmocka_unit_test_setup_teardown(test_krealloc_grow, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_heap_split_block, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_heap_merge_free_blocks, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_heap_expand_zero_pages, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_heap_expand_pmm_fail, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_heap_expand_twice_links_blocks, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_kfree_null_is_noop, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_kfree_bad_magic_is_noop, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_split_block_updates_next_prev, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_heap_init_pmm_fail, setup_empty, teardown),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
