@@ -150,12 +150,66 @@ static void test_pmm_init_no_usable(void **state) {
     assert_null(pmm_alloc());
 }
 
+static void test_pmm_get_total(void **state) {
+    (void)state;
+    struct limine_memmap_entry e1 = { .base = 0x100000, .length = PAGE_SIZE * 8, .type = LIMINE_MEMMAP_USABLE };
+    struct limine_memmap_entry *entries[] = { &e1 };
+    struct limine_memmap_response memmap = { .entry_count = 1, .entries = entries };
+    u64 hhdm_offset = (u64)fake_hhdm - 0x100000;
+    pmm_init(&memmap, hhdm_offset);
+
+    u64 total = pmm_get_total();
+    assert_true(total > 0);
+    assert_int_equal(total, total_pages * PAGE_SIZE);
+}
+
+static void test_pmm_alloc_exhausts_then_fails(void **state) {
+    (void)state;
+    /* Only 1 page usable; alloc it, then alloc should return NULL via free_pages==0 path */
+    struct limine_memmap_entry e1 = { .base = 0x100000, .length = PAGE_SIZE * 2, .type = LIMINE_MEMMAP_USABLE };
+    struct limine_memmap_entry *entries[] = { &e1 };
+    struct limine_memmap_response memmap = { .entry_count = 1, .entries = entries };
+    u64 hhdm_offset = (u64)fake_hhdm - 0x100000;
+    pmm_init(&memmap, hhdm_offset);
+
+    /* Drain all free pages */
+    void *p;
+    while(free_pages > 0 && (p = pmm_alloc()) != NULL)
+        ;
+
+    /* Now alloc should return NULL via the free_pages==0 branch */
+    assert_null(pmm_alloc());
+}
+
+static void test_pmm_alloc_bitmap_full_no_free_bit(void **state) {
+    (void)state;
+    /* Init, then manually mark all pages as used so bitmap scan returns 0 */
+    struct limine_memmap_entry e1 = { .base = 0x100000, .length = PAGE_SIZE * 4, .type = LIMINE_MEMMAP_USABLE };
+    struct limine_memmap_entry *entries[] = { &e1 };
+    struct limine_memmap_response memmap = { .entry_count = 1, .entries = entries };
+    u64 hhdm_offset = (u64)fake_hhdm - 0x100000;
+    pmm_init(&memmap, hhdm_offset);
+
+    /* Force all bitmap words to ALL_BITS_SET so the inner scan finds no free bit,
+       but free_pages > 0 — exercises the final `return 0` in pmm_alloc */
+    u64 words = bitmap_size / sizeof(u64);
+    for(u64 i = 0; i < words; i++)
+        bitmap[i] = ALL_BITS_SET;
+    /* free_pages still says > 0, so we skip the early-return */
+    assert_true(free_pages > 0);
+    void *result = pmm_alloc();
+    assert_null(result);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(test_pmm_init_success, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_pmm_free_out_of_bounds, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_pmm_alloc_pages, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_pmm_init_no_usable, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_pmm_get_total, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_pmm_alloc_exhausts_then_fails, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_pmm_alloc_bitmap_full_no_free_bit, setup_empty, teardown),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
