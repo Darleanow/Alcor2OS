@@ -123,7 +123,7 @@ $(OBJ)/src/%.o: $(SRC)/%.c | $(OBJ)
 $(BIN) $(OBJ) $(COV):
 	@mkdir -p $@
 
-test: ../build/alcor2.elf $(TEST_BINS) | $(COV)
+test: $(TEST_BINS) | $(COV)
 	@fail=0; \
 	for t in $(TEST_BINS); do \
 	  echo "--- $$(basename $$t) ---"; \
@@ -133,13 +133,7 @@ test: ../build/alcor2.elf $(TEST_BINS) | $(COV)
 
 COV_KERNEL_SRCS := $(shell find $(SRC) -name '*.c')
 COV_USER_SRCS   := $(shell find $(ROOT)/user -name '*.c' ! -path '*/doomgeneric/*' ! -path '*/ncurses-hello/*' ! -path '*/thirdparty/*')
-COV_BIN         := ../build/alcor2.elf
 COV_TEST_BINS   := $(firstword $(TEST_BINS)) $(foreach t,$(filter-out $(firstword $(TEST_BINS)),$(TEST_BINS)),-object $(t))
-
-KERNEL_SRCS := $(shell find $(SRC) ../include -name '*.c' -o -name '*.h' 2>/dev/null)
-
-../build/alcor2.elf: $(KERNEL_SRCS)
-	$(MAKE) -C .. build/alcor2.elf COV=1 CC=clang
 
 coverage: test
 	$(LLVM_PROFDATA) merge -sparse $(COV)/*.profraw -o $(COV)/merged.profdata
@@ -147,9 +141,9 @@ coverage: test
 	@echo "==========================================================="
 	@echo "               GLOBAL COVERAGE (KERNEL + USER)             "
 	@echo "==========================================================="
-	$(LLVM_COV) report $(COV_BIN) $(COV_TEST_BINS) \
+	$(LLVM_COV) report $(COV_TEST_BINS) \
 	  -instr-profile=$(COV)/merged.profdata $(COV_KERNEL_SRCS) $(COV_USER_SRCS) | tee $(COV)/coverage.txt
-	$(LLVM_COV) show $(COV_BIN) $(COV_TEST_BINS) \
+	$(LLVM_COV) show $(COV_TEST_BINS) \
 	  -instr-profile=$(COV)/merged.profdata \
 	  -format=html -show-line-counts-or-regions -output-dir=$(COV)/html \
 	  $(COV_KERNEL_SRCS) $(COV_USER_SRCS)
