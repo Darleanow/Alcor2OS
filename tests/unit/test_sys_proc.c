@@ -83,8 +83,10 @@ i64 vfs_open(const char *p, u32 f)           { (void)p; (void)f; return g_vfs_op
 i64 vfs_close(i64 fd)                        { (void)fd; return 0; }
 i64 vfs_stat(const char *p, vfs_stat_t *s)   { (void)p; if(s) *s = g_vfs_stat_out; return g_vfs_stat_ret; }
 void vfs_proc_close_cloexec_fds(void) {}
+static bool g_exec_replace_ok = false;
 i64 proc_exec_replace_image(proc_t *p, const char *n, i64 fd, char *const argv[], char *const envp[]) {
-  (void)p; (void)n; (void)fd; (void)argv; (void)envp; return -ENOSYS;
+  (void)p; (void)n; (void)fd; (void)argv; (void)envp;
+  return g_exec_replace_ok ? 0 : -ENOSYS;
 }
 void proc_notify_exec(const proc_t *p) { (void)p; }
 
@@ -97,9 +99,10 @@ static int setup(void **state)
   g_proc.pid        = 42;
   g_proc.parent_pid = 1;
   g_proc.fs_base    = 0;
-  g_no_proc         = false;
-  g_no_frame        = false;
-  g_user_ptr_ok     = true;
+  g_no_proc           = false;
+  g_no_frame          = false;
+  g_exec_replace_ok   = false;
+  g_user_ptr_ok       = true;
   g_user_range_ok   = true;
   g_fork_ret        = 10;
   g_clone_ret       = 11;
@@ -492,6 +495,22 @@ static void execve_success_path(void **state) {
   assert_int_equal(g_exit_code, 127);
 }
 
+/* sys_execve: exec_replace_image succeeds → cloexec + notify + frame update (lines 241-250) */
+static void execve_success_closes_cloexec_and_updates_frame(void **state) {
+  (void)state;
+  g_exec_replace_ok = true;
+  g_no_frame        = false; /* frame is available */
+  g_proc.user_rip   = 0x400000;
+  g_proc.user_rsp   = 0x7FFF0000;
+  g_proc.user_rflags = 0x202;
+  char path[] = "/bin/prog";
+  u64 ret = sys_execve((u64)path, 0, 0, 0, 0, 0);
+  assert_int_equal(ret, 0);
+  assert_int_equal(g_frame.rip, 0x400000);
+  assert_int_equal(g_frame.rsp, 0x7FFF0000ULL);
+  g_exec_replace_ok = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -539,6 +558,7 @@ int main(void)
       cmocka_unit_test_setup(execve_no_proc_einval, setup),
       cmocka_unit_test_setup(execve_success_path, setup),
       cmocka_unit_test_setup(execve_argv_cstr_bad_efault, setup),
+      cmocka_unit_test_setup(execve_success_closes_cloexec_and_updates_frame, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

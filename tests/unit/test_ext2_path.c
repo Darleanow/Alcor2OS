@@ -13,7 +13,9 @@
 
 void *kmalloc(u64 n) { (void)n; return NULL; }
 void  kfree(void *p) { (void)p; }
-u8   *cache_get_block(u32 s) { (void)s; return NULL; }
+static bool g_cache_ok = false;
+static u8   g_cache_buf[4096];
+u8   *cache_get_block(u32 s) { (void)s; return g_cache_ok ? g_cache_buf : NULL; }
 void  cache_put_block(u8 *p) { (void)p; }
 i64   ata_read(u8 d, u64 l, u32 c, void *b)
 {
@@ -112,11 +114,14 @@ i64 dir_find_entry(
     return -ENOENT;
 }
 
+static bool g_vol_read_ok = false;
+static u8   g_vol_read_buf[4096];
 i64 vol_read_block(const ext2_volume_t *v, u32 b, void *buf)
 {
-    (void)v; (void)b; (void)buf;
-    /* Not strictly needed if we only test fast symlinks, but return error to fail gracefully */
-    return -1;
+    (void)v; (void)b;
+    if(!g_vol_read_ok) return -1;
+    memcpy(buf, g_vol_read_buf, v->block_size ? v->block_size : 1024);
+    return 0;
 }
 
 #include "../../src/fs/ext2/path.c"
@@ -584,6 +589,58 @@ static void test_resolve_path_symlink_with_rest(void **state) {
   assert_int_equal(ino, 13);
 }
 
+/* read_symlink_target slow path: vol_read_block succeeds (lines 70-75) */
+static void test_read_symlink_slow_success(void **state) {
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* Slow symlink: size > EXT2_FAST_SYMLINK_MAX (60) */
+  mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK,
+                           EXT2_S_IFLNK | 0777, 65);
+  e->inode.i_block[0] = 5; /* data block */
+  /* Set up vol_read_block to succeed */
+  g_vol_read_ok = true;
+  g_cache_ok    = true;
+  memcpy(g_vol_read_buf, "/some/target/path", 18);
+  char buf[128];
+  i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+  assert_int_equal(ret, 0);
+  g_vol_read_ok = false;
+  g_cache_ok    = false;
+}
+
+/* read_symlink_target slow path: vol_read_block fails → -EIO (lines 66-68) */
+static void test_read_symlink_slow_read_fail_eio(void **state) {
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK,
+                           EXT2_S_IFLNK | 0777, 65);
+  e->inode.i_block[0] = 5;
+  g_vol_read_ok = false; /* read fails → -EIO */
+  char buf[128];
+  i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+  assert_int_equal(ret, -EIO);
+}
+
+/* read_symlink_target slow path: len >= bufsz → clamped (lines 72-73) */
+static void test_read_symlink_slow_len_clamped(void **state) {
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK,
+                           EXT2_S_IFLNK | 0777, 65);
+  e->inode.i_block[0] = 5;
+  g_vol_read_ok = true;
+  g_cache_ok    = true;
+  memcpy(g_vol_read_buf, "/some/long/path/here", 21);
+  char buf[10]; /* smaller than symlink size → triggers len >= bufsz clamping */
+  i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+  assert_int_equal(ret, 0); /* succeeds with clamped len */
+  g_vol_read_ok = false;
+  g_cache_ok    = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -639,6 +696,9 @@ int main(void)
       /* new coverage */
       cmocka_unit_test(test_build_symlink_path_tiny_outsz),
       cmocka_unit_test(test_resolve_path_symlink_with_rest),
+      cmocka_unit_test(test_read_symlink_slow_success),
+      cmocka_unit_test(test_read_symlink_slow_read_fail_eio),
+      cmocka_unit_test(test_read_symlink_slow_len_clamped),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

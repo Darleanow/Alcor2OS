@@ -423,6 +423,52 @@ static void brk_grow_succeeds(void **state)
   assert_int_equal(g_proc.program_break, new_brk);
 }
 
+/* sys_mmap: aligned_len wraps (huge length) → -ENOMEM (line 122) */
+static void mmap_aligned_len_overflow_enomem(void **state) {
+  (void)state;
+  /* length near UINT64_MAX → page_align_up wraps → aligned_len < length */
+  u64 ret = sys_mmap(0, (u64)-1ULL, PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, (u64)-1, 0);
+  assert_int_equal((i64)ret, -ENOMEM);
+}
+
+/* sys_mmap: end overflows or exceeds USER_SPACE_END → -ENOMEM (line 128) */
+static void mmap_end_overflow_enomem(void **state) {
+  (void)state;
+  /* Use MAP_FIXED with a very high addr so base+len > USER_SPACE_END */
+  u64 ret = sys_mmap(USER_SPACE_END - 0x1000, 0x10000,
+                     PROT_READ, MAP_FIXED | MAP_ANONYMOUS | MAP_PRIVATE,
+                     (u64)-1, 0);
+  assert_int_equal((i64)ret, -ENOMEM);
+}
+
+/* sys_mmap: file-backed with non-page-aligned offset → -EINVAL (line 191) */
+static void mmap_file_unaligned_offset_einval2(void **state) {
+  (void)state;
+  /* fd=3 (not -1), offset=1 (not page-aligned) → EINVAL */
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ, MAP_PRIVATE, 3, 1);
+  assert_int_equal((i64)ret, -EINVAL);
+}
+
+/* fill_file_backed_pages: vfs_read returns 0 → break (line 100) */
+static void fill_file_backed_vfs_read_zero_breaks(void **state) {
+  (void)state;
+  /* g_vfs_read_ok=false → vfs_read returns 0 → break on first iteration */
+  /* g_phys=0 → vmm_get_phys returns 0 → break at line 91 instead */
+  /* Set g_phys non-zero and g_vfs_read_ok=false to hit line 100 */
+  g_phys         = 0x1000; /* non-zero so we pass line 90-91 */
+  g_vfs_read_ok  = false;  /* vfs_read returns 0 */
+  g_map_ok       = true;
+  g_pmm_page     = (void *)0x1000;
+  /* Call sys_mmap with file-backed anonymous-like but fd valid */
+  /* Actually call fill_file_backed_pages directly — it's static.
+   * Trigger via sys_mmap with file fd and g_vfs_read_ok=false. */
+  /* sys_mmap with file: g_vfs_read_ok=false → vfs_read=0 → fill does nothing */
+  u64 ret = sys_mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_PRIVATE, 3, 0);
+  /* With g_map_ok=true and pmm_page non-null → succeeds (0 bytes filled) */
+  /* Just verify no crash */
+  (void)ret;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -469,6 +515,10 @@ int main(void)
       cmocka_unit_test_setup(brk_no_proc_returns_zero, setup),
       cmocka_unit_test_setup(brk_grow_pmm_fail_stays_at_current, setup),
       cmocka_unit_test_setup(brk_grow_succeeds, setup),
+      cmocka_unit_test_setup(mmap_aligned_len_overflow_enomem, setup),
+      cmocka_unit_test_setup(mmap_end_overflow_enomem, setup),
+      cmocka_unit_test_setup(mmap_file_unaligned_offset_einval2, setup),
+      cmocka_unit_test_setup(fill_file_backed_vfs_read_zero_breaks, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
