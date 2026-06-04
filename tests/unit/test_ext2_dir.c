@@ -1057,19 +1057,11 @@ static void ext2_mkdir_seed_write_block_fail_eio(void **state) {
   expect_any(alloc_block, preferred_group);
   will_return(alloc_block, (u32)6);
 
-  /* vol_write_block is called by mkdir_seed_first_block to write the dot/dotdot block */
-  /* Make it fail → ret=-EIO → rollback */
-  /* vol_write_block mock: */
-  /* No expect needed — vol_write_block in test_ext2_dir uses check_expected_ptr which
-   * requires explicit expects. Let's use expect_any: */
-  /* Actually vol_write_block is defined as a mock with check_expected_ptr.
-   * We need to provide the expectation or it'll fail with "unexpected call". */
-  /* Simplest: make the write fail by returning -1 */
-  /* But the mock needs expects. Let's skip and just check the alloc_block=0 already covers ENOSPC. */
-  /* For the write-fail path, we need vol_write_block to fail.
-   * Since the mock uses check_expected, we must provide expects. */
+  expect_value(vol_write_block, vol, &vol);
+  expect_value(vol_write_block, block, (u32)6);
+  expect_any(vol_write_block, buf);
+  will_return(vol_write_block, (i64)-1);
 
-  /* rollback: free_block + free_inode (since seed returns -EIO) */
   expect_value(free_block, vol, &vol);
   expect_value(free_block, block, (u32)6);
   will_return(free_block, 0);
@@ -1079,10 +1071,8 @@ static void ext2_mkdir_seed_write_block_fail_eio(void **state) {
   expect_value(free_inode, is_dir, true);
   will_return(free_inode, 0);
 
-  /* This won't actually make vol_write_block fail with the current mock.
-   * The test exercises the alloc path and rollback but not the write-fail branch.
-   * Keep as coverage of the alloc+rollback path. */
-  (void)state;
+  i64 ret = ext2_mkdir(&vol, "/newdir2");
+  assert_int_equal(ret, -EIO);
 }
 
 /* fill_entry_from_dirent: name_len clamped to EXT2_NAME_MAX (line 51) */
@@ -1230,6 +1220,24 @@ static void ext2_mkdir_seed_kmalloc_fail(void **state) {
 
   /* This test is complex — skip and test a simpler guard path */
   (void)vol;
+}
+
+static void ext2_unlink_file_not_found(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  expect_value(resolve_path, vol, &vol);
+  expect_string(resolve_path, path, "/nosuchfile");
+  will_return(resolve_path, -ENOENT);
+  assert_int_equal((i64)ext2_unlink(&vol, "/nosuchfile"), -ENOENT);
+}
+
+static void ext2_rmdir_dir_not_found(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  expect_value(resolve_path, vol, &vol);
+  expect_string(resolve_path, path, "/nosuchdir");
+  will_return(resolve_path, -ENOENT);
+  assert_int_equal((i64)ext2_rmdir(&vol, "/nosuchdir"), -ENOENT);
 }
 
 /* ext2_unlink: null vol → -EINVAL */
@@ -1407,6 +1415,9 @@ int main(void) {
       cmocka_unit_test(ext2_unlink_hardlink_writes_inode),
       cmocka_unit_test(ext2_mkdir_seed_kmalloc_fail_enomem),
       cmocka_unit_test(ext2_readdir_name_len_over_max_clamped),
+      cmocka_unit_test(ext2_mkdir_seed_write_block_fail_eio),
+      cmocka_unit_test(ext2_unlink_file_not_found),
+      cmocka_unit_test(ext2_rmdir_dir_not_found),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
