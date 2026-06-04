@@ -1322,6 +1322,43 @@ static void test_exec_apply_pipe_input_dup2_fail(void **state)
   free(content);
 }
 
+/* child_argv0_to_resolved_path: null argv → -1 */
+static void test_child_argv0_null_args_returns_minus1(void **state) {
+  (void)state;
+  assert_int_equal(child_argv0_to_resolved_path(NULL, "/bin/sh"), -1);
+  char *argv0 = strdup("prog");
+  char *argv[] = {argv0, NULL};
+  assert_int_equal(child_argv0_to_resolved_path(argv, NULL), -1);
+  free(argv0);
+}
+
+/* free_expanded_argv: null argv → no-op (line 167) */
+static void test_free_expanded_argv_null_noop(void **state) {
+  (void)state;
+  free_expanded_argv(NULL, 0); /* must not crash */
+}
+
+/* apply_pipe_input: pipe() fails → returns -1 */
+static void test_apply_pipe_input_pipe_fail(void **state) {
+  (void)state;
+  /* Make pipe() fail by setting up mock to return -1 */
+  will_return(mock_pipe, -1);
+  will_return(mock_pipe, -1);
+  will_return(mock_pipe, -1); /* mock_pipe returns rc=-1 */
+  int rc = apply_pipe_input("text", 0);
+  assert_int_equal(rc, -1);
+}
+
+/* apply_one_redir: expand_word returns NULL → -1 */
+static void test_apply_one_redir_expand_fail(void **state) {
+  (void)state;
+  /* Create a redir where target expansion fails — use a sentinel that expand_word
+   * can't expand into a valid path. Since expand_word with NULL returns NULL: */
+  redir_t r = {.kind = REDIR_OUT, .target = NULL};
+  int rc = apply_one_redir(&r);
+  assert_int_equal(rc, -1);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -1394,6 +1431,11 @@ int main(void)
 
       /* exec_pipeline: child fork=0 path with plumbing */
       cmocka_unit_test(test_exec_pipeline_child_fork_plumbing),
+      /* new coverage */
+      cmocka_unit_test(test_child_argv0_null_args_returns_minus1),
+      cmocka_unit_test(test_free_expanded_argv_null_noop),
+      cmocka_unit_test(test_apply_pipe_input_pipe_fail),
+      cmocka_unit_test(test_apply_one_redir_expand_fail),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
