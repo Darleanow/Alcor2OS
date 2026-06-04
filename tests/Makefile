@@ -135,6 +135,9 @@ COV_KERNEL_SRCS := $(shell find $(SRC) -name '*.c')
 COV_USER_SRCS   := $(shell find $(ROOT)/user -name '*.c' ! -path '*/doomgeneric/*' ! -path '*/ncurses-hello/*' ! -path '*/thirdparty/*')
 COV_TEST_BINS   := $(firstword $(TEST_BINS)) $(foreach t,$(filter-out $(firstword $(TEST_BINS)),$(TEST_BINS)),-object $(t))
 
+GENHTML       ?= $(shell command -v genhtml 2>/dev/null)
+LCOV_INFO     := $(COV)/lcov.info
+
 coverage: test
 	$(LLVM_PROFDATA) merge -sparse $(COV)/*.profraw -o $(COV)/merged.profdata
 	@echo ""
@@ -143,12 +146,22 @@ coverage: test
 	@echo "==========================================================="
 	$(LLVM_COV) report $(COV_TEST_BINS) \
 	  -instr-profile=$(COV)/merged.profdata $(COV_KERNEL_SRCS) $(COV_USER_SRCS) | tee $(COV)/coverage.txt
-	$(LLVM_COV) show $(COV_TEST_BINS) \
+	$(LLVM_COV) export $(COV_TEST_BINS) \
 	  -instr-profile=$(COV)/merged.profdata \
-	  -format=html -show-line-counts-or-regions -output-dir=$(COV)/html \
-	  $(COV_KERNEL_SRCS) $(COV_USER_SRCS)
-	@echo ""
-	@echo "HTML Report generated: $(COV)/html/index.html"
+	  --format=lcov $(COV_KERNEL_SRCS) $(COV_USER_SRCS) > $(LCOV_INFO)
+	@if [ -n "$(GENHTML)" ]; then \
+	  mkdir -p $(COV)/html; \
+	  $(GENHTML) $(LCOV_INFO) \
+	    --output-directory $(COV)/html \
+	    --title "Alcor2OS Coverage" \
+	    --legend --highlight --branch-coverage \
+	    --ignore-errors source \
+	    --quiet; \
+	  echo ""; \
+	  echo "HTML Report generated: $(COV)/html/index.html"; \
+	else \
+	  echo "genhtml not found — install lcov for HTML report"; \
+	fi
 
 clean:
 	rm -rf $(BUILD)
