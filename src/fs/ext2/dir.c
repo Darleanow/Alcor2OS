@@ -46,12 +46,12 @@ static void fill_entry_from_dirent(
     const ext2_volume_t *vol, const ext2_dirent_t *de, ext2_entry_t *entry
 )
 {
-  u32 name_len         = de->name_len;
-  char *dst            = (char *)entry->name;
+  u32   name_len = de->name_len;
+  char *dst      = (char *)entry->name;
   kmemcpy(dst, de->name, name_len);
-  dst[name_len]        = '\0';
-  entry->inode         = de->inode;
-  entry->file_type     = de->file_type;
+  dst[name_len]    = '\0';
+  entry->inode     = de->inode;
+  entry->file_type = de->file_type;
 
   ext2_inode_t file_inode;
   entry->size =
@@ -198,7 +198,7 @@ static i64 mkdir_seed_first_block(
   seed_dot_dotdot(block_buf, vol->block_size, self_ino, parent_ino);
   i64 wret = vol_write_block(vol, first_block, block_buf);
   kfree(block_buf);
-  i64 ret  = wret < 0 ? -EIO : 0;
+  i64 ret = wret < 0 ? -EIO : 0;
   if(ret < 0) {
     free_block(vol, first_block);
     return ret;
