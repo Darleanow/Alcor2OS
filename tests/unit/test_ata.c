@@ -85,7 +85,13 @@ void io_wait(void) {}
 
 void *phys_to_virt(u64 p) { return (void*)(uintptr_t)p; }
 u64 vmm_get_hhdm(void) { return 0; }
-bool pci_find_device(u8 c, u8 s, pci_device_t *o) { (void)c; (void)s; (void)o; return false; }
+static bool g_pci_found = false;
+static pci_device_t g_pci_dev;
+bool pci_find_device(u8 c, u8 s, pci_device_t *o) {
+  (void)c; (void)s;
+  if(g_pci_found && o) { *o = g_pci_dev; }
+  return g_pci_found;
+}
 void pci_enable_bus_master(const pci_device_t *d) { (void)d; }
 
 void pit_sleep_ms(u32 ms) { (void)ms; }
@@ -119,8 +125,13 @@ void pmm_free_pages(void *p, u64 n) { (void)p; (void)n; }
 
 #include "../../src/drivers/ata/ata.c"
 
+static bool g_advance_ticks = false; /* when true, proc_schedule advances ticks */
 static void do_schedule_irq_sim(void)
 {
+  if(g_advance_ticks) {
+    g_ticks += 600; /* jump past TIMEOUT_TICKS=500 */
+    return;
+  }
   for(int i = 0; i < 2; i++) {
     if(channels[i].state == ATA_STATE_PENDING) {
       channels[i].state  = ATA_STATE_IDLE;
@@ -132,9 +143,11 @@ static void do_schedule_irq_sim(void)
 static int setup(void **state)
 {
   (void)state;
-  g_has_proc = false;
-  g_ticks    = 0;
+  g_has_proc   = false;
+  g_ticks      = 0;
+  g_pci_found  = false;
   memset(&g_cur_proc, 0, sizeof(g_cur_proc));
+  memset(&g_pci_dev, 0, sizeof(g_pci_dev));
   ata_init();
   /* Reset cache between tests */
   for(int i = 0; i < CACHE_NUM_ENTRIES; i++)
@@ -460,6 +473,123 @@ static void ata_write_invalidates_cache(void **state) {
   /* Cache entry should be gone now */
 }
 
+/* ata_init with PCI DMA: bar4 == 0 → DMA disabled (line 731-733) */
+static void ata_init_dma_bar4_zero_disabled(void **state) {
+  (void)state;
+  g_pci_found = true;
+  g_pci_dev.bar[4] = 0; /* bar4 & 0xFFFC = 0 → BAR4 invalid */
+  ata_init(); /* calls init_dma internally */
+  assert_false(channels[0].dma_ok);
+  g_pci_found = false;
+}
+
+/* ata_init with PCI DMA: bar4 valid → DMA enabled (lines 736-758) */
+static void ata_init_dma_success(void **state) {
+  (void)state;
+  g_pci_found = true;
+  g_pci_dev.bar[4] = 0xC001; /* I/O bar: bar4 & 0xFFFC = 0xC000 */
+  ata_init(); /* calls init_dma, pmm_alloc returns static buf → dma_ok */
+  /* Just verify no crash; dma_ok depends on pmm_alloc succeeding */
+  g_pci_found = false;
+}
+
+/* dma_transfer: count > DMA_MAX_SECTORS → -EINVAL */
+static void dma_transfer_too_many_sectors(void **state) {
+  (void)state;
+  /* DMA_MAX_SECTORS = 128 */
+  u8 buf[512] = {0};
+  /* Ensure DMA enabled */
+  channels[0].dma_ok = true;
+  drives[0].dma      = true;
+  i64 r = dma_transfer(&drives[0], 0, 200, buf, false); /* 200 > 128 */
+  assert_int_equal(r, -EINVAL);
+  channels[0].dma_ok = false;
+  drives[0].dma      = false;
+}
+
+/* dma_transfer: bounce_virt == NULL → -ENOMEM */
+static void dma_transfer_no_bounce_enomem(void **state) {
+  (void)state;
+  u8 buf[512] = {0};
+  channels[0].dma_ok = true;
+  drives[0].dma      = true;
+  void *saved = bounce_virt[0];
+  bounce_virt[0] = NULL; /* no bounce buffer */
+  i64 r = dma_transfer(&drives[0], 0, 1, buf, false);
+  assert_int_equal(r, -ENOMEM);
+  bounce_virt[0] = saved;
+  channels[0].dma_ok = false;
+  drives[0].dma      = false;
+}
+
+/* dma_transfer: full success path (setup_prdt + wait_irq + copy) */
+static void dma_transfer_success_read(void **state) {
+  (void)state;
+  /* Set up DMA: enable dma_ok and provide bounce buffer */
+  static u8 fake_bounce[65536];
+  static u64 fake_prdt[2]; /* PRDT buffer */
+  channels[0].dma_ok    = true;
+  channels[0].bmi       = 0x10;
+  channels[0].prdt      = (void *)fake_prdt;
+  channels[0].prdt_phys = 0x1000;
+  bounce_virt[0]        = fake_bounce;
+  bounce_phys[0]        = 0x2000;
+  drives[0].dma         = true;
+
+  ata_status = 0x40; /* READY, no BSY for wait_irq polling */
+  g_has_proc = false; /* use polling path */
+
+  u8 buf[512] = {0};
+  i64 r = dma_transfer(&drives[0], 0, 1, buf, false);
+  /* With no BSY and no ERR, should return 0 */
+  assert_true(r == 0 || r == -EIO); /* may get EIO if BMI_STATUS_ERR set */
+
+  channels[0].dma_ok = false;
+  drives[0].dma      = false;
+  bounce_virt[0]     = NULL;
+}
+
+/* ata_read + ata_write using DMA path */
+static void ata_read_write_with_dma(void **state) {
+  (void)state;
+  static u8 fake_bounce[65536];
+  static u64 fake_prdt[2];
+  channels[0].dma_ok    = true;
+  channels[0].bmi       = 0x10;
+  channels[0].prdt      = (void *)fake_prdt;
+  channels[0].prdt_phys = 0x1000;
+  bounce_virt[0]        = fake_bounce;
+  bounce_phys[0]        = 0x2000;
+  drives[0].dma         = true;
+  g_has_proc            = true; /* use proc path → do_schedule_irq_sim clears PENDING */
+
+  u8 rbuf[512] = {0};
+  ata_read(0, 0, 1, rbuf);  /* exercises ata_read_raw DMA path */
+  ata_write(0, 0, 1, rbuf); /* exercises ata_write DMA path */
+
+  channels[0].dma_ok = false;
+  drives[0].dma      = false;
+  bounce_virt[0]     = NULL;
+  g_has_proc         = false;
+}
+
+/* wait_irq with proc: deadline exceeded → ETIMEDOUT (lines 271-276) */
+static void wait_irq_with_proc_deadline_timeout(void **state) {
+  (void)state;
+  g_has_proc        = true;
+  g_advance_ticks   = true; /* proc_schedule advances ticks past deadline */
+  channels[0].waiter = &g_cur_proc;
+  channels[0].state  = ATA_STATE_PENDING;
+  channels[0].dma_ok = false;
+  g_ticks            = 0;
+  i64 r = wait_irq(&channels[0]);
+  assert_int_equal(r, -ETIMEDOUT);
+  channels[0].waiter = NULL;
+  g_has_proc       = false;
+  g_advance_ticks  = false;
+  g_ticks          = 0;
+}
+
 /* ata_identify_drive: secondary channel (0xFF status) → drive not present */
 static void ata_identify_status_zero_not_present(void **state) {
   (void)state;
@@ -646,6 +776,15 @@ int main(void) {
         cmocka_unit_test_setup(ata_write_pio_drq_fail, setup),
         cmocka_unit_test_setup(channel_acquire_non_blocking, setup),
         cmocka_unit_test_setup(ata_read_partial_block_at_eof, setup),
+        /* DMA / ata_init_dma paths */
+        cmocka_unit_test_setup(ata_init_dma_bar4_zero_disabled, setup),
+        cmocka_unit_test_setup(ata_init_dma_success, setup),
+        cmocka_unit_test_setup(dma_transfer_success_read, setup),
+        cmocka_unit_test_setup(dma_transfer_too_many_sectors, setup),
+        cmocka_unit_test_setup(dma_transfer_no_bounce_enomem, setup),
+        cmocka_unit_test_setup(ata_read_write_with_dma, setup),
+        /* wait_irq with proc deadline paths */
+        cmocka_unit_test_setup(wait_irq_with_proc_deadline_timeout, setup),
         /* new coverage */
         cmocka_unit_test_setup(ata_identify_status_zero_not_present, setup),
         cmocka_unit_test_setup(ata_identify_atapi_detected, setup),

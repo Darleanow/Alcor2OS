@@ -537,6 +537,37 @@ static void ram_resolve_trailing_slash(void **state) {
   assert_non_null(node);
 }
 
+/* ramfs_chardev_register: null ops → -EINVAL */
+static void ramfs_chardev_register_null_ops_einval(void **state) {
+  (void)state;
+  assert_int_equal((i64)ramfs_chardev_register("/x", NULL, NULL), -EINVAL);
+}
+
+/* ramfs_chardev_register: path already exists → -EEXIST */
+static void ramfs_chardev_register_eexist(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {0};
+  /* Register directly under root — parent is "/" which exists */
+  assert_int_equal(ramfs_chardev_register("/mydev", &cops, NULL), 0);
+  assert_int_equal((i64)ramfs_chardev_register("/mydev", &cops, NULL), -EEXIST);
+}
+
+/* ramfs_chardev_register: OOM → -ENOMEM */
+static void ramfs_chardev_register_oom_enomem(void **state) {
+  (void)state;
+  ramfs_chardev_ops_t cops = {0};
+  g_kzalloc_fail_after = 0; /* next kzalloc fails */
+  /* parent is "/" (root) which exists, node creation fails with OOM */
+  assert_int_equal((i64)ramfs_chardev_register("/newdev2", &cops, NULL), -ENOMEM);
+}
+
+/* ramfs_init: idempotent — second call returns early (line 421) */
+static void ramfs_init_idempotent(void **state) {
+  (void)state;
+  ramfs_init(); /* root already set → early return */
+  assert_non_null(root);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(ram_mkdir_creates_directory, reset_ramfs),
@@ -608,6 +639,11 @@ int main(void) {
       cmocka_unit_test_setup(ram_write_krealloc_fail_enomem, reset_ramfs),
       cmocka_unit_test_setup(ram_mkdir_oom, reset_ramfs),
       cmocka_unit_test_setup(ram_resolve_trailing_slash, reset_ramfs),
+      /* chardev_register error paths */
+      cmocka_unit_test_setup(ramfs_chardev_register_null_ops_einval, reset_ramfs),
+      cmocka_unit_test_setup(ramfs_chardev_register_eexist, reset_ramfs),
+      cmocka_unit_test_setup(ramfs_chardev_register_oom_enomem, reset_ramfs),
+      cmocka_unit_test_setup(ramfs_init_idempotent, reset_ramfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
