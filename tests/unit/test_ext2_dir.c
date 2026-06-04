@@ -112,7 +112,11 @@ i64 write_inode(const ext2_volume_t *vol, u32 ino, const ext2_inode_t *inode) {
   return mock_type(i64);
 }
 
-void *kmalloc(size_t size) { return malloc(size); }
+static int g_kmalloc_fail_next = 0;
+void *kmalloc(size_t size) {
+  if(g_kmalloc_fail_next) { g_kmalloc_fail_next = 0; return NULL; }
+  return malloc(size);
+}
 void kfree(void *ptr) { free(ptr); }
 
 char *kstrncpy(char *dst, const char *src, u64 max) {
@@ -600,9 +604,14 @@ static void ext2_unlink_defers_free_when_file_open(void **state) {
   will_return(dir_remove_entry, 0);
 
   memset(g_files, 0, sizeof(g_files));
-  g_files[0].in_use = true;
-  g_files[0].vol = &vol;
-  g_files[0].inode_num = 4;
+  /* g_files[0]: same vol but different inode → branch false at line 364 */
+  g_files[0].in_use    = true;
+  g_files[0].vol       = &vol;
+  g_files[0].inode_num = 99;
+  /* g_files[1]: same vol and same inode → is_open = true */
+  g_files[1].in_use    = true;
+  g_files[1].vol       = &vol;
+  g_files[1].inode_num = 4;
 
   expect_value(write_inode, vol, &vol);
   expect_value(write_inode, ino, 4);
@@ -774,6 +783,42 @@ static void ext2_readdir_returns_first_entry(void **state) {
   i64 ret = ext2_readdir(&dir, 0, &entry);
   assert_int_equal(ret, 1);
   assert_int_equal(entry.inode, 5);
+}
+
+static void ext2_readdir_read_inode_fail_size_zero(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  memset(block_buf, 0, sizeof(block_buf));
+  ext2_dirent_t *de = (ext2_dirent_t *)block_buf;
+  de->inode     = 5;
+  de->rec_len   = 1024;
+  de->name_len  = 3;
+  de->file_type = EXT2_FT_REG_FILE;
+  memcpy(de->name, "foo", 3);
+
+  ext2_file_t dir = {.in_use = true, .is_dir = true, .vol = &vol};
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, block_buf);
+  expect_any(get_block_num, vol);
+  expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0);
+  will_return(get_block_num, 7);
+  expect_any(vol_read_block, vol);
+  expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf);
+  will_return(vol_read_block, 0);
+
+  /* read_inode fails → entry->size = 0 (line 58 false branch) */
+  expect_any(read_inode, vol);
+  expect_value(read_inode, ino, 5);
+  will_return(read_inode, -1);
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 0, &entry);
+  assert_int_equal(ret, 1);
+  assert_int_equal(entry.size, 0);
 }
 
 /* ext2_readdir: vol_read_block fails → -EIO */
@@ -1006,6 +1051,50 @@ static void ext2_mkdir_seed_kmalloc_fail_enomem(void **state) {
   assert_int_equal(ret, -ENOSPC);
 }
 
+static void ext2_mkdir_seed_block_buf_kmalloc_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  ext2_inode_t parent_inode = { .i_mode = EXT2_S_IFDIR | 0755, .i_links_count = 2 };
+
+  expect_value(resolve_path, vol, &vol);
+  expect_string(resolve_path, path, "/newdir3");
+  will_return(resolve_path, -ENOENT);
+
+  expect_string(path_split, path, "/newdir3");
+  will_return(path_split, "/");
+  will_return(path_split, "newdir3");
+
+  expect_value(resolve_path, vol, &vol);
+  expect_string(resolve_path, path, "/");
+  will_return(resolve_path, 0);
+  will_return(resolve_path, (u32)2);
+  will_return(resolve_path, &parent_inode);
+
+  expect_value(alloc_inode, vol, &vol);
+  expect_any(alloc_inode, preferred_group);
+  expect_value(alloc_inode, is_dir, true);
+  will_return(alloc_inode, (u32)12);
+
+  expect_value(alloc_block, vol, &vol);
+  expect_any(alloc_block, preferred_group);
+  will_return(alloc_block, (u32)7);
+
+  /* kmalloc for block_buf fails → free_block + free_inode rollback → -ENOMEM */
+  g_kmalloc_fail_next = 1;
+
+  expect_value(free_block, vol, &vol);
+  expect_value(free_block, block, (u32)7);
+  will_return(free_block, 0);
+
+  expect_value(free_inode, vol, &vol);
+  expect_value(free_inode, ino, (u32)12);
+  expect_value(free_inode, is_dir, true);
+  will_return(free_inode, 0);
+
+  i64 ret = ext2_mkdir(&vol, "/newdir3");
+  assert_int_equal(ret, -ENOMEM);
+}
+
 /* ext2_mkdir: vol_write_block fails → -EIO + rollback (lines 200-204) */
 static void ext2_mkdir_seed_write_block_fail_eio(void **state) {
   (void)state;
@@ -1050,6 +1139,59 @@ static void ext2_mkdir_seed_write_block_fail_eio(void **state) {
   will_return(free_inode, 0);
 
   i64 ret = ext2_mkdir(&vol, "/newdir2");
+  assert_int_equal(ret, -EIO);
+}
+
+static void ext2_mkdir_write_inode_fail(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  ext2_inode_t parent_inode = { .i_mode = EXT2_S_IFDIR | 0755, .i_links_count = 2 };
+
+  expect_value(resolve_path, vol, &vol);
+  expect_string(resolve_path, path, "/newdir4");
+  will_return(resolve_path, -ENOENT);
+
+  expect_string(path_split, path, "/newdir4");
+  will_return(path_split, "/");
+  will_return(path_split, "newdir4");
+
+  expect_value(resolve_path, vol, &vol);
+  expect_string(resolve_path, path, "/");
+  will_return(resolve_path, 0);
+  will_return(resolve_path, (u32)2);
+  will_return(resolve_path, &parent_inode);
+
+  expect_value(alloc_inode, vol, &vol);
+  expect_any(alloc_inode, preferred_group);
+  expect_value(alloc_inode, is_dir, true);
+  will_return(alloc_inode, (u32)13);
+
+  expect_value(alloc_block, vol, &vol);
+  expect_any(alloc_block, preferred_group);
+  will_return(alloc_block, (u32)8);
+
+  /* vol_write_block succeeds for seed */
+  expect_value(vol_write_block, vol, &vol);
+  expect_value(vol_write_block, block, (u32)8);
+  expect_any(vol_write_block, buf);
+  will_return(vol_write_block, (i64)0);
+
+  /* write_inode fails → finalize returns -EIO → rollback */
+  expect_value(write_inode, vol, &vol);
+  expect_value(write_inode, ino, (u32)13);
+  expect_any(write_inode, inode);
+  will_return(write_inode, (i64)-1);
+
+  expect_value(free_block, vol, &vol);
+  expect_value(free_block, block, (u32)8);
+  will_return(free_block, 0);
+
+  expect_value(free_inode, vol, &vol);
+  expect_value(free_inode, ino, (u32)13);
+  expect_value(free_inode, is_dir, true);
+  will_return(free_inode, 0);
+
+  i64 ret = ext2_mkdir(&vol, "/newdir4");
   assert_int_equal(ret, -EIO);
 }
 
@@ -1137,6 +1279,12 @@ static void ext2_mkdir_null_vol_einval(void **state) {
   assert_int_equal((i64)ext2_mkdir(NULL, "/dir"), -EINVAL);
 }
 
+static void ext2_mkdir_null_path_einval(void **state) {
+  (void)state;
+  ext2_volume_t vol = {.mounted = true};
+  assert_int_equal((i64)ext2_mkdir(&vol, NULL), -EINVAL);
+}
+
 /* ext2_mkdir: unmounted vol → -EINVAL */
 static void ext2_mkdir_unmounted_einval(void **state) {
   (void)state;
@@ -1167,6 +1315,18 @@ static void ext2_rmdir_dir_not_found(void **state) {
 static void ext2_unlink_null_vol_einval(void **state) {
   (void)state;
   assert_int_equal((i64)ext2_unlink(NULL, "/f"), -EINVAL);
+}
+
+static void ext2_unlink_unmounted_einval(void **state) {
+  (void)state;
+  ext2_volume_t vol = {.mounted = false};
+  assert_int_equal((i64)ext2_unlink(&vol, "/f"), -EINVAL);
+}
+
+static void ext2_unlink_null_path_einval(void **state) {
+  (void)state;
+  ext2_volume_t vol = {.mounted = true};
+  assert_int_equal((i64)ext2_unlink(&vol, NULL), -EINVAL);
 }
 
 /* ext2_unlink: parent resolve fails → -ENOENT */
@@ -1230,6 +1390,18 @@ static void ext2_unlink_remove_entry_eio(void **state) {
 static void ext2_rmdir_null_vol_einval(void **state) {
   (void)state;
   assert_int_equal((i64)ext2_rmdir(NULL, "/dir"), -EINVAL);
+}
+
+static void ext2_rmdir_unmounted_einval(void **state) {
+  (void)state;
+  ext2_volume_t vol = {.mounted = false};
+  assert_int_equal((i64)ext2_rmdir(&vol, "/dir"), -EINVAL);
+}
+
+static void ext2_rmdir_null_path_einval(void **state) {
+  (void)state;
+  ext2_volume_t vol = {.mounted = true};
+  assert_int_equal((i64)ext2_rmdir(&vol, NULL), -EINVAL);
 }
 
 /* ext2_rmdir: parent resolve fails → -ENOENT */
@@ -1328,20 +1500,28 @@ int main(void) {
       cmocka_unit_test(ext2_readdir_skips_deleted_inode),
       /* new coverage */
       cmocka_unit_test(ext2_mkdir_null_vol_einval),
+      cmocka_unit_test(ext2_mkdir_null_path_einval),
       cmocka_unit_test(ext2_mkdir_unmounted_einval),
       cmocka_unit_test(ext2_unlink_null_vol_einval),
+      cmocka_unit_test(ext2_unlink_unmounted_einval),
+      cmocka_unit_test(ext2_unlink_null_path_einval),
       cmocka_unit_test(ext2_unlink_parent_enoent),
       cmocka_unit_test(ext2_unlink_remove_entry_eio),
       cmocka_unit_test(ext2_rmdir_null_vol_einval),
+      cmocka_unit_test(ext2_rmdir_unmounted_einval),
+      cmocka_unit_test(ext2_rmdir_null_path_einval),
       cmocka_unit_test(ext2_rmdir_parent_enoent),
       cmocka_unit_test(ext2_rmdir_remove_entry_eio),
       cmocka_unit_test(ext2_unlink_hardlink_writes_inode),
       cmocka_unit_test(ext2_mkdir_seed_kmalloc_fail_enomem),
       cmocka_unit_test(ext2_readdir_name_len_over_max_clamped),
       cmocka_unit_test(ext2_mkdir_seed_write_block_fail_eio),
+      cmocka_unit_test(ext2_mkdir_seed_block_buf_kmalloc_fail),
+      cmocka_unit_test(ext2_mkdir_write_inode_fail),
       cmocka_unit_test(ext2_unlink_file_not_found),
       cmocka_unit_test(ext2_rmdir_dir_not_found),
       cmocka_unit_test(ext2_readdir_name_len_clamped),
+      cmocka_unit_test(ext2_readdir_read_inode_fail_size_zero),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
