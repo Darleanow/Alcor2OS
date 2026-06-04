@@ -520,6 +520,17 @@ static void caret_paint_cy_oob_clamped(void **state)
   caret_paint(); /* should clamp and paint at row ROWS-1 */
 }
 
+/* caret_paint: cols=0 → x becomes negative → early return (line 65) */
+static void caret_paint_zero_cols_no_crash(void **state) {
+  (void)state;
+  fb_ctx.cols = 0; /* clamping: x = 0-1 = -1 < 0 → return */
+  fb_ctx.rows = ROWS;
+  fb_ctx.cx   = 0;
+  fb_ctx.cy   = 0;
+  caret_paint(); /* must not crash */
+  fb_ctx.cols = COLS; /* restore */
+}
+
 /* blit_atlas_32bpp: glyph miss (ATLAS_NO_GLYPH) → returns false (line 172) */
 static void blit_atlas_32bpp_glyph_miss_returns_false(void **state) {
   (void)state;
@@ -598,6 +609,7 @@ int main(void)
       /* caret clamping */
       cmocka_unit_test_setup(caret_paint_cx_oob_clamped, setup),
       cmocka_unit_test_setup(caret_paint_cy_oob_clamped, setup),
+      cmocka_unit_test_setup(caret_paint_zero_cols_no_crash, setup),
       /* new coverage */
       cmocka_unit_test_setup(blit_atlas_32bpp_glyph_miss_returns_false, setup),
       cmocka_unit_test_setup(blit_atlas_slow_glyph_miss_returns_false, setup),

@@ -669,6 +669,24 @@ static void alloc_file_block_dind_alloc_fails(void **state)
   assert_int_equal(result, 0);
 }
 
+/* alloc_file_block: triple-indirect dind slot (2nd level) fails → returns 0 (line 254) */
+static void alloc_file_block_tind_dind_slot_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups     = &gd;
+  g_next_block = 1; /* tind alloc succeeds (returns 1), then dind slot read fails */
+  g_read_fail  = true; /* ensure_indirect_slot's vol_read_block fails → returns 0 */
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  u32 fb = EXT2_NDIR_BLOCKS + PPB + PPB * PPB; /* triple-indirect range */
+  u32 result = alloc_file_block(&v, &inode, fb, 0);
+  assert_int_equal(result, 0);
+  g_read_fail = false;
+}
+
 /* alloc_file_block: triple-indirect tind alloc fails → returns 0 */
 static void alloc_file_block_tind_alloc_fails(void **state)
 {
@@ -725,6 +743,8 @@ int main(void)
       cmocka_unit_test_setup(free_indirect_subtree_depth1_recurses, reset),
       cmocka_unit_test_setup(alloc_file_block_dind_alloc_fails, reset),
       cmocka_unit_test_setup(alloc_file_block_tind_alloc_fails, reset),
+      /* new coverage */
+      cmocka_unit_test_setup(alloc_file_block_tind_dind_slot_fails, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
