@@ -487,6 +487,58 @@ static void sigreturn_no_frame_returns_einval(void **state)
 /* sig_ucontext_t needs a matching struct layout — look at signal.h */
 #include <alcor2/proc/signal.h>
 
+/* proc_check_signals: no current proc → early return (line 320) */
+static void proc_check_signals_no_proc_noop(void **state) {
+  (void)state;
+  g_no_proc = true;
+  proc_check_signals(&g_frame); /* must not crash */
+  g_no_proc = false;
+}
+
+static int g_proc_exit_called = 0;
+
+/* proc_check_signals: SIG_DFL on ignore-default signal → return (line 349,351) */
+static void proc_check_signals_sig_dfl_fatal_exits(void **state) {
+  (void)state;
+  /* SIGCHLD is default-ignore → hits line 349 (!sig_default_ignore = false) → return */
+  g_proc.sig_pending                    = 1ULL << SIGCHLD;
+  g_proc.sig_mask                       = 0;
+  g_proc.sig_actions[SIGCHLD].sa_handler = SIG_DFL;
+  proc_check_signals(&g_frame); /* must not crash, returns at line 351 */
+  assert_int_equal(g_proc.sig_pending & (1ULL << SIGCHLD), 0);
+}
+
+/* proc_check_signals: SIG_IGN → silently discard (already tested via existing tests) */
+static void proc_check_signals_sigkill_exits(void **state) {
+  (void)state;
+  /* SIG_IGN: no delivery, signal cleared */
+  g_proc.sig_pending                    = 1ULL << SIGUSR1;
+  g_proc.sig_mask                       = 0;
+  g_proc.sig_actions[SIGUSR1].sa_handler = SIG_IGN;
+  proc_check_signals(&g_frame);
+  assert_int_equal(g_proc.sig_pending & (1ULL << SIGUSR1), 0);
+}
+
+/* proc_check_signals: SA_RESETHAND → resets handler to SIG_DFL (line 414) */
+static void proc_check_signals_sa_resethand(void **state) {
+  (void)state;
+  g_proc.sig_pending = 1ULL << SIGUSR2;
+  g_proc.sig_mask    = 0;
+  g_proc.sig_actions[SIGUSR2].sa_handler  = (u64)0x400000UL;
+  g_proc.sig_actions[SIGUSR2].sa_flags    = SA_RESETHAND;
+  g_proc.sig_actions[SIGUSR2].sa_restorer = 0x401000;
+  g_return_frame = true;
+  /* Set up user stack — frame->rsp points to writable memory */
+  static u8 fake_stack[256];
+  g_frame.rsp = (u64)(fake_stack + 128); /* mid-buffer */
+  g_proc.user_stack     = fake_stack;
+  g_proc.user_stack_top = (void *)(fake_stack + 256);
+
+  proc_check_signals(&g_frame);
+  /* SA_RESETHAND → handler reset to SIG_DFL */
+  assert_ptr_equal(g_proc.sig_actions[SIGUSR2].sa_handler, SIG_DFL);
+}
+
 /* sigreturn: frame valid but ctx vmm check fails → -EFAULT */
 static void sigreturn_bad_ctx_returns_efault(void **state) {
   (void)state;
@@ -579,6 +631,10 @@ int main(void)
       /* new coverage */
       cmocka_unit_test_setup(sigreturn_bad_ctx_returns_efault, setup),
       cmocka_unit_test_setup(sigreturn_restores_registers, setup),
+      cmocka_unit_test_setup(proc_check_signals_no_proc_noop, setup),
+      cmocka_unit_test_setup(proc_check_signals_sig_dfl_fatal_exits, setup),
+      cmocka_unit_test_setup(proc_check_signals_sigkill_exits, setup),
+      cmocka_unit_test_setup(proc_check_signals_sa_resethand, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
