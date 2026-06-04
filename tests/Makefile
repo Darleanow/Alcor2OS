@@ -100,7 +100,7 @@ SRC_user_init          :=
 
 TEST_BINS := $(foreach s,$(SUITES),$(BIN)/test_$(s))
 
-.PHONY: all test coverage clean FORCE
+.PHONY: all test coverage clean
 all: test
 
 # obj path for a kernel source: ../src/lib/x.c -> build/obj/src/lib/x.o
@@ -136,7 +136,9 @@ COV_USER_SRCS   := $(shell find $(ROOT)/user -name '*.c' ! -path '*/doomgeneric/
 COV_BIN         := ../build/alcor2.elf
 COV_TEST_BINS   := $(firstword $(TEST_BINS)) $(foreach t,$(filter-out $(firstword $(TEST_BINS)),$(TEST_BINS)),-object $(t))
 
-../build/alcor2.elf: FORCE
+KERNEL_SRCS := $(shell find $(SRC) ../include -name '*.c' -o -name '*.h' 2>/dev/null)
+
+../build/alcor2.elf: $(KERNEL_SRCS)
 	$(MAKE) -C .. build/alcor2.elf COV=1 CC=clang
 
 coverage: test ../build/alcor2.elf
