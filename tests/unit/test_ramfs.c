@@ -271,8 +271,9 @@ static void ram_readdir_returns_children(void **state) {
   char name[64];
   vfs_stat_t st;
   assert_int_equal(ram_readdir(fh, 0, name, &st), 1);
+  assert_int_equal(ram_readdir(fh, 0, name, NULL), 1); /* st==NULL → if(st) false branch */
   assert_int_equal(ram_readdir(fh, 1, name, &st), 1);
-  assert_int_equal(ram_readdir(fh, 2, name, NULL), 0); /* past end */
+  assert_int_equal(ram_readdir(fh, 3, name, NULL), 0); /* index > count → child==NULL in loop */
 }
 
 /* ram_readdir: on non-directory returns -ENOTDIR */

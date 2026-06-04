@@ -1144,9 +1144,13 @@ static void vfs_path_starts_with_false_branch(void **state) {
   vfs_init();
   vfs_register_fs(&noioctl_fstype);
   vfs_mount("dev2", "/foomount", "noioctlfs");
-  /* /bar does not start with /foomount → vfs_path_starts_with returns false → ENOENT */
+  /* /bar does not start with /foomount → false branch of prefix[0]=='/' && prefix[1]=='\0' */
   vfs_stat_t st;
   assert_int_equal((i64)vfs_stat("/bar/baz", &st), -ENOENT);
+  /* /foomount/sub starts with /foomount and path[plen]=='/' → second || branch covered */
+  vfs_stat("/foomount/sub", &st);
+  /* /foomount exactly → path[plen]=='\0' → first || branch */
+  vfs_stat("/foomount", &st);
 }
 
 /* vfs_normalize: null/non-absolute path is a no-op */

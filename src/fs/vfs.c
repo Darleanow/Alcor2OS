@@ -92,7 +92,7 @@ static vfs_mount_t *vfs_find_mount(const char *path, const char **rel_path)
   }
 
   if(best && rel_path) {
-    if(best_len == 1 && best->target[0] == '/')
+    if(best_len == 1)
       *rel_path = path;
     else
       *rel_path = path + best_len;

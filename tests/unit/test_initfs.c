@@ -152,7 +152,8 @@ static void init_readdir_past_end_returns_zero(void **state) {
   (void)state;
   assert_int_equal(initfs_register("testfile", "data", 4), 0);
   char name[VFS_NAME_MAX + 1];
-  assert_int_equal(init_readdir(INITFS_ROOT_HANDLE, 1, name, NULL), 0);
+  /* index=2 with 1 file: loop exits when f becomes NULL (covers f==NULL branch) */
+  assert_int_equal(init_readdir(INITFS_ROOT_HANDLE, 2, name, NULL), 0);
 }
 
 static void init_readdir_returns_registered_filename(void **state) {
