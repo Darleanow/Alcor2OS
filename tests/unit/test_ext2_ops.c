@@ -261,6 +261,20 @@ static void ops_readlink_returns_bytes(void **state) {
   assert_memory_equal(buf, "hello", 5);
 }
 
+static void ops_mount_calls_ext2_mount(void **state) {
+    (void)state;
+    g_mount_ret = 1;
+    void *result = g_ext2_fstype.mount("dev", 0);
+    assert_non_null(result);
+}
+
+static void ops_mount_returns_null_on_fail(void **state) {
+    (void)state;
+    g_mount_ret = 0;
+    void *result = g_ext2_fstype.mount("dev", 0);
+    assert_null(result);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -284,6 +298,8 @@ int main(void)
       cmocka_unit_test_setup(ops_readdir_end_returns_zero, setup),
       cmocka_unit_test_setup(ops_truncate_delegates, setup),
       cmocka_unit_test_setup(ops_readlink_returns_bytes, setup),
+      cmocka_unit_test_setup(ops_mount_calls_ext2_mount, setup),
+      cmocka_unit_test_setup(ops_mount_returns_null_on_fail, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
