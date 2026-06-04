@@ -64,8 +64,16 @@ static i64 dummy_stat(const void *fs_data, const char *path, vfs_stat_t *st) {
   return 0;
 }
 
+static const char *g_readdir_name = "";
+static int g_readdir_call_count = 0;
+static int g_readdir_fail_after = -1;
+
 static i64 dummy_readdir(fs_handle_t fh, u64 offset, char *name, vfs_stat_t *st) {
-  (void)fh; (void)offset; (void)name; (void)st;
+  (void)fh; (void)offset; (void)st;
+  g_readdir_call_count++;
+  if (g_readdir_fail_after >= 0 && g_readdir_call_count > g_readdir_fail_after)
+    return 0;
+  if (name && g_readdir_name) kstrncpy(name, g_readdir_name, VFS_NAME_MAX);
   return g_readdir_ret;
 }
 
@@ -203,7 +211,10 @@ static int setup_vfs(void **state) {
   fs_registry_count = 0;
   vfs_register_fs(&dummy_fstype);
   vfs_mount("dev", "/", "dummy"); /* mount root so vfs_open/stat work */
-  g_readdir_ret = 0;
+  g_readdir_ret          = 0;
+  g_readdir_name         = "";
+  g_readdir_call_count   = 0;
+  g_readdir_fail_after   = -1;
   g_read_calls  = -1;
   g_open_fail   = false;
   g_fstat_fail  = false;
