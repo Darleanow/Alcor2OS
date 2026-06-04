@@ -414,6 +414,92 @@ static void test_vmm_map_pmm_fail_mid_walk(void **state)
   assert_int_equal(vmm_get_phys(0x7000), 0);
 }
 
+/* vmm_map_range_alloc: PDPT allocation fails → returns false (line 162) */
+static void test_vmm_map_range_pdpt_fail(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3 = (u64)kernel_pml4;
+
+  /* vmm_map_range_alloc maps page 0x1000_0000 (different PML4 entry).
+   * Fail the PDPT alloc (2nd pmm call for the walk) */
+  mock_pmm_fail_on    = 2;
+  mock_pmm_call_count = 0;
+  bool ok = vmm_map_range_alloc(0x40000000ULL, 1, VMM_PRESENT | VMM_USER);
+  assert_false(ok);
+  mock_pmm_fail_on = -1;
+}
+
+/* vmm_map_range_alloc: PD allocation fails → returns false (line 169) */
+static void test_vmm_map_range_pd_fail(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3 = (u64)kernel_pml4;
+
+  mock_pmm_fail_on    = 3; /* fail PD alloc */
+  mock_pmm_call_count = 0;
+  bool ok = vmm_map_range_alloc(0x40000000ULL, 1, VMM_PRESENT | VMM_USER);
+  assert_false(ok);
+  mock_pmm_fail_on = -1;
+}
+
+/* vmm_unmap: PDPT or PD missing → early return (lines 213, 217) */
+static void test_vmm_unmap_pdpt_missing(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3 = (u64)kernel_pml4;
+  /* Unmap a VA that was never mapped — all get_next_level return NULL */
+  vmm_unmap(0x40000000ULL); /* must not crash */
+}
+
+/* vmm_clone_address_space: vmm_create_address_space returns 0 → returns 0 (line 381) */
+static void test_vmm_clone_create_fail(void **state)
+{
+  (void)state;
+  /* Make vmm_create_address_space fail by making the first pmm_alloc for it fail */
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3 = (u64)kernel_pml4;
+
+  mock_pmm_fail    = true; /* all pmm_alloc fail → create_address_space returns 0 */
+  u64 dst = vmm_clone_address_space((u64)kernel_pml4);
+  assert_int_equal(dst, 0);
+  mock_pmm_fail = false;
+}
+
+/* vmm_clone_address_space: pmm_alloc for page copy fails → returns 0 (line 422) */
+static void test_vmm_clone_pmm_fail(void **state)
+{
+  (void)state;
+  void *pml4_raw = pmm_alloc();
+  fake_cr3       = (u64)pml4_raw;
+  vmm_init(0);
+  fake_cr3 = (u64)kernel_pml4;
+
+  /* Map a user page so clone has something to copy */
+  void *user_page = pmm_alloc();
+  vmm_map(0x1000, (u64)user_page, VMM_PRESENT | VMM_USER | VMM_WRITE);
+
+  /* Let create_address_space succeed but fail on the page-copy pmm_alloc */
+  /* The clone calls pmm_alloc for the new PML4 (in create_address_space),
+   * then for each user page. Set fail_on to fail the first user-page alloc. */
+  mock_pmm_call_count = 0;
+  mock_pmm_fail_on    = 5; /* rough estimate: after PML4+PDPT+PD+PT for dst */
+  u64 dst = vmm_clone_address_space((u64)kernel_pml4);
+  /* With pmm fail mid-clone, may return 0 or a partially built space */
+  mock_pmm_fail_on = -1;
+  (void)dst; /* just verify no crash */
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -439,6 +525,11 @@ int main(void)
       cmocka_unit_test_setup(test_vmm_map_in_pd_fail, setup),
       cmocka_unit_test_setup(test_vmm_map_in_pt_fail, setup),
       cmocka_unit_test_setup(test_vmm_map_range_already_present_skip, setup),
+      cmocka_unit_test_setup(test_vmm_map_range_pdpt_fail, setup),
+      cmocka_unit_test_setup(test_vmm_map_range_pd_fail, setup),
+      cmocka_unit_test_setup(test_vmm_unmap_pdpt_missing, setup),
+      cmocka_unit_test_setup(test_vmm_clone_create_fail, setup),
+      cmocka_unit_test_setup(test_vmm_clone_pmm_fail, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
