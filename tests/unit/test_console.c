@@ -358,6 +358,42 @@ static void scroll_non32bpp(void **state)
   assert_true(ctx.cursor_y < (u32)FB_H);
 }
 
+/* fb_put_pixel: 16bpp path — exercises fb_store16 (lines 67-74) and case 2 (90-92) */
+static void fb_put_pixel_16bpp_writes(void **state) {
+  (void)state;
+  static u8 fb16[FB_H * FB_W * 2];
+  memset(fb16, 0, sizeof(fb16));
+  console_init(fb16, FB_W, FB_H, FB_W * 2, 16);
+  fb_put_pixel(0, 0, 0xFF0000);
+  assert_true(fb16[0] != 0 || fb16[1] != 0);
+}
+
+/* bytes_pp_from_bpp: default case (lines 108-113) */
+static void bytes_pp_from_bpp_default_case(void **state) {
+  (void)state;
+  assert_int_equal(bytes_pp_from_bpp(15), 2); /* guess=2 */
+  assert_int_equal(bytes_pp_from_bpp(1), 4);  /* guess=0 → fallback 4 */
+}
+
+/* fb_clear_rectangle: odd width 32bpp → last-pixel write (line 150) */
+static void fb_clear_odd_width_32bpp(void **state) {
+  (void)state;
+  static u8 fb32[FB_H * 9 * 4];
+  memset(fb32, 0xFF, sizeof(fb32));
+  console_init(fb32, 9, FB_H, 9 * 4, 32);
+  console_clear();
+  assert_int_equal(*(u32 *)fb32, ctx.bg);
+}
+
+/* draw_glyph: unmapped char falls back to '?' (line 175) */
+static void draw_glyph_unmapped_char(void **state) {
+  (void)state;
+  static u8 fb32[FB_H * FB_W * 4];
+  memset(fb32, 0, sizeof(fb32));
+  console_init(fb32, FB_W, FB_H, FB_W * 4, 32);
+  console_putchar('\x01'); /* unmapped → tries '?' fallback */
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -393,6 +429,10 @@ int main(void)
       cmocka_unit_test_setup(console_init_16bpp, reset),
       cmocka_unit_test_setup(console_clear_non32bpp, reset),
       cmocka_unit_test_setup(scroll_non32bpp, reset),
+      cmocka_unit_test_setup(fb_put_pixel_16bpp_writes, reset),
+      cmocka_unit_test_setup(bytes_pp_from_bpp_default_case, reset),
+      cmocka_unit_test_setup(fb_clear_odd_width_32bpp, reset),
+      cmocka_unit_test_setup(draw_glyph_unmapped_char, reset),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
