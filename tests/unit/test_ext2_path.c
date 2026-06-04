@@ -78,9 +78,12 @@ static void fs_add_symlink(u32 ino, u32 parent_ino, const char *name, const char
     }
 }
 
+static u32 g_read_inode_fail_ino = 0;
+
 i64 read_inode(const ext2_volume_t *v, u32 i, ext2_inode_t *n)
 {
     (void)v;
+    if(g_read_inode_fail_ino && i == g_read_inode_fail_ino) return -EIO;
     for (u32 idx = 0; idx < mock_fs_count; idx++) {
         if (mock_fs[idx].ino == i) {
             *n = mock_fs[idx].inode;
@@ -589,22 +592,19 @@ static void test_resolve_path_symlink_with_rest(void **state) {
   assert_int_equal(ino, 13);
 }
 
-/* read_symlink_target slow path: vol_read_block succeeds (lines 70-75) */
 static void test_read_symlink_slow_success(void **state) {
   (void)state;
   fs_reset();
   fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
-  /* Slow symlink: size > EXT2_FAST_SYMLINK_MAX (60) */
   mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK,
                            EXT2_S_IFLNK | 0777, 65);
-  e->inode.i_block[0] = 5; /* data block */
-  /* Set up vol_read_block to succeed */
+  e->inode.i_block[0] = 5;
   g_vol_read_ok = true;
   g_cache_ok    = true;
   memcpy(g_vol_read_buf, "/some/target/path", 18);
   char buf[128];
   i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
-  assert_int_equal(ret, 0);
+  assert_int_equal(ret, 65);
   g_vol_read_ok = false;
   g_cache_ok    = false;
 }
@@ -623,7 +623,6 @@ static void test_read_symlink_slow_read_fail_eio(void **state) {
   assert_int_equal(ret, -EIO);
 }
 
-/* read_symlink_target slow path: len >= bufsz → clamped (lines 72-73) */
 static void test_read_symlink_slow_len_clamped(void **state) {
   (void)state;
   fs_reset();
@@ -634,9 +633,9 @@ static void test_read_symlink_slow_len_clamped(void **state) {
   g_vol_read_ok = true;
   g_cache_ok    = true;
   memcpy(g_vol_read_buf, "/some/long/path/here", 21);
-  char buf[10]; /* smaller than symlink size → triggers len >= bufsz clamping */
+  char buf[10]; /* cap=10 < i_size=65 → -ENAMETOOLONG */
   i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
-  assert_int_equal(ret, 0); /* succeeds with clamped len */
+  assert_int_equal(ret, -ENAMETOOLONG);
   g_vol_read_ok = false;
   g_cache_ok    = false;
 }
@@ -666,13 +665,12 @@ static void test_resolve_step_read_inode_fail_eio(void **state) {
     (void)state;
     fs_reset();
     fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
-      mock_fs[mock_fs_count].ino        = 99;
-    mock_fs[mock_fs_count].parent_ino = EXT2_ROOT_INODE;
-    mock_fs[mock_fs_count].name       = "ghost";
-    mock_fs[mock_fs_count].type       = EXT2_FT_REG_FILE;
-    memset(&mock_fs[mock_fs_count].inode, 0, sizeof(ext2_inode_t));
-    mock_fs[mock_fs_count].inode.i_mode = EXT2_S_IFREG;
-   (void)state;
+    fs_add(5, EXT2_ROOT_INODE, "target", EXT2_FT_REG_FILE, EXT2_S_IFREG | 0644, 0);
+    g_read_inode_fail_ino = 5;
+    u32 ino; ext2_inode_t inode;
+    i64 ret = resolve_path(&dummy_vol, "/target", &ino, &inode);
+    assert_int_equal(ret, -EIO);
+    g_read_inode_fail_ino = 0;
 }
 
 static void test_ext2_readlink_empty_filename(void **state) {
@@ -720,19 +718,12 @@ static void test_ext2_readlink_read_inode_fail(void **state) {
     (void)state;
     fs_reset();
     fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
-    mock_fs[mock_fs_count].ino        = 50;
-    mock_fs[mock_fs_count].parent_ino = EXT2_ROOT_INODE;
-    mock_fs[mock_fs_count].name       = "ghost_lnk";
-    mock_fs[mock_fs_count].type       = EXT2_FT_SYMLINK;
-    memset(&mock_fs[mock_fs_count].inode, 0, sizeof(ext2_inode_t));
-    /* The inode is in mock_fs so read_inode will find it */
-    mock_fs[mock_fs_count].inode.i_mode = EXT2_S_IFLNK;
-    mock_fs[mock_fs_count].inode.i_size = 0; /* zero size → -EINVAL in read_symlink_target */
-    mock_fs_count++;
+    fs_add(5, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK, EXT2_S_IFLNK | 0777, 5);
+    g_read_inode_fail_ino = 5;
     char buf[64];
-    i64 ret = ext2_readlink(&dummy_vol, "/ghost_lnk", buf, sizeof(buf));
-    /* zero size → read_symlink_target returns -EINVAL → ext2_readlink returns -EIO */
+    i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
     assert_int_equal(ret, -EIO);
+    g_read_inode_fail_ino = 0;
 }
 
 static void test_ext2_readlink_eio_on_read_symlink_fail(void **state) {
