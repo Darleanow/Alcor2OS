@@ -189,3 +189,20 @@ void cpu_enable_sse(void)
 
   console_print("[CPU] SSE/AVX/FPU enabled\n");
 }
+
+u64 cpu_read_cr3(void)
+{
+  u64 cr3;
+  __asm__ volatile("mov %%cr3, %0" : "=r"(cr3));
+  return cr3;
+}
+
+void cpu_write_cr3(u64 pml4_phys)
+{
+  __asm__ volatile("mov %0, %%cr3" : : "r"(pml4_phys) : "memory");
+}
+
+void cpu_invlpg(u64 virt)
+{
+  __asm__ volatile("invlpg (%0)" : : "r"(virt) : "memory");
+}

@@ -1,5 +1,10 @@
 # Kernel object tree + unified compile_commands (kernel .c + user/apps .cpp)
 
+ifeq ($(COV),1)
+CFLAGS += -fprofile-instr-generate -fcoverage-mapping
+LDFLAGS += --unresolved-symbols=ignore-all
+endif
+
 KERNEL_SRCS_C   := $(shell find $(SRC) -name '*.c')
 KERNEL_SRCS_ASM := $(shell find $(SRC) -name '*.asm')
 

@@ -46,13 +46,12 @@ static void fill_entry_from_dirent(
     const ext2_volume_t *vol, const ext2_dirent_t *de, ext2_entry_t *entry
 )
 {
-  u32 name_len = de->name_len;
-  if(name_len > EXT2_NAME_MAX)
-    name_len = EXT2_NAME_MAX;
-  kmemcpy(entry->name, de->name, name_len);
-  entry->name[name_len] = '\0';
-  entry->inode          = de->inode;
-  entry->file_type      = de->file_type;
+  u32   name_len = de->name_len;
+  char *dst      = (char *)entry->name;
+  kmemcpy(dst, de->name, name_len);
+  dst[name_len]    = '\0';
+  entry->inode     = de->inode;
+  entry->file_type = de->file_type;
 
   ext2_inode_t file_inode;
   entry->size =
@@ -197,8 +196,9 @@ static i64 mkdir_seed_first_block(
     return -ENOMEM;
   }
   seed_dot_dotdot(block_buf, vol->block_size, self_ino, parent_ino);
-  i64 ret = vol_write_block(vol, first_block, block_buf) < 0 ? -EIO : 0;
+  i64 wret = vol_write_block(vol, first_block, block_buf);
   kfree(block_buf);
+  i64 ret = wret < 0 ? -EIO : 0;
   if(ret < 0) {
     free_block(vol, first_block);
     return ret;
@@ -359,8 +359,20 @@ i64 ext2_unlink(ext2_volume_t *vol, const char *path)
 
   file_inode.i_links_count--;
   if(file_inode.i_links_count == 0) {
-    free_inode_blocks(vol, &file_inode);
-    free_inode(vol, file_ino, false);
+    bool is_open = false;
+    for(int i = 0; i < EXT2_MAX_FILES; i++) {
+      if(g_files[i].in_use && g_files[i].vol == vol &&
+         g_files[i].inode_num == file_ino) {
+        is_open = true;
+        break;
+      }
+    }
+    if(!is_open) {
+      free_inode_blocks(vol, &file_inode);
+      free_inode(vol, file_ino, false);
+    } else {
+      write_inode(vol, file_ino, &file_inode);
+    }
   } else {
     write_inode(vol, file_ino, &file_inode);
   }
@@ -398,6 +410,9 @@ i64 ext2_rmdir(ext2_volume_t *vol, const char *path)
   char parent_path[VFS_PATH_MAX];
   char dirname[EXT2_NAME_MAX + 1];
   path_split(path, parent_path, dirname);
+
+  if(kstrcmp(dirname, ".") == 0 || kstrcmp(dirname, "..") == 0)
+    return -EINVAL;
 
   u32          parent_ino;
   ext2_inode_t parent_inode;

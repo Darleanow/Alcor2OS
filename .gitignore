@@ -10,3 +10,4 @@ mnt
 .vscode
 # Doxygen generated output
 docs/doxygen/
+*.profraw

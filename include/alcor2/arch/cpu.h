@@ -107,4 +107,22 @@ void cpu_set_gs_base(u64 addr);
  */
 u64 cpu_get_gs_base(void);
 
+/**
+ * @brief Get the current CR3 (PML4) value.
+ * @return Physical address of the PML4 table.
+ */
+u64 cpu_read_cr3(void);
+
+/**
+ * @brief Set the current CR3 (PML4) value and flush the TLB.
+ * @param pml4_phys Physical address of the new PML4 table.
+ */
+void cpu_write_cr3(u64 pml4_phys);
+
+/**
+ * @brief Invalidate a single page in the TLB.
+ * @param virt Virtual address to invalidate.
+ */
+void cpu_invlpg(u64 virt);
+
 #endif

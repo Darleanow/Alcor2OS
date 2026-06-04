@@ -1,0 +1,339 @@
+/* Adversarial tests for inode.c — targeting the read-modify-write correctness
+ * of write_inode.  The critical bug class: writing inode N reads the block,
+ * patches bytes [offset, offset+sizeof(inode)), then writes it back.  Any
+ * arithmetic error in `offset` corrupts the neighboring inodes that share
+ * the same 1 KiB block.
+ *
+ * Each test puts a distinct bit-pattern in every inode slot and re-reads all
+ * of them after each write, so a single byte of corruption is immediately
+ * visible. */
+
+#include "test_common.h"
+
+#include <alcor2/errno.h>
+#include <alcor2/fs/ext2.h>
+#include <alcor2/types.h>
+#include <fs/ext2/internal.h>
+
+#include <stdlib.h>
+#include <string.h>
+
+#define STORE_BLOCKS 16
+#define BLOCK_SZ     1024u
+
+static u8 g_store[STORE_BLOCKS][BLOCK_SZ];
+
+static int reset(void **s)
+{
+  (void)s;
+  memset(g_store, 0, sizeof(g_store));
+  return 0;
+}
+
+
+static bool g_kmalloc_fail = false;
+void       *kmalloc(u64 n)
+{
+  if(g_kmalloc_fail)
+    return NULL;
+  return malloc((size_t)n);
+}
+void  kfree(void *p)  { free(p); }
+void *kmemcpy(void *d, const void *s, u64 n) { return memcpy(d, s, n); }
+void  kzero(void *d, u64 n) { memset(d, 0, n); }
+u8   *cache_get_block(u32 s) { (void)s; return NULL; }
+void  cache_put_block(u8 *p) { (void)p; }
+
+static bool g_read_fail  = false;
+static bool g_write_fail = false;
+
+i64 vol_read_block(const ext2_volume_t *v, u32 blk, void *buf)
+{
+  (void)v;
+  if(g_read_fail)
+    return -EIO;
+  if(blk >= STORE_BLOCKS)
+    return -EIO;
+  memcpy(buf, g_store[blk], BLOCK_SZ);
+  return (i64)BLOCK_SZ;
+}
+
+i64 vol_write_block(const ext2_volume_t *v, u32 blk, const void *buf)
+{
+  (void)v;
+  if(g_write_fail)
+    return -EIO;
+  if(blk >= STORE_BLOCKS)
+    return -EIO;
+  memcpy(g_store[blk], buf, BLOCK_SZ);
+  return (i64)BLOCK_SZ;
+}
+
+ext2_file_t g_files[EXT2_MAX_FILES];
+
+#include "../../src/fs/ext2/inode.c"
+
+#define INODE_TABLE 2u
+
+static ext2_group_desc_t g_gd;
+
+static ext2_volume_t make_vol(void)
+{
+  ext2_volume_t v;
+  memset(&v, 0, sizeof(v));
+  v.block_size       = BLOCK_SZ;
+  v.inode_size       = 128;
+  v.inodes_per_group = 8;
+  v.inodes_count     = 8;
+  v.groups_count     = 1;
+  memset(&g_gd, 0, sizeof(g_gd));
+  g_gd.bg_inode_table = INODE_TABLE;
+  v.groups            = &g_gd;
+  return v;
+}
+
+/* Builds a recognisable inode for slot `id` so any byte-level corruption
+ * between two inodes is visible. */
+static void make_inode(ext2_inode_t *out, u32 id)
+{
+  memset(out, 0, sizeof(*out));
+  out->i_mode         = (u16)(0x8000 | id);
+  out->i_size         = id * 0x1000;
+  out->i_links_count  = (u16)id;
+  out->i_block[0]     = 0xDEAD0000 | id;
+}
+
+
+static void read_ino_zero_is_einval(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  out;
+  assert_int_equal(read_inode(&v, 0, &out), -EINVAL);
+}
+
+static void read_ino_above_count_is_einval(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  out;
+  assert_int_equal(read_inode(&v, 9, &out), -EINVAL); /* count = 8 */
+}
+
+static void read_ino_at_count_succeeds(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  src, dst;
+  make_inode(&src, 8);
+  assert_int_equal(write_inode(&v, 8, &src), 0);
+  assert_int_equal(read_inode(&v, 8, &dst), 0);
+  assert_int_equal(dst.i_mode, src.i_mode);
+}
+
+static void write_ino_zero_is_einval(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  assert_int_equal(write_inode(&v, 0, &dummy), -EINVAL);
+}
+
+static void write_ino_above_count_is_einval(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  assert_int_equal(write_inode(&v, 9, &dummy), -EINVAL);
+}
+
+
+static void write_inode_read_fail_returns_eio(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_read_fail = true;
+  i64 ret     = write_inode(&v, 1, &dummy);
+  g_read_fail = false;
+  assert_int_equal(ret, -EIO);
+}
+
+static void write_inode_write_fail_returns_eio(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_write_fail = true;
+  i64 ret      = write_inode(&v, 1, &dummy);
+  g_write_fail = false;
+  assert_int_equal(ret, -EIO);
+}
+
+static void write_inode_kmalloc_fail_returns_enomem(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_kmalloc_fail = true;
+  i64 ret        = write_inode(&v, 1, &dummy);
+  g_kmalloc_fail = false;
+  assert_int_equal(ret, -ENOMEM);
+}
+
+static void read_inode_read_fail_returns_eio(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  out;
+  g_read_fail = true;
+  i64 ret     = read_inode(&v, 1, &out);
+  g_read_fail = false;
+  assert_int_equal(ret, -EIO);
+}
+
+static void read_inode_kmalloc_fail_returns_enomem(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  ext2_inode_t  out;
+  g_kmalloc_fail = true;
+  i64 ret        = read_inode(&v, 1, &out);
+  g_kmalloc_fail = false;
+  assert_int_equal(ret, -ENOMEM);
+}
+
+
+static void write_inode1_does_not_corrupt_inode2(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+
+  ext2_inode_t a, b, readback_a, readback_b;
+  make_inode(&a, 1);
+  make_inode(&b, 2);
+
+  assert_int_equal(write_inode(&v, 1, &a), 0);
+  assert_int_equal(write_inode(&v, 2, &b), 0);
+
+  assert_int_equal(read_inode(&v, 1, &readback_a), 0);
+  assert_int_equal(read_inode(&v, 2, &readback_b), 0);
+
+  assert_memory_equal(&readback_a, &a, sizeof(a));
+  assert_memory_equal(&readback_b, &b, sizeof(b));
+}
+
+static void write_all_inodes_leaves_each_intact(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+
+  ext2_inode_t src[8];
+  for(u32 i = 0; i < 8; i++)
+    make_inode(&src[i], i + 1);
+
+  for(u32 i = 0; i < 8; i++)
+    assert_int_equal(write_inode(&v, i + 1, &src[i]), 0);
+
+  for(u32 i = 0; i < 8; i++) {
+    ext2_inode_t got;
+    assert_int_equal(read_inode(&v, i + 1, &got), 0);
+    assert_memory_equal(&got, &src[i], sizeof(got));
+  }
+}
+
+static void overwrite_inode_updates_only_target_fields(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+
+  ext2_inode_t first, second, readback;
+  make_inode(&first,  3);
+  make_inode(&second, 33);
+
+  assert_int_equal(write_inode(&v, 3, &first),  0);
+  assert_int_equal(write_inode(&v, 3, &second), 0);
+  assert_int_equal(read_inode(&v,  3, &readback), 0);
+
+  assert_memory_equal(&readback, &second, sizeof(second));
+}
+
+static void overwrite_middle_inode_preserves_neighbors(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+
+  ext2_inode_t i3, i4, i5, i4_new, got3, got5;
+  make_inode(&i3,     3);
+  make_inode(&i4,     4);
+  make_inode(&i5,     5);
+  make_inode(&i4_new, 44);
+
+  assert_int_equal(write_inode(&v, 3, &i3), 0);
+  assert_int_equal(write_inode(&v, 4, &i4), 0);
+  assert_int_equal(write_inode(&v, 5, &i5), 0);
+
+  assert_int_equal(write_inode(&v, 4, &i4_new), 0);
+
+  assert_int_equal(read_inode(&v, 3, &got3), 0);
+  assert_int_equal(read_inode(&v, 5, &got5), 0);
+
+  assert_memory_equal(&got3, &i3, sizeof(i3));
+  assert_memory_equal(&got5, &i5, sizeof(i5));
+}
+
+/* write_inode: open file handle with matching vol+inode_num gets inode updated */
+static void write_inode_updates_open_file_handle(void **state) {
+  (void)state;
+  ext2_volume_t v = make_vol();
+
+  /* Set up an open file handle pointing to inode 1 on this volume */
+  memset(g_files, 0, sizeof(g_files));
+  g_files[0].in_use    = true;
+  g_files[0].vol       = &v;
+  g_files[0].inode_num = 1;
+  g_files[0].inode.i_size = 0;
+
+  ext2_inode_t new_inode;
+  make_inode(&new_inode, 1);
+  new_inode.i_size = 4096;
+
+  i64 ret = write_inode(&v, 1, &new_inode);
+  assert_int_equal(ret, 0);
+  /* g_files[0].inode should be updated */
+  assert_int_equal(g_files[0].inode.i_size, 4096);
+
+  /* Cleanup */
+  memset(g_files, 0, sizeof(g_files));
+}
+
+int main(void)
+{
+  const struct CMUnitTest tests[] = {
+      /* validation */
+      cmocka_unit_test_setup(read_ino_zero_is_einval, reset),
+      cmocka_unit_test_setup(read_ino_above_count_is_einval, reset),
+      cmocka_unit_test_setup(read_ino_at_count_succeeds, reset),
+      cmocka_unit_test_setup(write_ino_zero_is_einval, reset),
+      cmocka_unit_test_setup(write_ino_above_count_is_einval, reset),
+      /* error paths */
+      cmocka_unit_test_setup(write_inode_read_fail_returns_eio, reset),
+      cmocka_unit_test_setup(write_inode_write_fail_returns_eio, reset),
+      cmocka_unit_test_setup(write_inode_kmalloc_fail_returns_enomem, reset),
+      cmocka_unit_test_setup(read_inode_read_fail_returns_eio, reset),
+      cmocka_unit_test_setup(read_inode_kmalloc_fail_returns_enomem, reset),
+      /* RMW correctness */
+      cmocka_unit_test_setup(write_inode1_does_not_corrupt_inode2, reset),
+      cmocka_unit_test_setup(write_all_inodes_leaves_each_intact, reset),
+      cmocka_unit_test_setup(overwrite_inode_updates_only_target_fields, reset),
+      cmocka_unit_test_setup(overwrite_middle_inode_preserves_neighbors, reset),
+      /* new coverage */
+      cmocka_unit_test_setup(write_inode_updates_open_file_handle, reset),
+  };
+  return cmocka_run_group_tests(tests, NULL, NULL);
+}

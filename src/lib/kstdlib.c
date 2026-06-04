@@ -79,6 +79,8 @@ u64 kstrlen(const char *s)
  */
 char *kstrncpy(char *dst, const char *src, u64 max)
 {
+  if(max == 0)
+    return dst;
   u64 i;
   for(i = 0; i < max - 1 && src[i]; i++)
     dst[i] = src[i];

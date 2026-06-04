@@ -92,7 +92,10 @@ static vfs_mount_t *vfs_find_mount(const char *path, const char **rel_path)
   }
 
   if(best && rel_path) {
-    *rel_path = path + best_len;
+    if(best_len == 1)
+      *rel_path = path;
+    else
+      *rel_path = path + best_len;
     if((*rel_path)[0] == '\0')
       *rel_path = "/";
   }
@@ -133,8 +136,9 @@ static void vfs_normalize(char *path)
       continue;
     if(len == 2 && start[0] == '.' && start[1] == '.') {
       if(out > res + 1) {
-        out--;
         while(out > res + 1 && *(out - 1) != '/')
+          out--;
+        if(out > res + 1 && *(out - 1) == '/')
           out--;
       }
       continue;
@@ -254,8 +258,6 @@ void vfs_oft_release(i32 idx)
 i64 vfs_install_fd(i32 oft_idx)
 {
   proc_t *p = proc_current();
-  if(!p)
-    return -EINVAL;
   for(i64 i = 3; i < VFS_MAX_FD; i++) {
     if(p->fds[i] < 0) {
       p->fds[i] = oft_idx;
@@ -573,8 +575,11 @@ i64 vfs_getdents(i64 fd, void *buf, u64 count)
     vfs_stat_t st;
     char       name[VFS_NAME_MAX + 1];
     i64        ret = e->ops->readdir(e->handle, e->offset, name, &st);
-    if(ret <= 0)
+    if(ret <= 0) {
+      if(written == 0 && ret < 0)
+        return ret;
       break;
+    }
 
     u32 namelen = (u32)kstrlen(name);
     u32 reclen  = (u32)((19 + namelen + 1 + 7) & ~7ULL);
@@ -669,13 +674,21 @@ i64 vfs_rename(const char *oldpath, const char *newpath)
     return -EIO;
   }
 
-  static u8 rename_buf[RENAME_CHUNK];
-  u64       off = 0;
-  i64       n;
+  u8 *rename_buf = kmalloc(RENAME_CHUNK);
+  if(!rename_buf) {
+    src_m->ops->close(src_fh);
+    dst_m->ops->close(dst_fh);
+    return -ENOMEM;
+  }
+
+  u64 off = 0;
+  i64 n;
   while((n = src_m->ops->read(src_fh, rename_buf, RENAME_CHUNK, off)) > 0) {
     dst_m->ops->write(dst_fh, rename_buf, (u64)n, off);
     off += (u64)n;
   }
+
+  kfree(rename_buf);
 
   src_m->ops->close(src_fh);
   dst_m->ops->close(dst_fh);
@@ -900,8 +913,6 @@ void vfs_proc_release_fds(i32 *fds)
 void vfs_proc_close_cloexec_fds(void)
 {
   proc_t *p = proc_current();
-  if(!p)
-    return;
   for(int i = 0; i < VFS_MAX_FD; i++) {
     if(p->fd_cloexec[i] && p->fds[i] >= 0) {
       vfs_oft_release(p->fds[i]);

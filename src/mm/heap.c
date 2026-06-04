@@ -317,7 +317,8 @@ void *krealloc(void *ptr, u64 new_size)
     return NULL;
   }
 
-  kmemcpy(new_ptr, ptr, block->size);
+  u64 copy_size = block->size < new_size ? block->size : new_size;
+  kmemcpy(new_ptr, ptr, copy_size);
 
   kfree(ptr);
   return new_ptr;

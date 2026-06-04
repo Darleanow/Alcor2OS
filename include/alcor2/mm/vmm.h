@@ -22,7 +22,9 @@
  * Only VMM_WC below is used today; VMM_PCD/VMM_PAT are provided for
  * completeness and are currently unused. */
 #define VMM_PAT (1ULL << 7)
-#define VMM_NX  (1ULL << 63)
+#define VMM_MMIO                                                               \
+  (1ULL << 9) /* Software bit: Do not free physical page on teardown */
+#define VMM_NX (1ULL << 63)
 /** @} */
 
 /* Write-Combining: selects PAT entry 4 (PAT=1, PCD=0, PWT=0) on a 4 KiB PTE,
@@ -100,7 +102,7 @@ u64 vmm_create_address_space(void);
  * @param phys Physical address.
  * @param flags Page flags.
  */
-void vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags);
+bool vmm_map_in(u64 pml4_phys, u64 virt, u64 phys, u64 flags);
 
 /**
  * @brief Clone user mappings for fork.

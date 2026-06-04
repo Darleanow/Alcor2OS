@@ -5,6 +5,8 @@
 
 #include <alcor2/arch/gdt.h>
 
+#include "gdt_internal.h"
+
 /** @name GDT Access Flags */
 /**@{*/
 #define GDT_ACCESS_PRESENT (1 << 7)
@@ -56,7 +58,7 @@ static tss_t     tss;
  * @param access Access byte.
  * @param flags Flags nibble.
  */
-static void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
+void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
 {
   entry->limit_low   = 0xFFFF;
   entry->base_low    = 0;
@@ -71,7 +73,7 @@ static void gdt_set_entry(gdt_entry_t *entry, u8 access, u8 flags)
  * @param entry TSS entry to configure.
  * @param base TSS base address.
  */
-static void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
+void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
 {
   entry->limit_low   = sizeof(tss_t) - 1;
   entry->base_low    = base & 0xFFFF;
@@ -92,11 +94,12 @@ static void gdt_set_tss(gdt_tss_entry_t *entry, u64 base)
  */
 void gdt_init(void)
 {
-  gdt_set_entry(&gdt.null, 0, 0);
-
-  for(int i = 0; i < 4; i++) {
-    gdt_set_entry(&gdt.reserved[i], 0, 0);
-  }
+  /* Entry 0 must be a true null descriptor, and the padding slots are
+   * reserved (never loaded). gdt_set_entry would stamp a 4 GiB flat limit
+   * into them, so zero them outright instead. */
+  gdt.null = (gdt_entry_t) {0};
+  for(int i = 0; i < 4; i++)
+    gdt.reserved[i] = (gdt_entry_t) {0};
 
   gdt_set_entry(
       &gdt.kernel_code,

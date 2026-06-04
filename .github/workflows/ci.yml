@@ -1,9 +1,15 @@
 # ci.yml: runs on every push and pull-request (all branches).
 #
 # Jobs:
-#   lint       clang-format diff check + cppcheck
-#   build      kernel compiled with clang-18 + ccache into a bootable ISO
-#   user-apps  musl + musl-cross + full user/ (C and C++ apps)
+#   lint             clang-format diff check + cppcheck
+#   build            kernel compiled with clang-18 + ccache into a bootable ISO
+#   unit-tests       cmocka tests + lcov coverage report (genhtml HTML)
+#   deploy-coverage  push HTML report to gh-pages/coverage (main only)
+#   user-apps        musl + musl-cross + full user/ (C and C++ apps)
+#
+# GitHub Pages setup (one-time):
+#   Settings → Pages → Source: Deploy from branch → gh-pages → / (root)
+#   Report URL: https://<org>.github.io/<repo>/coverage/
 #
 # The build ISO is kernel-only (fast); the full disk image is in release.yml.
 
@@ -200,6 +206,79 @@ jobs:
             release/BUILD_INFO.txt
           retention-days: 14
           compression-level: 0   # ISO is already compressed
+
+  # Host-compiled unit tests + coverage report
+  unit-tests:
+    name: Unit tests + coverage (cmocka, llvm-cov)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang-18 \
+            lld-18 \
+            llvm-18 \
+            libcmocka-dev \
+            lcov \
+            nasm \
+            make
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-18 100
+
+      - name: Run unit tests + coverage
+        run: make coverage
+
+      - name: Coverage summary
+        if: always()
+        run: cat tests/build/coverage/coverage.txt || true
+
+      - name: Upload coverage report (genhtml)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-html-${{ github.sha }}
+          path: tests/build/coverage/html
+          retention-days: 14
+
+      - name: Upload lcov tracefile
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-lcov-${{ github.sha }}
+          path: tests/build/coverage/lcov.info
+          retention-days: 14
+
+  # Deploy genhtml report to GitHub Pages (main branch only)
+  deploy-coverage:
+    name: Deploy coverage to GitHub Pages
+    needs: unit-tests
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download coverage HTML artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-html-${{ github.sha }}
+          path: coverage-site
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./coverage-site
+          destination_dir: coverage
+          commit_message: "chore: update coverage report [${{ github.sha }}]"
 
   # Userland + apps (needs musl-cross for C++ targets)
   user-apps:

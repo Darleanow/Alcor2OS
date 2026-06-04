@@ -7,6 +7,7 @@
 
 section .text
 global context_switch
+global context_switch_first
 
 ;; void context_switch(cpu_context_t **old_ctx, cpu_context_t *new_ctx)
 ;;
@@ -40,6 +41,20 @@ context_switch:
     pop rbp
 
     ;; Return to new task (rip is at top of stack after pops)
+    ret
+
+;; void context_switch_first(u64 new_rsp)
+;;
+;; First context switch: no old context to save, just load new stack and run.
+;;
+context_switch_first:
+    mov rsp, rdi
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbx
+    pop rbp
     ret
 
 section .note.GNU-stack noalloc noexec nowrite progbits

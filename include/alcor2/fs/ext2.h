@@ -262,6 +262,12 @@ typedef struct
 ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba);
 
 /**
+ * @brief Unmount an ext2 volume.
+ * @param vol Volume to unmount.
+ */
+void ext2_unmount(ext2_volume_t *vol);
+
+/**
  * @brief Open a file or directory.
  * @param vol Volume to search.
  * @param path Path relative to root.

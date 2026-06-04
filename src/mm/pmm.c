@@ -55,13 +55,14 @@ static inline bool bitmap_test(u64 page)
  */
 void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
 {
-  hhdm = hhdm_offset;
+  hhdm   = hhdm_offset;
+  bitmap = NULL;
 
   u64 highest_addr = 0;
   for(u64 i = 0; i < memmap->entry_count; i++) {
     const struct limine_memmap_entry *e   = memmap->entries[i];
     u64                               top = e->base + e->length;
-    if(e->type == LIMINE_MEMMAP_USABLE && top > highest_addr) {
+    if(top > highest_addr) {
       highest_addr = top;
     }
   }
@@ -78,6 +79,11 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
       e->length -= bitmap_size;
       break;
     }
+  }
+
+  if(!bitmap) {
+    free_pages = 0;
+    return;
   }
 
   for(u64 i = 0; i < bitmap_size / sizeof(u64); i++) {
@@ -108,6 +114,9 @@ void pmm_init(struct limine_memmap_response *memmap, u64 hhdm_offset)
  */
 void *pmm_alloc(void)
 {
+  if(free_pages == 0)
+    return NULL;
+
   for(u64 i = 0; i < bitmap_size / sizeof(u64); i++) {
     if(bitmap[i] != ALL_BITS_SET) {
       for(int b = 0; b < BITS_PER_ENTRY; b++) {
@@ -133,8 +142,10 @@ void *pmm_alloc(void)
  * @return Physical address of the first page, or NULL if not enough contiguous
  * memory.
  */
-void *pmm_alloc_pages(usize count)
+void *pmm_alloc_pages(u64 count)
 {
+  if(count == 0 || free_pages < count)
+    return NULL;
   u64 consecutive = 0;
   u64 start_page  = 0;
 
@@ -167,7 +178,7 @@ void *pmm_alloc_pages(usize count)
 void pmm_free(void *addr)
 {
   u64 page = (u64)addr / PAGE_SIZE;
-  if(bitmap_test(page)) {
+  if(page < total_pages && bitmap_test(page)) {
     bitmap_clear(page);
     free_pages++;
   }
@@ -185,7 +196,7 @@ void pmm_free_pages(void *addr, usize count)
 {
   u64 page = (u64)addr / PAGE_SIZE;
   for(usize i = 0; i < count; i++) {
-    if(bitmap_test(page + i)) {
+    if(page + i < total_pages && bitmap_test(page + i)) {
       bitmap_clear(page + i);
       free_pages++;
     }

@@ -575,10 +575,16 @@ void proc_exit(i64 code)
   mouse_set_relative(false);
   pit_reset_fast();
 
-  /* Release fds before flipping to ZOMBIE: close handlers may issue blocking
-   * disk I/O, and wait_irq would clobber the ZOMBIE state. */
   vfs_proc_release_fds(p->fds);
   p->state = PROC_STATE_ZOMBIE;
+
+  /* Reparent children to init (PID 1) */
+  for(int i = 0; i < PROC_MAX; i++) {
+    if(proc_table[i].state != PROC_STATE_FREE &&
+       proc_table[i].parent_pid == p->pid) {
+      proc_table[i].parent_pid = 1;
+    }
+  }
 
   /* Notify parent via SIGCHLD and wake it if blocked in waitpid */
   proc_t *parent = proc_get(p->parent_pid);
@@ -659,7 +665,7 @@ const char *proc_name(const proc_t *p)
 
 void proc_block(proc_t *p)
 {
-  if(p)
+  if(p && (p->state == PROC_STATE_READY || p->state == PROC_STATE_RUNNING))
     p->state = PROC_STATE_BLOCKED;
 }
 
@@ -697,10 +703,12 @@ void proc_schedule(void)
   proc_t *next = NULL;
 
   /* Simple round-robin: start from current+1 */
-  int start = current_proc ? (int)(current_proc - proc_table) : 0;
+  int start = current_proc ? (int)(current_proc - proc_table) : -1;
 
   for(int i = 1; i <= PROC_MAX; i++) {
     int idx = (start + i) % PROC_MAX;
+    /* In C, % of negative numbers is negative, but start+i >= 0 because
+     * start>=-1 and i>=1 */
     if(proc_table[idx].state == PROC_STATE_READY) {
       next = &proc_table[idx];
       break;
@@ -788,23 +796,13 @@ void proc_switch(proc_t *next)
   /* Restore FS base (TLS) for new process. Must run even when 0: otherwise
    * the previous task's %fs leaks across switches (fatal after execve). */
   cpu_set_fs_base(next->fs_base);
-
   /* Context switch */
   if(prev) {
     context_switch(&prev->saved_rsp, next->saved_rsp);
   } else {
-    /* First switch, just load new context - matches context_switch pop order */
-    __asm__ volatile("mov %0, %%rsp\n"
-                     "pop %%r15\n"
-                     "pop %%r14\n"
-                     "pop %%r13\n"
-                     "pop %%r12\n"
-                     "pop %%rbx\n"
-                     "pop %%rbp\n"
-                     "ret\n"
-                     :
-                     : "r"(next->saved_rsp)
-                     : "memory");
+    /* First switch, just load new context */
+    extern void context_switch_first(u64 new_rsp);
+    context_switch_first(next->saved_rsp);
   }
 
   cpu_enable_interrupts();
@@ -911,7 +909,7 @@ static i64 proc_fork_impl(
   proc_t *child = proc_alloc();
   if(!child) {
     console_print("[PROC] fork: no free process slot\n");
-    return -ENOMEM;
+    return -EAGAIN;
   }
 
   /* Clone the address space */
