@@ -539,11 +539,14 @@ static void pub_dir_remove_entry_failure(void **state) {
   ext2_inode_t dir;
   memset(&dir, 0, sizeof(dir));
   dir.i_size = BLOCK_SZ;
-  
+
   u32 b1 = get_block_num(&v, &dir, 0);
   u32 off = 0;
   build_dirent(g_blocks[b1], &off, 10, "foo");
-  
+  /* Extend last entry rec_len to fill the entire block → loop exits normally */
+  ext2_dirent_t *de = (ext2_dirent_t *)g_blocks[b1];
+  de->rec_len = BLOCK_SZ;
+
   assert_int_equal(dir_remove_entry(&v, &dir, "bar"), -ENOENT);
 }
 
