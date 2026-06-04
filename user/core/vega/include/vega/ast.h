@@ -28,7 +28,7 @@ typedef enum
   AST_WHILE, /* while cond { body } — loops while cond exits 0 */
   AST_FOR,   /* for var in words... { body } */
   AST_FN,    /* fn name(args) { body } — registers a function on exec */
-  AST_LET, /* let NAME VALUE — variable assignment (value expanded at exec) */
+  AST_LET,   /* let NAME VALUE — variable assignment (value expanded at exec) */
 } ast_kind_t;
 
 typedef enum

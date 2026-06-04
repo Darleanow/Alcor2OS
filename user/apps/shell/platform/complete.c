@@ -173,8 +173,9 @@ void sh_complete(const char *prefix, bool is_command, comp_result_t *out)
         return;
       }
       char dir_prefix[MAX_PATH];
-      (void
-      )snprintf(dir_prefix, sizeof(dir_prefix), "%.*s/", (int)dlen, prefix);
+      (void)snprintf(
+          dir_prefix, sizeof(dir_prefix), "%.*s/", (int)dlen, prefix
+      );
       scan_path_dir(
           out, dir, dir_prefix, slash + 1, strlen(slash + 1), prefix, plen
       );

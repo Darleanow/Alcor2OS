@@ -55,8 +55,9 @@ static int remove_recursive(const char *path, int verbose, int simulate)
 {
   DIR *dir = opendir(path);
   if(!dir) {
-    (void
-    )fprintf(stderr, "rmdir: cannot open '%s': %s\n", path, strerror(errno));
+    (void)fprintf(
+        stderr, "rmdir: cannot open '%s': %s\n", path, strerror(errno)
+    );
     return -1;
   }
 

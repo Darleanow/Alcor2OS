@@ -17,14 +17,8 @@
   #define SYS_TRACE 0
 #endif
 
-#define SYS_DEF(n, nm, fn)                                                     \
-  {                                                                            \
-    (n), (nm), (fn)                                                            \
-  }
-#define SYS_END                                                                \
-  {                                                                            \
-    0, NULL, NULL                                                              \
-  }
+#define SYS_DEF(n, nm, fn) {(n), (nm), (fn)}
+#define SYS_END            {0, NULL, NULL}
 
 /**
  * @brief Table of all supported syscalls.
