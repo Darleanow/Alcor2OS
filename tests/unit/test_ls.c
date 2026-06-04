@@ -370,6 +370,41 @@ static void test_ls_name_wider_than_terminal(void **state)
   assert_int_equal(ls_main(2, argv), 0);
 }
 
+/* buf_add: string > 4096 chars → triggers nc *= 2 inner loop (line 64) */
+static void test_ls_very_long_name_triggers_realloc(void **state) {
+  (void)state;
+  char *argv[] = {"ls", "mydir"};
+  DIR  *fake   = (DIR *)0x9999;
+
+  expect_string(mock_opendir, name, "mydir");
+  will_return(mock_opendir, fake);
+
+  /* Create a dirent with a 250-char name to exercise buf_add with a large name */
+  static struct dirent de;
+  memset(de.d_name, 'z', 250);
+  de.d_name[250] = '\0';
+  de.d_type = DT_REG;
+
+  /* Add 20 such entries to force total buffer > 4096 → nc *= 2 needed */
+  for(int i = 0; i < 20; i++) {
+    expect_value(mock_readdir, dirp, fake);
+    will_return(mock_readdir, &de);
+  }
+  expect_value(mock_readdir, dirp, fake);
+  will_return(mock_readdir, NULL);
+
+  expect_value(mock_closedir, dirp, fake);
+  will_return(mock_closedir, 0);
+
+  expect_value(mock_ioctl, fd, STDOUT_FILENO);
+  will_return(mock_ioctl, 0);
+  will_return(mock_ioctl, 80);
+
+  expect_value(mock_write, fd, STDOUT_FILENO);
+
+  assert_int_equal(ls_main(2, argv), 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -385,6 +420,8 @@ int main(void)
       cmocka_unit_test(test_ls_help),
       cmocka_unit_test(test_ls_columns_from_env),
       cmocka_unit_test(test_ls_name_wider_than_terminal),
+      /* new coverage */
+      cmocka_unit_test(test_ls_very_long_name_triggers_realloc),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

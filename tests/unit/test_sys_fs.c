@@ -770,6 +770,75 @@ static void pwrite64_seek_fail(void **state) {
   assert_int_equal((i64)sys_pwrite64(3, (u64)buf, 2, 100, 0, 0), -EBADF);
 }
 
+#define SYS_AT_FDCWD (-100)
+
+/* sys_newfstatat: efault on bad pathname */
+static void newfstatat_efault_on_bad_pathname(void **state) {
+  (void)state;
+  g_user_ptr_ok = false;
+  struct stat_buf st;
+  assert_int_equal((i64)sys_newfstatat(SYS_AT_FDCWD, (u64)"/path", (u64)&st, 0, 0, 0), -EFAULT);
+  g_user_ptr_ok = true;
+}
+
+/* sys_newfstatat: relative path with non-AT_FDCWD dirfd → ENOSYS */
+static void newfstatat_relative_non_fdcwd_enosys2(void **state) {
+  (void)state;
+  struct stat_buf st;
+  char path[] = "relative";
+  assert_int_equal((i64)sys_newfstatat(3, (u64)path, (u64)&st, 0, 0, 0), -ENOSYS);
+}
+
+/* sys_fcntl: F_GETFD no proc → EINVAL */
+static void fcntl_getfd_no_proc_einval(void **state) {
+  (void)state;
+  g_no_proc = true;
+  assert_int_equal((i64)sys_fcntl(3, F_GETFD, 0, 0, 0, 0), -EINVAL);
+}
+
+/* sys_fcntl: F_SETFD no proc → EINVAL */
+static void fcntl_setfd_no_proc_einval(void **state) {
+  (void)state;
+  g_no_proc = true;
+  assert_int_equal((i64)sys_fcntl(3, F_SETFD, 0, 0, 0, 0), -EINVAL);
+}
+
+/* sys_ftruncate: fd <= 2 → EBADF */
+static void ftruncate_stdio_fd_ebadf(void **state) {
+  (void)state;
+  assert_int_equal((i64)sys_ftruncate(1, 0, 0, 0, 0, 0), -EBADF);
+}
+
+/* sys_readlink: bufsiz == 0 → EINVAL */
+static void readlink_zero_bufsiz_einval(void **state) {
+  (void)state;
+  char path[] = "/some/link";
+  char buf[4];
+  assert_int_equal((i64)sys_readlink((u64)path, (u64)buf, 0, 0, 0, 0), -EINVAL);
+}
+
+/* sys_readlink: non-proc-self-exe, vfs_readlink succeeds → returns tlen */
+static void readlink_vfs_path_success_len(void **state) {
+  (void)state;
+  char path[] = "/other/link";
+  char buf[32];
+  g_vfs_readlink_ret = 5; /* returns 5 bytes */
+  u64 ret = sys_readlink((u64)path, (u64)buf, sizeof(buf), 0, 0, 0);
+  assert_int_equal(ret, 5);
+}
+
+/* sys_pipe: vfs_oft_alloc_pipe for read returns < 0 → ENFILE */
+static void pipe_oft_alloc_fails_enfile(void **state) {
+  (void)state;
+  int fds[2];
+  /* Make first oft alloc fail by returning -1 */
+  g_oft_seq = -1; /* negative → vfs_oft_alloc_pipe returns -1 */
+  /* But our stub always returns g_oft_seq++ — need to make it negative */
+  /* Actually stub returns g_oft_seq++ so if g_oft_seq starts at -1, returns -1 */
+  u64 ret = sys_pipe((u64)fds, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -ENFILE);
+}
+
 /* sys_fstat: fd <= 2 → stdio stat (pipe-like) */
 static void fstat_stdio_fd_returns_chardev(void **state) {
   (void)state;
@@ -958,6 +1027,15 @@ int main(void)
       cmocka_unit_test_setup(pipe_write_fd_install_fails, setup),
       cmocka_unit_test_setup(readlink_vfs_success, setup),
       cmocka_unit_test_setup(readlink_vfs_result_too_long, setup),
+      /* new coverage */
+      cmocka_unit_test_setup(newfstatat_efault_on_bad_pathname, setup),
+      cmocka_unit_test_setup(newfstatat_relative_non_fdcwd_enosys2, setup),
+      cmocka_unit_test_setup(fcntl_getfd_no_proc_einval, setup),
+      cmocka_unit_test_setup(fcntl_setfd_no_proc_einval, setup),
+      cmocka_unit_test_setup(ftruncate_stdio_fd_ebadf, setup),
+      cmocka_unit_test_setup(readlink_zero_bufsiz_einval, setup),
+      cmocka_unit_test_setup(readlink_vfs_path_success_len, setup),
+      cmocka_unit_test_setup(pipe_oft_alloc_fails_enfile, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
