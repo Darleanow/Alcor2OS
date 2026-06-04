@@ -1,0 +1,36 @@
+<map id="vmm_get_phys" name="vmm_get_phys">
+<area shape="rect" id="Node000001" title="Translate virtual address to physical address in current address space." alt="" coords="647,197,769,223"/>
+<area shape="rect" id="Node000002" href="$sys__mm_8c.html#a7da07ec899f677a888d630e40f1635c2" title=" " alt="" coords="222,247,349,272"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="644,228,599,237,466,252,349,259,349,254,465,246,598,231,643,223"/>
+<area shape="rect" id="Node000004" href="$elf_8c.html#ad6a2ec668bb3290e664ab1a581e8eaac" title=" " alt="" coords="433,49,590,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="690,187,652,137,626,110,597,88,574,77,576,72,600,84,630,107,656,133,694,184"/>
+<area shape="rect" id="Node000015" href="$sys__mm_8c.html#a0d76fce616e6b2bfc5a09e0fa5df3ecd" title=" " alt="" coords="429,99,593,124"/>
+<area shape="poly" id="edge8_Node000001_Node000015" title=" " alt="" coords="679,191,642,163,598,138,568,127,570,122,600,133,645,159,683,186"/>
+<area shape="rect" id="Node000016" href="$sys__misc_8c.html#a728f404e37f7caa2842ea7bea366b61e" title=" " alt="" coords="457,197,566,223"/>
+<area shape="poly" id="edge10_Node000001_Node000016" title=" " alt="" coords="633,213,566,213,566,207,633,207"/>
+<area shape="rect" id="Node000018" href="$sys__misc_8c.html#a4040fd018bf7e62a552bcdb77ba8a5b9" title=" " alt="" coords="450,148,573,173"/>
+<area shape="poly" id="edge12_Node000001_Node000018" title=" " alt="" coords="643,197,562,176,563,171,644,191"/>
+<area shape="rect" id="Node000019" href="$sys__mm_8c.html#a5d85ae596caf7c76319a5ae5690f0d33" title=" " alt="" coords="456,299,567,324"/>
+<area shape="poly" id="edge14_Node000001_Node000019" title=" " alt="" coords="679,233,642,258,600,282,553,301,551,296,597,277,640,253,677,229"/>
+<area shape="rect" id="Node000020" href="$sys__mm_8c.html#a4a9a3125254665467fbc3e506c768b9a" title=" " alt="" coords="424,348,599,373"/>
+<area shape="poly" id="edge15_Node000001_Node000020" title=" " alt="" coords="694,236,656,288,630,316,600,339,577,350,574,345,597,334,626,312,652,285,690,233"/>
+<area shape="rect" id="Node000003" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="29,272,123,297"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="209,271,123,282,123,276,208,266"/>
+<area shape="rect" id="Node000005" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="248,5,323,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="432,49,323,28,324,23,433,44"/>
+<area shape="rect" id="Node000014" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="238,55,333,80"/>
+<area shape="poly" id="edge6_Node000004_Node000014" title=" " alt="" coords="419,67,333,69,333,64,419,62"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="5,31,147,56"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="234,27,147,37,147,32,234,21"/>
+<area shape="poly" id="edge7_Node000014_Node000006" title=" " alt="" coords="224,63,146,54,147,49,225,58"/>
+<area shape="poly" id="edge9_Node000015_Node000003" title=" " alt="" coords="416,121,307,140,250,157,196,180,162,202,132,227,89,274,85,270,129,223,159,197,193,176,248,152,306,135,415,116"/>
+<area shape="rect" id="Node000017" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="243,191,328,216"/>
+<area shape="poly" id="edge11_Node000016_Node000017" title=" " alt="" coords="443,211,328,207,328,202,443,205"/>
+<area shape="poly" id="edge13_Node000018_Node000017" title=" " alt="" coords="437,177,329,198,328,193,436,172"/>
+<area shape="poly" id="edge18_Node000020_Node000003" title=" " alt="" coords="426,348,376,339,122,295,123,290,376,334,427,343"/>
+<area shape="rect" id="Node000021" href="$sys__mm_8c.html#abdac42378ec121cb3f3b48c5af03ded3" title=" " alt="" coords="195,397,376,423"/>
+<area shape="poly" id="edge16_Node000020_Node000021" title=" " alt="" coords="440,379,345,400,344,395,439,374"/>
+<area shape="rect" id="Node000022" href="$sys__mm_8c.html#a95d35a82f8059990e8f0598e18299f19" title=" " alt="" coords="231,348,340,373"/>
+<area shape="poly" id="edge19_Node000020_Node000022" title=" " alt="" coords="410,363,341,363,341,358,410,358"/>
+<area shape="poly" id="edge17_Node000021_Node000003" title=" " alt="" coords="208,395,193,388,161,367,130,343,87,300,90,296,134,339,164,363,196,384,210,390"/>
+</map>

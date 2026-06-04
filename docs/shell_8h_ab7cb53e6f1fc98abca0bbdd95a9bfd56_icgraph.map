@@ -1,0 +1,9 @@
+<map id="sh_hist_count" name="sh_hist_count">
+<area shape="rect" id="Node000001" title="Return the number of entries currently held." alt="" coords="523,5,633,31"/>
+<area shape="rect" id="Node000002" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="371,5,475,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="509,21,475,21,475,15,509,15"/>
+<area shape="rect" id="Node000003" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="108,5,323,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="357,21,323,21,323,15,357,15"/>
+<area shape="rect" id="Node000004" href="$user_2apps_2shell_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,60,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,21,60,21,60,15,94,15"/>
+</map>

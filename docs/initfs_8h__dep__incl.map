@@ -1,0 +1,7 @@
+<map id="include/alcor2/fs/initfs.h" name="include/alcor2/fs/initfs.h">
+<area shape="rect" id="Node000001" title="Read&#45;only, buffer&#45;backed filesystem populated from Limine modules." alt="" coords="41,5,219,31"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html" title="Read&#45;only, flat ramfs populated from Limine boot modules." alt="" coords="5,79,111,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,43,72,80,68,77,106,39"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="135,79,269,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="154,39,192,77,188,80,150,43"/>
+</map>

@@ -1,0 +1,32 @@
+<map id="sys_pipe2" name="sys_pipe2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,60,92,85"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="481,9,583,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,57,166,30,266,8,343,3,420,8,467,12,467,17,420,13,343,9,267,13,167,35,85,62"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d" title=" " alt="" coords="140,160,219,185"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="68,83,153,149,149,153,65,87"/>
+<area shape="poly" id="edge9_Node000003_Node000002" title=" " alt="" coords="183,158,211,102,235,70,265,45,315,23,368,12,421,9,467,11,467,16,421,14,369,18,317,28,268,49,238,74,215,105,188,161"/>
+<area shape="rect" id="Node000004" href="$pipe_8c.html#adb0edb6e17dfb3d1b33d1bb0959cc573" title="Allocate a fresh pipe object with both ends open." alt="" coords="286,109,401,134"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="218,158,287,136,289,141,220,163"/>
+<area shape="rect" id="Node000007" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="469,186,595,212"/>
+<area shape="poly" id="edge5_Node000003_Node000007" title=" " alt="" coords="219,172,456,190,455,196,219,178"/>
+<area shape="rect" id="Node000009" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="468,236,596,261"/>
+<area shape="poly" id="edge7_Node000003_Node000009" title=" " alt="" coords="192,183,223,217,244,233,268,246,314,258,363,263,410,263,454,259,455,265,411,269,363,269,313,263,266,251,241,238,219,221,188,187"/>
+<area shape="rect" id="Node000010" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="289,60,398,85"/>
+<area shape="poly" id="edge10_Node000003_Node000010" title=" " alt="" coords="190,157,222,126,265,94,278,88,280,92,268,98,226,130,194,161"/>
+<area shape="rect" id="Node000011" href="$vfs_8c.html#a1978511048c4f6a6460e749b3f9e63bc" title="Allocate an OFT entry for one end of a pipe and set its kind." alt="" coords="274,312,413,337"/>
+<area shape="poly" id="edge12_Node000003_Node000011" title=" " alt="" coords="189,184,219,235,242,264,268,290,290,304,287,308,265,294,238,268,215,238,185,187"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="283,210,404,236"/>
+<area shape="poly" id="edge14_Node000003_Node000013" title=" " alt="" coords="220,182,289,203,287,209,218,187"/>
+<area shape="rect" id="Node000014" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="267,361,420,386"/>
+<area shape="poly" id="edge17_Node000003_Node000014" title=" " alt="" coords="186,184,194,217,210,261,235,308,250,329,268,348,275,352,271,356,265,352,246,332,230,310,205,263,189,219,181,186"/>
+<area shape="rect" id="Node000005" href="$pipe_8c.html#ac9ccbd4c1701eb8aa9c65517dfa693c5" title="Find a free pipe slot, zero it, and mark both ends open." alt="" coords="488,109,576,134"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="401,119,474,119,474,124,401,124"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="644,212,735,237"/>
+<area shape="poly" id="edge6_Node000007_Node000008" title=" " alt="" coords="595,206,631,212,630,217,594,212"/>
+<area shape="poly" id="edge8_Node000009_Node000008" title=" " alt="" coords="596,236,630,230,631,236,597,241"/>
+<area shape="poly" id="edge11_Node000010_Node000002" title=" " alt="" coords="391,57,470,35,471,40,392,62"/>
+<area shape="rect" id="Node000012" href="$vfs_8c.html#a7a6905322835d34f51e6b34bd87075da" title="Allocate and zero a free OFT slot; refcount is initialised to 1." alt="" coords="493,312,571,337"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="413,322,480,322,480,327,413,327"/>
+<area shape="poly" id="edge15_Node000013_Node000007" title=" " alt="" coords="404,213,455,206,456,211,404,218"/>
+<area shape="poly" id="edge16_Node000013_Node000009" title=" " alt="" coords="404,228,455,235,454,240,404,234"/>
+</map>

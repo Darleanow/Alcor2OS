@@ -1,0 +1,11 @@
+<map id="list_candidates" name="list_candidates">
+<area shape="rect" id="Node000001" title="Print completion candidates in coloured columns (double&#45;tab)." alt="" coords="5,55,125,80"/>
+<area shape="rect" id="Node000002" href="$edit_8c.html#aa7654baef48ef9a60e7973387009299f" title="Return the display name for a completion entry (strip dir prefix)." alt="" coords="173,5,317,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,52,184,32,185,37,113,57"/>
+<area shape="rect" id="Node000003" href="$io_8c.html#ac3e98303df49d2058bbde227fbe73286" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="209,55,281,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,65,195,65,195,70,126,70"/>
+<area shape="rect" id="Node000005" href="$edit_8c.html#abd409a02af078b9a9096d611ef989a19" title="Count visible UTF&#45;8 glyphs in s." alt="" coords="205,104,286,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="113,77,192,99,191,105,112,83"/>
+<area shape="rect" id="Node000004" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="365,55,443,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="282,65,351,65,351,70,282,70"/>
+</map>

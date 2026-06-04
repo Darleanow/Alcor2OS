@@ -1,0 +1,17 @@
+<map id="dir_find_entry" name="dir_find_entry">
+<area shape="rect" id="Node000001" title="Find a directory entry by name." alt="" coords="968,7,1079,33"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="195,33,305,58"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="954,18,840,12,690,8,522,11,354,24,296,35,295,30,353,19,522,6,690,3,840,6,954,12"/>
+<area shape="rect" id="Node000004" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="756,33,920,58"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="955,32,921,37,920,31,954,27"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#a2fc366e280a85e6ef6f5b18663c7d6c5" title="fs_ops_t.readlink shim." alt="" coords="5,33,147,58"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="181,48,147,48,147,43,181,43"/>
+<area shape="rect" id="Node000005" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="557,33,708,58"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="743,48,708,48,708,43,743,43"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="353,33,509,58"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="543,57,510,57,510,51,543,52"/>
+<area shape="rect" id="Node000007" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="378,82,485,107"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="568,64,485,84,483,79,566,59"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="523,34,557,34,557,39,523,39"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="370,81,297,61,299,56,371,76"/>
+</map>

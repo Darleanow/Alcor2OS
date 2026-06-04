@@ -1,0 +1,21 @@
+<map id="screen_input" name="screen_input">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,111,179"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2ncurses-hello_2main_8c.html#a4377930a011086dc422ce563f01679f1" title=" " alt="" coords="167,5,290,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,152,99,98,126,67,157,40,166,34,169,39,160,44,130,71,104,101,69,155"/>
+<area shape="rect" id="Node000004" href="$spazer_8c.html#a5ad4eca0ee1876c9c2107d18cc686bf8" title=" " alt="" coords="163,55,294,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="72,151,109,120,157,89,170,83,173,88,160,94,112,125,76,155"/>
+<area shape="rect" id="Node000005" href="$spazer_8c.html#a3e1e17f9df3d47f92408cd737377e985" title=" " alt="" coords="187,104,270,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="102,151,173,130,175,135,103,156"/>
+<area shape="rect" id="Node000006" href="$spazer_8c.html#acc8a84e0c39e0ecc82c0682da852a7b4" title=" " alt="" coords="159,153,298,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="111,163,146,163,146,169,111,169"/>
+<area shape="rect" id="Node000008" href="$spazer_8c.html#a0b4ab5dcfb2068e9b906f75de8f1fd78" title=" " alt="" coords="159,203,299,228"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="103,176,171,196,170,201,102,181"/>
+<area shape="rect" id="Node000009" href="$user_2apps_2ncurses-hello_2main_8c.html#a6bd5d1b60b8a46e162c0b60e4582ef92" title=" " alt="" coords="187,252,271,277"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="76,177,113,206,160,237,175,244,173,249,157,242,110,211,72,181"/>
+<area shape="rect" id="Node000010" href="$user_2apps_2ncurses-hello_2main_8c.html#a05ae4b0fe5557a2d5f4dfb0c3a52750c" title=" " alt="" coords="163,301,294,327"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="69,178,104,230,130,260,160,287,171,293,169,298,157,291,126,264,100,233,64,181"/>
+<area shape="rect" id="Node000003" href="$spazer_8c.html#a0859dec92d5b0eb613363977e0805c6e" title=" " alt="" coords="347,5,459,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,15,333,15,333,21,290,21"/>
+<area shape="rect" id="Node000007" href="$spazer_8c.html#aacb565e999310637e95a0607e69ef6bd" title=" " alt="" coords="351,153,454,179"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="298,163,338,163,338,169,298,169"/>
+</map>

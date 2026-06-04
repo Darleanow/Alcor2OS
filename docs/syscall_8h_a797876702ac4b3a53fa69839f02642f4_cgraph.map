@@ -1,0 +1,22 @@
+<map id="syscall_init" name="syscall_init">
+<area shape="rect" id="Node000001" title="Initialize syscall mechanism (set MSRs)." alt="" coords="5,155,100,180"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="148,80,257,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,152,147,114,158,109,161,114,149,119,78,157"/>
+<area shape="rect" id="Node000014" href="$syscall__arch_8c.html#af908de068f853f0ef1e912af50497a43" title=" " alt="" coords="173,129,233,155"/>
+<area shape="poly" id="edge8_Node000001_Node000014" title=" " alt="" coords="100,157,159,147,160,152,101,162"/>
+<area shape="rect" id="Node000015" href="$syscall__arch_8c.html#acb026f235ea1f3cf01f77bdcfa31fd12" title=" " alt="" coords="149,179,257,204"/>
+<area shape="poly" id="edge9_Node000001_Node000015" title=" " alt="" coords="101,172,136,178,135,183,100,177"/>
+<area shape="rect" id="Node000016" href="$syscall__arch_8c.html#adec6dc2bdaca4b4036caf60f985cef00" title=" " alt="" coords="171,228,234,253"/>
+<area shape="poly" id="edge10_Node000001_Node000016" title=" " alt="" coords="79,178,149,214,161,220,158,225,147,219,76,182"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="305,80,433,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="258,90,292,90,292,95,258,95"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="481,5,601,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="397,77,480,40,495,33,497,38,482,44,399,82"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="493,55,590,80"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="433,81,478,74,479,79,434,86"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="649,80,751,105"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="434,90,635,90,635,95,434,95"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="513,156,570,181"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="400,103,501,148,498,153,398,108"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="591,72,636,80,635,85,590,78"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="lex_next" name="lex_next">
+<area shape="rect" id="Node000001" title="Consume and return the next token." alt="" coords="5,54,84,80"/>
+<area shape="rect" id="Node000002" href="$lexer_8c.html#a4f6b122799074ebf08f4ea10ade65b39" title=" " alt="" coords="132,54,215,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,64,118,64,118,70,84,70"/>
+<area shape="rect" id="Node000003" href="$lexer_8c.html#acbe69e56df80c5c4f737cfde6d9be873" title=" " alt="" coords="577,53,664,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="190,52,222,31,262,14,304,6,348,3,435,10,513,26,575,46,574,51,512,32,434,15,348,8,305,11,263,19,224,36,192,56"/>
+<area shape="rect" id="Node000004" href="$lexer_8c.html#a89fb4c390705931605dfa96c5ba59d11" title=" " alt="" coords="263,29,365,54"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="214,57,248,51,249,56,215,62"/>
+<area shape="rect" id="Node000005" href="$lexer_8c.html#abaab6431350f60fa9623b5b63b6b329a" title=" " alt="" coords="263,78,365,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="215,71,249,77,248,83,214,77"/>
+<area shape="rect" id="Node000006" href="$lexer_8c.html#a38ea90df448960e553ef9a9629959a2c" title=" " alt="" coords="269,128,359,153"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="198,77,264,114,274,119,272,124,261,119,195,82"/>
+<area shape="rect" id="Node000007" href="$lexer_8c.html#abb4d930b3739653552f511ecf3e02c08" title=" " alt="" coords="413,78,529,104"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="354,125,416,105,418,111,356,130"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="529,79,563,73,564,78,530,84"/>
+</map>

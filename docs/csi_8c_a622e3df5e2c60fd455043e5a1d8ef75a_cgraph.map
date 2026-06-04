@@ -1,0 +1,7 @@
+<map id="csi_absolute_axis" name="csi_absolute_axis">
+<area shape="rect" id="Node000001" title="CSI G (CHA) / CSI d (VPA) — absolute column or row positioning. Both are 1&#45;based on the wire and clam..." alt="" coords="5,5,143,31"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a37411d42e9b1d6fea496d0d50b99507d" title="Convenience for cursor&#45;movement sequences: parse first param, default to 1 when missing or zero." alt="" coords="191,5,288,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,15,177,15,177,21,143,21"/>
+<area shape="rect" id="Node000003" href="$csi_8c.html#a12726087c8c2716aab2cf78cff0f2a79" title="Parse up to maxn decimal parameters from esc_buf into pv." alt="" coords="336,5,432,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="288,15,322,15,322,21,288,21"/>
+</map>

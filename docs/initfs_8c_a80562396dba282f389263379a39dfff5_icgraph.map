@@ -1,0 +1,9 @@
+<map id="fill_stat" name="fill_stat">
+<area shape="rect" id="Node000001" title="Populate a stat buffer from a file node, or fill the directory stub when no node is given." alt="" coords="149,55,220,80"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#acf86dee0b1e98f1b6ad8dadc0a6df8cf" title="Stat an open handle (root sentinel or file node)." alt="" coords="13,5,93,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,52,87,33,89,28,139,47"/>
+<area shape="rect" id="Node000003" href="$initfs_8c.html#a04b6ccb0e9086b3365f4971073d5e9de" title="Yield the index&#39;th entry in the root directory." alt="" coords="5,55,101,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,70,102,70,102,65,136,65"/>
+<area shape="rect" id="Node000004" href="$initfs_8c.html#a7b313c1adfe6feb8320abb829e59cc91" title="Stat a path. The empty/root path resolves to the directory stub." alt="" coords="16,104,91,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="139,87,89,106,87,101,137,82"/>
+</map>

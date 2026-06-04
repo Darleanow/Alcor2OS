@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['icw1_5ficw4_0',['ICW1_ICW4',['../pic_8c.html#a964d12193d2b36e8a7ec7fa57438e313',1,'pic.c']]],
+  ['icw1_5finit_1',['ICW1_INIT',['../pic_8c.html#a286dc251f3d73c08e08a53a4696f31ef',1,'pic.c']]],
+  ['icw4_5f8086_2',['ICW4_8086',['../pic_8c.html#a42803c5ddcec9e120a6dbf7bc5c1b7af',1,'pic.c']]],
+  ['idt_5fentries_3',['IDT_ENTRIES',['../idt_8h.html#a2a59a505aa55f15c152f30f811fbd310',1,'idt.h']]],
+  ['idt_5fgate_5fint_4',['IDT_GATE_INT',['../idt_8h.html#a1c69843987f7662bc41ab9c957275160',1,'idt.h']]],
+  ['idt_5fgate_5ftrap_5',['IDT_GATE_TRAP',['../idt_8h.html#a7f47f23250c0318035e06568dddabfe8',1,'idt.h']]],
+  ['initfs_5froot_5fhandle_6',['INITFS_ROOT_HANDLE',['../initfs_8c.html#a14049ee0c46daaccf73db55d450f41a0',1,'initfs.c']]],
+  ['initfs_5fst_5fdev_7',['INITFS_ST_DEV',['../initfs_8c.html#aa8d40fdc27dbdea3b4a82cfe7e12b269',1,'initfs.c']]],
+  ['initial_5fargv_5fcap_8',['INITIAL_ARGV_CAP',['../ast_8c.html#a14d2cf5c24bda71401414d18a94be1aa',1,'ast.c']]],
+  ['initial_5ffor_5fcap_9',['INITIAL_FOR_CAP',['../ast_8c.html#a1d2733e1b16393bd8ff68ab767e72a39',1,'ast.c']]],
+  ['initial_5fpipeline_5fcap_10',['INITIAL_PIPELINE_CAP',['../ast_8c.html#a414f9805a79ec4053173abc88f3eeeea',1,'ast.c']]],
+  ['input_5fring_11',['INPUT_RING',['../src_2kernel_2drivers_2fb__console_2internal_8h.html#a7348d45d81972fdf7b35a1d1ea90df79',1,'internal.h']]],
+  ['irq_5fata_5fprimary_12',['irq_ata_primary',['../pic_8h.html#aeeebc5ed9fe7344386aae4bd5eae8c09',1,'IRQ_ATA_PRIMARY:&#160;pic.h'],['../ata_8h.html#aeeebc5ed9fe7344386aae4bd5eae8c09',1,'IRQ_ATA_PRIMARY:&#160;ata.h']]],
+  ['irq_5fata_5fsecondary_13',['irq_ata_secondary',['../pic_8h.html#a772895cb3a9438fdd5b5b6af3d93c30a',1,'IRQ_ATA_SECONDARY:&#160;pic.h'],['../ata_8h.html#a772895cb3a9438fdd5b5b6af3d93c30a',1,'IRQ_ATA_SECONDARY:&#160;ata.h']]],
+  ['irq_5fkeyboard_14',['IRQ_KEYBOARD',['../pic_8h.html#a8092843c014fad609c1b01a4604a44a3',1,'pic.h']]],
+  ['irq_5fmouse_15',['IRQ_MOUSE',['../pic_8h.html#a32ffe73ffc337fbec467ea02948591af',1,'pic.h']]],
+  ['irq_5ftimer_16',['IRQ_TIMER',['../pic_8h.html#a85fc66e3edd4ed6a4db6e455feaba8ca',1,'pic.h']]],
+  ['irq_5ftrace_17',['IRQ_TRACE',['../idt_8c.html#a54ba2d4f2457948a128ced1af5815811',1,'idt.c']]]
+];

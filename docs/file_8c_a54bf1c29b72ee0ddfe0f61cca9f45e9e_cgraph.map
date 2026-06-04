@@ -1,0 +1,26 @@
+<map id="read_with_buffers" name="read_with_buffers">
+<area shape="rect" id="Node000001" title="Drive the read loop with pre&#45;allocated buffers." alt="" coords="5,107,144,132"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#aa4ace95cb1d031a3141636122511c8fc" title="One iteration of the read loop: pick the right path for one block and copy as much as fits." alt="" coords="192,107,336,132"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,117,178,117,178,122,144,122"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a845ca06242d90d0b72a0f50c2d615c95" title="Count how many on&#45;disk blocks following base_block_num are contiguous to it for this inode." alt="" coords="407,5,546,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="283,104,328,77,383,48,420,33,422,38,385,52,330,81,286,109"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="617,5,739,31"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="316,104,611,31,612,37,318,109"/>
+<area shape="rect" id="Node000038" href="$file_8c.html#a253947ab8dc6030b251e47048526795e" title="Read run consecutive blocks in one device call, copy slice into dst." alt="" coords="414,107,539,132"/>
+<area shape="poly" id="edge5_Node000002_Node000038" title=" " alt="" coords="336,117,400,117,400,122,336,122"/>
+<area shape="rect" id="Node000039" href="$file_8c.html#ad37b55f9af3768427abb5ba1ab29ce2f" title="Read one block, copy a slice of it into dst." alt="" coords="384,156,569,181"/>
+<area shape="poly" id="edge8_Node000002_Node000039" title=" " alt="" coords="320,129,408,150,407,155,319,135"/>
+<area shape="rect" id="Node000040" href="$file_8c.html#a10ca6e8208aa94bf0bfc0ee79713cd84" title="Fill dst with zeros for a sparse&#45;file hole." alt="" coords="403,205,550,231"/>
+<area shape="poly" id="edge12_Node000002_Node000040" title=" " alt="" coords="284,130,328,161,385,192,404,199,402,204,383,196,325,165,281,134"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="546,15,603,15,603,21,546,21"/>
+<area shape="rect" id="Node000020" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="635,107,721,132"/>
+<area shape="poly" id="edge6_Node000038_Node000020" title=" " alt="" coords="540,117,621,117,621,122,540,122"/>
+<area shape="rect" id="Node000037" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="787,107,919,132"/>
+<area shape="poly" id="edge7_Node000038_Node000037" title=" " alt="" coords="534,104,617,91,678,87,739,91,793,101,792,106,738,97,678,93,618,97,535,109"/>
+<area shape="poly" id="edge9_Node000039_Node000020" title=" " alt="" coords="529,153,621,131,622,136,530,159"/>
+<area shape="rect" id="Node000036" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="618,156,738,181"/>
+<area shape="poly" id="edge10_Node000039_Node000036" title=" " alt="" coords="570,166,604,166,604,171,570,171"/>
+<area shape="poly" id="edge11_Node000036_Node000037" title=" " alt="" coords="723,153,793,133,794,138,724,159"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="649,205,707,231"/>
+<area shape="poly" id="edge13_Node000040_Node000031" title=" " alt="" coords="550,215,635,215,635,221,550,221"/>
+</map>

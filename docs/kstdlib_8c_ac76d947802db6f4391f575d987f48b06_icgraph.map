@@ -1,0 +1,68 @@
+<map id="kstrcmp" name="kstrcmp">
+<area shape="rect" id="Node000001" title="Compare two strings lexicographically." alt="" coords="789,431,864,456"/>
+<area shape="rect" id="Node000002" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="612,181,705,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="807,420,666,208,671,206,811,417"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="627,431,690,456"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="776,446,690,446,690,441,776,441"/>
+<area shape="rect" id="Node000030" href="$sys__fs_8c.html#a66b61fd8589babbbf716e2f2b54fdd6c" title="Return non&#45;zero if path refers to the /proc/self/exe virtual symlink." alt="" coords="576,863,741,888"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="818,470,667,863,662,862,813,468"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#ac522aded5a92cdfd53591e3881498544" title="fs_ops_t.rmdir shim." alt="" coords="405,5,527,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="638,172,591,114,560,82,526,52,495,33,498,28,530,48,564,78,595,110,642,168"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="5,256,132,281"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="649,418,635,367,610,301,575,232,552,200,526,171,486,137,449,118,408,107,355,97,305,85,265,77,226,78,181,96,159,112,139,131,108,177,88,222,76,257,71,255,83,220,104,174,135,128,155,108,179,92,225,73,265,71,306,79,357,91,410,102,451,113,489,133,530,167,556,196,579,229,615,299,640,365,654,417"/>
+<area shape="rect" id="Node000006" href="$initfs_8c.html#aa643724cb164df58c6432d3e72345ab2" title="Linear lookup in the registered&#45;file list." alt="" coords="433,181,499,207"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="637,421,475,209,479,205,641,418"/>
+<area shape="rect" id="Node000010" href="$src_2kernel_2main_8c.html#a361b3a2c5772decce68f395a53108323" title="Return true when path ends with suffix (case&#45;sensitive)." alt="" coords="404,331,528,356"/>
+<area shape="poly" id="edge10_Node000004_Node000010" title=" " alt="" coords="620,426,490,359,493,354,622,422"/>
+<area shape="rect" id="Node000011" href="$ramfs_8c.html#a4e3acc197dd9bee00d37e6e305106e11" title="Walk path from the ramfs root and return the matching node." alt="" coords="411,431,521,456"/>
+<area shape="poly" id="edge12_Node000004_Node000011" title=" " alt="" coords="614,446,521,446,521,441,614,441"/>
+<area shape="rect" id="Node000022" href="$src_2kernel_2main_8c.html#ab6ec631451acb0eed8e92c147115ea34" title="Strip a trailing .elf extension in&#45;place." alt="" coords="407,529,525,555"/>
+<area shape="poly" id="edge19_Node000004_Node000022" title=" " alt="" coords="622,465,494,531,491,527,620,460"/>
+<area shape="rect" id="Node000023" href="$vfs_8c.html#ac4354fc0bb7f7dff4e927b6b2db330d3" title="Mount source at target using the named filesystem driver." alt="" coords="223,655,313,680"/>
+<area shape="poly" id="edge21_Node000004_Node000023" title=" " alt="" coords="640,468,592,518,562,544,529,568,474,599,416,624,314,658,313,653,414,619,472,594,527,564,559,540,589,514,636,465"/>
+<area shape="rect" id="Node000024" href="$vfs_8c.html#accf204077f65d2cb4cf3098f18100985" title="Register a filesystem driver in the type registry." alt="" coords="407,717,525,743"/>
+<area shape="poly" id="edge24_Node000004_Node000024" title=" " alt="" coords="649,470,602,564,569,621,530,676,486,719,482,715,526,672,564,618,597,561,644,468"/>
+<area shape="rect" id="Node000007" href="$initfs_8c.html#a8f527b0cda5d28c2b882c0bedc0a7e96" title="Open the root directory or a registered file." alt="" coords="227,107,309,132"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="427,178,355,146,309,132,310,126,357,141,429,173"/>
+<area shape="rect" id="Node000008" href="$initfs_8c.html#a7b313c1adfe6feb8320abb829e59cc91" title="Stat a path. The empty/root path resolves to the directory stub." alt="" coords="231,156,305,181"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="419,191,305,176,306,171,420,186"/>
+<area shape="rect" id="Node000009" href="$initfs_8c.html#a295a2283cd260b2ef62cd7c003afafe3" title="Add a virtual file to initfs." alt="" coords="212,205,324,231"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="420,202,325,214,324,209,419,197"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="205,237,120,259,119,253,203,232"/>
+<area shape="poly" id="edge11_Node000010_Node000005" title=" " alt="" coords="429,327,394,310,355,297,297,284,238,277,132,271,133,266,238,271,298,279,357,291,396,305,432,322"/>
+<area shape="rect" id="Node000012" href="$ramfs_8c.html#a30e0ae82a2105bc9a8b929931029145c" title=" " alt="" coords="221,307,315,332"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="444,422,405,383,355,346,314,330,316,325,357,341,409,379,448,419"/>
+<area shape="rect" id="Node000013" href="$ramfs_8c.html#ad7ed46498570f58ce0f21fc5510b240d" title=" " alt="" coords="225,356,311,381"/>
+<area shape="poly" id="edge14_Node000011_Node000013" title=" " alt="" coords="427,427,355,395,311,381,312,376,357,390,429,422"/>
+<area shape="rect" id="Node000014" href="$ramfs_8c.html#ae151a871071dfc7c887b13188867feda" title=" " alt="" coords="223,405,313,431"/>
+<area shape="poly" id="edge15_Node000011_Node000014" title=" " alt="" coords="397,437,313,426,314,421,397,432"/>
+<area shape="rect" id="Node000015" href="$ramfs_8c.html#a16797e497ebbdc056e25081a8d7da82b" title=" " alt="" coords="228,455,308,480"/>
+<area shape="poly" id="edge16_Node000011_Node000015" title=" " alt="" coords="397,454,309,465,308,460,397,449"/>
+<area shape="rect" id="Node000016" href="$ramfs_8c.html#a912ad3d60fbcee6e95526e55291aed97" title=" " alt="" coords="221,504,315,529"/>
+<area shape="poly" id="edge17_Node000011_Node000016" title=" " alt="" coords="427,465,357,494,316,507,315,502,355,489,425,460"/>
+<area shape="rect" id="Node000017" href="$ramfs_8c.html#a9d21ebf7315f835ae07f5d47014a72d0" title="Register a character device under path inside the ramfs tree." alt="" coords="180,553,356,579"/>
+<area shape="poly" id="edge18_Node000011_Node000017" title=" " alt="" coords="446,468,408,507,357,543,327,556,325,551,355,538,404,503,443,465"/>
+<area shape="poly" id="edge20_Node000022_Node000005" title=" " alt="" coords="434,564,381,589,314,611,279,616,244,616,210,608,178,592,143,559,116,518,96,473,82,427,69,340,67,282,72,281,74,340,88,426,101,472,120,516,147,555,182,588,212,603,244,611,279,611,313,605,379,584,431,559"/>
+<area shape="poly" id="edge22_Node000023_Node000005" title=" " alt="" coords="209,657,192,649,178,637,144,593,118,543,99,491,85,438,71,344,67,281,73,281,76,343,90,437,104,489,123,541,149,590,182,633,195,644,211,653"/>
+<area shape="rect" id="Node000019" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="19,679,118,704"/>
+<area shape="poly" id="edge23_Node000023_Node000019" title=" " alt="" coords="210,677,118,688,118,683,209,672"/>
+<area shape="rect" id="Node000025" href="$super_8c.html#a33024e70ff9fc8299e2c55f91fd17a77" title="Initialise the ext2 driver: clear the volume + file pools and register the fs type with the VFS." alt="" coords="229,704,307,729"/>
+<area shape="poly" id="edge25_Node000024_Node000025" title=" " alt="" coords="393,728,308,722,308,717,393,722"/>
+<area shape="rect" id="Node000026" href="$initfs_8c.html#a41f86ef438912e9d4f217ec4786b847b" title="Register the initfs driver with the VFS. Idempotent." alt="" coords="227,753,309,779"/>
+<area shape="poly" id="edge27_Node000024_Node000026" title=" " alt="" coords="394,746,310,761,309,756,393,741"/>
+<area shape="rect" id="Node000029" href="$ramfs_8c.html#af637621c8cf4b54bce326f48174772ff" title="Initialise ramfs (idempotent)." alt="" coords="224,803,312,828"/>
+<area shape="poly" id="edge28_Node000024_Node000029" title=" " alt="" coords="434,752,357,792,313,807,311,802,355,788,432,748"/>
+<area shape="poly" id="edge26_Node000025_Node000019" title=" " alt="" coords="214,713,118,700,118,695,215,707"/>
+<area shape="rect" id="Node000031" href="$sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" title="Check that path exists and is accessible; always grants access." alt="" coords="419,839,513,864"/>
+<area shape="poly" id="edge30_Node000030_Node000031" title=" " alt="" coords="562,866,513,860,514,855,562,861"/>
+<area shape="rect" id="Node000033" href="$sys__fs_8c.html#a3c7030445954bf053945683539a885b4" title="Read the target of a symbolic link at path into buf." alt="" coords="414,888,518,913"/>
+<area shape="poly" id="edge32_Node000030_Node000033" title=" " alt="" coords="563,891,519,897,518,891,562,885"/>
+<area shape="rect" id="Node000034" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="428,937,504,963"/>
+<area shape="poly" id="edge33_Node000030_Node000034" title=" " alt="" coords="613,896,501,940,499,935,611,891"/>
+<area shape="rect" id="Node000032" href="$sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972" title="faccessat — only AT_FDCWD and absolute paths are supported." alt="" coords="211,852,325,877"/>
+<area shape="poly" id="edge31_Node000031_Node000032" title=" " alt="" coords="405,858,325,864,324,858,405,853"/>
+<area shape="rect" id="Node000035" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="228,925,308,951"/>
+<area shape="poly" id="edge34_Node000034_Node000035" title=" " alt="" coords="414,950,308,943,308,938,415,944"/>
+<area shape="rect" id="Node000036" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="207,975,329,1000"/>
+<area shape="poly" id="edge35_Node000034_Node000036" title=" " alt="" coords="415,962,329,979,328,973,414,957"/>
+</map>

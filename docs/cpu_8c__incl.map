@@ -1,0 +1,16 @@
+<map id="src/arch/x86_64/cpu.c" name="src/arch/x86_64/cpu.c">
+<area shape="rect" id="Node000001" title="CPU control and management implementation." alt="" coords="80,5,243,31"/>
+<area shape="rect" id="Node000002" href="$cpu_8h.html" title="x86_64 CPU control and state management." alt="" coords="5,79,139,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,33,99,72,96,68,145,29"/>
+<area shape="rect" id="Node000007" href="$console_8h.html" title="Kernel boot/panic logger on the linear framebuffer." alt="" coords="163,79,341,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="178,29,228,68,225,72,174,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="104,152,219,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,102,138,141,134,145,85,106"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="17,225,100,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="146,180,88,219,85,215,143,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="124,225,199,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="164,178,164,212,159,212,159,178"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="223,225,294,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="179,175,233,215,230,219,175,180"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="239,106,189,145,185,141,236,102"/>
+</map>

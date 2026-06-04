@@ -1,0 +1,11 @@
+<map id="sys_uname" name="sys_uname">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,101,80"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="161,5,239,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,52,147,33,149,38,93,57"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="171,55,229,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="101,65,157,65,157,70,101,70"/>
+<area shape="rect" id="Node000004" href="$sys__misc_8c.html#a8a3d72124ddacfcc1825b04f29980211" title=" " alt="" coords="149,104,251,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="93,78,149,97,147,102,91,83"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="299,104,452,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="251,114,285,114,285,119,251,119"/>
+</map>

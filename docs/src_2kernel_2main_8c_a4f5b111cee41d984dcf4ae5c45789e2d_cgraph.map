@@ -1,0 +1,87 @@
+<map id="init_input" name="init_input">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,341,88,367"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="747,315,856,340"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,348,287,334,551,321,693,321,733,322,733,327,693,326,551,326,287,339,89,353"/>
+<area shape="rect" id="Node000014" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="160,441,255,467"/>
+<area shape="poly" id="edge10_Node000001_Node000014" title=" " alt="" coords="70,365,176,432,173,436,67,369"/>
+<area shape="rect" id="Node000044" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="560,164,684,189"/>
+<area shape="poly" id="edge30_Node000001_Node000044" title=" " alt="" coords="53,340,85,297,108,274,135,256,186,231,241,212,297,198,353,187,459,175,546,172,547,177,459,180,354,192,298,203,243,217,188,236,137,260,111,279,89,301,58,343"/>
+<area shape="rect" id="Node000060" href="$mouse_8c.html#a597c2f242c19da6bf6b3284cfebc5e92" title="Set the screen geometry used to clamp the cursor." alt="" coords="136,692,279,717"/>
+<area shape="poly" id="edge49_Node000001_Node000060" title=" " alt="" coords="56,366,197,678,192,680,51,368"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="918,416,1046,441"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="828,338,863,357,949,407,946,411,860,362,825,343"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="1103,316,1223,341"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1005,413,1125,346,1128,350,1008,418"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="1114,443,1211,468"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="1046,435,1100,443,1100,449,1046,441"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="1271,431,1372,456"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="1046,424,1130,424,1223,427,1258,431,1257,436,1222,433,1130,429,1046,429"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="1134,492,1191,517"/>
+<area shape="poly" id="edge8_Node000003_Node000011" title=" " alt="" coords="1014,439,1123,485,1120,490,1012,444"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="1296,171,1347,196"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1176,314,1294,204,1298,208,1180,318"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1211,449,1257,445,1257,451,1212,454"/>
+<area shape="rect" id="Node000013" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="1278,505,1365,531"/>
+<area shape="poly" id="edge9_Node000011_Node000013" title=" " alt="" coords="1192,504,1264,510,1264,516,1191,510"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="357,416,472,441"/>
+<area shape="poly" id="edge11_Node000014_Node000015" title=" " alt="" coords="255,446,343,435,344,440,255,451"/>
+<area shape="rect" id="Node000019" href="$kstdlib_8c.html#a53f4ad004ca51ec3d2aa9dbe906a23c0" title="Fill memory with a byte value." alt="" coords="373,465,457,491"/>
+<area shape="poly" id="edge21_Node000014_Node000019" title=" " alt="" coords="255,457,360,469,359,474,255,462"/>
+<area shape="rect" id="Node000020" href="$ramfs_8c.html#a9d21ebf7315f835ae07f5d47014a72d0" title="Register a character device under path inside the ramfs tree." alt="" coords="327,643,503,668"/>
+<area shape="poly" id="edge22_Node000014_Node000020" title=" " alt="" coords="224,465,392,631,388,635,220,469"/>
+<area shape="poly" id="edge12_Node000015_Node000002" title=" " alt="" coords="432,414,483,381,515,364,550,350,596,338,644,330,732,324,733,329,645,336,598,343,551,355,518,369,485,385,435,418"/>
+<area shape="poly" id="edge13_Node000015_Node000003" title=" " alt="" coords="472,434,549,444,646,452,753,455,861,450,915,441,916,447,862,455,753,460,646,457,549,449,472,440"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="581,365,663,391"/>
+<area shape="poly" id="edge14_Node000015_Node000016" title=" " alt="" coords="467,413,567,388,568,394,468,418"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="763,517,839,543"/>
+<area shape="poly" id="edge17_Node000015_Node000017" title=" " alt="" coords="473,437,504,450,519,462,528,474,537,486,552,496,602,514,655,524,705,529,749,530,749,535,705,534,654,529,601,519,549,500,534,490,524,478,515,466,501,455,471,442"/>
+<area shape="rect" id="Node000018" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="759,416,843,441"/>
+<area shape="poly" id="edge19_Node000015_Node000018" title=" " alt="" coords="472,426,745,426,745,431,472,431"/>
+<area shape="poly" id="edge15_Node000016_Node000002" title=" " alt="" coords="663,364,742,341,743,346,664,369"/>
+<area shape="poly" id="edge16_Node000016_Node000003" title=" " alt="" coords="664,378,755,387,862,401,914,410,913,416,861,406,754,392,663,384"/>
+<area shape="poly" id="edge18_Node000017_Node000003" title=" " alt="" coords="825,515,860,496,946,446,949,450,863,500,828,519"/>
+<area shape="poly" id="edge20_Node000018_Node000003" title=" " alt="" coords="844,426,904,426,904,431,844,431"/>
+<area shape="poly" id="edge23_Node000020_Node000013" title=" " alt="" coords="444,640,493,621,550,605,619,590,674,582,800,578,983,578,1061,573,1137,562,1265,532,1267,537,1138,567,1061,579,983,583,800,583,675,587,620,595,551,610,495,626,446,645"/>
+<area shape="rect" id="Node000021" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="762,693,841,719"/>
+<area shape="poly" id="edge24_Node000020_Node000021" title=" " alt="" coords="467,666,504,678,528,692,551,703,603,712,655,715,748,710,748,716,655,720,602,717,550,708,525,697,502,683,465,671"/>
+<area shape="rect" id="Node000022" href="$kstdlib_8c.html#a8a0a6ba19f294ca025d4afe7b776444e" title="Find the last occurrence of a character in a string." alt="" coords="586,769,658,795"/>
+<area shape="poly" id="edge25_Node000020_Node000022" title=" " alt="" coords="480,666,504,678,521,696,530,713,538,731,552,748,575,762,572,767,549,752,533,733,525,716,517,699,501,683,478,670"/>
+<area shape="rect" id="Node000023" href="$ramfs_8c.html#a12678cdafc9b669f5cdda769c7ace312" title="Prepend child to parent&#39;s children list and set its parent pointer." alt="" coords="560,819,684,844"/>
+<area shape="poly" id="edge26_Node000020_Node000023" title=" " alt="" coords="485,666,504,679,518,695,525,711,530,743,534,775,540,790,553,805,557,809,554,813,549,809,536,793,529,776,524,744,520,712,513,697,501,683,482,670"/>
+<area shape="rect" id="Node000024" href="$ramfs_8c.html#aec74d885a86466ccf3ca6a7893e9001a" title="Allocate and zero a new ramfs node with the given name and type." alt="" coords="551,668,693,693"/>
+<area shape="poly" id="edge27_Node000020_Node000024" title=" " alt="" coords="503,663,537,668,537,673,502,669"/>
+<area shape="rect" id="Node000041" href="$ramfs_8c.html#a4e3acc197dd9bee00d37e6e305106e11" title="Walk path from the ramfs root and return the matching node." alt="" coords="567,619,677,644"/>
+<area shape="poly" id="edge29_Node000020_Node000041" title=" " alt="" coords="502,642,552,637,553,642,503,648"/>
+<area shape="poly" id="edge28_Node000024_Node000021" title=" " alt="" coords="694,688,749,696,748,701,693,693"/>
+<area shape="poly" id="edge31_Node000044_Node000002" title=" " alt="" coords="636,188,680,237,743,293,762,306,759,310,740,297,677,241,632,191"/>
+<area shape="rect" id="Node000045" href="$idt_8c.html#a667ec0b02033ad55d73e9b8b32b034a5" title="Register a callback for a hardware IRQ line." alt="" coords="753,164,849,189"/>
+<area shape="poly" id="edge32_Node000044_Node000045" title=" " alt="" coords="684,174,739,174,739,179,684,179"/>
+<area shape="rect" id="Node000046" href="$mouse__ps2_8c.html#a24c01f5f20bd1823b7ba8ea033d68acc" title="Send a command to the mouse via the AUX port." alt="" coords="751,63,852,88"/>
+<area shape="poly" id="edge33_Node000044_Node000046" title=" " alt="" coords="643,162,740,105,763,92,765,97,743,110,646,166"/>
+<area shape="rect" id="Node000047" href="$mouse__ps2_8c.html#a16ddfad4f1a5feb09d3b53f7893b703f" title="Send a command byte to the controller (port 0x64)." alt="" coords="942,15,1022,40"/>
+<area shape="poly" id="edge46_Node000044_Node000047" title=" " alt="" coords="626,163,641,132,665,93,698,54,718,37,740,23,788,8,838,3,886,5,929,12,928,17,886,11,838,8,789,13,742,28,721,41,702,57,669,96,646,135,631,165"/>
+<area shape="rect" id="Node000051" href="$mouse__ps2_8c.html#ad166364dae9026806e72b787a51fc2f7" title="Read one byte from the controller." alt="" coords="923,113,1041,139"/>
+<area shape="poly" id="edge47_Node000044_Node000051" title=" " alt="" coords="676,161,741,149,909,129,910,134,742,154,677,167"/>
+<area shape="rect" id="Node000053" href="$mouse__ps2_8c.html#a67fb73771a785ab88414bf6622c194c3" title="Send a data byte to the controller (port 0x60)." alt="" coords="921,64,1043,89"/>
+<area shape="poly" id="edge48_Node000044_Node000053" title=" " alt="" coords="628,162,644,136,669,104,702,72,740,47,773,37,800,37,862,47,922,58,921,63,861,53,800,42,774,43,742,52,705,76,673,107,649,139,633,165"/>
+<area shape="rect" id="Node000054" href="$mouse__ps2_8c.html#a059fb6ffb95c8c6a22097d748a2aa357" title="IRQ 12 handler: accumulate one mouse packet byte, post on completion." alt="" coords="741,213,861,239"/>
+<area shape="poly" id="edge40_Node000044_Node000054" title=" " alt="" coords="670,187,741,207,740,212,668,192"/>
+<area shape="rect" id="Node000059" href="$pic_8c.html#a3e514f789fbbbf7edfd418e7982743fd" title="Unmask (enable) an IRQ line." alt="" coords="932,264,1032,289"/>
+<area shape="poly" id="edge43_Node000044_Node000059" title=" " alt="" coords="640,187,685,219,713,235,742,247,787,260,833,268,918,274,917,280,832,273,786,265,740,252,710,239,682,223,637,192"/>
+<area shape="poly" id="edge34_Node000046_Node000047" title=" " alt="" coords="849,60,928,39,929,44,851,65"/>
+<area shape="poly" id="edge36_Node000046_Node000051" title=" " alt="" coords="848,85,923,107,922,112,847,91"/>
+<area shape="poly" id="edge38_Node000046_Node000053" title=" " alt="" coords="852,73,908,73,908,79,852,78"/>
+<area shape="poly" id="edge35_Node000047_Node000005" title=" " alt="" coords="1023,37,1056,49,1141,77,1178,91,1224,113,1262,136,1295,160,1292,164,1259,140,1221,118,1176,96,1140,82,1054,54,1021,42"/>
+<area shape="rect" id="Node000049" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="1141,164,1184,189"/>
+<area shape="poly" id="edge37_Node000051_Node000049" title=" " alt="" coords="1029,136,1129,165,1127,170,1028,141"/>
+<area shape="poly" id="edge39_Node000053_Node000005" title=" " alt="" coords="1026,87,1223,149,1283,168,1282,173,1222,154,1024,92"/>
+<area shape="poly" id="edge41_Node000054_Node000049" title=" " alt="" coords="853,211,909,199,1029,184,1127,176,1128,181,1029,189,910,205,854,216"/>
+<area shape="rect" id="Node000055" href="$mouse_8c.html#a7549de64e1ca943611685af5f4907fd9" title="Post one movement/button report into the broker." alt="" coords="909,215,1055,240"/>
+<area shape="poly" id="edge42_Node000054_Node000055" title=" " alt="" coords="861,224,896,224,895,229,861,229"/>
+<area shape="poly" id="edge45_Node000059_Node000005" title=" " alt="" coords="1028,261,1282,191,1284,196,1030,266"/>
+<area shape="poly" id="edge44_Node000059_Node000049" title=" " alt="" coords="1024,261,1053,249,1097,223,1134,196,1137,200,1100,227,1056,254,1026,266"/>
+<area shape="rect" id="Node000061" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="330,741,499,767"/>
+<area shape="poly" id="edge50_Node000060_Node000061" title=" " alt="" coords="262,715,348,735,347,741,261,720"/>
+<area shape="rect" id="Node000062" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="331,692,498,717"/>
+<area shape="poly" id="edge51_Node000060_Node000062" title=" " alt="" coords="279,702,318,702,318,707,279,707"/>
+</map>

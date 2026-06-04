@@ -1,0 +1,96 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,1219,60,1244"/>
+<area shape="rect" id="Node000002" href="$atlas__stub_8c.html#a34a39eb846920e477d6fc59cc68bdbfc" title="Load the TTF at font_path, rasterize ASCII + box&#45;drawing + a few Latin&#45;1 glyphs, and submit the atlas..." alt="" coords="162,168,269,194"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="32,1219,51,964,73,767,105,565,129,459,156,357,203,206,208,208,161,358,134,461,111,566,79,768,57,965,37,1219"/>
+<area shape="rect" id="Node000011" href="$edit_8c.html#a3f9668bb1aa4b7438b9761dbfc8c82d8" title="Initialise the off&#45;screen ncurses input pad used by sh_read_line." alt="" coords="167,1244,264,1270"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="61,1233,153,1246,152,1251,60,1238"/>
+<area shape="rect" id="Node000012" href="$history_8c.html#a6d9678664cc38ad9d98f4b6cd7c6708b" title="Append line to history." alt="" coords="162,578,269,603"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="33,1219,56,1070,77,961,105,851,128,783,154,716,199,615,204,617,159,718,133,785,111,853,82,962,61,1071,38,1220"/>
+<area shape="rect" id="Node000014" href="$io_8c.html#ac3e98303df49d2058bbde227fbe73286" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="958,1016,1030,1042"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="60,1226,229,1213,343,1206,461,1204,680,1204,726,1199,770,1186,813,1168,853,1145,922,1094,970,1050,973,1054,925,1098,856,1149,816,1172,772,1191,727,1204,680,1209,461,1209,344,1212,229,1218,61,1232"/>
+<area shape="rect" id="Node000016" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="108,864,323,890"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="38,1218,199,901,204,903,43,1220"/>
+<area shape="rect" id="Node000050" href="$vconf_8c.html#afeca6cfc6a44d8a8bdef9d340e11dd66" title="Source path as a vega script with stdout redirected to /dev/null." alt="" coords="150,1294,281,1319"/>
+<area shape="poly" id="edge43_Node000001_Node000050" title=" " alt="" coords="51,1242,77,1261,109,1279,137,1289,135,1294,107,1284,75,1266,48,1247"/>
+<area shape="rect" id="Node000052" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="421,1343,503,1368"/>
+<area shape="poly" id="edge53_Node000001_Node000052" title=" " alt="" coords="42,1243,66,1288,85,1311,109,1329,146,1346,185,1358,266,1369,343,1369,407,1363,408,1368,344,1374,266,1375,184,1363,144,1351,107,1334,82,1315,62,1291,37,1246"/>
+<area shape="rect" id="Node000129" href="$vega_8c.html#af032a348a0968cfde27fd6601005274a" title="Register the host operations table. Must be called once before any vega_run() / vega_setvar() call...." alt="" coords="174,1395,257,1420"/>
+<area shape="poly" id="edge52_Node000001_Node000129" title=" " alt="" coords="39,1244,61,1306,82,1343,110,1374,134,1388,161,1398,159,1403,132,1393,106,1378,78,1346,57,1308,34,1246"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2shell_2platform_2atlas_8c.html#a98ddd251fc55ef0e1725cfa026038462" title=" " alt="" coords="403,242,521,267"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,191,371,227,402,235,400,241,370,232,256,196"/>
+<area shape="rect" id="Node000004" href="$user_2apps_2shell_2platform_2atlas_8c.html#a971474934e9dffbb5818be77e465fa63" title=" " alt="" coords="408,291,516,316"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="235,192,294,233,372,276,396,285,394,290,370,281,291,237,232,196"/>
+<area shape="rect" id="Node000005" href="$user_2apps_2shell_2platform_2atlas_8c.html#ac54dafacaa58f7504f63e715d970d133" title=" " alt="" coords="407,44,517,70"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="231,166,290,124,329,100,370,79,392,70,394,75,372,84,331,104,293,128,234,170"/>
+<area shape="rect" id="Node000006" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="814,542,893,567"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="223,167,244,136,277,97,319,59,344,42,370,29,420,11,463,3,506,9,555,29,591,52,624,78,682,140,731,211,770,285,801,359,824,427,850,527,844,529,818,428,796,361,765,287,726,214,678,144,620,82,588,56,552,34,505,14,464,9,422,16,372,34,346,47,323,63,281,101,248,140,227,170"/>
+<area shape="rect" id="Node000008" href="$user_2apps_2shell_2platform_2atlas_8c.html#a799c36d743c2e38323d54c2e19668ef3" title=" " alt="" coords="385,94,539,119"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="252,166,370,128,397,120,399,125,371,133,254,171"/>
+<area shape="rect" id="Node000009" href="$user_2apps_2shell_2platform_2atlas_8c.html#aa3f70f5b9c6dd68c8021c012e00c9361" title=" " alt="" coords="407,143,517,168"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="269,173,393,160,393,165,269,178"/>
+<area shape="rect" id="Node000010" href="$user_2apps_2shell_2platform_2atlas_8c.html#af6f6f6a72719191807a99f6d6bde1dd1" title=" " alt="" coords="391,192,533,218"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="269,184,377,194,377,200,269,189"/>
+<area shape="rect" id="Node000007" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="951,567,1037,592"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="893,559,938,567,937,572,892,564"/>
+<area shape="rect" id="Node000013" href="$compiler__abi_8c.html#a67a32512b988260592273ddf743c5c3c" title=" " alt="" coords="807,591,900,616"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="227,576,311,498,374,447,447,399,526,361,566,348,606,339,646,337,685,343,722,356,758,378,779,400,788,424,791,448,789,473,786,525,791,551,806,577,810,581,806,585,802,580,786,553,780,525,783,473,785,448,783,425,774,403,754,382,720,360,684,348,646,343,607,345,568,353,528,366,450,404,377,452,314,502,231,579"/>
+<area shape="poly" id="edge13_Node000013_Node000007" title=" " alt="" coords="900,593,937,587,937,592,901,598"/>
+<area shape="rect" id="Node000015" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="1085,1016,1163,1042"/>
+<area shape="poly" id="edge15_Node000014_Node000015" title=" " alt="" coords="1030,1026,1072,1026,1072,1032,1030,1032"/>
+<area shape="rect" id="Node000017" href="$apps_2shell_2platform_2parse_8c.html#a6efaee64a50f1ee34d84d90b42760775" title="True if buf parses as a complete vega statement." alt="" coords="391,491,533,516"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="223,863,443,526,447,529,227,866"/>
+<area shape="rect" id="Node000023" href="$sys_8c.html#a5684320039ca73989a9526373bf5da01" title="Clear the terminal screen with an ANSI erase&#45;display sequence." alt="" coords="424,791,500,816"/>
+<area shape="poly" id="edge22_Node000016_Node000023" title=" " alt="" coords="254,862,370,825,410,814,411,819,371,830,255,867"/>
+<area shape="rect" id="Node000024" href="$prompt_8c.html#a00bbb089e4298ee414e2fd3fdf5ef795" title="Format the bottom&#45;line prompt (╰─ $) into out." alt="" coords="391,890,533,915"/>
+<area shape="poly" id="edge23_Node000016_Node000024" title=" " alt="" coords="323,885,377,891,377,896,323,891"/>
+<area shape="rect" id="Node000025" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="410,840,514,866"/>
+<area shape="poly" id="edge24_Node000016_Node000025" title=" " alt="" coords="323,864,396,857,396,862,323,869"/>
+<area shape="rect" id="Node000049" href="$prompt_8c.html#ace54b4717588b11e401baf89fe2fc1fa" title="Paint the decorative header line above the primary prompt." alt="" coords="371,1092,553,1118"/>
+<area shape="poly" id="edge40_Node000016_Node000049" title=" " alt="" coords="232,888,439,1081,435,1085,229,892"/>
+<area shape="rect" id="Node000018" href="$apps_2shell_2platform_2parse_8c.html#a9606a2b96b722b2d4872fe3ef5f0cfab" title="Double&#45;quoted state: handle \&quot; \ \$ escapes, exit on closing quote." alt="" coords="619,491,738,516"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="533,501,606,501,606,506,533,506"/>
+<area shape="rect" id="Node000019" href="$apps_2shell_2platform_2parse_8c.html#a9f8c0036f2d33924daeac7a6b55bf9d0" title="Heredoc body: accumulate one line at a time, exit on delim match." alt="" coords="615,540,743,566"/>
+<area shape="poly" id="edge19_Node000017_Node000019" title=" " alt="" coords="519,514,610,535,608,540,518,519"/>
+<area shape="rect" id="Node000021" href="$apps_2shell_2platform_2parse_8c.html#a2d6fdfc4c94282086513274493733813" title="Top&#45;level dispatch: brace counting, quote/heredoc triggers." alt="" coords="619,392,738,418"/>
+<area shape="poly" id="edge20_Node000017_Node000021" title=" " alt="" coords="483,489,535,458,600,427,619,420,620,425,602,432,538,463,486,493"/>
+<area shape="rect" id="Node000022" href="$apps_2shell_2platform_2parse_8c.html#a18110e63c64a34bf23d1ac8518357551" title="&lt;&lt; delimiter&#45;collection state: read the word that follows." alt="" coords="604,442,753,467"/>
+<area shape="poly" id="edge21_Node000017_Node000022" title=" " alt="" coords="518,488,608,468,610,473,519,494"/>
+<area shape="poly" id="edge31_Node000025_Node000013" title=" " alt="" coords="513,846,534,838,551,826,568,802,575,777,576,752,573,727,570,701,571,676,580,651,600,627,621,612,645,601,695,588,747,586,794,590,793,595,747,591,696,593,646,606,624,616,603,631,585,653,576,677,575,701,578,726,581,752,580,778,573,804,555,830,536,843,515,851"/>
+<area shape="poly" id="edge37_Node000025_Node000014" title=" " alt="" coords="515,863,554,875,602,893,946,1011,944,1016,600,898,552,880,513,868"/>
+<area shape="rect" id="Node000026" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="631,790,726,815"/>
+<area shape="poly" id="edge25_Node000025_Node000026" title=" " alt="" coords="513,839,617,814,619,819,515,844"/>
+<area shape="rect" id="Node000030" href="$edit_8c.html#a49d1c35f42b665a736da8063551682ec" title="Repaint the input row in&#45;place: clear, prompt, buffer, cursor." alt="" coords="804,840,903,866"/>
+<area shape="poly" id="edge34_Node000025_Node000030" title=" " alt="" coords="514,850,790,850,790,856,514,856"/>
+<area shape="rect" id="Node000029" href="$edit_8c.html#abd409a02af078b9a9096d611ef989a19" title="Count visible UTF&#45;8 glyphs in s." alt="" coords="813,891,894,916"/>
+<area shape="poly" id="edge38_Node000025_Node000029" title=" " alt="" coords="514,857,799,894,799,900,514,862"/>
+<area shape="rect" id="Node000044" href="$edit_8c.html#a8cc47725f64996d06197dfe3d5690be7" title="Move idx right to the next UTF&#45;8 character boundary." alt="" coords="601,992,756,1018"/>
+<area shape="poly" id="edge32_Node000025_Node000044" title=" " alt="" coords="515,856,536,863,555,875,574,899,581,923,587,947,603,971,622,984,618,989,599,975,582,950,576,925,569,901,552,879,534,868,513,861"/>
+<area shape="rect" id="Node000045" href="$edit_8c.html#a730c92e29ad74b9c6da4cc4bfd29aa6a" title="Move idx left to the previous UTF&#45;8 character boundary." alt="" coords="601,1042,756,1067"/>
+<area shape="poly" id="edge33_Node000025_Node000045" title=" " alt="" coords="515,855,536,862,555,875,570,894,578,914,581,952,583,990,589,1009,603,1027,609,1032,606,1036,599,1031,585,1011,577,991,575,953,573,915,566,897,552,879,534,867,513,860"/>
+<area shape="rect" id="Node000046" href="$history_8c.html#a49968f00b1bd25fd8f6652c451d82f36" title="Look up history entry at idx (0 = oldest)." alt="" coords="635,642,723,667"/>
+<area shape="poly" id="edge35_Node000025_Node000046" title=" " alt="" coords="513,845,534,838,552,826,565,808,572,790,575,753,577,715,585,696,600,676,620,663,623,667,603,680,589,698,583,716,580,754,578,792,570,811,555,830,536,843,515,850"/>
+<area shape="rect" id="Node000047" href="$history_8c.html#ab7cb53e6f1fc98abca0bbdd95a9bfd56" title="Return the number of entries currently held." alt="" coords="623,691,734,716"/>
+<area shape="poly" id="edge36_Node000025_Node000047" title=" " alt="" coords="513,844,534,837,552,826,563,814,569,802,575,777,581,752,588,739,600,726,609,719,613,723,603,730,592,742,586,754,580,779,574,804,567,817,555,830,536,842,515,849"/>
+<area shape="rect" id="Node000048" href="$edit_8c.html#a89eff61e38e725b9f70be86f28e8ac28" title="Count visible columns in s, skipping ESC[...m sequences." alt="" coords="629,740,728,766"/>
+<area shape="poly" id="edge39_Node000025_Node000048" title=" " alt="" coords="513,841,552,825,566,814,575,801,585,788,600,775,615,767,618,772,603,779,588,792,580,804,570,817,555,830,515,846"/>
+<area shape="poly" id="edge26_Node000026_Node000006" title=" " alt="" coords="725,793,741,786,754,775,771,751,779,727,781,704,779,679,779,630,786,604,802,577,805,574,809,577,806,580,791,606,784,630,785,679,786,704,784,728,776,753,758,779,744,790,727,798"/>
+<area shape="poly" id="edge27_Node000026_Node000013" title=" " alt="" coords="725,791,754,775,786,741,811,701,830,662,842,629,847,630,835,664,816,704,790,744,758,779,727,795"/>
+<area shape="poly" id="edge28_Node000026_Node000030" title=" " alt="" coords="724,813,796,834,795,839,723,818"/>
+<area shape="poly" id="edge30_Node000026_Node000029" title=" " alt="" coords="702,813,805,875,818,882,815,887,803,879,700,818"/>
+<area shape="poly" id="edge29_Node000030_Node000014" title=" " alt="" coords="887,864,904,876,931,907,954,941,985,1002,980,1005,949,944,927,910,901,880,884,868"/>
+<area shape="poly" id="edge42_Node000049_Node000014" title=" " alt="" coords="554,1097,651,1089,756,1076,856,1058,944,1038,945,1043,857,1063,756,1081,652,1094,554,1102"/>
+<area shape="rect" id="Node000043" href="$sys_8c.html#abb1d3053a2319560989362c984cdd2a7" title="Get the current working directory into buf of size bytes." alt="" coords="633,1143,724,1168"/>
+<area shape="poly" id="edge41_Node000049_Node000043" title=" " alt="" coords="518,1115,621,1140,619,1145,517,1120"/>
+<area shape="rect" id="Node000051" href="$vconf_8c.html#a7d887e982f58c0697237972bf97fcbb4" title="Read the whole content of fd into a freshly malloc&#39;d buffer." alt="" coords="425,1294,499,1319"/>
+<area shape="poly" id="edge44_Node000050_Node000051" title=" " alt="" coords="281,1304,411,1304,411,1309,281,1309"/>
+<area shape="poly" id="edge45_Node000050_Node000052" title=" " alt="" coords="280,1317,408,1342,407,1348,279,1322"/>
+<area shape="rect" id="Node000053" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="816,1318,891,1343"/>
+<area shape="poly" id="edge46_Node000052_Node000053" title=" " alt="" coords="503,1344,601,1329,709,1324,802,1326,802,1331,709,1330,602,1334,504,1350"/>
+<area shape="rect" id="Node000054" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="633,1416,724,1442"/>
+<area shape="poly" id="edge48_Node000052_Node000054" title=" " alt="" coords="501,1366,628,1409,626,1414,500,1371"/>
+<area shape="rect" id="Node000087" href="$core_2vega_2parse_8c.html#a37fb9f6bddc87aa3381e31f183663b88" title="Parse line into an AST." alt="" coords="630,1343,727,1368"/>
+<area shape="poly" id="edge50_Node000052_Node000087" title=" " alt="" coords="504,1353,616,1353,616,1358,504,1358"/>
+<area shape="poly" id="edge47_Node000053_Node000053" title=" " alt="" coords="830,1319,825,1309,827,1300,837,1293,853,1291,873,1295,881,1303,877,1307,870,1299,853,1296,839,1298,832,1303,830,1309,834,1316"/>
+<area shape="poly" id="edge49_Node000054_Node000054" title=" " alt="" coords="650,1418,644,1408,647,1398,659,1392,679,1390,703,1393,713,1402,709,1406,700,1398,679,1395,660,1397,651,1402,649,1407,654,1415"/>
+<area shape="poly" id="edge51_Node000087_Node000053" title=" " alt="" coords="727,1346,802,1335,803,1340,728,1351"/>
+</map>

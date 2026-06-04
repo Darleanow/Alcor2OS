@@ -1,0 +1,29 @@
+<map id="src/mm/vmm.c" name="src/mm/vmm.c">
+<area shape="rect" id="Node000001" title="x86_64 virtual memory manager (PML4 → PT, address&#45;space clone, tear down user maps)." alt="" coords="237,5,357,31"/>
+<area shape="rect" id="Node000002" href="$cpu_8h.html" title="x86_64 CPU control and state management." alt="" coords="5,152,139,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="261,33,211,53,159,81,122,111,92,143,88,139,118,108,156,76,209,48,259,28"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="316,225,431,251"/>
+<area shape="poly" id="edge16_Node000001_Node000003" title=" " alt="" coords="282,33,250,59,215,96,203,116,195,136,195,157,204,176,223,196,248,211,275,222,303,229,302,234,274,227,246,216,220,200,199,179,190,158,190,136,198,114,211,93,246,56,279,29"/>
+<area shape="rect" id="Node000007" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="213,152,336,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="287,33,269,53,255,80,252,94,253,110,263,139,258,140,248,111,247,94,249,78,264,50,283,29"/>
+<area shape="rect" id="Node000008" href="$memory__layout_8h.html" title="Virtual memory layout constants for x86_64." alt="" coords="264,79,475,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="311,29,350,67,346,71,307,33"/>
+<area shape="rect" id="Node000009" href="$pmm_8h.html" title="Physical memory manager (page allocator)." alt="" coords="498,79,641,104"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="342,28,513,73,512,78,340,33"/>
+<area shape="rect" id="Node000011" href="$vmm_8h.html" title="Virtual memory manager (paging)." alt="" coords="665,79,807,104"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="358,26,652,74,652,79,357,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,175,312,220,311,225,120,180"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="229,299,312,324"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="358,253,300,293,297,288,355,248"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="336,299,411,324"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="376,251,376,285,371,285,371,251"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="435,299,506,324"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="391,249,445,288,442,292,387,253"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="292,175,348,215,345,219,289,180"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="372,104,375,212,370,212,367,105"/>
+<area shape="poly" id="edge13_Node000009_Node000003" title=" " alt="" coords="554,107,488,154,401,219,398,215,485,150,551,102"/>
+<area shape="rect" id="Node000010" href="$limine_8h.html" title="Limine bootloader protocol definitions." alt="" coords="498,152,617,177"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="570,105,564,139,559,138,565,104"/>
+<area shape="poly" id="edge12_Node000010_Node000003" title=" " alt="" coords="529,180,417,223,415,218,527,175"/>
+<area shape="poly" id="edge15_Node000011_Node000003" title=" " alt="" coords="727,106,687,143,660,163,631,180,584,199,535,213,445,231,444,226,534,208,582,194,628,175,657,158,683,139,723,103"/>
+</map>

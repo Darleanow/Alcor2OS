@@ -1,0 +1,5 @@
+<map id="ext2_readlink" name="ext2_readlink">
+<area shape="rect" id="Node000001" title="Read symlink target (final path component only). Path is mount&#45;relative (e.g. &quot;bin/clang&quot;),..." alt="" coords="195,5,305,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#a2fc366e280a85e6ef6f5b18663c7d6c5" title="fs_ops_t.readlink shim." alt="" coords="5,5,147,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,21,147,21,147,15,181,15"/>
+</map>

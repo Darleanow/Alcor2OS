@@ -1,0 +1,7 @@
+<map id="fb_console_get_size" name="fb_console_get_size">
+<area shape="rect" id="Node000001" title="Cell grid dimensions in cells (not pixels). Both pointers may be NULL. Used by TIOCGWINSZ so userspac..." alt="" coords="347,5,500,31"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a03fc9bfa825f574de2ef71f445cdf71c" title="Pack live console geometry into a Linux winsize for a TIOCGWINSZ answer." alt="" coords="128,5,299,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="333,21,299,21,299,15,333,15"/>
+<area shape="rect" id="Node000003" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="5,5,80,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,21,80,21,80,15,114,15"/>
+</map>

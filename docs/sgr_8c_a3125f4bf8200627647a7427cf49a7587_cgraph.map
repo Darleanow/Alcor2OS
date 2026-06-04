@@ -1,0 +1,9 @@
+<map id="sgr_apply_extended_color" name="sgr_apply_extended_color">
+<area shape="rect" id="Node000001" title="Handle the multi&#45;param extended colour forms 38;5;N, 38;2;R;G;B, 48;5;N, 48;2;R;G;B." alt="" coords="5,23,159,63"/>
+<area shape="rect" id="Node000002" href="$palette_8c.html#ac86ffecc8684687c5d2622aa1355d80e" title="Resolve an xterm 256&#45;colour palette index to a 0xRRGGBB triplet." alt="" coords="207,31,328,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,41,193,41,193,46,159,46"/>
+<area shape="rect" id="Node000003" href="$palette_8c.html#a5a5d432f2e5515feb43f72c8b9f7eed6" title="Pack three 0..255 channels into a 0xRRGGBB triplet." alt="" coords="402,5,483,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="328,32,388,23,389,28,328,37"/>
+<area shape="rect" id="Node000004" href="$palette_8c.html#a68133a258612d53fe2cbe3d2e17e2994" title="Look up one axis (red, green, or blue) of the xterm 6x6x6 cube." alt="" coords="376,55,509,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="328,49,363,54,362,59,328,54"/>
+</map>

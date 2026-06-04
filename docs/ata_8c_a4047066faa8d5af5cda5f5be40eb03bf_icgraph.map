@@ -1,0 +1,13 @@
+<map id="setup_prdt" name="setup_prdt">
+<area shape="rect" id="Node000001" title="Load PRDT with a single bounce&#45;buffer entry." alt="" coords="484,31,575,56"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="327,31,436,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="470,46,437,46,437,41,470,41"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="168,5,279,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="313,35,278,29,279,24,314,30"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="182,55,265,80"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="313,56,265,64,265,58,313,51"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="23,5,102,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,21,102,21,102,15,154,15"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="5,55,120,80"/>
+<area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="168,70,120,70,120,65,168,65"/>
+</map>

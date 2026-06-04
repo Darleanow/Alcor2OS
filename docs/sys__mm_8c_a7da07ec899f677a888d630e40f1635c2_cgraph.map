@@ -1,0 +1,23 @@
+<map id="apply_final_prot" name="apply_final_prot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,132,132,157"/>
+<area shape="rect" id="Node000002" href="$vmm_8c.html#a79058902336b9774ccdf1efa90360b18" title="Translate virtual address to physical address in current address space." alt="" coords="180,156,303,181"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,151,167,156,166,161,132,156"/>
+<area shape="rect" id="Node000011" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="195,107,287,132"/>
+<area shape="poly" id="edge8_Node000001_Node000011" title=" " alt="" coords="132,133,181,125,182,131,133,138"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="356,107,464,132"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="285,153,352,134,353,139,286,159"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="351,208,469,233"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="284,179,355,201,354,206,282,184"/>
+<area shape="rect" id="Node000006" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="517,157,620,183"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="303,166,504,167,503,172,303,172"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="539,207,598,232"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="469,218,525,217,525,222,469,223"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="450,205,514,184,516,189,452,210"/>
+<area shape="rect" id="Node000008" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="521,256,616,281"/>
+<area shape="poly" id="edge6_Node000004_Node000008" title=" " alt="" coords="454,231,513,249,512,254,452,236"/>
+<area shape="poly" id="edge10_Node000011_Node000003" title=" " alt="" coords="288,117,342,117,342,122,288,122"/>
+<area shape="poly" id="edge11_Node000011_Node000004" title=" " alt="" coords="280,130,304,141,348,169,385,197,382,201,345,173,301,146,278,135"/>
+<area shape="poly" id="edge12_Node000011_Node000006" title=" " alt="" coords="276,104,316,93,365,84,418,82,470,91,493,102,514,116,548,145,545,149,511,120,491,107,469,97,418,87,366,89,317,98,277,109"/>
+<area shape="rect" id="Node000012" href="$cpu_8c.html#a79c2518c5bb9a861f616254c974685b4" title="Invalidate a single page in the TLB." alt="" coords="364,5,456,31"/>
+<area shape="poly" id="edge9_Node000011_Node000012" title=" " alt="" coords="261,104,349,48,371,35,374,40,352,52,263,109"/>
+</map>

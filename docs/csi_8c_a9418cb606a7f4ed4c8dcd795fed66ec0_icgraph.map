@@ -1,0 +1,15 @@
+<map id="erase_rect" name="erase_rect">
+<area shape="rect" id="Node000001" title="Blank the inclusive rectangle [(y0, x0), (y1, x1)] using the current SGR fg/bg." alt="" coords="489,55,580,80"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a70429ceb320ba5d04cd0d21ea2b0983f" title="CSI X (ECH) — erase Pn chars at the cursor, no cursor move." alt="" coords="310,5,435,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,53,415,33,416,28,480,48"/>
+<area shape="rect" id="Node000014" href="$csi_8c.html#a7eae43490b5d98fbf307d2521bc09019" title="CSI J (ED) — erase in display (mode 0/1/2)." alt="" coords="304,55,441,80"/>
+<area shape="poly" id="edge4_Node000001_Node000014" title=" " alt="" coords="475,70,441,70,441,65,475,65"/>
+<area shape="rect" id="Node000015" href="$csi_8c.html#a26848e54b8dcf798b7cb2175e4af9a81" title="CSI K (EL) — erase in line (mode 0/1/2)." alt="" coords="315,104,430,129"/>
+<area shape="poly" id="edge6_Node000001_Node000015" title=" " alt="" coords="480,87,416,106,415,101,478,82"/>
+<area shape="rect" id="Node000003" href="$csi_8c.html#a13481ca709daa8398739bba14a24f240" title="Final&#45;byte dispatcher for the assembled CSI sequence." alt="" coords="165,55,256,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="318,37,254,57,253,52,316,32"/>
+<area shape="rect" id="Node000004" href="$ansi_8c.html#a02fc143e65dd6786ede77f13e0d80641" title="Handle one byte while the parser is accumulating a CSI sequence." alt="" coords="5,55,117,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="152,70,118,70,118,65,152,65"/>
+<area shape="poly" id="edge5_Node000014_Node000003" title=" " alt="" coords="290,70,256,70,256,65,290,65"/>
+<area shape="poly" id="edge7_Node000015_Node000003" title=" " alt="" coords="316,102,253,83,254,78,318,97"/>
+</map>

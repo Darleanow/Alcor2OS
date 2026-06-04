@@ -1,0 +1,28 @@
+<map id="blit_atlas_32bpp" name="blit_atlas_32bpp">
+<area shape="rect" id="Node000001" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="665,322,795,347"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="508,322,617,347"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="652,337,617,337,617,332,652,332"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="387,222,460,247"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="531,316,441,250,444,245,534,312"/>
+<area shape="rect" id="Node000011" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="9,314,150,339"/>
+<area shape="poly" id="edge14_Node000002_Node000011" title=" " alt="" coords="527,356,465,383,383,409,338,417,292,422,246,420,201,411,168,397,137,378,92,342,95,337,140,374,170,392,202,405,246,415,292,416,338,412,382,403,463,378,525,351"/>
+<area shape="rect" id="Node000004" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="221,222,319,247"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="373,237,320,237,320,232,373,232"/>
+<area shape="rect" id="Node000023" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="223,121,317,146"/>
+<area shape="poly" id="edge5_Node000003_Node000023" title=" " alt="" coords="397,215,337,168,301,148,304,144,340,163,400,210"/>
+<area shape="rect" id="Node000024" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="5,82,153,107"/>
+<area shape="poly" id="edge10_Node000003_Node000024" title=" " alt="" coords="411,210,384,157,363,131,337,110,292,92,244,83,195,81,151,85,150,79,195,76,244,78,294,87,340,106,367,127,388,154,416,208"/>
+<area shape="rect" id="Node000033" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="8,153,151,193"/>
+<area shape="poly" id="edge13_Node000003_Node000033" title=" " alt="" coords="373,222,338,213,241,196,151,184,152,178,241,190,339,208,374,217"/>
+<area shape="rect" id="Node000035" href="$flush_8c.html#acbd1d56bd93968c876236a4f9db5bcc2" title="Commit cp with the live SGR state into c and either mark dirty (batch mode) or blit immediately." alt="" coords="209,271,331,297"/>
+<area shape="poly" id="edge8_Node000003_Node000035" title=" " alt="" coords="374,253,311,274,310,269,373,248"/>
+<area shape="rect" id="Node000044" href="$csi_8c.html#a9418cb606a7f4ed4c8dcd795fed66ec0" title="Blank the inclusive rectangle [(y0, x0), (y1, x1)] using the current SGR fg/bg." alt="" coords="225,321,315,346"/>
+<area shape="poly" id="edge9_Node000003_Node000044" title=" " alt="" coords="403,259,375,286,340,312,316,323,314,318,337,307,371,282,400,255"/>
+<area shape="rect" id="Node000048" href="$flush_8c.html#a2dabde3cffa3ed745cdc5c88d3951ce9" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="203,370,337,395"/>
+<area shape="poly" id="edge11_Node000003_Node000048" title=" " alt="" coords="413,261,385,311,365,338,340,361,321,372,318,368,337,357,361,334,380,308,409,258"/>
+<area shape="rect" id="Node000050" href="$fb__console_2mouse_8c.html#a906bc8eb5537d1c6fac0db66df2dad8e" title="Re&#45;blit every cell that the cursor footprint touched, restoring the characters under it." alt="" coords="201,5,339,45"/>
+<area shape="poly" id="edge12_Node000003_Node000050" title=" " alt="" coords="412,209,385,140,364,101,337,66,313,47,317,43,341,62,368,98,390,138,417,207"/>
+<area shape="poly" id="edge4_Node000004_Node000011" title=" " alt="" coords="220,255,202,262,103,316,100,312,200,258,218,250"/>
+<area shape="poly" id="edge6_Node000023_Node000024" title=" " alt="" coords="208,124,142,110,143,105,209,118"/>
+<area shape="poly" id="edge7_Node000023_Node000033" title=" " alt="" coords="210,149,151,161,150,156,209,143"/>
+</map>

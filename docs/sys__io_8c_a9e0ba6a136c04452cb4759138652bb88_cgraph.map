@@ -1,0 +1,22 @@
+<map id="sys_read" name="sys_read">
+<area shape="rect" id="Node000001" title="Read up to count bytes from fd into buf." alt="" coords="5,31,85,56"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#aa22ffdd5fbef3893cc52ebbe6e176d6b" title="Return true if ptr..ptr+size is a valid user read/write range." alt="" coords="133,5,229,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,33,119,27,120,32,86,39"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#aa43ccf694fc49a889902be97e38e32db" title="Read up to count bytes from fd into buf." alt="" coords="142,55,221,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="86,48,129,55,128,61,85,53"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="277,5,431,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="230,15,264,15,264,21,230,21"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="315,55,393,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="221,65,301,65,301,70,221,70"/>
+<area shape="rect" id="Node000007" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="297,104,411,129"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="222,76,296,98,295,103,220,81"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="485,55,587,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="393,65,471,65,471,70,393,70"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="401,101,474,81,476,86,402,107"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a7252d4cb0ebec561f76091963a6dbe6a" title="Block p (set state to BLOCKED). Call before proc_schedule()." alt="" coords="490,104,582,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="411,114,476,114,476,119,411,119"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="479,153,593,179"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="402,127,476,147,474,152,401,132"/>
+<area shape="rect" id="Node000019" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="491,203,581,228"/>
+<area shape="poly" id="edge10_Node000007_Node000019" title=" " alt="" coords="377,127,480,188,494,194,491,199,477,192,374,132"/>
+</map>

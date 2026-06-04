@@ -1,0 +1,38 @@
+<map id="ext2_read" name="ext2_read">
+<area shape="rect" id="Node000001" title="Read up to count bytes from file at byte offset." alt="" coords="5,168,92,193"/>
+<area shape="rect" id="Node000002" href="$cache_8c.html#a8a62396b0bb6fb9b445be9aa68c99e3a" title="Borrow a one&#45;block scratch buffer from the pool." alt="" coords="144,67,275,92"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,166,97,138,139,109,164,95,166,100,141,114,100,143,66,170"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="361,67,436,92"/>
+<area shape="poly" id="edge11_Node000001_Node000003" title=" " alt="" coords="91,166,347,91,349,96,93,171"/>
+<area shape="rect" id="Node000018" href="$cache_8c.html#a3f836c60fb5837ae4127d5de332b462e" title="Return a buffer obtained from cache_get_block." alt="" coords="144,168,275,193"/>
+<area shape="poly" id="edge6_Node000001_Node000018" title=" " alt="" coords="92,178,130,178,130,183,92,183"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="371,191,427,216"/>
+<area shape="poly" id="edge10_Node000001_Node000019" title=" " alt="" coords="90,191,140,202,199,207,258,208,357,204,357,210,258,214,199,212,140,207,88,196"/>
+<area shape="rect" id="Node000033" href="$file_8c.html#a54bf1c29b72ee0ddfe0f61cca9f45e9e" title="Drive the read loop with pre&#45;allocated buffers." alt="" coords="140,293,279,319"/>
+<area shape="poly" id="edge12_Node000001_Node000033" title=" " alt="" coords="68,192,183,283,180,287,65,196"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,77,347,77,347,82,275,82"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="551,5,672,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="435,65,518,39,546,32,547,37,519,45,437,70"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="557,55,666,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="436,75,542,69,543,74,436,80"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="565,104,657,129"/>
+<area shape="poly" id="edge5_Node000003_Node000017" title=" " alt="" coords="437,83,553,104,552,109,436,88"/>
+<area shape="poly" id="edge7_Node000018_Node000019" title=" " alt="" coords="275,186,357,196,357,201,275,191"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="572,153,651,179"/>
+<area shape="poly" id="edge8_Node000019_Node000020" title=" " alt="" coords="427,196,558,173,559,178,427,201"/>
+<area shape="rect" id="Node000021" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="557,203,666,228"/>
+<area shape="poly" id="edge9_Node000019_Node000021" title=" " alt="" coords="427,202,543,209,543,214,427,208"/>
+<area shape="rect" id="Node000034" href="$file_8c.html#aa4ace95cb1d031a3141636122511c8fc" title="One iteration of the read loop: pick the right path for one block and copy as much as fits." alt="" coords="327,341,471,367"/>
+<area shape="poly" id="edge13_Node000033_Node000034" title=" " alt="" coords="261,316,335,335,334,340,260,321"/>
+<area shape="rect" id="Node000035" href="$file_8c.html#a845ca06242d90d0b72a0f50c2d615c95" title="Count how many on&#45;disk blocks following base_block_num are contiguous to it for this inode." alt="" coords="542,252,681,277"/>
+<area shape="poly" id="edge14_Node000034_Node000035" title=" " alt="" coords="423,339,518,294,557,279,558,284,520,299,425,344"/>
+<area shape="rect" id="Node000036" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="752,277,873,303"/>
+<area shape="poly" id="edge16_Node000034_Node000036" title=" " alt="" coords="470,340,738,299,738,304,471,346"/>
+<area shape="rect" id="Node000041" href="$file_8c.html#a253947ab8dc6030b251e47048526795e" title="Read run consecutive blocks in one device call, copy slice into dst." alt="" coords="549,353,674,379"/>
+<area shape="poly" id="edge17_Node000034_Node000041" title=" " alt="" coords="471,355,535,359,535,364,471,361"/>
+<area shape="rect" id="Node000042" href="$file_8c.html#ad37b55f9af3768427abb5ba1ab29ce2f" title="Read one block, copy a slice of it into dst." alt="" coords="519,403,704,428"/>
+<area shape="poly" id="edge18_Node000034_Node000042" title=" " alt="" coords="442,364,519,387,551,396,550,402,518,393,440,369"/>
+<area shape="rect" id="Node000043" href="$file_8c.html#a10ca6e8208aa94bf0bfc0ee79713cd84" title="Fill dst with zeros for a sparse&#45;file hole." alt="" coords="538,452,685,477"/>
+<area shape="poly" id="edge19_Node000034_Node000043" title=" " alt="" coords="416,365,461,400,520,437,540,445,538,450,517,442,457,405,413,369"/>
+<area shape="poly" id="edge15_Node000035_Node000036" title=" " alt="" coords="681,271,738,278,738,283,681,276"/>
+</map>

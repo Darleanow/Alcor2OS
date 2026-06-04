@@ -1,0 +1,7 @@
+<map id="sh_putnum" name="sh_putnum">
+<area shape="rect" id="Node000001" title="Write n as a decimal integer to stdout (handles negative)." alt="" coords="5,5,100,31"/>
+<area shape="rect" id="Node000002" href="$io_8c.html#abbcf40b333390b085e60b958797ff888" title="Write a single byte to stdout." alt="" coords="148,5,241,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,15,134,15,134,21,100,21"/>
+<area shape="rect" id="Node000003" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="289,5,367,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="241,15,276,15,276,21,241,21"/>
+</map>

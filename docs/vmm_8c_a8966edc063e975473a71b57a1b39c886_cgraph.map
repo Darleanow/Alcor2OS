@@ -1,0 +1,16 @@
+<map id="vmm_destroy_user_mappings" name="vmm_destroy_user_mappings">
+<area shape="rect" id="Node000001" title="Destroy all user mappings in an address space." alt="" coords="5,77,224,103"/>
+<area shape="rect" id="Node000002" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="485,52,575,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,81,471,66,472,71,225,86"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="272,98,431,138"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="222,100,259,104,258,110,222,105"/>
+<area shape="rect" id="Node000003" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="640,5,747,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="574,49,634,32,635,37,576,55"/>
+<area shape="rect" id="Node000004" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="643,55,743,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="575,63,629,64,629,69,575,68"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="418,95,473,79,475,84,419,101"/>
+<area shape="rect" id="Node000006" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="479,105,581,131"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="431,115,465,115,465,121,431,121"/>
+<area shape="rect" id="Node000007" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="629,105,757,131"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="582,115,615,115,615,121,582,121"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="reblit_cells_under_footprint" name="reblit_cells_under_footprint">
+<area shape="rect" id="Node000001" title="Re&#45;blit every cell that the cursor footprint touched, restoring the characters under it." alt="" coords="645,35,783,75"/>
+<area shape="rect" id="Node000002" href="$fb__console_2mouse_8c.html#a05afd0ea2119945dc3b079c2b5b99a66" title=" " alt="" coords="441,42,597,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="631,57,598,57,598,52,631,52"/>
+<area shape="rect" id="Node000003" href="$fb__console_2mouse_8c.html#a677e4373c35c0f708dfa5c99ce5051ba" title="Erase the software mouse cursor if it is painted, so the scrollback pixel&#45;move does not drag a stale ..." alt="" coords="208,5,393,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="427,45,393,40,394,35,428,40"/>
+<area shape="rect" id="Node000013" href="$fb__console_2mouse_8c.html#a261a735182368be5acb1566346962626" title="Paint or move the software mouse cursor. Early&#45;outs when the pointer has not moved since the last cal..." alt="" coords="219,70,382,95"/>
+<area shape="poly" id="edge4_Node000002_Node000013" title=" " alt="" coords="428,69,383,75,382,70,427,64"/>
+<area shape="rect" id="Node000004" href="$scrollback_8c.html#a5eb39721ae7c9e68a54d078fc0fa6033" title="Drain the pending&#45;scroll counter: copies pixels up in one MMIO blit and marks the freshly exposed row..." alt="" coords="5,13,160,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="194,28,160,28,160,23,194,23"/>
+<area shape="rect" id="Node000014" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="21,70,144,95"/>
+<area shape="poly" id="edge5_Node000013_Node000014" title=" " alt="" coords="206,85,144,85,144,80,206,80"/>
+</map>

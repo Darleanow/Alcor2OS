@@ -1,0 +1,7 @@
+<map id="user/games/doom/src/i_sound_stub.c" name="user/games/doom/src/i_sound_stub.c">
+<area shape="rect" id="Node000001" title="No&#45;op sound backend for Alcor2OS." alt="" coords="18,5,181,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,89,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,47,65,83,60,80,85,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="114,93,189,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,44,138,80,134,83,110,47"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sh_putchar" name="sh_putchar">
+<area shape="rect" id="Node000001" title="Write a single byte to stdout." alt="" coords="5,5,99,31"/>
+<area shape="rect" id="Node000002" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="147,5,224,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,15,133,15,133,21,99,21"/>
+</map>

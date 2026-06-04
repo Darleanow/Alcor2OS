@@ -1,0 +1,5 @@
+<map id="vmm_switch" name="vmm_switch">
+<area shape="rect" id="Node000001" title="Switch to a different page table." alt="" coords="5,5,111,31"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a3509e1de421fbf18b46fad5dc211d7d1" title="Set the current CR3 (PML4) value and flush the TLB." alt="" coords="159,5,271,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,15,145,15,145,21,111,21"/>
+</map>

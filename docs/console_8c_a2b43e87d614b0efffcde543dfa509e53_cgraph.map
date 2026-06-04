@@ -1,0 +1,9 @@
+<map id="fb_clear_rectangle" name="fb_clear_rectangle">
+<area shape="rect" id="Node000001" title="Fill rows [y0, y1) with ctx.bg, fast&#45;path on 32 bpp." alt="" coords="5,31,148,56"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="196,31,297,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,41,182,41,182,46,148,46"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="345,5,436,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="297,32,331,26,332,31,298,37"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="345,55,436,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="298,49,332,55,331,60,297,54"/>
+</map>

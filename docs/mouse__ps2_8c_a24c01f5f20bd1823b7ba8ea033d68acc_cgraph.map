@@ -1,0 +1,25 @@
+<map id="mouse_cmd" name="mouse_cmd">
+<area shape="rect" id="Node000001" title="Send a command to the mouse via the AUX port." alt="" coords="5,72,107,98"/>
+<area shape="rect" id="Node000002" href="$mouse__ps2_8c.html#a16ddfad4f1a5feb09d3b53f7893b703f" title="Send a command byte to the controller (port 0x64)." alt="" coords="175,72,255,98"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,82,162,82,162,88,107,88"/>
+<area shape="rect" id="Node000007" href="$mouse__ps2_8c.html#ad166364dae9026806e72b787a51fc2f7" title="Read one byte from the controller." alt="" coords="157,122,274,147"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="98,95,161,115,159,120,97,100"/>
+<area shape="rect" id="Node000009" href="$mouse__ps2_8c.html#a67fb73771a785ab88414bf6622c194c3" title="Send a data byte to the controller (port 0x60)." alt="" coords="155,23,276,48"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="97,70,159,50,161,55,98,75"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="648,22,699,47"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="255,72,324,58,497,40,634,33,634,38,497,45,324,64,256,77"/>
+<area shape="rect" id="Node000004" href="$mouse__ps2_8c.html#a2c86d21aafe1ed28adf9fb89f6019dc5" title="Spin until the input buffer is free." alt="" coords="324,72,483,98"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="256,82,310,82,310,88,256,88"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="544,122,587,147"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="446,95,532,122,530,127,445,100"/>
+<area shape="rect" id="Node000006" href="$io_8h.html#a488d1b3600792ee3aac5be4b7e0be16b" title="Short I/O delay (write to port 0x80)." alt="" coords="531,72,600,98"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="483,82,517,82,517,88,483,88"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="592,70,635,49,637,54,594,75"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="261,144,324,157,403,164,482,157,530,145,531,150,483,162,403,169,324,162,260,150"/>
+<area shape="rect" id="Node000008" href="$mouse__ps2_8c.html#a16aef608030c66970d3ac07b5762eff6" title="Spin until a byte is available to read." alt="" coords="325,122,482,147"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="274,132,311,132,311,137,274,137"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="482,132,530,132,530,137,482,137"/>
+<area shape="poly" id="edge11_Node000008_Node000006" title=" " alt="" coords="445,119,482,108,517,97,518,102,483,113,447,124"/>
+<area shape="poly" id="edge13_Node000009_Node000003" title=" " alt="" coords="274,20,324,13,462,3,523,5,600,13,635,20,634,25,600,18,523,10,462,8,324,18,275,26"/>
+<area shape="poly" id="edge14_Node000009_Node000004" title=" " alt="" coords="265,46,341,66,340,71,264,51"/>
+</map>

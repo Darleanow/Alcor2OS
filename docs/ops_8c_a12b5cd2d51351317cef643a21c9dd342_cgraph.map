@@ -1,0 +1,68 @@
+<map id="ext2_ops_mkdir" name="ext2_ops_mkdir">
+<area shape="rect" id="Node000001" title="fs_ops_t.mkdir shim." alt="" coords="5,349,132,375"/>
+<area shape="rect" id="Node000002" href="$dir_8c.html#a28d0deef2247c3e0c95faa3a132818cb" title="Create a directory on an ext2 volume." alt="" coords="180,349,276,375"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,359,167,359,167,365,132,365"/>
+<area shape="rect" id="Node000003" href="$alloc_8c.html#ad5ce0f6a48bd8f159250205d87f776fe" title="Allocate a free inode, preferring preferred_group." alt="" coords="373,293,469,319"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="272,347,362,320,364,325,273,352"/>
+<area shape="rect" id="Node000040" href="$super_8c.html#aa50c8585de644b8e72f4a802b28ba90f" title="Flush the in&#45;memory superblock + group descriptor table back to disk." alt="" coords="359,457,482,483"/>
+<area shape="poly" id="edge7_Node000002_Node000040" title=" " alt="" coords="253,372,386,448,384,453,251,377"/>
+<area shape="rect" id="Node000043" href="$dir_8c.html#a50965d840027273bd97786f78aab5010" title="Initialise the in&#45;memory new&#45;directory inode." alt="" coords="345,556,496,581"/>
+<area shape="poly" id="edge14_Node000002_Node000043" title=" " alt="" coords="239,373,274,427,326,492,358,521,390,546,387,550,354,525,322,496,270,431,235,376"/>
+<area shape="rect" id="Node000044" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="324,156,517,181"/>
+<area shape="poly" id="edge16_Node000002_Node000044" title=" " alt="" coords="232,348,264,284,290,245,322,211,343,196,365,184,367,189,346,200,326,215,294,249,269,287,237,350"/>
+<area shape="rect" id="Node000055" href="$inode_8c.html#a83b9fef6ebc8d2289b2c6bd6258cf7bd" title="Persist inode to its on&#45;disk slot for inode number ino." alt="" coords="605,156,704,181"/>
+<area shape="poly" id="edge43_Node000002_Node000055" title=" " alt="" coords="240,347,275,313,323,278,392,244,464,216,591,179,593,184,465,221,394,249,325,283,279,317,243,351"/>
+<area shape="rect" id="Node000065" href="$dir_8c.html#ae8b1d460d057e6b7e793044f392a1274" title="Allocate the first data block, seed it with ./.., persist it, and wire it into inode." alt="" coords="335,349,507,375"/>
+<area shape="poly" id="edge32_Node000002_Node000065" title=" " alt="" coords="276,359,321,359,321,365,276,365"/>
+<area shape="rect" id="Node000067" href="$dir_8c.html#a040966dd0c8ee506f6df4f40a6729ad2" title="Validate the path&#45;target / split&#45;name / resolve&#45;parent triple." alt="" coords="337,657,504,683"/>
+<area shape="poly" id="edge40_Node000002_Node000067" title=" " alt="" coords="235,374,264,470,291,532,326,591,356,623,389,648,385,652,352,627,322,594,286,534,259,472,230,376"/>
+<area shape="rect" id="Node000004" href="$alloc_8c.html#afec890af95487aee5f579d5ff8442824" title="Try to allocate one inode inside group." alt="" coords="575,205,734,231"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="446,291,500,266,564,239,587,232,589,237,566,245,502,271,449,296"/>
+<area shape="rect" id="Node000007" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="826,205,882,231"/>
+<area shape="poly" id="edge4_Node000004_Node000007" title=" " alt="" coords="734,215,812,215,812,221,734,221"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="817,156,891,181"/>
+<area shape="poly" id="edge5_Node000004_Node000021" title=" " alt="" coords="706,203,803,178,804,184,707,208"/>
+<area shape="rect" id="Node000038" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="792,255,916,280"/>
+<area shape="poly" id="edge6_Node000004_Node000038" title=" " alt="" coords="707,228,789,249,788,254,706,233"/>
+<area shape="rect" id="Node000041" href="$super_8c.html#ab583d07e6992607105e3b289df85efc6" title="Persist the group descriptor table back to disk." alt="" coords="565,457,744,483"/>
+<area shape="poly" id="edge8_Node000040_Node000041" title=" " alt="" coords="482,467,551,467,551,473,482,473"/>
+<area shape="rect" id="Node000042" href="$super_8c.html#a9317379514987ab108f12351bd0aa464" title="Persist the in&#45;memory superblock back to disk." alt="" coords="588,556,721,581"/>
+<area shape="poly" id="edge13_Node000040_Node000042" title=" " alt="" coords="445,480,499,510,566,541,591,549,589,555,564,546,497,515,442,485"/>
+<area shape="poly" id="edge9_Node000041_Node000007" title=" " alt="" coords="674,455,709,428,742,391,753,370,758,351,762,314,767,278,775,259,790,240,811,226,814,230,794,244,780,262,772,280,767,315,764,352,758,372,746,394,713,432,678,459"/>
+<area shape="poly" id="edge10_Node000041_Node000021" title=" " alt="" coords="675,455,710,428,727,411,742,391,755,364,760,338,761,289,760,265,763,241,772,217,790,191,803,180,806,185,794,194,777,219,768,243,766,266,766,289,766,338,760,365,746,394,731,414,713,432,678,459"/>
+<area shape="poly" id="edge12_Node000041_Node000038" title=" " alt="" coords="707,455,742,436,776,402,804,363,841,291,845,294,808,366,780,405,746,440,710,460"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="825,507,883,532"/>
+<area shape="poly" id="edge11_Node000041_Node000031" title=" " alt="" coords="707,480,812,506,810,511,706,485"/>
+<area shape="poly" id="edge15_Node000043_Node000031" title=" " alt="" coords="465,579,521,592,592,602,668,603,706,599,743,590,790,568,827,539,831,544,792,572,745,595,707,604,668,608,591,607,520,597,464,584"/>
+<area shape="rect" id="Node000045" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="599,5,710,31"/>
+<area shape="poly" id="edge17_Node000044_Node000045" title=" " alt="" coords="432,154,487,104,524,74,564,48,595,33,597,38,567,52,527,78,490,108,436,158"/>
+<area shape="rect" id="Node000062" href="$alloc_8c.html#a8cee33622c2b8dee0188a576295a4e74" title="Mark block as free in its owning group&#39;s bitmap." alt="" coords="609,255,700,280"/>
+<area shape="poly" id="edge20_Node000044_Node000062" title=" " alt="" coords="445,179,499,209,566,240,597,250,595,255,564,244,497,213,442,184"/>
+<area shape="rect" id="Node000064" href="$alloc_8c.html#a10b50b2d49c8692548222a916d2257a8" title="Mark inode ino as free in its owning group&#39;s bitmap." alt="" coords="609,107,700,132"/>
+<area shape="poly" id="edge24_Node000044_Node000064" title=" " alt="" coords="481,153,595,129,597,134,482,159"/>
+<area shape="poly" id="edge28_Node000044_Node000055" title=" " alt="" coords="517,166,591,166,591,171,517,171"/>
+<area shape="poly" id="edge18_Node000045_Node000007" title=" " alt="" coords="676,29,711,56,746,92,762,120,768,144,776,167,794,191,814,204,811,208,790,195,771,170,763,146,757,122,742,96,707,60,673,33"/>
+<area shape="poly" id="edge19_Node000045_Node000021" title=" " alt="" coords="705,28,745,48,774,70,799,95,838,143,834,146,795,99,770,74,743,52,703,33"/>
+<area shape="poly" id="edge21_Node000062_Node000007" title=" " alt="" coords="699,254,812,225,813,231,701,259"/>
+<area shape="poly" id="edge22_Node000062_Node000021" title=" " alt="" coords="699,257,743,240,757,228,766,216,775,204,790,190,802,184,805,188,794,195,779,207,770,219,761,232,745,244,701,262"/>
+<area shape="poly" id="edge23_Node000062_Node000038" title=" " alt="" coords="700,265,778,265,778,270,700,270"/>
+<area shape="poly" id="edge25_Node000064_Node000007" title=" " alt="" coords="701,124,745,141,761,153,771,166,780,178,794,190,814,202,812,206,790,195,776,182,766,169,757,157,743,146,699,129"/>
+<area shape="poly" id="edge26_Node000064_Node000021" title=" " alt="" coords="701,128,804,154,803,159,699,133"/>
+<area shape="poly" id="edge27_Node000064_Node000038" title=" " alt="" coords="701,121,724,129,746,141,758,154,765,166,771,191,777,216,794,240,800,245,797,249,790,244,772,218,766,192,760,168,753,157,742,145,722,133,699,126"/>
+<area shape="poly" id="edge29_Node000055_Node000007" title=" " alt="" coords="705,178,813,205,812,211,703,183"/>
+<area shape="poly" id="edge30_Node000055_Node000021" title=" " alt="" coords="704,166,802,166,802,171,704,171"/>
+<area shape="poly" id="edge31_Node000055_Node000038" title=" " alt="" coords="705,174,745,190,761,203,771,215,780,227,794,240,805,247,802,251,790,244,776,231,766,218,757,206,743,195,703,179"/>
+<area shape="poly" id="edge35_Node000065_Node000007" title=" " alt="" coords="505,347,640,321,700,305,743,289,757,278,766,266,776,253,790,240,812,229,814,233,794,244,780,257,771,269,761,282,745,294,702,310,641,326,506,352"/>
+<area shape="poly" id="edge36_Node000065_Node000021" title=" " alt="" coords="488,347,515,328,534,299,540,269,539,238,534,208,530,177,530,148,540,119,564,92,586,76,608,67,629,63,650,64,693,74,745,92,793,115,831,144,828,148,790,119,743,96,692,80,649,69,629,68,609,72,589,81,567,96,545,122,535,149,535,177,539,207,544,238,546,269,539,301,519,332,491,351"/>
+<area shape="poly" id="edge39_Node000065_Node000038" title=" " alt="" coords="454,372,510,391,584,406,624,410,665,409,705,403,743,390,774,370,800,344,838,291,842,294,805,348,777,375,745,395,706,408,666,415,624,415,583,412,509,396,452,377"/>
+<area shape="poly" id="edge34_Node000065_Node000062" title=" " alt="" coords="467,347,516,328,540,313,564,297,599,282,601,287,567,302,543,317,519,332,468,352"/>
+<area shape="rect" id="Node000050" href="$alloc_8c.html#ad132e225f76cc34a8971d2fcd30e55b8" title="Allocate a free block, preferring preferred_group." alt="" coords="607,356,702,381"/>
+<area shape="poly" id="edge33_Node000065_Node000050" title=" " alt="" coords="507,362,593,364,593,370,507,367"/>
+<area shape="rect" id="Node000066" href="$dir_8c.html#ac8168e91870d7204651f2225f36f612e" title="Populate block_buf with the . and .. dirents." alt="" coords="589,507,720,532"/>
+<area shape="poly" id="edge37_Node000065_Node000066" title=" " alt="" coords="439,373,519,443,542,470,552,481,567,492,582,499,579,504,564,496,548,485,538,473,515,447,436,377"/>
+<area shape="poly" id="edge38_Node000066_Node000031" title=" " alt="" coords="720,517,811,517,811,522,720,522"/>
+<area shape="rect" id="Node000068" href="$path_8c.html#a3b165d99d5585b3187f4caf5c427723a" title="Split a path into its parent and final component." alt="" coords="611,657,698,683"/>
+<area shape="poly" id="edge41_Node000067_Node000068" title=" " alt="" coords="504,667,597,667,597,673,504,673"/>
+<area shape="rect" id="Node000070" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="601,707,708,732"/>
+<area shape="poly" id="edge42_Node000067_Node000070" title=" " alt="" coords="482,680,588,703,587,708,481,685"/>
+</map>

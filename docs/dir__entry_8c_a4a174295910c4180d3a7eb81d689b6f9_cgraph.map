@@ -1,0 +1,7 @@
+<map id="dir_init_first_entry" name="dir_init_first_entry">
+<area shape="rect" id="Node000001" title="Lay a single dirent in a freshly allocated, zeroed block." alt="" coords="5,31,145,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="193,5,280,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,30,179,24,180,29,146,35"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="207,55,266,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,51,194,58,193,64,145,56"/>
+</map>

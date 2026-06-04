@@ -1,0 +1,10 @@
+<map id="ps2_cmd" name="ps2_cmd">
+<area shape="rect" id="Node000001" title="Send a command byte to the controller (port 0x64)." alt="" coords="457,31,537,56"/>
+<area shape="rect" id="Node000002" href="$mouse__ps2_8c.html#a24c01f5f20bd1823b7ba8ea033d68acc" title="Send a command to the mouse via the AUX port." alt="" coords="308,5,409,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="443,36,409,30,410,25,444,31"/>
+<area shape="rect" id="Node000003" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="136,31,260,56"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="444,46,260,46,260,41,444,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,31,261,36,260,31,294,25"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="5,31,88,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="122,46,88,46,88,41,122,41"/>
+</map>

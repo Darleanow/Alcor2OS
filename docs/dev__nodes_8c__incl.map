@@ -1,0 +1,70 @@
+<map id="src/kernel/drivers/dev_nodes.c" name="src/kernel/drivers/dev_nodes.c">
+<area shape="rect" id="Node000001" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="936,5,1071,45"/>
+<area shape="rect" id="Node000002" href="$alcor__fb_8h.html" title="Userspace API: Limine linear framebuffer info and mmap helpers." alt="" coords="885,167,1016,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="999,47,961,154,956,153,994,45"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="996,240,1110,265"/>
+<area shape="poly" id="edge45_Node000001_Node000003" title=" " alt="" coords="1010,45,1050,226,1045,227,1005,46"/>
+<area shape="rect" id="Node000007" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="287,167,414,192"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="936,28,844,31,729,41,604,61,542,77,482,96,423,126,375,160,372,156,420,122,480,91,540,72,603,56,729,36,844,26,936,23"/>
+<area shape="rect" id="Node000008" href="$console_8h.html" title="Kernel boot/panic logger on the linear framebuffer." alt="" coords="490,167,667,192"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="936,40,835,61,779,77,725,96,660,128,607,161,604,156,658,123,723,91,777,72,834,56,935,34"/>
+<area shape="rect" id="Node000009" href="$fb__console_8h.html" title="Kernel framebuffer text console." alt="" coords="1645,93,1842,119"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="1072,31,1632,90,1631,95,1071,36"/>
+<area shape="rect" id="Node000010" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="1883,167,2066,192"/>
+<area shape="poly" id="edge24_Node000001_Node000010" title=" " alt="" coords="1071,25,1247,29,1475,39,1696,59,1787,73,1855,91,1884,104,1911,121,1954,155,1951,159,1908,125,1881,109,1853,96,1786,78,1696,64,1474,45,1247,34,1071,30"/>
+<area shape="rect" id="Node000011" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="1346,167,1482,192"/>
+<area shape="poly" id="edge36_Node000001_Node000011" title=" " alt="" coords="1072,27,1128,34,1194,45,1262,64,1326,91,1368,121,1399,154,1395,158,1364,125,1324,96,1260,69,1193,51,1128,39,1071,33"/>
+<area shape="rect" id="Node000012" href="$fb__user_8h.html" title="Export Limine framebuffer to user processes (shared scanout buffer)." alt="" coords="735,93,910,119"/>
+<area shape="poly" id="edge18_Node000001_Node000012" title=" " alt="" coords="961,48,863,90,861,85,959,43"/>
+<area shape="rect" id="Node000014" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="1917,93,2029,119"/>
+<area shape="poly" id="edge23_Node000001_Node000014" title=" " alt="" coords="1071,27,1425,49,1660,67,1899,91,1904,91,1903,97,1898,96,1660,72,1425,54,1071,33"/>
+<area shape="rect" id="Node000015" href="$ramfs_8h.html" title="Public ramfs API: init + character&#45;device registration." alt="" coords="1042,93,1174,119"/>
+<area shape="poly" id="edge25_Node000001_Node000015" title=" " alt="" coords="1030,43,1083,83,1080,87,1027,48"/>
+<area shape="rect" id="Node000016" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="1198,93,1313,119"/>
+<area shape="poly" id="edge27_Node000001_Node000016" title=" " alt="" coords="1065,43,1206,87,1205,92,1063,48"/>
+<area shape="rect" id="Node000018" href="$kbd_8h.html" title="Keyboard layouts and tty&#45;line translation (scancode → characters)." alt="" coords="67,93,170,119"/>
+<area shape="poly" id="edge30_Node000001_Node000018" title=" " alt="" coords="936,33,614,55,402,73,188,96,184,97,183,91,187,91,402,68,613,49,936,28"/>
+<area shape="rect" id="Node000020" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="200,93,322,119"/>
+<area shape="poly" id="edge34_Node000001_Node000020" title=" " alt="" coords="936,36,336,99,336,94,935,31"/>
+<area shape="rect" id="Node000021" href="$vmm_8h.html" title="Virtual memory manager (paging)." alt="" coords="492,93,635,119"/>
+<area shape="poly" id="edge37_Node000001_Node000021" title=" " alt="" coords="936,41,642,94,641,88,935,36"/>
+<area shape="rect" id="Node000022" href="$proc_8h.html" title="Process management and scheduling." alt="" coords="1388,93,1526,119"/>
+<area shape="poly" id="edge39_Node000001_Node000022" title=" " alt="" coords="1071,36,1378,88,1377,94,1071,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="968,190,1026,230,1023,234,965,194"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="1533,313,1616,339"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1111,259,1520,315,1519,320,1110,264"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="1116,313,1190,339"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="1071,263,1127,303,1124,307,1068,268"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="1800,313,1871,339"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="1111,257,1787,318,1786,323,1110,262"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="414,187,433,189,739,221,982,243,982,248,739,226,433,195,414,192"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="655,189,982,238,982,243,654,195"/>
+<area shape="poly" id="edge15_Node000009_Node000003" title=" " alt="" coords="1742,120,1725,158,1711,178,1692,194,1646,214,1584,228,1509,239,1427,247,1261,254,1124,255,1124,250,1261,249,1427,241,1508,234,1583,223,1644,209,1689,190,1707,174,1721,155,1738,118"/>
+<area shape="poly" id="edge16_Node000009_Node000004" title=" " alt="" coords="1767,117,1793,137,1815,165,1827,193,1833,218,1829,242,1815,267,1803,278,1785,287,1737,302,1630,321,1629,316,1736,297,1783,282,1800,273,1811,264,1824,240,1827,218,1822,195,1811,168,1790,140,1763,121"/>
+<area shape="poly" id="edge17_Node000009_Node000005" title=" " alt="" coords="1747,119,1743,156,1735,176,1723,194,1684,220,1627,243,1559,263,1482,280,1328,306,1205,322,1204,317,1327,301,1481,275,1557,258,1626,238,1681,215,1719,190,1731,174,1737,154,1741,119"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="1781,116,1925,160,1923,165,1780,121"/>
+<area shape="poly" id="edge13_Node000009_Node000011" title=" " alt="" coords="1691,121,1481,166,1480,161,1690,116"/>
+<area shape="poly" id="edge12_Node000010_Node000006" title=" " alt="" coords="1965,194,1858,305,1854,302,1961,191"/>
+<area shape="poly" id="edge14_Node000011_Node000003" title=" " alt="" coords="1357,195,1125,240,1123,235,1356,189"/>
+<area shape="poly" id="edge19_Node000012_Node000002" title=" " alt="" coords="844,116,918,157,916,162,842,121"/>
+<area shape="poly" id="edge22_Node000012_Node000003" title=" " alt="" coords="795,121,767,135,742,152,729,171,729,181,734,190,749,203,773,213,837,230,912,240,982,246,982,251,911,245,836,235,771,218,746,207,730,194,723,182,724,170,739,148,764,130,792,116"/>
+<area shape="rect" id="Node000013" href="$limine_8h.html" title="Limine bootloader protocol definitions." alt="" coords="743,167,862,192"/>
+<area shape="poly" id="edge20_Node000012_Node000013" title=" " alt="" coords="822,120,812,154,807,153,816,118"/>
+<area shape="poly" id="edge21_Node000013_Node000003" title=" " alt="" coords="843,189,1000,234,998,239,842,195"/>
+<area shape="poly" id="edge26_Node000015_Node000003" title=" " alt="" coords="1106,120,1065,228,1060,226,1101,118"/>
+<area shape="poly" id="edge29_Node000016_Node000003" title=" " alt="" coords="1241,121,1082,234,1079,230,1238,117"/>
+<area shape="rect" id="Node000017" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="1192,167,1322,192"/>
+<area shape="poly" id="edge28_Node000016_Node000017" title=" " alt="" coords="1259,119,1259,153,1254,153,1253,119"/>
+<area shape="poly" id="edge33_Node000018_Node000003" title=" " alt="" coords="85,121,53,135,24,152,15,161,9,171,9,180,15,190,28,196,55,202,146,213,424,230,739,241,982,247,982,253,739,246,424,235,146,218,54,207,26,201,11,194,4,182,4,169,10,158,21,148,51,130,83,116"/>
+<area shape="rect" id="Node000019" href="$keyboard_8h.html" title="PS/2 keyboard driver." alt="" coords="25,167,212,192"/>
+<area shape="poly" id="edge31_Node000018_Node000019" title=" " alt="" coords="121,119,121,153,116,153,116,119"/>
+<area shape="poly" id="edge32_Node000019_Node000003" title=" " alt="" coords="212,188,231,189,657,222,982,244,982,250,657,228,230,195,212,193"/>
+<area shape="poly" id="edge35_Node000020_Node000003" title=" " alt="" coords="262,119,261,155,266,174,277,190,291,198,314,205,383,218,474,228,580,236,802,245,982,248,982,253,802,250,580,241,474,233,382,223,313,210,289,203,274,194,262,176,256,156,256,119"/>
+<area shape="poly" id="edge38_Node000021_Node000003" title=" " alt="" coords="538,121,512,135,488,153,475,172,475,181,480,190,504,202,551,213,688,230,846,241,982,247,981,252,846,246,687,235,550,218,503,207,476,194,470,182,470,170,484,149,509,131,536,116"/>
+<area shape="poly" id="edge44_Node000022_Node000003" title=" " alt="" coords="1527,110,1588,119,1644,134,1665,145,1678,159,1680,175,1669,194,1641,208,1590,220,1440,237,1269,247,1124,252,1124,247,1269,242,1440,231,1589,215,1639,203,1666,190,1675,174,1673,161,1662,149,1642,139,1587,124,1526,115"/>
+<area shape="poly" id="edge41_Node000022_Node000011" title=" " alt="" coords="1452,120,1430,156,1426,154,1448,118"/>
+<area shape="poly" id="edge40_Node000022_Node000017" title=" " alt="" coords="1426,121,1304,164,1302,159,1424,116"/>
+<area shape="rect" id="Node000023" href="$signal_8h.html" title="POSIX signal handling infrastructure (Linux x86_64 compatible)." alt="" coords="1506,167,1656,192"/>
+<area shape="poly" id="edge42_Node000022_Node000023" title=" " alt="" coords="1478,116,1550,157,1548,162,1476,121"/>
+<area shape="poly" id="edge43_Node000023_Node000003" title=" " alt="" coords="1506,193,1124,244,1124,239,1506,188"/>
+</map>

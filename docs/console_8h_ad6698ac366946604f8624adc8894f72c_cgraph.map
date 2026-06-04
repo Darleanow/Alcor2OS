@@ -1,0 +1,5 @@
+<map id="console_init" name="console_init">
+<area shape="rect" id="Node000001" title="Initialize the console with the given framebuffer." alt="" coords="5,5,105,31"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a4a9b6ef5ee0db021ca9b257eb0a006a0" title="Translate bits&#45;per&#45;pixel to bytes&#45;per&#45;pixel, clamped to [2, 4]." alt="" coords="153,5,304,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,15,139,15,139,21,106,21"/>
+</map>

@@ -1,0 +1,46 @@
+<map id="blit_cell_data" name="blit_cell_data">
+<area shape="rect" id="Node000001" title="Render c at grid (col, row)." alt="" coords="5,303,115,328"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="167,252,297,277"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,300,174,279,176,284,105,305"/>
+<area shape="rect" id="Node000014" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="173,153,291,179"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="74,301,204,186,208,190,78,305"/>
+<area shape="rect" id="Node000019" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="163,352,301,377"/>
+<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="106,325,175,346,173,351,104,331"/>
+<area shape="rect" id="Node000021" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="349,552,508,577"/>
+<area shape="poly" id="edge24_Node000001_Node000021" title=" " alt="" coords="76,326,118,366,183,423,263,484,351,538,365,545,363,550,348,543,260,489,180,427,114,370,72,330"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#a6044c78408cc1b4d1b0391c9d20157b8" title="Companion of atlas_blit_width for the height axis." alt="" coords="363,252,494,277"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="297,262,349,262,349,267,297,267"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a1c96b96c3d950073be21f399e4774e1e" title="Atlas cell width clamped to the live cell width." alt="" coords="366,55,491,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="245,250,272,223,299,189,313,161,319,137,328,113,347,89,353,85,357,89,351,93,332,116,324,138,318,163,304,191,276,226,249,254"/>
+<area shape="rect" id="Node000005" href="$cell_8c.html#adc43e1a6950e650d97d104d9410bc4f7" title="Resolve cp / attr to an atlas glyph base pointer, or NULL when no glyph is registered." alt="" coords="361,104,496,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="243,250,348,139,359,132,362,137,351,143,247,254"/>
+<area shape="rect" id="Node000008" href="$cell_8c.html#a23ea76c7f8a7c496dacf16c291233e6a" title="Bytes per atlas pixel, rounded up from atlas_bpp." alt="" coords="361,203,497,228"/>
+<area shape="poly" id="edge6_Node000002_Node000008" title=" " alt="" coords="283,249,364,229,365,234,284,255"/>
+<area shape="rect" id="Node000009" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html#ac925fc3736956c3f5c81b6bcda4908a9" title="Alpha&#45;blend one row of an atlas glyph into the framebuffer." alt="" coords="363,301,495,327"/>
+<area shape="poly" id="edge7_Node000002_Node000009" title=" " alt="" coords="284,275,365,295,364,301,283,280"/>
+<area shape="rect" id="Node000010" href="$cell_8c.html#ade3086a7926e6d075655c612091a204d" title="Pointer to the start of pixel&#45;x px_x on framebuffer row y in the 32&#45;bpp fast path." alt="" coords="580,453,667,479"/>
+<area shape="poly" id="edge8_Node000002_Node000010" title=" " alt="" coords="253,275,351,336,475,398,580,445,578,450,472,403,348,340,250,280"/>
+<area shape="rect" id="Node000011" href="$cell_8c.html#ad1ec4964107f67e9686ac7aee48cd5e6" title="Bg&#45;fill every framebuffer row inside the cell at (px_x, px_y)." alt="" coords="359,453,498,479"/>
+<area shape="poly" id="edge9_Node000002_Node000011" title=" " alt="" coords="249,276,276,303,304,338,318,365,325,388,333,410,351,432,370,445,367,449,348,436,329,413,320,390,313,367,299,341,272,307,245,279"/>
+<area shape="rect" id="Node000013" href="$cell_8c.html#aef10e06b384c26fb419d301d54197703" title="Split a packed 0xRRGGBB word into its three 8&#45;bit channels." alt="" coords="380,153,477,179"/>
+<area shape="poly" id="edge12_Node000002_Node000013" title=" " alt="" coords="248,250,292,219,348,188,366,180,368,185,350,192,295,224,251,254"/>
+<area shape="rect" id="Node000006" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a5a024efc6ccd9545de342ac39a77ef3f" title="Resolve to the bold or italic sub&#45;atlas slot when SGR asks for one." alt="" coords="556,104,691,129"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="496,114,542,114,542,119,496,119"/>
+<area shape="poly" id="edge10_Node000011_Node000010" title=" " alt="" coords="498,463,566,463,566,469,498,469"/>
+<area shape="rect" id="Node000012" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html#af20729b3f28f794e0ac0570ac8ef9c9d" title="32&#45;bit splat using rep stosl. Inlined across every TU that touches pixels because the call overhead d..." alt="" coords="596,527,651,552"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="475,476,509,488,584,519,582,524,507,492,474,481"/>
+<area shape="poly" id="edge14_Node000014_Node000003" title=" " alt="" coords="252,177,296,206,350,237,370,245,368,250,348,242,293,211,249,181"/>
+<area shape="poly" id="edge15_Node000014_Node000004" title=" " alt="" coords="248,151,292,121,348,89,365,82,367,87,351,94,295,125,251,156"/>
+<area shape="poly" id="edge16_Node000014_Node000005" title=" " alt="" coords="283,151,364,130,365,135,284,156"/>
+<area shape="poly" id="edge17_Node000014_Node000008" title=" " alt="" coords="284,176,365,197,364,202,283,181"/>
+<area shape="poly" id="edge20_Node000014_Node000013" title=" " alt="" coords="292,163,366,163,366,169,292,169"/>
+<area shape="rect" id="Node000015" href="$cell_8c.html#ac3152c39c80c4fd39e25e31ea7bd3403" title="Blend one atlas pixel onto the framebuffer at (x, y)." alt="" coords="361,5,496,31"/>
+<area shape="poly" id="edge18_Node000014_Node000015" title=" " alt="" coords="240,151,282,98,313,67,348,40,359,34,362,38,351,44,316,71,286,101,244,155"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="573,253,674,279"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="492,29,510,40,530,63,540,86,547,111,558,140,611,240,606,242,554,142,542,112,535,88,526,66,506,44,489,33"/>
+<area shape="poly" id="edge22_Node000019_Node000016" title=" " alt="" coords="302,364,401,358,455,350,507,336,555,313,594,285,597,290,557,317,509,340,456,355,401,364,302,369"/>
+<area shape="rect" id="Node000020" href="$font__bitmap_8h.html#aa872bd8d398352cd9c51ed4151e6f056" title="Each byte indexes directly into the atlas." alt="" coords="361,503,496,528"/>
+<area shape="poly" id="edge23_Node000019_Node000020" title=" " alt="" coords="244,376,286,430,316,461,351,488,364,495,361,500,348,492,313,465,282,433,240,379"/>
+<area shape="poly" id="edge25_Node000021_Node000010" title=" " alt="" coords="478,549,507,538,553,512,593,485,596,489,556,517,509,543,480,554"/>
+<area shape="poly" id="edge26_Node000021_Node000012" title=" " alt="" coords="508,552,581,542,582,547,508,557"/>
+</map>

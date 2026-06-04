@@ -1,0 +1,11 @@
+<map id="pit_get_frequency" name="pit_get_frequency">
+<area shape="rect" id="Node000001" title="Current tick rate in Hz." alt="" coords="547,31,685,56"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#a232cb32967d6e6c86fd7bd7de2d05c82" title="Convert a millisecond timeout to whole HLT ticks at the current PIT rate, rounding up to at least one..." alt="" coords="348,31,499,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="533,46,499,46,499,41,533,41"/>
+<area shape="rect" id="Node000003" href="$sys__io_8c.html#a9ae20dc458b159a9649c9ebaba7d84d8" title="Compute select/poll timeout parameters from a millisecond value." alt="" coords="168,31,300,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="334,46,300,46,300,41,334,41"/>
+<area shape="rect" id="Node000004" href="$sys__io_8c.html#aaca06518b651665442960902b9448aa1" title="Parse a struct timeval from user space into poll parameters." alt="" coords="5,5,120,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,34,120,29,120,24,155,29"/>
+<area shape="rect" id="Node000006" href="$sys__io_8c.html#ac1f83a4054cef5b877820ce1a87cd67f" title="Wait for events on an array of nfds_u file descriptors (poll)." alt="" coords="25,55,100,80"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="155,57,100,65,100,60,154,52"/>
+</map>

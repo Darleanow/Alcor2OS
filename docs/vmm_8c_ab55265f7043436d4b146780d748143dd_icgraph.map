@@ -1,0 +1,55 @@
+<map id="vmm_switch" name="vmm_switch">
+<area shape="rect" id="Node000001" title="Switch to a different page table." alt="" coords="801,193,907,218"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="612,106,753,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="814,189,708,134,710,129,817,184"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="5,30,124,55"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="835,183,801,138,778,115,752,95,713,74,673,56,587,30,498,15,410,9,326,10,248,15,125,33,124,27,247,10,325,4,410,3,499,10,588,25,674,51,716,69,755,91,781,111,805,134,840,179"/>
+<area shape="rect" id="Node000010" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="633,366,732,391"/>
+<area shape="poly" id="edge8_Node000001_Node000010" title=" " alt="" coords="832,230,698,368,694,364,828,226"/>
+<area shape="rect" id="Node000062" href="$vmm_8c.html#ad88914a67f0dc1a691e35e81f47751fb" title="Initialize the virtual memory manager." alt="" coords="641,415,725,441"/>
+<area shape="poly" id="edge25_Node000001_Node000062" title=" " alt="" coords="849,232,837,270,818,316,791,363,755,405,726,421,724,416,752,401,786,360,813,314,832,268,844,231"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="399,55,538,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="614,105,522,83,524,78,615,100"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="373,106,564,131"/>
+<area shape="poly" id="edge5_Node000002_Node000008" title=" " alt="" coords="598,121,564,121,564,116,598,116"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#af54f572ae171e2176cb67d7b16b30f50" title="Create a process from an ELF image held in kernel memory." alt="" coords="179,55,318,81"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="386,71,318,71,318,65,386,65"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="166,59,124,53,125,48,166,54"/>
+<area shape="rect" id="Node000009" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="16,378,113,403"/>
+<area shape="poly" id="edge6_Node000008_Node000009" title=" " alt="" coords="386,107,334,104,278,108,223,121,197,132,174,146,146,171,124,201,107,234,93,268,77,332,70,378,64,377,71,331,88,266,102,231,120,198,142,167,170,142,195,127,221,116,277,102,334,99,386,102"/>
+<area shape="rect" id="Node000011" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="411,453,526,478"/>
+<area shape="poly" id="edge9_Node000010_Node000011" title=" " alt="" coords="631,398,613,405,498,455,496,450,611,400,629,393"/>
+<area shape="rect" id="Node000012" href="$ata_8c.html#a68e6896893fbe98c8eccac60438be274" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="185,354,313,379"/>
+<area shape="poly" id="edge10_Node000011_Node000012" title=" " alt="" coords="433,448,382,420,324,393,293,382,295,377,326,388,385,416,435,443"/>
+<area shape="rect" id="Node000019" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="192,403,305,429"/>
+<area shape="poly" id="edge11_Node000011_Node000019" title=" " alt="" coords="397,452,305,431,306,426,399,447"/>
+<area shape="rect" id="Node000023" href="$mouse_8c.html#a6362117f962512857d60ae1344e0f756" title="Block until one event is available, then dequeue it." alt="" coords="177,453,321,478"/>
+<area shape="poly" id="edge12_Node000011_Node000023" title=" " alt="" coords="397,468,321,468,321,463,397,463"/>
+<area shape="rect" id="Node000024" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="192,502,305,527"/>
+<area shape="poly" id="edge13_Node000011_Node000024" title=" " alt="" coords="399,484,306,505,305,499,397,478"/>
+<area shape="rect" id="Node000032" href="$pipe_8c.html#a5c16a89b7c4822d4587cee68c0f93c49" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="190,551,307,577"/>
+<area shape="poly" id="edge14_Node000011_Node000032" title=" " alt="" coords="435,487,326,541,292,554,291,549,324,536,432,482"/>
+<area shape="rect" id="Node000037" href="$proc_8c.html#ae82260def3c053c895a522d59223af06" title="If a timer tick requested preemption, run the process scheduler." alt="" coords="172,601,325,626"/>
+<area shape="poly" id="edge15_Node000011_Node000037" title=" " alt="" coords="448,490,396,540,363,567,327,590,298,603,296,598,324,586,359,562,392,536,445,486"/>
+<area shape="rect" id="Node000039" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="207,650,290,675"/>
+<area shape="poly" id="edge16_Node000011_Node000039" title=" " alt="" coords="456,491,405,564,369,604,327,639,291,656,289,651,324,635,365,601,401,561,451,488"/>
+<area shape="rect" id="Node000045" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="189,699,308,725"/>
+<area shape="poly" id="edge18_Node000011_Node000045" title=" " alt="" coords="460,492,441,535,412,587,374,642,327,689,304,702,302,697,324,684,370,638,408,585,436,532,455,490"/>
+<area shape="rect" id="Node000050" href="$proc_8c.html#a6a505a763018bb704b23f24074faf131" title="Wait for a specific child process to exit." alt="" coords="206,749,291,774"/>
+<area shape="poly" id="edge19_Node000011_Node000050" title=" " alt="" coords="458,491,389,632,352,700,327,738,311,749,293,756,291,751,308,744,323,734,348,698,385,629,453,489"/>
+<area shape="rect" id="Node000051" href="$proc_8c.html#a6915d539f11de3b93e8316c67f23301b" title="Wait for child process(es) to change state." alt="" coords="196,798,301,823"/>
+<area shape="poly" id="edge20_Node000011_Node000051" title=" " alt="" coords="457,491,376,662,365,698,359,729,350,758,327,787,303,802,300,798,324,783,345,755,354,728,359,697,371,660,452,489"/>
+<area shape="rect" id="Node000053" href="$sys__io_8c.html#acb10234426dd92c5d297320fd5f3aebb" title="Yield the CPU for one ~10 ms timer tick, then yield to any other READY user proc." alt="" coords="197,157,300,182"/>
+<area shape="poly" id="edge21_Node000011_Node000053" title=" " alt="" coords="458,440,442,388,415,323,376,254,352,223,324,195,299,182,302,177,327,191,356,219,381,251,420,320,447,387,464,438"/>
+<area shape="rect" id="Node000056" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="206,206,291,231"/>
+<area shape="poly" id="edge22_Node000011_Node000056" title=" " alt="" coords="456,441,437,398,409,345,371,291,348,266,324,245,290,229,293,224,327,240,352,263,375,288,413,343,442,396,460,439"/>
+<area shape="rect" id="Node000057" href="$sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536" title=" " alt="" coords="185,255,313,281"/>
+<area shape="poly" id="edge23_Node000011_Node000057" title=" " alt="" coords="451,442,401,369,365,329,324,294,302,283,304,278,327,290,369,325,405,365,456,439"/>
+<area shape="rect" id="Node000058" href="$ata_8c.html#a8b4d3c021710bacc1b78076d406b7f48" title="Wait for ATA command completion." alt="" coords="211,305,286,330"/>
+<area shape="poly" id="edge24_Node000011_Node000058" title=" " alt="" coords="445,444,393,394,360,367,324,344,285,328,287,323,327,339,363,363,397,390,449,441"/>
+<area shape="poly" id="edge17_Node000039_Node000009" title=" " alt="" coords="193,653,170,639,145,611,123,579,92,511,74,448,65,404,70,403,79,447,97,509,128,577,149,608,174,635,196,649"/>
+<area shape="rect" id="Node000063" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="427,674,510,699"/>
+<area shape="poly" id="edge26_Node000062_Node000063" title=" " alt="" coords="664,453,483,675,478,672,660,450"/>
+<area shape="rect" id="Node000007" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="217,847,280,873"/>
+<area shape="poly" id="edge27_Node000063_Node000007" title=" " alt="" coords="453,712,401,775,366,809,327,838,304,849,281,857,279,851,302,844,324,834,362,805,397,771,449,709"/>
+</map>

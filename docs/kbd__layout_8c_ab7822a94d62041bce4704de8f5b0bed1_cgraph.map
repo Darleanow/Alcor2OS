@@ -1,0 +1,43 @@
+<map id="kbd_raw_pending" name="kbd_raw_pending">
+<area shape="rect" id="Node000001" title="Whether a read(2) on fd 0 could return a byte right now." alt="" coords="5,329,141,355"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="195,280,363,305"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,327,212,306,213,311,128,332"/>
+<area shape="rect" id="Node000044" href="$keyboard_8c.html#a66a8de728f8653f553e66cabe28e03cf" title="Check if the raw scancode ring buffer has data." alt="" coords="189,329,369,355"/>
+<area shape="poly" id="edge19_Node000001_Node000044" title=" " alt="" coords="142,339,176,339,176,345,142,345"/>
+<area shape="rect" id="Node000045" href="$keyboard_8c.html#a93917ff9f44c405459286cafcc9e46f3" title="Copy pending scancodes without consuming (irq snapshot)." alt="" coords="203,379,355,404"/>
+<area shape="poly" id="edge20_Node000001_Node000045" title=" " alt="" coords="128,352,213,373,212,378,126,357"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="437,280,567,305"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="364,290,423,290,423,295,364,295"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a4d967a46a4825890d9fed20d49337bf9" title=" " alt="" coords="683,5,793,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="504,279,518,235,543,173,581,106,605,75,633,48,669,28,672,33,636,52,609,79,585,109,548,175,523,237,509,281"/>
+<area shape="rect" id="Node000005" href="$kbd__layout_8c.html#a021bcda8746ce32783a0c2cfa9774a50" title=" " alt="" coords="889,304,1009,329"/>
+<area shape="poly" id="edge9_Node000003_Node000005" title=" " alt="" coords="505,279,519,240,544,187,582,133,606,110,633,92,689,66,715,59,739,57,764,58,789,65,843,92,867,111,888,135,918,189,937,244,947,290,942,291,932,246,913,191,884,138,864,115,840,96,787,70,763,64,739,62,716,65,691,71,636,96,609,114,586,137,549,190,524,242,510,281"/>
+<area shape="rect" id="Node000006" href="$api_8c.html#acb3341aad43b4d1cf1c2121189cf2cc2" title="Report DECCKM state to the keyboard layer." alt="" coords="635,107,841,132"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="508,278,555,212,591,174,633,141,645,135,648,139,636,146,594,178,559,216,513,281"/>
+<area shape="rect" id="Node000007" href="$scrollback_8c.html#a81d1fb9846695e15207aab71a96d8ff9" title="Scroll the view lines rows toward the live tail." alt="" coords="635,156,841,181"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="515,278,564,235,598,212,634,192,655,183,657,188,636,196,601,216,568,240,518,282"/>
+<area shape="rect" id="Node000034" href="$scrollback_8c.html#a8a8b369ad40c10e99dc55ebc36ced5b9" title="Scroll the view lines rows back into history." alt="" coords="644,205,832,231"/>
+<area shape="poly" id="edge7_Node000003_Node000034" title=" " alt="" coords="533,277,634,241,666,232,668,237,635,246,535,282"/>
+<area shape="rect" id="Node000035" href="$kbd__layout_8c.html#a413dc2531e15506de68f25d6cb1693d5" title=" " alt="" coords="685,255,791,280"/>
+<area shape="poly" id="edge8_Node000003_Node000035" title=" " alt="" coords="567,283,671,272,672,277,568,288"/>
+<area shape="rect" id="Node000036" href="$kbd__layout_8c.html#afb4eeac601bdc564089037a49f624dbd" title=" " alt="" coords="699,304,777,329"/>
+<area shape="poly" id="edge10_Node000003_Node000036" title=" " alt="" coords="568,297,685,309,685,314,567,302"/>
+<area shape="rect" id="Node000037" href="$kbd__layout_8c.html#ae8a7493c17484612ceb39c2bf4bc2830" title=" " alt="" coords="681,353,795,379"/>
+<area shape="poly" id="edge12_Node000003_Node000037" title=" " alt="" coords="535,303,635,339,668,348,666,353,634,345,533,308"/>
+<area shape="rect" id="Node000038" href="$kbd__layout_8c.html#a59b6591d34ccf01d64cda05b6b4fb91e" title=" " alt="" coords="697,403,779,428"/>
+<area shape="poly" id="edge14_Node000003_Node000038" title=" " alt="" coords="530,303,588,340,603,354,612,366,621,378,636,389,659,399,684,406,682,411,657,404,633,394,617,382,608,370,599,357,585,344,527,308"/>
+<area shape="rect" id="Node000039" href="$kbd__layout_8c.html#ab10c1db0dadab7b18be6f2f04c7a19df" title=" " alt="" coords="704,452,772,477"/>
+<area shape="poly" id="edge16_Node000003_Node000039" title=" " alt="" coords="535,303,563,319,589,340,605,367,611,393,618,416,636,439,662,453,691,460,690,465,660,458,633,443,613,419,606,394,600,369,585,344,560,323,533,308"/>
+<area shape="rect" id="Node000042" href="$kbd__layout_8c.html#aaf069fd4dd3d3d6f4ec3e93f870f1c79" title=" " alt="" coords="703,501,773,527"/>
+<area shape="poly" id="edge17_Node000003_Node000042" title=" " alt="" coords="538,303,565,319,589,340,601,361,608,381,610,418,614,454,622,471,636,488,661,503,690,510,688,515,659,508,633,492,618,474,609,455,605,419,603,382,597,363,585,344,562,323,535,308"/>
+<area shape="rect" id="Node000043" href="$kbd__layout_8c.html#a3a2bd71121089eac43b72bcf44d8d139" title=" " alt="" coords="683,551,793,576"/>
+<area shape="poly" id="edge18_Node000003_Node000043" title=" " alt="" coords="539,303,566,318,589,340,604,368,610,394,609,444,608,468,610,491,619,514,637,537,652,549,671,556,669,561,650,553,633,541,614,517,605,492,603,468,604,444,605,395,599,370,585,344,563,323,537,308"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="794,23,820,32,843,48,868,76,889,107,920,174,938,239,948,290,942,291,933,241,915,176,884,109,864,79,840,52,817,37,792,28"/>
+<area shape="poly" id="edge11_Node000036_Node000005" title=" " alt="" coords="778,314,875,314,875,319,778,319"/>
+<area shape="poly" id="edge13_Node000037_Node000005" title=" " alt="" coords="793,351,841,339,881,330,882,335,842,345,794,356"/>
+<area shape="poly" id="edge15_Node000038_Node000005" title=" " alt="" coords="779,407,810,400,840,389,885,364,922,336,925,340,887,368,842,394,811,405,780,412"/>
+<area shape="rect" id="Node000046" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="417,353,587,379"/>
+<area shape="poly" id="edge21_Node000045_Node000046" title=" " alt="" coords="355,380,404,375,404,380,356,385"/>
+<area shape="rect" id="Node000047" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="419,403,585,428"/>
+<area shape="poly" id="edge22_Node000045_Node000047" title=" " alt="" coords="356,397,405,402,404,408,355,402"/>
+</map>

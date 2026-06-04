@@ -1,0 +1,9 @@
+<map id="sh_stat" name="sh_stat">
+<area shape="rect" id="Node000001" title="Stat path and fill st; returns 0 on success." alt="" coords="461,5,531,31"/>
+<area shape="rect" id="Node000002" href="$complete_8c.html#aa61f9f2bc47d14007ed6b24c853a44bd" title="Scan a directory for path&#45;completion entries matching name_prefix." alt="" coords="301,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="448,21,414,21,414,15,448,15"/>
+<area shape="rect" id="Node000003" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="148,5,253,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="288,21,253,21,253,15,288,15"/>
+<area shape="rect" id="Node000004" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="5,5,100,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,21,100,21,100,15,134,15"/>
+</map>

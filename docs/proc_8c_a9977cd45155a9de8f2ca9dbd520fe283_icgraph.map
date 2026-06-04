@@ -1,0 +1,13 @@
+<map id="push_string" name="push_string">
+<area shape="rect" id="Node000001" title="Push a string onto user stack and return the new stack pointer." alt="" coords="620,31,717,56"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="431,31,572,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="606,46,572,46,572,41,606,41"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="218,5,357,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,36,357,29,357,24,417,31"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="192,55,383,80"/>
+<area shape="poly" id="edge4_Node000002_Node000008" title=" " alt="" coords="417,55,383,59,383,54,417,50"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#af54f572ae171e2176cb67d7b16b30f50" title="Create a process from an ELF image held in kernel memory." alt="" coords="5,5,144,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="204,21,144,21,144,15,204,15"/>
+<area shape="rect" id="Node000009" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="26,55,123,80"/>
+<area shape="poly" id="edge5_Node000008_Node000009" title=" " alt="" coords="178,70,124,70,124,65,178,65"/>
+</map>

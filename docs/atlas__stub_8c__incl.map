@@ -1,0 +1,5 @@
+<map id="user/apps/shell/platform/atlas_stub.c" name="user/apps/shell/platform/atlas_stub.c">
+<area shape="rect" id="Node000001" title="Stub used when FreeType isn&#39;t built. Kernel keeps the CP437 bitmap fallback when atlas_submit returns..." alt="" coords="5,5,185,45"/>
+<area shape="rect" id="Node000002" href="$atlas_8h.html" title="Rasterize a TTF (Fira Code) into a glyph atlas and submit it to the kernel framebuffer console via io..." alt="" coords="45,93,146,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,46,98,79,93,79,93,46"/>
+</map>

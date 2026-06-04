@@ -1,0 +1,6 @@
+<map id="gr__dispatch" name="gr__dispatch">
+<area shape="rect" id="Node000001" title="Core recursive command dispatcher: resolves tokens and calls the leaf handler." alt="" coords="151,29,255,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="228,18,220,11,203,8,187,10,180,15,178,20,182,28,178,31,173,21,175,11,186,5,203,3,223,6,232,15"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a7f04d2a8ddb69baa1d282de4c9d8ff0e" title="Dispatch main arguments through the subcommand tree." alt="" coords="5,29,103,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="137,45,103,45,103,39,137,39"/>
+</map>

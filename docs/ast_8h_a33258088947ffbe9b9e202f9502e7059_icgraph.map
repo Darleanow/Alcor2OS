@@ -1,0 +1,9 @@
+<map id="ast_new_while" name="ast_new_while">
+<area shape="rect" id="Node000001" title="Allocate an AST_WHILE node, taking ownership of cond and body. body may be NULL for an empty { }." alt="" coords="457,5,576,31"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#acd97c7ea67e9c6549e462a92ba006cb6" title=" " alt="" coords="309,5,409,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,21,409,21,409,15,444,15"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="171,5,261,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="296,21,261,21,261,15,296,15"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="5,5,123,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,21,123,21,123,15,157,15"/>
+</map>

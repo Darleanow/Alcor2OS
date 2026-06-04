@@ -1,0 +1,11 @@
+<map id="parse_if" name="parse_if">
+<area shape="rect" id="Node000001" title=" " alt="" coords="467,31,541,56"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="526,19,519,12,504,9,491,11,484,16,482,22,486,29,481,32,477,22,479,13,489,6,504,4,522,7,530,16"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="328,5,419,31"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="452,36,418,29,419,24,454,31"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="163,5,280,31"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="314,21,280,21,280,15,314,15"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#a24f34aac8be89baba9f81f4669552b8f" title=" " alt="" coords="5,31,115,56"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="149,32,115,37,115,32,149,27"/>
+<area shape="poly" id="edge5_Node000004_Node000001" title=" " alt="" coords="128,41,467,41,467,46,128,46"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="vmm_clone_address_space" name="vmm_clone_address_space">
+<area shape="rect" id="Node000001" title="Clone user mappings for fork." alt="" coords="447,31,648,56"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="280,31,399,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="433,46,399,46,399,41,433,41"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#a8e1df0d5a8bdad3e0d90a18187ba3406" title="Clone the task like fork, but the child resumes with user RSP child_stack when non&#45;zero (musl posix_s..." alt="" coords="140,5,232,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,34,232,28,233,23,267,29"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#a343bbb181246db8a2491f82d14f9d26e" title="Fork the current process." alt="" coords="145,55,227,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="267,57,228,64,227,58,266,52"/>
+<area shape="rect" id="Node000004" href="$sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e" title="Duplicate the calling process (clone)." alt="" coords="5,5,92,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
+<area shape="rect" id="Node000006" href="$sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" title="Duplicate the calling process (fork)." alt="" coords="10,55,87,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="131,70,87,70,87,65,131,65"/>
+</map>

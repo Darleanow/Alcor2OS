@@ -1,0 +1,5 @@
+<map id="fb_draw_glyph" name="fb_draw_glyph">
+<area shape="rect" id="Node000001" title="Draws a monochrome 8x16 glyph onto the framebuffer." alt="" coords="5,5,123,31"/>
+<area shape="rect" id="Node000002" href="$pixel_8c.html#a11b082fd47841feddf059650f8e1e7f4" title="Plot one pixel honouring the current framebuffer depth." alt="" coords="171,5,272,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,15,157,15,157,21,123,21"/>
+</map>

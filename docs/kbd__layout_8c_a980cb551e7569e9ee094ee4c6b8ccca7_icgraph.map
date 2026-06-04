@@ -1,0 +1,21 @@
+<map id="process_raw_ctx" name="process_raw_ctx">
+<area shape="rect" id="Node000001" title=" " alt="" coords="777,81,908,107"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="561,56,729,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="763,87,729,82,730,77,764,81"/>
+<area shape="rect" id="Node000006" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="589,105,702,131"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="764,106,703,114,702,108,763,101"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#ab7822a94d62041bce4704de8f5b0bed1" title="Whether a read(2) on fd 0 could return a byte right now." alt="" coords="363,56,499,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="548,71,500,71,500,66,548,66"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a194a31955e4d501a3274c1df551c274c" title=" " alt="" coords="129,5,301,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="362,55,269,33,271,28,363,50"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#a53ba066fbd825803a884309edf38a731" title="Report read/write readiness for /dev/tty." alt="" coords="8,31,79,56"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="350,66,79,48,79,43,350,61"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="116,35,79,41,78,36,115,30"/>
+<area shape="rect" id="Node000007" href="$kbd__layout_8c.html#a7563fa1166b876f198b727e912747c09" title="read(2) on stdin honoring the process&#39;s termios (ICANON, VMIN/VTIME)." alt="" coords="349,107,513,132"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="575,121,514,121,514,116,575,116"/>
+<area shape="rect" id="Node000008" href="$kbd__layout_8c.html#a79e8864bb2dd3b40d30c0698f74b0485" title="Block until at least one layout&#45;translated byte is available." alt="" coords="138,107,293,132"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="335,122,293,122,293,117,335,117"/>
+<area shape="rect" id="Node000009" href="$dev__nodes_8c.html#a6687d841b4dafd7f557c59776162e139" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="5,132,81,157"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="365,137,302,147,181,152,82,150,82,144,181,147,301,142,364,132"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="125,135,82,142,81,136,124,130"/>
+</map>

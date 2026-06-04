@@ -1,0 +1,24 @@
+<map id="dir_find_entry" name="dir_find_entry">
+<area shape="rect" id="Node000001" title="Look up an entry by name inside directory dir_inode." alt="" coords="5,181,116,207"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a7e797fd0335d62d125f2361b79980b4e" title="Locate the dirent named name inside a single block buffer." alt="" coords="164,5,320,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,180,101,118,129,81,162,48,185,34,188,38,166,52,133,84,106,121,70,182"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="181,156,303,181"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="116,184,167,176,168,182,116,189"/>
+<area shape="rect" id="Node000007" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="587,107,643,132"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="83,179,120,160,163,141,256,108,332,90,409,84,507,91,574,105,573,110,506,97,409,89,333,95,258,113,165,146,122,164,85,184"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="577,181,652,207"/>
+<area shape="poly" id="edge10_Node000001_Node000021" title=" " alt="" coords="116,191,563,191,563,197,116,197"/>
+<area shape="rect" id="Node000036" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="555,231,675,256"/>
+<area shape="poly" id="edge12_Node000001_Node000036" title=" " alt="" coords="117,196,541,234,541,240,116,202"/>
+<area shape="rect" id="Node000038" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="209,308,275,333"/>
+<area shape="poly" id="edge11_Node000001_Node000038" title=" " alt="" coords="75,205,113,244,165,286,197,303,195,308,163,291,110,248,71,209"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#ab77d8981772dbf05f403fca1354eb314" title="Compare two strings up to n characters." alt="" coords="396,5,479,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="320,15,382,15,382,21,320,21"/>
+<area shape="rect" id="Node000005" href="$blockmap_8c.html#ae0cee49141d18668ec4dd1734d0a3e45" title="Number of u32 block&#45;pointer slots per indirect block." alt="" coords="379,107,496,132"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="292,153,372,133,374,138,294,159"/>
+<area shape="rect" id="Node000006" href="$blockmap_8c.html#a94ad86b6cd7f847465e1f8d336a02947" title="Read slot slot_idx out of indirect block indirect_block." alt="" coords="368,156,507,181"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="303,166,354,166,354,171,303,171"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="483,153,573,128,574,133,484,159"/>
+<area shape="poly" id="edge7_Node000006_Node000021" title=" " alt="" coords="507,176,564,184,563,189,506,181"/>
+<area shape="poly" id="edge8_Node000006_Node000036" title=" " alt="" coords="470,179,572,223,570,228,468,184"/>
+</map>

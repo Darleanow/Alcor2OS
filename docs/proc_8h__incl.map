@@ -1,0 +1,19 @@
+<map id="include/alcor2/proc/proc.h" name="include/alcor2/proc/proc.h">
+<area shape="rect" id="Node000001" title="Process management and scheduling." alt="" coords="207,5,353,45"/>
+<area shape="rect" id="Node000002" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="5,93,136,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,48,115,91,113,86,229,43"/>
+<area shape="rect" id="Node000003" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="160,93,296,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,47,246,83,241,80,265,44"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="276,167,391,192"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="291,45,311,92,329,152,324,154,305,94,286,47"/>
+<area shape="rect" id="Node000008" href="$signal_8h.html" title="POSIX signal handling infrastructure (Linux x86_64 compatible)." alt="" coords="371,93,520,119"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="321,43,410,85,408,90,318,48"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="246,116,306,157,304,161,243,121"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="189,240,272,265"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="318,194,260,234,257,230,315,190"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="296,240,371,265"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="336,192,336,226,331,226,331,192"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="395,240,466,265"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="351,190,405,229,402,234,347,194"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="429,121,365,161,362,157,426,116"/>
+</map>

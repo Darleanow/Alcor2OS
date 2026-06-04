@@ -1,0 +1,7 @@
+<map id="build_symlink_path" name="build_symlink_path">
+<area shape="rect" id="Node000001" title="Build a resolved path from a base path and a (possibly relative) symlink target." alt="" coords="5,31,155,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="203,5,289,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,29,188,24,189,29,155,35"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="207,55,285,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,52,194,57,193,62,154,57"/>
+</map>

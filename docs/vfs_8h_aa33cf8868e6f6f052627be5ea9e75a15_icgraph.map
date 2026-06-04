@@ -1,0 +1,21 @@
+<map id="vfs_seek" name="vfs_seek">
+<area shape="rect" id="Node000001" title="Reposition the file offset of fd." alt="" coords="645,128,725,153"/>
+<area shape="rect" id="Node000002" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="468,29,563,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="661,120,632,93,596,68,562,55,564,50,599,64,635,89,665,116"/>
+<area shape="rect" id="Node000011" href="$sys__mm_8c.html#a0d76fce616e6b2bfc5a09e0fa5df3ecd" title=" " alt="" coords="433,79,597,104"/>
+<area shape="poly" id="edge5_Node000001_Node000011" title=" " alt="" coords="631,128,559,107,561,102,633,123"/>
+<area shape="rect" id="Node000013" href="$sys__io_8c.html#aaf0072fb1689f96d7565297e99d45c8a" title="Reposition the file offset of fd (lseek)." alt="" coords="472,128,559,153"/>
+<area shape="poly" id="edge7_Node000001_Node000013" title=" " alt="" coords="631,143,559,143,559,138,631,138"/>
+<area shape="rect" id="Node000014" href="$sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635" title="Read count bytes from fd at absolute offset without moving the seek position." alt="" coords="463,177,567,203"/>
+<area shape="poly" id="edge8_Node000001_Node000014" title=" " alt="" coords="633,159,561,180,559,175,631,153"/>
+<area shape="rect" id="Node000015" href="$sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237" title="Write count bytes to fd at absolute offset without moving the seek position." alt="" coords="461,227,569,252"/>
+<area shape="poly" id="edge9_Node000001_Node000015" title=" " alt="" coords="664,166,634,192,599,216,569,229,567,224,596,212,631,188,660,162"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="244,29,385,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="454,45,385,45,385,39,454,39"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="31,5,170,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="230,35,170,28,171,23,230,30"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="5,55,196,80"/>
+<area shape="poly" id="edge4_Node000003_Node000009" title=" " alt="" coords="230,55,197,59,196,53,230,49"/>
+<area shape="rect" id="Node000012" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="268,79,361,104"/>
+<area shape="poly" id="edge6_Node000011_Node000012" title=" " alt="" coords="419,94,362,94,362,89,419,89"/>
+</map>

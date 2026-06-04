@@ -1,0 +1,7 @@
+<map id="read_run_chunk" name="read_run_chunk">
+<area shape="rect" id="Node000001" title="Read run consecutive blocks in one device call, copy slice into dst." alt="" coords="5,31,131,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="201,5,288,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,32,187,23,188,29,131,37"/>
+<area shape="rect" id="Node000003" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="179,55,311,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="131,49,165,54,165,59,130,54"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="vfs_proc_inherit_fds" name="vfs_proc_inherit_fds">
+<area shape="rect" id="Node000001" title="Inherit parent&#39;s fd table into child&#39;s after fork." alt="" coords="5,5,159,31"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#aa6ae139c297636a7f4ab9c9980b856e1" title="Increment the OFT refcount for slot idx." alt="" coords="207,5,317,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,15,193,15,193,21,159,21"/>
+</map>

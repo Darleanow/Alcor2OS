@@ -1,0 +1,16 @@
+<map id="channel_acquire" name="channel_acquire">
+<area shape="rect" id="Node000001" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="600,32,728,57"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="441,7,552,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="586,36,552,30,553,25,587,30"/>
+<area shape="rect" id="Node000006" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="455,56,538,81"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="587,58,539,65,538,60,586,53"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="315,5,393,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="428,21,394,21,394,16,428,16"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a06dcb29ace09bf90167814b75b3d2f7e" title="Initialize storage and filesystems." alt="" coords="154,7,265,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="301,21,265,21,265,16,301,16"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,32,104,57"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="141,33,105,39,104,34,140,28"/>
+<area shape="rect" id="Node000007" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="152,56,267,81"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="442,71,267,71,267,66,442,66"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="138,60,104,55,105,50,139,55"/>
+</map>

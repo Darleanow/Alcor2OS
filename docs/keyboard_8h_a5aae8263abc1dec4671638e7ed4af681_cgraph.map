@@ -1,0 +1,19 @@
+<map id="keyboard_init" name="keyboard_init">
+<area shape="rect" id="Node000001" title="Initialize the PS/2 keyboard driver." alt="" coords="5,58,116,83"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="546,31,589,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,55,117,34,163,17,215,8,268,4,373,7,465,19,533,33,532,38,464,24,372,12,268,9,216,13,165,22,119,39,82,60"/>
+<area shape="rect" id="Node000003" href="$idt_8c.html#a667ec0b02033ad55d73e9b8b32b034a5" title="Register a callback for a hardware IRQ line." alt="" coords="197,32,293,58"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="116,60,184,51,184,56,116,65"/>
+<area shape="rect" id="Node000004" href="$keyboard_8c.html#a91e1bd244fa1ddc661eeeed18f4bcb38" title=" " alt="" coords="164,131,327,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="87,81,165,117,185,124,183,129,163,122,85,86"/>
+<area shape="rect" id="Node000007" href="$pic_8c.html#a3e514f789fbbbf7edfd418e7982743fd" title="Unmask (enable) an IRQ line." alt="" coords="195,82,295,107"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="116,75,182,83,181,89,116,80"/>
+<area shape="rect" id="Node000005" href="$keyboard_8c.html#a46b78f9b5f3f9a5e5d24871774db270c" title=" " alt="" coords="375,131,481,156"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="327,141,361,141,361,146,327,146"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="460,129,480,117,514,91,542,65,546,69,517,95,483,122,462,133"/>
+<area shape="rect" id="Node000006" href="$keyboard_8c.html#a2d4a97aa9193a5098506f35f6de07697" title=" " alt="" coords="529,131,605,156"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="481,141,515,141,515,146,481,146"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="295,81,374,66,532,45,533,50,375,72,296,86"/>
+<area shape="rect" id="Node000008" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="403,82,453,107"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="295,92,389,92,389,97,295,97"/>
+</map>

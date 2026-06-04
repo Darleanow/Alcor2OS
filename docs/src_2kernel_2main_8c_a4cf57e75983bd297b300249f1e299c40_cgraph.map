@@ -1,0 +1,67 @@
+<map id="init_bin_overlay" name="init_bin_overlay">
+<area shape="rect" id="Node000001" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="5,463,132,489"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="516,9,625,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,463,75,405,92,316,106,266,124,215,148,166,178,121,216,78,253,50,296,31,353,14,391,6,430,3,502,7,502,12,430,9,391,11,354,19,298,36,256,54,220,81,182,124,153,169,129,217,111,267,97,317,80,406,73,464"/>
+<area shape="rect" id="Node000014" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="185,135,300,161"/>
+<area shape="poly" id="edge9_Node000001_Node000014" title=" " alt="" coords="74,462,226,172,231,174,79,465"/>
+<area shape="rect" id="Node000018" href="$initfs_8c.html#a295a2283cd260b2ef62cd7c003afafe3" title="Add a virtual file to initfs." alt="" coords="187,463,299,489"/>
+<area shape="poly" id="edge19_Node000001_Node000018" title=" " alt="" coords="132,473,173,473,173,479,132,479"/>
+<area shape="rect" id="Node000019" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="531,338,610,363"/>
+<area shape="poly" id="edge27_Node000001_Node000019" title=" " alt="" coords="78,461,118,418,147,394,179,375,223,359,269,347,362,335,448,335,518,341,517,346,448,340,362,341,270,352,224,364,181,380,150,398,122,422,82,465"/>
+<area shape="rect" id="Node000037" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="539,615,602,641"/>
+<area shape="poly" id="edge26_Node000001_Node000037" title=" " alt="" coords="93,487,203,543,277,574,354,600,445,617,526,624,525,630,444,623,353,605,275,579,201,548,91,491"/>
+<area shape="rect" id="Node000039" href="$src_2kernel_2main_8c.html#ac9cb0de55370fccf62fa07ed5af8b1d6" title="Return true when path starts with prefix." alt="" coords="180,765,305,790"/>
+<area shape="poly" id="edge28_Node000001_Node000039" title=" " alt="" coords="74,489,82,537,101,607,115,646,133,684,155,720,182,752,186,755,183,759,178,755,151,723,128,686,110,648,96,609,77,538,69,490"/>
+<area shape="rect" id="Node000040" href="$src_2kernel_2main_8c.html#a361b3a2c5772decce68f395a53108323" title="Return true when path ends with suffix (case&#45;sensitive)." alt="" coords="181,666,305,691"/>
+<area shape="poly" id="edge29_Node000001_Node000040" title=" " alt="" coords="78,488,115,560,145,604,182,645,199,657,196,662,178,649,141,608,111,563,73,490"/>
+<area shape="rect" id="Node000042" href="$src_2kernel_2main_8c.html#ab6ec631451acb0eed8e92c147115ea34" title="Strip a trailing .elf extension in&#45;place." alt="" coords="183,715,302,741"/>
+<area shape="poly" id="edge32_Node000001_Node000042" title=" " alt="" coords="75,488,86,529,107,586,138,648,158,677,182,702,187,706,183,710,178,706,154,680,133,651,102,588,81,531,70,490"/>
+<area shape="rect" id="Node000043" href="$vfs_8c.html#ac4354fc0bb7f7dff4e927b6b2db330d3" title="Mount source at target using the named filesystem driver." alt="" coords="197,389,288,414"/>
+<area shape="poly" id="edge35_Node000001_Node000043" title=" " alt="" coords="98,461,199,417,201,422,101,466"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="673,111,801,137"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="595,32,627,51,707,102,704,106,624,56,592,37"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="849,61,969,86"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="781,109,851,88,853,93,782,114"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="861,162,958,187"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="782,134,853,156,851,161,781,139"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="1017,150,1119,175"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="802,128,970,147,1004,151,1004,157,969,152,801,133"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="881,211,938,237"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="757,135,799,165,851,196,869,206,867,210,848,201,796,169,754,139"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="958,169,1003,165,1004,170,959,174"/>
+<area shape="rect" id="Node000013" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="1025,225,1111,250"/>
+<area shape="poly" id="edge8_Node000011_Node000013" title=" " alt="" coords="938,224,1011,230,1011,235,938,229"/>
+<area shape="poly" id="edge10_Node000014_Node000002" title=" " alt="" coords="251,133,291,88,320,64,352,44,389,31,428,22,502,16,502,21,429,28,391,36,354,49,323,68,295,92,255,137"/>
+<area shape="poly" id="edge11_Node000014_Node000003" title=" " alt="" coords="300,143,660,125,660,131,301,148"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="369,59,452,85"/>
+<area shape="poly" id="edge12_Node000014_Node000015" title=" " alt="" coords="271,133,368,88,370,93,273,138"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="533,161,609,186"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="301,150,519,167,519,172,300,155"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="369,211,453,237"/>
+<area shape="poly" id="edge17_Node000014_Node000017" title=" " alt="" coords="273,158,370,203,368,208,271,163"/>
+<area shape="poly" id="edge13_Node000015_Node000002" title=" " alt="" coords="451,57,516,36,518,41,453,62"/>
+<area shape="poly" id="edge14_Node000015_Node000003" title=" " alt="" coords="453,75,626,102,660,107,659,113,625,107,452,80"/>
+<area shape="poly" id="edge16_Node000016_Node000003" title=" " alt="" coords="608,160,679,138,681,144,610,165"/>
+<area shape="poly" id="edge18_Node000017_Node000003" title=" " alt="" coords="453,222,534,216,580,208,624,195,671,171,709,144,712,148,674,176,626,200,581,213,535,221,453,227"/>
+<area shape="poly" id="edge20_Node000018_Node000019" title=" " alt="" coords="276,461,523,366,525,371,278,466"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a4d46efddfad41d6c402283b85b3b15b6" title="Allocate zeroed memory from kernel heap." alt="" coords="377,463,445,489"/>
+<area shape="poly" id="edge21_Node000018_Node000020" title=" " alt="" coords="299,473,363,473,363,479,299,479"/>
+<area shape="rect" id="Node000036" href="$initfs_8c.html#aa643724cb164df58c6432d3e72345ab2" title="Linear lookup in the registered&#45;file list." alt="" coords="378,565,443,590"/>
+<area shape="poly" id="edge24_Node000018_Node000036" title=" " alt="" coords="265,487,355,543,376,555,373,560,352,548,262,491"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="533,439,608,465"/>
+<area shape="poly" id="edge22_Node000020_Node000021" title=" " alt="" coords="445,468,519,457,520,462,445,474"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="541,489,600,514"/>
+<area shape="poly" id="edge23_Node000020_Node000031" title=" " alt="" coords="445,479,528,492,528,497,445,484"/>
+<area shape="poly" id="edge25_Node000036_Node000037" title=" " alt="" coords="444,585,527,612,525,617,443,590"/>
+<area shape="poly" id="edge30_Node000040_Node000037" title=" " alt="" coords="305,668,468,644,525,634,526,639,468,649,305,673"/>
+<area shape="rect" id="Node000041" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="377,717,444,742"/>
+<area shape="poly" id="edge31_Node000040_Node000041" title=" " alt="" coords="287,689,365,713,363,718,285,694"/>
+<area shape="poly" id="edge33_Node000042_Node000037" title=" " alt="" coords="273,738,313,752,363,764,416,766,442,761,467,752,497,732,522,706,556,652,560,655,526,709,500,736,469,757,443,766,416,771,362,769,311,758,271,743"/>
+<area shape="poly" id="edge34_Node000042_Node000041" title=" " alt="" coords="302,726,363,726,363,732,302,731"/>
+<area shape="poly" id="edge37_Node000043_Node000019" title=" " alt="" coords="288,392,518,356,518,361,289,397"/>
+<area shape="poly" id="edge36_Node000043_Node000037" title=" " alt="" coords="262,412,307,450,330,476,355,499,385,517,411,526,437,535,469,551,545,605,542,609,467,556,435,540,409,531,383,522,352,504,326,480,303,454,259,416"/>
+<area shape="rect" id="Node000044" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="353,261,468,286"/>
+<area shape="poly" id="edge38_Node000043_Node000044" title=" " alt="" coords="259,387,381,292,384,297,262,391"/>
+<area shape="poly" id="edge39_Node000044_Node000013" title=" " alt="" coords="468,270,688,263,969,247,1011,242,1012,248,970,252,688,269,468,275"/>
+<area shape="poly" id="edge40_Node000044_Node000019" title=" " alt="" coords="439,284,532,330,530,334,437,289"/>
+</map>

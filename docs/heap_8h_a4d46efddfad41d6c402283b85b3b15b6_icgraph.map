@@ -1,0 +1,23 @@
+<map id="kzalloc" name="kzalloc">
+<area shape="rect" id="Node000001" title="Allocate zeroed memory." alt="" coords="588,80,656,105"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#a295a2283cd260b2ef62cd7c003afafe3" title="Add a virtual file to initfs." alt="" coords="413,31,525,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="574,80,508,59,510,54,576,75"/>
+<area shape="rect" id="Node000004" href="$ramfs_8c.html#aec74d885a86466ccf3ca6a7893e9001a" title="Allocate and zero a new ramfs node with the given name and type." alt="" coords="397,104,540,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="575,103,541,108,540,103,574,97"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="198,5,325,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="399,38,325,28,325,23,399,32"/>
+<area shape="rect" id="Node000005" href="$ramfs_8c.html#a30e0ae82a2105bc9a8b929931029145c" title=" " alt="" coords="215,55,308,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="401,103,308,81,309,76,402,98"/>
+<area shape="rect" id="Node000006" href="$ramfs_8c.html#ad7ed46498570f58ce0f21fc5510b240d" title=" " alt="" coords="218,104,305,129"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="383,119,305,119,305,114,383,114"/>
+<area shape="rect" id="Node000007" href="$ramfs_8c.html#a9d21ebf7315f835ae07f5d47014a72d0" title="Register a character device under path inside the ramfs tree." alt="" coords="173,153,349,179"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="402,135,316,156,315,151,401,130"/>
+<area shape="rect" id="Node000012" href="$ramfs_8c.html#af637621c8cf4b54bce326f48174772ff" title="Initialise ramfs (idempotent)." alt="" coords="217,203,305,228"/>
+<area shape="poly" id="edge9_Node000004_Node000012" title=" " alt="" coords="441,139,399,167,350,192,306,208,304,203,348,188,396,162,438,135"/>
+<area shape="rect" id="Node000008" href="$dev__nodes_8c.html#ae65ed532860c590d0e567ec0487fee0a" title="Register /dev/null, /dev/zero, /dev/tty, and /dev/fb on the ramfs mounted at /dev." alt="" coords="5,104,125,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="196,153,116,132,117,127,198,147"/>
+<area shape="rect" id="Node000010" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="18,153,113,179"/>
+<area shape="poly" id="edge8_Node000007_Node000010" title=" " alt="" coords="159,169,113,169,113,163,159,163"/>
+<area shape="rect" id="Node000013" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="24,203,107,228"/>
+<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="203,218,107,218,107,213,203,213"/>
+</map>

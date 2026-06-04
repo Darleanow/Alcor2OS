@@ -1,0 +1,11 @@
+<map id="ram_truncate" name="ram_truncate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,115,56"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="163,31,219,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,41,149,41,149,46,115,46"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="282,5,361,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="219,35,268,26,269,31,220,41"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="267,55,376,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="220,46,254,52,253,57,219,51"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="424,55,552,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="376,65,410,65,410,70,376,70"/>
+</map>

@@ -1,0 +1,43 @@
+<map id="user/apps/shell/main.c" name="user/apps/shell/main.c">
+<area shape="rect" id="Node000001" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="607,5,775,31"/>
+<area shape="rect" id="Node000002" href="$boxdraw_8h.html" title="UTF&#45;8 box&#45;drawing character literals for write()/printf() output." alt="" coords="5,79,95,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="607,28,386,47,109,81,108,76,385,42,607,23"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="119,79,195,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="607,30,428,50,209,81,208,76,427,44,607,24"/>
+<area shape="rect" id="Node000004" href="$atlas_8h.html" title="Rasterize a TTF (Fira Code) into a glyph atlas and submit it to the kernel framebuffer console via io..." alt="" coords="219,79,321,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="624,33,335,82,334,77,623,28"/>
+<area shape="rect" id="Node000005" href="$shell_8h.html" title="Shell&#45;internal helpers (sh_*) used by main.c, builtins.c, and the shell&#39;s platform layer...." alt="" coords="519,79,619,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="673,33,602,74,599,69,670,28"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="321,152,395,177"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="608,28,478,47,422,62,400,71,385,81,375,93,368,108,361,138,356,137,363,106,371,90,382,77,398,66,420,57,477,42,607,23"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="732,152,803,177"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="689,32,680,65,679,85,684,103,703,126,728,143,725,148,700,130,680,105,674,85,674,65,684,30"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="694,79,761,104"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="700,30,718,65,713,68,695,32"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="785,79,856,104"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="713,28,788,69,786,74,711,33"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="880,79,951,104"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="728,28,868,72,866,77,727,33"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="975,79,1059,104"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="744,28,962,75,961,81,743,33"/>
+<area shape="rect" id="Node000015" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="1083,79,1159,104"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="776,28,910,48,1070,76,1069,81,909,53,775,33"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1183,79,1258,104"/>
+<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="776,24,953,44,1170,76,1169,81,953,49,775,30"/>
+<area shape="rect" id="Node000018" href="$host_8h.html" title="libvega embedding interface." alt="" coords="395,79,494,104"/>
+<area shape="poly" id="edge19_Node000001_Node000018" title=" " alt="" coords="652,33,498,77,497,72,651,28"/>
+<area shape="rect" id="Node000019" href="$vega_8h.html" title="vega — Alcor2&#39;s shell scripting language. Public entry points." alt="" coords="1283,79,1385,104"/>
+<area shape="poly" id="edge22_Node000001_Node000019" title=" " alt="" coords="776,23,995,44,1269,76,1269,81,994,49,775,29"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="526,152,598,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="570,105,567,139,562,138,565,104"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="419,152,502,177"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="553,106,491,147,488,142,550,102"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="536,107,406,150,404,145,534,101"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="601,102,723,145,721,150,600,107"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="622,152,707,177"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="586,102,639,141,636,146,583,106"/>
+<area shape="rect" id="Node000016" href="$catppuccin_8h.html" title="Catppuccin Mocha palette — xterm&#45;256 indices and true&#45;colour ANSI escapes." alt="" coords="1069,152,1173,177"/>
+<area shape="poly" id="edge17_Node000015_Node000016" title=" " alt="" coords="1123,104,1123,138,1118,138,1118,104"/>
+<area shape="poly" id="edge20_Node000018_Node000007" title=" " alt="" coords="450,104,458,138,453,139,445,105"/>
+<area shape="poly" id="edge21_Node000018_Node000008" title=" " alt="" coords="432,106,384,145,381,141,429,102"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="proc" name="proc">
+<area shape="rect" id="Node000001" title="Process Control Block." alt="" coords="162,93,213,119"/>
+<area shape="poly" id="edge4_Node000001_Node000001" title=" " alt="" coords="227,96,235,99,239,106,230,115,213,116,213,111,228,110,234,106,232,103,225,101"/>
+<area shape="rect" id="Node000002" href="$structk__sigaction__t.html" title="Kernel&#45;side sigaction (Linux x86_64 ABI compatible)." alt="" coords="5,5,113,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,40,106,67,134,83,163,94,161,99,132,88,103,71,74,44"/>
+<area shape="rect" id="Node000003" href="$structk__termios__t.html" title="Kernel mirror of musl&#39;s struct termios." alt="" coords="138,5,237,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,45,190,93,185,93,185,45"/>
+<area shape="rect" id="Node000004" href="$structsyscall__frame.html" title="Saved registers on syscall entry (x86_64 System V layout)." alt="" coords="261,5,375,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="293,41,249,72,209,96,206,91,246,67,290,37"/>
+</map>

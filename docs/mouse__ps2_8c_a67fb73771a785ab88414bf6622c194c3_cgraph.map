@@ -1,0 +1,12 @@
+<map id="ps2_write_data" name="ps2_write_data">
+<area shape="rect" id="Node000001" title="Send a data byte to the controller (port 0x60)." alt="" coords="5,5,127,31"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="499,31,549,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,9,275,3,363,5,451,15,486,25,485,30,450,21,363,11,275,8,127,15"/>
+<area shape="rect" id="Node000003" href="$mouse__ps2_8c.html#a2c86d21aafe1ed28adf9fb89f6019dc5" title="Spin until the input buffer is free." alt="" coords="175,31,333,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="127,24,161,28,161,34,127,29"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="395,31,437,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="334,41,380,41,380,46,334,46"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a488d1b3600792ee3aac5be4b7e0be16b" title="Short I/O delay (write to port 0x80)." alt="" coords="381,80,451,105"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="297,54,369,76,368,81,296,59"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="443,78,485,58,487,63,446,82"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="fb_user_boot_init" name="fb_user_boot_init">
+<area shape="rect" id="Node000001" title="Capture framebuffer geometry and physical span from Limine." alt="" coords="5,31,140,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="232,5,291,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,32,218,21,219,26,140,37"/>
+<area shape="rect" id="Node000003" href="$fb__user_8c.html#acb331b08978a597fbce2bb7e58f6623b" title=" " alt="" coords="188,55,335,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,49,175,54,174,59,140,55"/>
+</map>

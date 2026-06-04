@@ -1,0 +1,23 @@
+<map id="initfs_register" name="initfs_register">
+<area shape="rect" id="Node000001" title="Add a virtual file to initfs." alt="" coords="5,104,117,129"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="165,55,244,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,101,153,82,155,87,100,106"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a4d46efddfad41d6c402283b85b3b15b6" title="Allocate zeroed memory from kernel heap." alt="" coords="171,104,239,129"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,114,157,114,157,119,117,119"/>
+<area shape="rect" id="Node000019" href="$initfs_8c.html#aa643724cb164df58c6432d3e72345ab2" title="Linear lookup in the registered&#45;file list." alt="" coords="172,153,237,179"/>
+<area shape="poly" id="edge8_Node000001_Node000019" title=" " alt="" coords="100,127,160,148,158,153,98,132"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="292,55,367,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="236,101,283,83,285,88,238,106"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="300,104,359,129"/>
+<area shape="poly" id="edge7_Node000003_Node000014" title=" " alt="" coords="239,114,286,114,286,119,239,119"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="415,5,536,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="366,52,423,33,425,38,368,57"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="421,55,530,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="367,65,407,65,407,70,367,70"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="429,104,521,129"/>
+<area shape="poly" id="edge6_Node000004_Node000018" title=" " alt="" coords="368,77,425,97,423,102,366,82"/>
+<area shape="rect" id="Node000020" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="298,153,361,179"/>
+<area shape="poly" id="edge9_Node000019_Node000020" title=" " alt="" coords="237,163,284,163,284,169,237,169"/>
+<area shape="rect" id="Node000021" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="438,153,513,179"/>
+<area shape="poly" id="edge10_Node000020_Node000021" title=" " alt="" coords="361,163,424,163,424,169,361,169"/>
+</map>

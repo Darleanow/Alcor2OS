@@ -1,0 +1,34 @@
+<map id="syscall_dispatch" name="syscall_dispatch">
+<area shape="rect" id="Node000001" title="Dispatch a syscall from the architecture&#45;specific entry point." alt="" coords="5,212,135,237"/>
+<area shape="rect" id="Node000002" href="$klog_8c.html#aea21daace6c756e7867a08fa2e9fc03a" title="Format a message to the kernel debug log (debugcon)." alt="" coords="232,85,287,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,210,226,116,229,121,92,214"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#ae82260def3c053c895a522d59223af06" title="If a timer tick requested preemption, run the process scheduler." alt="" coords="183,187,336,212"/>
+<area shape="poly" id="edge11_Node000001_Node000008" title=" " alt="" coords="135,213,169,209,169,214,135,219"/>
+<area shape="rect" id="Node000019" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="208,236,311,261"/>
+<area shape="poly" id="edge17_Node000001_Node000019" title=" " alt="" coords="135,230,194,238,194,243,135,236"/>
+<area shape="rect" id="Node000020" href="$sys__dispatch_8c.html#a134b1ff8578623dd7ab8660f541495aa" title=" " alt="" coords="218,285,301,311"/>
+<area shape="poly" id="edge18_Node000001_Node000020" title=" " alt="" coords="99,235,184,272,206,279,204,284,182,276,97,240"/>
+<area shape="rect" id="Node000003" href="$klog_8c.html#a84403189353e810c4c948c32d95fa9d0" title="Emit a single byte to debugcon." alt="" coords="805,60,890,85"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="274,83,320,49,351,32,383,19,440,8,499,3,557,4,615,10,719,30,799,53,798,58,718,36,614,16,557,10,499,8,441,13,385,25,353,37,323,54,277,87"/>
+<area shape="rect" id="Node000005" href="$klog_8c.html#a7d467ec8cd33c46253b8833bafaf9e51" title="Emit a signed integer in base 10." alt="" coords="394,35,489,60"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="286,88,382,61,383,66,287,93"/>
+<area shape="rect" id="Node000006" href="$klog_8c.html#af9caf386809c0d688fc5ab03d7ba1b5f" title="Emit an unsigned integer in base base." alt="" coords="580,85,683,111"/>
+<area shape="poly" id="edge10_Node000002_Node000006" title=" " alt="" coords="287,95,566,95,566,101,287,101"/>
+<area shape="rect" id="Node000007" href="$klog_8c.html#a9c348d5c2d6195c2e02d0aba3a33ca69" title="Emit a NUL&#45;terminated string to debugcon." alt="" coords="399,136,484,161"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="287,103,386,131,385,136,286,108"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="979,60,1029,85"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="890,70,964,70,964,75,890,75"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="489,48,791,67,791,72,489,53"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="490,57,571,79,569,84,488,62"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="682,89,791,77,792,82,683,95"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="484,145,590,139,653,131,715,119,763,105,805,88,807,93,764,110,717,125,654,136,591,144,485,151"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="384,212,499,237"/>
+<area shape="poly" id="edge12_Node000008_Node000009" title=" " alt="" coords="337,207,371,212,370,217,336,213"/>
+<area shape="rect" id="Node000010" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="547,187,716,212"/>
+<area shape="poly" id="edge13_Node000009_Node000010" title=" " alt="" coords="499,214,533,210,534,215,499,220"/>
+<area shape="rect" id="Node000011" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="764,263,931,288"/>
+<area shape="poly" id="edge14_Node000009_Node000011" title=" " alt="" coords="499,229,751,261,750,266,498,234"/>
+<area shape="rect" id="Node000012" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="582,288,681,313"/>
+<area shape="poly" id="edge15_Node000009_Node000012" title=" " alt="" coords="473,235,548,266,585,281,583,286,546,271,471,240"/>
+<area shape="poly" id="edge16_Node000012_Node000011" title=" " alt="" coords="681,292,750,284,751,289,681,298"/>
+</map>

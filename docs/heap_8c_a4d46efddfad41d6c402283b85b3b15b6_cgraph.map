@@ -1,0 +1,17 @@
+<map id="kzalloc" name="kzalloc">
+<area shape="rect" id="Node000001" title="Allocate zeroed memory from kernel heap." alt="" coords="5,80,73,105"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="121,55,196,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,83,107,75,109,81,74,88"/>
+<area shape="rect" id="Node000012" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="129,104,188,129"/>
+<area shape="poly" id="edge7_Node000001_Node000012" title=" " alt="" coords="74,97,117,106,115,111,73,102"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="244,5,365,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="195,52,253,33,254,38,197,57"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="250,55,359,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="196,65,236,65,236,70,196,70"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="259,104,351,129"/>
+<area shape="poly" id="edge6_Node000002_Node000016" title=" " alt="" coords="197,77,254,97,253,102,195,82"/>
+<area shape="rect" id="Node000005" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="413,31,553,56"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="359,57,399,52,400,57,360,63"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="437,80,529,105"/>
+<area shape="poly" id="edge5_Node000004_Node000008" title=" " alt="" coords="360,72,424,82,423,87,359,78"/>
+</map>

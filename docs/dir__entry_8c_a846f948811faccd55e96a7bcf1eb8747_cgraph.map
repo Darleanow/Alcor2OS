@@ -1,0 +1,20 @@
+<map id="dir_is_empty" name="dir_is_empty">
+<area shape="rect" id="Node000001" title="Check if a directory is empty." alt="" coords="5,132,112,157"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a620c9af80a711914ccba5ef0c37925b0" title="Count non&#45;./.. dirents in a single block buffer." alt="" coords="160,5,336,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,130,106,90,159,48,188,33,190,38,161,52,109,94,72,134"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="187,132,309,157"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,142,173,142,173,147,112,147"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="603,81,659,107"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="104,129,159,117,271,99,384,91,495,89,589,90,588,95,495,94,384,97,272,105,161,122,106,134"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="593,169,668,195"/>
+<area shape="poly" id="edge9_Node000001_Node000020" title=" " alt="" coords="108,155,160,166,261,183,341,191,420,194,523,190,579,185,579,191,523,195,420,199,340,197,261,188,160,171,107,160"/>
+<area shape="rect" id="Node000035" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="571,219,691,244"/>
+<area shape="poly" id="edge10_Node000001_Node000035" title=" " alt="" coords="79,155,116,178,161,197,267,220,374,231,474,235,557,233,557,239,474,240,374,237,266,225,159,202,113,182,76,160"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#ae0cee49141d18668ec4dd1734d0a3e45" title="Number of u32 block&#45;pointer slots per indirect block." alt="" coords="395,156,512,181"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="309,149,381,158,381,163,309,154"/>
+<area shape="rect" id="Node000005" href="$blockmap_8c.html#a94ad86b6cd7f847465e1f8d336a02947" title="Read slot slot_idx out of indirect block indirect_block." alt="" coords="384,107,523,132"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="309,135,370,127,371,132,309,140"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="522,107,588,97,589,103,523,112"/>
+<area shape="poly" id="edge6_Node000005_Node000020" title=" " alt="" coords="492,130,524,141,582,162,581,167,522,146,490,135"/>
+<area shape="poly" id="edge7_Node000005_Node000035" title=" " alt="" coords="503,130,524,141,540,157,549,173,558,188,572,204,581,210,578,214,569,208,553,192,545,176,536,160,521,145,501,134"/>
+</map>

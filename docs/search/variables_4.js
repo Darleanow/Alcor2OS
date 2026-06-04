@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['d_5fino_0',['d_ino',['../structPACKED.html#ab266ff6710de55ef2b1d148a66bb3d4a',1,'PACKED']]],
+  ['d_5fname_1',['d_name',['../structPACKED.html#a3107f82083eb3efa6f4bcb20c952a73f',1,'PACKED']]],
+  ['d_5foff_2',['d_off',['../structPACKED.html#aaa5c9a54c1ac60558188be338d7e9e46',1,'PACKED']]],
+  ['d_5freclen_3',['d_reclen',['../structPACKED.html#a8b64b9d18aab2dc993fa88a79d11f227',1,'PACKED']]],
+  ['d_5ftype_4',['d_type',['../structPACKED.html#abb10b193369dc1efdc538ff2b8c2d28c',1,'PACKED']]],
+  ['data_5',['data',['../structblock__pool__entry__t.html#a85ebd6cc902953a7578d558b755207bd',1,'block_pool_entry_t::data'],['../structinit__file.html#a4843d4b6a8c41cecf66e2c5045a148c1',1,'init_file::data'],['../structram__node.html#a077c610758e05553eb829423f7ae5c8e',1,'ram_node::data']]],
+  ['default_5fbg_6',['default_bg',['../structfb__console__ctx__t.html#a3ce8eb00ae4addb9c1166da5c57dbcbb',1,'fb_console_ctx_t']]],
+  ['default_5ffg_7',['default_fg',['../structfb__console__ctx__t.html#a906ff2f90fea45ff785bbbc29f140e74',1,'fb_console_ctx_t']]],
+  ['delim_8',['delim',['../structparse__state__t.html#a91c31131032d58f30c8bfc1fb1e1b4c7',1,'parse_state_t']]],
+  ['details_9',['details',['../structgr__cmd.html#a4d2ed91e9fdc17aed9e5f5275c64b0f8',1,'gr_cmd']]],
+  ['dev_10',['dev',['../structext2__volume__t.html#abba6d7eadb9e5e7556410fc7121105ae',1,'ext2_volume_t::dev'],['../structvfs__stat__t.html#a4541beb5b0b15533d02b9da0e8183e7e',1,'vfs_stat_t::dev']]],
+  ['device_5fid_11',['device_id',['../structpci__device.html#a667dc056a03fc6774c7e8743cc7676e6',1,'pci_device']]],
+  ['dirty_12',['dirty',['../structfb__cell__t.html#a28593680e75cc2c130c6230a09bc1ee2',1,'fb_cell_t::dirty'],['../structext2__file__t.html#a1d6fedfe77cd2ed4692c9c2ccecbcea3',1,'ext2_file_t::dirty']]],
+  ['dk_13',['dk',['../structheld__entry.html#a1011a9789be09321845db3a23d50c2d4',1,'held_entry::dk'],['../structkey__event.html#a16cde93855ecadf733c615c74f66e3ad',1,'key_event::dk']]],
+  ['dma_14',['dma',['../structata__drive.html#af14acf90d840dfc6d08f8353f9841f73',1,'ata_drive']]],
+  ['dma_5fok_15',['dma_ok',['../structata__channel.html#abf9b24e0d61fcd61e22647ab0e2ea66e',1,'ata_channel']]],
+  ['dn_16',['dn',['../structparse__state__t.html#a1c703b18bd0d20c26f32076b6945da38',1,'parse_state_t']]],
+  ['drawn_17',['drawn',['../structmouse__cur__state.html#a0340dbbce8fca5d003f10c1283f221fe',1,'mouse_cur_state']]],
+  ['drive_18',['drive',['../structata__cache__entry__t.html#a2405a552be451ae23a734407bfa1dffb',1,'ata_cache_entry_t']]],
+  ['drives_19',['drives',['../ata_8c.html#a3e799c6d9cb0e20a066a0c44dd7fb7d3',1,'ata.c']]],
+  ['dwheel_20',['dwheel',['../structalcor2__mouse__event.html#a73e0e25a41d9a130a9a1c2d75d1cde3e',1,'alcor2_mouse_event']]],
+  ['dx_21',['dx',['../structalcor2__mouse__event.html#af34bc068017f3cb6ce4395b3cb5132f9',1,'alcor2_mouse_event']]],
+  ['dy_22',['dy',['../structalcor2__mouse__event.html#a06dc8a42c363a59f03895802f6f29d55',1,'alcor2_mouse_event']]]
+];

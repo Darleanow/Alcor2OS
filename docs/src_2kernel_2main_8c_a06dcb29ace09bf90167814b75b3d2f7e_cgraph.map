@@ -1,0 +1,27 @@
+<map id="ata0_bd_read" name="ata0_bd_read">
+<area shape="rect" id="Node000001" title="Initialize storage and filesystems." alt="" coords="5,307,116,332"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="164,307,243,332"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,317,150,317,150,322,116,322"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="299,132,409,157"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="214,304,331,166,335,170,218,308"/>
+<area shape="rect" id="Node000020" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="649,205,736,231"/>
+<area shape="poly" id="edge13_Node000002_Node000020" title=" " alt="" coords="242,305,290,293,375,276,442,266,508,257,593,241,635,231,637,236,594,246,509,262,442,271,376,281,291,298,244,310"/>
+<area shape="rect" id="Node000035" href="$ata_8c.html#a5ecb7f0821ee058c29e04c52937db12a" title=" " alt="" coords="305,307,403,332"/>
+<area shape="poly" id="edge10_Node000002_Node000035" title=" " alt="" coords="243,317,291,317,291,322,243,322"/>
+<area shape="rect" id="Node000036" href="$ata_8c.html#a29513e85ae228a27f9dfe8b9a106acc8" title=" " alt="" coords="291,356,417,381"/>
+<area shape="poly" id="edge11_Node000002_Node000036" title=" " alt="" coords="244,330,302,349,300,354,242,335"/>
+<area shape="rect" id="Node000037" href="$ata_8c.html#ae8480a9ebd2209cd3d6c96ff7aea0a12" title=" " alt="" coords="299,405,409,431"/>
+<area shape="poly" id="edge12_Node000002_Node000037" title=" " alt="" coords="219,331,251,361,292,392,302,397,300,402,289,396,247,365,215,334"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a68e6896893fbe98c8eccac60438be274" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="465,5,593,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="366,130,408,91,464,48,486,35,488,39,467,52,412,95,370,134"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="641,31,744,56"/>
+<area shape="poly" id="edge9_Node000003_Node000008" title=" " alt="" coords="378,129,418,110,464,91,549,68,627,51,628,57,550,73,466,97,420,115,380,134"/>
+<area shape="rect" id="Node000017" href="$ata_8c.html#a6db50a62b7a5faa883c988e3301ac67f" title="Release exclusive access and wake any waiting caller." alt="" coords="465,107,593,132"/>
+<area shape="poly" id="edge5_Node000003_Node000017" title=" " alt="" coords="409,134,451,128,452,133,410,139"/>
+<area shape="rect" id="Node000019" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="475,156,584,181"/>
+<area shape="poly" id="edge6_Node000003_Node000019" title=" " alt="" coords="410,150,462,157,461,162,409,155"/>
+<area shape="rect" id="Node000033" href="$ata_8c.html#a86b888e981bed8edbc644d872c9139a9" title="Read sectors using PIO." alt="" coords="490,205,569,231"/>
+<area shape="poly" id="edge8_Node000003_Node000033" title=" " alt="" coords="385,155,466,190,485,198,483,203,464,195,383,160"/>
+<area shape="poly" id="edge4_Node000004_Node000008" title=" " alt="" coords="594,25,628,31,627,36,593,31"/>
+<area shape="poly" id="edge7_Node000019_Node000020" title=" " alt="" coords="573,179,638,199,636,204,571,184"/>
+</map>

@@ -1,0 +1,18 @@
+<map id="pic_unmask" name="pic_unmask">
+<area shape="rect" id="Node000001" title="Unmask (enable) an IRQ line." alt="" coords="339,80,439,105"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="193,5,264,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="352,76,290,44,263,33,265,28,292,40,354,71"/>
+<area shape="rect" id="Node000004" href="$keyboard_8c.html#a5aae8263abc1dec4671638e7ed4af681" title="Initialize the PS/2 keyboard driver." alt="" coords="173,55,284,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="325,85,284,79,285,73,326,80"/>
+<area shape="rect" id="Node000006" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="167,153,291,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="352,114,292,143,263,156,261,151,290,138,349,109"/>
+<area shape="rect" id="Node000008" href="$pit_8c.html#aad83f0d07314d8845558b13050011b0d" title="Program the PIT and install the timer IRQ handler." alt="" coords="195,104,262,129"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="325,105,263,114,262,109,324,100"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="13,5,111,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="179,21,111,21,111,15,179,15"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#a9cf4a417b66a038c3dd1e074be9fde2e" title="Initialize interrupt controllers and drivers." alt="" coords="5,79,119,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="160,80,120,86,119,81,159,75"/>
+<area shape="rect" id="Node000007" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="21,153,103,179"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="153,169,104,169,104,163,153,163"/>
+<area shape="poly" id="edge8_Node000008_Node000005" title=" " alt="" coords="181,112,119,103,120,97,182,107"/>
+</map>

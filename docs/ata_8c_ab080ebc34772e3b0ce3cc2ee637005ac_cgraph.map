@@ -1,0 +1,9 @@
+<map id="poll_bsy" name="poll_bsy">
+<area shape="rect" id="Node000001" title="Poll until BSY clears." alt="" coords="5,31,81,56"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a72dd5d1604adc49aa410d8bd39714cb5" title="CPU pause instruction for spinlock optimization." alt="" coords="129,5,220,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,33,115,27,116,32,82,39"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a2e42765bdca6c8d40cafe008a9c35e7e" title=" " alt="" coords="135,55,214,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="82,48,122,55,121,60,81,53"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="268,55,311,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="215,65,254,65,254,70,215,70"/>
+</map>

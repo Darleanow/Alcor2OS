@@ -1,0 +1,7 @@
+<map id="vfs_dup" name="vfs_dup">
+<area shape="rect" id="Node000001" title="Duplicate oldfd into the lowest free fd ≥ 3 and retain the OFT entry." alt="" coords="133,31,207,56"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a3da7d8c19db4de1b35b610bbe9b7cdd4" title="Duplicate oldfd to the lowest free fd ≥ 3." alt="" coords="8,5,83,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,36,82,28,83,23,120,30"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e" title="Perform a file&#45;control operation on fd." alt="" coords="5,55,85,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="120,56,86,62,85,57,119,50"/>
+</map>

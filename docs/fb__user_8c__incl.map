@@ -1,0 +1,20 @@
+<map id="src/kernel/drivers/fb_user.c" name="src/kernel/drivers/fb_user.c">
+<area shape="rect" id="Node000001" title="Framebuffer physical range + geometry for user mmap." alt="" coords="244,5,379,45"/>
+<area shape="rect" id="Node000002" href="$fb__user_8h.html" title="Export Limine framebuffer to user processes (shared scanout buffer)." alt="" coords="28,93,203,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="266,48,158,91,156,86,264,43"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="373,167,496,192"/>
+<area shape="poly" id="edge7_Node000001_Node000009" title=" " alt="" coords="343,43,372,65,398,92,416,122,429,152,424,154,412,125,394,95,368,69,340,47"/>
+<area shape="rect" id="Node000010" href="$pmm_8h.html" title="Physical memory manager (page allocator)." alt="" coords="240,93,383,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="314,46,314,79,309,79,309,46"/>
+<area shape="rect" id="Node000003" href="$alcor__fb_8h.html" title="Userspace API: Limine linear framebuffer info and mmap helpers." alt="" coords="24,167,154,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,120,101,155,96,153,109,118"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="181,240,296,265"/>
+<area shape="poly" id="edge6_Node000002_Node000004" title=" " alt="" coords="82,121,51,134,24,151,9,170,9,180,14,190,37,207,75,220,168,240,167,245,74,225,34,211,10,194,3,181,4,168,21,147,49,130,80,116"/>
+<area shape="rect" id="Node000008" href="$limine_8h.html" title="Limine bootloader protocol definitions." alt="" coords="179,167,298,192"/>
+<area shape="poly" id="edge4_Node000002_Node000008" title=" " alt="" coords="137,116,208,157,205,162,134,121"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="114,190,203,232,200,236,112,194"/>
+<area shape="poly" id="edge5_Node000008_Node000004" title=" " alt="" coords="241,192,241,226,236,226,236,192"/>
+<area shape="poly" id="edge8_Node000009_Node000004" title=" " alt="" coords="404,195,284,238,282,233,402,190"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="317,119,321,153,319,173,313,193,296,217,274,235,270,231,292,213,308,191,314,172,315,153,312,119"/>
+<area shape="poly" id="edge10_Node000010_Node000008" title=" " alt="" coords="301,121,262,159,258,155,298,117"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="feed_byte" name="feed_byte">
+<area shape="rect" id="Node000001" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="5,352,92,377"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#a7fd1926dc1bcdd98794488807df72221" title="Handle one byte while the parser is waiting for a G0 charset designator after ESC(/)." alt="" coords="140,277,283,303"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,350,139,312,155,305,157,310,141,316,71,354"/>
+<area shape="rect" id="Node000003" href="$ansi_8c.html#a02fc143e65dd6786ede77f13e0d80641" title="Handle one byte while the parser is accumulating a CSI sequence." alt="" coords="155,327,267,352"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="92,355,141,348,142,353,92,361"/>
+<area shape="rect" id="Node000058" href="$ansi_8c.html#a862bec20ffdb4a79ec0e9b93ed56c94a" title="Handle one byte while the parser is in the ESC&#45;was&#45;just&#45;seen state." alt="" coords="153,376,269,401"/>
+<area shape="poly" id="edge16_Node000001_Node000058" title=" " alt="" coords="92,368,140,375,139,381,92,374"/>
+<area shape="rect" id="Node000059" href="$ansi_8c.html#a95caeb62a209e7d835114c4b18ef080b" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="334,600,418,625"/>
+<area shape="poly" id="edge17_Node000001_Node000059" title=" " alt="" coords="69,376,349,590,346,594,65,380"/>
+<area shape="rect" id="Node000004" href="$csi_8c.html#a13481ca709daa8398739bba14a24f240" title="Final&#45;byte dispatcher for the assembled CSI sequence." alt="" coords="331,277,421,303"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="254,324,319,304,320,309,255,329"/>
+<area shape="rect" id="Node000005" href="$csi_8c.html#a622e3df5e2c60fd455043e5a1d8ef75a" title="CSI G (CHA) / CSI d (VPA) — absolute column or row positioning. Both are 1&#45;based on the wire and clam..." alt="" coords="471,5,608,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="376,277,382,232,397,169,424,101,443,69,467,40,472,36,476,40,471,44,448,72,429,103,402,171,387,233,381,278"/>
+<area shape="rect" id="Node000008" href="$csi_8c.html#abd1966eec2539b71df1491eca3549301" title="CSI H / f — cursor position. Row and column are 1&#45;based on the wire; the cell grid is 0&#45;based,..." alt="" coords="504,55,575,80"/>
+<area shape="poly" id="edge5_Node000004_Node000008" title=" " alt="" coords="377,277,386,240,403,190,429,137,447,111,468,89,489,76,492,80,471,93,451,115,434,139,408,192,391,242,382,278"/>
+<area shape="rect" id="Node000009" href="$csi_8c.html#a054574007ff5c6dea6a9a9806d66829d" title="CSI A/B/C/D — relative cursor motion, clamped to the grid edge." alt="" coords="474,104,605,129"/>
+<area shape="poly" id="edge6_Node000004_Node000009" title=" " alt="" coords="379,276,409,211,435,172,468,139,474,134,478,138,471,143,439,176,414,214,384,278"/>
+<area shape="rect" id="Node000010" href="$csi_8c.html#a50732b884398cd74922fd3449bbc73cf" title="CSI ?N h / CSI ?N l — DEC private mode set/reset." alt="" coords="478,153,601,179"/>
+<area shape="poly" id="edge7_Node000004_Node000010" title=" " alt="" coords="384,275,417,233,441,209,468,188,478,182,480,187,471,192,445,213,421,236,388,279"/>
+<area shape="rect" id="Node000013" href="$csi_8c.html#a70429ceb320ba5d04cd0d21ea2b0983f" title="CSI X (ECH) — erase Pn chars at the cursor, no cursor move." alt="" coords="477,203,602,228"/>
+<area shape="poly" id="edge8_Node000004_Node000013" title=" " alt="" coords="397,275,468,237,484,230,486,235,470,242,399,280"/>
+<area shape="rect" id="Node000037" href="$csi_8c.html#a7eae43490b5d98fbf307d2521bc09019" title="CSI J (ED) — erase in display (mode 0/1/2)." alt="" coords="471,252,608,277"/>
+<area shape="poly" id="edge9_Node000004_Node000037" title=" " alt="" coords="421,280,457,275,458,280,422,286"/>
+<area shape="rect" id="Node000038" href="$csi_8c.html#a26848e54b8dcf798b7cb2175e4af9a81" title="CSI K (EL) — erase in line (mode 0/1/2)." alt="" coords="482,301,597,327"/>
+<area shape="poly" id="edge10_Node000004_Node000038" title=" " alt="" coords="422,294,468,301,468,306,421,299"/>
+<area shape="rect" id="Node000039" href="$csi_8c.html#a7db7ffbb34457f15e761ac21391d95f5" title="CSI b (REP) — repeat the last emitted codepoint Pn times." alt="" coords="495,351,584,376"/>
+<area shape="poly" id="edge11_Node000004_Node000039" title=" " alt="" coords="401,300,470,336,489,343,487,348,468,340,399,305"/>
+<area shape="rect" id="Node000048" href="$csi_8c.html#a27a30c06a6b813a9cd83a4d8b2d73800" title="CSI u — restore cursor saved by CSI s." alt="" coords="469,400,609,425"/>
+<area shape="poly" id="edge13_Node000004_Node000048" title=" " alt="" coords="389,301,422,342,445,365,471,385,483,392,480,397,468,390,442,369,418,346,385,305"/>
+<area shape="rect" id="Node000049" href="$csi_8c.html#ae66d416fcb919f2a3ed00390e69035d7" title="CSI s — save cursor (paired with CSI u)." alt="" coords="477,449,602,475"/>
+<area shape="poly" id="edge14_Node000004_Node000049" title=" " alt="" coords="384,302,415,365,440,402,471,435,480,441,477,445,468,439,436,406,410,368,380,304"/>
+<area shape="rect" id="Node000050" href="$sgr_8c.html#ac4f95099e325c3abc02d3bb6dba97b98" title="CSI m — Select Graphic Rendition. Defined in sgr.c; called from csi.c&#39;s handle_csi switch." alt="" coords="506,499,573,524"/>
+<area shape="poly" id="edge15_Node000004_Node000050" title=" " alt="" coords="382,302,391,338,408,387,434,439,451,463,471,484,495,498,492,503,468,488,447,466,430,441,403,389,386,340,377,304"/>
+<area shape="rect" id="Node000040" href="$flush_8c.html#a44a71e48febb7915140c21fe215037ec" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="657,549,789,575"/>
+<area shape="poly" id="edge12_Node000039_Node000040" title=" " alt="" coords="586,371,611,385,647,421,676,461,714,535,709,537,671,464,643,424,608,389,583,376"/>
+<area shape="poly" id="edge24_Node000059_Node000040" title=" " alt="" coords="418,598,469,586,559,573,643,565,644,570,560,578,470,591,419,603"/>
+<area shape="poly" id="edge21_Node000059_Node000059" title=" " alt="" coords="349,601,343,592,346,582,357,576,376,573,398,577,408,585,404,589,396,582,376,579,359,581,350,585,348,591,353,598"/>
+<area shape="rect" id="Node000060" href="$ansi_8c.html#ae17d9b8bddeae69976a74a6dc8e2202d" title="Emit a single ASCII byte to the cursor, applying DEC ACS translation when the G0 set is the special&#45;g..." alt="" coords="495,600,584,625"/>
+<area shape="poly" id="edge18_Node000059_Node000060" title=" " alt="" coords="418,610,480,610,480,615,418,615"/>
+<area shape="rect" id="Node000062" href="$ansi_8c.html#a18c6ecf4c578965fdd84b8b25849cb88" title="Apply one C0 control character to the cursor/grid state." alt="" coords="480,649,599,675"/>
+<area shape="poly" id="edge22_Node000059_Node000062" title=" " alt="" coords="419,623,484,643,483,648,418,628"/>
+<area shape="rect" id="Node000063" href="$ansi_8c.html#aef6dd46fa5dd672eab286e30d562a4ce" title="Try to start a UTF&#45;8 multi&#45;byte sequence based on the high bits of b." alt="" coords="484,699,595,724"/>
+<area shape="poly" id="edge25_Node000059_Node000063" title=" " alt="" coords="392,623,426,654,471,685,483,691,480,696,468,690,423,658,388,627"/>
+<area shape="poly" id="edge20_Node000060_Node000040" title=" " alt="" coords="583,598,663,576,664,581,585,603"/>
+<area shape="rect" id="Node000061" href="$ansi_8c.html#af0a0a81bd1368dfe474da441d7d4d3fb" title="Translate a DEC ACS (Special Graphics) printable ASCII byte to its Unicode equivalent." alt="" coords="662,600,785,625"/>
+<area shape="poly" id="edge19_Node000060_Node000061" title=" " alt="" coords="584,610,648,610,648,615,584,615"/>
+<area shape="rect" id="Node000043" href="$scrollback_8c.html#a20a43904baf76078b5399667db4f67d3" title="Move the top row off the grid into the scrollback ring and shift every remaining row up...." alt="" coords="679,649,767,675"/>
+<area shape="poly" id="edge23_Node000062_Node000043" title=" " alt="" coords="599,659,666,659,666,665,599,665"/>
+<area shape="rect" id="Node000064" href="$ansi_8c.html#abe5d0937fa54ec7f4b665fb7a7a514ba" title="Begin a multi&#45;byte UTF&#45;8 sequence: store the lead bits and remaining continuation&#45;byte count,..." alt="" coords="678,699,769,724"/>
+<area shape="poly" id="edge26_Node000063_Node000064" title=" " alt="" coords="595,709,665,709,665,714,595,714"/>
+</map>

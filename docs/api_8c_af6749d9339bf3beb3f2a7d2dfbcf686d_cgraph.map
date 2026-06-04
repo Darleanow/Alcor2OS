@@ -1,0 +1,25 @@
+<map id="fb_console_write_raw" name="fb_console_write_raw">
+<area shape="rect" id="Node000001" title="Feed len bytes through the ANSI/UTF&#45;8 parser without flushing." alt="" coords="5,80,168,105"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#aed57f05021fc0a714155c4f892ef5cee" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="216,80,303,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,90,202,90,202,95,168,95"/>
+<area shape="rect" id="Node000003" href="$ansi_8c.html#a7fd1926dc1bcdd98794488807df72221" title="Handle one byte while the parser is waiting for a G0 charset designator after ESC(/)." alt="" coords="351,5,493,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="280,78,350,40,366,33,368,38,352,44,282,82"/>
+<area shape="rect" id="Node000004" href="$ansi_8c.html#a02fc143e65dd6786ede77f13e0d80641" title="Handle one byte while the parser is accumulating a CSI sequence." alt="" coords="366,55,478,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="302,83,352,76,353,81,303,89"/>
+<area shape="rect" id="Node000059" href="$ansi_8c.html#a862bec20ffdb4a79ec0e9b93ed56c94a" title="Handle one byte while the parser is in the ESC&#45;was&#45;just&#45;seen state." alt="" coords="364,104,480,129"/>
+<area shape="poly" id="edge5_Node000002_Node000059" title=" " alt="" coords="303,96,351,103,350,109,302,102"/>
+<area shape="rect" id="Node000060" href="$ansi_8c.html#a95caeb62a209e7d835114c4b18ef080b" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="380,177,464,203"/>
+<area shape="poly" id="edge6_Node000002_Node000060" title=" " alt="" coords="283,103,389,168,387,172,280,108"/>
+<area shape="rect" id="Node000005" href="$csi_8c.html#a13481ca709daa8398739bba14a24f240" title="Final&#45;byte dispatcher for the assembled CSI sequence." alt="" coords="555,55,646,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="478,65,542,65,542,70,478,70"/>
+<area shape="poly" id="edge9_Node000060_Node000060" title=" " alt="" coords="395,179,389,169,392,159,403,153,422,151,444,154,454,163,450,167,442,159,422,156,405,158,396,163,394,168,399,176"/>
+<area shape="rect" id="Node000061" href="$ansi_8c.html#ae17d9b8bddeae69976a74a6dc8e2202d" title="Emit a single ASCII byte to the cursor, applying DEC ACS translation when the G0 set is the special&#45;g..." alt="" coords="556,115,645,140"/>
+<area shape="poly" id="edge7_Node000060_Node000061" title=" " alt="" coords="458,175,550,142,551,147,460,180"/>
+<area shape="rect" id="Node000041" href="$flush_8c.html#a44a71e48febb7915140c21fe215037ec" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="708,140,840,165"/>
+<area shape="poly" id="edge11_Node000060_Node000041" title=" " alt="" coords="464,183,694,158,695,164,464,188"/>
+<area shape="rect" id="Node000063" href="$ansi_8c.html#a18c6ecf4c578965fdd84b8b25849cb88" title="Apply one C0 control character to the cursor/grid state." alt="" coords="541,216,660,241"/>
+<area shape="poly" id="edge10_Node000060_Node000063" title=" " alt="" coords="465,196,529,210,528,216,464,202"/>
+<area shape="rect" id="Node000064" href="$ansi_8c.html#aef6dd46fa5dd672eab286e30d562a4ce" title="Try to start a UTF&#45;8 multi&#45;byte sequence based on the high bits of b." alt="" coords="545,265,656,291"/>
+<area shape="poly" id="edge12_Node000060_Node000064" title=" " alt="" coords="447,200,543,250,558,257,555,262,540,255,445,205"/>
+<area shape="poly" id="edge8_Node000061_Node000041" title=" " alt="" coords="646,131,695,138,694,144,645,136"/>
+</map>

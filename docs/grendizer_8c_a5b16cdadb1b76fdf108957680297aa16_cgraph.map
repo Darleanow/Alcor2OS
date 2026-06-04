@@ -1,0 +1,19 @@
+<map id="gr__dispatch" name="gr__dispatch">
+<area shape="rect" id="Node000001" title="Core recursive command dispatcher: resolves tokens and calls the leaf handler." alt="" coords="5,111,109,136"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="31,112,25,102,28,93,39,86,57,84,79,87,88,96,85,100,77,92,57,89,41,91,32,96,31,102,35,109"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a179c0df2ca45d2cc6fb2f1999c3aad2a" title="Linear search for a subcommand by name in a table slice." alt="" coords="323,5,431,31"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="70,108,107,79,156,50,195,37,235,28,309,18,310,23,236,33,196,42,158,55,110,83,74,113"/>
+<area shape="rect" id="Node000003" href="$grendizer_8c.html#a226832e33d4fd0b34c462c97f1099e8c" title="Recursively resolve a command path for &#39;help &lt;command&gt; [subcommand]&#39;." alt="" coords="157,111,272,136"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="110,121,143,121,143,126,110,126"/>
+<area shape="rect" id="Node000004" href="$grendizer_8c.html#a5243b40b2661b9b66ab0583548fb1542" title="Build a space&#45;joined &quot;prefix seg&quot; command path string into dst." alt="" coords="323,92,432,117"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="76,108,112,88,157,71,189,65,214,64,272,71,330,85,328,90,272,77,214,70,189,71,158,77,115,93,79,113"/>
+<area shape="rect" id="Node000005" href="$grendizer_8c.html#a6f728f3677542ee90fa06b52840c4eef" title="Print detailed usage for a single command node to stream." alt="" coords="320,161,435,187"/>
+<area shape="poly" id="edge10_Node000001_Node000005" title=" " alt="" coords="107,133,158,145,306,165,306,170,157,150,106,139"/>
+<area shape="rect" id="Node000006" href="$grendizer_8c.html#a3a87ca84afedecfa023ec02b1b7115a1" title="Print a help listing of all commands in a group to stream." alt="" coords="483,187,605,212"/>
+<area shape="poly" id="edge11_Node000001_Node000006" title=" " alt="" coords="82,134,117,151,158,167,240,187,323,197,402,201,469,201,469,206,402,207,323,203,239,192,157,173,115,156,80,138"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="234,108,344,36,347,40,237,113"/>
+<area shape="poly" id="edge5_Node000003_Node000003" title=" " alt="" coords="188,112,183,102,186,93,197,86,215,84,236,87,246,96,242,100,234,92,215,89,198,91,190,96,188,102,193,109"/>
+<area shape="poly" id="edge6_Node000003_Node000004" title=" " alt="" coords="272,114,308,110,309,115,273,119"/>
+<area shape="poly" id="edge7_Node000003_Node000005" title=" " alt="" coords="257,134,323,155,322,160,256,139"/>
+<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="436,180,469,185,469,191,435,185"/>
+</map>

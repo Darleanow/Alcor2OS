@@ -1,0 +1,7 @@
+<map id="vfs_ioctl" name="vfs_ioctl">
+<area shape="rect" id="Node000001" title="Dispatch an ioctl to the filesystem behind fd." alt="" coords="5,5,83,31"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="131,5,209,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,15,117,15,117,21,83,21"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="257,5,360,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="210,15,244,15,244,21,210,21"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="klog_putuint" name="klog_putuint">
+<area shape="rect" id="Node000001" title="Emit an unsigned integer in base base." alt="" coords="5,5,108,31"/>
+<area shape="rect" id="Node000002" href="$klog_8c.html#a84403189353e810c4c948c32d95fa9d0" title="Emit a single byte to debugcon." alt="" coords="156,5,241,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,15,142,15,142,21,108,21"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="289,5,340,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="242,15,275,15,275,21,242,21"/>
+</map>

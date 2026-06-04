@@ -1,0 +1,5 @@
+<map id="io_wait" name="io_wait">
+<area shape="rect" id="Node000001" title="Short I/O delay (write to port 0x80)." alt="" coords="5,5,75,31"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="123,5,173,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,15,109,15,109,21,75,21"/>
+</map>

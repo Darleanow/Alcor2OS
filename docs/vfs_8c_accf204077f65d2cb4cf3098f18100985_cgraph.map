@@ -1,0 +1,7 @@
+<map id="vfs_register_fs" name="vfs_register_fs">
+<area shape="rect" id="Node000001" title="Register a filesystem driver in the type registry." alt="" coords="5,5,124,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="172,5,235,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,15,158,15,158,21,124,21"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="283,5,357,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="235,15,269,15,269,21,235,21"/>
+</map>

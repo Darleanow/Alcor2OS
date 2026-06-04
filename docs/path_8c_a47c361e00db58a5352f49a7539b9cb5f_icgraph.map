@@ -1,0 +1,7 @@
+<map id="extract_basename" name="extract_basename">
+<area shape="rect" id="Node000001" title="Copy the basename of path into name." alt="" coords="297,5,440,31"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#aecf245e7de6ece833406905140c35e24" title="Get file status information." alt="" coords="167,5,249,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="284,21,249,21,249,15,284,15"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#ab0bb1a8ce17f5f904d45fe5b02f347df" title="fs_ops_t.stat shim — path&#45;based stat." alt="" coords="5,5,119,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="153,21,119,21,119,15,153,15"/>
+</map>

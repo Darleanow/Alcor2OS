@@ -1,0 +1,39 @@
+<map id="cpu_invlpg" name="cpu_invlpg">
+<area shape="rect" id="Node000001" title="Invalidate a single page in the TLB." alt="" coords="760,107,852,132"/>
+<area shape="rect" id="Node000002" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="612,208,704,233"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="777,142,679,210,676,206,774,138"/>
+<area shape="rect" id="Node000136" href="$vmm_8c.html#a6244b5d7fe137846a4daf0e46f73cac0" title="Allocate and map a range of consecutive virtual pages." alt="" coords="381,107,556,132"/>
+<area shape="poly" id="edge10_Node000001_Node000136" title=" " alt="" coords="746,122,556,122,556,117,746,117"/>
+<area shape="rect" id="Node000140" href="$vmm_8c.html#aeaa0c698c155c448ca914e36088c2e23" title="Unmap a virtual page from the current address space." alt="" coords="604,56,712,81"/>
+<area shape="poly" id="edge16_Node000001_Node000140" title=" " alt="" coords="754,105,695,84,697,79,756,100"/>
+<area shape="rect" id="Node000003" href="$sys__mm_8c.html#a7da07ec899f677a888d630e40f1635c2" title=" " alt="" coords="177,156,304,181"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="598,208,556,199,421,183,304,174,304,169,422,177,556,194,599,203"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="414,257,523,283"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="600,239,519,260,518,255,598,233"/>
+<area shape="rect" id="Node000134" href="$sys__mm_8c.html#a2d1d07fe317612d6d37d18174c73b63b" title=" " alt="" coords="433,208,505,233"/>
+<area shape="poly" id="edge8_Node000002_Node000134" title=" " alt="" coords="598,223,505,223,505,218,598,218"/>
+<area shape="rect" id="Node000135" href="$sys__mm_8c.html#a5d85ae596caf7c76319a5ae5690f0d33" title=" " alt="" coords="413,307,524,332"/>
+<area shape="poly" id="edge9_Node000002_Node000135" title=" " alt="" coords="634,245,599,272,557,298,525,310,523,305,555,293,596,268,631,241"/>
+<area shape="rect" id="Node000004" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="6,107,99,132"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="177,155,147,147,99,134,100,129,149,142,178,150"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a7e7a6625a49b6a560a47ae7575575264" title="Initialize the kernel heap allocator." alt="" coords="199,255,282,280"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="400,272,282,270,282,265,400,267"/>
+<area shape="rect" id="Node000009" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="203,304,278,329"/>
+<area shape="poly" id="edge6_Node000005_Node000009" title=" " alt="" coords="401,286,279,312,278,307,400,281"/>
+<area shape="rect" id="Node000056" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="5,279,100,304"/>
+<area shape="poly" id="edge7_Node000009_Node000056" title=" " alt="" coords="189,313,100,300,101,295,190,307"/>
+<area shape="rect" id="Node000137" href="$elf_8c.html#ac1396569a9a8edc3e72a606e32adfe98" title=" " alt="" coords="148,205,333,231"/>
+<area shape="poly" id="edge11_Node000136_Node000137" title=" " alt="" coords="438,142,390,170,334,196,300,208,298,203,332,192,388,165,435,137"/>
+<area shape="rect" id="Node000139" href="$sys__mm_8c.html#abdac42378ec121cb3f3b48c5af03ded3" title=" " alt="" coords="150,107,331,132"/>
+<area shape="poly" id="edge14_Node000136_Node000139" title=" " alt="" coords="367,122,332,122,332,117,367,117"/>
+<area shape="poly" id="edge13_Node000137_Node000056" title=" " alt="" coords="174,237,149,246,77,281,75,276,147,241,172,232"/>
+<area shape="rect" id="Node000138" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="15,205,90,231"/>
+<area shape="poly" id="edge12_Node000137_Node000138" title=" " alt="" coords="134,221,90,221,90,215,134,215"/>
+<area shape="poly" id="edge15_Node000139_Node000004" title=" " alt="" coords="136,122,100,122,100,117,136,117"/>
+<area shape="rect" id="Node000141" href="$sys__mm_8c.html#a4a9a3125254665467fbc3e506c768b9a" title=" " alt="" coords="381,56,556,81"/>
+<area shape="poly" id="edge17_Node000140_Node000141" title=" " alt="" coords="590,71,556,71,556,66,590,66"/>
+<area shape="poly" id="edge19_Node000141_Node000004" title=" " alt="" coords="368,75,262,83,148,98,98,109,97,104,148,93,261,78,367,70"/>
+<area shape="poly" id="edge18_Node000141_Node000139" title=" " alt="" coords="398,87,299,109,298,104,397,82"/>
+<area shape="rect" id="Node000142" href="$sys__mm_8c.html#a95d35a82f8059990e8f0598e18299f19" title=" " alt="" coords="186,5,295,31"/>
+<area shape="poly" id="edge20_Node000141_Node000142" title=" " alt="" coords="397,56,295,33,296,27,398,50"/>
+</map>

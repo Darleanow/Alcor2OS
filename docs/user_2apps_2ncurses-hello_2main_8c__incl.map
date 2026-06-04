@@ -1,0 +1,24 @@
+<map id="user/apps/ncurses&#45;hello/main.c" name="user/apps/ncurses&#45;hello/main.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="238,5,414,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,167,81,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,37,177,46,117,58,66,74,47,84,35,95,28,108,27,123,34,153,29,154,22,123,23,107,31,92,44,80,64,70,115,53,177,41,238,32"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="45,93,119,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="268,48,132,92,130,86,267,43"/>
+<area shape="rect" id="Node000004" href="$spazer_8h.html" title=" " alt="" coords="143,93,266,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="298,48,235,88,233,84,295,43"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="291,93,361,119"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="329,46,329,79,323,79,323,46"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="386,93,453,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="350,44,396,82,393,86,347,48"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="477,93,548,119"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="372,43,474,85,472,90,370,48"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="572,93,643,119"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="394,43,559,89,558,94,393,48"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="180,121,83,163,81,159,178,116"/>
+<area shape="rect" id="Node000005" href="$palette_8h.html" title="Spazer palette — re&#45;exports theme.h and boxdraw.h." alt="" coords="141,167,268,192"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="207,119,207,153,202,153,202,119"/>
+<area shape="rect" id="Node000006" href="$boxdraw_8h.html" title="UTF&#45;8 box&#45;drawing character literals for write()/printf() output." alt="" coords="107,240,196,265"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="198,194,170,231,166,228,194,191"/>
+<area shape="rect" id="Node000007" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="220,240,296,265"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="216,191,243,228,239,231,211,194"/>
+</map>

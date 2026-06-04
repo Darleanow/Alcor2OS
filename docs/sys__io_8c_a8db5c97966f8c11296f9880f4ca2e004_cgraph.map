@@ -1,0 +1,11 @@
+<map id="sel_read_ready" name="sel_read_ready">
+<area shape="rect" id="Node000001" title="Return positive if fd has data available, 0 if not, negative on error." alt="" coords="5,31,127,56"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#ad9f22619a86ca604e464d7a1def4ce1f" title="Poll fd&#39;s read end for non&#45;blocking readiness." alt="" coords="175,31,343,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,41,161,41,161,46,127,46"/>
+<area shape="rect" id="Node000003" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="432,5,511,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="343,31,418,22,419,27,343,36"/>
+<area shape="rect" id="Node000005" href="$pipe_8c.html#a62f7491c178fbe7b1df4adce79090bb9" title="Check whether a read would return data immediately." alt="" coords="391,55,552,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="343,50,377,54,376,59,343,55"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="600,5,703,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="511,15,587,15,587,21,511,21"/>
+</map>

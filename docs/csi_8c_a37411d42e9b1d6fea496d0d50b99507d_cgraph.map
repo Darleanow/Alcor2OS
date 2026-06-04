@@ -1,0 +1,5 @@
+<map id="csi_param1" name="csi_param1">
+<area shape="rect" id="Node000001" title="Convenience for cursor&#45;movement sequences: parse first param, default to 1 when missing or zero." alt="" coords="5,5,103,31"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a12726087c8c2716aab2cf78cff0f2a79" title="Parse up to maxn decimal parameters from esc_buf into pv." alt="" coords="151,5,247,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,15,137,15,137,21,103,21"/>
+</map>

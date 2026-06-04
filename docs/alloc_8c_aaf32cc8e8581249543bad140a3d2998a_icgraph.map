@@ -1,0 +1,34 @@
+<map id="bitmap_clear" name="bitmap_clear">
+<area shape="rect" id="Node000001" title="Clear bit bit in the bitmap rooted at bitmap." alt="" coords="721,191,828,217"/>
+<area shape="rect" id="Node000002" href="$alloc_8c.html#a8cee33622c2b8dee0188a576295a4e74" title="Mark block as free in its owning group&#39;s bitmap." alt="" coords="583,241,673,266"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="724,224,668,243,666,238,722,219"/>
+<area shape="rect" id="Node000017" href="$alloc_8c.html#a10b50b2d49c8692548222a916d2257a8" title="Mark inode ino as free in its owning group&#39;s bitmap." alt="" coords="583,115,673,141"/>
+<area shape="poly" id="edge13_Node000001_Node000017" title=" " alt="" coords="736,187,652,143,655,138,738,182"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#ac1186d8d194bfb877678c89302286c51" title="Recursively free an indirect&#45;block subtree." alt="" coords="357,366,517,391"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="602,277,536,325,464,368,461,363,533,320,598,273"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#a14a27d30b184dac4588f28bfa35d7fe5" title="Free every block referenced by inode and reset its counters." alt="" coords="152,241,292,266"/>
+<area shape="poly" id="edge8_Node000002_Node000004" title=" " alt="" coords="577,272,535,281,437,289,340,281,270,269,271,263,340,276,437,284,534,276,576,267"/>
+<area shape="rect" id="Node000013" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="341,191,534,217"/>
+<area shape="poly" id="edge9_Node000002_Node000013" title=" " alt="" coords="569,241,486,219,488,214,570,236"/>
+<area shape="rect" id="Node000016" href="$dir_8c.html#ae8b1d460d057e6b7e793044f392a1274" title="Allocate the first data block, seed it with ./.., persist it, and wire it into inode." alt="" coords="351,241,523,266"/>
+<area shape="poly" id="edge11_Node000002_Node000016" title=" " alt="" coords="569,256,523,256,523,251,569,251"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="471,356,461,348,437,345,417,347,407,351,405,357,410,364,406,367,399,358,403,348,416,341,437,339,463,343,474,352"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="401,361,339,325,243,268,246,264,341,320,403,357"/>
+<area shape="rect" id="Node000005" href="$file_8c.html#ab3496119d1da698296609134293d2a0a" title="Close an ext2 file handle." alt="" coords="9,91,101,117"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="159,237,150,231,130,211,105,179,62,118,67,115,109,176,134,207,154,227,162,232"/>
+<area shape="rect" id="Node000007" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="8,191,101,217"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="164,239,98,219,100,214,166,234"/>
+<area shape="rect" id="Node000011" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="5,15,104,41"/>
+<area shape="poly" id="edge7_Node000004_Node000011" title=" " alt="" coords="154,235,150,231,135,212,126,194,120,158,117,121,112,101,102,80,86,59,69,43,73,39,90,56,106,77,117,99,122,120,126,157,131,192,140,209,154,227,158,231"/>
+<area shape="rect" id="Node000014" href="$dir_8c.html#a28d0deef2247c3e0c95faa3a132818cb" title="Create a directory on an ext2 volume." alt="" coords="174,191,270,217"/>
+<area shape="poly" id="edge10_Node000013_Node000014" title=" " alt="" coords="327,207,270,207,270,201,327,201"/>
+<area shape="poly" id="edge12_Node000016_Node000014" title=" " alt="" coords="367,240,270,217,271,212,369,235"/>
+<area shape="poly" id="edge16_Node000017_Node000005" title=" " alt="" coords="597,110,567,93,534,80,429,59,345,55,260,64,152,80,94,94,92,89,152,75,259,59,345,50,429,53,535,75,570,88,600,105"/>
+<area shape="poly" id="edge17_Node000017_Node000007" title=" " alt="" coords="569,134,383,151,268,165,152,183,102,194,101,189,152,177,267,159,382,146,569,129"/>
+<area shape="poly" id="edge18_Node000017_Node000011" title=" " alt="" coords="607,106,575,75,555,60,534,49,477,30,417,18,357,11,297,9,188,12,104,22,104,17,188,7,297,3,357,6,418,13,478,25,536,44,558,56,578,71,610,103"/>
+<area shape="poly" id="edge19_Node000017_Node000013" title=" " alt="" coords="591,149,536,174,482,194,480,189,534,169,589,144"/>
+<area shape="rect" id="Node000018" href="$file_8c.html#a3a6ddc6334a7a3057601d6a7195bbfba" title="Allocate a fresh inode, link it into parent_inode under filename, and persist the metadata." alt="" coords="340,90,535,115"/>
+<area shape="poly" id="edge14_Node000017_Node000018" title=" " alt="" coords="569,123,533,118,533,113,569,117"/>
+<area shape="rect" id="Node000019" href="$file_8c.html#a0a9f5f8d942af3cc0b2c41f852c0a880" title="Create a new file on an ext2 volume." alt="" coords="173,90,271,115"/>
+<area shape="poly" id="edge15_Node000018_Node000019" title=" " alt="" coords="326,105,272,105,272,100,326,100"/>
+</map>

@@ -1,0 +1,56 @@
+<map id="handle_tab" name="handle_tab">
+<area shape="rect" id="Node000001" title="Handle a Tab keypress: complete or list candidates." alt="" coords="5,131,100,156"/>
+<area shape="rect" id="Node000002" href="$edit_8c.html#ad639ab0386e6acda4129570616eff51e" title="Print completion candidates in coloured columns (double&#45;tab)." alt="" coords="148,55,268,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,128,168,84,170,88,81,133"/>
+<area shape="rect" id="Node000006" href="$edit_8c.html#abd409a02af078b9a9096d611ef989a19" title="Count visible UTF&#45;8 glyphs in s." alt="" coords="347,104,429,129"/>
+<area shape="poly" id="edge31_Node000001_Node000006" title=" " alt="" coords="100,137,333,118,334,124,100,142"/>
+<area shape="rect" id="Node000007" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="349,207,427,232"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="75,154,108,173,149,190,197,202,247,210,335,216,335,222,246,215,196,207,147,195,106,178,72,158"/>
+<area shape="rect" id="Node000009" href="$compiler__abi_8c.html#a67a32512b988260592273ddf743c5c3c" title=" " alt="" coords="161,156,255,181"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="101,148,148,156,147,162,100,154"/>
+<area shape="rect" id="Node000010" href="$edit_8c.html#a49d1c35f42b665a736da8063551682ec" title="Repaint the input row in&#45;place: clear, prompt, buffer, cursor." alt="" coords="159,5,257,31"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="61,129,95,86,120,62,146,40,154,35,157,39,150,44,123,66,99,90,65,132"/>
+<area shape="rect" id="Node000011" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="155,357,261,383"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="65,155,193,344,188,347,60,158"/>
+<area shape="rect" id="Node000003" href="$edit_8c.html#aa7654baef48ef9a60e7973387009299f" title="Return the display name for a completion entry (strip dir prefix)." alt="" coords="316,55,460,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="268,65,302,65,302,70,268,70"/>
+<area shape="rect" id="Node000004" href="$io_8c.html#ac3e98303df49d2058bbde227fbe73286" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="352,5,424,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="254,52,338,29,340,34,256,57"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="256,77,335,99,333,105,254,83"/>
+<area shape="rect" id="Node000005" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="517,5,594,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="424,15,503,15,503,21,424,21"/>
+<area shape="rect" id="Node000008" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="512,181,599,207"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="427,211,498,200,499,205,428,216"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="255,169,499,187,498,193,255,175"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="258,15,338,15,338,21,258,21"/>
+<area shape="poly" id="edge14_Node000011_Node000007" title=" " alt="" coords="216,355,255,305,283,276,314,249,337,236,340,240,318,254,287,280,259,309,220,359"/>
+<area shape="rect" id="Node000012" href="$complete_8c.html#afe1c4a00bc178d85024f218962e226da" title="Compute the longest common prefix across all entries in out." alt="" coords="317,555,459,580"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="216,382,229,414,250,457,280,502,318,541,324,546,321,550,314,545,276,505,246,460,224,416,211,384"/>
+<area shape="rect" id="Node000013" href="$compiler__abi_8c.html#a1aeb4017ca34da59589e381fd2d963ee" title=" " alt="" coords="350,407,426,432"/>
+<area shape="poly" id="edge15_Node000011_Node000013" title=" " alt="" coords="256,380,337,403,336,408,254,385"/>
+<area shape="rect" id="Node000015" href="$complete_8c.html#a098b0148d9bc1cb0deca349abb5b98a2" title="Scan a directory for command&#45;name entries matching prefix." alt="" coords="333,308,443,333"/>
+<area shape="poly" id="edge17_Node000011_Node000015" title=" " alt="" coords="254,355,326,335,328,340,256,360"/>
+<area shape="rect" id="Node000019" href="$complete_8c.html#a622c44c54e814a2b4a3e7575b069aa62" title="Add a candidate to out if it matches prefix and isn&#39;t a duplicate." alt="" coords="520,257,591,283"/>
+<area shape="poly" id="edge30_Node000011_Node000019" title=" " alt="" coords="221,355,261,323,287,306,315,293,365,279,416,270,506,266,506,271,416,275,366,284,317,298,290,311,264,327,225,359"/>
+<area shape="rect" id="Node000020" href="$complete_8c.html#aa61f9f2bc47d14007ed6b24c853a44bd" title="Scan a directory for path&#45;completion entries matching name_prefix." alt="" coords="332,357,444,383"/>
+<area shape="poly" id="edge22_Node000011_Node000020" title=" " alt="" coords="261,367,318,367,318,373,261,373"/>
+<area shape="rect" id="Node000022" href="$builtins_8c.html#ac0a66823926a43ef1a8789fe46191936" title="Return the NULL&#45;terminated array of builtin command names." alt="" coords="332,456,444,481"/>
+<area shape="poly" id="edge28_Node000011_Node000022" title=" " alt="" coords="227,381,267,410,317,441,334,449,332,453,315,446,264,415,224,385"/>
+<area shape="rect" id="Node000023" href="$sys_8c.html#abb1d3053a2319560989362c984cdd2a7" title="Get the current working directory into buf of size bytes." alt="" coords="343,505,433,531"/>
+<area shape="poly" id="edge29_Node000011_Node000023" title=" " alt="" coords="219,381,257,435,285,465,318,492,331,500,329,504,314,496,282,469,253,438,215,384"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#a53f4ad004ca51ec3d2aa9dbe906a23c0" title="Fill memory with a byte value." alt="" coords="513,504,597,529"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="427,426,461,441,477,453,487,466,496,478,510,491,515,495,512,499,506,495,492,481,482,469,473,457,459,446,425,431"/>
+<area shape="rect" id="Node000016" href="$sys_8c.html#aaaebb5cda49a412535ba9ac89aaf7e96" title="Close the DIR stream dir." alt="" coords="508,405,603,431"/>
+<area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="438,331,461,342,477,354,487,366,510,391,517,396,514,400,506,395,483,370,473,358,459,347,436,336"/>
+<area shape="rect" id="Node000017" href="$sys_8c.html#a3ab91d3e8065dd89a981bff3515bede6" title="Open the directory at path and return a DIR stream." alt="" coords="509,307,602,332"/>
+<area shape="poly" id="edge19_Node000015_Node000017" title=" " alt="" coords="444,318,495,317,495,322,444,323"/>
+<area shape="rect" id="Node000018" href="$sys_8c.html#a03e4ed37b028859a45e534e9f853c9aa" title="Read the next entry from dir." alt="" coords="510,356,601,381"/>
+<area shape="poly" id="edge20_Node000015_Node000018" title=" " alt="" coords="434,331,498,349,496,355,432,336"/>
+<area shape="poly" id="edge21_Node000015_Node000019" title=" " alt="" coords="430,305,506,282,508,287,432,310"/>
+<area shape="poly" id="edge23_Node000020_Node000016" title=" " alt="" coords="434,380,498,399,496,404,432,385"/>
+<area shape="poly" id="edge24_Node000020_Node000017" title=" " alt="" coords="430,355,499,333,500,339,432,360"/>
+<area shape="poly" id="edge25_Node000020_Node000018" title=" " alt="" coords="444,367,496,366,496,372,444,372"/>
+<area shape="poly" id="edge27_Node000020_Node000019" title=" " alt="" coords="434,355,459,342,473,330,482,318,492,306,506,292,512,288,515,292,510,296,496,309,487,322,477,334,461,347,436,360"/>
+<area shape="rect" id="Node000021" href="$sys_8c.html#ac0373a863e835f8b64b3374651e6c402" title="Stat path and fill st; returns 0 on success." alt="" coords="521,455,590,480"/>
+<area shape="poly" id="edge26_Node000020_Node000021" title=" " alt="" coords="438,380,461,392,477,404,487,415,510,440,517,445,514,450,506,444,483,419,473,408,459,396,436,385"/>
+</map>

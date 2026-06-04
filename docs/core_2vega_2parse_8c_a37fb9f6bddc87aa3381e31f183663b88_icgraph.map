@@ -1,0 +1,21 @@
+<map id="vega_parse" name="vega_parse">
+<area shape="rect" id="Node000001" title="Parse line into an AST." alt="" coords="464,81,561,106"/>
+<area shape="rect" id="Node000002" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="333,81,416,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="450,96,416,96,416,91,450,91"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2shell_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="29,19,83,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,72,323,43,284,21,230,10,175,10,124,17,84,26,83,21,123,12,175,4,231,4,286,16,326,39,356,68"/>
+<area shape="rect" id="Node000004" href="$user_2apps_2vega_2main_8c.html#ae3a067ea1e9a6422d4961a492ef99534" title=" " alt="" coords="185,81,255,106"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="319,96,256,96,256,91,319,91"/>
+<area shape="rect" id="Node000006" href="$user_2apps_2vega_2main_8c.html#a96d656030559612d7fc9ebe5b3421bf1" title=" " alt="" coords="179,130,261,155"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="322,113,262,132,260,127,320,108"/>
+<area shape="rect" id="Node000007" href="$expand_8c.html#af26464f800cc1e25fdbc77618c17abd9" title=" " alt="" coords="157,179,283,205"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="353,118,323,145,287,170,263,182,261,177,284,166,319,141,349,114"/>
+<area shape="rect" id="Node000021" href="$vconf_8c.html#afeca6cfc6a44d8a8bdef9d340e11dd66" title="Source path as a vega script with stdout redirected to /dev/null." alt="" coords="155,31,285,57"/>
+<area shape="poly" id="edge9_Node000002_Node000021" title=" " alt="" coords="320,79,260,59,262,54,322,74"/>
+<area shape="rect" id="Node000005" href="$user_2apps_2vega_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="29,93,83,118"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="171,99,84,106,83,101,171,94"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="165,133,83,114,84,109,166,128"/>
+<area shape="rect" id="Node000008" href="$expand_8c.html#a8fad758a4b43ef0f6249301c7aa31727" title=" " alt="" coords="5,179,107,205"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="143,195,107,195,107,189,143,189"/>
+<area shape="poly" id="edge10_Node000021_Node000003" title=" " alt="" coords="141,41,83,37,84,31,141,35"/>
+</map>

@@ -1,0 +1,48 @@
+<map id="parse_list" name="parse_list">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,105,91,130"/>
+<area shape="rect" id="Node000002" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="503,91,577,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,104,138,96,276,85,415,89,489,95,489,101,415,95,276,90,139,101,91,110"/>
+<area shape="rect" id="Node000003" href="$ast_8c.html#a0cf89a1a6c99c9d1f1d5418a00857f49" title="Allocate a binary operator node (AND, OR or SEQ) taking ownership of left and right...." alt="" coords="296,105,415,130"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="91,115,282,115,282,120,91,120"/>
+<area shape="rect" id="Node000004" href="$lexer_8c.html#a84851e4cf3d14fcf913e267852e1ab08" title="Consume and return the next token." alt="" coords="669,394,748,419"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="55,129,78,201,98,252,124,309,157,368,196,425,243,476,297,518,341,542,381,560,418,572,455,577,492,575,530,567,571,552,616,531,634,516,654,489,691,430,696,433,658,492,637,519,619,535,573,557,531,572,492,580,455,582,417,577,379,565,338,547,295,522,239,480,192,428,152,371,119,312,93,254,73,203,50,131"/>
+<area shape="rect" id="Node000011" href="$lexer_8c.html#af5096e6d8a92971808526ba626a46bdc" title="Peek at the next token without consuming." alt="" coords="668,243,749,269"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="73,102,168,60,235,37,309,17,389,5,469,5,508,10,547,19,584,33,619,52,640,70,658,91,684,139,699,188,707,229,702,230,694,189,679,141,653,94,636,73,616,57,581,38,545,24,507,15,468,10,389,11,310,23,236,42,170,65,75,107"/>
+<area shape="rect" id="Node000012" href="$core_2vega_2parse_8c.html#a24f34aac8be89baba9f81f4669552b8f" title=" " alt="" coords="139,206,248,231"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="69,128,165,196,162,200,66,132"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="512,93,506,83,509,73,521,67,540,65,563,68,573,77,569,81,561,73,540,70,522,72,513,77,511,82,516,90"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="415,110,488,105,489,110,415,116"/>
+<area shape="rect" id="Node000005" href="$lexer_8c.html#a4f6b122799074ebf08f4ea10ade65b39" title=" " alt="" coords="800,319,883,345"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="731,391,804,349,807,354,734,396"/>
+<area shape="rect" id="Node000006" href="$lexer_8c.html#acbe69e56df80c5c4f737cfde6d9be873" title=" " alt="" coords="939,245,1025,270"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="862,317,929,279,939,274,942,278,932,284,865,322"/>
+<area shape="rect" id="Node000007" href="$lexer_8c.html#a89fb4c390705931605dfa96c5ba59d11" title=" " alt="" coords="931,294,1033,319"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="882,322,916,316,917,321,883,327"/>
+<area shape="rect" id="Node000008" href="$lexer_8c.html#abaab6431350f60fa9623b5b63b6b329a" title=" " alt="" coords="931,343,1033,369"/>
+<area shape="poly" id="edge9_Node000005_Node000008" title=" " alt="" coords="883,336,917,342,916,347,882,342"/>
+<area shape="rect" id="Node000009" href="$lexer_8c.html#a38ea90df448960e553ef9a9629959a2c" title=" " alt="" coords="937,393,1027,418"/>
+<area shape="poly" id="edge10_Node000005_Node000009" title=" " alt="" coords="867,342,932,378,944,384,942,389,929,382,864,347"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="733,267,807,310,805,314,731,271"/>
+<area shape="poly" id="edge14_Node000012_Node000002" title=" " alt="" coords="232,203,489,118,490,123,234,208"/>
+<area shape="poly" id="edge15_Node000012_Node000003" title=" " alt="" coords="211,204,295,147,316,134,319,139,297,152,214,208"/>
+<area shape="poly" id="edge18_Node000012_Node000004" title=" " alt="" coords="208,230,245,270,305,324,379,376,420,398,463,413,513,423,565,424,613,421,655,415,656,420,614,426,565,430,513,428,462,418,418,402,376,381,301,328,242,274,204,233"/>
+<area shape="poly" id="edge19_Node000012_Node000011" title=" " alt="" coords="248,211,414,188,462,177,541,166,576,166,618,177,640,188,659,201,690,231,686,235,656,205,637,192,616,182,575,172,542,171,463,183,415,193,249,216"/>
+<area shape="rect" id="Node000013" href="$core_2vega_2parse_8c.html#aff2f216010f09e97a4d1831e7638d7cc" title=" " alt="" coords="463,495,617,521"/>
+<area shape="poly" id="edge16_Node000012_Node000013" title=" " alt="" coords="198,231,204,278,219,345,232,381,249,416,270,447,298,474,332,494,370,507,410,513,449,514,449,520,410,518,369,512,330,499,294,478,266,451,244,418,227,383,214,347,198,279,193,232"/>
+<area shape="rect" id="Node000015" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="297,275,414,301"/>
+<area shape="poly" id="edge20_Node000012_Node000015" title=" " alt="" coords="225,229,313,267,311,272,223,234"/>
+<area shape="rect" id="Node000014" href="$lexer_8c.html#adb509730aa3f5613653d198ce99a75da" title="Human&#45;readable name for a token kind (for error messages)." alt="" coords="665,495,752,521"/>
+<area shape="poly" id="edge17_Node000013_Node000014" title=" " alt="" coords="618,505,652,505,652,511,618,511"/>
+<area shape="poly" id="edge21_Node000015_Node000002" title=" " alt="" coords="367,273,461,178,514,124,518,128,465,182,371,277"/>
+<area shape="poly" id="edge25_Node000015_Node000004" title=" " alt="" coords="369,299,407,339,434,361,464,377,513,394,564,403,656,407,655,412,563,408,511,399,462,382,431,365,404,343,365,303"/>
+<area shape="poly" id="edge26_Node000015_Node000011" title=" " alt="" coords="414,280,654,258,655,263,414,285"/>
+<area shape="poly" id="edge24_Node000015_Node000013" title=" " alt="" coords="368,299,465,424,519,483,515,487,461,427,364,302"/>
+<area shape="rect" id="Node000016" href="$ast_8c.html#a6e63e9a06023a3012861269ffcf81f06" title="Allocate an empty AST_PIPE node." alt="" coords="473,343,607,369"/>
+<area shape="poly" id="edge22_Node000015_Node000016" title=" " alt="" coords="388,298,464,328,487,336,485,341,462,333,386,303"/>
+<area shape="rect" id="Node000017" href="$ast_8c.html#aea526f3b571fbbd7863f60235763f3b0" title="Append stage to a pipeline (taking ownership). Grows as needed." alt="" coords="471,193,609,218"/>
+<area shape="poly" id="edge23_Node000015_Node000017" title=" " alt="" coords="382,273,462,235,494,221,496,226,464,240,384,277"/>
+<area shape="rect" id="Node000018" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="495,294,585,319"/>
+<area shape="poly" id="edge27_Node000015_Node000018" title=" " alt="" coords="415,291,481,298,480,303,414,296"/>
+<area shape="poly" id="edge28_Node000018_Node000004" title=" " alt="" coords="587,315,619,328,656,354,687,382,684,386,653,358,616,333,585,320"/>
+<area shape="poly" id="edge29_Node000018_Node000011" title=" " alt="" coords="582,291,654,269,655,275,584,296"/>
+</map>

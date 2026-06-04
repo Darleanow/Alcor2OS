@@ -1,0 +1,9 @@
+<map id="include/alcor2/proc/elf.h" name="include/alcor2/proc/elf.h">
+<area shape="rect" id="Node000001" title="ELF64 format definitions and loader." alt="" coords="159,5,305,45"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="5,101,139,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,54,95,103,92,98,184,49"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="163,93,301,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="235,59,235,93,229,93,229,59"/>
+<area shape="rect" id="Node000004" href="$elf_8c.html" title="ELF64 executable loader: validation, PT_LOAD mapping, file or memory copy, user entry." alt="" coords="326,101,469,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="282,49,377,98,374,103,279,54"/>
+</map>

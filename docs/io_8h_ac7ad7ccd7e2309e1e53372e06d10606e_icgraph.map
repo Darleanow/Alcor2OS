@@ -1,0 +1,9 @@
+<map id="outw" name="outw">
+<area shape="rect" id="Node000001" title="Write a word to an I/O port." alt="" coords="429,5,484,31"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#ad23c5f0ba707314019c13a32973d6c0d" title="Write sectors using PIO with cache flush." alt="" coords="299,5,381,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="415,21,381,21,381,15,415,15"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="168,5,251,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="285,21,251,21,251,15,285,15"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="5,5,120,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,21,120,21,120,15,154,15"/>
+</map>

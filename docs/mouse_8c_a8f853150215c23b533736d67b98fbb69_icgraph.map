@@ -1,0 +1,9 @@
+<map id="ring_empty" name="ring_empty">
+<area shape="rect" id="Node000001" title=" " alt="" coords="197,55,293,80"/>
+<area shape="rect" id="Node000002" href="$mouse_8c.html#a5dc0eec4384a9c71ab2708c978853724" title="Report read&#45;readiness for /dev/mouse." alt="" coords="13,5,141,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,53,121,33,122,28,189,48"/>
+<area shape="rect" id="Node000003" href="$mouse_8c.html#a2054494320b53dbc851b211c63700a1e" title=" " alt="" coords="11,55,144,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,70,144,70,144,65,184,65"/>
+<area shape="rect" id="Node000004" href="$mouse_8c.html#a6362117f962512857d60ae1344e0f756" title="Block until one event is available, then dequeue it." alt="" coords="5,104,149,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="189,87,122,106,121,101,188,81"/>
+</map>

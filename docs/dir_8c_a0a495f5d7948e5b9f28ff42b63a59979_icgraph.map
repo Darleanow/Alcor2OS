@@ -1,0 +1,7 @@
+<map id="fill_entry_from_dirent" name="fill_entry_from_dirent">
+<area shape="rect" id="Node000001" title="Fill entry with the public&#45;facing view of a dirent." alt="" coords="340,5,503,31"/>
+<area shape="rect" id="Node000002" href="$dir_8c.html#ababeb4e8c776d2b2c367e0f49234c2f9" title="Read the entry at index from an open directory." alt="" coords="188,5,292,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="326,21,292,21,292,15,326,15"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#a8b01b0f12e74e9ca626d34d91d6f9e65" title="fs_ops_t.readdir shim — copies one entry&#39;s name + stat." alt="" coords="5,5,140,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="174,21,140,21,140,15,174,15"/>
+</map>

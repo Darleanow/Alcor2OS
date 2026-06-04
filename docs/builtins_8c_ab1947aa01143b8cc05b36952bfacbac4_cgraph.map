@@ -1,0 +1,27 @@
+<map id="sh_run_builtin" name="sh_run_builtin">
+<area shape="rect" id="Node000001" title="Dispatch argv[0] to the matching builtin handler." alt="" coords="5,104,119,129"/>
+<area shape="rect" id="Node000002" href="$builtins_8c.html#aa31aee232b0ead46f489bca572719991" title=" " alt="" coords="183,5,255,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,102,117,72,165,40,175,35,177,39,168,44,120,76,81,106"/>
+<area shape="rect" id="Node000006" href="$builtins_8c.html#a6dff31ee4789340df2661d51566b8d32" title=" " alt="" coords="177,55,262,80"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="102,101,164,82,166,87,104,107"/>
+<area shape="rect" id="Node000007" href="$builtins_8c.html#a92ba9d4bb1736306f2339a923e431f0b" title=" " alt="" coords="177,153,261,179"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="104,127,166,147,164,152,102,132"/>
+<area shape="rect" id="Node000010" href="$builtins_8c.html#a2211091fcc0277909cceb8ec7e1663cc" title=" " alt="" coords="167,104,272,129"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="119,114,153,114,153,119,119,119"/>
+<area shape="rect" id="Node000011" href="$sys_8c.html#a5684320039ca73989a9526373bf5da01" title="Clear the terminal screen with an ANSI erase&#45;display sequence." alt="" coords="181,203,257,228"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="81,127,168,188,179,194,176,199,165,192,78,132"/>
+<area shape="rect" id="Node000003" href="$sys_8c.html#a9b15a2806129d8316679b4875ea30714" title="Change the current working directory to path." alt="" coords="329,5,405,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="256,15,315,15,315,21,256,21"/>
+<area shape="rect" id="Node000004" href="$io_8c.html#ac3e98303df49d2058bbde227fbe73286" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="331,79,403,104"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="250,28,273,40,331,70,329,75,271,44,247,33"/>
+<area shape="rect" id="Node000005" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="461,128,539,153"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="403,102,453,120,451,125,401,107"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="263,72,317,81,316,86,262,77"/>
+<area shape="poly" id="edge11_Node000007_Node000004" title=" " alt="" coords="246,151,271,138,328,108,330,113,273,143,248,156"/>
+<area shape="rect" id="Node000008" href="$sys_8c.html#abb1d3053a2319560989362c984cdd2a7" title="Get the current working directory into buf of size bytes." alt="" coords="321,128,412,153"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="261,156,307,148,308,153,262,162"/>
+<area shape="rect" id="Node000009" href="$io_8c.html#abbcf40b333390b085e60b958797ff888" title="Write a single byte to stdout." alt="" coords="320,177,413,203"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="262,170,307,178,306,183,261,175"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="401,175,451,156,453,161,403,180"/>
+<area shape="poly" id="edge13_Node000010_Node000004" title=" " alt="" coords="272,105,317,97,318,102,273,110"/>
+</map>

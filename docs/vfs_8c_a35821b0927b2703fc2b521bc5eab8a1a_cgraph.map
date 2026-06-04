@@ -1,0 +1,9 @@
+<map id="vfs_fstat" name="vfs_fstat">
+<area shape="rect" id="Node000001" title="Stat an open file descriptor, returning synthetic metadata for pipes." alt="" coords="5,31,84,56"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="132,5,211,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,33,118,26,119,31,85,38"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="142,55,201,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="85,48,129,57,128,62,84,53"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="259,5,361,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="211,15,245,15,245,21,211,21"/>
+</map>

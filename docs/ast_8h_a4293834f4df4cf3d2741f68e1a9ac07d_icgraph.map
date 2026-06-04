@@ -1,0 +1,9 @@
+<map id="ast_new_fn" name="ast_new_fn">
+<area shape="rect" id="Node000001" title="Allocate an AST_FN node, taking ownership of name, arg_names (heap array of n_args heap strings; may ..." alt="" coords="436,5,532,31"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#a9bc1c8aed40cc8b4b3e64df2d6bb40ba" title=" " alt="" coords="309,5,388,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,21,388,21,388,15,422,15"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="171,5,261,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,21,262,21,262,15,295,15"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="5,5,123,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,21,123,21,123,15,157,15"/>
+</map>

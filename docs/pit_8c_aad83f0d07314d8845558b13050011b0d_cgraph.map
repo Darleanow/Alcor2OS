@@ -1,0 +1,24 @@
+<map id="pit_init" name="pit_init">
+<area shape="rect" id="Node000001" title="Program the PIT and install the timer IRQ handler." alt="" coords="5,80,72,105"/>
+<area shape="rect" id="Node000002" href="$idt_8c.html#a667ec0b02033ad55d73e9b8b32b034a5" title="Register a callback for a hardware IRQ line." alt="" coords="131,5,227,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,77,119,40,131,34,133,39,121,44,60,82"/>
+<area shape="rect" id="Node000003" href="$pic_8c.html#a3e514f789fbbbf7edfd418e7982743fd" title="Unmask (enable) an IRQ line." alt="" coords="129,55,229,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="72,84,115,76,116,81,72,89"/>
+<area shape="rect" id="Node000006" href="$pit_8c.html#a1ec93c1a5802efe9e3925acb8ccb5f64" title=" " alt="" coords="120,153,239,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="61,103,121,138,136,145,134,150,119,143,59,108"/>
+<area shape="rect" id="Node000075" href="$pit_8c.html#aeb02a58361ba396db774530bfe97be0e" title="Program PIT channel 0 for frequency Hz (clamped to a sane range)." alt="" coords="129,104,230,129"/>
+<area shape="poly" id="edge10_Node000001_Node000075" title=" " alt="" coords="72,96,115,103,114,108,72,101"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="327,55,369,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="230,65,313,65,313,70,230,70"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="323,104,373,129"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="224,77,310,103,309,108,223,83"/>
+<area shape="rect" id="Node000007" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="287,153,409,179"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="239,163,272,163,272,169,239,169"/>
+<area shape="rect" id="Node000074" href="$proc_8c.html#a916f6799bcbfee16430e01cb28f57514" title="Timer hook: request a reschedule at the next syscall boundary." alt="" coords="307,203,389,228"/>
+<area shape="poly" id="edge9_Node000006_Node000074" title=" " alt="" coords="224,176,295,197,293,202,223,181"/>
+<area shape="rect" id="Node000008" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="496,129,581,155"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="409,156,482,146,482,152,410,161"/>
+<area shape="rect" id="Node000066" href="$fb__console_2mouse_8c.html#a261a735182368be5acb1566346962626" title="Paint or move the software mouse cursor. Early&#45;outs when the pointer has not moved since the last cal..." alt="" coords="457,179,620,204"/>
+<area shape="poly" id="edge8_Node000007_Node000066" title=" " alt="" coords="410,171,444,176,444,181,409,177"/>
+<area shape="poly" id="edge11_Node000075_Node000005" title=" " alt="" coords="230,114,309,114,309,119,230,119"/>
+</map>

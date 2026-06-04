@@ -1,0 +1,31 @@
+<map id="fb_clear_rectangle" name="fb_clear_rectangle">
+<area shape="rect" id="Node000001" title="Fill rows [y0, y1) with ctx.bg, fast&#45;path on 32 bpp." alt="" coords="979,77,1121,103"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#aa458c825fb8701dc71639422d2a03385" title="Clear the console screen." alt="" coords="706,5,817,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="984,77,812,33,814,28,985,71"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="873,103,931,128"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="966,107,931,113,930,108,965,102"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="116,57,199,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="692,27,199,69,198,64,692,21"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,108,68,133"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="115,91,69,110,67,105,113,86"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="697,179,825,204"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="867,137,787,181,784,176,864,132"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="540,96,649,121"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="722,175,620,124,623,119,724,170"/>
+<area shape="rect" id="Node000010" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="247,147,361,172"/>
+<area shape="poly" id="edge13_Node000006_Node000010" title=" " alt="" coords="683,197,555,198,481,194,409,187,348,175,349,169,410,182,482,189,555,192,683,192"/>
+<area shape="rect" id="Node000139" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="409,147,492,172"/>
+<area shape="poly" id="edge14_Node000006_Node000139" title=" " alt="" coords="684,186,492,166,492,161,684,181"/>
+<area shape="rect" id="Node000152" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="413,248,489,273"/>
+<area shape="poly" id="edge15_Node000006_Node000152" title=" " alt="" coords="715,211,650,231,564,249,489,259,488,254,563,243,649,226,713,206"/>
+<area shape="rect" id="Node000153" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="553,299,637,324"/>
+<area shape="poly" id="edge17_Node000006_Node000153" title=" " alt="" coords="736,215,651,282,620,301,617,296,648,277,733,211"/>
+<area shape="poly" id="edge10_Node000007_Node000003" title=" " alt="" coords="526,105,199,76,199,71,526,100"/>
+<area shape="poly" id="edge7_Node000007_Node000010" title=" " alt="" coords="527,119,410,137,354,149,353,144,409,131,526,114"/>
+<area shape="poly" id="edge11_Node000007_Node000139" title=" " alt="" coords="546,128,489,149,487,144,544,123"/>
+<area shape="poly" id="edge8_Node000010_Node000003" title=" " alt="" coords="269,142,178,85,181,81,272,137"/>
+<area shape="poly" id="edge9_Node000010_Node000004" title=" " alt="" coords="233,152,68,128,69,122,234,147"/>
+<area shape="poly" id="edge12_Node000139_Node000010" title=" " alt="" coords="396,162,361,162,361,157,396,157"/>
+<area shape="poly" id="edge16_Node000152_Node000010" title=" " alt="" coords="419,242,322,174,325,170,422,238"/>
+<area shape="poly" id="edge18_Node000153_Node000010" title=" " alt="" coords="539,317,474,311,440,302,408,288,374,262,345,230,309,173,314,171,349,227,377,258,411,284,442,297,475,306,539,311"/>
+</map>

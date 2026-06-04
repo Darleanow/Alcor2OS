@@ -1,0 +1,12 @@
+<map id="parse_input" name="parse_input">
+<area shape="rect" id="Node000001" title="Parse a raw input buffer and push key events into the queue." alt="" coords="5,55,104,80"/>
+<area shape="rect" id="Node000002" href="$dg__alcor_8c.html#aabc94768052cb9f6b3e4c10e332ca8cc" title=" " alt="" coords="164,5,256,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,52,155,32,157,37,96,57"/>
+<area shape="rect" id="Node000004" href="$dg__alcor_8c.html#adf5d391d2e8d53cf34712dc4b7535673" title=" " alt="" coords="157,55,263,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="104,65,144,65,144,70,104,70"/>
+<area shape="rect" id="Node000005" href="$dg__alcor_8c.html#accf373c884804e228408059a7a428040" title="Map a raw input byte to a Doom key." alt="" coords="152,104,268,129"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="96,78,157,97,155,102,94,83"/>
+<area shape="rect" id="Node000003" href="$dg__alcor_8c.html#abf0f4d7caf65c1d25f040afe75da9239" title=" " alt="" coords="316,31,400,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,23,303,31,302,36,256,28"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="263,56,302,50,303,55,263,61"/>
+</map>

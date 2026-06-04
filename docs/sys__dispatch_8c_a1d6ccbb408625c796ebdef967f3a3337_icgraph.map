@@ -1,0 +1,11 @@
+<map id="syscall_get_current_frame" name="syscall_get_current_frame">
+<area shape="rect" id="Node000001" title="Return the syscall_frame_t for the currently executing syscall." alt="" coords="180,73,328,113"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e" title="Duplicate the calling process (clone)." alt="" coords="25,5,112,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,70,131,44,103,33,105,28,133,40,194,65"/>
+<area shape="rect" id="Node000003" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="20,55,117,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,83,117,77,118,71,167,78"/>
+<area shape="rect" id="Node000004" href="$sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" title="Duplicate the calling process (fork)." alt="" coords="30,104,107,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="167,107,108,114,107,109,166,101"/>
+<area shape="rect" id="Node000005" href="$signal_8c.html#ac280ec41dc24bc5323e752f9499814b7" title="Return from a signal handler by restoring saved register context." alt="" coords="5,153,132,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="191,120,103,156,101,151,189,115"/>
+</map>

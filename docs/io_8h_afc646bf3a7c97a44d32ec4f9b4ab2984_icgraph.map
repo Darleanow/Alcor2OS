@@ -1,0 +1,38 @@
+<map id="outl" name="outl">
+<area shape="rect" id="Node000001" title="Write a dword to an I/O port." alt="" coords="687,143,733,168"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#ae8802a65150faad75ccd3af146dbfdff" title="Read 32&#45;bit value from PCI configuration space." alt="" coords="543,143,637,168"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="673,158,637,158,637,153,673,153"/>
+<area shape="rect" id="Node000015" href="$pci_8c.html#aff57a55e7be34fe90b4c42f79109348d" title="Write 32&#45;bit value to PCI configuration space." alt="" coords="541,68,639,93"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="675,137,610,96,613,91,678,133"/>
+<area shape="rect" id="Node000016" href="$ata_8c.html#a4047066faa8d5af5cda5f5be40eb03bf" title="Load PRDT with a single bounce&#45;buffer entry." alt="" coords="545,243,635,268"/>
+<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="684,179,608,245,605,241,681,175"/>
+<area shape="rect" id="Node000003" href="$pci_8c.html#a04b573b20a07f8bfa9ccefb89e1f3115" title="Read 16&#45;bit value from PCI configuration space." alt="" coords="392,104,485,129"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="529,143,485,131,486,126,531,137"/>
+<area shape="rect" id="Node000011" href="$pci_8c.html#a64c38b3266cb57b1ff1417e1e8e5da2a" title=" " alt="" coords="183,156,310,181"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="529,160,310,169,310,164,529,155"/>
+<area shape="rect" id="Node000012" href="$pci_8c.html#a723f5f1bea79b9954324982481e994d4" title="Read 8&#45;bit value from PCI configuration space." alt="" coords="396,205,481,231"/>
+<area shape="poly" id="edge8_Node000002_Node000012" title=" " alt="" coords="547,176,472,208,470,203,545,171"/>
+<area shape="rect" id="Node000014" href="$pci_8c.html#a3a1084d4226e71015aa3ad09f78b161a" title="Write 16&#45;bit value to PCI configuration space." alt="" coords="390,55,487,80"/>
+<area shape="poly" id="edge14_Node000002_Node000014" title=" " alt="" coords="559,137,492,94,470,83,472,78,495,89,562,132"/>
+<area shape="rect" id="Node000004" href="$pci_8c.html#a4a3a26341cdca867f78928565db5bc8a" title="Enable bus mastering for a PCI device." alt="" coords="159,5,334,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="393,100,382,93,359,72,335,52,292,33,294,28,337,48,362,68,386,89,396,95"/>
+<area shape="rect" id="Node000008" href="$pci_8c.html#ab5eb74aae5d07f53b3fd81158cbf04a3" title="Walk the capability list looking for cap_id." alt="" coords="175,107,318,132"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="379,120,318,121,318,116,378,115"/>
+<area shape="rect" id="Node000009" href="$pci_8c.html#a21f2f28f1e12177e4ea4f88554ae3ae6" title="Iterate all PCI devices and invoke cb until it returns true." alt="" coords="5,156,109,181"/>
+<area shape="poly" id="edge5_Node000003_Node000009" title=" " alt="" coords="384,103,335,92,278,85,217,85,158,97,132,109,108,125,72,157,69,154,105,120,130,104,157,91,217,79,278,79,336,87,386,98"/>
+<area shape="poly" id="edge6_Node000003_Node000011" title=" " alt="" coords="380,135,295,159,294,153,378,130"/>
+<area shape="poly" id="edge7_Node000011_Node000009" title=" " alt="" coords="169,171,109,171,109,166,169,166"/>
+<area shape="poly" id="edge9_Node000012_Node000008" title=" " alt="" coords="411,198,376,171,335,146,306,135,308,130,337,141,379,166,415,194"/>
+<area shape="poly" id="edge11_Node000012_Node000009" title=" " alt="" coords="386,237,337,248,279,256,217,256,157,245,130,232,105,216,69,184,72,180,108,212,132,228,158,239,217,251,278,251,336,243,385,232"/>
+<area shape="poly" id="edge12_Node000012_Node000011" title=" " alt="" coords="382,206,296,184,297,179,383,201"/>
+<area shape="rect" id="Node000013" href="$pci_8c.html#a2d659beb32f7b094b11c2cb603152b93" title="Continue walking the capability list from current." alt="" coords="157,205,336,231"/>
+<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="382,221,336,221,336,215,382,215"/>
+<area shape="poly" id="edge15_Node000014_Node000004" title=" " alt="" coords="376,54,296,33,298,28,377,49"/>
+<area shape="poly" id="edge17_Node000015_Node000014" title=" " alt="" coords="527,78,487,74,488,69,528,73"/>
+<area shape="rect" id="Node000017" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="384,307,493,332"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="547,276,471,309,469,304,545,271"/>
+<area shape="rect" id="Node000018" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="191,307,302,332"/>
+<area shape="poly" id="edge20_Node000017_Node000018" title=" " alt="" coords="370,322,303,322,303,317,370,317"/>
+<area shape="rect" id="Node000021" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="205,356,288,381"/>
+<area shape="poly" id="edge21_Node000017_Node000021" title=" " alt="" coords="376,338,289,361,288,356,375,333"/>
+</map>

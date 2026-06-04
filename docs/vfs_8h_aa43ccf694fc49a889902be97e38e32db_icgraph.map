@@ -1,0 +1,21 @@
+<map id="vfs_read" name="vfs_read">
+<area shape="rect" id="Node000001" title="Read up to count bytes from fd into buf." alt="" coords="645,104,724,129"/>
+<area shape="rect" id="Node000002" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="468,29,563,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="652,99,596,68,562,56,564,51,598,64,654,94"/>
+<area shape="rect" id="Node000011" href="$sys__mm_8c.html#a0d76fce616e6b2bfc5a09e0fa5df3ecd" title=" " alt="" coords="433,79,597,104"/>
+<area shape="poly" id="edge5_Node000001_Node000011" title=" " alt="" coords="631,111,597,106,598,101,632,106"/>
+<area shape="rect" id="Node000013" href="$sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635" title="Read count bytes from fd at absolute offset without moving the seek position." alt="" coords="463,128,567,153"/>
+<area shape="poly" id="edge7_Node000001_Node000013" title=" " alt="" coords="632,127,568,136,567,131,631,121"/>
+<area shape="rect" id="Node000014" href="$sys__io_8c.html#a9e0ba6a136c04452cb4759138652bb88" title="Read up to count bytes from fd into buf." alt="" coords="475,177,555,203"/>
+<area shape="poly" id="edge8_Node000001_Node000014" title=" " alt="" coords="654,139,598,168,556,183,555,178,596,164,652,134"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="244,29,385,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="454,45,385,45,385,39,454,39"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="31,5,170,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="230,35,170,28,171,23,230,30"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="5,55,196,80"/>
+<area shape="poly" id="edge4_Node000003_Node000009" title=" " alt="" coords="230,55,197,59,196,53,230,49"/>
+<area shape="rect" id="Node000012" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="268,79,361,104"/>
+<area shape="poly" id="edge6_Node000011_Node000012" title=" " alt="" coords="419,94,362,94,362,89,419,89"/>
+<area shape="rect" id="Node000015" href="$sys__io_8c.html#a20b06db6011d3c71ba1ce6b1de28c1f5" title=" " alt="" coords="271,177,359,203"/>
+<area shape="poly" id="edge9_Node000014_Node000015" title=" " alt="" coords="461,193,359,193,359,187,461,187"/>
+</map>

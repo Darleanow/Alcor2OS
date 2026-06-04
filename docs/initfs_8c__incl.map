@@ -1,0 +1,26 @@
+<map id="src/fs/initfs.c" name="src/fs/initfs.c">
+<area shape="rect" id="Node000001" title="Read&#45;only, flat ramfs populated from Limine boot modules." alt="" coords="302,5,407,31"/>
+<area shape="rect" id="Node000002" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="5,79,117,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="308,33,123,78,121,73,307,28"/>
+<area shape="rect" id="Node000003" href="$initfs_8h.html" title="Read&#45;only, buffer&#45;backed filesystem populated from Limine modules." alt="" coords="142,79,269,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="332,33,243,75,241,70,330,28"/>
+<area shape="rect" id="Node000008" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="605,79,720,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="405,28,600,73,599,78,404,33"/>
+<area shape="rect" id="Node000010" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="293,79,416,104"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="357,31,357,65,352,65,352,31"/>
+<area shape="rect" id="Node000011" href="$heap_8h.html" title="Kernel heap allocator." alt="" coords="441,79,581,104"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="381,28,474,70,472,75,379,33"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="376,152,491,177"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="243,101,384,145,382,150,241,107"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="289,225,372,251"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="418,180,360,219,357,215,415,175"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="396,225,471,251"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="436,178,436,212,431,212,431,178"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="495,225,566,251"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="451,175,505,215,502,219,447,180"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="627,107,485,150,483,145,625,101"/>
+<area shape="rect" id="Node000009" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="597,152,728,177"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="665,104,665,138,660,138,660,104"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="369,102,412,141,409,145,366,106"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="500,106,458,144,454,141,496,102"/>
+</map>

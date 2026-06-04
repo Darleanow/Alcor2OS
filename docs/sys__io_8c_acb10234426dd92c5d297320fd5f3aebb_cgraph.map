@@ -1,0 +1,24 @@
+<map id="sel_hlt_slice" name="sel_hlt_slice">
+<area shape="rect" id="Node000001" title="Yield the CPU for one ~10 ms timer tick, then yield to any other READY user proc." alt="" coords="5,28,108,53"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="319,28,488,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,38,305,38,305,43,108,43"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="536,5,703,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="108,27,156,19,249,11,322,9,488,13,522,13,522,18,488,18,322,14,249,16,156,25,109,32"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="156,79,271,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="98,51,161,72,159,77,96,56"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="261,76,341,54,342,60,263,81"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="271,89,373,83,431,76,487,63,511,53,535,41,559,32,561,37,537,46,513,58,489,69,432,81,373,89,271,94"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="354,129,453,155"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="263,102,342,123,341,128,261,107"/>
+<area shape="poly" id="edge8_Node000005_Node000003" title=" " alt="" coords="451,127,486,108,501,92,509,75,518,58,534,41,546,34,549,39,538,45,522,61,514,77,506,95,490,112,453,132"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#a2b49e9b247efbece339a2f95a191ef64" title="Low&#45;level context switch function." alt="" coords="559,104,679,129"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="453,134,546,123,546,128,453,139"/>
+<area shape="rect" id="Node000007" href="$cpu_8c.html#a18a6945bd70a07d34d7133848b6fb519" title="Get the current FS base MSR value." alt="" coords="554,153,685,179"/>
+<area shape="poly" id="edge9_Node000005_Node000007" title=" " alt="" coords="453,145,541,155,540,160,453,150"/>
+<area shape="rect" id="Node000008" href="$cpu_8c.html#a1c5d89ceee7d8c90e90526e6fec26e6f" title="Set the FS base MSR for thread&#45;local storage." alt="" coords="555,203,684,228"/>
+<area shape="poly" id="edge10_Node000005_Node000008" title=" " alt="" coords="438,152,537,189,560,196,558,201,535,194,436,157"/>
+<area shape="rect" id="Node000009" href="$gdt_8c.html#af95c2c00bd26bfbb9016f228e3daaa26" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="568,252,671,277"/>
+<area shape="poly" id="edge11_Node000005_Node000009" title=" " alt="" coords="420,153,469,195,502,218,537,238,556,246,554,251,535,243,499,222,466,199,416,157"/>
+<area shape="rect" id="Node000010" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="567,55,672,80"/>
+<area shape="poly" id="edge12_Node000005_Node000010" title=" " alt="" coords="437,127,535,90,562,81,563,87,537,95,439,132"/>
+</map>

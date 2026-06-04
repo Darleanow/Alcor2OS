@@ -1,0 +1,14 @@
+<map id="fr_tables_init" name="fr_tables_init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="519,31,625,56"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#ab10c1db0dadab7b18be6f2f04c7a19df" title=" " alt="" coords="401,5,469,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="505,34,469,27,470,22,506,28"/>
+<area shape="rect" id="Node000012" href="$kbd__layout_8c.html#aaf069fd4dd3d3d6f4ec3e93f870f1c79" title=" " alt="" coords="400,55,471,80"/>
+<area shape="poly" id="edge5_Node000001_Node000012" title=" " alt="" coords="506,58,471,64,470,59,505,52"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="221,31,352,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,29,353,35,352,30,388,23"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="5,5,173,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="207,36,173,31,174,26,208,31"/>
+<area shape="rect" id="Node000008" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="33,55,146,80"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="208,56,147,63,146,58,207,50"/>
+<area shape="poly" id="edge6_Node000012_Node000003" title=" " alt="" coords="386,62,352,57,353,51,387,57"/>
+</map>

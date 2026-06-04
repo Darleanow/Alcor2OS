@@ -1,0 +1,28 @@
+<map id="ext2_stat" name="ext2_stat">
+<area shape="rect" id="Node000001" title="Get file/directory info." alt="" coords="5,92,88,117"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#a47c361e00db58a5352f49a7539b9cb5f" title="Copy the basename of path into name." alt="" coords="541,5,684,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,90,135,78,347,44,527,23,528,28,347,49,137,83,89,95"/>
+<area shape="rect" id="Node000005" href="$path_8c.html#af6799af86f8398614f9347195f7a81a1" title="Translate an ext2 on&#45;disk mode field to a directory&#45;entry file_type code." alt="" coords="136,141,279,167"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="89,115,153,135,151,140,87,120"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a path to an inode." alt="" coords="154,92,261,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="88,102,140,102,140,107,88,107"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="762,31,829,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="684,25,749,34,748,40,684,31"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="756,104,835,129"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="673,28,701,40,740,65,773,92,769,96,737,69,699,44,671,33"/>
+<area shape="rect" id="Node000007" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="327,104,477,129"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="261,105,313,109,313,114,261,111"/>
+<area shape="poly" id="edge11_Node000007_Node000004" title=" " alt="" coords="453,127,526,139,613,146,700,139,743,130,744,136,700,145,613,151,525,145,452,132"/>
+<area shape="rect" id="Node000008" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="535,104,691,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="478,123,521,123,521,128,478,128"/>
+<area shape="rect" id="Node000044" href="$path_8c.html#aafde89a77c03337dd6c31bf0fb23a814" title="Advance *p past one path component into component." alt="" coords="525,55,700,80"/>
+<area shape="poly" id="edge12_Node000007_Node000044" title=" " alt="" coords="456,101,544,81,545,86,458,107"/>
+<area shape="rect" id="Node000045" href="$inode_8c.html#aba1cf116b95090ec043930c6efaa8dce" title="Load on&#45;disk inode ino into the caller&#45;provided inode." alt="" coords="748,231,843,256"/>
+<area shape="poly" id="edge13_Node000007_Node000045" title=" " alt="" coords="443,127,743,224,741,229,442,132"/>
+<area shape="rect" id="Node000046" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="531,256,695,281"/>
+<area shape="poly" id="edge14_Node000007_Node000046" title=" " alt="" coords="415,128,460,179,492,208,527,234,554,249,552,253,524,239,489,212,457,183,411,131"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="666,101,699,90,760,60,762,65,701,95,667,106"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="691,114,742,114,742,119,691,119"/>
+<area shape="poly" id="edge10_Node000008_Node000007" title=" " alt="" coords="535,111,491,110,491,105,535,105"/>
+<area shape="poly" id="edge15_Node000046_Node000045" title=" " alt="" coords="695,255,734,249,735,254,695,260"/>
+</map>

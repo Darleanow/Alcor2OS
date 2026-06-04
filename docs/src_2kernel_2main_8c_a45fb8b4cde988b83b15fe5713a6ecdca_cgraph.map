@@ -1,0 +1,30 @@
+<map id="print_banner" name="print_banner">
+<area shape="rect" id="Node000001" title="Print boot banner." alt="" coords="5,31,109,56"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="452,5,561,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,34,207,23,320,14,404,14,438,14,438,20,404,19,320,19,207,28,110,39"/>
+<area shape="rect" id="Node000014" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="157,81,272,107"/>
+<area shape="poly" id="edge8_Node000001_Node000014" title=" " alt="" coords="99,54,162,74,160,79,97,59"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="609,107,737,132"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="531,28,563,48,642,97,639,102,560,52,528,33"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="785,31,905,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="702,104,802,59,804,64,704,109"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="797,132,894,157"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="738,126,783,133,782,138,737,131"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="953,107,1055,132"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="738,117,939,117,939,122,738,122"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="817,181,874,207"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="704,130,786,166,805,174,803,179,784,171,702,135"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="894,134,939,127,940,132,895,140"/>
+<area shape="poly" id="edge9_Node000014_Node000002" title=" " alt="" coords="236,79,274,59,319,41,379,27,438,19,438,25,380,32,321,46,276,64,238,84"/>
+<area shape="poly" id="edge10_Node000014_Node000003" title=" " alt="" coords="273,94,596,112,595,118,272,100"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="321,56,403,81"/>
+<area shape="poly" id="edge11_Node000014_Node000015" title=" " alt="" coords="272,82,307,75,307,81,273,87"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="469,157,545,183"/>
+<area shape="poly" id="edge14_Node000014_Node000016" title=" " alt="" coords="243,104,279,121,321,135,391,152,455,162,454,167,390,157,319,141,277,125,240,109"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="320,208,404,233"/>
+<area shape="poly" id="edge16_Node000014_Node000017" title=" " alt="" coords="232,105,322,187,335,197,331,202,318,191,228,109"/>
+<area shape="poly" id="edge12_Node000015_Node000002" title=" " alt="" coords="398,53,456,33,458,38,400,58"/>
+<area shape="poly" id="edge13_Node000015_Node000003" title=" " alt="" coords="404,72,562,98,596,104,595,109,561,103,403,78"/>
+<area shape="poly" id="edge15_Node000016_Node000003" title=" " alt="" coords="544,156,617,134,619,139,546,161"/>
+<area shape="poly" id="edge17_Node000017_Node000003" title=" " alt="" coords="404,218,478,213,520,205,560,193,607,168,646,139,649,143,610,172,562,198,521,210,479,218,404,224"/>
+</map>

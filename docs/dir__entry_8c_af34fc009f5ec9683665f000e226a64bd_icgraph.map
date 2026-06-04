@@ -1,0 +1,11 @@
+<map id="dir_remove_entry" name="dir_remove_entry">
+<area shape="rect" id="Node000001" title="Remove a directory entry." alt="" coords="328,31,465,56"/>
+<area shape="rect" id="Node000002" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="184,5,277,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="314,33,277,28,278,22,315,28"/>
+<area shape="rect" id="Node000004" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="181,55,280,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="315,58,281,63,280,58,314,53"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#ac522aded5a92cdfd53591e3881498544" title="fs_ops_t.rmdir shim." alt="" coords="8,5,131,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="170,21,131,21,131,15,170,15"/>
+<area shape="rect" id="Node000005" href="$ops_8c.html#a80c49e4d95295031cd2604075a37d7ce" title="fs_ops_t.unlink shim." alt="" coords="5,55,133,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="168,70,134,70,134,65,168,65"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="atlas_meta_is_sane" name="atlas_meta_is_sane">
+<area shape="rect" id="Node000001" title="Reject a userspace atlas descriptor whose fields would misbehave inside the renderer." alt="" coords="647,5,797,31"/>
+<area shape="rect" id="Node000002" href="$atlas__install_8c.html#aad80a470b407d9bcef3f961c50f593f2" title="Validate meta and the user buffers it points at." alt="" coords="444,5,599,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="633,21,599,21,599,15,633,15"/>
+<area shape="rect" id="Node000003" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="237,5,396,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,21,396,21,396,15,430,15"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="5,5,189,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="224,21,190,21,190,15,224,15"/>
+</map>

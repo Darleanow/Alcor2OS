@@ -1,0 +1,9 @@
+<map id="write_superblock" name="write_superblock">
+<area shape="rect" id="Node000001" title="Persist the in&#45;memory superblock back to disk." alt="" coords="5,55,139,80"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="211,5,298,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,52,197,31,199,36,120,57"/>
+<area shape="rect" id="Node000003" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="189,55,321,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,65,175,65,175,70,139,70"/>
+<area shape="rect" id="Node000004" href="$src_2fs_2ext2_2internal_8h.html#a92bf399aefd098ef22b483f7aa903291" title="Companion of vol_read_sectors for writes." alt="" coords="187,104,323,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="120,77,194,98,193,103,119,83"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="pci_write16" name="pci_write16">
+<area shape="rect" id="Node000001" title="Write 16&#45;bit value to PCI configuration space." alt="" coords="473,5,571,31"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#a4a3a26341cdca867f78928565db5bc8a" title="Enable bus mastering for a PCI device." alt="" coords="251,5,425,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="460,21,426,21,426,15,460,15"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="124,5,203,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="237,21,203,21,203,15,237,15"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="5,5,76,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="110,21,76,21,76,15,110,15"/>
+</map>

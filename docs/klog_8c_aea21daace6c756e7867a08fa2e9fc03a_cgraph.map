@@ -1,0 +1,17 @@
+<map id="klogf" name="klogf">
+<area shape="rect" id="Node000001" title="Format a message to the kernel debug log (debugcon)." alt="" coords="5,55,60,81"/>
+<area shape="rect" id="Node000002" href="$klog_8c.html#a84403189353e810c4c948c32d95fa9d0" title="Emit a single byte to debugcon." alt="" coords="401,55,487,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="46,53,73,32,107,15,147,6,188,3,229,4,269,10,343,27,402,48,400,53,342,32,268,15,229,10,188,8,148,11,109,20,75,37,49,57"/>
+<area shape="rect" id="Node000004" href="$klog_8c.html#a7d467ec8cd33c46253b8833bafaf9e51" title="Emit a signed integer in base 10." alt="" coords="108,30,203,55"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="59,60,94,53,95,58,61,65"/>
+<area shape="rect" id="Node000005" href="$klog_8c.html#af9caf386809c0d688fc5ab03d7ba1b5f" title="Emit an unsigned integer in base base." alt="" coords="251,81,353,106"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="60,68,237,85,237,90,60,73"/>
+<area shape="rect" id="Node000006" href="$klog_8c.html#a9c348d5c2d6195c2e02d0aba3a33ca69" title="Emit a NUL&#45;terminated string to debugcon." alt="" coords="259,130,345,155"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="61,73,109,87,247,125,246,130,107,92,59,78"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="535,55,585,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="487,65,521,65,521,71,487,71"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="203,44,388,60,388,66,203,49"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="194,53,252,74,251,79,192,58"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="353,82,387,75,388,81,354,87"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="330,127,352,116,408,85,411,90,355,121,332,132"/>
+</map>

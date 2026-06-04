@@ -1,0 +1,13 @@
+<map id="try_add" name="try_add">
+<area shape="rect" id="Node000001" title="Add a candidate to out if it matches prefix and isn&#39;t a duplicate." alt="" coords="461,56,532,81"/>
+<area shape="rect" id="Node000002" href="$complete_8c.html#a098b0148d9bc1cb0deca349abb5b98a2" title="Scan a directory for command&#45;name entries matching prefix." alt="" coords="302,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="447,54,392,33,394,28,449,49"/>
+<area shape="rect" id="Node000003" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="148,56,253,81"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="448,71,254,71,254,66,448,66"/>
+<area shape="rect" id="Node000008" href="$complete_8c.html#aa61f9f2bc47d14007ed6b24c853a44bd" title="Scan a directory for path&#45;completion entries matching name_prefix." alt="" coords="301,107,413,132"/>
+<area shape="poly" id="edge4_Node000001_Node000008" title=" " alt="" coords="449,89,394,109,392,104,447,84"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="305,38,242,58,240,53,303,33"/>
+<area shape="rect" id="Node000004" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="5,56,100,81"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,71,100,71,100,66,134,66"/>
+<area shape="poly" id="edge5_Node000008_Node000003" title=" " alt="" coords="303,105,240,84,242,79,305,100"/>
+</map>

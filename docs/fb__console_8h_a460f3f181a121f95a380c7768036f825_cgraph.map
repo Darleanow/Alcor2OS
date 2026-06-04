@@ -1,0 +1,5 @@
+<map id="fb_console_yield" name="fb_console_yield">
+<area shape="rect" id="Node000001" title="Yield the framebuffer to a userspace process for raw pixel access (games, graphics demos)...." alt="" coords="5,5,136,31"/>
+<area shape="rect" id="Node000002" href="$fb__console_2mouse_8c.html#ae5f0507a92c6c100661c22cd379e2caa" title="Forget the painted&#45;at position without erasing pixels. Used by paths that are about to repaint the wh..." alt="" coords="184,5,333,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,15,170,15,170,21,136,21"/>
+</map>

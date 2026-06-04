@@ -1,0 +1,40 @@
+<map id="src/kernel/drivers/fb_console/atlas_install.c" name="src/kernel/drivers/fb_console/atlas_install.c">
+<area shape="rect" id="Node000001" title="Userspace atlas submission pipeline for the framebuffer console." alt="" coords="495,5,685,45"/>
+<area shape="rect" id="Node000002" href="$fb__console_8h.html" title="Kernel framebuffer text console." alt="" coords="107,101,305,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="506,48,271,100,270,95,505,43"/>
+<area shape="rect" id="Node000006" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="507,255,622,280"/>
+<area shape="poly" id="edge18_Node000001_Node000006" title=" " alt="" coords="591,46,570,241,565,241,585,45"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="602,181,725,207"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="601,45,655,168,650,170,596,47"/>
+<area shape="rect" id="Node000010" href="$heap_8h.html" title="Kernel heap allocator." alt="" coords="681,101,821,126"/>
+<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="627,43,719,92,717,97,624,48"/>
+<area shape="rect" id="Node000011" href="$vmm_8h.html" title="Virtual memory manager (paging)." alt="" coords="384,101,527,126"/>
+<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="561,48,486,95,484,91,559,43"/>
+<area shape="rect" id="Node000012" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html" title="Shared state, types, and hot&#45;path primitives for the fb_console module split." alt="" coords="859,93,1044,133"/>
+<area shape="poly" id="edge19_Node000001_Node000012" title=" " alt="" coords="670,43,860,88,859,93,669,48"/>
+<area shape="rect" id="Node000003" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="243,181,425,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="226,124,305,172,302,176,223,128"/>
+<area shape="rect" id="Node000005" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="82,181,218,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="200,128,168,172,164,169,196,125"/>
+<area shape="poly" id="edge9_Node000002_Node000006" title=" " alt="" coords="263,123,347,145,438,179,495,211,541,244,538,249,492,216,435,184,345,150,262,129"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="574,328,657,353"/>
+<area shape="poly" id="edge10_Node000002_Node000007" title=" " alt="" coords="160,129,121,142,86,160,74,170,67,181,66,192,72,205,131,223,267,256,561,324,560,329,266,261,130,228,68,209,61,193,62,179,70,167,83,155,119,137,159,124"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="475,328,550,353"/>
+<area shape="poly" id="edge11_Node000002_Node000008" title=" " alt="" coords="117,128,67,148,46,163,28,183,14,208,8,232,13,255,28,278,41,290,59,299,106,313,162,320,225,323,351,322,448,325,462,328,461,333,447,331,351,327,225,328,162,325,105,318,57,304,38,294,24,282,8,257,3,232,9,206,24,180,42,159,65,144,115,124"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="365,328,436,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="342,206,392,314,387,317,337,208"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="217,204,494,251,493,256,216,209"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="539,282,441,325,439,320,537,278"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="575,279,601,315,597,318,571,282"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="558,282,531,318,527,315,554,279"/>
+<area shape="poly" id="edge13_Node000009_Node000006" title=" " alt="" coords="649,209,593,249,590,244,646,205"/>
+<area shape="poly" id="edge15_Node000010_Node000006" title=" " alt="" coords="756,126,755,165,750,188,739,208,717,228,691,243,636,261,635,256,689,239,714,224,735,205,745,186,750,165,750,126"/>
+<area shape="poly" id="edge17_Node000011_Node000006" title=" " alt="" coords="466,124,550,242,546,245,461,128"/>
+<area shape="poly" id="edge22_Node000012_Node000003" title=" " alt="" coords="859,132,834,136,439,184,438,179,834,131,858,127"/>
+<area shape="poly" id="edge23_Node000012_Node000006" title=" " alt="" coords="957,134,958,171,952,191,941,209,920,223,889,236,809,253,719,263,636,267,636,262,718,257,808,247,887,230,917,219,937,205,947,189,952,170,952,134"/>
+<area shape="poly" id="edge24_Node000012_Node000007" title=" " alt="" coords="989,131,1015,152,1036,180,1048,208,1054,233,1051,257,1036,282,1010,300,973,314,926,325,874,333,764,341,671,343,670,337,764,336,873,327,925,320,971,309,1008,296,1032,278,1046,255,1049,233,1043,210,1032,183,1012,156,985,135"/>
+<area shape="poly" id="edge25_Node000012_Node000008" title=" " alt="" coords="963,133,974,169,973,190,965,209,913,231,803,264,564,329,563,324,801,259,911,226,961,205,968,189,969,170,958,134"/>
+<area shape="rect" id="Node000013" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="800,181,927,207"/>
+<area shape="poly" id="edge20_Node000012_Node000013" title=" " alt="" coords="932,136,889,174,885,170,928,132"/>
+<area shape="poly" id="edge21_Node000013_Node000006" title=" " alt="" coords="816,209,627,254,626,249,815,204"/>
+</map>

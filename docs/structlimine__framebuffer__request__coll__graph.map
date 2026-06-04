@@ -1,0 +1,9 @@
+<map id="limine_framebuffer_request" name="limine_framebuffer_request">
+<area shape="rect" id="Node000001" title="Framebuffer request structure." alt="" coords="7,284,154,324"/>
+<area shape="rect" id="Node000002" href="$structlimine__framebuffer__response.html" title="Framebuffer response from bootloader." alt="" coords="7,181,154,221"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,235,83,284,78,284,78,235"/>
+<area shape="rect" id="Node000003" href="$structlimine__framebuffer.html" title="Framebuffer descriptor." alt="" coords="7,93,154,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,132,83,181,78,181,78,132"/>
+<area shape="rect" id="Node000004" href="$structlimine__video__mode.html" title="Video mode descriptor." alt="" coords="5,5,156,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,45,83,93,78,93,78,45"/>
+</map>

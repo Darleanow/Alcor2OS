@@ -1,0 +1,7 @@
+<map id="keyboard_raw_pop" name="keyboard_raw_pop">
+<area shape="rect" id="Node000001" title="Pop one raw scancode from the ring buffer." alt="" coords="5,31,149,56"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="197,5,367,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,32,184,27,184,33,150,37"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="199,55,365,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,49,185,53,185,59,150,54"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="spz_label" name="spz_label">
+<area shape="rect" id="Node000001" title=" " alt="" coords="267,80,349,105"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2ncurses-hello_2main_8c.html#a15f2e9692565ff3c8d1e6057901a88c2" title=" " alt="" coords="112,5,215,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="273,75,217,44,194,33,196,28,220,40,276,71"/>
+<area shape="rect" id="Node000004" href="$user_2apps_2ncurses-hello_2main_8c.html#a939443cb13cdb89c89d06987d8212043" title=" " alt="" coords="111,55,215,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="252,86,215,79,216,74,253,80"/>
+<area shape="rect" id="Node000005" href="$user_2apps_2ncurses-hello_2main_8c.html#aa194c28ae4fd5d59b8e7abe784827a93" title=" " alt="" coords="108,104,219,129"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="254,104,219,110,218,105,253,99"/>
+<area shape="rect" id="Node000006" href="$user_2apps_2ncurses-hello_2main_8c.html#aaca7c1ae6bb22796b397925670c1b194" title=" " alt="" coords="111,153,216,179"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="273,115,220,143,194,156,192,151,217,138,271,110"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2ncurses-hello_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="5,80,60,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,39,109,44,53,82,50,77,107,40,117,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="98,83,61,90,60,85,97,77"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="94,107,60,100,61,95,95,101"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="120,150,107,143,51,108,54,103,109,138,122,145"/>
+</map>

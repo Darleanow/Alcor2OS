@@ -1,0 +1,17 @@
+<map id="include/alcor2/arch/pic.h" name="include/alcor2/arch/pic.h">
+<area shape="rect" id="Node000001" title="8259 PIC (Programmable Interrupt Controller) driver." alt="" coords="551,5,696,45"/>
+<area shape="rect" id="Node000002" href="$idt_8c.html" title="Interrupt Descriptor Table and exception handlers." alt="" coords="5,101,161,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="537,41,368,64,173,96,136,103,135,98,172,91,368,59,537,35"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html" title="ATA/IDE disk driver (DMA + PIO fallback, LBA28/48)." alt="" coords="185,101,336,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="538,50,310,103,309,98,536,44"/>
+<area shape="rect" id="Node000004" href="$keyboard_8c.html" title="PS/2 keyboard driver with scancode translation." alt="" coords="361,93,515,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="571,54,480,96,477,91,569,49"/>
+<area shape="rect" id="Node000005" href="$mouse__ps2_8c.html" title="PS/2 mouse driver (i8042 second port)." alt="" coords="539,93,707,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="626,59,626,93,621,93,621,59"/>
+<area shape="rect" id="Node000006" href="$pic_8c.html" title="8259 PIC driver for IRQ management." alt="" coords="731,101,878,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="677,49,782,98,779,103,674,54"/>
+<area shape="rect" id="Node000007" href="$pit_8c.html" title="8253/8254 PIT timer driver with a runtime&#45;adjustable tick rate." alt="" coords="903,101,1045,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="710,45,928,98,927,103,709,50"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="1070,101,1203,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="710,35,872,59,1059,91,1092,98,1091,103,1057,96,872,64,710,40"/>
+</map>

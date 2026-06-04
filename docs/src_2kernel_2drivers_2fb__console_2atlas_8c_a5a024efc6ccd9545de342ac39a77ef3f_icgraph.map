@@ -1,0 +1,16 @@
+<map id="atlas_lookup_attr" name="atlas_lookup_attr">
+<area shape="rect" id="Node000001" title="Resolve to the bold or italic sub&#45;atlas slot when SGR asks for one." alt="" coords="523,80,657,105"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#adc43e1a6950e650d97d104d9410bc4f7" title="Resolve cp / attr to an atlas glyph base pointer, or NULL when no glyph is registered." alt="" coords="340,55,475,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="509,84,475,79,476,74,510,79"/>
+<area shape="rect" id="Node000058" href="$flush_8c.html#a78b9c1602b135454913114b75737f27f" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="348,104,467,129"/>
+<area shape="poly" id="edge6_Node000001_Node000058" title=" " alt="" coords="510,106,467,112,467,106,509,101"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="163,5,292,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,53,274,33,276,28,348,48"/>
+<area shape="rect" id="Node000057" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="168,55,287,80"/>
+<area shape="poly" id="edge4_Node000002_Node000057" title=" " alt="" coords="326,70,287,70,287,65,326,65"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="5,31,115,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="149,33,115,38,114,32,148,27"/>
+<area shape="poly" id="edge5_Node000057_Node000004" title=" " alt="" coords="154,60,115,54,115,49,155,54"/>
+<area shape="rect" id="Node000051" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="179,104,275,129"/>
+<area shape="poly" id="edge7_Node000058_Node000051" title=" " alt="" coords="334,119,276,119,276,114,334,114"/>
+</map>

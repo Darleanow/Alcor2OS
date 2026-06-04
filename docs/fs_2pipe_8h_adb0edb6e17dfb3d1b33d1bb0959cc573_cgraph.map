@@ -1,0 +1,7 @@
+<map id="pipe_alloc_obj" name="pipe_alloc_obj">
+<area shape="rect" id="Node000001" title="Allocate a fresh pipe object with both ends open." alt="" coords="5,5,120,31"/>
+<area shape="rect" id="Node000002" href="$pipe_8c.html#ac9ccbd4c1701eb8aa9c65517dfa693c5" title="Find a free pipe slot, zero it, and mark both ends open." alt="" coords="168,5,256,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,15,155,15,155,21,120,21"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="304,5,363,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="256,15,290,15,290,21,256,21"/>
+</map>

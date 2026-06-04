@@ -1,0 +1,98 @@
+<map id="inb" name="inb">
+<area shape="rect" id="Node000001" title="Read a byte from an I/O port." alt="" coords="909,763,952,788"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a210a41152ac79a3588f1869164b196f2" title=" " alt="" coords="739,584,825,610"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="911,753,859,683,795,612,799,608,863,679,915,749"/>
+<area shape="rect" id="Node000019" href="$ata_8c.html#abde118a713492fc92ec9f7b6258933db" title="ATA IRQ handler — reading status clears the device&#39;s IRQ line." alt="" coords="351,232,418,258"/>
+<area shape="poly" id="edge20_Node000001_Node000019" title=" " alt="" coords="923,750,916,713,904,667,886,619,859,575,808,515,749,461,686,412,622,369,503,301,416,260,418,255,505,297,625,364,689,407,752,457,812,511,863,572,890,617,909,666,922,712,929,749"/>
+<area shape="rect" id="Node000022" href="$keyboard_8c.html#a5aae8263abc1dec4671638e7ed4af681" title="Initialize the PS/2 keyboard driver." alt="" coords="329,787,440,812"/>
+<area shape="poly" id="edge25_Node000001_Node000022" title=" " alt="" coords="895,776,722,770,608,772,492,780,436,790,435,784,492,774,608,766,722,765,896,771"/>
+<area shape="rect" id="Node000024" href="$keyboard_8c.html#a46b78f9b5f3f9a5e5d24871774db270c" title=" " alt="" coords="729,788,835,814"/>
+<area shape="poly" id="edge27_Node000001_Node000024" title=" " alt="" coords="896,784,836,795,835,789,895,779"/>
+<area shape="rect" id="Node000026" href="$mouse__ps2_8c.html#a059fb6ffb95c8c6a22097d748a2aa357" title="IRQ 12 handler: accumulate one mouse packet byte, post on completion." alt="" coords="722,1014,842,1039"/>
+<area shape="poly" id="edge30_Node000001_Node000026" title=" " alt="" coords="928,803,908,882,889,928,863,971,837,997,809,1016,806,1011,834,993,859,967,884,925,902,880,923,801"/>
+<area shape="rect" id="Node000029" href="$pic_8c.html#a3e514f789fbbbf7edfd418e7982743fd" title="Unmask (enable) an IRQ line." alt="" coords="523,687,623,712"/>
+<area shape="poly" id="edge33_Node000001_Node000029" title=" " alt="" coords="902,757,860,734,798,717,734,707,623,701,623,696,734,702,799,712,862,729,905,752"/>
+<area shape="rect" id="Node000031" href="$mouse__ps2_8c.html#ad166364dae9026806e72b787a51fc2f7" title="Read one byte from the controller." alt="" coords="515,938,632,963"/>
+<area shape="poly" id="edge39_Node000001_Node000031" title=" " alt="" coords="928,803,921,832,909,867,890,900,863,927,836,943,807,955,745,967,685,968,632,964,632,958,685,963,745,961,805,949,834,938,860,923,886,897,904,864,916,831,923,801"/>
+<area shape="rect" id="Node000033" href="$mouse__ps2_8c.html#a2c86d21aafe1ed28adf9fb89f6019dc5" title="Spin until the input buffer is free." alt="" coords="703,838,861,863"/>
+<area shape="poly" id="edge43_Node000001_Node000033" title=" " alt="" coords="906,799,863,829,835,840,833,835,860,824,903,795"/>
+<area shape="rect" id="Node000036" href="$mouse__ps2_8c.html#a16aef608030c66970d3ac07b5762eff6" title="Spin until a byte is available to read." alt="" coords="703,887,861,912"/>
+<area shape="poly" id="edge50_Node000001_Node000036" title=" " alt="" coords="920,803,898,841,882,861,863,878,842,889,840,885,860,874,878,857,893,838,916,800"/>
+<area shape="rect" id="Node000037" href="$ata_8c.html#a2e42765bdca6c8d40cafe008a9c35e7e" title=" " alt="" coords="534,156,613,182"/>
+<area shape="poly" id="edge52_Node000001_Node000037" title=" " alt="" coords="925,750,919,662,906,546,887,432,874,387,859,354,834,322,804,293,737,244,668,208,612,184,614,179,671,203,739,239,808,288,838,318,864,352,879,385,892,431,912,545,924,662,931,749"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a19176aed0b71563bf7d030583c5865b1" title=" " alt="" coords="521,460,625,486"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="746,580,595,488,598,484,749,575"/>
+<area shape="rect" id="Node000018" href="$ata_8c.html#a8b4d3c021710bacc1b78076d406b7f48" title="Wait for ATA command completion." alt="" coords="347,584,422,610"/>
+<area shape="poly" id="edge16_Node000002_Node000018" title=" " alt="" coords="725,600,422,600,422,594,725,594"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a69cc2f51d9f7c84d9f7ae376cbb59ffb" title="Run IDENTIFY and populate drive descriptor." alt="" coords="171,158,242,183"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="544,454,418,352,323,271,309,250,301,231,292,214,276,196,259,187,241,180,243,175,262,182,279,192,296,211,306,229,313,247,327,267,422,348,547,450"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#ad23c5f0ba707314019c13a32973d6c0d" title="Write sectors using PIO with cache flush." alt="" coords="165,486,248,511"/>
+<area shape="poly" id="edge5_Node000003_Node000007" title=" " alt="" coords="508,472,421,471,326,476,249,490,248,485,325,470,421,465,508,467"/>
+<area shape="rect" id="Node000010" href="$ata_8c.html#a76551fd547f6d7ea4a7da3efc4bce305" title="Select a drive on its channel (master or slave)." alt="" coords="334,384,435,410"/>
+<area shape="poly" id="edge6_Node000003_Node000010" title=" " alt="" coords="527,458,416,412,418,407,529,453"/>
+<area shape="rect" id="Node000011" href="$ata_8c.html#ad40ebb2a3659dfbd39dca2fc63914a08" title="Program task&#45;file registers for LBA28." alt="" coords="334,535,435,560"/>
+<area shape="poly" id="edge8_Node000003_Node000011" title=" " alt="" coords="528,494,419,538,417,533,526,489"/>
+<area shape="rect" id="Node000017" href="$ata_8c.html#a9cbc0b43bfa6357113351d33bb77583e" title="Program task&#45;file registers for LBA48 (HOB first)." alt="" coords="334,486,435,511"/>
+<area shape="poly" id="edge12_Node000003_Node000017" title=" " alt="" coords="508,484,436,494,435,489,507,479"/>
+<area shape="rect" id="Node000005" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="11,207,82,232"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="159,188,83,212,81,206,157,183"/>
+<area shape="poly" id="edge7_Node000010_Node000004" title=" " alt="" coords="336,379,323,367,309,343,302,321,301,278,298,237,291,217,275,196,260,185,241,178,243,173,262,180,279,193,295,214,303,236,306,278,307,320,314,341,327,363,340,375"/>
+<area shape="poly" id="edge11_Node000011_Node000007" title=" " alt="" coords="324,534,247,512,249,507,326,529"/>
+<area shape="rect" id="Node000012" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="152,535,261,560"/>
+<area shape="poly" id="edge9_Node000011_Node000012" title=" " alt="" coords="320,550,262,550,262,545,320,545"/>
+<area shape="rect" id="Node000016" href="$ata_8c.html#a86b888e981bed8edbc644d872c9139a9" title="Read sectors using PIO." alt="" coords="167,584,246,610"/>
+<area shape="poly" id="edge10_Node000011_Node000016" title=" " alt="" coords="326,567,247,589,246,584,324,562"/>
+<area shape="poly" id="edge15_Node000017_Node000007" title=" " alt="" coords="320,501,248,501,248,496,320,496"/>
+<area shape="poly" id="edge13_Node000017_Node000012" title=" " alt="" coords="326,517,254,537,253,532,324,512"/>
+<area shape="poly" id="edge14_Node000017_Node000016" title=" " alt="" coords="337,520,327,526,313,538,304,550,294,563,279,575,247,590,245,585,276,571,290,559,299,547,309,535,324,522,334,515"/>
+<area shape="poly" id="edge19_Node000018_Node000007" title=" " alt="" coords="334,581,324,575,309,562,299,550,290,538,276,526,247,512,249,507,279,521,294,534,304,547,313,559,327,571,336,577"/>
+<area shape="poly" id="edge17_Node000018_Node000012" title=" " alt="" coords="333,586,253,563,254,558,335,581"/>
+<area shape="poly" id="edge18_Node000018_Node000016" title=" " alt="" coords="334,600,246,600,246,594,334,594"/>
+<area shape="rect" id="Node000020" href="$ata_8c.html#a8fb7c02769509cb3a7399f56dd42681b" title=" " alt="" coords="144,256,269,282"/>
+<area shape="poly" id="edge21_Node000019_Node000020" title=" " alt="" coords="338,254,270,263,269,258,337,249"/>
+<area shape="rect" id="Node000021" href="$ata_8c.html#ae320cdeb9f17d5b97075bf4f22b76bcc" title=" " alt="" coords="136,207,277,232"/>
+<area shape="poly" id="edge23_Node000019_Node000021" title=" " alt="" coords="337,241,277,232,278,227,338,236"/>
+<area shape="poly" id="edge22_Node000020_Node000005" title=" " alt="" coords="151,255,82,233,83,228,153,250"/>
+<area shape="poly" id="edge24_Node000021_Node000005" title=" " alt="" coords="122,222,82,222,82,217,122,217"/>
+<area shape="rect" id="Node000023" href="$src_2kernel_2main_8c.html#a9cf4a417b66a038c3dd1e074be9fde2e" title="Initialize interrupt controllers and drivers." alt="" coords="150,736,263,762"/>
+<area shape="poly" id="edge26_Node000022_Node000023" title=" " alt="" coords="325,786,251,764,253,759,327,781"/>
+<area shape="rect" id="Node000025" href="$keyboard_8c.html#a91e1bd244fa1ddc661eeeed18f4bcb38" title=" " alt="" coords="492,788,655,814"/>
+<area shape="poly" id="edge28_Node000024_Node000025" title=" " alt="" coords="715,804,655,804,655,798,715,798"/>
+<area shape="poly" id="edge29_Node000025_Node000022" title=" " alt="" coords="478,803,440,803,440,797,478,798"/>
+<area shape="rect" id="Node000027" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="145,914,269,939"/>
+<area shape="poly" id="edge31_Node000026_Node000027" title=" " alt="" coords="708,1029,628,1027,532,1020,427,1006,325,984,272,964,228,942,231,937,274,959,326,979,428,1001,532,1014,629,1021,708,1024"/>
+<area shape="rect" id="Node000028" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="5,914,88,939"/>
+<area shape="poly" id="edge32_Node000027_Node000028" title=" " alt="" coords="131,929,88,929,88,924,131,924"/>
+<area shape="poly" id="edge34_Node000029_Node000005" title=" " alt="" coords="509,690,444,677,396,672,353,672,277,678,241,677,206,670,171,653,134,624,113,593,96,548,81,492,70,431,54,313,46,233,52,232,59,312,75,430,87,491,101,546,118,591,138,621,174,649,208,665,242,672,276,672,352,667,396,666,444,672,510,684"/>
+<area shape="poly" id="edge35_Node000029_Node000022" title=" " alt="" coords="523,720,493,734,469,751,445,770,413,789,410,784,443,766,466,747,491,729,521,715"/>
+<area shape="poly" id="edge36_Node000029_Node000027" title=" " alt="" coords="511,717,406,746,359,762,327,778,289,811,257,849,217,915,212,912,253,846,285,807,324,774,357,757,405,741,509,712"/>
+<area shape="rect" id="Node000030" href="$pit_8c.html#aad83f0d07314d8845558b13050011b0d" title="Program the PIT and install the timer IRQ handler." alt="" coords="351,686,418,711"/>
+<area shape="poly" id="edge37_Node000029_Node000030" title=" " alt="" coords="509,702,418,701,418,696,509,697"/>
+<area shape="poly" id="edge38_Node000030_Node000023" title=" " alt="" coords="339,714,253,739,251,734,338,709"/>
+<area shape="poly" id="edge42_Node000031_Node000027" title=" " alt="" coords="503,968,418,978,371,978,325,973,275,959,233,942,235,937,277,954,326,968,371,973,417,973,502,963"/>
+<area shape="rect" id="Node000032" href="$mouse__ps2_8c.html#a24c01f5f20bd1823b7ba8ea033d68acc" title="Send a command to the mouse via the AUX port." alt="" coords="334,888,435,914"/>
+<area shape="poly" id="edge40_Node000031_Node000032" title=" " alt="" coords="510,937,434,916,435,911,512,932"/>
+<area shape="poly" id="edge41_Node000032_Node000027" title=" " alt="" coords="320,913,270,920,269,915,320,908"/>
+<area shape="rect" id="Node000034" href="$mouse__ps2_8c.html#a16ddfad4f1a5feb09d3b53f7893b703f" title="Send a command byte to the controller (port 0x64)." alt="" coords="533,888,613,914"/>
+<area shape="poly" id="edge44_Node000033_Node000034" title=" " alt="" coords="716,869,614,894,613,889,715,864"/>
+<area shape="rect" id="Node000035" href="$mouse__ps2_8c.html#a67fb73771a785ab88414bf6622c194c3" title="Send a data byte to the controller (port 0x60)." alt="" coords="513,838,634,863"/>
+<area shape="poly" id="edge47_Node000033_Node000035" title=" " alt="" coords="689,853,634,853,634,848,689,848"/>
+<area shape="poly" id="edge46_Node000034_Node000027" title=" " alt="" coords="520,916,444,929,352,934,269,932,269,927,352,928,444,924,520,911"/>
+<area shape="poly" id="edge45_Node000034_Node000032" title=" " alt="" coords="519,904,436,904,436,898,519,898"/>
+<area shape="poly" id="edge49_Node000035_Node000027" title=" " alt="" coords="499,855,415,863,326,880,276,897,234,916,231,911,274,892,325,874,415,858,499,850"/>
+<area shape="poly" id="edge48_Node000035_Node000032" title=" " alt="" coords="513,869,434,891,432,886,511,864"/>
+<area shape="poly" id="edge51_Node000036_Node000031" title=" " alt="" coords="716,918,627,940,626,935,715,913"/>
+<area shape="poly" id="edge57_Node000037_Node000004" title=" " alt="" coords="520,172,242,173,242,168,520,167"/>
+<area shape="poly" id="edge53_Node000037_Node000005" title=" " alt="" coords="557,146,539,115,514,80,481,47,443,22,412,11,386,8,359,13,326,22,282,39,240,61,162,114,101,168,61,209,58,205,97,164,159,110,237,56,280,34,324,17,358,8,386,3,413,6,445,17,485,43,518,77,544,112,562,143"/>
+<area shape="poly" id="edge58_Node000037_Node000007" title=" " alt="" coords="547,193,431,286,327,374,266,436,221,487,217,484,262,433,324,370,428,281,543,188"/>
+<area shape="poly" id="edge54_Node000037_Node000019" title=" " alt="" coords="529,189,418,235,416,230,527,184"/>
+<area shape="rect" id="Node000038" href="$ata_8c.html#a2dbd463b4d0069e223eab48b63d80977" title="Check whether a device is present (0xFF = floating bus)." alt="" coords="325,32,444,58"/>
+<area shape="poly" id="edge55_Node000037_Node000038" title=" " alt="" coords="546,149,500,111,443,71,420,60,422,55,445,67,503,106,550,145"/>
+<area shape="rect" id="Node000039" href="$ata_8c.html#ab080ebc34772e3b0ce3cc2ee637005ac" title="Poll until BSY clears." alt="" coords="347,82,423,107"/>
+<area shape="poly" id="edge59_Node000037_Node000039" title=" " alt="" coords="526,154,417,110,419,105,528,149"/>
+<area shape="rect" id="Node000040" href="$ata_8c.html#afece4807d5a19ec91aa03298b05f7351" title="Poll until DRQ asserted (BSY clear)." alt="" coords="347,131,422,156"/>
+<area shape="poly" id="edge61_Node000037_Node000040" title=" " alt="" coords="520,165,422,151,423,146,521,159"/>
+<area shape="poly" id="edge56_Node000038_Node000004" title=" " alt="" coords="336,66,327,71,266,117,222,160,218,156,262,113,324,67,334,61"/>
+<area shape="poly" id="edge60_Node000039_Node000004" title=" " alt="" coords="341,115,326,121,237,160,235,155,324,116,338,110"/>
+<area shape="poly" id="edge62_Node000040_Node000004" title=" " alt="" coords="334,154,243,168,242,163,333,149"/>
+</map>

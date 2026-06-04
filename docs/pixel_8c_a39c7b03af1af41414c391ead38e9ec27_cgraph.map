@@ -1,0 +1,9 @@
+<map id="fb_draw_fallback_char" name="fb_draw_fallback_char">
+<area shape="rect" id="Node000001" title="Draws a fallback character using the built&#45;in VGA font." alt="" coords="5,31,173,56"/>
+<area shape="rect" id="Node000002" href="$pixel_8c.html#a023396f3fb16eb74113e80913b7912a3" title="Draws a monochrome 8x16 glyph onto the framebuffer." alt="" coords="230,5,347,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,30,216,25,216,30,174,35"/>
+<area shape="rect" id="Node000004" href="$font__bitmap_8h.html#aa872bd8d398352cd9c51ed4151e6f056" title="Each byte indexes directly into the atlas." alt="" coords="221,55,356,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,51,208,55,207,60,173,56"/>
+<area shape="rect" id="Node000003" href="$pixel_8c.html#a11b082fd47841feddf059650f8e1e7f4" title="Plot one pixel honouring the current framebuffer depth." alt="" coords="404,5,505,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="348,15,390,15,390,21,348,21"/>
+</map>

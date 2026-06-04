@@ -1,0 +1,31 @@
+<map id="src/kernel/drivers/fb_console/atlas.c" name="src/kernel/drivers/fb_console/atlas.c">
+<area shape="rect" id="Node000001" title="Glyph atlas lookup + meta validation." alt="" coords="431,5,574,45"/>
+<area shape="rect" id="Node000002" href="$fb__console_8h.html" title="Kernel framebuffer text console." alt="" coords="549,101,747,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="536,43,618,91,615,96,533,48"/>
+<area shape="rect" id="Node000006" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="395,255,509,280"/>
+<area shape="poly" id="edge12_Node000001_Node000006" title=" " alt="" coords="504,46,497,117,480,207,466,243,461,241,475,206,492,117,499,45"/>
+<area shape="rect" id="Node000009" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html" title="Shared state, types, and hot&#45;path primitives for the fb_console module split." alt="" coords="182,93,367,133"/>
+<area shape="poly" id="edge13_Node000001_Node000009" title=" " alt="" coords="453,48,338,91,337,86,452,43"/>
+<area shape="rect" id="Node000003" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="29,181,211,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="572,129,210,182,210,177,571,123"/>
+<area shape="rect" id="Node000005" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="591,181,727,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="652,126,658,167,653,168,647,127"/>
+<area shape="poly" id="edge9_Node000002_Node000006" title=" " alt="" coords="635,128,479,248,476,244,632,124"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="461,328,544,353"/>
+<area shape="poly" id="edge10_Node000002_Node000007" title=" " alt="" coords="701,124,747,144,768,160,785,180,799,207,804,232,800,256,785,282,769,294,747,305,688,321,620,332,558,338,557,333,619,327,687,316,745,300,767,290,781,278,795,255,799,232,794,209,780,183,764,164,744,149,699,128"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="363,328,437,353"/>
+<area shape="poly" id="edge11_Node000002_Node000008" title=" " alt="" coords="676,124,704,139,730,158,745,182,746,195,741,208,722,227,693,245,615,279,528,308,451,329,450,324,526,303,613,274,690,241,718,223,736,205,741,194,740,183,726,162,701,143,674,129"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="227,328,298,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="133,205,243,316,240,320,130,209"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="626,209,499,253,497,248,625,204"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="422,283,307,325,305,320,421,278"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="462,279,489,315,484,318,458,282"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="445,282,419,318,414,315,441,279"/>
+<area shape="poly" id="edge16_Node000009_Node000003" title=" " alt="" coords="239,136,156,177,154,173,236,131"/>
+<area shape="poly" id="edge17_Node000009_Node000006" title=" " alt="" coords="283,132,300,169,327,205,362,230,401,248,399,252,360,234,323,209,295,171,279,135"/>
+<area shape="poly" id="edge18_Node000009_Node000007" title=" " alt="" coords="280,133,287,168,304,205,336,245,377,277,419,302,459,320,456,325,417,307,374,281,333,248,299,208,282,170,274,134"/>
+<area shape="poly" id="edge19_Node000009_Node000008" title=" " alt="" coords="182,120,111,127,48,143,26,154,12,168,9,184,18,205,39,225,72,244,162,279,263,307,349,327,348,332,262,312,161,284,70,249,36,229,14,208,4,185,7,165,23,150,47,138,110,122,181,114"/>
+<area shape="rect" id="Node000010" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="338,181,465,207"/>
+<area shape="poly" id="edge14_Node000009_Node000010" title=" " alt="" coords="307,131,373,172,370,176,304,136"/>
+<area shape="poly" id="edge15_Node000010_Node000006" title=" " alt="" coords="412,205,438,242,434,245,407,209"/>
+</map>

@@ -1,0 +1,39 @@
+<map id="reg_write" name="reg_write">
+<area shape="rect" id="Node000001" title=" " alt="" coords="780,134,863,159"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="473,171,583,197"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="803,172,772,201,733,224,709,230,684,232,634,227,589,214,553,199,555,194,591,209,635,222,684,227,708,225,731,219,769,196,799,168"/>
+<area shape="rect" id="Node000009" href="$ata_8c.html#a69cc2f51d9f7c84d9f7ae376cbb59ffb" title="Run IDENTIFY and populate drive descriptor." alt="" coords="493,33,563,58"/>
+<area shape="poly" id="edge7_Node000001_Node000009" title=" " alt="" coords="809,123,780,69,758,42,731,22,709,14,686,10,638,11,594,22,557,35,555,30,592,17,638,6,686,4,710,9,733,18,762,39,784,66,813,120"/>
+<area shape="rect" id="Node000011" href="$ata_8c.html#a86b888e981bed8edbc644d872c9139a9" title="Read sectors using PIO." alt="" coords="489,122,567,147"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="771,133,732,124,688,121,644,122,568,130,567,125,644,116,688,115,732,119,772,127"/>
+<area shape="rect" id="Node000012" href="$ata_8c.html#ad23c5f0ba707314019c13a32973d6c0d" title="Write sectors using PIO with cache flush." alt="" coords="487,221,569,246"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="806,172,776,208,756,224,733,237,691,249,647,252,605,250,569,245,570,240,606,245,647,247,690,243,731,232,753,220,772,204,802,169"/>
+<area shape="rect" id="Node000013" href="$ata_8c.html#a76551fd547f6d7ea4a7da3efc4bce305" title="Select a drive on its channel (master or slave)." alt="" coords="631,33,732,58"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="793,127,730,79,702,60,705,56,734,75,796,123"/>
+<area shape="rect" id="Node000014" href="$ata_8c.html#ad40ebb2a3659dfbd39dca2fc63914a08" title="Program task&#45;file registers for LBA28." alt="" coords="631,134,732,159"/>
+<area shape="poly" id="edge16_Node000001_Node000014" title=" " alt="" coords="767,149,732,149,732,144,767,144"/>
+<area shape="rect" id="Node000015" href="$ata_8c.html#a9cbc0b43bfa6357113351d33bb77583e" title="Program task&#45;file registers for LBA48 (HOB first)." alt="" coords="631,183,732,209"/>
+<area shape="poly" id="edge20_Node000001_Node000015" title=" " alt="" coords="773,166,719,186,717,181,771,161"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="315,122,425,147"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="473,170,411,150,413,145,475,165"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="329,171,411,197"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="460,187,412,187,412,181,460,181"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="170,122,249,147"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="301,137,249,137,249,132,301,132"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="152,171,267,197"/>
+<area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="315,187,267,187,267,181,315,181"/>
+<area shape="rect" id="Node000006" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,122,104,147"/>
+<area shape="poly" id="edge6_Node000008_Node000006" title=" " alt="" coords="155,169,95,150,96,145,156,164"/>
+<area shape="rect" id="Node000010" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="174,73,245,98"/>
+<area shape="poly" id="edge8_Node000009_Node000010" title=" " alt="" coords="479,54,245,84,245,78,479,49"/>
+<area shape="poly" id="edge9_Node000010_Node000006" title=" " alt="" coords="162,103,96,124,95,119,160,98"/>
+<area shape="poly" id="edge11_Node000011_Node000003" title=" " alt="" coords="475,137,426,137,426,132,475,132"/>
+<area shape="poly" id="edge13_Node000012_Node000007" title=" " alt="" coords="473,219,411,199,413,194,475,214"/>
+<area shape="poly" id="edge15_Node000013_Node000009" title=" " alt="" coords="617,48,564,48,564,43,617,43"/>
+<area shape="poly" id="edge17_Node000014_Node000002" title=" " alt="" coords="618,165,581,174,580,169,617,159"/>
+<area shape="poly" id="edge18_Node000014_Node000011" title=" " alt="" coords="617,144,568,140,568,135,617,139"/>
+<area shape="poly" id="edge19_Node000014_Node000012" title=" " alt="" coords="642,168,632,174,608,193,584,212,562,223,560,218,581,207,605,189,629,170,640,164"/>
+<area shape="poly" id="edge21_Node000015_Node000002" title=" " alt="" coords="617,194,583,191,583,186,617,188"/>
+<area shape="poly" id="edge22_Node000015_Node000011" title=" " alt="" coords="635,181,560,150,562,145,637,176"/>
+<area shape="poly" id="edge23_Node000015_Node000012" title=" " alt="" coords="618,214,570,226,569,221,617,209"/>
+</map>

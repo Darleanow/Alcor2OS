@@ -1,0 +1,7 @@
+<map id="ata_write" name="ata_write">
+<area shape="rect" id="Node000001" title="Write sectors to drive." alt="" coords="315,5,397,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="152,5,267,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="301,21,267,21,267,15,301,15"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="138,21,104,21,104,15,138,15"/>
+</map>

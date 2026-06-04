@@ -1,0 +1,9 @@
+<map id="pci_write32" name="pci_write32">
+<area shape="rect" id="Node000001" title="Write 32&#45;bit value to PCI configuration space." alt="" coords="500,5,597,31"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#a3a1084d4226e71015aa3ad09f78b161a" title="Write 16&#45;bit value to PCI configuration space." alt="" coords="355,5,452,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="486,21,452,21,452,15,486,15"/>
+<area shape="rect" id="Node000003" href="$pci_8c.html#a4a3a26341cdca867f78928565db5bc8a" title="Enable bus mastering for a PCI device." alt="" coords="132,5,307,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,21,307,21,307,15,341,15"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="5,5,84,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,21,84,21,84,15,118,15"/>
+</map>

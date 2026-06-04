@@ -1,0 +1,9 @@
+<map id="proc_enter_first_time" name="proc_enter_first_time">
+<area shape="rect" id="Node000001" title="External assembly entry point for new processes." alt="" coords="545,5,705,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="359,5,497,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="531,21,498,21,498,15,531,15"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#af54f572ae171e2176cb67d7b16b30f50" title="Create a process from an ELF image held in kernel memory." alt="" coords="172,5,311,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="345,21,311,21,311,15,345,15"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="158,21,124,21,124,15,158,15"/>
+</map>

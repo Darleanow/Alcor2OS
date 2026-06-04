@@ -1,0 +1,67 @@
+<map id="fb_console_ioctl_forward" name="fb_console_ioctl_forward">
+<area shape="rect" id="Node000001" title="Forward an ioctl request to fb_console." alt="" coords="5,625,189,651"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="450,156,598,181"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,623,500,190,504,193,112,627"/>
+<area shape="rect" id="Node000029" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="237,625,396,651"/>
+<area shape="poly" id="edge10_Node000001_Node000029" title=" " alt="" coords="190,635,224,635,224,641,190,641"/>
+<area shape="rect" id="Node000040" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="700,771,787,796"/>
+<area shape="poly" id="edge38_Node000001_Node000040" title=" " alt="" coords="152,648,445,717,687,769,686,774,443,722,151,653"/>
+<area shape="rect" id="Node000068" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="667,869,820,895"/>
+<area shape="poly" id="edge39_Node000001_Node000068" title=" " alt="" coords="115,649,165,691,243,748,340,807,392,833,445,854,497,868,552,877,653,883,653,888,551,882,496,873,443,859,390,838,337,812,240,753,162,695,111,653"/>
+<area shape="rect" id="Node000069" href="$api_8c.html#a460f3f181a121f95a380c7768036f825" title="Hand the framebuffer to a userspace mmap&#45;er (typically Doom)." alt="" coords="251,141,382,167"/>
+<area shape="poly" id="edge36_Node000001_Node000069" title=" " alt="" coords="102,624,154,497,235,313,300,178,305,180,240,315,159,499,106,626"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="883,255,957,280"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="539,154,587,121,618,105,651,93,703,78,747,69,789,72,811,80,836,93,854,107,870,124,893,164,909,205,917,240,912,242,904,207,889,166,866,128,851,111,833,98,809,85,788,77,747,74,705,83,653,98,620,110,590,126,542,158"/>
+<area shape="rect" id="Node000025" href="$caret_8c.html#ae19ecefda194f357460e6a4f5bb4d456" title="Forget the tracker without repainting." alt="" coords="673,205,814,231"/>
+<area shape="poly" id="edge4_Node000002_Node000025" title=" " alt="" coords="582,179,673,200,672,205,581,184"/>
+<area shape="rect" id="Node000026" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="696,255,791,280"/>
+<area shape="poly" id="edge5_Node000002_Node000026" title=" " alt="" coords="545,179,593,210,653,241,684,252,682,257,651,246,590,214,542,184"/>
+<area shape="rect" id="Node000015" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html#af20729b3f28f794e0ac0570ac8ef9c9d" title="32&#45;bit splat using rep stosl. Inlined across every TU that touches pixels because the call overhead d..." alt="" coords="716,107,771,132"/>
+<area shape="poly" id="edge7_Node000002_Node000015" title=" " alt="" coords="581,153,702,126,703,131,582,159"/>
+<area shape="rect" id="Node000027" href="$fb__console_2mouse_8c.html#ae5f0507a92c6c100661c22cd379e2caa" title="Forget the painted&#45;at position without erasing pixels. Used by paths that are about to repaint the wh..." alt="" coords="669,5,818,31"/>
+<area shape="poly" id="edge8_Node000002_Node000027" title=" " alt="" coords="536,154,593,97,651,48,681,33,683,38,653,52,597,101,539,158"/>
+<area shape="rect" id="Node000028" href="$scrollback_8c.html#af25555e5a162a563860a3d8aab81343e" title="Forget pending scrolls without flushing them. Used by paths that are about to repaint the entire grid..." alt="" coords="652,156,835,181"/>
+<area shape="poly" id="edge9_Node000002_Node000028" title=" " alt="" coords="598,166,638,166,638,171,598,171"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="1005,255,1115,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="957,265,992,265,992,270,957,270"/>
+<area shape="poly" id="edge6_Node000026_Node000003" title=" " alt="" coords="791,265,870,265,870,270,791,270"/>
+<area shape="rect" id="Node000030" href="$atlas__install_8c.html#a54262a79f9deda2b5141bea67af7ce4f" title="Mirror the user&#45;side atlas into kernel&#45;owned buffers and publish every field of meta into fb_ctx...." alt="" coords="444,681,604,707"/>
+<area shape="poly" id="edge11_Node000029_Node000030" title=" " alt="" coords="365,648,464,675,462,680,364,653"/>
+<area shape="rect" id="Node000056" href="$atlas__install_8c.html#a71d659ad29efcff918c1d53668fe4bfc" title="Reflow the cell grid when the new atlas&#39;s cell size differs from the live one." alt="" coords="445,541,603,567"/>
+<area shape="poly" id="edge15_Node000029_Node000056" title=" " alt="" coords="348,623,478,570,480,574,350,628"/>
+<area shape="rect" id="Node000062" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="453,273,595,313"/>
+<area shape="poly" id="edge27_Node000029_Node000062" title=" " alt="" coords="323,624,502,323,506,326,328,627"/>
+<area shape="rect" id="Node000066" href="$atlas__install_8c.html#aad80a470b407d9bcef3f961c50f593f2" title="Validate meta and the user buffers it points at." alt="" coords="447,819,601,844"/>
+<area shape="poly" id="edge33_Node000029_Node000066" title=" " alt="" coords="333,649,501,807,497,811,330,653"/>
+<area shape="rect" id="Node000031" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="892,589,948,615"/>
+<area shape="poly" id="edge12_Node000030_Node000031" title=" " alt="" coords="571,704,626,715,694,722,765,718,800,710,833,698,856,684,875,665,904,625,908,628,879,669,859,688,836,703,802,716,766,723,693,727,625,720,570,709"/>
+<area shape="rect" id="Node000041" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="883,512,957,537"/>
+<area shape="poly" id="edge13_Node000030_Node000041" title=" " alt="" coords="604,690,735,680,793,669,833,654,851,638,861,621,868,601,880,577,900,548,904,550,885,579,873,603,866,623,856,642,836,659,795,674,735,685,604,695"/>
+<area shape="poly" id="edge14_Node000030_Node000040" title=" " alt="" coords="553,704,653,749,692,764,691,769,651,754,551,709"/>
+<area shape="rect" id="Node000057" href="$atlas__install_8c.html#a45db6d74b02b3bdec3631033f7bd5dc6" title="Bg&#45;fill the whole framebuffer (margins included) at the current default bg colour." alt="" coords="664,505,823,545"/>
+<area shape="poly" id="edge16_Node000056_Node000057" title=" " alt="" coords="603,541,650,534,651,540,604,546"/>
+<area shape="rect" id="Node000058" href="$atlas__install_8c.html#a3f77609d8b2cc8f3771672dbc3c7b840" title="Compute the new column/row counts that fit new_cell_w/h pixels inside the framebuffer with FB_CONSOLE..." alt="" coords="668,569,819,595"/>
+<area shape="poly" id="edge17_Node000056_Node000058" title=" " alt="" coords="604,561,655,568,654,573,603,567"/>
+<area shape="rect" id="Node000059" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="682,619,805,644"/>
+<area shape="poly" id="edge18_Node000056_Node000059" title=" " alt="" coords="554,564,653,605,677,612,676,618,651,610,552,569"/>
+<area shape="rect" id="Node000060" href="$scrollback_8c.html#ad9b94f482326d916380acf246bc7d759" title="(Re)allocate the scrollback ring for cols columns; existing contents are dropped (cell coordinates do..." alt="" coords="668,455,819,480"/>
+<area shape="poly" id="edge21_Node000056_Node000060" title=" " alt="" coords="547,539,595,515,651,490,676,482,678,487,653,495,597,520,550,544"/>
+<area shape="rect" id="Node000061" href="$atlas__install_8c.html#a57284827ed88c70143141190e87f3a91" title="Allocate a fresh empty grid sized cols x rows and replace fb_ctx.cells with it." alt="" coords="667,405,819,431"/>
+<area shape="poly" id="edge24_Node000056_Node000061" title=" " alt="" coords="535,539,582,491,615,464,651,441,669,433,671,438,653,446,618,469,585,495,538,543"/>
+<area shape="poly" id="edge19_Node000059_Node000031" title=" " alt="" coords="805,619,878,606,879,611,805,624"/>
+<area shape="poly" id="edge20_Node000059_Node000041" title=" " alt="" coords="804,617,833,605,870,577,899,546,903,550,874,581,836,610,806,622"/>
+<area shape="poly" id="edge22_Node000060_Node000031" title=" " alt="" coords="811,478,836,491,865,525,904,577,899,580,861,528,833,495,808,482"/>
+<area shape="poly" id="edge23_Node000060_Node000041" title=" " alt="" coords="794,478,836,490,876,505,874,510,834,495,792,483"/>
+<area shape="poly" id="edge25_Node000061_Node000031" title=" " alt="" coords="816,428,836,441,858,467,866,492,872,518,885,549,903,577,899,580,880,551,867,520,861,493,853,469,833,445,813,433"/>
+<area shape="poly" id="edge26_Node000061_Node000041" title=" " alt="" coords="807,428,836,441,873,469,902,499,898,503,870,473,833,446,805,433"/>
+<area shape="poly" id="edge28_Node000062_Node000003" title=" " alt="" coords="596,296,708,299,772,297,834,290,871,282,872,287,835,295,772,302,708,304,596,301"/>
+<area shape="poly" id="edge29_Node000062_Node000025" title=" " alt="" coords="573,270,651,241,680,232,681,237,653,246,575,275"/>
+<area shape="poly" id="edge30_Node000062_Node000026" title=" " alt="" coords="595,282,682,272,683,277,596,287"/>
+<area shape="poly" id="edge32_Node000062_Node000028" title=" " alt="" coords="544,270,591,231,651,192,670,183,672,188,653,196,594,235,548,274"/>
+<area shape="rect" id="Node000063" href="$proc_8c.html#aa22e3da99e1e9e37ab34f672214545cb" title="Wake every process so TUIs re&#45;query TIOCGWINSZ after a reflow. Defined in proc/signal...." alt="" coords="660,356,827,381"/>
+<area shape="poly" id="edge31_Node000062_Node000063" title=" " alt="" coords="584,310,693,349,692,354,582,315"/>
+<area shape="rect" id="Node000067" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a80010209c461f64d700230b38fc907dd" title="Reject a userspace atlas descriptor whose fields would misbehave inside the renderer." alt="" coords="668,820,819,845"/>
+<area shape="poly" id="edge34_Node000066_Node000067" title=" " alt="" coords="602,829,654,829,654,835,602,834"/>
+<area shape="poly" id="edge35_Node000066_Node000068" title=" " alt="" coords="581,842,675,864,674,869,579,847"/>
+<area shape="poly" id="edge37_Node000069_Node000027" title=" " alt="" coords="357,139,689,32,690,37,358,144"/>
+</map>

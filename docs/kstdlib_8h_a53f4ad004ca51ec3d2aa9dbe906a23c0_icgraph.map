@@ -1,0 +1,24 @@
+<map id="kmemset" name="kmemset">
+<area shape="rect" id="Node000001" title="Set memory to value." alt="" coords="628,104,712,129"/>
+<area shape="rect" id="Node000002" href="$compiler__abi_8c.html#a1aeb4017ca34da59589e381fd2d963ee" title=" " alt="" coords="471,55,547,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="614,102,547,81,548,76,615,97"/>
+<area shape="rect" id="Node000009" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="462,104,557,129"/>
+<area shape="poly" id="edge5_Node000001_Node000009" title=" " alt="" coords="614,119,557,119,557,114,614,114"/>
+<area shape="rect" id="Node000011" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="439,153,580,179"/>
+<area shape="poly" id="edge7_Node000001_Node000011" title=" " alt="" coords="616,136,553,156,551,151,614,131"/>
+<area shape="rect" id="Node000003" href="$ls_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="260,5,315,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="458,59,315,27,316,21,459,54"/>
+<area shape="rect" id="Node000004" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="235,55,340,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="458,70,340,70,340,65,458,65"/>
+<area shape="rect" id="Node000005" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="23,55,118,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="220,70,118,70,118,65,220,65"/>
+<area shape="rect" id="Node000010" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="246,104,329,129"/>
+<area shape="poly" id="edge6_Node000009_Node000010" title=" " alt="" coords="448,119,329,119,329,114,448,114"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a81d1fb9846695e15207aab71a96d8ff9" title="Scroll the view lines rows toward the live tail." alt="" coords="184,153,391,179"/>
+<area shape="poly" id="edge8_Node000011_Node000012" title=" " alt="" coords="425,169,391,169,391,163,425,163"/>
+<area shape="rect" id="Node000022" href="$scrollback_8c.html#a8a8b369ad40c10e99dc55ebc36ced5b9" title="Scroll the view lines rows back into history." alt="" coords="193,203,381,228"/>
+<area shape="poly" id="edge10_Node000011_Node000022" title=" " alt="" coords="439,184,346,205,345,200,438,179"/>
+<area shape="rect" id="Node000013" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="5,177,136,203"/>
+<area shape="poly" id="edge9_Node000012_Node000013" title=" " alt="" coords="170,182,136,185,136,180,170,176"/>
+<area shape="poly" id="edge11_Node000022_Node000013" title=" " alt="" coords="179,205,136,200,136,195,180,200"/>
+</map>

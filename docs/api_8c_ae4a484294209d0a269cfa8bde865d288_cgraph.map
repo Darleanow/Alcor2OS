@@ -1,0 +1,5 @@
+<map id="fb_console_init_ctx" name="fb_console_init_ctx">
+<area shape="rect" id="Node000001" title="Populate fb_ctx with the geometry from Limine + the boot&#45;time defaults (CP437 cell size,..." alt="" coords="5,5,152,31"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a4a9b6ef5ee0db021ca9b257eb0a006a0" title="Translate bits&#45;per&#45;pixel to bytes&#45;per&#45;pixel, clamped to [2, 4]." alt="" coords="200,5,351,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,15,186,15,186,21,152,21"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="user/sdk/vega/include/vega/vega.h" name="user/sdk/vega/include/vega/vega.h">
+<area shape="rect" id="Node000001" title="vega — Alcor2&#39;s shell scripting language. Public entry points." alt="" coords="609,5,773,45"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2shell_2main_8c.html" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="5,101,173,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="596,40,406,64,186,96,145,103,144,98,185,91,405,59,595,35"/>
+<area shape="rect" id="Node000003" href="$builtins_8c.html" title=" " alt="" coords="198,93,378,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="595,50,377,96,376,91,594,44"/>
+<area shape="rect" id="Node000004" href="$vconf_8c.html" title="Source /home/.vconf (or any path) as a vega script on startup." alt="" coords="402,93,582,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="636,53,537,96,534,91,633,48"/>
+<area shape="rect" id="Node000005" href="$user_2apps_2vega_2main_8c.html" title="Standalone vega interpreter CLI." alt="" coords="606,101,775,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="693,59,693,100,688,100,688,59"/>
+<area shape="rect" id="Node000006" href="$exec_8c.html" title="Walks vega AST nodes and runs them." alt="" coords="799,101,958,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="745,49,855,98,853,103,743,53"/>
+<area shape="rect" id="Node000007" href="$expand_8c.html" title="vega expansion: $&#45;syntax in words, special vars, user vars." alt="" coords="983,101,1159,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="787,46,1020,98,1019,103,786,51"/>
+<area shape="rect" id="Node000008" href="$vega_8c.html" title="vega top&#45;level: host registration + lex → parse → execute → free." alt="" coords="1183,101,1343,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="787,36,965,59,1171,91,1210,98,1209,103,1170,96,965,64,786,41"/>
+</map>

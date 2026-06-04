@@ -1,0 +1,11 @@
+<map id="dir_block_try_insert" name="dir_block_try_insert">
+<area shape="rect" id="Node000001" title="Try to insert a new dirent into a single block by splicing slack." alt="" coords="595,31,745,56"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a636acc589597366c76316781d88c4505" title="Try to splice the new entry into any existing block&#39;s slack." alt="" coords="407,23,547,63"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="581,46,547,46,547,41,581,41"/>
+<area shape="rect" id="Node000003" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="248,31,359,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="393,46,359,46,359,41,393,41"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#a3a6ddc6334a7a3057601d6a7195bbfba" title="Allocate a fresh inode, link it into parent_inode under filename, and persist the metadata." alt="" coords="5,5,200,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="234,37,200,33,201,28,235,32"/>
+<area shape="rect" id="Node000007" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="6,55,199,80"/>
+<area shape="poly" id="edge4_Node000003_Node000007" title=" " alt="" coords="235,54,200,58,199,53,234,49"/>
+</map>

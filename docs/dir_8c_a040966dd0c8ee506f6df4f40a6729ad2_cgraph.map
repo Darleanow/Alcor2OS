@@ -1,0 +1,29 @@
+<map id="mkdir_validate_target" name="mkdir_validate_target">
+<area shape="rect" id="Node000001" title="Validate the path&#45;target / split&#45;name / resolve&#45;parent triple." alt="" coords="5,185,172,211"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#a3b165d99d5585b3187f4caf5c427723a" title="Split a path into its parent and final component." alt="" coords="617,235,704,260"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,202,604,240,604,245,172,208"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="220,160,327,185"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="172,184,206,179,206,184,173,189"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="939,136,1025,161"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="704,247,792,244,842,236,890,221,928,198,958,170,962,174,931,202,892,226,843,241,793,249,704,253"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="810,185,877,211"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="703,233,796,208,797,213,705,238"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="804,136,883,161"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="703,238,747,221,761,210,771,198,780,185,794,172,802,166,805,171,798,176,784,189,775,201,765,213,749,225,705,243"/>
+<area shape="rect" id="Node000007" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="375,136,525,161"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="327,163,361,158,362,163,327,168"/>
+<area shape="poly" id="edge11_Node000007_Node000005" title=" " alt="" coords="504,133,573,122,661,115,748,122,791,130,790,136,748,127,661,121,574,127,505,138"/>
+<area shape="rect" id="Node000008" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="583,185,739,211"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="479,159,570,183,568,188,478,164"/>
+<area shape="rect" id="Node000043" href="$path_8c.html#aafde89a77c03337dd6c31bf0fb23a814" title="Advance *p past one path component into component." alt="" coords="573,136,748,161"/>
+<area shape="poly" id="edge12_Node000007_Node000043" title=" " alt="" coords="526,146,560,146,560,151,526,151"/>
+<area shape="rect" id="Node000044" href="$inode_8c.html#aba1cf116b95090ec043930c6efaa8dce" title="Load on&#45;disk inode ino into the caller&#45;provided inode." alt="" coords="796,35,891,60"/>
+<area shape="poly" id="edge13_Node000007_Node000044" title=" " alt="" coords="456,134,474,108,499,76,533,44,572,19,601,10,631,5,692,5,749,14,797,28,796,33,748,19,692,10,632,10,602,15,574,24,536,48,503,79,478,111,461,137"/>
+<area shape="rect" id="Node000045" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="579,35,743,60"/>
+<area shape="poly" id="edge15_Node000007_Node000045" title=" " alt="" coords="470,133,516,106,572,77,607,62,609,67,574,82,519,111,473,138"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="739,195,796,195,796,201,739,201"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="708,183,790,160,791,165,709,188"/>
+<area shape="poly" id="edge10_Node000008_Node000007" title=" " alt="" coords="632,188,538,163,540,158,633,183"/>
+<area shape="poly" id="edge14_Node000044_Node000003" title=" " alt="" coords="863,58,954,126,951,130,860,62"/>
+<area shape="poly" id="edge16_Node000045_Node000044" title=" " alt="" coords="743,45,782,45,782,50,743,50"/>
+</map>

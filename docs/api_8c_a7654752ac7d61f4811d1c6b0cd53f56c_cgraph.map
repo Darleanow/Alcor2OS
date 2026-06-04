@@ -1,0 +1,40 @@
+<map id="fb_console_write_end" name="fb_console_write_end">
+<area shape="rect" id="Node000001" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="5,129,168,155"/>
+<area shape="rect" id="Node000002" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="246,31,341,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,127,252,60,254,65,115,132"/>
+<area shape="rect" id="Node000025" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="245,129,341,155"/>
+<area shape="poly" id="edge4_Node000001_Node000025" title=" " alt="" coords="168,139,232,139,232,145,168,145"/>
+<area shape="rect" id="Node000056" href="$scrollback_8c.html#a5eb39721ae7c9e68a54d078fc0fa6033" title="Drain the pending&#45;scroll counter: copies pixels up in one MMIO blit and marks the freshly exposed row..." alt="" coords="216,276,371,301"/>
+<area shape="poly" id="edge14_Node000001_Node000056" title=" " alt="" coords="107,153,265,266,262,270,104,157"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="693,5,767,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,38,679,18,679,24,341,43"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="856,5,965,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="767,15,842,15,842,21,767,21"/>
+<area shape="rect" id="Node000026" href="$flush_8c.html#a2dabde3cffa3ed745cdc5c88d3951ce9" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="445,55,578,80"/>
+<area shape="poly" id="edge5_Node000025_Node000026" title=" " alt="" coords="322,127,418,89,443,81,445,86,420,94,324,132"/>
+<area shape="rect" id="Node000027" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="450,104,573,129"/>
+<area shape="poly" id="edge7_Node000025_Node000027" title=" " alt="" coords="341,134,436,123,437,128,342,139"/>
+<area shape="rect" id="Node000053" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="449,153,573,179"/>
+<area shape="poly" id="edge10_Node000025_Node000053" title=" " alt="" coords="342,145,436,155,435,160,341,150"/>
+<area shape="rect" id="Node000055" href="$flush_8c.html#a78b9c1602b135454913114b75737f27f" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="452,203,571,228"/>
+<area shape="poly" id="edge12_Node000025_Node000055" title=" " alt="" coords="326,152,420,187,448,196,447,201,418,193,324,157"/>
+<area shape="poly" id="edge6_Node000026_Node000003" title=" " alt="" coords="568,52,679,27,680,32,569,57"/>
+<area shape="rect" id="Node000028" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="702,55,758,80"/>
+<area shape="poly" id="edge8_Node000027_Node000028" title=" " alt="" coords="568,101,688,74,689,79,569,107"/>
+<area shape="rect" id="Node000038" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="693,104,767,129"/>
+<area shape="poly" id="edge9_Node000027_Node000038" title=" " alt="" coords="573,114,679,114,679,119,573,119"/>
+<area shape="rect" id="Node000054" href="$flush_8c.html#a5947c6def1d20a4175990821e4f4a74c" title="Paint one scanline of one dirty cell using its prepared scratch." alt="" coords="653,153,807,179"/>
+<area shape="poly" id="edge11_Node000053_Node000054" title=" " alt="" coords="573,163,639,163,639,169,573,169"/>
+<area shape="rect" id="Node000009" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a5a024efc6ccd9545de342ac39a77ef3f" title="Resolve to the bold or italic sub&#45;atlas slot when SGR asks for one." alt="" coords="663,203,797,228"/>
+<area shape="poly" id="edge13_Node000055_Node000009" title=" " alt="" coords="571,213,649,213,649,218,571,218"/>
+<area shape="rect" id="Node000057" href="$scrollback_8c.html#a0ea5237a11f029affd80c362f8b6d665" title="Drain the pending&#45;scroll counter in one VRAM copy plus dirty marks." alt="" coords="440,252,583,277"/>
+<area shape="poly" id="edge15_Node000056_Node000057" title=" " alt="" coords="371,277,426,271,426,277,371,283"/>
+<area shape="rect" id="Node000058" href="$scrollback_8c.html#ad8079ac6535b6104193f726ba136caeb" title="Slow&#45;path scroll for non&#45;32&#45;bpp framebuffers: mark every cell dirty and let flush_batch re&#45;blit them." alt="" coords="445,301,577,327"/>
+<area shape="poly" id="edge17_Node000056_Node000058" title=" " alt="" coords="372,295,432,302,431,307,371,300"/>
+<area shape="rect" id="Node000059" href="$fb__console_2mouse_8c.html#a677e4373c35c0f708dfa5c99ce5051ba" title="Erase the software mouse cursor if it is painted, so the scrollback pixel&#45;move does not drag a stale ..." alt="" coords="419,351,604,391"/>
+<area shape="poly" id="edge18_Node000056_Node000059" title=" " alt="" coords="326,299,420,337,439,344,438,349,418,342,324,304"/>
+<area shape="rect" id="Node000037" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="687,252,773,277"/>
+<area shape="poly" id="edge16_Node000057_Node000037" title=" " alt="" coords="583,262,673,262,673,267,583,267"/>
+<area shape="rect" id="Node000060" href="$fb__console_2mouse_8c.html#a05afd0ea2119945dc3b079c2b5b99a66" title=" " alt="" coords="652,359,808,384"/>
+<area shape="poly" id="edge19_Node000059_Node000060" title=" " alt="" coords="604,369,638,369,638,374,604,374"/>
+</map>

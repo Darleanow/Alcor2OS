@@ -1,0 +1,15 @@
+<map id="scrollback_push_top_row" name="scrollback_push_top_row">
+<area shape="rect" id="Node000001" title="Copy the live top row into the scrollback ring before it gets shifted off." alt="" coords="603,29,788,55"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a20a43904baf76078b5399667db4f67d3" title="Move the top row off the grid into the scrollback ring and shift every remaining row up...." alt="" coords="467,29,555,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="589,45,555,45,555,39,589,39"/>
+<area shape="rect" id="Node000003" href="$ansi_8c.html#a18c6ecf4c578965fdd84b8b25849cb88" title="Apply one C0 control character to the cursor/grid state." alt="" coords="144,5,263,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="453,40,263,25,263,20,453,35"/>
+<area shape="rect" id="Node000014" href="$flush_8c.html#a29200e8da98ef3a5bb44b516480c7ee7" title="Wrap the cursor to the next line, scrolling the grid when at the bottom." alt="" coords="317,55,419,80"/>
+<area shape="poly" id="edge5_Node000002_Node000014" title=" " alt="" coords="454,55,419,61,418,56,453,49"/>
+<area shape="rect" id="Node000004" href="$ansi_8c.html#a95caeb62a209e7d835114c4b18ef080b" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="5,31,89,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="131,32,90,39,89,34,130,27"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="74,20,66,12,47,9,31,11,23,16,21,22,26,29,21,32,16,22,19,13,30,6,47,4,69,7,78,16"/>
+<area shape="rect" id="Node000015" href="$flush_8c.html#a44a71e48febb7915140c21fe215037ec" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="137,55,269,80"/>
+<area shape="poly" id="edge6_Node000014_Node000015" title=" " alt="" coords="304,70,269,70,269,65,304,65"/>
+<area shape="poly" id="edge7_Node000015_Node000004" title=" " alt="" coords="123,58,89,52,90,47,124,52"/>
+</map>

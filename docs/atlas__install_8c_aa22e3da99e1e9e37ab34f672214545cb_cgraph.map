@@ -1,0 +1,7 @@
+<map id="proc_signal_broadcast" name="proc_signal_broadcast">
+<area shape="rect" id="Node000001" title="Wake every process so TUIs re&#45;query TIOCGWINSZ after a reflow. Defined in proc/signal...." alt="" coords="5,5,172,31"/>
+<area shape="rect" id="Node000002" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="220,5,316,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,15,206,15,206,21,172,21"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="364,5,443,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,15,351,15,351,21,316,21"/>
+</map>

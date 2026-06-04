@@ -1,0 +1,9 @@
+<map id="path_has_suffix" name="path_has_suffix">
+<area shape="rect" id="Node000001" title="Return true when path ends with suffix (case&#45;sensitive)." alt="" coords="5,31,129,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="179,5,242,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,30,165,23,166,28,130,35"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="177,55,244,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="130,51,164,57,163,62,129,56"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="292,5,367,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="242,15,278,15,278,21,242,21"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="ata_irq_primary" name="ata_irq_primary">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,52,131,78"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#abde118a713492fc92ec9f7b6258933db" title="ATA IRQ handler — reading status clears the device&#39;s IRQ line." alt="" coords="179,52,245,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,62,165,62,165,68,131,68"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="432,51,475,76"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="226,50,256,29,293,12,339,3,385,12,410,24,431,39,428,44,407,28,383,17,339,8,294,17,258,34,230,54"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="313,27,364,52"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="245,56,299,45,300,50,246,61"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="293,76,384,102"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="246,69,281,75,280,81,245,74"/>
+<area shape="rect" id="Node000006" href="$ata_8c.html#a2e42765bdca6c8d40cafe008a9c35e7e" title=" " alt="" coords="299,126,378,151"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="236,75,295,111,304,116,302,121,292,115,233,80"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="362,123,383,111,423,83,426,87,385,115,364,128"/>
+</map>

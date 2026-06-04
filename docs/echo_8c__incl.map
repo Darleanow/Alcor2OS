@@ -1,0 +1,10 @@
+<map id="user/bin/echo.c" name="user/bin/echo.c">
+<area shape="rect" id="Node000001" title="Print arguments to standard output, separated by spaces." alt="" coords="35,5,155,31"/>
+<area shape="rect" id="Node000002" href="$grendizer_8h.html" title="Single&#45;header CLI parsing library for Alcor2 userland." alt="" coords="5,79,100,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,32,69,68,64,66,86,30"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="105,152,171,177"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="101,30,133,138,128,139,96,32"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="6,152,81,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="54,105,49,139,44,138,48,104"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="68,102,115,141,112,145,65,106"/>
+</map>

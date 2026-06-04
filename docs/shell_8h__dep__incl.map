@@ -1,0 +1,23 @@
+<map id="user/apps/shell/include/shell/shell.h" name="user/apps/shell/include/shell/shell.h">
+<area shape="rect" id="Node000001" title="Shell&#45;internal helpers (sh_*) used by main.c, builtins.c, and the shell&#39;s platform layer...." alt="" coords="923,5,1093,45"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2shell_2main_8c.html" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="5,101,173,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="909,34,587,54,386,72,186,96,143,103,142,98,185,91,386,67,586,49,909,28"/>
+<area shape="rect" id="Node000003" href="$builtins_8c.html" title=" " alt="" coords="198,93,378,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="909,38,672,61,390,96,378,98,378,92,389,91,671,56,909,32"/>
+<area shape="rect" id="Node000004" href="$complete_8c.html" title="Tab&#45;completion engine for the vega shell." alt="" coords="402,93,582,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="909,45,594,96,582,98,582,93,593,91,908,39"/>
+<area shape="rect" id="Node000005" href="$edit_8c.html" title="Single&#45;line interactive editor: cursor motion, history navigation, tab completion display,..." alt="" coords="606,93,786,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="927,52,765,96,764,91,926,46"/>
+<area shape="rect" id="Node000006" href="$history_8c.html" title="Bounded history ring for the shell&#39;s line editor." alt="" coords="810,93,990,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="975,56,926,95,922,91,972,52"/>
+<area shape="rect" id="Node000007" href="$io_8c.html" title="Shell I/O helpers: character output and string writing." alt="" coords="1014,101,1221,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1045,52,1104,98,1101,102,1041,56"/>
+<area shape="rect" id="Node000008" href="$apps_2shell_2platform_2parse_8c.html" title="Multi&#45;line statement accumulator: brace/quote/heredoc&#45;aware test for whether the buffer is a complete..." alt="" coords="1245,93,1425,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1093,46,1264,91,1262,96,1092,51"/>
+<area shape="rect" id="Node000009" href="$prompt_8c.html" title="Shell prompt rendering: decorative header (cwd) and one&#45;line input prompt with rounded box&#45;drawing ac..." alt="" coords="1449,93,1629,133"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1108,39,1438,91,1449,93,1448,98,1437,96,1107,44"/>
+<area shape="rect" id="Node000010" href="$sys_8c.html" title="Thin syscall wrappers that back the shell platform interface." alt="" coords="1653,93,1833,133"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1108,32,1351,55,1642,91,1653,92,1652,98,1641,96,1350,61,1107,37"/>
+<area shape="rect" id="Node000011" href="$vconf_8c.html" title="Source /home/.vconf (or any path) as a vega script on startup." alt="" coords="1857,93,2037,133"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1107,29,1436,50,1640,67,1846,91,1857,92,1856,97,1845,96,1640,73,1435,55,1107,34"/>
+</map>

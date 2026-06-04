@@ -1,0 +1,16 @@
+<map id="scrollback_drop_pending" name="scrollback_drop_pending">
+<area shape="rect" id="Node000001" title="Forget pending scrolls without flushing them." alt="" coords="757,32,940,57"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="365,5,513,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="743,41,514,25,514,20,744,35"/>
+<area shape="rect" id="Node000006" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="567,53,709,93"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="744,61,710,66,709,61,744,56"/>
+<area shape="rect" id="Node000003" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="128,32,312,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,31,313,36,312,31,352,26"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html#a0041e2d9dbe8ba13306a473bc4126402" title="ioctl on /dev/fb — forwards FB_CONSOLE_YIELD, FB_CONSOLE_RECLAIM, and FB_CONSOLE_SET_ATLAS." alt="" coords="7,7,78,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="117,33,78,27,79,22,118,27"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="5,56,80,81"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="115,62,80,66,80,61,114,56"/>
+<area shape="rect" id="Node000007" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="360,56,519,81"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="553,74,519,73,519,68,553,68"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="346,61,312,57,313,52,347,56"/>
+</map>

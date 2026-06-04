@@ -1,0 +1,29 @@
+<map id="sys_exit_group" name="sys_exit_group">
+<area shape="rect" id="Node000001" title="Terminate all threads in the group — equivalent to sys_exit here." alt="" coords="5,228,125,253"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status." alt="" coords="173,228,249,253"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,238,159,238,159,243,125,243"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="297,228,380,253"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,238,283,238,283,243,249,243"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="464,5,573,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="339,227,347,190,362,140,388,86,405,61,426,40,449,26,452,31,430,44,409,65,392,89,367,142,352,192,344,228"/>
+<area shape="rect" id="Node000016" href="$cpu_8c.html#a914a92c64f247056c5432b0caf50f547" title="Halt the CPU indefinitely." alt="" coords="480,55,557,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="341,227,352,198,369,161,394,122,426,89,445,78,466,71,467,76,447,83,430,93,398,126,374,163,357,200,346,228"/>
+<area shape="rect" id="Node000018" href="$kbd__layout_8c.html#a00b1c813a1bcb350df46f9d55810696a" title="Toggle \x00&lt;char&gt; key&#45;release sentinels." alt="" coords="429,104,608,129"/>
+<area shape="poly" id="edge5_Node000003_Node000018" title=" " alt="" coords="346,226,377,183,400,159,427,138,438,132,441,137,429,143,404,163,381,186,350,229"/>
+<area shape="rect" id="Node000019" href="$mouse_8c.html#abf17473a267e0d4c04fe3d6e89835775" title="Enable or disable relative mode (cursor pinned to centre, raw deltas passed through)...." alt="" coords="443,153,594,179"/>
+<area shape="poly" id="edge6_Node000003_Node000019" title=" " alt="" coords="357,226,389,206,427,188,447,180,449,185,429,192,392,211,360,230"/>
+<area shape="rect" id="Node000021" href="$pit_8c.html#a3337be496f83d39022cfe60700673475" title="Clear all fast&#45;rate votes; called on process exit." alt="" coords="463,203,574,228"/>
+<area shape="poly" id="edge7_Node000003_Node000021" title=" " alt="" coords="380,232,449,222,450,228,381,238"/>
+<area shape="rect" id="Node000023" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="657,353,736,379"/>
+<area shape="poly" id="edge8_Node000003_Node000023" title=" " alt="" coords="381,239,429,243,488,251,550,266,611,289,648,313,677,341,673,345,644,318,608,294,549,271,487,257,428,248,380,244"/>
+<area shape="rect" id="Node000024" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="461,304,576,329"/>
+<area shape="poly" id="edge9_Node000003_Node000024" title=" " alt="" coords="365,251,429,282,467,297,465,302,427,287,362,256"/>
+<area shape="rect" id="Node000032" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="471,353,567,379"/>
+<area shape="poly" id="edge10_Node000003_Node000032" title=" " alt="" coords="350,252,381,295,404,318,429,338,458,352,456,357,427,343,400,322,377,298,346,255"/>
+<area shape="rect" id="Node000033" href="$proc_8c.html#a605acc71b74a4015f96530987df63a80" title=" " alt="" coords="428,403,609,428"/>
+<area shape="poly" id="edge12_Node000003_Node000033" title=" " alt="" coords="346,253,374,318,398,356,430,388,440,395,437,399,426,392,394,359,369,320,341,255"/>
+<area shape="rect" id="Node000034" href="$vfs_8c.html#a54d444c54dfa18b4b8a15ea152b8d300" title="Release all file descriptors held by an exiting process." alt="" coords="439,452,598,477"/>
+<area shape="poly" id="edge14_Node000003_Node000034" title=" " alt="" coords="344,253,352,290,367,339,393,392,410,416,430,437,438,443,435,448,426,441,405,420,388,395,362,341,347,291,339,254"/>
+<area shape="poly" id="edge11_Node000032_Node000023" title=" " alt="" coords="567,363,644,363,644,369,567,369"/>
+<area shape="poly" id="edge13_Node000033_Node000023" title=" " alt="" coords="564,400,643,378,645,383,566,405"/>
+</map>

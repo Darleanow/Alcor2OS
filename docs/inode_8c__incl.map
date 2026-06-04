@@ -1,0 +1,33 @@
+<map id="src/fs/ext2/inode.c" name="src/fs/ext2/inode.c">
+<area shape="rect" id="Node000001" title="On&#45;disk inode read + write." alt="" coords="135,5,276,31"/>
+<area shape="rect" id="Node000002" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="5,79,117,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,33,98,75,96,70,181,28"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="45,152,168,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,33,125,142,120,139,195,30"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="307,299,421,324"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="208,31,211,95,219,136,234,176,257,210,284,241,338,288,334,292,280,245,252,214,230,179,214,138,206,96,202,31"/>
+<area shape="rect" id="Node000008" href="$heap_8h.html" title="Kernel heap allocator." alt="" coords="243,152,383,177"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="216,30,299,139,294,142,212,33"/>
+<area shape="rect" id="Node000009" href="$src_2fs_2ext2_2internal_8h.html" title="Shared state, sizing macros, and private helpers for the ext2 module split." alt="" coords="411,79,544,104"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="250,28,421,73,420,78,248,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="117,176,146,212,166,231,188,248,241,275,295,293,293,298,239,280,185,253,162,235,142,215,113,179"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="220,372,303,397"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="349,326,291,366,288,362,346,322"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="327,372,401,397"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="367,324,367,358,361,358,361,324"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="426,372,497,397"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="381,322,436,361,433,366,378,326"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="320,177,358,285,353,287,315,179"/>
+<area shape="poly" id="edge19_Node000009_Node000004" title=" " alt="" coords="470,106,433,156,392,226,372,286,367,284,387,224,428,153,466,102"/>
+<area shape="rect" id="Node000010" href="$blockdev_8h.html" title="Generic block device interface." alt="" coords="401,225,553,251"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="480,104,480,212,475,212,475,104"/>
+<area shape="rect" id="Node000011" href="$ext2_8h.html" title="ext2 filesystem driver." alt="" coords="517,152,640,177"/>
+<area shape="poly" id="edge13_Node000009_Node000011" title=" " alt="" coords="495,102,552,142,549,146,492,106"/>
+<area shape="rect" id="Node000012" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="628,225,743,251"/>
+<area shape="poly" id="edge18_Node000009_Node000012" title=" " alt="" coords="545,99,602,117,629,131,654,150,674,180,684,211,679,213,669,182,650,154,626,136,600,122,543,104"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="461,253,395,294,392,289,458,248"/>
+<area shape="poly" id="edge17_Node000011_Node000004" title=" " alt="" coords="583,177,583,213,578,234,567,252,539,277,505,293,470,304,435,310,434,305,468,299,503,288,536,272,563,249,573,232,578,213,578,177"/>
+<area shape="poly" id="edge14_Node000011_Node000010" title=" " alt="" coords="564,180,507,219,504,215,561,175"/>
+<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="597,175,658,215,655,220,594,180"/>
+<area shape="poly" id="edge16_Node000012_Node000004" title=" " alt="" coords="634,253,430,298,429,293,633,248"/>
+</map>

@@ -1,0 +1,29 @@
+<map id="read_one_iteration" name="read_one_iteration">
+<area shape="rect" id="Node000001" title="One iteration of the read loop: pick the right path for one block and copy as much as fits." alt="" coords="5,155,149,180"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#a845ca06242d90d0b72a0f50c2d615c95" title="Count how many on&#45;disk blocks following base_block_num are contiguous to it for this inode." alt="" coords="221,105,359,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,152,221,131,222,136,133,157"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="431,55,552,80"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="92,152,137,121,166,104,196,91,253,77,311,68,417,62,417,67,312,73,254,82,198,97,168,109,140,125,96,157"/>
+<area shape="rect" id="Node000037" href="$file_8c.html#a253947ab8dc6030b251e47048526795e" title="Read run consecutive blocks in one device call, copy slice into dst." alt="" coords="227,204,353,229"/>
+<area shape="poly" id="edge8_Node000001_Node000037" title=" " alt="" coords="133,177,222,198,221,203,132,183"/>
+<area shape="rect" id="Node000038" href="$file_8c.html#ad37b55f9af3768427abb5ba1ab29ce2f" title="Read one block, copy a slice of it into dst." alt="" coords="197,155,383,180"/>
+<area shape="poly" id="edge11_Node000001_Node000038" title=" " alt="" coords="150,165,184,165,184,170,150,170"/>
+<area shape="rect" id="Node000039" href="$file_8c.html#a10ca6e8208aa94bf0bfc0ee79713cd84" title="Fill dst with zeros for a sparse&#45;file hole." alt="" coords="217,255,363,280"/>
+<area shape="poly" id="edge14_Node000001_Node000039" title=" " alt="" coords="97,178,142,209,198,240,221,248,219,253,196,244,139,213,94,182"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,103,426,81,428,86,342,108"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#ae0cee49141d18668ec4dd1734d0a3e45" title="Number of u32 block&#45;pointer slots per indirect block." alt="" coords="611,5,728,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="537,52,608,32,610,37,539,57"/>
+<area shape="rect" id="Node000005" href="$blockmap_8c.html#a94ad86b6cd7f847465e1f8d336a02947" title="Read slot slot_idx out of indirect block indirect_block." alt="" coords="600,55,739,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="552,65,586,65,586,70,552,70"/>
+<area shape="rect" id="Node000035" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="787,105,907,131"/>
+<area shape="poly" id="edge5_Node000005_Node000035" title=" " alt="" coords="715,78,789,99,788,104,714,83"/>
+<area shape="rect" id="Node000036" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="955,156,1087,181"/>
+<area shape="poly" id="edge6_Node000035_Node000036" title=" " alt="" coords="892,128,964,149,962,155,890,133"/>
+<area shape="poly" id="edge10_Node000037_Node000036" title=" " alt="" coords="353,210,940,171,941,177,353,215"/>
+<area shape="rect" id="Node000019" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="448,156,535,181"/>
+<area shape="poly" id="edge9_Node000037_Node000019" title=" " alt="" coords="343,201,434,179,435,185,345,207"/>
+<area shape="poly" id="edge13_Node000038_Node000035" title=" " alt="" coords="361,152,430,142,615,126,773,118,773,123,616,131,431,147,361,157"/>
+<area shape="poly" id="edge12_Node000038_Node000019" title=" " alt="" coords="383,165,434,166,434,171,383,171"/>
+<area shape="rect" id="Node000030" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="462,257,521,283"/>
+<area shape="poly" id="edge15_Node000039_Node000030" title=" " alt="" coords="364,266,448,267,448,272,364,271"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="fb_row_at" name="fb_row_at">
+<area shape="rect" id="Node000001" title="Pointer to the start of pixel&#45;x px_x on framebuffer row y in the 32&#45;bpp fast path." alt="" coords="745,24,832,49"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="367,24,496,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="737,22,697,14,628,8,559,14,484,26,483,21,558,8,628,3,698,8,738,17"/>
+<area shape="rect" id="Node000056" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="352,73,511,98"/>
+<area shape="poly" id="edge5_Node000001_Node000056" title=" " alt="" coords="733,55,698,63,601,77,511,84,510,79,600,71,697,58,732,50"/>
+<area shape="rect" id="Node000057" href="$cell_8c.html#ad1ec4964107f67e9686ac7aee48cd5e6" title="Bg&#45;fill every framebuffer row inside the cell at (px_x, px_y)." alt="" coords="559,24,697,49"/>
+<area shape="poly" id="edge7_Node000001_Node000057" title=" " alt="" coords="731,39,697,39,697,34,731,34"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="195,49,304,74"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="353,50,304,57,304,52,352,45"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="39,24,113,49"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="181,54,112,44,113,39,181,49"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="5,73,147,98"/>
+<area shape="poly" id="edge4_Node000003_Node000012" title=" " alt="" coords="181,74,147,79,147,73,181,69"/>
+<area shape="poly" id="edge6_Node000056_Node000003" title=" " alt="" coords="338,76,304,72,305,66,339,71"/>
+<area shape="poly" id="edge8_Node000057_Node000002" title=" " alt="" coords="545,39,497,39,497,34,545,34"/>
+</map>

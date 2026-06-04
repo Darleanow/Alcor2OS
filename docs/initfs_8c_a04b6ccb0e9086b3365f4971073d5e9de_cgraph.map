@@ -1,0 +1,7 @@
+<map id="init_readdir" name="init_readdir">
+<area shape="rect" id="Node000001" title="Yield the index&#39;th entry in the root directory." alt="" coords="5,31,101,56"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#a80562396dba282f389263379a39dfff5" title="Populate a stat buffer from a file node, or fill the directory stub when no node is given." alt="" coords="153,5,224,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,32,139,24,140,30,102,37"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="149,55,228,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="102,49,136,55,135,61,101,54"/>
+</map>

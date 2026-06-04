@@ -1,0 +1,7 @@
+<map id="flush_prep_cell" name="flush_prep_cell">
+<area shape="rect" id="Node000001" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="5,5,124,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a5a024efc6ccd9545de342ac39a77ef3f" title="Resolve to the bold or italic sub&#45;atlas slot when SGR asks for one." alt="" coords="172,5,307,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,15,158,15,158,21,124,21"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#aeae8440c475694814764f9a01f8d82d8" title="Resolve a Unicode codepoint to its slot in the userspace atlas." alt="" coords="355,5,459,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="307,15,341,15,341,21,307,21"/>
+</map>

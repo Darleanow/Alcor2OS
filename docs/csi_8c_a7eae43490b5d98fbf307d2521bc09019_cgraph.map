@@ -1,0 +1,11 @@
+<map id="csi_erase_display" name="csi_erase_display">
+<area shape="rect" id="Node000001" title="CSI J (ED) — erase in display (mode 0/1/2)." alt="" coords="5,31,143,56"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a12726087c8c2716aab2cf78cff0f2a79" title="Parse up to maxn decimal parameters from esc_buf into pv." alt="" coords="191,5,287,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,30,177,25,178,30,144,35"/>
+<area shape="rect" id="Node000003" href="$csi_8c.html#a9418cb606a7f4ed4c8dcd795fed66ec0" title="Blank the inclusive rectangle [(y0, x0), (y1, x1)] using the current SGR fg/bg." alt="" coords="193,55,284,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,51,180,56,179,61,143,56"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="335,55,408,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="284,65,321,65,321,70,284,70"/>
+<area shape="rect" id="Node000005" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="456,55,565,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="408,65,442,65,442,70,408,70"/>
+</map>

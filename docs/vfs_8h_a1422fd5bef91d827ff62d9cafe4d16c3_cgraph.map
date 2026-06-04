@@ -1,0 +1,7 @@
+<map id="vfs_set_flags" name="vfs_set_flags">
+<area shape="rect" id="Node000001" title="Overwrite the open flags for fd (used by fcntl F_SETFL)." alt="" coords="5,5,112,31"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="160,5,239,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,15,146,15,146,21,112,21"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="287,5,389,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="239,15,273,15,273,21,239,21"/>
+</map>

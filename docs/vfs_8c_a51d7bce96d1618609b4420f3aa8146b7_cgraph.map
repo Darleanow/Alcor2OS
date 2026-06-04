@@ -1,0 +1,17 @@
+<map id="vfs_make_absolute" name="vfs_make_absolute">
+<area shape="rect" id="Node000001" title="Build an absolute, normalised path in out." alt="" coords="5,107,153,132"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="223,5,294,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,104,200,48,222,35,225,40,203,52,104,109"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="374,31,441,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="135,104,360,51,361,57,136,109"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="368,132,447,157"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="154,122,355,138,354,143,153,128"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="207,157,310,183"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="126,130,200,151,199,156,125,135"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="201,207,316,232"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="100,130,146,160,203,193,214,199,211,203,200,198,143,165,97,134"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,21,361,33,360,38,294,27"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="291,204,315,193,372,162,374,167,317,198,293,209"/>
+<area shape="rect" id="Node000007" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="364,207,451,232"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="316,217,351,217,351,222,316,222"/>
+</map>

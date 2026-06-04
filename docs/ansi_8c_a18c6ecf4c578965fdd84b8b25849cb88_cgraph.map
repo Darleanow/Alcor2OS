@@ -1,0 +1,14 @@
+<map id="handle_control" name="handle_control">
+<area shape="rect" id="Node000001" title="Apply one C0 control character to the cursor/grid state." alt="" coords="5,55,124,80"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a20a43904baf76078b5399667db4f67d3" title="Move the top row off the grid into the scrollback ring and shift every remaining row up...." alt="" coords="172,55,260,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,65,158,65,158,70,124,70"/>
+<area shape="rect" id="Node000003" href="$caret_8c.html#ae19ecefda194f357460e6a4f5bb4d456" title="Forget the tracker without repainting." alt="" coords="330,5,471,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="259,53,307,39,337,32,338,37,309,45,261,58"/>
+<area shape="rect" id="Node000004" href="$scrollback_8c.html#ace0c1c0bfd0ca2353793c3ff5df4f44d" title="Copy the live top row into the scrollback ring before it gets shifted off." alt="" coords="308,55,493,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="260,65,294,65,294,70,260,70"/>
+<area shape="rect" id="Node000006" href="$scrollback_8c.html#a083a9e1e7a449ba0ec97ef40a16af296" title="Shift every grid row up by one and blank the freshly exposed bottom." alt="" coords="311,104,490,129"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="261,76,340,98,339,103,259,81"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="541,80,628,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="494,77,528,82,527,88,493,83"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="490,102,527,97,528,103,490,108"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sel_mask_high_bits" name="sel_mask_high_bits">
+<area shape="rect" id="Node000001" title="Zero bits above nfds in the three fd_set arrays to avoid stale results." alt="" coords="144,5,295,31"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#aa9e778b7b4070bb665442953438b91f7" title="Monitor up to nfds_u descriptors for I/O readiness (select)." alt="" coords="5,5,96,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,21,96,21,96,15,130,15"/>
+</map>

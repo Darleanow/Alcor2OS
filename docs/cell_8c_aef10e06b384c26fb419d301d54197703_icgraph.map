@@ -1,0 +1,14 @@
+<map id="rgb_unpack" name="rgb_unpack">
+<area shape="rect" id="Node000001" title="Split a packed 0xRRGGBB word into its three 8&#45;bit channels." alt="" coords="529,31,627,56"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="352,5,481,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="515,36,481,31,482,25,516,31"/>
+<area shape="rect" id="Node000056" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="357,55,476,80"/>
+<area shape="poly" id="edge5_Node000001_Node000056" title=" " alt="" coords="516,55,477,61,476,56,515,50"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="195,31,304,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,33,304,38,304,32,338,27"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="39,5,113,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="181,36,112,26,113,21,181,31"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="5,55,147,80"/>
+<area shape="poly" id="edge4_Node000003_Node000012" title=" " alt="" coords="181,55,147,60,147,55,181,50"/>
+<area shape="poly" id="edge6_Node000056_Node000003" title=" " alt="" coords="343,60,304,54,305,49,344,54"/>
+</map>

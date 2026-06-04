@@ -1,0 +1,27 @@
+<map id="exec_stage_in_child" name="exec_stage_in_child">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,157,157,183"/>
+<area shape="rect" id="Node000002" href="$exec_8c.html#a115ab5ccd38fe53851105855c7ae152a" title=" " alt="" coords="262,5,365,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,155,135,103,168,74,204,48,248,29,250,34,207,52,171,78,139,107,94,159"/>
+<area shape="rect" id="Node000022" href="$exec_8c.html#acbb7ff6148e8d1243a60bc1bc22f440e" title=" " alt="" coords="469,56,631,81"/>
+<area shape="poly" id="edge5_Node000001_Node000022" title=" " alt="" coords="97,155,143,123,173,106,204,93,269,77,334,67,455,62,456,67,335,72,270,82,206,98,175,111,146,127,100,159"/>
+<area shape="rect" id="Node000024" href="$exec_8c.html#af380c909e0c9b94aa47bb10f1e682d9f" title=" " alt="" coords="261,107,366,132"/>
+<area shape="poly" id="edge7_Node000001_Node000024" title=" " alt="" coords="140,155,246,131,248,136,141,160"/>
+<area shape="rect" id="Node000020" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="505,129,595,155"/>
+<area shape="poly" id="edge14_Node000001_Node000020" title=" " alt="" coords="157,163,491,143,491,148,158,168"/>
+<area shape="rect" id="Node000031" href="$exec_8c.html#ac3a8263f02344c71ba786c8ed23cc961" title=" " alt="" coords="205,208,421,233"/>
+<area shape="poly" id="edge11_Node000001_Node000031" title=" " alt="" coords="141,180,242,202,241,208,140,185"/>
+<area shape="rect" id="Node000027" href="$fntab_8c.html#a1175b4458cee241a8d00238582685b85" title="Look up a function by name." alt="" coords="271,257,355,283"/>
+<area shape="poly" id="edge12_Node000001_Node000027" title=" " alt="" coords="101,181,147,212,206,244,258,259,257,264,204,248,144,217,98,185"/>
+<area shape="rect" id="Node000032" href="$exec_8c.html#a80fe6d3953d99aba5e7f730a0efbccce" title=" " alt="" coords="260,307,367,332"/>
+<area shape="poly" id="edge13_Node000001_Node000032" title=" " alt="" coords="93,181,138,236,170,267,207,293,247,308,246,313,204,298,166,271,134,240,89,185"/>
+<area shape="rect" id="Node000003" href="$exec_8c.html#aa80df9fa56a7e6325a532357ded2847c" title=" " alt="" coords="487,7,613,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,16,473,16,473,22,365,21"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html#ac9a976655a17bba1237d7ef963555da4" title=" " alt="" coords="679,7,812,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="613,17,665,17,665,22,613,22"/>
+<area shape="rect" id="Node000005" href="$expand_8c.html#a4fda5f1bdaaefe8d10a7a1b8c9c486c9" title="Expand $&#45;syntax in src and return a new heap&#45;allocated string. The caller takes ownership and must fr..." alt="" coords="691,56,800,81"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="602,29,682,50,680,55,600,35"/>
+<area shape="poly" id="edge6_Node000022_Node000005" title=" " alt="" coords="631,66,677,66,677,71,631,71"/>
+<area shape="poly" id="edge8_Node000024_Node000020" title=" " alt="" coords="366,122,491,134,491,139,366,127"/>
+<area shape="poly" id="edge9_Node000020_Node000005" title=" " alt="" coords="584,127,697,84,698,89,586,132"/>
+<area shape="poly" id="edge10_Node000020_Node000020" title=" " alt="" coords="518,131,511,121,515,111,528,105,550,103,577,106,588,115,585,119,575,111,550,108,529,110,518,115,516,120,522,128"/>
+</map>

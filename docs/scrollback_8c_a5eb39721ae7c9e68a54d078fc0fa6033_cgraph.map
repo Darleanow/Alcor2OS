@@ -1,0 +1,17 @@
+<map id="flush_pending_scroll" name="flush_pending_scroll">
+<area shape="rect" id="Node000001" title="Drain the pending&#45;scroll counter in one VRAM copy plus dirty marks." alt="" coords="5,55,160,80"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a0ea5237a11f029affd80c362f8b6d665" title="Drain the pending&#45;scroll counter in one VRAM copy plus dirty marks." alt="" coords="229,5,372,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,52,230,31,231,36,140,57"/>
+<area shape="rect" id="Node000004" href="$scrollback_8c.html#ad8079ac6535b6104193f726ba136caeb" title="Slow&#45;path scroll for non&#45;32&#45;bpp framebuffers: mark every cell dirty and let flush_batch re&#45;blit them." alt="" coords="235,55,367,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="161,65,221,65,221,70,161,70"/>
+<area shape="rect" id="Node000005" href="$fb__console_2mouse_8c.html#a677e4373c35c0f708dfa5c99ce5051ba" title="Erase the software mouse cursor if it is painted, so the scrollback pixel&#45;move does not drag a stale ..." alt="" coords="208,105,393,145"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="132,77,212,99,210,104,131,83"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="476,5,563,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,15,463,15,463,21,372,21"/>
+<area shape="rect" id="Node000006" href="$fb__console_2mouse_8c.html#a05afd0ea2119945dc3b079c2b5b99a66" title=" " alt="" coords="441,112,597,137"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="394,122,428,122,428,127,394,127"/>
+<area shape="rect" id="Node000007" href="$fb__console_2mouse_8c.html#a5c8ae3f66b1a4b466f8f05de69c72cff" title="Wipe the arrow&#39;s footprint and restore the cells beneath." alt="" coords="645,83,816,108"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="597,111,631,106,632,112,598,116"/>
+<area shape="rect" id="Node000011" href="$fb__console_2mouse_8c.html#a906bc8eb5537d1c6fac0db66df2dad8e" title="Re&#45;blit every cell that the cursor footprint touched, restoring the characters under it." alt="" coords="662,133,799,173"/>
+<area shape="poly" id="edge7_Node000006_Node000011" title=" " alt="" coords="598,132,648,139,648,144,597,138"/>
+</map>

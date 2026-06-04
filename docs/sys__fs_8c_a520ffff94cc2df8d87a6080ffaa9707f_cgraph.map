@@ -1,0 +1,43 @@
+<map id="sys_open" name="sys_open">
+<area shape="rect" id="Node000001" title="Open or create a file and return a file descriptor." alt="" coords="5,153,88,179"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a2b62b386a750a6392a02d67953da3095" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="136,79,240,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,151,150,108,152,113,73,155"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="147,177,229,203"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="89,170,134,178,133,183,88,176"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="295,5,429,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="211,76,287,40,305,33,307,38,289,44,214,81"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#a7a6905322835d34f51e6b34bd87075da" title="Allocate and zero a free OFT slot; refcount is initialised to 1." alt="" coords="323,177,401,203"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="229,187,310,187,310,193,229,193"/>
+<area shape="rect" id="Node000007" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="511,239,614,264"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="203,201,239,234,263,250,289,262,343,274,399,276,452,272,499,264,500,270,453,277,399,282,342,279,287,267,260,255,236,238,199,205"/>
+<area shape="rect" id="Node000008" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="301,55,423,80"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="204,175,286,113,328,85,331,90,290,118,207,179"/>
+<area shape="rect" id="Node000012" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="307,227,417,252"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="230,199,304,220,302,225,228,204"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="288,328,436,353"/>
+<area shape="poly" id="edge13_Node000004_Node000013" title=" " alt="" coords="199,201,235,251,260,281,290,307,312,320,309,325,286,311,257,284,231,255,195,204"/>
+<area shape="rect" id="Node000018" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="301,128,423,153"/>
+<area shape="poly" id="edge21_Node000004_Node000018" title=" " alt="" coords="228,176,302,155,304,160,230,181"/>
+<area shape="rect" id="Node000006" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="533,189,592,215"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="401,190,519,197,519,202,401,195"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="695,165,762,191"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="398,52,483,26,566,9,601,10,643,26,674,52,697,86,713,121,724,151,718,153,708,123,692,88,670,56,640,31,600,15,566,14,485,31,399,57"/>
+<area shape="rect" id="Node000010" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="484,41,641,67"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="424,61,470,57,470,63,424,66"/>
+<area shape="poly" id="edge10_Node000010_Node000009" title=" " alt="" coords="620,64,643,76,665,93,685,113,715,152,710,156,680,117,661,97,640,80,617,69"/>
+<area shape="poly" id="edge12_Node000012_Node000007" title=" " alt="" coords="417,240,498,245,497,250,417,245"/>
+<area shape="poly" id="edge18_Node000013_Node000007" title=" " alt="" coords="393,325,435,306,483,281,515,267,517,272,485,286,437,311,395,330"/>
+<area shape="poly" id="edge16_Node000013_Node000009" title=" " alt="" coords="436,327,552,303,604,289,640,274,662,258,681,239,711,201,715,204,685,243,665,262,643,279,606,294,553,309,437,332"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="527,340,598,365"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="437,342,514,347,513,352,436,348"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="689,416,768,441"/>
+<area shape="poly" id="edge17_Node000013_Node000015" title=" " alt="" coords="402,351,485,375,587,399,676,417,675,422,585,404,483,381,400,356"/>
+<area shape="rect" id="Node000016" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="505,441,620,467"/>
+<area shape="poly" id="edge19_Node000013_Node000016" title=" " alt="" coords="381,351,427,384,485,420,515,434,513,439,483,424,424,388,378,356"/>
+<area shape="poly" id="edge15_Node000014_Node000009" title=" " alt="" coords="597,341,619,332,640,319,665,291,687,260,715,202,720,205,691,263,669,295,643,323,622,337,599,346"/>
+<area shape="poly" id="edge20_Node000016_Node000015" title=" " alt="" coords="620,443,675,434,676,439,621,448"/>
+<area shape="rect" id="Node000019" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="500,91,625,116"/>
+<area shape="poly" id="edge22_Node000018_Node000019" title=" " alt="" coords="422,127,486,115,487,120,423,132"/>
+<area shape="rect" id="Node000021" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="499,140,627,165"/>
+<area shape="poly" id="edge23_Node000018_Node000021" title=" " alt="" coords="423,142,485,145,485,151,423,147"/>
+</map>

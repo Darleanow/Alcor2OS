@@ -1,0 +1,26 @@
+<map id="src/fs/ramfs.c" name="src/fs/ramfs.c">
+<area shape="rect" id="Node000001" title="Standalone ramfs driver for Alcor2." alt="" coords="305,5,415,31"/>
+<area shape="rect" id="Node000002" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="5,79,117,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="313,33,124,78,122,73,311,28"/>
+<area shape="rect" id="Node000003" href="$ramfs_8h.html" title="Public ramfs API: init + character&#45;device registration." alt="" coords="142,79,274,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="337,33,246,75,244,70,334,28"/>
+<area shape="rect" id="Node000008" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="611,79,725,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="410,28,606,73,605,78,409,33"/>
+<area shape="rect" id="Node000010" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="299,79,421,104"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="363,31,363,65,357,65,357,31"/>
+<area shape="rect" id="Node000011" href="$heap_8h.html" title="Kernel heap allocator." alt="" coords="446,79,586,104"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="386,28,479,70,477,75,384,33"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="381,152,496,177"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="246,101,389,145,388,151,244,107"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="295,225,377,251"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="424,180,366,219,363,215,421,175"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="401,225,476,251"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="441,178,441,212,436,212,436,178"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="501,225,571,251"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="456,175,510,215,507,219,453,180"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="632,107,490,150,488,145,630,101"/>
+<area shape="rect" id="Node000009" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="603,152,733,177"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="671,104,671,138,665,138,665,104"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="374,102,418,141,414,145,371,106"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="505,106,463,144,460,141,502,102"/>
+</map>

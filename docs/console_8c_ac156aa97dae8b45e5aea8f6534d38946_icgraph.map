@@ -1,0 +1,136 @@
+<map id="console_putchar" name="console_putchar">
+<area shape="rect" id="Node000001" title="Write a single character to the console." alt="" coords="1108,76,1236,102"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="951,704,1060,730"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1166,116,1013,705,1007,703,1161,114"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="533,376,647,402"/>
+<area shape="poly" id="edge79_Node000001_Node000005" title=" " alt="" coords="1145,69,1107,40,1059,17,1025,11,979,8,870,12,770,24,736,30,719,37,681,74,652,119,630,168,614,219,598,313,594,376,589,376,593,313,609,218,625,167,647,116,677,71,716,32,734,25,769,18,869,7,979,3,1026,5,1061,12,1109,35,1148,64"/>
+<area shape="rect" id="Node000136" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="769,127,851,152"/>
+<area shape="poly" id="edge80_Node000001_Node000136" title=" " alt="" coords="1105,107,1060,116,947,130,852,139,851,134,947,125,1060,110,1104,102"/>
+<area shape="rect" id="Node000149" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="967,27,1043,52"/>
+<area shape="poly" id="edge81_Node000001_Node000149" title=" " alt="" coords="1114,75,1043,53,1045,48,1116,70"/>
+<area shape="rect" id="Node000150" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="963,76,1047,102"/>
+<area shape="poly" id="edge83_Node000001_Node000150" title=" " alt="" coords="1094,92,1047,92,1047,86,1094,86"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="347,176,418,202"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1001,691,997,567,984,391,971,302,954,222,930,158,916,134,901,116,872,96,840,81,807,71,772,66,699,68,626,83,557,105,495,132,406,178,404,174,493,127,555,100,625,77,699,63,772,61,808,66,842,76,874,91,904,112,921,130,935,155,959,221,976,301,989,391,1003,566,1007,691"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="136,227,235,252"/>
+<area shape="poly" id="edge45_Node000002_Node000004" title=" " alt="" coords="999,691,988,601,969,481,956,421,940,367,922,323,901,295,879,280,851,267,777,248,686,237,586,231,387,231,235,239,235,233,386,226,586,225,686,231,778,243,852,262,882,275,905,291,926,321,945,365,961,419,974,480,994,600,1004,690"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="998,691,986,615,965,516,936,424,919,390,901,368,867,350,830,340,790,337,751,340,676,357,619,379,617,374,675,352,750,335,790,332,831,334,869,345,904,364,924,387,941,422,970,515,991,614,1003,691"/>
+<area shape="rect" id="Node000007" href="$idt_8c.html#a8a93c29846db4e5a2697c572d1e6bd7a" title=" " alt="" coords="311,578,454,603"/>
+<area shape="poly" id="edge35_Node000002_Node000007" title=" " alt="" coords="975,699,941,677,902,659,843,642,781,627,659,607,546,597,454,593,455,588,546,592,659,602,783,622,844,636,904,654,943,673,978,694"/>
+<area shape="rect" id="Node000008" href="$super_8c.html#aa3b33fc4657b2e71defc951eeb6f2ada" title="Mount an ext2 partition: read the superblock, validate the magic, load the group descriptor table int..." alt="" coords="333,627,433,652"/>
+<area shape="poly" id="edge36_Node000002_Node000008" title=" " alt="" coords="953,703,902,690,770,670,638,656,433,644,433,638,638,651,771,665,903,685,954,698"/>
+<area shape="rect" id="Node000010" href="$heap_8c.html#a7e7a6625a49b6a560a47ae7575575264" title="Initialize the kernel heap allocator." alt="" coords="341,676,424,702"/>
+<area shape="poly" id="edge37_Node000002_Node000010" title=" " alt="" coords="937,715,903,713,424,693,424,688,903,708,937,710"/>
+<area shape="rect" id="Node000011" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="144,554,227,579"/>
+<area shape="poly" id="edge41_Node000002_Node000011" title=" " alt="" coords="963,737,842,779,761,800,672,816,578,824,482,821,435,814,389,803,344,787,301,766,279,738,247,684,191,580,196,578,251,682,283,735,304,762,346,782,390,798,436,809,482,816,577,819,671,811,760,795,840,774,961,732"/>
+<area shape="rect" id="Node000013" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="319,727,446,752"/>
+<area shape="poly" id="edge38_Node000002_Node000013" title=" " alt="" coords="937,722,446,740,446,735,937,717"/>
+<area shape="rect" id="Node000015" href="$src_2kernel_2main_8c.html#ae1d9b721e1a1c60b10f0baef1ce6e199" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="336,831,429,856"/>
+<area shape="poly" id="edge67_Node000002_Node000015" title=" " alt="" coords="998,744,985,775,965,810,938,844,904,870,839,896,771,909,701,913,632,909,566,899,507,886,417,859,419,854,508,881,567,894,632,903,701,908,770,904,838,891,901,865,934,840,960,807,980,772,993,742"/>
+<area shape="rect" id="Node000017" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="144,932,227,958"/>
+<area shape="poly" id="edge43_Node000002_Node000017" title=" " alt="" coords="1005,744,998,794,982,858,969,890,952,921,931,948,904,971,879,984,848,993,769,1004,675,1005,573,1000,373,978,226,955,227,950,374,973,574,995,676,1000,769,999,847,988,877,979,901,967,927,945,948,918,964,888,977,856,993,793,1000,743"/>
+<area shape="rect" id="Node000018" href="$src_2kernel_2main_8c.html#a45fb8b4cde988b83b15fe5713a6ecdca" title="Print boot banner." alt="" coords="331,278,435,303"/>
+<area shape="poly" id="edge70_Node000002_Node000018" title=" " alt="" coords="998,691,987,608,967,500,938,398,920,360,901,335,866,316,816,303,754,294,686,289,547,286,435,290,435,285,547,281,687,283,755,289,817,298,868,311,904,331,925,357,943,396,972,499,992,607,1004,690"/>
+<area shape="rect" id="Node000019" href="$cpu_8c.html#a1a37140b7259a82ccc1136062f0ea3dd" title="Enable SSE and FPU instructions." alt="" coords="747,1034,873,1059"/>
+<area shape="poly" id="edge23_Node000002_Node000019" title=" " alt="" coords="1005,744,998,799,982,872,969,911,952,949,931,984,904,1016,874,1036,871,1031,901,1012,927,981,947,946,964,909,977,871,993,799,1000,743"/>
+<area shape="rect" id="Node000020" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="553,1186,627,1211"/>
+<area shape="poly" id="edge24_Node000002_Node000020" title=" " alt="" coords="1006,743,1001,858,986,1019,973,1101,955,1175,933,1234,920,1257,904,1274,881,1290,859,1300,837,1305,815,1305,769,1294,716,1274,700,1265,690,1255,681,1243,668,1233,626,1213,629,1208,671,1228,685,1240,694,1251,704,1261,718,1269,771,1289,816,1299,836,1300,857,1295,878,1286,901,1270,915,1254,928,1232,950,1173,968,1100,980,1019,996,858,1001,743"/>
+<area shape="rect" id="Node000022" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="116,1162,255,1187"/>
+<area shape="poly" id="edge73_Node000002_Node000022" title=" " alt="" coords="1003,744,990,820,969,919,940,1012,923,1048,904,1073,604,1114,303,1152,241,1164,240,1159,302,1146,603,1108,901,1068,919,1045,935,1010,964,918,985,819,998,743"/>
+<area shape="rect" id="Node000027" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="543,1136,637,1162"/>
+<area shape="poly" id="edge27_Node000002_Node000027" title=" " alt="" coords="1004,744,993,829,973,942,959,998,943,1049,925,1090,905,1118,874,1139,840,1153,805,1163,768,1168,697,1169,637,1161,638,1156,697,1163,767,1163,804,1158,839,1148,872,1134,901,1114,921,1087,938,1047,954,997,967,941,987,828,999,743"/>
+<area shape="rect" id="Node000028" href="$elf_8c.html#ac1396569a9a8edc3e72a606e32adfe98" title=" " alt="" coords="717,1235,903,1260"/>
+<area shape="poly" id="edge29_Node000002_Node000028" title=" " alt="" coords="1005,743,996,848,977,991,964,1064,948,1131,928,1186,905,1224,887,1237,884,1233,901,1220,923,1184,943,1130,959,1063,972,991,991,847,1000,743"/>
+<area shape="rect" id="Node000029" href="$elf_8c.html#aa96bf6caa2146da9ef5e8b118c3be087" title="Validate ELF64 header." alt="" coords="761,1186,859,1211"/>
+<area shape="poly" id="edge32_Node000002_Node000029" title=" " alt="" coords="1004,744,993,837,973,964,943,1086,925,1134,905,1168,884,1184,861,1193,859,1188,882,1179,901,1164,921,1132,938,1085,967,963,988,836,999,743"/>
+<area shape="rect" id="Node000030" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="771,176,849,202"/>
+<area shape="poly" id="edge39_Node000002_Node000030" title=" " alt="" coords="999,690,989,588,970,448,957,377,941,312,922,259,901,223,877,205,849,196,850,191,879,201,905,219,927,257,946,311,962,376,976,447,995,588,1005,690"/>
+<area shape="rect" id="Node000031" href="$src_2kernel_2main_8c.html#a89bdce4ed8f742df23e972ff247a32db" title="Enable interrupts and log the event." alt="" coords="747,1563,873,1588"/>
+<area shape="poly" id="edge42_Node000002_Node000031" title=" " alt="" coords="1005,744,994,919,973,1176,959,1305,943,1419,925,1505,915,1535,905,1553,891,1565,874,1572,872,1568,888,1560,901,1550,910,1533,920,1504,938,1418,954,1304,967,1175,989,918,1000,744"/>
+<area shape="rect" id="Node000032" href="$src_2kernel_2main_8c.html#a9cf4a417b66a038c3dd1e074be9fde2e" title="Initialize interrupt controllers and drivers." alt="" coords="753,379,867,404"/>
+<area shape="poly" id="edge44_Node000002_Node000032" title=" " alt="" coords="1000,690,995,633,979,560,966,521,949,483,928,448,901,418,885,407,866,400,868,395,887,402,904,414,932,445,954,481,971,519,984,558,1000,633,1006,690"/>
+<area shape="rect" id="Node000033" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="782,1514,838,1539"/>
+<area shape="poly" id="edge46_Node000002_Node000033" title=" " alt="" coords="1004,744,995,839,976,982,947,1149,928,1234,905,1318,885,1377,861,1433,821,1515,816,1512,856,1431,880,1375,900,1316,922,1233,942,1148,971,981,990,838,999,743"/>
+<area shape="rect" id="Node000135" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="748,932,872,958"/>
+<area shape="poly" id="edge68_Node000002_Node000135" title=" " alt="" coords="1000,744,987,781,968,827,941,874,904,915,870,934,868,930,901,911,936,871,963,825,982,780,995,742"/>
+<area shape="poly" id="edge71_Node000002_Node000136" title=" " alt="" coords="1000,690,993,577,975,419,962,339,946,266,925,206,913,183,901,166,878,150,851,143,852,138,880,145,905,162,918,180,930,204,951,264,968,338,981,419,998,577,1005,690"/>
+<area shape="rect" id="Node000137" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="769,428,851,454"/>
+<area shape="poly" id="edge74_Node000002_Node000137" title=" " alt="" coords="998,691,990,643,972,582,944,520,924,492,901,467,877,453,851,446,852,441,879,448,904,463,928,488,948,517,977,580,995,641,1004,690"/>
+<area shape="rect" id="Node000143" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="751,478,869,503"/>
+<area shape="poly" id="edge75_Node000002_Node000143" title=" " alt="" coords="996,692,984,652,965,605,938,557,921,535,901,516,886,507,868,500,870,495,888,502,904,512,925,532,942,554,970,602,989,651,1001,690"/>
+<area shape="rect" id="Node000024" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="751,831,869,856"/>
+<area shape="poly" id="edge76_Node000002_Node000024" title=" " alt="" coords="987,742,950,778,904,814,861,833,858,828,901,809,947,774,983,738"/>
+<area shape="rect" id="Node000148" href="$syscall__arch_8c.html#a797876702ac4b3a53fa69839f02642f4" title="Initialize syscall mechanism (set MSRs)." alt="" coords="763,527,857,552"/>
+<area shape="poly" id="edge78_Node000002_Node000148" title=" " alt="" coords="990,693,956,633,931,601,901,574,880,561,857,552,859,547,882,556,904,569,934,598,960,630,995,690"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="335,204,236,230,234,224,333,199"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="564,369,461,267,396,204,399,200,465,263,568,365"/>
+<area shape="rect" id="Node000006" href="$dev__nodes_8c.html#ae65ed532860c590d0e567ec0487fee0a" title="Register /dev/null, /dev/zero, /dev/tty, and /dev/fb on the ramfs mounted at /dev." alt="" coords="323,376,443,402"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="519,392,443,392,443,386,519,386"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="580,415,562,449,536,490,503,531,464,567,440,580,438,575,461,563,499,528,532,487,557,447,575,413"/>
+<area shape="poly" id="edge9_Node000005_Node000008" title=" " alt="" coords="584,416,568,459,543,513,509,568,488,594,464,616,434,632,432,628,461,612,484,590,505,565,539,511,563,457,579,414"/>
+<area shape="poly" id="edge10_Node000005_Node000010" title=" " alt="" coords="586,416,574,468,550,535,515,605,492,637,464,666,446,678,425,685,423,680,443,673,461,662,488,634,510,602,546,533,569,467,581,415"/>
+<area shape="poly" id="edge14_Node000005_Node000011" title=" " alt="" coords="557,411,464,461,384,491,304,518,216,556,214,551,302,513,382,486,462,456,555,406"/>
+<area shape="rect" id="Node000012" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,554,68,579"/>
+<area shape="poly" id="edge16_Node000005_Node000012" title=" " alt="" coords="526,408,422,436,303,471,172,517,69,557,67,552,171,512,302,466,420,431,525,402"/>
+<area shape="poly" id="edge13_Node000005_Node000013" title=" " alt="" coords="588,416,578,477,557,557,541,599,520,641,495,680,464,715,443,729,440,725,461,711,491,677,515,638,536,597,552,555,573,476,583,415"/>
+<area shape="rect" id="Node000014" href="$idt_8c.html#af94018d2295ea8c5c8bb95e454c64784" title=" " alt="" coords="335,327,430,352"/>
+<area shape="poly" id="edge15_Node000005_Node000014" title=" " alt="" coords="522,376,430,353,431,348,524,370"/>
+<area shape="poly" id="edge17_Node000005_Node000015" title=" " alt="" coords="587,416,573,480,549,569,513,669,491,718,465,765,434,804,403,833,399,829,430,800,460,762,486,716,508,667,544,568,568,479,582,414"/>
+<area shape="rect" id="Node000016" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="335,528,430,554"/>
+<area shape="poly" id="edge19_Node000005_Node000016" title=" " alt="" coords="571,414,525,462,464,511,425,531,422,526,461,507,522,458,567,410"/>
+<area shape="poly" id="edge21_Node000005_Node000018" title=" " alt="" coords="558,371,513,343,462,317,431,305,433,300,464,312,516,339,560,366"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="315,373,301,366,266,339,235,308,193,254,197,251,239,304,270,335,304,361,317,369"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="327,677,301,666,270,646,241,623,197,581,201,578,244,618,273,641,304,661,330,673"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="130,569,68,569,68,564,130,564"/>
+<area shape="poly" id="edge18_Node000015_Node000012" title=" " alt="" coords="328,828,301,814,219,753,145,685,85,624,47,581,51,577,89,620,148,682,222,749,304,809,331,823"/>
+<area shape="poly" id="edge20_Node000016_Node000017" title=" " alt="" coords="324,554,304,567,269,611,241,661,221,715,207,769,192,868,189,932,184,932,187,867,202,768,216,714,237,659,264,608,301,563,321,549"/>
+<area shape="poly" id="edge22_Node000018_Node000011" title=" " alt="" coords="320,306,304,316,278,344,256,376,222,444,202,508,191,554,186,552,196,507,217,442,251,373,274,340,301,312,317,302"/>
+<area shape="rect" id="Node000021" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="312,1162,453,1187"/>
+<area shape="poly" id="edge25_Node000020_Node000021" title=" " alt="" coords="539,1195,453,1185,454,1180,539,1190"/>
+<area shape="poly" id="edge26_Node000021_Node000022" title=" " alt="" coords="298,1177,255,1177,255,1172,298,1172"/>
+<area shape="poly" id="edge28_Node000027_Node000021" title=" " alt="" coords="529,1159,454,1168,453,1163,528,1154"/>
+<area shape="poly" id="edge30_Node000028_Node000020" title=" " alt="" coords="739,1234,627,1209,628,1204,740,1229"/>
+<area shape="poly" id="edge31_Node000028_Node000027" title=" " alt="" coords="732,1232,716,1224,700,1212,691,1199,682,1187,668,1175,636,1161,639,1157,671,1171,686,1183,695,1196,704,1208,719,1220,734,1228"/>
+<area shape="poly" id="edge33_Node000029_Node000020" title=" " alt="" coords="747,1201,628,1201,628,1196,747,1196"/>
+<area shape="poly" id="edge34_Node000029_Node000027" title=" " alt="" coords="746,1187,637,1162,638,1157,748,1182"/>
+<area shape="poly" id="edge40_Node000030_Node000003" title=" " alt="" coords="757,192,419,192,419,186,757,186"/>
+<area shape="poly" id="edge66_Node000033_Node000022" title=" " alt="" coords="800,1501,784,1452,757,1391,719,1328,695,1300,668,1277,248,1190,249,1184,671,1272,699,1297,723,1325,762,1388,789,1450,805,1499"/>
+<area shape="poly" id="edge57_Node000033_Node000027" title=" " alt="" coords="797,1501,732,1318,694,1224,679,1192,667,1175,653,1165,636,1158,638,1153,656,1160,671,1171,684,1189,699,1222,737,1316,802,1500"/>
+<area shape="rect" id="Node000034" href="$alloc_8c.html#a10b951f10689e7635a7c2695c6e1b795" title="Try to allocate one block inside group." alt="" coords="511,1388,669,1414"/>
+<area shape="poly" id="edge47_Node000033_Node000034" title=" " alt="" coords="782,1507,731,1468,668,1429,637,1416,639,1411,671,1424,734,1463,786,1503"/>
+<area shape="rect" id="Node000054" href="$alloc_8c.html#afec890af95487aee5f579d5ff8442824" title="Try to allocate one inode inside group." alt="" coords="511,1438,669,1463"/>
+<area shape="poly" id="edge48_Node000033_Node000054" title=" " alt="" coords="768,1515,627,1466,629,1461,770,1510"/>
+<area shape="rect" id="Node000036" href="$blockmap_8c.html#a4888ff3d79af7bc66c91c7f9d349c3c0" title="Allocate a fresh block, zero it, and bill the inode for it." alt="" coords="517,1539,663,1564"/>
+<area shape="poly" id="edge49_Node000033_Node000036" title=" " alt="" coords="768,1534,664,1546,663,1541,768,1528"/>
+<area shape="rect" id="Node000037" href="$blockmap_8c.html#a871be77d1ce03e491179610dd24933b6" title="Resolve slot slot_idx of indirect_block; allocate it if hole." alt="" coords="306,1514,459,1539"/>
+<area shape="poly" id="edge58_Node000033_Node000037" title=" " alt="" coords="768,1529,459,1529,459,1524,768,1524"/>
+<area shape="rect" id="Node000056" href="$cache_8c.html#a3f836c60fb5837ae4127d5de332b462e" title="Return a buffer obtained from cache_get_block." alt="" coords="525,1640,655,1666"/>
+<area shape="poly" id="edge51_Node000033_Node000056" title=" " alt="" coords="769,1534,743,1541,719,1554,703,1570,695,1587,687,1605,671,1623,636,1642,634,1638,668,1619,683,1602,690,1584,699,1567,716,1549,741,1536,768,1529"/>
+<area shape="rect" id="Node000057" href="$file_8c.html#ac244024eb57350647fc868bd02827b03" title="Read up to count bytes from file at byte offset." alt="" coords="339,1615,426,1640"/>
+<area shape="poly" id="edge59_Node000033_Node000057" title=" " alt="" coords="769,1538,718,1554,695,1567,670,1579,605,1598,538,1612,426,1627,426,1622,537,1607,603,1593,668,1574,692,1562,716,1549,768,1533"/>
+<area shape="rect" id="Node000040" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="535,1690,645,1715"/>
+<area shape="poly" id="edge53_Node000033_Node000040" title=" " alt="" coords="769,1532,743,1539,719,1554,707,1568,700,1583,696,1615,692,1647,684,1664,671,1680,647,1695,644,1690,668,1676,680,1661,687,1646,690,1614,695,1582,702,1566,716,1550,740,1534,768,1527"/>
+<area shape="rect" id="Node000076" href="$dir__entry_8c.html#a44847a1e74b0df6de11296fd8980308e" title="Find a directory entry by name." alt="" coords="535,1739,645,1764"/>
+<area shape="poly" id="edge54_Node000033_Node000076" title=" " alt="" coords="769,1531,742,1539,719,1554,704,1575,696,1596,696,1639,695,1684,688,1707,671,1730,647,1745,644,1740,668,1726,683,1704,690,1683,690,1639,691,1595,699,1572,716,1550,740,1534,768,1526"/>
+<area shape="rect" id="Node000078" href="$dir__entry_8c.html#a846f948811faccd55e96a7bcf1eb8747" title="Check if a directory is empty." alt="" coords="537,1788,643,1814"/>
+<area shape="poly" id="edge55_Node000033_Node000078" title=" " alt="" coords="769,1531,742,1538,719,1553,700,1581,693,1608,692,1636,696,1664,699,1692,699,1721,691,1750,671,1779,659,1789,645,1796,642,1791,656,1784,667,1775,686,1747,693,1720,694,1692,690,1664,687,1636,687,1607,696,1578,715,1550,740,1533,767,1526"/>
+<area shape="rect" id="Node000079" href="$dir__entry_8c.html#af34fc009f5ec9683665f000e226a64bd" title="Remove a directory entry." alt="" coords="521,1838,659,1863"/>
+<area shape="poly" id="edge56_Node000033_Node000079" title=" " alt="" coords="769,1531,742,1538,719,1553,697,1587,689,1620,690,1654,695,1688,701,1722,702,1757,694,1793,671,1828,657,1840,653,1835,667,1824,689,1790,697,1757,696,1723,690,1689,685,1655,684,1620,692,1585,715,1550,740,1533,768,1525"/>
+<area shape="rect" id="Node000080" href="$super_8c.html#afc4401e48bdcb719cd61518e662cd77a" title="Unmount an ext2 partition." alt="" coords="532,1887,648,1912"/>
+<area shape="poly" id="edge60_Node000033_Node000080" title=" " alt="" coords="769,1530,742,1538,719,1554,704,1573,694,1593,685,1633,687,1673,695,1713,703,1753,706,1794,697,1835,687,1856,671,1877,650,1893,647,1888,667,1874,682,1854,692,1834,701,1794,698,1754,690,1714,682,1673,680,1632,689,1591,700,1571,715,1550,740,1533,768,1525"/>
+<area shape="rect" id="Node000081" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="529,1936,651,1962"/>
+<area shape="poly" id="edge61_Node000033_Node000081" title=" " alt="" coords="769,1530,742,1538,719,1553,702,1577,691,1600,684,1623,681,1645,685,1691,695,1737,706,1784,710,1830,707,1854,700,1878,689,1902,671,1927,653,1941,650,1936,667,1923,684,1900,695,1876,702,1853,704,1830,700,1784,690,1738,680,1692,676,1645,679,1621,686,1598,698,1574,715,1550,740,1533,768,1525"/>
+<area shape="rect" id="Node000101" href="$alloc_8c.html#a8cee33622c2b8dee0188a576295a4e74" title="Mark block as free in its owning group&#39;s bitmap." alt="" coords="545,1287,635,1312"/>
+<area shape="poly" id="edge62_Node000033_Node000101" title=" " alt="" coords="794,1503,746,1421,710,1374,668,1334,633,1315,636,1310,671,1329,714,1371,750,1418,799,1500"/>
+<area shape="rect" id="Node000102" href="$blockmap_8c.html#ac1186d8d194bfb877678c89302286c51" title="Recursively free an indirect&#45;block subtree." alt="" coords="303,1324,463,1350"/>
+<area shape="poly" id="edge65_Node000033_Node000102" title=" " alt="" coords="792,1503,742,1439,708,1406,668,1379,618,1359,564,1346,511,1339,463,1337,463,1331,511,1334,565,1341,619,1354,671,1375,711,1402,746,1436,796,1500"/>
+<area shape="poly" id="edge50_Node000036_Node000037" title=" " alt="" coords="503,1544,459,1538,460,1533,503,1538"/>
+<area shape="poly" id="edge52_Node000056_Node000057" title=" " alt="" coords="511,1646,426,1635,426,1630,511,1641"/>
+<area shape="poly" id="edge63_Node000101_Node000102" title=" " alt="" coords="531,1313,454,1327,453,1322,531,1307"/>
+<area shape="poly" id="edge64_Node000102_Node000102" title=" " alt="" coords="418,1314,408,1306,383,1303,362,1305,351,1310,348,1315,354,1323,350,1326,343,1316,347,1306,360,1300,383,1298,410,1301,421,1310"/>
+<area shape="poly" id="edge69_Node000135_Node000017" title=" " alt="" coords="734,948,227,948,227,942,734,942"/>
+<area shape="poly" id="edge72_Node000136_Node000005" title=" " alt="" coords="756,149,736,155,719,166,693,190,670,217,634,278,610,335,597,377,592,375,605,334,630,276,666,214,689,186,716,161,734,151,754,144"/>
+<area shape="poly" id="edge77_Node000024_Node000015" title=" " alt="" coords="737,846,430,846,430,841,737,841"/>
+<area shape="poly" id="edge82_Node000149_Node000005" title=" " alt="" coords="954,34,900,31,838,34,775,48,746,61,719,78,685,111,658,150,636,193,620,238,602,320,595,376,589,376,596,319,615,236,632,191,653,147,681,107,716,73,743,56,774,43,837,29,900,26,954,29"/>
+<area shape="poly" id="edge84_Node000150_Node000005" title=" " alt="" coords="950,81,897,76,836,78,775,90,746,101,719,116,688,144,662,178,641,215,625,253,604,325,595,376,590,375,599,324,620,252,636,213,657,175,684,141,716,112,743,96,773,85,836,72,897,71,950,76"/>
+</map>

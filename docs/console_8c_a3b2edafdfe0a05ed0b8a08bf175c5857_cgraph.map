@@ -1,0 +1,23 @@
+<map id="print_uint" name="print_uint">
+<area shape="rect" id="Node000001" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="5,132,89,157"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="137,132,265,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,142,123,142,123,147,90,147"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="313,32,433,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="223,130,337,62,340,67,226,134"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="325,107,422,132"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="265,133,310,126,311,131,266,138"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="672,157,773,183"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="266,145,659,164,658,170,266,150"/>
+<area shape="rect" id="Node000010" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="345,208,402,233"/>
+<area shape="poly" id="edge8_Node000002_Node000010" title=" " alt="" coords="232,155,333,200,330,205,230,160"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="527,5,578,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="433,33,513,21,514,26,434,38"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="409,104,453,92,508,82,567,80,596,84,625,91,648,102,669,116,703,145,699,149,665,120,645,107,623,97,595,89,567,86,508,88,455,97,411,109"/>
+<area shape="rect" id="Node000009" href="$font__bitmap_8h.html#aa872bd8d398352cd9c51ed4151e6f056" title="Each byte indexes directly into the atlas." alt="" coords="485,107,620,132"/>
+<area shape="poly" id="edge6_Node000005_Node000009" title=" " alt="" coords="422,117,472,117,472,122,422,122"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#a2b43e87d614b0efffcde543dfa509e53" title="Fill rows [y0, y1) with ctx.bg, fast&#45;path on 32 bpp." alt="" coords="481,208,624,233"/>
+<area shape="poly" id="edge9_Node000010_Node000011" title=" " alt="" coords="402,218,467,218,467,223,402,223"/>
+<area shape="rect" id="Node000012" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="509,257,596,283"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="403,226,497,252,495,257,402,231"/>
+<area shape="poly" id="edge10_Node000011_Node000006" title=" " alt="" coords="595,205,665,184,667,189,597,210"/>
+</map>

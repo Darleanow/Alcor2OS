@@ -1,0 +1,41 @@
+<map id="ext2_ops_mount" name="ext2_ops_mount">
+<area shape="rect" id="Node000001" title="fs_type_t.mount shim — opens the default device." alt="" coords="5,321,136,347"/>
+<area shape="rect" id="Node000002" href="$super_8c.html#aa3b33fc4657b2e71defc951eeb6f2ada" title="Mount an ext2 partition: read the superblock, validate the magic, load the group descriptor table int..." alt="" coords="184,321,284,347"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,331,170,331,170,337,136,337"/>
+<area shape="rect" id="Node000003" href="$super_8c.html#a7310d91a1a374f93aa38dcaab3e28f01" title="Claim the first free slot in g_volumes." alt="" coords="340,5,519,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="233,321,238,271,252,198,265,158,281,118,303,81,330,48,349,35,352,39,334,52,307,84,286,121,270,160,257,199,243,272,238,321"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="743,156,852,181"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="248,319,297,276,374,219,469,161,521,137,574,118,607,110,635,108,695,118,732,131,765,147,763,152,730,135,694,123,634,113,608,116,575,123,523,142,471,166,377,223,300,280,251,323"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="372,283,487,308"/>
+<area shape="poly" id="edge5_Node000002_Node000016" title=" " alt="" coords="284,322,358,307,359,312,285,327"/>
+<area shape="rect" id="Node000020" href="$super_8c.html#a7e5871019086e0c87445b360aa3fb23b" title="Allocate vol&#45;&gt;groups and fill it from disk." alt="" coords="343,372,516,397"/>
+<area shape="poly" id="edge15_Node000002_Node000020" title=" " alt="" coords="285,344,367,366,366,371,283,349"/>
+<area shape="rect" id="Node000040" href="$super_8c.html#a20f17625f9f258c6f88923cdecdfe050" title="Populate vol&#39;s cached fields from the on&#45;disk superblock." alt="" coords="332,421,527,447"/>
+<area shape="poly" id="edge21_Node000002_Node000040" title=" " alt="" coords="250,345,286,376,333,406,353,415,351,420,331,411,283,380,247,349"/>
+<area shape="rect" id="Node000041" href="$super_8c.html#ae854296369d7f4018cd7f515c2443ee6" title="Read the on&#45;disk superblock and validate its magic." alt="" coords="334,471,525,496"/>
+<area shape="poly" id="edge23_Node000002_Node000041" title=" " alt="" coords="244,345,277,399,303,430,334,456,347,463,344,468,330,460,299,434,273,402,239,348"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="900,257,1028,283"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="821,179,853,198,932,248,930,252,851,203,819,184"/>
+<area shape="poly" id="edge6_Node000016_Node000004" title=" " alt="" coords="436,281,455,250,486,211,526,172,549,155,574,142,620,131,668,130,714,138,753,149,751,154,712,143,668,136,621,136,576,147,552,160,529,176,490,214,460,253,440,284"/>
+<area shape="poly" id="edge7_Node000016_Node000005" title=" " alt="" coords="487,290,886,271,887,276,487,295"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="593,157,676,183"/>
+<area shape="poly" id="edge8_Node000016_Node000017" title=" " alt="" coords="445,280,500,239,573,192,585,186,587,191,576,196,503,243,448,285"/>
+<area shape="rect" id="Node000018" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="759,308,835,333"/>
+<area shape="poly" id="edge11_Node000016_Node000018" title=" " alt="" coords="487,297,746,315,745,320,487,302"/>
+<area shape="rect" id="Node000019" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="755,357,839,383"/>
+<area shape="poly" id="edge13_Node000016_Node000019" title=" " alt="" coords="487,304,742,356,741,361,486,309"/>
+<area shape="poly" id="edge9_Node000017_Node000004" title=" " alt="" coords="676,167,729,167,729,172,676,172"/>
+<area shape="poly" id="edge10_Node000017_Node000005" title=" " alt="" coords="677,180,909,251,908,256,675,185"/>
+<area shape="poly" id="edge12_Node000018_Node000005" title=" " alt="" coords="835,307,908,284,909,289,836,312"/>
+<area shape="poly" id="edge14_Node000019_Node000005" title=" " alt="" coords="827,355,851,342,933,289,936,293,853,347,829,359"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="607,207,663,232"/>
+<area shape="poly" id="edge16_Node000020_Node000021" title=" " alt="" coords="450,370,525,317,609,240,613,244,528,321,453,374"/>
+<area shape="rect" id="Node000023" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="597,409,672,435"/>
+<area shape="poly" id="edge18_Node000020_Node000023" title=" " alt="" coords="500,395,584,410,583,415,499,400"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="591,508,678,533"/>
+<area shape="poly" id="edge19_Node000020_Node000015" title=" " alt="" coords="509,395,528,407,547,428,554,451,561,473,577,495,581,499,578,503,573,499,556,475,549,453,542,431,525,411,506,400"/>
+<area shape="rect" id="Node000038" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one ext2 block worth of bytes into buf." alt="" coords="575,459,695,484"/>
+<area shape="poly" id="edge20_Node000020_Node000038" title=" " alt="" coords="498,395,528,406,553,425,576,444,589,450,586,455,573,448,549,429,525,411,496,400"/>
+<area shape="poly" id="edge17_Node000021_Node000004" title=" " alt="" coords="662,208,742,183,744,188,664,213"/>
+<area shape="poly" id="edge22_Node000040_Node000015" title=" " alt="" coords="499,444,528,456,553,475,576,494,586,500,584,505,573,499,549,479,525,460,497,449"/>
+</map>

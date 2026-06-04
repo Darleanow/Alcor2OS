@@ -1,0 +1,9 @@
+<map id="ring_full" name="ring_full">
+<area shape="rect" id="Node000001" title=" " alt="" coords="539,5,613,31"/>
+<area shape="rect" id="Node000002" href="$mouse_8c.html#a7549de64e1ca943611685af5f4907fd9" title="Post one movement/button report into the broker." alt="" coords="345,5,491,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="525,21,491,21,491,15,525,15"/>
+<area shape="rect" id="Node000003" href="$mouse__ps2_8c.html#a059fb6ffb95c8c6a22097d748a2aa357" title="IRQ 12 handler: accumulate one mouse packet byte, post on completion." alt="" coords="177,5,297,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,21,297,21,297,15,332,15"/>
+<area shape="rect" id="Node000004" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="5,5,129,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="163,21,129,21,129,15,163,15"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="user/sdk/vega/expand.c" name="user/sdk/vega/expand.c">
+<area shape="rect" id="Node000001" title="vega expansion: $&#45;syntax in words, special vars, user vars." alt="" coords="310,5,486,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,76,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="334,33,90,81,89,76,333,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="100,79,171,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="356,33,185,80,183,74,355,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="195,79,283,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="374,33,279,75,277,71,371,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="307,79,382,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="391,33,364,69,359,66,387,29"/>
+<area shape="rect" id="Node000006" href="$ast_8h.html" title="vega abstract syntax tree node types and constructors." alt="" coords="406,79,497,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="409,29,437,66,432,69,405,33"/>
+<area shape="rect" id="Node000007" href="$host_8h.html" title="libvega embedding interface." alt="" coords="521,79,619,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="427,28,530,71,528,76,425,33"/>
+<area shape="rect" id="Node000010" href="$expand_8h.html" title="Sdk&#45;internal expansion helpers. vega_setvar lives in &lt;vega/vega.h&gt; because hosts implement let agains..." alt="" coords="644,79,816,104"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="452,28,664,73,662,78,451,33"/>
+<area shape="rect" id="Node000011" href="$vega_8h.html" title="vega — Alcor2&#39;s shell scripting language. Public entry points." alt="" coords="840,79,943,104"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="486,28,827,76,826,81,486,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="477,152,559,177"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="564,106,537,142,532,139,559,103"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="583,152,658,177"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="581,103,607,139,602,142,576,106"/>
+</map>

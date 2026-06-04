@@ -1,0 +1,14 @@
+<map id="exec_stage_in_child" name="exec_stage_in_child">
+<area shape="rect" id="Node000001" title=" " alt="" coords="456,56,608,81"/>
+<area shape="rect" id="Node000002" href="$exec_8c.html#a71ef69197a1c04bbcd7e6216c03506f3" title=" " alt="" coords="297,5,408,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,55,398,33,399,28,474,50"/>
+<area shape="rect" id="Node000003" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="159,56,249,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="302,38,243,58,241,53,301,33"/>
+<area shape="poly" id="edge5_Node000003_Node000001" title=" " alt="" coords="263,66,456,66,456,71,263,71"/>
+<area shape="poly" id="edge6_Node000003_Node000003" title=" " alt="" coords="229,45,221,38,204,35,189,37,181,41,180,47,184,55,179,57,174,48,177,38,187,32,204,29,224,33,233,41"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html#af380c909e0c9b94aa47bb10f1e682d9f" title=" " alt="" coords="5,105,111,131"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,88,97,108,96,103,152,83"/>
+<area shape="rect" id="Node000007" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="17,56,99,81"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="145,71,100,71,100,66,145,66"/>
+<area shape="poly" id="edge4_Node000004_Node000001" title=" " alt="" coords="124,109,456,74,456,79,124,114"/>
+</map>

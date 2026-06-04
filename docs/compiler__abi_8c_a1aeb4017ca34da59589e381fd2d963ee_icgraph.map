@@ -1,0 +1,11 @@
+<map id="memset" name="memset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="453,31,529,56"/>
+<area shape="rect" id="Node000002" href="$ls_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="325,5,380,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="439,37,380,25,381,20,440,31"/>
+<area shape="rect" id="Node000003" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="300,55,405,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="440,55,406,61,405,56,440,50"/>
+<area shape="rect" id="Node000004" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="157,55,252,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="286,70,252,70,252,65,286,65"/>
+<area shape="rect" id="Node000005" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="5,55,109,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="144,70,109,70,109,65,144,65"/>
+</map>

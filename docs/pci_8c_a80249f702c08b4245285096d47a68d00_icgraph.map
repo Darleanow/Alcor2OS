@@ -1,0 +1,9 @@
+<map id="match_class" name="match_class">
+<area shape="rect" id="Node000001" title=" " alt="" coords="421,5,524,31"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#accf929056b06889454a27d9013ef3aee" title="Find PCI device by class and subclass." alt="" coords="251,5,373,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="408,21,374,21,374,15,408,15"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="124,5,203,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="237,21,203,21,203,15,237,15"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="5,5,76,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="110,21,76,21,76,15,110,15"/>
+</map>

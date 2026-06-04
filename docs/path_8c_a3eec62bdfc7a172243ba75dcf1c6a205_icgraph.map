@@ -1,0 +1,10 @@
+<map id="build_symlink_path" name="build_symlink_path">
+<area shape="rect" id="Node000001" title="Build a resolved path from a base path and a (possibly relative) symlink target." alt="" coords="563,5,712,31"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="359,5,515,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="549,21,515,21,515,15,549,15"/>
+<area shape="rect" id="Node000003" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="160,5,311,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="345,30,311,29,311,24,345,24"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="325,6,359,7,359,12,325,12"/>
+<area shape="rect" id="Node000004" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="5,5,112,31"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="146,21,112,21,112,15,146,15"/>
+</map>

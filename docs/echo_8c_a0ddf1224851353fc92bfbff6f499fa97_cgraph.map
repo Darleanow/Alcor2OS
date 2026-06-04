@@ -1,0 +1,38 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,207,60,232"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a856ce27279fc9ff59cc800cb6b638444" title="Parse command&#45;line arguments according to spec." alt="" coords="108,207,187,232"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,217,94,217,94,222,61,222"/>
+<area shape="rect" id="Node000003" href="$grendizer_8c.html#aa797faea2bca5a766903925a39cb8257" title="Increment the accumulating counter storage." alt="" coords="412,5,540,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="148,206,157,173,172,130,197,85,214,65,233,48,272,27,314,15,357,9,398,8,398,13,358,14,315,20,274,32,236,52,217,68,201,88,177,132,162,175,154,207"/>
+<area shape="rect" id="Node000004" href="$grendizer_8c.html#a567dd32fb181a8127afb574abb37fb6b" title="Write a formatted diagnostic to buf or fallback stream. Truncates with &quot;...&quot; when buf is too small; f..." alt="" coords="589,157,661,183"/>
+<area shape="poly" id="edge16_Node000002_Node000004" title=" " alt="" coords="150,205,161,180,178,148,202,116,233,92,276,73,315,63,351,61,386,65,457,88,542,121,596,148,593,152,540,126,455,93,384,70,351,66,316,68,278,78,236,96,206,120,182,151,166,182,155,207"/>
+<area shape="rect" id="Node000007" href="$grendizer_8c.html#ad77dd2a004746af8d162015d09c07540" title="Set the boolean flag storage to 1." alt="" coords="241,107,357,132"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="159,204,191,174,233,142,246,135,249,140,236,147,195,178,163,208"/>
+<area shape="rect" id="Node000008" href="$grendizer_8c.html#a7cd7ff450550ead6f6dea5d440874db8" title="Dispatch value parsing to the correct typed handler for o." alt="" coords="235,157,363,183"/>
+<area shape="poly" id="edge6_Node000002_Node000008" title=" " alt="" coords="186,204,245,185,247,190,188,209"/>
+<area shape="rect" id="Node000012" href="$grendizer_8c.html#a8c5930904c98c02e2c149425638d7a85" title="Find an option descriptor by long name, length&#45;bounded (no NUL required)." alt="" coords="249,207,349,232"/>
+<area shape="poly" id="edge14_Node000002_Node000012" title=" " alt="" coords="187,217,235,217,235,222,187,222"/>
+<area shape="rect" id="Node000013" href="$grendizer_8c.html#a5a02919a2bacd3e11e6c11c25f421f81" title="Find an option descriptor by its short character key." alt="" coords="246,256,351,281"/>
+<area shape="poly" id="edge15_Node000002_Node000013" title=" " alt="" coords="188,230,247,249,245,254,186,235"/>
+<area shape="rect" id="Node000014" href="$grendizer_8c.html#a5ad67079ff756c8f59550116192284db" title="Return non&#45;zero if the option kind requires a value token." alt="" coords="411,356,541,381"/>
+<area shape="poly" id="edge17_Node000002_Node000014" title=" " alt="" coords="163,231,194,261,236,290,276,310,318,326,399,350,397,355,316,331,274,315,233,295,191,265,159,234"/>
+<area shape="rect" id="Node000015" href="$grendizer_8c.html#a8dc5a5bb6f608ade07c04cc6d3028ac5" title="Resolve the display program name from spec and argv0." alt="" coords="241,407,356,432"/>
+<area shape="poly" id="edge18_Node000002_Node000015" title=" " alt="" coords="154,232,163,264,179,307,203,353,237,393,242,398,238,402,233,397,199,356,174,309,158,266,149,233"/>
+<area shape="rect" id="Node000017" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="258,357,339,383"/>
+<area shape="poly" id="edge20_Node000002_Node000017" title=" " alt="" coords="158,231,188,281,210,310,236,336,254,348,251,353,233,340,206,313,184,284,153,234"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="512,28,543,48,566,71,585,96,614,144,610,147,581,99,562,74,540,52,509,33"/>
+<area shape="poly" id="edge5_Node000007_Node000004" title=" " alt="" coords="357,123,542,149,576,156,575,161,541,154,356,128"/>
+<area shape="poly" id="edge7_Node000008_Node000004" title=" " alt="" coords="363,167,576,167,576,173,363,173"/>
+<area shape="rect" id="Node000009" href="$grendizer_8c.html#a0eae8d348350684f2fa1b77435cd0c0e" title="Parse a floating&#45;point value from text into out. Hand&#45;rolled to avoid a strtod dependency in freestan..." alt="" coords="415,208,537,233"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="345,180,418,202,417,207,343,185"/>
+<area shape="rect" id="Node000010" href="$grendizer_8c.html#a91c2a6ae03cea75ee7262316b3c395f2" title="Parse a signed decimal integer from text into out." alt="" coords="421,257,531,283"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="342,180,364,192,379,205,389,218,398,230,412,243,424,249,421,254,409,247,394,234,385,221,375,209,361,196,340,185"/>
+<area shape="rect" id="Node000011" href="$grendizer_8c.html#a8e70c9e2b4b39959c3a210f3aae769ce" title="Parse an unsigned decimal integer from text into out." alt="" coords="417,307,535,332"/>
+<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="348,181,365,192,383,218,389,243,395,268,413,292,419,298,416,302,409,296,391,270,384,245,378,220,361,196,345,185"/>
+<area shape="poly" id="edge9_Node000009_Node000004" title=" " alt="" coords="513,205,575,184,577,189,515,210"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="515,255,540,242,573,217,601,191,605,195,577,221,543,247,517,260"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="519,304,540,292,563,269,582,243,611,194,615,197,587,246,567,273,543,296,522,309"/>
+<area shape="rect" id="Node000016" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="417,407,535,432"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="356,417,403,417,403,422,356,422"/>
+<area shape="poly" id="edge21_Node000017_Node000014" title=" " alt="" coords="340,367,397,367,397,372,340,372"/>
+</map>

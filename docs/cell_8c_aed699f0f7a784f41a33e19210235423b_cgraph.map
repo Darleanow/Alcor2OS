@@ -1,0 +1,7 @@
+<map id="blit_underline_32bpp" name="blit_underline_32bpp">
+<area shape="rect" id="Node000001" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="5,31,164,56"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#ade3086a7926e6d075655c612091a204d" title="Pointer to the start of pixel&#45;x px_x on framebuffer row y in the 32&#45;bpp fast path." alt="" coords="212,5,299,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,29,198,24,199,29,164,34"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html#af20729b3f28f794e0ac0570ac8ef9c9d" title="32&#45;bit splat using rep stosl. Inlined across every TU that touches pixels because the call overhead d..." alt="" coords="228,55,283,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,52,215,59,214,64,164,57"/>
+</map>

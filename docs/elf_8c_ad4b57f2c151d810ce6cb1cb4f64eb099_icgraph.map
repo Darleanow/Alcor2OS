@@ -1,0 +1,14 @@
+<map id="elf_info_init" name="elf_info_init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="576,31,675,56"/>
+<area shape="rect" id="Node000002" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="443,5,518,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="562,35,518,27,519,22,563,30"/>
+<area shape="rect" id="Node000011" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="433,55,528,80"/>
+<area shape="poly" id="edge5_Node000001_Node000011" title=" " alt="" coords="563,56,529,62,528,57,562,51"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="244,31,385,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,28,386,35,385,30,429,23"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="31,5,170,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="230,36,170,29,171,24,230,31"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="5,55,196,80"/>
+<area shape="poly" id="edge4_Node000003_Node000009" title=" " alt="" coords="230,55,197,59,196,54,230,50"/>
+<area shape="poly" id="edge6_Node000011_Node000003" title=" " alt="" coords="419,61,385,56,386,51,420,56"/>
+</map>

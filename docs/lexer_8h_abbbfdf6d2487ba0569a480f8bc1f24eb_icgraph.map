@@ -1,0 +1,26 @@
+<map id="lex_token_free" name="lex_token_free">
+<area shape="rect" id="Node000001" title="Free a token&#39;s heap storage if any." alt="" coords="496,180,615,205"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#a969e47cdeb2e17e38d7636cd2dce5ce7" title=" " alt="" coords="323,79,448,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="523,174,447,126,411,107,414,102,449,121,526,170"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a214fd6eb4dcf7e6a104f94d9e7094dd4" title=" " alt="" coords="168,5,251,31"/>
+<area shape="poly" id="edge11_Node000001_Node000003" title=" " alt="" coords="538,170,501,117,476,90,447,68,397,46,344,32,294,24,251,21,251,16,294,19,345,26,399,41,449,64,480,86,506,114,543,167"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="5,155,96,180"/>
+<area shape="poly" id="edge14_Node000001_Node000004" title=" " alt="" coords="482,181,448,177,350,169,252,166,96,168,96,163,252,161,350,164,448,171,483,176"/>
+<area shape="rect" id="Node000033" href="$core_2vega_2parse_8c.html#af11d1e381b4ab40b77eb1a695e0b1eab" title=" " alt="" coords="144,180,275,205"/>
+<area shape="poly" id="edge7_Node000001_Node000033" title=" " alt="" coords="482,195,275,195,275,190,482,190"/>
+<area shape="rect" id="Node000010" href="$core_2vega_2parse_8c.html#a9bc1c8aed40cc8b4b3e64df2d6bb40ba" title=" " alt="" coords="170,231,249,256"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="483,206,249,240,249,235,482,201"/>
+<area shape="rect" id="Node000034" href="$core_2vega_2parse_8c.html#a415d331d76cb3622ce96292488032274" title=" " alt="" coords="344,281,427,307"/>
+<area shape="poly" id="edge12_Node000001_Node000034" title=" " alt="" coords="526,216,449,264,414,284,411,279,447,260,523,211"/>
+<area shape="rect" id="Node000012" href="$core_2vega_2parse_8c.html#a37fb9f6bddc87aa3381e31f183663b88" title="Parse line into an AST." alt="" coords="337,331,434,356"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="541,219,503,270,478,297,450,322,429,333,426,328,446,317,474,294,499,267,537,216"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="344,75,274,44,245,33,247,28,276,40,346,70"/>
+<area shape="rect" id="Node000007" href="$core_2vega_2parse_8c.html#a56e786533d4f52b9b9c4013b71cb224a" title=" " alt="" coords="172,79,247,104"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="309,94,247,94,247,89,309,89"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,37,146,44,117,71,92,102,61,156,56,153,88,99,113,68,142,40,154,32"/>
+<area shape="poly" id="edge6_Node000007_Node000004" title=" " alt="" coords="171,112,79,157,77,152,168,108"/>
+<area shape="poly" id="edge5_Node000007_Node000007" title=" " alt="" coords="237,68,229,60,209,57,193,59,184,64,183,70,187,77,183,80,177,70,180,61,191,54,209,52,231,55,240,64"/>
+<area shape="poly" id="edge8_Node000033_Node000004" title=" " alt="" coords="130,183,96,177,97,172,131,177"/>
+<area shape="poly" id="edge10_Node000010_Node000004" title=" " alt="" coords="162,228,143,219,73,182,76,178,145,214,165,223"/>
+<area shape="poly" id="edge13_Node000034_Node000004" title=" " alt="" coords="330,301,288,301,240,297,190,288,143,270,114,250,90,226,57,182,62,179,94,223,118,246,145,265,191,282,240,292,288,296,330,296"/>
+</map>

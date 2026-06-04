@@ -1,0 +1,5 @@
+<map id="proc_clone" name="proc_clone">
+<area shape="rect" id="Node000001" title="Clone the task like fork, but the child resumes with user RSP child_stack when non&#45;zero (musl posix_s..." alt="" coords="140,5,232,31"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e" title="Duplicate the calling process (clone)." alt="" coords="5,5,92,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
+</map>

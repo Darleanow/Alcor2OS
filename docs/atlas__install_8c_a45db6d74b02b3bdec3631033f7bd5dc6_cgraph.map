@@ -1,0 +1,9 @@
+<map id="clear_framebuffer_to_default_bg" name="clear_framebuffer_to_default_bg">
+<area shape="rect" id="Node000001" title="Bg&#45;fill the whole framebuffer (margins included) at the current default bg colour." alt="" coords="5,23,164,63"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="212,31,313,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,41,198,41,198,46,164,46"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="361,5,452,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="313,32,347,26,348,31,314,37"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="361,55,452,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="314,49,348,55,347,60,313,54"/>
+</map>

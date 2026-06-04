@@ -1,0 +1,12 @@
+<map id="sh_closedir" name="sh_closedir">
+<area shape="rect" id="Node000001" title="Close the DIR stream dir." alt="" coords="461,31,556,56"/>
+<area shape="rect" id="Node000002" href="$complete_8c.html#a098b0148d9bc1cb0deca349abb5b98a2" title="Scan a directory for command&#45;name entries matching prefix." alt="" coords="302,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="447,36,412,30,413,25,448,31"/>
+<area shape="rect" id="Node000008" href="$complete_8c.html#aa61f9f2bc47d14007ed6b24c853a44bd" title="Scan a directory for path&#45;completion entries matching name_prefix." alt="" coords="301,55,413,80"/>
+<area shape="poly" id="edge4_Node000001_Node000008" title=" " alt="" coords="448,56,414,61,413,56,447,50"/>
+<area shape="rect" id="Node000003" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="148,31,253,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="289,32,254,37,253,32,288,27"/>
+<area shape="rect" id="Node000004" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="5,31,100,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,46,100,46,100,41,134,41"/>
+<area shape="poly" id="edge5_Node000008_Node000003" title=" " alt="" coords="287,59,253,54,254,49,288,54"/>
+</map>

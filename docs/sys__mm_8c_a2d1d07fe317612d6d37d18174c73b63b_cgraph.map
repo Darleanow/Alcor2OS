@@ -1,0 +1,31 @@
+<map id="sys_brk" name="sys_brk">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,200,77,225"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="478,49,537,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="52,197,88,161,143,114,212,68,249,49,289,35,335,28,383,29,427,36,465,45,464,50,426,41,382,34,336,33,290,40,251,54,214,72,146,118,92,165,56,201"/>
+<area shape="rect" id="Node000003" href="$sys__mm_8c.html#a8b6f3e2b4bcb25bcb8477b3794fabb63" title=" " alt="" coords="125,301,241,326"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="58,223,127,279,147,292,144,296,124,284,55,227"/>
+<area shape="rect" id="Node000004" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="460,224,555,249"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="78,211,446,230,446,236,77,217"/>
+<area shape="rect" id="Node000007" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="132,350,235,376"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="50,224,78,278,100,309,127,337,133,341,129,345,124,341,96,313,74,281,46,226"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="607,62,735,88"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="45,198,72,139,95,105,124,74,164,46,200,30,289,14,365,4,425,5,484,16,559,34,627,55,625,60,558,39,483,21,424,11,365,9,290,19,202,35,167,50,127,78,99,108,76,142,50,201"/>
+<area shape="rect" id="Node000009" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="137,149,229,174"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="77,197,133,176,135,181,78,202"/>
+<area shape="rect" id="Node000005" href="$pmm_8c.html#aaed7a89cb2264555f10bf9e03b06676e" title="Mark page as allocated in bitmap." alt="" coords="623,198,718,224"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="554,226,609,218,610,223,555,232"/>
+<area shape="rect" id="Node000006" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="621,248,721,273"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="555,240,607,248,606,254,554,246"/>
+<area shape="rect" id="Node000010" href="$cpu_8c.html#a79c2518c5bb9a861f616254c974685b4" title="Invalidate a single page in the TLB." alt="" coords="303,50,395,76"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="199,147,238,117,288,85,299,79,302,84,291,89,241,121,202,151"/>
+<area shape="rect" id="Node000011" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="295,100,403,125"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="226,146,291,126,293,132,227,151"/>
+<area shape="rect" id="Node000012" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="289,149,408,174"/>
+<area shape="poly" id="edge11_Node000009_Node000012" title=" " alt="" coords="230,159,276,159,276,164,230,164"/>
+<area shape="rect" id="Node000013" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="456,149,559,174"/>
+<area shape="poly" id="edge16_Node000009_Node000013" title=" " alt="" coords="230,172,290,183,349,187,408,183,450,175,451,180,408,188,349,193,289,188,229,177"/>
+<area shape="poly" id="edge12_Node000012_Node000002" title=" " alt="" coords="382,146,407,134,446,108,480,81,483,85,449,112,409,139,384,151"/>
+<area shape="poly" id="edge15_Node000012_Node000004" title=" " alt="" coords="378,172,468,215,466,220,376,177"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="408,159,442,159,442,164,408,164"/>
+<area shape="poly" id="edge14_Node000013_Node000008" title=" " alt="" coords="531,146,632,92,635,97,534,151"/>
+</map>

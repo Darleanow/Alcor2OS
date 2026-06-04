@@ -1,0 +1,23 @@
+<map id="futex_read_u32" name="futex_read_u32">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,128,64"/>
+<area shape="rect" id="Node000002" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="548,90,651,115"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,36,186,19,284,6,338,3,393,5,448,12,501,25,544,48,578,77,575,82,541,53,499,30,447,17,393,10,338,8,285,11,187,24,112,42"/>
+<area shape="rect" id="Node000004" href="$sys__misc_8c.html#a8a3d72124ddacfcc1825b04f29980211" title=" " alt="" coords="187,39,288,64"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="128,49,173,49,173,54,128,54"/>
+<area shape="rect" id="Node000006" href="$vmm_8c.html#a79058902336b9774ccdf1efa90360b18" title="Translate virtual address to physical address in current address space." alt="" coords="176,115,299,140"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="97,62,196,107,194,112,95,67"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="699,90,827,115"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="651,100,684,100,684,105,651,105"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="347,39,500,64"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="288,49,333,49,333,54,288,54"/>
+<area shape="poly" id="edge11_Node000006_Node000002" title=" " alt="" coords="299,121,534,104,534,110,299,126"/>
+<area shape="rect" id="Node000007" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="369,140,477,166"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="299,133,356,141,356,147,298,139"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="364,190,483,215"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="265,138,348,176,366,183,365,188,346,181,262,143"/>
+<area shape="poly" id="edge9_Node000008_Node000002" title=" " alt="" coords="472,187,499,176,539,150,573,122,576,127,542,154,501,181,475,192"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="570,164,629,190"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="482,191,556,181,557,186,483,197"/>
+<area shape="rect" id="Node000010" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="552,214,647,239"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="483,208,539,216,538,221,483,213"/>
+</map>

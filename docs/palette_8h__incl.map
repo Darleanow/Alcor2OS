@@ -1,0 +1,9 @@
+<map id="user/include/spazer/palette.h" name="user/include/spazer/palette.h">
+<area shape="rect" id="Node000001" title="Spazer palette — re&#45;exports theme.h and boxdraw.h." alt="" coords="29,5,177,45"/>
+<area shape="rect" id="Node000002" href="$boxdraw_8h.html" title="UTF&#45;8 box&#45;drawing character literals for write()/printf() output." alt="" coords="5,93,95,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,47,68,83,64,80,88,44"/>
+<area shape="rect" id="Node000003" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="119,93,195,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,44,143,80,139,83,114,47"/>
+<area shape="rect" id="Node000004" href="$catppuccin_8h.html" title="Catppuccin Mocha palette — xterm&#45;256 indices and true&#45;colour ANSI escapes." alt="" coords="105,167,209,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="159,119,159,153,154,153,154,119"/>
+</map>

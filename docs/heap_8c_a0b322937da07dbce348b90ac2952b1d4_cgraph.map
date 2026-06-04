@@ -1,0 +1,25 @@
+<map id="krealloc" name="krealloc">
+<area shape="rect" id="Node000001" title="Reallocate memory to a new size." alt="" coords="5,128,80,153"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="143,55,199,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,126,135,85,138,89,67,130"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="134,128,209,153"/>
+<area shape="poly" id="edge5_Node000001_Node000016" title=" " alt="" coords="80,138,120,138,120,143,80,143"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="128,177,215,203"/>
+<area shape="poly" id="edge11_Node000001_Node000015" title=" " alt="" coords="77,151,125,170,123,175,75,156"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="284,5,363,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="199,56,270,32,272,37,200,61"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="269,55,378,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="199,65,255,65,255,70,199,70"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="438,55,566,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="378,65,425,65,425,70,378,70"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="263,104,384,129"/>
+<area shape="poly" id="edge6_Node000016_Node000017" title=" " alt="" coords="208,132,249,126,249,131,209,137"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="269,153,378,179"/>
+<area shape="poly" id="edge7_Node000016_Node000018" title=" " alt="" coords="209,144,255,152,254,157,208,149"/>
+<area shape="rect" id="Node000030" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="277,203,369,228"/>
+<area shape="poly" id="edge10_Node000016_Node000030" title=" " alt="" coords="196,151,264,189,277,195,275,200,261,194,194,156"/>
+<area shape="rect" id="Node000019" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="432,128,572,153"/>
+<area shape="poly" id="edge8_Node000018_Node000019" title=" " alt="" coords="378,156,418,150,419,155,379,161"/>
+<area shape="rect" id="Node000022" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="456,177,548,203"/>
+<area shape="poly" id="edge9_Node000018_Node000022" title=" " alt="" coords="379,171,442,179,441,185,378,176"/>
+</map>

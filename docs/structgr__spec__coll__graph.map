@@ -1,0 +1,5 @@
+<map id="gr_spec" name="gr_spec">
+<area shape="rect" id="Node000001" title="Parsing context passed to gr_parse." alt="" coords="5,93,77,119"/>
+<area shape="rect" id="Node000002" href="$structgr__opt.html" title="Descriptor for one command&#45;line option." alt="" coords="10,5,73,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="44,45,44,93,39,93,39,45"/>
+</map>

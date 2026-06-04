@@ -1,0 +1,10 @@
+<map id="feed_utf8" name="feed_utf8">
+<area shape="rect" id="Node000001" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="531,29,615,55"/>
+<area shape="poly" id="edge4_Node000001_Node000001" title=" " alt="" coords="595,18,588,11,573,8,559,10,552,14,550,20,554,28,550,30,545,21,548,11,557,5,573,3,591,6,599,14"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#aed57f05021fc0a714155c4f892ef5cee" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="396,29,483,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="517,45,483,45,483,39,517,39"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#af6749d9339bf3beb3f2a7d2dfbcf686d" title="Feed len bytes through the ANSI/UTF&#45;8 parser without flushing." alt="" coords="185,29,348,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="382,45,348,45,348,39,382,39"/>
+<area shape="rect" id="Node000004" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="5,29,137,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="172,45,138,45,138,39,172,39"/>
+</map>

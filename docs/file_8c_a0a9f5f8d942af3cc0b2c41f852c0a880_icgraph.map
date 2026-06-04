@@ -1,0 +1,5 @@
+<map id="ext2_create" name="ext2_create">
+<area shape="rect" id="Node000001" title="Create a new file on an ext2 volume." alt="" coords="173,5,272,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#a595f6c9fe7f4bf9922cc86d06469caa5" title="fs_ops_t.open shim — routes O_CREAT to ext2_create, else to ext2_open." alt="" coords="5,5,125,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,21,126,21,126,15,160,15"/>
+</map>

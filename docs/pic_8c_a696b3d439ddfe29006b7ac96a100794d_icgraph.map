@@ -1,0 +1,5 @@
+<map id="pic_eoi" name="pic_eoi">
+<area shape="rect" id="Node000001" title="Send End&#45;Of&#45;Interrupt signal to the PIC." alt="" coords="148,5,216,31"/>
+<area shape="rect" id="Node000002" href="$idt_8c.html#af94018d2295ea8c5c8bb95e454c64784" title=" " alt="" coords="5,5,100,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,21,100,21,100,15,134,15"/>
+</map>

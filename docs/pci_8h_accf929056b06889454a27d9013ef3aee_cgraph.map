@@ -1,0 +1,19 @@
+<map id="pci_find_device" name="pci_find_device">
+<area shape="rect" id="Node000001" title="Find PCI device by class and subclass." alt="" coords="5,32,128,57"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#a80249f702c08b4245285096d47a68d00" title=" " alt="" coords="177,7,279,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,32,162,27,163,32,129,38"/>
+<area shape="rect" id="Node000003" href="$pci_8c.html#a21f2f28f1e12177e4ea4f88554ae3ae6" title="Iterate all PCI devices and invoke cb until it returns true." alt="" coords="176,56,280,81"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="129,51,163,56,162,62,128,56"/>
+<area shape="rect" id="Node000004" href="$pci_8c.html#a04b573b20a07f8bfa9ccefb89e1f3115" title="Read 16&#45;bit value from PCI configuration space." alt="" coords="503,5,596,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="276,53,328,42,488,21,489,26,328,47,277,59"/>
+<area shape="rect" id="Node000009" href="$pci_8c.html#a723f5f1bea79b9954324982481e994d4" title="Read 8&#45;bit value from PCI configuration space." alt="" coords="507,107,592,132"/>
+<area shape="poly" id="edge5_Node000003_Node000009" title=" " alt="" coords="274,79,328,91,415,104,493,112,492,118,414,110,328,97,273,84"/>
+<area shape="rect" id="Node000010" href="$pci_8c.html#a64c38b3266cb57b1ff1417e1e8e5da2a" title=" " alt="" coords="328,56,455,81"/>
+<area shape="poly" id="edge7_Node000003_Node000010" title=" " alt="" coords="280,66,314,66,314,71,280,71"/>
+<area shape="rect" id="Node000005" href="$pci_8c.html#ae8802a65150faad75ccd3af146dbfdff" title="Read 32&#45;bit value from PCI configuration space." alt="" coords="644,56,737,81"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="587,28,642,49,641,54,585,33"/>
+<area shape="poly" id="edge6_Node000009_Node000005" title=" " alt="" coords="585,104,641,84,642,89,587,109"/>
+<area shape="poly" id="edge8_Node000010_Node000004" title=" " alt="" coords="431,53,495,33,496,38,433,58"/>
+<area shape="poly" id="edge9_Node000010_Node000005" title=" " alt="" coords="455,66,630,66,630,71,455,71"/>
+<area shape="poly" id="edge10_Node000010_Node000009" title=" " alt="" coords="433,79,496,100,495,105,431,84"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="prepare_irq_wait" name="prepare_irq_wait">
+<area shape="rect" id="Node000001" title="Prepare a channel for IRQ&#45;driven command completion." alt="" coords="5,31,136,56"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="184,5,353,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,32,170,28,171,33,137,38"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="217,55,320,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="137,49,204,57,203,62,136,54"/>
+</map>

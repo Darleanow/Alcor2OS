@@ -1,0 +1,10 @@
+<map id="ast_new_if" name="ast_new_if">
+<area shape="rect" id="Node000001" title="Allocate an AST_IF node, taking ownership of cond, then_branch, and (optionally NULL) else_branch." alt="" coords="432,29,524,55"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#a56e786533d4f52b9b9c4013b71cb224a" title=" " alt="" coords="309,29,384,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="418,45,384,45,384,39,418,39"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="369,18,362,11,347,8,333,10,326,14,325,20,329,28,324,30,320,21,322,11,331,5,347,3,365,6,373,14"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="171,29,261,55"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="295,45,261,45,261,39,295,39"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="5,29,123,55"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="157,45,123,45,123,39,157,39"/>
+</map>

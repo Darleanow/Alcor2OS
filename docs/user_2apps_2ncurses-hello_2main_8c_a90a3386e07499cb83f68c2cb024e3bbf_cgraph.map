@@ -1,0 +1,21 @@
+<map id="screen_menu" name="screen_menu">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,128,115,153"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2ncurses-hello_2main_8c.html#a4377930a011086dc422ce563f01679f1" title=" " alt="" coords="171,29,293,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,126,195,59,198,64,84,130"/>
+<area shape="rect" id="Node000004" href="$spazer_8c.html#a494217fd4b328802c926e25e7802bd9d" title=" " alt="" coords="188,103,276,128"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="115,130,174,121,175,126,115,135"/>
+<area shape="rect" id="Node000008" href="$spazer_8c.html#a0b4ab5dcfb2068e9b906f75de8f1fd78" title=" " alt="" coords="349,153,489,179"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="115,142,335,157,335,163,115,147"/>
+<area shape="rect" id="Node000009" href="$spazer_8c.html#acc8a84e0c39e0ecc82c0682da852a7b4" title=" " alt="" coords="163,204,301,229"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="91,151,191,196,189,201,89,156"/>
+<area shape="rect" id="Node000003" href="$spazer_8c.html#a0859dec92d5b0eb613363977e0805c6e" title=" " alt="" coords="363,5,475,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="293,31,349,24,350,30,294,37"/>
+<area shape="rect" id="Node000005" href="$spazer_8c.html#a8d74493be99c8c9595d8bb86276f0fd5" title=" " alt="" coords="362,55,477,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="275,102,355,81,357,86,277,107"/>
+<area shape="rect" id="Node000006" href="$spazer_8c.html#a3c15ac437f9ced5f1c63c0efa7406e9a" title=" " alt="" coords="359,104,480,129"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="276,113,345,113,345,119,276,118"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="277,125,359,147,358,152,275,130"/>
+<area shape="rect" id="Node000007" href="$spazer_8c.html#aacb565e999310637e95a0607e69ef6bd" title=" " alt="" coords="537,155,640,180"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="463,127,533,148,532,153,462,132"/>
+<area shape="poly" id="edge9_Node000009_Node000007" title=" " alt="" coords="301,209,391,201,489,187,524,180,525,186,490,193,391,206,302,215"/>
+</map>

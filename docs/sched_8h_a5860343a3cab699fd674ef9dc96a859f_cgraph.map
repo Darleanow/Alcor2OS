@@ -1,0 +1,67 @@
+<map id="proc_exit" name="proc_exit">
+<area shape="rect" id="Node000001" title="Exit the current process with code. Does not return." alt="" coords="5,282,88,308"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="172,109,281,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,281,60,252,77,215,102,177,134,144,157,131,160,136,138,148,106,180,82,218,65,254,54,283"/>
+<area shape="rect" id="Node000014" href="$cpu_8c.html#a914a92c64f247056c5432b0caf50f547" title="Halt the CPU indefinitely." alt="" coords="188,257,265,282"/>
+<area shape="poly" id="edge9_Node000001_Node000014" title=" " alt="" coords="88,287,174,274,175,280,89,292"/>
+<area shape="rect" id="Node000016" href="$kbd__layout_8c.html#a00b1c813a1bcb350df46f9d55810696a" title="Toggle \x00&lt;char&gt; key&#45;release sentinels." alt="" coords="137,158,316,184"/>
+<area shape="poly" id="edge11_Node000001_Node000016" title=" " alt="" coords="54,281,85,237,108,213,135,193,146,186,149,191,137,197,112,217,89,241,58,284"/>
+<area shape="rect" id="Node000017" href="$mouse_8c.html#abf17473a267e0d4c04fe3d6e89835775" title="Enable or disable relative mode (cursor pinned to centre, raw deltas passed through)...." alt="" coords="151,208,302,233"/>
+<area shape="poly" id="edge12_Node000001_Node000017" title=" " alt="" coords="65,280,97,261,135,242,155,235,157,240,137,247,100,265,68,285"/>
+<area shape="rect" id="Node000019" href="$pit_8c.html#a3337be496f83d39022cfe60700673475" title="Clear all fast&#45;rate votes; called on process exit." alt="" coords="171,34,282,60"/>
+<area shape="poly" id="edge15_Node000001_Node000019" title=" " alt="" coords="48,282,57,246,74,197,99,144,134,95,154,77,177,63,180,68,158,81,138,98,104,146,79,199,62,248,53,283"/>
+<area shape="rect" id="Node000021" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="411,408,489,433"/>
+<area shape="poly" id="edge18_Node000001_Node000021" title=" " alt="" coords="69,305,101,323,137,341,256,374,397,407,396,412,255,379,135,346,98,328,67,310"/>
+<area shape="rect" id="Node000022" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="169,306,284,332"/>
+<area shape="poly" id="edge19_Node000001_Node000022" title=" " alt="" coords="89,298,156,307,156,312,88,303"/>
+<area shape="rect" id="Node000030" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="179,408,275,433"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="59,306,91,345,113,367,137,386,167,401,165,406,135,391,109,371,87,349,55,309"/>
+<area shape="rect" id="Node000031" href="$proc_8c.html#a605acc71b74a4015f96530987df63a80" title=" " alt="" coords="136,457,317,482"/>
+<area shape="poly" id="edge31_Node000001_Node000031" title=" " alt="" coords="54,307,82,372,106,410,138,442,148,449,145,453,134,446,102,413,77,375,49,309"/>
+<area shape="rect" id="Node000032" href="$vfs_8c.html#a54d444c54dfa18b4b8a15ea152b8d300" title="Release all file descriptors held by an exiting process." alt="" coords="147,506,306,532"/>
+<area shape="poly" id="edge33_Node000001_Node000032" title=" " alt="" coords="52,307,60,344,75,394,101,447,118,471,138,492,146,498,143,502,134,496,113,474,96,449,70,396,55,345,47,308"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="386,109,514,134"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="281,119,372,119,372,124,281,124"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="606,84,726,109"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="514,112,592,102,593,108,515,117"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="617,133,715,158"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="514,126,604,136,604,141,514,131"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="797,146,899,172"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="479,132,527,151,583,167,635,173,688,174,783,166,784,172,689,179,635,178,582,172,525,157,477,137"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="637,34,695,60"/>
+<area shape="poly" id="edge8_Node000003_Node000011" title=" " alt="" coords="481,106,582,68,623,56,625,61,584,74,483,111"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="823,72,873,97"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="726,90,809,84,809,90,726,95"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="715,147,784,152,783,157,715,152"/>
+<area shape="rect" id="Node000015" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="365,257,535,282"/>
+<area shape="poly" id="edge10_Node000014_Node000015" title=" " alt="" coords="265,267,352,267,352,272,265,272"/>
+<area shape="poly" id="edge13_Node000017_Node000015" title=" " alt="" coords="285,230,379,251,378,257,284,236"/>
+<area shape="rect" id="Node000018" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="583,234,749,260"/>
+<area shape="poly" id="edge14_Node000017_Node000018" title=" " alt="" coords="302,222,569,238,569,244,302,228"/>
+<area shape="rect" id="Node000020" href="$pit_8c.html#aeb02a58361ba396db774530bfe97be0e" title="Program PIT channel 0 for frequency Hz (clamped to a sane range)." alt="" coords="399,10,501,36"/>
+<area shape="poly" id="edge16_Node000019_Node000020" title=" " alt="" coords="282,38,385,27,386,33,283,44"/>
+<area shape="poly" id="edge17_Node000020_Node000005" title=" " alt="" coords="501,12,553,6,616,3,684,6,750,19,790,37,823,60,820,65,787,42,749,24,683,11,616,8,554,11,501,17"/>
+<area shape="poly" id="edge20_Node000022_Node000015" title=" " alt="" coords="284,304,378,283,379,288,285,309"/>
+<area shape="poly" id="edge21_Node000022_Node000018" title=" " alt="" coords="284,318,401,313,468,305,534,291,558,281,582,269,603,261,605,266,584,273,560,286,535,296,469,310,401,318,285,323"/>
+<area shape="rect" id="Node000023" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="401,358,499,384"/>
+<area shape="poly" id="edge22_Node000022_Node000023" title=" " alt="" coords="283,329,388,354,387,359,281,334"/>
+<area shape="poly" id="edge24_Node000023_Node000018" title=" " alt="" coords="498,356,533,337,548,320,556,303,564,286,581,269,590,263,593,268,584,273,569,289,561,306,552,323,536,341,500,361"/>
+<area shape="rect" id="Node000024" href="$proc_8c.html#a2b49e9b247efbece339a2f95a191ef64" title="Low&#45;level context switch function." alt="" coords="606,432,726,457"/>
+<area shape="poly" id="edge23_Node000023_Node000024" title=" " alt="" coords="500,381,536,393,584,417,607,425,605,430,582,421,534,397,499,386"/>
+<area shape="rect" id="Node000025" href="$cpu_8c.html#a18a6945bd70a07d34d7133848b6fb519" title="Get the current FS base MSR value." alt="" coords="601,481,731,506"/>
+<area shape="poly" id="edge25_Node000023_Node000025" title=" " alt="" coords="501,376,536,393,553,412,561,431,569,449,584,466,595,473,592,477,581,470,564,452,556,433,549,414,533,397,498,381"/>
+<area shape="rect" id="Node000026" href="$cpu_8c.html#a1c5d89ceee7d8c90e90526e6fec26e6f" title="Set the FS base MSR for thread&#45;local storage." alt="" coords="601,284,731,309"/>
+<area shape="poly" id="edge26_Node000023_Node000026" title=" " alt="" coords="484,356,534,337,582,318,605,310,606,316,584,323,536,341,486,361"/>
+<area shape="rect" id="Node000027" href="$gdt_8c.html#af95c2c00bd26bfbb9016f228e3daaa26" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="615,333,717,358"/>
+<area shape="poly" id="edge27_Node000023_Node000027" title=" " alt="" coords="499,363,601,351,601,356,500,368"/>
+<area shape="rect" id="Node000028" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="613,382,719,408"/>
+<area shape="poly" id="edge28_Node000023_Node000028" title=" " alt="" coords="500,374,600,385,599,390,499,379"/>
+<area shape="poly" id="edge30_Node000030_Node000021" title=" " alt="" coords="275,418,397,418,397,423,275,423"/>
+<area shape="poly" id="edge32_Node000031_Node000021" title=" " alt="" coords="284,454,397,429,398,434,285,460"/>
+<area shape="rect" id="Node000033" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="389,530,511,556"/>
+<area shape="poly" id="edge34_Node000032_Node000033" title=" " alt="" coords="307,525,376,532,375,538,306,530"/>
+<area shape="rect" id="Node000034" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="603,580,729,605"/>
+<area shape="poly" id="edge35_Node000033_Node000034" title=" " alt="" coords="507,553,597,574,596,579,506,558"/>
+<area shape="rect" id="Node000036" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="602,530,730,556"/>
+<area shape="poly" id="edge36_Node000033_Node000036" title=" " alt="" coords="511,540,588,540,588,546,511,546"/>
+</map>

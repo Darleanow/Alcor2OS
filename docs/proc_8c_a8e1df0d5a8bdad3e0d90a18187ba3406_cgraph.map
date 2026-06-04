@@ -1,0 +1,70 @@
+<map id="proc_clone" name="proc_clone">
+<area shape="rect" id="Node000001" title="Clone the task like fork, but the child resumes with user RSP child_stack when non&#45;zero (musl posix_s..." alt="" coords="5,621,97,647"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="145,621,264,647"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,631,132,631,132,637,97,637"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="367,31,476,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="205,621,216,525,238,375,269,222,289,160,310,115,340,83,376,60,379,65,344,87,314,118,294,162,275,223,243,376,221,525,210,622"/>
+<area shape="rect" id="Node000015" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="384,129,459,155"/>
+<area shape="poly" id="edge4_Node000002_Node000015" title=" " alt="" coords="204,621,209,556,224,455,238,397,256,338,280,280,310,226,344,188,383,160,386,164,348,192,314,229,285,282,261,339,243,398,230,456,214,557,209,621"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="620,203,707,228"/>
+<area shape="poly" id="edge8_Node000002_Node000014" title=" " alt="" coords="204,621,211,571,228,498,242,458,260,418,282,380,310,347,343,318,380,294,420,273,460,257,539,233,606,220,607,225,540,238,462,262,422,278,383,298,346,322,314,351,287,383,265,420,247,460,234,500,217,572,210,622"/>
+<area shape="rect" id="Node000030" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="624,784,703,809"/>
+<area shape="poly" id="edge9_Node000002_Node000030" title=" " alt="" coords="222,645,261,676,313,706,372,728,420,738,469,745,531,758,611,780,610,785,530,763,468,750,419,743,370,733,311,711,258,680,219,649"/>
+<area shape="rect" id="Node000031" href="$proc_8c.html#a40d46395d176126b25c230734917a8a1" title="Allocate a free process slot from the process table." alt="" coords="377,672,465,697"/>
+<area shape="poly" id="edge10_Node000002_Node000031" title=" " alt="" coords="261,644,365,669,363,674,259,649"/>
+<area shape="rect" id="Node000034" href="$proc_8c.html#a05cb45e33877daf7c114aa14309b4613" title="Entry point for forked child processes." alt="" coords="340,773,503,799"/>
+<area shape="poly" id="edge16_Node000002_Node000034" title=" " alt="" coords="216,645,254,697,282,727,313,752,343,766,341,771,311,756,278,731,250,701,212,649"/>
+<area shape="rect" id="Node000035" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="364,847,479,872"/>
+<area shape="poly" id="edge17_Node000002_Node000035" title=" " alt="" coords="213,646,248,721,277,767,314,808,338,826,365,839,363,844,336,830,310,812,273,770,243,723,208,648"/>
+<area shape="rect" id="Node000045" href="$vfs_8c.html#a70fac88fc076d7652f7f0956468e0046" title="Copy the parent&#39;s fd table into the child&#39;s after fork." alt="" coords="345,945,498,971"/>
+<area shape="poly" id="edge22_Node000002_Node000045" title=" " alt="" coords="211,646,222,689,243,750,273,818,292,851,314,882,347,913,383,936,380,941,344,917,310,885,288,854,268,820,238,752,217,690,206,647"/>
+<area shape="rect" id="Node000047" href="$vmm_8c.html#aca93d0285bf352c3551ae24b92a73744" title="Clone an address space for fork()." alt="" coords="321,361,522,387"/>
+<area shape="poly" id="edge24_Node000002_Node000047" title=" " alt="" coords="215,619,399,396,403,399,219,623"/>
+<area shape="rect" id="Node000052" href="$vmm_8c.html#a8966edc063e975473a71b57a1b39c886" title="Destroy all user mappings in an address space." alt="" coords="312,584,531,609"/>
+<area shape="poly" id="edge35_Node000002_Node000052" title=" " alt="" coords="264,621,333,609,334,614,265,626"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="599,5,727,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="476,35,586,23,586,29,477,40"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="603,55,724,80"/>
+<area shape="poly" id="edge5_Node000015_Node000016" title=" " alt="" coords="458,127,578,89,603,81,605,86,579,94,460,132"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="609,104,718,129"/>
+<area shape="poly" id="edge6_Node000015_Node000017" title=" " alt="" coords="459,136,594,121,595,126,459,141"/>
+<area shape="rect" id="Node000029" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="617,153,709,179"/>
+<area shape="poly" id="edge7_Node000015_Node000029" title=" " alt="" coords="459,143,604,157,603,163,459,148"/>
+<area shape="poly" id="edge11_Node000031_Node000030" title=" " alt="" coords="466,689,500,699,532,714,548,728,557,743,566,756,580,769,612,784,610,788,577,774,562,760,552,745,544,732,529,719,498,704,465,694"/>
+<area shape="rect" id="Node000032" href="$ktermios_8c.html#a1a9811c2c69a777da120ed3d4dd28520" title="Reset t to the cooked&#45;TTY defaults a freshly forked PID would expect (ICRNL|ONLCR|CS8|CREAD|CLOCAL|IS..." alt="" coords="583,685,744,711"/>
+<area shape="poly" id="edge12_Node000031_Node000032" title=" " alt="" coords="466,684,569,690,569,695,465,690"/>
+<area shape="rect" id="Node000025" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="850,635,909,660"/>
+<area shape="poly" id="edge14_Node000031_Node000025" title=" " alt="" coords="465,678,836,648,837,653,466,684"/>
+<area shape="rect" id="Node000033" href="$vfs_8c.html#a80c978da31292631e5055bf9b776eaa3" title="Initialise fds to the &quot;all closed&quot; state (&#45;1 in every slot)." alt="" coords="597,735,729,760"/>
+<area shape="poly" id="edge15_Node000031_Node000033" title=" " alt="" coords="466,693,601,729,599,734,465,698"/>
+<area shape="poly" id="edge13_Node000032_Node000025" title=" " alt="" coords="718,683,836,655,837,660,719,688"/>
+<area shape="rect" id="Node000036" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="579,833,748,859"/>
+<area shape="poly" id="edge18_Node000035_Node000036" title=" " alt="" coords="479,854,565,849,565,854,479,859"/>
+<area shape="rect" id="Node000037" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="796,909,963,935"/>
+<area shape="poly" id="edge19_Node000035_Node000037" title=" " alt="" coords="479,864,783,906,782,911,479,870"/>
+<area shape="rect" id="Node000038" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="614,935,713,960"/>
+<area shape="poly" id="edge20_Node000035_Node000038" title=" " alt="" coords="458,870,615,927,614,932,457,875"/>
+<area shape="poly" id="edge21_Node000038_Node000037" title=" " alt="" coords="713,939,782,931,783,936,713,944"/>
+<area shape="rect" id="Node000046" href="$vfs_8c.html#aa6ae139c297636a7f4ab9c9980b856e1" title="Increment the OFT refcount for slot idx." alt="" coords="608,984,719,1009"/>
+<area shape="poly" id="edge23_Node000045_Node000046" title=" " alt="" coords="499,968,595,983,594,988,498,973"/>
+<area shape="poly" id="edge25_Node000047_Node000014" title=" " alt="" coords="434,359,493,306,534,274,577,245,607,231,610,235,580,250,537,278,496,310,437,363"/>
+<area shape="rect" id="Node000026" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="828,333,931,359"/>
+<area shape="poly" id="edge26_Node000047_Node000026" title=" " alt="" coords="438,359,498,322,537,303,578,289,625,279,663,276,701,280,749,289,800,304,845,325,842,329,798,309,747,294,700,285,663,282,626,284,579,294,539,308,500,326,441,364"/>
+<area shape="rect" id="Node000028" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="832,401,927,427"/>
+<area shape="poly" id="edge27_Node000047_Node000028" title=" " alt="" coords="474,384,579,403,707,412,818,413,818,418,707,417,578,409,473,389"/>
+<area shape="rect" id="Node000048" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="835,533,924,559"/>
+<area shape="poly" id="edge28_Node000047_Node000048" title=" " alt="" coords="434,385,456,414,489,451,531,489,580,518,641,538,706,548,768,551,821,549,821,555,768,556,705,554,640,543,578,523,528,493,485,455,452,418,429,388"/>
+<area shape="rect" id="Node000050" href="$vmm_8c.html#ab321838b3005bc8babeab2f24daeb3d2" title="Create a new address space (PML4) for a process." alt="" coords="582,354,745,394"/>
+<area shape="poly" id="edge29_Node000047_Node000050" title=" " alt="" coords="522,371,568,371,568,377,522,377"/>
+<area shape="rect" id="Node000051" href="$vmm_8c.html#a8558a335feee5b72f59e28085c1716d7" title="Map a page in a specific address space." alt="" coords="608,304,719,329"/>
+<area shape="poly" id="edge33_Node000047_Node000051" title=" " alt="" coords="475,359,595,330,597,335,476,364"/>
+<area shape="poly" id="edge30_Node000050_Node000025" title=" " alt="" coords="692,392,722,421,750,455,767,486,774,513,782,539,798,568,824,599,852,624,848,628,820,603,794,572,777,541,769,514,762,488,746,458,718,424,688,396"/>
+<area shape="poly" id="edge31_Node000050_Node000026" title=" " alt="" coords="744,361,814,352,815,357,745,366"/>
+<area shape="poly" id="edge32_Node000050_Node000028" title=" " alt="" coords="745,386,818,400,817,405,744,392"/>
+<area shape="poly" id="edge34_Node000051_Node000026" title=" " alt="" coords="719,322,815,335,814,340,719,327"/>
+<area shape="poly" id="edge36_Node000052_Node000048" title=" " alt="" coords="531,585,748,562,820,552,821,557,748,567,531,590"/>
+<area shape="rect" id="Node000053" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="584,469,743,509"/>
+<area shape="poly" id="edge37_Node000052_Node000053" title=" " alt="" coords="450,581,604,512,606,517,452,586"/>
+<area shape="poly" id="edge38_Node000053_Node000026" title=" " alt="" coords="687,466,735,428,795,386,837,362,840,367,797,391,739,432,690,471"/>
+<area shape="poly" id="edge39_Node000053_Node000048" title=" " alt="" coords="740,506,822,528,820,533,739,511"/>
+</map>

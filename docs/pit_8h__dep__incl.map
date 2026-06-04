@@ -1,0 +1,47 @@
+<map id="include/alcor2/arch/pit.h" name="include/alcor2/arch/pit.h">
+<area shape="rect" id="Node000001" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="1203,5,1349,45"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html" title="ATA/IDE disk driver (DMA + PIO fallback, LBA28/48)." alt="" coords="522,101,673,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1190,36,961,59,684,96,647,103,646,98,684,91,960,54,1189,31"/>
+<area shape="rect" id="Node000003" href="$pit_8c.html" title="8253/8254 PIT timer driver with a runtime&#45;adjustable tick rate." alt="" coords="697,101,839,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1190,41,1032,65,851,96,817,103,815,98,850,91,1031,59,1189,36"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="863,93,998,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1191,50,999,98,997,93,1189,45"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html" title="Shared state, types, and hot&#45;path primitives for the fb_console module split." alt="" coords="1023,93,1185,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1227,54,1143,96,1140,91,1225,49"/>
+<area shape="rect" id="Node000019" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="1209,101,1343,126"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="1279,59,1279,100,1273,100,1273,59"/>
+<area shape="rect" id="Node000020" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="1367,93,1505,133"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="1324,49,1402,91,1400,96,1322,54"/>
+<area shape="rect" id="Node000021" href="$sys__io_8c.html" title="I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep, select, poll." alt="" coords="1530,101,1697,126"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="1363,46,1569,98,1567,103,1361,51"/>
+<area shape="rect" id="Node000022" href="$sys__misc_8c.html" title="Misc syscalls: uname, time, minimal futex, sched_yield." alt="" coords="1721,93,1858,133"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="1363,35,1524,59,1710,91,1721,93,1720,98,1709,96,1523,64,1362,41"/>
+<area shape="rect" id="Node000023" href="$dg__alcor_8c.html" title="doomgeneric platform backend for Alcor2OS." alt="" coords="1883,93,2045,133"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="1363,31,1593,54,1871,91,1883,93,1882,98,1870,96,1592,60,1362,37"/>
+<area shape="rect" id="Node000006" href="$ansi_8c.html" title="ANSI/CSI escape parser, UTF&#45;8 decoder, and SGR/colour resolution for the framebuffer console." alt="" coords="5,181,144,221"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1009,136,879,149,768,156,580,158,393,161,284,169,156,184,145,186,144,181,156,179,284,163,393,155,580,152,768,150,879,144,1009,131"/>
+<area shape="rect" id="Node000007" href="$api_8c.html" title="Runtime framebuffer text console with UTF&#45;8 and ANSI/CSI support." alt="" coords="169,181,303,221"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="1009,136,903,147,813,154,659,158,507,163,419,170,315,184,304,186,303,181,314,179,418,165,507,157,659,152,813,148,903,142,1009,131"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html" title="Glyph atlas lookup + meta validation." alt="" coords="327,181,470,221"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="1009,136,860,152,743,159,627,166,482,184,471,186,470,181,481,179,627,161,742,153,859,147,1009,131"/>
+<area shape="rect" id="Node000009" href="$atlas__install_8c.html" title="Userspace atlas submission pipeline for the framebuffer console." alt="" coords="494,181,685,221"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="1009,136,851,161,698,184,685,186,684,181,697,179,851,156,1009,131"/>
+<area shape="rect" id="Node000010" href="$caret_8c.html" title="Text caret (blinking block cursor) tracker for the framebuffer console." alt="" coords="709,181,853,221"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="1021,139,853,184,851,179,1020,134"/>
+<area shape="rect" id="Node000011" href="$cell_8c.html" title="Cell&#45;to&#45;pixel rendering for the framebuffer console." alt="" coords="878,181,1013,221"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="1058,142,981,184,979,179,1056,138"/>
+<area shape="rect" id="Node000012" href="$csi_8c.html" title="CSI sequence parser and dispatcher." alt="" coords="1037,181,1171,221"/>
+<area shape="poly" id="edge11_Node000005_Node000012" title=" " alt="" coords="1107,147,1107,181,1101,181,1101,147"/>
+<area shape="rect" id="Node000013" href="$flush_8c.html" title="Dirty&#45;cell flush batch + character emission for the framebuffer console." alt="" coords="1195,181,1338,221"/>
+<area shape="poly" id="edge12_Node000005_Node000013" title=" " alt="" coords="1153,137,1232,179,1230,184,1150,142"/>
+<area shape="rect" id="Node000014" href="$fb__console_2mouse_8c.html" title="Software mouse cursor overlay for the framebuffer console." alt="" coords="1363,181,1517,221"/>
+<area shape="poly" id="edge13_Node000005_Node000014" title=" " alt="" coords="1192,134,1367,179,1366,184,1190,139"/>
+<area shape="rect" id="Node000015" href="$palette_8c.html" title="Catppuccin Mocha ANSI palette and xterm&#45;256 resolution." alt="" coords="1541,181,1699,221"/>
+<area shape="poly" id="edge14_Node000005_Node000015" title=" " alt="" coords="1199,131,1366,155,1530,179,1541,181,1540,186,1529,184,1366,160,1198,136"/>
+<area shape="rect" id="Node000016" href="$pixel_8c.html" title="Raw framebuffer pixel primitives for the fb_console module." alt="" coords="1723,181,1866,221"/>
+<area shape="poly" id="edge15_Node000005_Node000016" title=" " alt="" coords="1199,131,1344,147,1457,154,1569,161,1711,179,1724,181,1723,186,1710,184,1569,166,1457,159,1343,152,1199,136"/>
+<area shape="rect" id="Node000017" href="$scrollback_8c.html" title="Scrollback ring + deferred pixel&#45;scroll for the framebuffer console." alt="" coords="1890,181,2067,221"/>
+<area shape="poly" id="edge16_Node000005_Node000017" title=" " alt="" coords="1199,131,1391,150,1541,155,1690,161,1879,179,1890,180,1890,186,1878,184,1690,166,1541,161,1390,155,1199,136"/>
+<area shape="rect" id="Node000018" href="$sgr_8c.html" title="Select Graphic Rendition (SGR) handling — CSI m parsing." alt="" coords="2091,181,2226,221"/>
+<area shape="poly" id="edge17_Node000005_Node000018" title=" " alt="" coords="1200,131,1334,144,1448,151,1642,152,1835,154,1948,163,2080,179,2091,181,2091,186,2080,184,1948,168,1835,160,1642,157,1447,156,1333,150,1199,136"/>
+</map>

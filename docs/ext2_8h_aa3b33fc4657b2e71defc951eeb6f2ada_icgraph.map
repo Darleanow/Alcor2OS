@@ -1,0 +1,5 @@
+<map id="ext2_mount" name="ext2_mount">
+<area shape="rect" id="Node000001" title="Mount an ext2 volume." alt="" coords="184,5,284,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#a7d42ab75249625e6a128b68687bc01c5" title="fs_type_t.mount shim — opens the default device." alt="" coords="5,5,136,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,21,136,21,136,15,170,15"/>
+</map>

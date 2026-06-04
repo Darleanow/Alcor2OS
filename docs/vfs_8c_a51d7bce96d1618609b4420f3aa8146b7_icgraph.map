@@ -1,0 +1,56 @@
+<map id="vfs_make_absolute" name="vfs_make_absolute">
+<area shape="rect" id="Node000001" title="Build an absolute, normalised path in out." alt="" coords="492,349,640,375"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#a67bb6451b3cc29b98fdbdba7d9dd1594" title="Change the calling process&#39;s working directory to path." alt="" coords="193,177,275,203"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="545,340,502,292,474,267,443,246,400,226,355,212,274,197,275,191,356,207,402,221,445,241,477,262,505,288,549,336"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#a01c1203977d3bd65619c0c17a45fa5d1" title="Create a directory at path via the responsible driver." alt="" coords="349,375,436,400"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="479,377,436,384,436,378,478,372"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="352,123,433,148"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="549,338,505,265,475,221,442,180,409,150,413,146,446,176,479,218,509,262,554,336"/>
+<area shape="rect" id="Node000014" href="$vfs_8c.html#ad7ec41d06faa2ce0fc58d46873948f75" title="Read the target of the symbolic link at path into buf." alt="" coords="341,424,444,449"/>
+<area shape="poly" id="edge12_Node000001_Node000014" title=" " alt="" coords="524,383,424,426,422,422,522,378"/>
+<area shape="rect" id="Node000016" href="$vfs_8c.html#a9381581b42a850046ecb0593a98bd3af" title="Rename (move) a file, copying across mount points if necessary." alt="" coords="185,325,283,351"/>
+<area shape="poly" id="edge14_Node000001_Node000016" title=" " alt="" coords="478,358,283,344,284,339,479,353"/>
+<area shape="rect" id="Node000018" href="$vfs_8c.html#a30b9db50187eccd6bf2e1cd0cef5b7a9" title="Remove the empty directory at path." alt="" coords="351,473,435,499"/>
+<area shape="poly" id="edge16_Node000001_Node000018" title=" " alt="" coords="542,386,498,424,445,463,423,475,421,471,443,458,495,420,539,382"/>
+<area shape="rect" id="Node000020" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="355,256,430,281"/>
+<area shape="poly" id="edge18_Node000001_Node000020" title=" " alt="" coords="528,345,416,284,419,279,531,340"/>
+<area shape="rect" id="Node000026" href="$vfs_8c.html#ae501b60ae231b75a9b8efbf7cac10324" title="Delete the file at path; fails if it is a directory." alt="" coords="348,523,437,548"/>
+<area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="552,388,509,449,479,483,446,513,427,525,425,520,442,509,475,479,504,445,548,385"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a5ffaa19d9650c07f19e99856e7465210" title="Change the calling process&#39;s working directory to path." alt="" coords="25,153,107,179"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="179,185,107,175,108,169,180,180"/>
+<area shape="rect" id="Node000005" href="$sys__fs_8c.html#afdc1e627b591695459f391aebfdaef92" title="Create a directory at pathname." alt="" coords="189,375,279,400"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="335,390,279,390,279,385,335,385"/>
+<area shape="rect" id="Node000007" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="175,17,293,43"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="361,117,292,68,255,45,258,40,295,64,364,112"/>
+<area shape="rect" id="Node000010" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="185,128,283,153"/>
+<area shape="poly" id="edge8_Node000006_Node000010" title=" " alt="" coords="338,140,283,142,283,136,338,134"/>
+<area shape="rect" id="Node000011" href="$sys__fs_8c.html#a520ffff94cc2df8d87a6080ffaa9707f" title="Open or create a file and return a file descriptor." alt="" coords="193,79,275,104"/>
+<area shape="poly" id="edge9_Node000006_Node000011" title=" " alt="" coords="338,123,275,105,276,100,340,118"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html#ae1d9b721e1a1c60b10f0baef1ce6e199" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="19,5,113,31"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="161,27,113,24,113,19,161,22"/>
+<area shape="rect" id="Node000012" href="$sys__fs_8c.html#abb5ff8d1a9032c4f32ad1f65a4a5133e" title="Create or truncate a file at pathname (open with O_WRONLY|O_CREAT|O_TRUNC)." alt="" coords="24,104,108,129"/>
+<area shape="poly" id="edge10_Node000011_Node000012" title=" " alt="" coords="179,102,109,113,108,108,178,97"/>
+<area shape="rect" id="Node000013" href="$sys__fs_8c.html#a22b2ac6b30d04a46bf880d289a4aea46" title="openat — only AT_FDCWD is supported; delegates to sys_open." alt="" coords="18,55,114,80"/>
+<area shape="poly" id="edge11_Node000011_Node000013" title=" " alt="" coords="179,86,114,77,114,71,180,81"/>
+<area shape="rect" id="Node000015" href="$sys__fs_8c.html#a3c7030445954bf053945683539a885b4" title="Read the target of a symbolic link at path into buf." alt="" coords="182,424,286,449"/>
+<area shape="poly" id="edge13_Node000014_Node000015" title=" " alt="" coords="328,439,287,439,287,434,328,434"/>
+<area shape="rect" id="Node000017" href="$sys__fs_8c.html#aa6dfd2d967f7393f9df4852259140393" title="Rename oldpath to newpath, copying across mount points if necessary." alt="" coords="15,351,117,376"/>
+<area shape="poly" id="edge15_Node000016_Node000017" title=" " alt="" coords="172,350,117,358,117,353,171,345"/>
+<area shape="rect" id="Node000019" href="$sys__fs_8c.html#a5a0e70030b084d0a0fe76e4f0e18ce00" title="Remove the empty directory at pathname." alt="" coords="191,473,277,499"/>
+<area shape="poly" id="edge17_Node000018_Node000019" title=" " alt="" coords="337,489,278,489,278,483,337,483"/>
+<area shape="poly" id="edge25_Node000020_Node000002" title=" " alt="" coords="358,252,292,216,267,205,269,200,295,212,360,247"/>
+<area shape="poly" id="edge21_Node000020_Node000010" title=" " alt="" coords="372,247,337,206,292,167,271,156,274,151,295,162,341,203,376,243"/>
+<area shape="poly" id="edge26_Node000020_Node000016" title=" " alt="" coords="352,289,294,315,266,328,264,323,292,310,350,285"/>
+<area shape="rect" id="Node000021" href="$sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" title="Check that path exists and is accessible; always grants access." alt="" coords="187,276,281,301"/>
+<area shape="poly" id="edge19_Node000020_Node000021" title=" " alt="" coords="342,278,282,285,281,280,341,272"/>
+<area shape="rect" id="Node000023" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="196,227,272,252"/>
+<area shape="poly" id="edge22_Node000020_Node000023" title=" " alt="" coords="341,262,272,249,273,244,342,257"/>
+<area shape="rect" id="Node000022" href="$sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972" title="faccessat — only AT_FDCWD and absolute paths are supported." alt="" coords="9,301,123,327"/>
+<area shape="poly" id="edge20_Node000021_Node000022" title=" " alt="" coords="174,300,124,308,123,303,173,295"/>
+<area shape="rect" id="Node000024" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="26,252,106,277"/>
+<area shape="poly" id="edge23_Node000023_Node000024" title=" " alt="" coords="183,250,107,261,106,256,182,244"/>
+<area shape="rect" id="Node000025" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="5,203,127,228"/>
+<area shape="poly" id="edge24_Node000023_Node000025" title=" " alt="" coords="182,235,127,227,128,221,183,229"/>
+<area shape="rect" id="Node000027" href="$sys__fs_8c.html#a9b635f43a86efa68bdf828ae9fb1c76c" title="Delete the file at pathname." alt="" coords="189,523,279,548"/>
+<area shape="poly" id="edge28_Node000026_Node000027" title=" " alt="" coords="334,538,280,538,280,533,334,533"/>
+</map>

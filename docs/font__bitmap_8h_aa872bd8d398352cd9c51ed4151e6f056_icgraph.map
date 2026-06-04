@@ -1,0 +1,32 @@
+<map id="font_glyph_index" name="font_glyph_index">
+<area shape="rect" id="Node000001" title="Each byte indexes directly into the atlas." alt="" coords="881,160,1016,185"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="680,73,819,99"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="905,157,779,101,781,96,907,152"/>
+<area shape="rect" id="Node000056" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="701,160,798,185"/>
+<area shape="poly" id="edge5_Node000001_Node000056" title=" " alt="" coords="868,175,798,175,798,170,868,170"/>
+<area shape="rect" id="Node000189" href="$pixel_8c.html#a39c7b03af1af41414c391ead38e9ec27" title="Draws a fallback character using the built&#45;in VGA font." alt="" coords="665,209,833,235"/>
+<area shape="poly" id="edge17_Node000001_Node000189" title=" " alt="" coords="884,191,802,212,801,207,883,186"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="499,55,608,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="666,81,608,75,609,70,667,75"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="334,5,407,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="492,54,407,30,408,25,493,48"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="300,55,441,80"/>
+<area shape="poly" id="edge4_Node000003_Node000012" title=" " alt="" coords="485,70,442,70,442,65,485,65"/>
+<area shape="rect" id="Node000057" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="489,180,617,205"/>
+<area shape="poly" id="edge6_Node000056_Node000057" title=" " alt="" coords="687,182,618,189,617,184,687,176"/>
+<area shape="rect" id="Node000058" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="316,104,425,129"/>
+<area shape="poly" id="edge7_Node000057_Node000058" title=" " alt="" coords="508,177,401,132,403,127,510,172"/>
+<area shape="rect" id="Node000061" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="5,205,120,231"/>
+<area shape="poly" id="edge11_Node000057_Node000061" title=" " alt="" coords="476,199,120,218,120,212,476,194"/>
+<area shape="rect" id="Node000174" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="169,155,251,180"/>
+<area shape="poly" id="edge12_Node000057_Node000174" title=" " alt="" coords="475,190,251,173,252,168,476,184"/>
+<area shape="rect" id="Node000187" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="172,256,248,281"/>
+<area shape="poly" id="edge13_Node000057_Node000187" title=" " alt="" coords="514,213,442,239,337,259,248,269,248,264,336,254,441,234,512,208"/>
+<area shape="rect" id="Node000188" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="168,305,252,331"/>
+<area shape="poly" id="edge15_Node000057_Node000188" title=" " alt="" coords="528,216,489,244,442,270,393,288,341,301,253,316,252,311,340,296,391,283,440,265,486,240,525,212"/>
+<area shape="poly" id="edge8_Node000058_Node000061" title=" " alt="" coords="302,119,236,126,169,144,142,158,117,175,78,207,75,203,114,170,139,153,167,140,235,121,302,114"/>
+<area shape="poly" id="edge9_Node000058_Node000174" title=" " alt="" coords="317,136,252,157,250,152,316,131"/>
+<area shape="poly" id="edge10_Node000174_Node000061" title=" " alt="" coords="160,187,101,208,100,203,158,182"/>
+<area shape="poly" id="edge14_Node000187_Node000061" title=" " alt="" coords="158,254,100,233,101,228,160,249"/>
+<area shape="poly" id="edge16_Node000188_Node000061" title=" " alt="" coords="173,300,166,296,79,233,82,229,170,292,176,296"/>
+</map>

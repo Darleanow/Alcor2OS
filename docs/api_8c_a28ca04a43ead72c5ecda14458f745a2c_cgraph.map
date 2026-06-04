@@ -1,0 +1,35 @@
+<map id="blink_tick" name="blink_tick">
+<area shape="rect" id="Node000001" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="5,179,91,204"/>
+<area shape="rect" id="Node000002" href="$caret_8c.html#a674b75430f133c207889645eb15efcc0" title="caret_erase followed by caret_paint." alt="" coords="169,55,277,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,176,191,86,194,90,69,181"/>
+<area shape="rect" id="Node000027" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="175,153,271,179"/>
+<area shape="poly" id="edge6_Node000001_Node000027" title=" " alt="" coords="90,183,161,172,162,178,91,188"/>
+<area shape="rect" id="Node000058" href="$api_8c.html#ae9025ea1b334a52e46bbc5ec1175ab94" title="Mark every blinking cell dirty and update the dirty&#45;row range." alt="" coords="139,203,308,228"/>
+<area shape="poly" id="edge16_Node000001_Node000058" title=" " alt="" coords="91,194,126,199,125,205,90,200"/>
+<area shape="rect" id="Node000059" href="$fb__console_2mouse_8c.html#ae5f0507a92c6c100661c22cd379e2caa" title="Forget the painted&#45;at position without erasing pixels. Used by paths that are about to repaint the wh..." alt="" coords="149,252,298,277"/>
+<area shape="poly" id="edge17_Node000001_Node000059" title=" " alt="" coords="72,202,140,237,162,245,160,250,138,242,69,207"/>
+<area shape="rect" id="Node000003" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="373,5,472,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,52,360,31,361,36,276,57"/>
+<area shape="rect" id="Node000026" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="375,55,470,80"/>
+<area shape="poly" id="edge4_Node000002_Node000026" title=" " alt="" coords="277,65,362,65,362,70,277,70"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="578,55,651,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="473,28,565,52,564,57,472,33"/>
+<area shape="poly" id="edge5_Node000026_Node000004" title=" " alt="" coords="470,65,564,65,564,70,470,70"/>
+<area shape="rect" id="Node000028" href="$flush_8c.html#a2dabde3cffa3ed745cdc5c88d3951ce9" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="356,104,489,129"/>
+<area shape="poly" id="edge7_Node000027_Node000028" title=" " alt="" coords="271,152,357,130,358,135,272,157"/>
+<area shape="rect" id="Node000029" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="361,153,484,179"/>
+<area shape="poly" id="edge9_Node000027_Node000029" title=" " alt="" coords="272,163,348,163,348,169,272,169"/>
+<area shape="rect" id="Node000055" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="361,203,485,228"/>
+<area shape="poly" id="edge12_Node000027_Node000055" title=" " alt="" coords="272,175,358,197,357,202,271,180"/>
+<area shape="rect" id="Node000057" href="$flush_8c.html#a78b9c1602b135454913114b75737f27f" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="363,252,482,277"/>
+<area shape="poly" id="edge14_Node000027_Node000057" title=" " alt="" coords="272,172,309,188,325,200,334,213,343,225,358,237,370,244,367,249,354,242,339,229,330,216,321,204,307,192,270,177"/>
+<area shape="poly" id="edge8_Node000028_Node000004" title=" " alt="" coords="472,101,564,77,565,83,473,107"/>
+<area shape="rect" id="Node000030" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="587,104,643,129"/>
+<area shape="poly" id="edge10_Node000029_Node000030" title=" " alt="" coords="472,151,573,125,574,130,473,156"/>
+<area shape="rect" id="Node000040" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="577,153,652,179"/>
+<area shape="poly" id="edge11_Node000029_Node000040" title=" " alt="" coords="484,163,564,163,564,169,484,169"/>
+<area shape="rect" id="Node000056" href="$flush_8c.html#a5947c6def1d20a4175990821e4f4a74c" title="Paint one scanline of one dirty cell using its prepared scratch." alt="" coords="537,203,692,228"/>
+<area shape="poly" id="edge13_Node000055_Node000056" title=" " alt="" coords="485,213,524,213,524,218,485,218"/>
+<area shape="rect" id="Node000010" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a5a024efc6ccd9545de342ac39a77ef3f" title="Resolve to the bold or italic sub&#45;atlas slot when SGR asks for one." alt="" coords="547,252,682,277"/>
+<area shape="poly" id="edge15_Node000057_Node000010" title=" " alt="" coords="482,262,534,262,534,267,482,267"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="pci_bar_base64" name="pci_bar_base64">
+<area shape="rect" id="Node000001" title="Resolve the physical base of a BAR, handling 64&#45;bit pairs." alt="" coords="5,5,128,31"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#a16e24db3ca50bd7979c8be98c0d75b17" title="true if BAR idx (with bar[idx+1]) is a 64&#45;bit memory BAR." alt="" coords="176,5,287,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,15,162,15,162,21,128,21"/>
+</map>

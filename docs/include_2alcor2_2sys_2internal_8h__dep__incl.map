@@ -1,0 +1,17 @@
+<map id="include/alcor2/sys/internal.h" name="include/alcor2/sys/internal.h">
+<area shape="rect" id="Node000001" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="565,5,703,45"/>
+<area shape="rect" id="Node000002" href="$sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch." alt="" coords="5,93,143,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="551,39,369,62,156,96,143,98,142,93,155,91,368,57,550,33"/>
+<area shape="rect" id="Node000003" href="$sys__fb_8c.html" title="Syscalls: framebuffer info + mmap (userspace drawing / font stacks)." alt="" coords="167,101,335,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="552,48,303,103,302,98,550,43"/>
+<area shape="rect" id="Node000004" href="$sys__fs_8c.html" title="Filesystem syscalls: open, close, stat, seek, rename, chdir, …" alt="" coords="360,101,527,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="581,53,470,103,468,98,579,49"/>
+<area shape="rect" id="Node000005" href="$sys__io_8c.html" title="I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep, select, poll." alt="" coords="551,101,717,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="637,59,637,100,631,100,631,59"/>
+<area shape="rect" id="Node000006" href="$sys__misc_8c.html" title="Misc syscalls: uname, time, minimal futex, sched_yield." alt="" coords="741,93,879,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="686,49,773,91,770,96,684,54"/>
+<area shape="rect" id="Node000007" href="$sys__mm_8c.html" title="Memory syscalls: mmap, mprotect, munmap, brk." alt="" coords="903,101,1085,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="717,44,947,98,945,103,716,49"/>
+<area shape="rect" id="Node000008" href="$sys__proc_8c.html" title="Process syscalls: PID queries, fork, exec, wait, clone, identity." alt="" coords="1109,93,1247,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="717,34,892,57,1097,91,1110,93,1109,98,1096,96,892,63,717,39"/>
+</map>

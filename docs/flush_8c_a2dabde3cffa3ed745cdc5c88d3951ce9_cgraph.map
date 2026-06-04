@@ -1,0 +1,15 @@
+<map id="flush_batch_slow" name="flush_batch_slow">
+<area shape="rect" id="Node000001" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="5,80,139,105"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="187,80,260,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,90,173,90,173,95,139,95"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="308,80,417,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="260,90,294,90,294,95,260,95"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="480,5,609,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="386,77,464,40,484,32,486,37,466,44,388,82"/>
+<area shape="rect" id="Node000016" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="485,55,604,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="417,82,471,75,472,80,418,88"/>
+<area shape="rect" id="Node000021" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="475,104,614,129"/>
+<area shape="poly" id="edge5_Node000003_Node000021" title=" " alt="" coords="418,97,462,103,461,108,417,103"/>
+<area shape="rect" id="Node000023" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="465,153,624,179"/>
+<area shape="poly" id="edge6_Node000003_Node000023" title=" " alt="" coords="390,103,466,138,489,147,487,152,464,143,387,108"/>
+</map>

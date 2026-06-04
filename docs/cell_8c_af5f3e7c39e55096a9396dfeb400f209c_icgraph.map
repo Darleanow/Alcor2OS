@@ -1,0 +1,44 @@
+<map id="blit_cell_data" name="blit_cell_data">
+<area shape="rect" id="Node000001" title="Render c at grid (col, row)." alt="" coords="727,413,836,439"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="605,311,679,336"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="750,407,659,338,662,334,753,403"/>
+<area shape="rect" id="Node000010" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="223,516,365,541"/>
+<area shape="poly" id="edge23_Node000001_Node000010" title=" " alt="" coords="739,446,656,478,558,506,457,522,365,529,365,524,457,516,557,501,655,473,737,441"/>
+<area shape="rect" id="Node000003" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="439,416,538,441"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="619,347,559,395,518,418,516,414,556,390,615,343"/>
+<area shape="rect" id="Node000022" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="441,311,536,336"/>
+<area shape="poly" id="edge5_Node000002_Node000022" title=" " alt="" coords="591,326,536,326,536,321,591,321"/>
+<area shape="rect" id="Node000023" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="220,252,368,277"/>
+<area shape="poly" id="edge16_Node000002_Node000023" title=" " alt="" coords="592,311,557,302,458,285,368,274,368,269,459,280,558,297,593,306"/>
+<area shape="rect" id="Node000032" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="223,353,365,393"/>
+<area shape="poly" id="edge22_Node000002_Node000032" title=" " alt="" coords="593,342,558,351,457,366,366,373,365,367,457,360,557,346,591,337"/>
+<area shape="rect" id="Node000034" href="$flush_8c.html#acbd1d56bd93968c876236a4f9db5bcc2" title="Commit cp with the live SGR state into c and either mark dirty (batch mode) or blit immediately." alt="" coords="427,41,550,67"/>
+<area shape="poly" id="edge10_Node000002_Node000034" title=" " alt="" coords="632,298,605,212,583,162,555,114,532,89,508,69,511,65,536,85,559,111,588,159,610,210,637,296"/>
+<area shape="rect" id="Node000043" href="$csi_8c.html#a9418cb606a7f4ed4c8dcd795fed66ec0" title="Blank the inclusive rectangle [(y0, x0), (y1, x1)] using the current SGR fg/bg." alt="" coords="443,125,534,151"/>
+<area shape="poly" id="edge12_Node000002_Node000043" title=" " alt="" coords="627,299,598,244,578,213,555,185,535,167,513,153,516,149,538,163,559,181,583,210,603,241,632,297"/>
+<area shape="rect" id="Node000047" href="$flush_8c.html#a2dabde3cffa3ed745cdc5c88d3951ce9" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="422,465,555,491"/>
+<area shape="poly" id="edge17_Node000002_Node000047" title=" " alt="" coords="633,350,605,403,584,431,559,456,540,467,537,463,556,452,580,428,600,400,628,347"/>
+<area shape="rect" id="Node000049" href="$fb__console_2mouse_8c.html#a906bc8eb5537d1c6fac0db66df2dad8e" title="Re&#45;blit every cell that the cursor footprint touched, restoring the characters under it." alt="" coords="420,195,557,235"/>
+<area shape="poly" id="edge20_Node000002_Node000049" title=" " alt="" coords="615,303,556,256,526,238,529,233,559,252,618,299"/>
+<area shape="rect" id="Node000004" href="$caret_8c.html#a674b75430f133c207889645eb15efcc0" title="caret_erase followed by caret_paint." alt="" coords="240,417,348,443"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="425,432,348,432,348,427,425,426"/>
+<area shape="poly" id="edge4_Node000003_Node000010" title=" " alt="" coords="434,449,422,456,407,469,398,481,389,494,373,507,350,518,347,514,371,502,385,490,394,478,403,465,418,452,431,445"/>
+<area shape="poly" id="edge6_Node000022_Node000004" title=" " alt="" coords="463,347,422,377,373,407,342,420,340,415,371,402,419,373,460,343"/>
+<area shape="poly" id="edge7_Node000022_Node000023" title=" " alt="" coords="432,309,336,280,338,275,433,304"/>
+<area shape="rect" id="Node000027" href="$api_8c.html#a7654752ac7d61f4811d1c6b0cd53f56c" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="5,385,168,411"/>
+<area shape="poly" id="edge8_Node000022_Node000027" title=" " alt="" coords="428,324,328,327,272,333,217,343,159,364,111,388,109,383,156,359,215,338,271,327,327,321,427,318"/>
+<area shape="poly" id="edge9_Node000022_Node000032" title=" " alt="" coords="428,341,366,357,365,352,427,336"/>
+<area shape="rect" id="Node000035" href="$flush_8c.html#a44a71e48febb7915140c21fe215037ec" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="228,5,360,31"/>
+<area shape="poly" id="edge11_Node000034_Node000035" title=" " alt="" coords="413,43,360,33,361,28,414,38"/>
+<area shape="rect" id="Node000044" href="$csi_8c.html#a70429ceb320ba5d04cd0d21ea2b0983f" title="CSI X (ECH) — erase Pn chars at the cursor, no cursor move." alt="" coords="231,55,357,80"/>
+<area shape="poly" id="edge13_Node000043_Node000044" title=" " alt="" coords="444,122,371,94,337,83,339,78,373,89,446,117"/>
+<area shape="rect" id="Node000045" href="$csi_8c.html#a7eae43490b5d98fbf307d2521bc09019" title="CSI J (ED) — erase in display (mode 0/1/2)." alt="" coords="225,104,363,129"/>
+<area shape="poly" id="edge14_Node000043_Node000045" title=" " alt="" coords="430,134,363,127,363,122,430,129"/>
+<area shape="rect" id="Node000046" href="$csi_8c.html#a26848e54b8dcf798b7cb2175e4af9a81" title="CSI K (EL) — erase in line (mode 0/1/2)." alt="" coords="237,153,351,179"/>
+<area shape="poly" id="edge15_Node000043_Node000046" title=" " alt="" coords="430,149,352,160,351,155,430,144"/>
+<area shape="rect" id="Node000048" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="246,467,342,492"/>
+<area shape="poly" id="edge18_Node000047_Node000048" title=" " alt="" coords="408,481,342,482,342,476,408,476"/>
+<area shape="poly" id="edge19_Node000048_Node000027" title=" " alt="" coords="235,465,215,458,113,413,115,408,217,453,237,460"/>
+<area shape="rect" id="Node000050" href="$fb__console_2mouse_8c.html#a05afd0ea2119945dc3b079c2b5b99a66" title=" " alt="" coords="216,203,372,228"/>
+<area shape="poly" id="edge21_Node000049_Node000050" title=" " alt="" coords="406,218,372,218,372,213,406,213"/>
+</map>

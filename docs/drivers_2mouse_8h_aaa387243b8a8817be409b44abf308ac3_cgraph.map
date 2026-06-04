@@ -1,0 +1,41 @@
+<map id="mouse_init" name="mouse_init">
+<area shape="rect" id="Node000001" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="5,259,100,284"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="179,132,293,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,256,204,163,207,168,74,261"/>
+<area shape="rect" id="Node000018" href="$kstdlib_8c.html#a53f4ad004ca51ec3d2aa9dbe906a23c0" title="Fill memory with a byte value." alt="" coords="194,259,278,284"/>
+<area shape="poly" id="edge12_Node000001_Node000018" title=" " alt="" coords="100,269,180,269,180,274,100,274"/>
+<area shape="rect" id="Node000019" href="$ramfs_8c.html#a9d21ebf7315f835ae07f5d47014a72d0" title="Register a character device under path inside the ramfs tree." alt="" coords="148,359,324,384"/>
+<area shape="poly" id="edge13_Node000001_Node000019" title=" " alt="" coords="79,282,201,350,198,354,76,287"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="563,107,672,132"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="293,138,549,121,549,126,294,144"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="720,107,848,132"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="283,129,371,110,455,96,521,87,588,85,672,91,725,101,724,106,672,97,588,90,522,92,456,101,373,115,284,135"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="402,157,485,183"/>
+<area shape="poly" id="edge5_Node000002_Node000015" title=" " alt="" coords="294,149,389,161,388,166,293,154"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="579,208,655,233"/>
+<area shape="poly" id="edge8_Node000002_Node000016" title=" " alt="" coords="267,155,316,174,373,191,475,208,565,216,565,221,474,214,371,197,314,179,265,160"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="575,5,659,31"/>
+<area shape="poly" id="edge10_Node000002_Node000017" title=" " alt="" coords="249,130,300,88,334,66,371,48,420,32,471,23,561,15,562,20,471,28,421,38,373,52,337,70,303,93,252,134"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="672,117,706,117,706,122,672,122"/>
+<area shape="poly" id="edge6_Node000015_Node000003" title=" " alt="" coords="484,156,559,133,561,138,486,161"/>
+<area shape="poly" id="edge7_Node000015_Node000004" title=" " alt="" coords="485,164,571,155,672,141,715,132,716,138,672,146,572,160,485,169"/>
+<area shape="poly" id="edge9_Node000016_Node000004" title=" " alt="" coords="639,206,671,186,750,137,752,142,673,191,641,210"/>
+<area shape="poly" id="edge11_Node000017_Node000004" title=" " alt="" coords="641,28,673,48,752,97,750,102,671,52,639,33"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="400,507,487,532"/>
+<area shape="poly" id="edge14_Node000019_Node000014" title=" " alt="" coords="250,382,300,435,335,466,373,493,388,501,386,505,371,498,332,470,296,439,246,386"/>
+<area shape="rect" id="Node000020" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="578,308,657,333"/>
+<area shape="poly" id="edge15_Node000019_Node000020" title=" " alt="" coords="253,356,303,323,336,306,371,294,422,287,474,287,523,294,565,303,564,308,522,299,474,293,423,292,373,299,338,311,306,328,255,361"/>
+<area shape="rect" id="Node000021" href="$kstdlib_8c.html#a8a0a6ba19f294ca025d4afe7b776444e" title="Find the last occurrence of a character in a string." alt="" coords="407,309,479,335"/>
+<area shape="poly" id="edge16_Node000019_Node000021" title=" " alt="" coords="289,356,393,331,394,336,291,361"/>
+<area shape="rect" id="Node000022" href="$ramfs_8c.html#a12678cdafc9b669f5cdda769c7ace312" title="Prepend child to parent&#39;s children list and set its parent pointer." alt="" coords="381,359,505,384"/>
+<area shape="poly" id="edge17_Node000019_Node000022" title=" " alt="" coords="324,369,367,369,367,374,324,374"/>
+<area shape="rect" id="Node000023" href="$ramfs_8c.html#aec74d885a86466ccf3ca6a7893e9001a" title="Allocate and zero a new ramfs node with the given name and type." alt="" coords="372,408,515,433"/>
+<area shape="poly" id="edge18_Node000019_Node000023" title=" " alt="" coords="291,381,376,402,375,407,289,387"/>
+<area shape="rect" id="Node000040" href="$ramfs_8c.html#a4e3acc197dd9bee00d37e6e305106e11" title="Walk path from the ramfs root and return the matching node." alt="" coords="388,457,499,483"/>
+<area shape="poly" id="edge21_Node000019_Node000040" title=" " alt="" coords="259,382,310,412,373,444,389,450,387,455,371,448,308,416,256,386"/>
+<area shape="poly" id="edge19_Node000023_Node000020" title=" " alt="" coords="485,406,513,393,554,367,589,340,592,345,557,372,516,398,487,410"/>
+<area shape="rect" id="Node000024" href="$heap_8c.html#a4d46efddfad41d6c402283b85b3b15b6" title="Allocate zeroed memory from kernel heap." alt="" coords="583,408,651,433"/>
+<area shape="poly" id="edge20_Node000023_Node000024" title=" " alt="" coords="515,418,570,418,570,423,515,423"/>
+<area shape="rect" id="Node000041" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="586,457,649,483"/>
+<area shape="poly" id="edge22_Node000040_Node000041" title=" " alt="" coords="499,467,572,467,572,473,499,473"/>
+</map>

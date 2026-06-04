@@ -1,0 +1,31 @@
+<map id="sys_chdir" name="sys_chdir">
+<area shape="rect" id="Node000001" title="Change the calling process&#39;s working directory to path." alt="" coords="5,83,88,108"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a2b62b386a750a6392a02d67953da3095" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="136,32,240,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,80,138,60,140,65,84,85"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#a67bb6451b3cc29b98fdbdba7d9dd1594" title="Change the calling process&#39;s working directory to path." alt="" coords="147,107,229,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="89,100,134,108,133,113,88,105"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="288,5,423,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="240,34,274,28,275,33,241,39"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="829,157,908,183"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="228,105,328,81,394,69,468,60,546,56,626,58,706,70,782,92,803,102,822,115,851,145,848,149,818,120,800,106,780,96,705,75,626,64,546,61,468,65,395,74,329,86,229,110"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="673,107,775,132"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="229,117,659,117,659,122,229,122"/>
+<area shape="rect" id="Node000007" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="471,208,619,233"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="230,128,487,202,485,207,228,133"/>
+<area shape="rect" id="Node000012" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="318,208,393,233"/>
+<area shape="poly" id="edge14_Node000004_Node000012" title=" " alt="" coords="207,130,289,186,314,200,312,204,287,191,204,134"/>
+<area shape="poly" id="edge10_Node000007_Node000005" title=" " alt="" coords="601,205,666,193,815,173,816,178,667,198,602,211"/>
+<area shape="poly" id="edge11_Node000007_Node000006" title=" " alt="" coords="567,206,665,149,687,136,690,141,668,154,570,210"/>
+<area shape="rect" id="Node000008" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="689,257,759,283"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="592,231,676,254,675,259,591,236"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="835,308,902,333"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="563,231,608,263,637,280,668,293,707,304,748,311,822,318,821,323,747,317,706,309,666,298,635,284,606,268,560,236"/>
+<area shape="rect" id="Node000010" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="667,208,781,233"/>
+<area shape="poly" id="edge12_Node000007_Node000010" title=" " alt="" coords="619,218,653,218,653,223,619,223"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="760,280,823,302,821,307,758,285"/>
+<area shape="poly" id="edge13_Node000010_Node000005" title=" " alt="" coords="760,205,818,185,820,190,762,210"/>
+<area shape="poly" id="edge17_Node000012_Node000007" title=" " alt="" coords="393,218,456,218,456,223,393,223"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="483,308,606,333"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="382,231,509,299,506,304,379,236"/>
+<area shape="poly" id="edge16_Node000013_Node000009" title=" " alt="" coords="607,329,667,337,724,340,781,337,821,330,822,335,782,342,724,346,666,342,606,335"/>
+</map>

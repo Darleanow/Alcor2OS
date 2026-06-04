@@ -1,0 +1,5 @@
+<map id="ext2_read" name="ext2_read">
+<area shape="rect" id="Node000001" title="Read from file." alt="" coords="171,5,257,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#a7d4c82aac4f89abf698c21972978b332" title="fs_ops_t.read shim." alt="" coords="5,5,123,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,21,123,21,123,15,157,15"/>
+</map>

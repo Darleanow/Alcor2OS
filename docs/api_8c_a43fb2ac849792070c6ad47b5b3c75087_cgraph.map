@@ -1,0 +1,44 @@
+<map id="fb_console_tick" name="fb_console_tick">
+<area shape="rect" id="Node000001" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="5,309,128,335"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="215,227,300,252"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,307,213,255,215,260,98,312"/>
+<area shape="rect" id="Node000061" href="$fb__console_2mouse_8c.html#a261a735182368be5acb1566346962626" title="Paint or move the software mouse cursor. Early&#45;outs when the pointer has not moved since the last cal..." alt="" coords="176,412,339,437"/>
+<area shape="poly" id="edge12_Node000001_Node000061" title=" " alt="" coords="93,332,222,403,219,408,90,337"/>
+<area shape="rect" id="Node000003" href="$caret_8c.html#a674b75430f133c207889645eb15efcc0" title="caret_erase followed by caret_paint." alt="" coords="417,55,525,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="273,224,441,87,445,91,276,228"/>
+<area shape="rect" id="Node000028" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="423,177,519,203"/>
+<area shape="poly" id="edge5_Node000002_Node000028" title=" " alt="" coords="300,227,409,201,410,207,301,232"/>
+<area shape="rect" id="Node000059" href="$api_8c.html#ae9025ea1b334a52e46bbc5ec1175ab94" title="Mark every blinking cell dirty and update the dirty&#45;row range." alt="" coords="387,227,556,252"/>
+<area shape="poly" id="edge10_Node000002_Node000059" title=" " alt="" coords="300,237,373,237,373,242,300,242"/>
+<area shape="rect" id="Node000060" href="$fb__console_2mouse_8c.html#ae5f0507a92c6c100661c22cd379e2caa" title="Forget the painted&#45;at position without erasing pixels. Used by paths that are about to repaint the wh..." alt="" coords="397,276,546,301"/>
+<area shape="poly" id="edge11_Node000002_Node000060" title=" " alt="" coords="301,246,403,270,402,276,300,252"/>
+<area shape="rect" id="Node000004" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="640,5,739,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="525,53,626,29,627,35,526,58"/>
+<area shape="rect" id="Node000027" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="642,55,737,80"/>
+<area shape="poly" id="edge4_Node000003_Node000027" title=" " alt="" coords="525,65,628,65,628,70,525,70"/>
+<area shape="rect" id="Node000029" href="$flush_8c.html#a2dabde3cffa3ed745cdc5c88d3951ce9" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="623,104,756,129"/>
+<area shape="poly" id="edge6_Node000028_Node000029" title=" " alt="" coords="503,175,603,138,627,131,628,136,605,143,505,180"/>
+<area shape="rect" id="Node000030" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="628,153,751,179"/>
+<area shape="poly" id="edge7_Node000028_Node000030" title=" " alt="" coords="519,182,614,172,615,177,520,187"/>
+<area shape="rect" id="Node000056" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="627,203,751,228"/>
+<area shape="poly" id="edge8_Node000028_Node000056" title=" " alt="" coords="520,193,614,204,613,209,519,198"/>
+<area shape="rect" id="Node000058" href="$flush_8c.html#a78b9c1602b135454913114b75737f27f" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="630,252,749,277"/>
+<area shape="poly" id="edge9_Node000028_Node000058" title=" " alt="" coords="520,199,557,212,605,237,628,245,626,250,603,242,555,216,519,204"/>
+<area shape="rect" id="Node000062" href="$fb__console_2mouse_8c.html#a05afd0ea2119945dc3b079c2b5b99a66" title=" " alt="" coords="393,359,549,384"/>
+<area shape="poly" id="edge13_Node000061_Node000062" title=" " alt="" coords="309,409,406,385,407,390,310,414"/>
+<area shape="rect" id="Node000065" href="$fb__console_2mouse_8c.html#a8ae650740465d27698738640e0836a96" title="Paint the arrow at (cx, cy) in two passes." alt="" coords="395,412,548,437"/>
+<area shape="poly" id="edge17_Node000061_Node000065" title=" " alt="" coords="339,422,381,422,381,427,339,427"/>
+<area shape="rect" id="Node000067" href="$mouse_8c.html#a5fac1665f6a22d0d0c8f82978394a7e5" title="Get the rendered cursor position (the centre in relative mode)." alt="" coords="401,461,542,487"/>
+<area shape="poly" id="edge20_Node000061_Node000067" title=" " alt="" coords="314,435,403,456,401,461,312,440"/>
+<area shape="rect" id="Node000068" href="$mouse_8c.html#a6811e40dadb781c9dd066da379b89db8" title="Whether the pointer has moved at least once since boot." alt="" coords="397,511,545,536"/>
+<area shape="poly" id="edge21_Node000061_Node000068" title=" " alt="" coords="279,435,327,466,388,497,406,504,404,509,386,502,324,470,276,440"/>
+<area shape="rect" id="Node000063" href="$fb__console_2mouse_8c.html#a5c8ae3f66b1a4b466f8f05de69c72cff" title="Wipe the arrow&#39;s footprint and restore the cells beneath." alt="" coords="604,301,775,327"/>
+<area shape="poly" id="edge14_Node000062_Node000063" title=" " alt="" coords="520,356,627,328,628,333,521,361"/>
+<area shape="rect" id="Node000064" href="$fb__console_2mouse_8c.html#a906bc8eb5537d1c6fac0db66df2dad8e" title="Re&#45;blit every cell that the cursor footprint touched, restoring the characters under it." alt="" coords="621,351,758,391"/>
+<area shape="poly" id="edge16_Node000062_Node000064" title=" " alt="" coords="550,369,607,369,607,374,550,374"/>
+<area shape="rect" id="Node000021" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="823,359,924,384"/>
+<area shape="poly" id="edge15_Node000063_Node000021" title=" " alt="" coords="734,324,775,337,822,352,821,357,774,342,733,329"/>
+<area shape="poly" id="edge19_Node000065_Node000021" title=" " alt="" coords="548,422,656,416,774,401,826,386,828,391,775,406,656,422,549,427"/>
+<area shape="rect" id="Node000066" href="$fb__console_2mouse_8c.html#acc7b565443144b8f73deb03d66d54f16" title="Test whether the (row, col) of the arrow bitmap is set." alt="" coords="646,467,733,492"/>
+<area shape="poly" id="edge18_Node000065_Node000066" title=" " alt="" coords="523,435,634,463,632,468,522,440"/>
+</map>

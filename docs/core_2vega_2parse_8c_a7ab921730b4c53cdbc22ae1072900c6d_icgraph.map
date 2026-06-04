@@ -1,0 +1,16 @@
+<map id="parse_unit" name="parse_unit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="476,79,567,104"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="311,79,428,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="462,94,428,94,428,89,462,89"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a24f34aac8be89baba9f81f4669552b8f" title=" " alt="" coords="153,79,263,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="297,94,263,94,263,89,297,89"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#a56e786533d4f52b9b9c4013b71cb224a" title=" " alt="" coords="18,29,93,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,77,92,57,94,51,156,72"/>
+<area shape="rect" id="Node000005" href="$core_2vega_2parse_8c.html#a39c2363ce6301b51c1dc201986050d62" title=" " alt="" coords="13,79,98,104"/>
+<area shape="poly" id="edge6_Node000003_Node000005" title=" " alt="" coords="139,94,98,94,98,89,139,89"/>
+<area shape="rect" id="Node000009" href="$core_2vega_2parse_8c.html#acd97c7ea67e9c6549e462a92ba006cb6" title=" " alt="" coords="5,128,105,153"/>
+<area shape="poly" id="edge7_Node000003_Node000009" title=" " alt="" coords="156,111,97,130,95,125,154,106"/>
+<area shape="poly" id="edge5_Node000004_Node000001" title=" " alt="" coords="106,40,251,46,340,53,428,65,478,76,477,81,428,70,339,58,251,51,106,45"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="82,19,74,11,55,8,40,10,31,15,30,20,34,28,30,31,24,21,27,11,38,5,55,3,76,6,85,15"/>
+<area shape="poly" id="edge8_Node000009_Node000001" title=" " alt="" coords="119,138,261,132,345,125,428,114,480,102,481,107,428,119,345,131,261,138,119,143"/>
+</map>

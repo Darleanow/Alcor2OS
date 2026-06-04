@@ -1,0 +1,5 @@
+<map id="oft_alloc" name="oft_alloc">
+<area shape="rect" id="Node000001" title="Allocate and zero a free OFT slot; refcount is initialised to 1." alt="" coords="5,5,83,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="131,5,189,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,15,117,15,117,21,83,21"/>
+</map>

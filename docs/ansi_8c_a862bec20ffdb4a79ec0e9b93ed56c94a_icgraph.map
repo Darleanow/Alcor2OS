@@ -1,0 +1,9 @@
+<map id="feed_byte_esc" name="feed_byte_esc">
+<area shape="rect" id="Node000001" title="Handle one byte while the parser is in the ESC&#45;was&#45;just&#45;seen state." alt="" coords="531,5,647,31"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#aed57f05021fc0a714155c4f892ef5cee" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="396,5,483,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="517,21,483,21,483,15,517,15"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#af6749d9339bf3beb3f2a7d2dfbcf686d" title="Feed len bytes through the ANSI/UTF&#45;8 parser without flushing." alt="" coords="185,5,348,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="382,21,348,21,348,15,382,15"/>
+<area shape="rect" id="Node000004" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="5,5,137,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="172,21,138,21,138,15,172,15"/>
+</map>

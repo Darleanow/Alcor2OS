@@ -1,0 +1,5 @@
+<map id="gr_usage" name="gr_usage">
+<area shape="rect" id="Node000001" title="Emit formatted usage text for spec to stream." alt="" coords="5,5,87,31"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a5ad67079ff756c8f59550116192284db" title="Return non&#45;zero if the option kind requires a value token." alt="" coords="135,5,265,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,15,121,15,121,21,87,21"/>
+</map>

@@ -1,0 +1,24 @@
+<map id="sys_alcor_fb_mmap" name="sys_alcor_fb_mmap">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,145,157,171"/>
+<area shape="rect" id="Node000002" href="$fb__user_8c.html#a4ef17282eef77bc6609628060b878a25" title="Length in bytes of the mappable span (multiple of page size)." alt="" coords="215,5,353,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,143,137,94,169,66,204,41,219,33,222,38,207,46,172,70,140,98,95,147"/>
+<area shape="rect" id="Node000003" href="$fb__user_8c.html#ad67931ffce84c2c082dedba5636f2e17" title="Offset in bytes from fb_user_phys_base to the first pixel." alt="" coords="205,55,363,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,143,220,98,222,103,114,148"/>
+<area shape="rect" id="Node000004" href="$fb__user_8c.html#a2d2b1c5cb62398a51c5daaaa97e99f10" title="Page&#45;aligned physical base of the mappable span." alt="" coords="211,120,357,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="157,146,197,141,197,146,158,151"/>
+<area shape="rect" id="Node000005" href="$fb__user_8c.html#a1b13f136dc59d57da369b55ccebb56d5" title=" " alt="" coords="227,169,341,195"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="158,164,214,171,213,176,157,170"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="233,219,335,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="115,168,206,203,230,212,228,217,204,209,113,173"/>
+<area shape="rect" id="Node000007" href="$vmm_8c.html#a8558a335feee5b72f59e28085c1716d7" title="Map a page in a specific address space." alt="" coords="229,268,339,293"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="97,169,143,210,174,233,207,253,223,261,221,266,204,258,171,237,140,214,94,173"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="411,243,529,268"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="339,271,397,263,397,268,340,276"/>
+<area shape="rect" id="Node000010" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="577,293,680,319"/>
+<area shape="poly" id="edge11_Node000007_Node000010" title=" " alt="" coords="340,282,564,299,563,304,339,287"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="599,195,658,220"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="512,240,585,218,587,223,514,245"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="512,266,576,287,574,292,510,271"/>
+<area shape="rect" id="Node000012" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="581,244,676,269"/>
+<area shape="poly" id="edge10_Node000008_Node000012" title=" " alt="" coords="529,253,567,253,567,259,529,258"/>
+</map>

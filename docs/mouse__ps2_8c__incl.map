@@ -1,0 +1,28 @@
+<map id="src/drivers/mouse_ps2/mouse_ps2.c" name="src/drivers/mouse_ps2/mouse_ps2.c">
+<area shape="rect" id="Node000001" title="PS/2 mouse driver (i8042 second port)." alt="" coords="122,5,290,45"/>
+<area shape="rect" id="Node000002" href="$idt_8h.html" title="Interrupt Descriptor Table setup." alt="" coords="5,167,132,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,48,149,69,121,95,99,125,82,155,78,153,95,122,117,92,145,65,174,43"/>
+<area shape="rect" id="Node000007" href="$io_8h.html" title="x86 I/O port access functions." alt="" coords="165,167,287,192"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="173,48,153,62,136,80,128,98,131,118,152,142,180,159,177,163,149,146,126,120,122,98,132,77,149,58,170,43"/>
+<area shape="rect" id="Node000008" href="$pic_8h.html" title="8259 PIC (Programmable Interrupt Controller) driver." alt="" coords="141,93,271,119"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="209,46,209,79,203,79,203,46"/>
+<area shape="rect" id="Node000009" href="$console_8h.html" title="Kernel boot/panic logger on the linear framebuffer." alt="" coords="295,93,472,119"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="250,43,346,85,344,90,247,48"/>
+<area shape="rect" id="Node000010" href="$drivers_2mouse_8h.html" title="Kernel&#45;side mouse broker: accepts events from a low&#45;level driver and serves them to userspace via /de..." alt="" coords="497,93,667,119"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="291,42,514,88,513,93,290,47"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="297,240,411,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,189,295,234,294,239,114,195"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="210,313,293,339"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="339,268,281,307,278,303,336,263"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="317,313,391,339"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="357,266,357,300,351,300,351,266"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="416,313,487,339"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="371,263,426,303,423,307,368,268"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="248,190,322,231,320,235,245,194"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="231,116,266,137,301,165,326,195,345,226,340,229,322,199,297,169,263,141,228,121"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="384,120,362,227,356,226,378,119"/>
+<area shape="poly" id="edge15_Node000010_Node000003" title=" " alt="" coords="565,121,386,235,383,230,562,117"/>
+<area shape="rect" id="Node000011" href="$mouse_8h.html" title="Shared user/kernel ABI for /dev/mouse events and mode control." alt="" coords="507,167,630,192"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="582,119,576,154,571,153,577,119"/>
+<area shape="poly" id="edge14_Node000011_Node000003" title=" " alt="" coords="535,195,403,238,401,233,533,189"/>
+</map>

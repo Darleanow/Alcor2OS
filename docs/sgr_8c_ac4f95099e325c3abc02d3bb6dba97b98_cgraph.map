@@ -1,0 +1,19 @@
+<map id="csi_sgr" name="csi_sgr">
+<area shape="rect" id="Node000001" title="CSI m — Select Graphic Rendition. Defined in sgr.c; called from csi.c&#39;s handle_csi switch." alt="" coords="5,104,72,129"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a12726087c8c2716aab2cf78cff0f2a79" title="Parse up to maxn decimal parameters from esc_buf into pv." alt="" coords="155,5,251,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,102,78,71,119,40,141,30,143,34,121,44,82,75,52,105"/>
+<area shape="rect" id="Node000003" href="$sgr_8c.html#a324aefd6aff75188923c49a3f655a284" title="Update cur_attr from a single&#45;param attribute code (bold, italic, …, or the corresponding 21/22/23/… ..." alt="" coords="145,55,260,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="71,104,119,89,144,81,146,86,121,94,73,109"/>
+<area shape="rect" id="Node000004" href="$sgr_8c.html#a818c46bca4bf34b71108df7e07a11dee" title="Update cur_fg / cur_bg from a single&#45;param colour code (default, 30..37, 40..47, 90...." alt="" coords="120,104,285,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="72,114,106,114,106,119,72,119"/>
+<area shape="rect" id="Node000005" href="$sgr_8c.html#a3125f4bf8200627647a7427cf49a7587" title="Handle the multi&#45;param extended colour forms 38;5;N, 38;2;R;G;B, 48;5;N, 48;2;R;G;B." alt="" coords="126,154,279,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="73,126,133,147,131,152,71,131"/>
+<area shape="rect" id="Node000009" href="$sgr_8c.html#a06972cb43e6e6b3b0553a41be77d579a" title="Reset cur_fg / cur_bg / cur_attr to the boot defaults." alt="" coords="161,219,244,244"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="50,128,79,166,99,186,121,204,149,217,147,222,119,208,95,190,75,169,46,131"/>
+<area shape="rect" id="Node000006" href="$palette_8c.html#ac86ffecc8684687c5d2622aa1355d80e" title="Resolve an xterm 256&#45;colour palette index to a 0xRRGGBB triplet." alt="" coords="333,161,455,187"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="280,171,320,171,320,177,280,177"/>
+<area shape="rect" id="Node000007" href="$palette_8c.html#a5a5d432f2e5515feb43f72c8b9f7eed6" title="Pack three 0..255 channels into a 0xRRGGBB triplet." alt="" coords="529,136,610,161"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="454,163,515,154,516,159,455,168"/>
+<area shape="rect" id="Node000008" href="$palette_8c.html#a68133a258612d53fe2cbe3d2e17e2994" title="Look up one axis (red, green, or blue) of the xterm 6x6x6 cube." alt="" coords="503,185,636,211"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="455,180,489,184,489,190,454,185"/>
+</map>

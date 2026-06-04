@@ -1,0 +1,28 @@
+<map id="src/kernel/drivers/fb_console/flush.c" name="src/kernel/drivers/fb_console/flush.c">
+<area shape="rect" id="Node000001" title="Dirty&#45;cell flush batch + character emission for the framebuffer console." alt="" coords="484,5,627,45"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="567,181,690,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="566,45,621,168,616,170,561,47"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="371,255,486,280"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="551,47,521,119,476,208,450,245,445,242,472,205,516,117,546,45"/>
+<area shape="rect" id="Node000007" href="$heap_8h.html" title="Kernel heap allocator." alt="" coords="647,101,787,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="592,43,685,92,682,97,589,48"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html" title="Shared state, types, and hot&#45;path primitives for the fb_console module split." alt="" coords="235,93,420,133"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="506,48,391,91,389,86,504,43"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="597,209,475,252,474,247,596,204"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="210,328,293,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="401,282,294,325,292,320,399,278"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="366,328,441,353"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="427,281,414,316,409,314,422,279"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="101,328,172,353"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="382,283,186,330,185,325,381,277"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="721,126,722,166,716,188,704,208,690,219,670,228,618,244,500,262,499,257,617,238,668,223,687,215,700,205,711,186,716,165,716,126"/>
+<area shape="poly" id="edge14_Node000008_Node000003" title=" " alt="" coords="393,131,428,151,443,164,455,180,460,196,459,213,447,244,442,242,454,212,455,197,450,183,439,168,425,155,391,136"/>
+<area shape="poly" id="edge15_Node000008_Node000004" title=" " alt="" coords="301,135,278,156,260,182,250,217,246,252,250,315,244,315,241,252,245,216,256,180,274,153,297,131"/>
+<area shape="poly" id="edge16_Node000008_Node000005" title=" " alt="" coords="318,135,304,168,302,187,305,206,320,239,340,269,382,317,378,320,336,272,315,241,299,207,296,187,299,167,313,133"/>
+<area shape="rect" id="Node000009" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="315,181,441,207"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="342,132,365,168,361,171,337,135"/>
+<area shape="rect" id="Node000010" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="5,255,188,280"/>
+<area shape="poly" id="edge12_Node000008_Node000010" title=" " alt="" coords="292,136,209,184,122,248,119,244,206,179,289,131"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="389,205,415,242,410,245,384,209"/>
+<area shape="poly" id="edge13_Node000010_Node000006" title=" " alt="" coords="106,279,126,315,121,317,101,282"/>
+</map>

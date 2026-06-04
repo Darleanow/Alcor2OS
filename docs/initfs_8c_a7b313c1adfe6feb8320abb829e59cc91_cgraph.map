@@ -1,0 +1,13 @@
+<map id="init_stat" name="init_stat">
+<area shape="rect" id="Node000001" title="Stat a path. The empty/root path resolves to the directory stub." alt="" coords="5,55,80,80"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#a80562396dba282f389263379a39dfff5" title="Populate a stat buffer from a file node, or fill the directory stub when no node is given." alt="" coords="139,5,209,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,52,126,33,128,38,78,57"/>
+<area shape="rect" id="Node000003" href="$initfs_8c.html#aa643724cb164df58c6432d3e72345ab2" title="Linear lookup in the registered&#45;file list." alt="" coords="141,55,207,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="80,65,127,65,127,70,80,70"/>
+<area shape="rect" id="Node000006" href="$initfs_8c.html#a18d542a7dc09ed566d7855e0cc6bb3f3" title="Strip the leading slash from a VFS&#45;relative path." alt="" coords="128,104,220,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="78,78,128,96,126,101,76,83"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="268,55,331,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="207,65,254,65,254,70,207,70"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="379,55,453,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="331,65,365,65,365,70,331,70"/>
+</map>

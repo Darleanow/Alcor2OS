@@ -1,0 +1,24 @@
+<map id="feed_utf8" name="feed_utf8">
+<area shape="rect" id="Node000001" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="5,81,89,107"/>
+<area shape="poly" id="edge7_Node000001_Node000001" title=" " alt="" coords="23,82,18,73,20,63,31,57,47,55,67,58,76,67,72,70,65,63,47,60,32,62,25,67,23,72,27,80"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#ae17d9b8bddeae69976a74a6dc8e2202d" title="Emit a single ASCII byte to the cursor, applying DEC ACS translation when the G0 set is the special&#45;g..." alt="" coords="148,5,237,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,79,154,35,157,39,74,83"/>
+<area shape="rect" id="Node000004" href="$flush_8c.html#a44a71e48febb7915140c21fe215037ec" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="296,55,428,80"/>
+<area shape="poly" id="edge10_Node000001_Node000004" title=" " alt="" coords="89,88,282,71,283,77,90,93"/>
+<area shape="rect" id="Node000034" href="$ansi_8c.html#a18c6ecf4c578965fdd84b8b25849cb88" title="Apply one C0 control character to the cursor/grid state." alt="" coords="478,107,597,132"/>
+<area shape="poly" id="edge8_Node000001_Node000034" title=" " alt="" coords="90,93,464,113,464,118,89,99"/>
+<area shape="rect" id="Node000035" href="$ansi_8c.html#aef6dd46fa5dd672eab286e30d562a4ce" title="Try to start a UTF&#45;8 multi&#45;byte sequence based on the high bits of b." alt="" coords="137,157,248,183"/>
+<area shape="poly" id="edge11_Node000001_Node000035" title=" " alt="" coords="74,105,157,149,154,153,72,109"/>
+<area shape="rect" id="Node000003" href="$ansi_8c.html#af0a0a81bd1368dfe474da441d7d4d3fb" title="Translate a DEC ACS (Special Graphics) printable ASCII byte to its Unicode equivalent." alt="" coords="301,5,423,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="237,15,287,15,287,21,237,21"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="238,28,305,48,303,53,236,33"/>
+<area shape="rect" id="Node000005" href="$flush_8c.html#acbd1d56bd93968c876236a4f9db5bcc2" title="Commit cp with the live SGR state into c and either mark dirty (batch mode) or blit immediately." alt="" coords="476,8,599,33"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="410,52,475,34,477,39,411,57"/>
+<area shape="rect" id="Node000028" href="$flush_8c.html#a29200e8da98ef3a5bb44b516480c7ee7" title="Wrap the cursor to the next line, scrolling the grid when at the bottom." alt="" coords="487,57,588,83"/>
+<area shape="poly" id="edge5_Node000004_Node000028" title=" " alt="" coords="428,66,473,66,473,72,428,71"/>
+<area shape="rect" id="Node000029" href="$scrollback_8c.html#a20a43904baf76078b5399667db4f67d3" title="Move the top row off the grid into the scrollback ring and shift every remaining row up...." alt="" coords="647,83,735,108"/>
+<area shape="poly" id="edge6_Node000028_Node000029" title=" " alt="" coords="588,76,634,83,633,89,588,81"/>
+<area shape="poly" id="edge9_Node000034_Node000029" title=" " alt="" coords="596,107,633,102,634,107,597,113"/>
+<area shape="rect" id="Node000036" href="$ansi_8c.html#abe5d0937fa54ec7f4b665fb7a7a514ba" title="Begin a multi&#45;byte UTF&#45;8 sequence: store the lead bits and remaining continuation&#45;byte count,..." alt="" coords="317,157,407,183"/>
+<area shape="poly" id="edge12_Node000035_Node000036" title=" " alt="" coords="248,167,303,167,303,173,248,173"/>
+</map>

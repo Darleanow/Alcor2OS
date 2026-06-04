@@ -1,0 +1,14 @@
+<map id="scrollback_repaint" name="scrollback_repaint">
+<area shape="rect" id="Node000001" title="Repaint the visible grid blending scrollback history with live cells." alt="" coords="655,31,796,56"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a81d1fb9846695e15207aab71a96d8ff9" title="Scroll the view lines rows toward the live tail." alt="" coords="400,5,607,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="641,36,607,32,607,27,641,31"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a8a8b369ad40c10e99dc55ebc36ced5b9" title="Scroll the view lines rows back into history." alt="" coords="409,55,597,80"/>
+<area shape="poly" id="edge5_Node000001_Node000012" title=" " alt="" coords="641,55,598,60,597,55,641,50"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="221,31,352,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="386,34,352,38,352,33,385,29"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="5,5,173,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="207,36,173,31,174,26,208,31"/>
+<area shape="rect" id="Node000008" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="33,55,146,80"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="208,56,147,63,146,58,207,50"/>
+<area shape="poly" id="edge6_Node000012_Node000003" title=" " alt="" coords="395,58,352,53,352,48,396,53"/>
+</map>

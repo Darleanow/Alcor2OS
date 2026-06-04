@@ -1,0 +1,11 @@
+<map id="fill_cell_bg_32bpp" name="fill_cell_bg_32bpp">
+<area shape="rect" id="Node000001" title="Bg&#45;fill every framebuffer row inside the cell at (px_x, px_y)." alt="" coords="529,31,668,56"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="352,31,481,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="516,46,481,46,481,41,516,41"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="195,31,304,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="338,46,304,46,304,41,338,41"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="39,5,113,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="181,36,112,26,113,21,181,31"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="5,55,147,80"/>
+<area shape="poly" id="edge4_Node000003_Node000012" title=" " alt="" coords="181,55,147,60,147,55,181,50"/>
+</map>

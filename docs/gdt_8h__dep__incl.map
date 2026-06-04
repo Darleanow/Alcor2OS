@@ -1,0 +1,14 @@
+<map id="include/alcor2/arch/gdt.h" name="include/alcor2/arch/gdt.h">
+<area shape="rect" id="Node000001" title="Global Descriptor Table and Task State Segment setup." alt="" coords="246,5,391,45"/>
+<area shape="rect" id="Node000002" href="$gdt_8c.html" title="Global Descriptor Table and TSS setup." alt="" coords="5,181,165,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,40,127,61,83,76,57,95,51,105,50,116,54,139,65,161,78,180,73,183,61,164,49,141,44,116,46,103,53,92,81,72,125,56,232,34"/>
+<area shape="rect" id="Node000003" href="$gdt__internal_8h.html" title=" " alt="" coords="67,93,216,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="269,54,181,96,179,91,266,49"/>
+<area shape="rect" id="Node000004" href="$idt_8c.html" title="Interrupt Descriptor Table and exception handlers." alt="" coords="241,101,397,126"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="321,59,321,100,316,100,316,59"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="421,101,555,126"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="369,49,467,98,464,103,367,54"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="579,93,717,133"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="405,46,579,91,577,96,403,51"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="122,146,96,183,92,179,118,143"/>
+</map>

@@ -1,0 +1,31 @@
+<map id="alloc_block" name="alloc_block">
+<area shape="rect" id="Node000001" title="Allocate a free block, preferring preferred_group." alt="" coords="5,129,100,155"/>
+<area shape="rect" id="Node000002" href="$alloc_8c.html#a10b951f10689e7635a7c2695c6e1b795" title="Try to allocate one block inside group." alt="" coords="148,129,307,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,139,134,139,134,145,100,145"/>
+<area shape="rect" id="Node000003" href="$alloc_8c.html#a2d0514ac6e7fe9a08bb405700cedef38" title="Locate the first clear bit in a bitmap." alt="" coords="355,5,493,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="240,127,288,85,353,40,366,33,368,38,356,44,291,89,243,131"/>
+<area shape="rect" id="Node000004" href="$alloc_8c.html#a92112ad41af262ed304b3f6385d01899" title="Set bit bit in the bitmap rooted at bitmap." alt="" coords="377,55,471,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="259,127,354,89,372,82,373,87,356,94,261,132"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="396,104,452,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="307,129,382,119,383,125,307,134"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="387,153,461,179"/>
+<area shape="poly" id="edge7_Node000002_Node000019" title=" " alt="" coords="307,149,374,157,373,163,307,154"/>
+<area shape="rect" id="Node000034" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="364,227,484,252"/>
+<area shape="poly" id="edge11_Node000002_Node000034" title=" " alt="" coords="255,152,386,218,384,223,253,157"/>
+<area shape="rect" id="Node000036" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="362,288,486,313"/>
+<area shape="poly" id="edge13_Node000002_Node000036" title=" " alt="" coords="242,153,289,203,356,261,385,279,382,284,353,265,286,207,238,157"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="570,5,649,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="451,107,492,89,506,77,515,65,525,53,540,40,556,31,559,36,543,44,529,56,519,68,510,81,495,94,454,112"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="555,55,664,80"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="452,107,547,81,549,86,453,112"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="549,104,670,129"/>
+<area shape="poly" id="edge8_Node000019_Node000020" title=" " alt="" coords="461,154,547,130,548,136,462,159"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="555,153,664,179"/>
+<area shape="poly" id="edge9_Node000019_Node000021" title=" " alt="" coords="461,163,541,163,541,169,461,169"/>
+<area shape="rect" id="Node000033" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="563,203,655,228"/>
+<area shape="poly" id="edge10_Node000019_Node000033" title=" " alt="" coords="462,173,551,197,549,202,461,178"/>
+<area shape="rect" id="Node000035" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="543,252,675,277"/>
+<area shape="poly" id="edge12_Node000034_Node000035" title=" " alt="" coords="485,245,530,251,529,256,484,250"/>
+<area shape="rect" id="Node000037" href="$src_2fs_2ext2_2internal_8h.html#a92bf399aefd098ef22b483f7aa903291" title="Companion of vol_read_sectors for writes." alt="" coords="541,301,677,327"/>
+<area shape="poly" id="edge14_Node000036_Node000037" title=" " alt="" coords="486,302,528,305,527,311,486,308"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="sys_writev" name="sys_writev">
+<area shape="rect" id="Node000001" title="Gathered&#45;write across iovcnt iovecs into fd." alt="" coords="5,31,97,56"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#aaf2c4002d448ac156bcf915154c831bb" title="Write count bytes from buf to fd." alt="" coords="145,31,229,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,41,132,41,132,46,97,46"/>
+<area shape="rect" id="Node000003" href="$sys__io_8c.html#aa22ffdd5fbef3893cc52ebbe6e176d6b" title="Return true if ptr..ptr+size is a valid user read/write range." alt="" coords="277,5,373,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,33,263,27,264,32,230,38"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#a802e2397ea43dd94acf2feae98d44cba" title="Write count bytes from buf to fd." alt="" coords="284,55,367,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="230,48,271,55,270,60,229,53"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="421,5,575,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="374,15,408,15,408,21,374,21"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="459,55,537,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="367,65,445,65,445,70,367,70"/>
+<area shape="rect" id="Node000008" href="$pipe_8c.html#a5c16a89b7c4822d4587cee68c0f93c49" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="439,104,557,129"/>
+<area shape="poly" id="edge6_Node000005_Node000008" title=" " alt="" coords="368,76,440,98,439,103,366,82"/>
+</map>

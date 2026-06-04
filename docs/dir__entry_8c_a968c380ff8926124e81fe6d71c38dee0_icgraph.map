@@ -1,0 +1,9 @@
+<map id="dirent_aligned_len" name="dirent_aligned_len">
+<area shape="rect" id="Node000001" title="Aligned on&#45;disk size of a dirent with name_len bytes of name." alt="" coords="551,13,693,38"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a5b4bb0cf0b643113d6774ddfb49c05d0" title="Try to insert a new dirent into a single block by splicing slack." alt="" coords="352,13,503,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="537,28,503,28,503,23,537,23"/>
+<area shape="rect" id="Node000003" href="$dir__entry_8c.html#a636acc589597366c76316781d88c4505" title="Try to splice the new entry into any existing block&#39;s slack." alt="" coords="164,5,304,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="338,28,304,28,304,23,338,23"/>
+<area shape="rect" id="Node000004" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="5,13,116,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="150,28,116,28,116,23,150,23"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="user_cstr_ok" name="user_cstr_ok">
+<area shape="rect" id="Node000001" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="5,5,109,31"/>
+<area shape="rect" id="Node000002" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="157,5,292,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,15,144,15,144,21,109,21"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ext2_close" name="ext2_close">
+<area shape="rect" id="Node000001" title="Close an ext2 file handle." alt="" coords="176,5,268,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#a70bd34c87c3098559b390c7a2feb3cd6" title="fs_ops_t.close shim." alt="" coords="5,5,128,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,21,129,21,129,15,162,15"/>
+</map>

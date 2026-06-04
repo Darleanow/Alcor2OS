@@ -1,0 +1,5 @@
+<map id="phys_to_virt" name="phys_to_virt">
+<area shape="rect" id="Node000001" title="Convert physical address to virtual (HHDM)." alt="" coords="5,5,108,31"/>
+<area shape="rect" id="Node000002" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="156,5,284,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,15,142,15,142,21,108,21"/>
+</map>

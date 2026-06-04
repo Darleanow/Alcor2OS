@@ -1,0 +1,83 @@
+<map id="include/alcor2/kstdlib.h" name="include/alcor2/kstdlib.h">
+<area shape="rect" id="Node000001" title="Kernel micro standard library." alt="" coords="3161,5,3334,31"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html" title="ATA/IDE disk driver (DMA + PIO fallback, LBA28/48)." alt="" coords="5,86,156,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="3147,23,1585,41,691,58,363,69,169,81,127,89,126,83,168,76,363,64,691,53,1584,35,3147,17"/>
+<area shape="rect" id="Node000003" href="$console_8c.html" title="Boot/panic logger on the linear framebuffer." alt="" coords="181,79,325,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="3147,23,1668,41,828,58,519,69,337,81,325,83,325,78,336,76,519,64,828,53,1668,36,3147,18"/>
+<area shape="rect" id="Node000004" href="$alloc_8c.html" title="Block + inode allocation bitmap operations." alt="" coords="349,86,485,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="3147,23,1748,41,958,59,668,69,497,81,458,89,457,83,496,76,668,64,958,53,1748,36,3147,18"/>
+<area shape="rect" id="Node000005" href="$blockmap_8c.html" title="Direct + indirect block resolution and reservation for ext2." alt="" coords="509,86,679,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="3147,22,2659,24,1948,32,1222,50,919,64,690,81,644,89,644,83,690,76,919,58,1222,45,1948,27,2659,19,3147,17"/>
+<area shape="rect" id="Node000006" href="$cache_8c.html" title="Single&#45;block scratch pool for one&#45;off ext2 metadata reads." alt="" coords="703,86,845,111"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="3146,22,2686,23,2024,30,1676,38,1350,48,1069,63,857,81,818,89,817,83,856,76,1069,57,1350,43,1676,32,2023,25,2686,18,3146,17"/>
+<area shape="rect" id="Node000007" href="$dir_8c.html" title="High&#45;level directory operations — readdir, mkdir, unlink, rmdir." alt="" coords="869,86,991,111"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="3147,22,2711,22,2091,29,1767,36,1462,47,1200,62,1002,81,968,89,967,83,1002,76,1200,56,1462,41,1767,31,2091,23,2711,17,3147,16"/>
+<area shape="rect" id="Node000008" href="$dir__entry_8c.html" title="On&#45;disk directory entry primitives — lookup, insert, remove, emptiness check." alt="" coords="1015,86,1176,111"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="3147,23,2744,27,2178,37,1607,54,1369,66,1189,81,1144,89,1144,83,1188,76,1369,61,1607,49,2178,31,2744,21,3147,17"/>
+<area shape="rect" id="Node000009" href="$file_8c.html" title="File open / close / read / write / truncate / flush — the public ext2 byte&#45;oriented API." alt="" coords="1201,86,1326,111"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="3147,22,2770,25,2247,34,1722,52,1504,65,1338,81,1303,89,1302,83,1338,76,1503,59,1722,46,2247,29,2770,20,3147,17"/>
+<area shape="rect" id="Node000010" href="$inode_8c.html" title="On&#45;disk inode read + write." alt="" coords="1350,86,1491,111"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="3147,23,2800,28,2325,38,1851,55,1653,67,1504,81,1465,89,1464,83,1503,76,1653,62,1850,50,2325,33,2800,22,3147,18"/>
+<area shape="rect" id="Node000011" href="$ops_8c.html" title="fs_ops_t bridge for ext2." alt="" coords="1515,86,1643,111"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="3147,23,2827,28,2397,38,1968,56,1791,67,1656,81,1620,89,1619,83,1655,76,1790,62,1968,50,2396,33,2827,23,3147,18"/>
+<area shape="rect" id="Node000012" href="$path_8c.html" title="Path resolution, symlink following, and the ext2_stat / ext2_readlink endpoints." alt="" coords="1668,86,1803,111"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="3147,24,2472,41,2092,58,1934,69,1814,81,1777,89,1776,83,1814,76,1934,64,2091,53,2472,36,3147,18"/>
+<area shape="rect" id="Node000013" href="$super_8c.html" title="Block&#45;level I/O, superblock + GDT writeback, volume bring&#45;up." alt="" coords="1827,86,1967,111"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="3147,24,2550,44,2219,60,2083,70,1978,81,1940,89,1939,83,1978,76,2082,65,2219,55,2550,38,3147,19"/>
+<area shape="rect" id="Node000014" href="$initfs_8c.html" title="Read&#45;only, flat ramfs populated from Limine boot modules." alt="" coords="1991,86,2096,111"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="3147,24,2612,42,2320,59,2199,69,2108,81,2077,89,2076,83,2107,76,2199,64,2319,54,2611,37,3147,19"/>
+<area shape="rect" id="Node000015" href="$ramfs_8c.html" title="Standalone ramfs driver for Alcor2." alt="" coords="2120,86,2231,111"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="3147,21,2975,22,2749,30,2496,49,2368,63,2242,81,2211,89,2210,83,2242,76,2367,58,2496,43,2749,25,2975,17,3147,16"/>
+<area shape="rect" id="Node000016" href="$vfs_8c.html" title="Virtual File System orchestration layer." alt="" coords="2255,86,2347,111"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="3147,26,2734,46,2516,62,2359,81,2332,88,2331,83,2357,76,2516,56,2733,40,3147,20"/>
+<area shape="rect" id="Node000017" href="$dev__nodes_8c.html" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="2371,79,2505,119"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="3147,25,2862,42,2690,58,2517,81,2506,83,2505,78,2516,76,2689,53,2862,37,3146,20"/>
+<area shape="rect" id="Node000018" href="$api_8c.html" title="Runtime framebuffer text console with UTF&#45;8 and ANSI/CSI support." alt="" coords="2529,79,2664,119"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="3147,28,2930,48,2802,62,2676,81,2665,83,2664,78,2675,76,2802,57,2929,42,3147,23"/>
+<area shape="rect" id="Node000019" href="$atlas__install_8c.html" title="Userspace atlas submission pipeline for the framebuffer console." alt="" coords="2688,79,2879,119"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="3165,36,2890,81,2879,83,2878,78,2890,76,3164,30"/>
+<area shape="rect" id="Node000020" href="$flush_8c.html" title="Dirty&#45;cell flush batch + character emission for the framebuffer console." alt="" coords="2903,79,3045,119"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="3195,37,3040,81,3039,76,3194,32"/>
+<area shape="rect" id="Node000021" href="$scrollback_8c.html" title="Scrollback ring + deferred pixel&#45;scroll for the framebuffer console." alt="" coords="3069,79,3247,119"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="3226,42,3181,81,3178,77,3222,38"/>
+<area shape="rect" id="Node000022" href="$fb__user_8c.html" title="Framebuffer physical range + geometry for user mmap." alt="" coords="3271,79,3405,119"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="3273,38,3318,76,3314,81,3269,42"/>
+<area shape="rect" id="Node000023" href="$mouse_8c.html" title="Kernel mouse broker." alt="" coords="3429,79,3564,119"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="3297,32,3438,76,3436,81,3296,37"/>
+<area shape="rect" id="Node000024" href="$kbd__layout_8c.html" title="PS/2 scancode translator: layout mapping, line discipline, and TTY I/O." alt="" coords="3588,79,3739,119"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="3328,30,3577,76,3588,78,3587,84,3576,81,3327,36"/>
+<area shape="rect" id="Node000025" href="$ktermios_8c.html" title="Default termios (canonical + echo) for new processes." alt="" coords="3763,86,3921,111"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="3348,26,3536,46,3752,76,3791,83,3790,89,3751,81,3535,52,3347,31"/>
+<area shape="rect" id="Node000026" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="3946,86,4079,111"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="3348,21,3614,38,3774,54,3934,76,3970,83,3969,89,3934,81,3774,60,3613,44,3347,26"/>
+<area shape="rect" id="Node000027" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="4103,79,4242,119"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="3348,19,3679,34,3885,51,4092,76,4104,78,4103,83,4091,81,3885,56,3679,39,3347,24"/>
+<area shape="rect" id="Node000028" href="$elf_8c.html" title="ELF64 executable loader: validation, PT_LOAD mapping, file or memory copy, user entry." alt="" coords="4267,86,4409,111"/>
+<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="3348,17,3520,21,3746,30,3999,48,4254,76,4293,83,4292,89,4254,81,3999,53,3746,36,3520,26,3348,23"/>
+<area shape="rect" id="Node000029" href="$pipe_8c.html" title="Anonymous pipes backed by a fixed&#45;size ring buffer." alt="" coords="4434,86,4589,111"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="3348,16,3546,19,3813,27,4116,45,4271,59,4422,76,4464,83,4463,89,4422,81,4270,64,4116,51,3813,33,3546,24,3348,22"/>
+<area shape="rect" id="Node000030" href="$signal_8c.html" title="POSIX signal system calls and delivery mechanism." alt="" coords="4613,86,4778,111"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="3348,16,3573,17,3884,25,4240,43,4423,57,4601,76,4645,83,4645,89,4600,81,4422,63,4240,48,3884,30,3573,23,3348,21"/>
+<area shape="rect" id="Node000031" href="$sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch." alt="" coords="4803,79,4940,119"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="3348,18,4075,35,4488,52,4660,63,4790,76,4803,78,4802,83,4790,81,4660,68,4488,57,4075,40,3348,23"/>
+<area shape="rect" id="Node000032" href="$sys__fb_8c.html" title="Syscalls: framebuffer info + mmap (userspace drawing / font stacks)." alt="" coords="4965,86,5133,111"/>
+<area shape="poly" id="edge31_Node000001_Node000032" title=" " alt="" coords="3348,18,4152,35,4614,53,4807,63,4953,76,4999,83,4998,89,4952,81,4806,69,4614,58,4151,41,3348,23"/>
+<area shape="rect" id="Node000033" href="$sys__fs_8c.html" title="Filesystem syscalls: open, close, stat, seek, rename, chdir, …" alt="" coords="5157,86,5324,111"/>
+<area shape="poly" id="edge32_Node000001_Node000033" title=" " alt="" coords="3348,18,3723,23,4242,33,4763,51,4980,62,5145,76,5191,83,5190,89,5144,81,4980,68,4763,56,4242,39,3723,28,3348,23"/>
+<area shape="rect" id="Node000034" href="$sys__io_8c.html" title="I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep, select, poll." alt="" coords="5348,86,5515,111"/>
+<area shape="poly" id="edge33_Node000001_Node000034" title=" " alt="" coords="3348,17,3756,21,4331,31,4911,49,5154,61,5337,76,5382,83,5382,89,5336,81,5153,66,4911,54,4331,36,3756,27,3348,23"/>
+<area shape="rect" id="Node000035" href="$sys__misc_8c.html" title="Misc syscalls: uname, time, minimal futex, sched_yield." alt="" coords="5539,79,5676,119"/>
+<area shape="poly" id="edge34_Node000001_Node000035" title=" " alt="" coords="3348,17,3789,18,4420,26,4750,33,5059,43,5326,58,5528,76,5539,78,5538,83,5527,81,5326,63,5059,49,4749,38,4420,31,3789,23,3348,22"/>
+<area shape="rect" id="Node000036" href="$sys__mm_8c.html" title="Memory syscalls: mmap, mprotect, munmap, brk." alt="" coords="5701,86,5882,111"/>
+<area shape="poly" id="edge35_Node000001_Node000036" title=" " alt="" coords="3348,17,3817,20,4494,29,5183,47,5471,60,5689,76,5738,83,5737,89,5688,81,5471,65,5183,52,4494,35,3817,26,3348,22"/>
+<area shape="rect" id="Node000037" href="$sys__proc_8c.html" title="Process syscalls: PID queries, fork, exec, wait, clone, identity." alt="" coords="5907,79,6044,119"/>
+<area shape="poly" id="edge36_Node000001_Node000037" title=" " alt="" coords="3348,16,3853,16,4589,22,4977,29,5342,40,5657,55,5894,76,5907,78,5906,83,5894,81,5656,61,5342,45,4977,34,4589,27,3853,21,3348,22"/>
+<area shape="rect" id="Node000038" href="$compiler__abi_8c.html" title="Compiler ABI built&#45;in shims." alt="" coords="6069,86,6229,111"/>
+<area shape="poly" id="edge37_Node000001_Node000038" title=" " alt="" coords="3348,16,3879,17,4663,23,5077,30,5467,41,5803,56,6057,76,6101,83,6100,89,6056,81,5803,61,5467,47,5077,36,4663,29,3879,22,3348,22"/>
+<area shape="rect" id="Node000039" href="$kstdlib_8c.html" title="Kernel micro&#45;library implementation (strings, memory)." alt="" coords="6253,86,6373,111"/>
+<area shape="poly" id="edge38_Node000001_Node000039" title=" " alt="" coords="3348,17,3965,22,4868,33,5735,50,6053,62,6241,76,6276,83,6275,89,6240,81,6053,67,5734,56,4868,38,3965,27,3348,23"/>
+<area shape="rect" id="Node000040" href="$heap_8c.html" title="Kernel heap allocator implementation." alt="" coords="6397,86,6516,111"/>
+<area shape="poly" id="edge39_Node000001_Node000040" title=" " alt="" coords="3348,17,3992,22,4940,32,5852,49,6187,62,6385,76,6420,83,6419,89,6384,81,6187,67,5852,55,4940,37,3992,27,3348,22"/>
+<area shape="rect" id="Node000041" href="$vmm_8c.html" title="x86_64 virtual memory manager (PML4 → PT, address&#45;space clone, tear down user maps)." alt="" coords="6541,86,6661,111"/>
+<area shape="poly" id="edge40_Node000001_Node000041" title=" " alt="" coords="3348,17,4018,21,5012,31,5969,49,6321,61,6529,76,6564,83,6563,89,6528,81,6321,66,5969,54,5012,36,4018,26,3348,22"/>
+</map>

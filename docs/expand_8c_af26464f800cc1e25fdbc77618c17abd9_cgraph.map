@@ -1,0 +1,38 @@
+<map id="run_substitution" name="run_substitution">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,132,195"/>
+<area shape="rect" id="Node000002" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="180,169,263,195"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,179,166,179,166,185,132,185"/>
+<area shape="rect" id="Node000003" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="650,343,725,368"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="233,167,294,111,338,76,389,44,443,18,498,4,525,3,552,7,577,16,602,31,619,52,634,84,659,168,676,258,686,329,680,330,671,259,654,169,629,86,615,55,598,35,575,20,550,12,525,8,498,9,444,23,391,49,341,81,297,115,237,171"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="314,169,405,195"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="263,179,300,179,300,185,263,185"/>
+<area shape="rect" id="Node000038" href="$core_2vega_2parse_8c.html#a37fb9f6bddc87aa3381e31f183663b88" title="Parse line into an AST." alt="" coords="311,443,408,468"/>
+<area shape="poly" id="edge12_Node000002_Node000038" title=" " alt="" coords="231,194,348,429,343,431,227,196"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="661,344,655,334,658,325,669,318,687,316,709,320,718,328,715,332,707,324,687,321,671,323,662,328,661,334,665,341"/>
+<area shape="poly" id="edge10_Node000004_Node000004" title=" " alt="" coords="336,170,331,161,334,151,343,145,359,143,378,146,386,154,382,158,375,151,359,148,345,150,338,155,337,160,341,168"/>
+<area shape="rect" id="Node000005" href="$exec_8c.html#ae80adbc2156956a944b33f5d1be0cc55" title=" " alt="" coords="485,95,571,120"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="381,167,455,129,472,122,474,127,457,134,383,172"/>
+<area shape="rect" id="Node000033" href="$exec_8c.html#a71ef69197a1c04bbcd7e6216c03506f3" title=" " alt="" coords="473,144,583,169"/>
+<area shape="poly" id="edge6_Node000004_Node000033" title=" " alt="" coords="404,173,458,164,459,170,405,178"/>
+<area shape="rect" id="Node000035" href="$expand_8c.html#a6c6e8f6f4d0e9d5a0b001d74e308843e" title="Record the exit status of the most recently completed command." alt="" coords="456,193,600,219"/>
+<area shape="poly" id="edge7_Node000004_Node000035" title=" " alt="" coords="405,186,442,191,442,196,404,191"/>
+<area shape="rect" id="Node000007" href="$expand_8c.html#a4fda5f1bdaaefe8d10a7a1b8c9c486c9" title="Expand $&#45;syntax in src and return a new heap&#45;allocated string. The caller takes ownership and must fr..." alt="" coords="473,243,583,268"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="384,192,457,229,474,236,472,241,455,234,382,197"/>
+<area shape="rect" id="Node000036" href="$fntab_8c.html#a1df92697cea4c74361d14515422c10ac" title="Insert or replace a function. Takes ownership of name, arg_names (and each string therein) and body." alt="" coords="487,292,569,317"/>
+<area shape="poly" id="edge9_Node000004_Node000036" title=" " alt="" coords="372,193,407,235,431,258,457,278,475,288,473,292,455,283,427,262,403,239,368,197"/>
+<area shape="rect" id="Node000025" href="$expand_8c.html#a8d600c1ad95fcb65708123c14c09769b" title="Assign value to vega variable name." alt="" coords="477,45,579,71"/>
+<area shape="poly" id="edge11_Node000004_Node000025" title=" " alt="" coords="368,167,403,125,427,101,455,80,465,74,468,79,457,84,431,105,406,128,372,171"/>
+<area shape="poly" id="edge13_Node000038_Node000003" title=" " alt="" coords="371,440,406,409,430,393,455,380,502,365,550,356,636,351,637,356,551,362,503,370,457,385,432,397,410,413,375,444"/>
+<area shape="rect" id="Node000039" href="$core_2vega_2parse_8c.html#a892d1d86bd325ddd4aec5ae1469db7e2" title=" " alt="" coords="461,443,595,468"/>
+<area shape="poly" id="edge14_Node000038_Node000039" title=" " alt="" coords="408,453,448,453,448,458,408,458"/>
+<area shape="rect" id="Node000041" href="$lexer_8c.html#ac36c645bf8348db018cfeb9588978b84" title="Initialise a lexer over the given line. The line is not modified." alt="" coords="493,492,563,517"/>
+<area shape="poly" id="edge15_Node000038_Node000041" title=" " alt="" coords="404,466,480,488,479,493,403,471"/>
+<area shape="rect" id="Node000042" href="$lexer_8c.html#a84851e4cf3d14fcf913e267852e1ab08" title="Consume and return the next token." alt="" coords="648,468,727,493"/>
+<area shape="poly" id="edge16_Node000038_Node000042" title=" " alt="" coords="374,467,409,499,432,516,457,528,496,539,527,541,559,537,599,528,630,515,657,499,660,504,632,520,601,533,560,543,528,547,495,544,455,533,429,520,405,504,370,470"/>
+<area shape="rect" id="Node000049" href="$lexer_8c.html#abbbfdf6d2487ba0569a480f8bc1f24eb" title="Free a token&#39;s heap storage if any." alt="" coords="469,593,587,619"/>
+<area shape="poly" id="edge17_Node000038_Node000049" title=" " alt="" coords="370,467,404,517,429,546,458,572,479,585,476,590,454,576,425,550,400,520,366,470"/>
+<area shape="rect" id="Node000050" href="$core_2vega_2parse_8c.html#a39c2363ce6301b51c1dc201986050d62" title=" " alt="" coords="485,393,571,419"/>
+<area shape="poly" id="edge18_Node000038_Node000050" title=" " alt="" coords="403,440,471,420,473,425,404,445"/>
+<area shape="poly" id="edge19_Node000050_Node000003" title=" " alt="" coords="568,391,636,369,637,374,570,396"/>
+<area shape="poly" id="edge20_Node000050_Node000042" title=" " alt="" coords="570,416,601,429,655,458,653,463,599,434,568,421"/>
+</map>

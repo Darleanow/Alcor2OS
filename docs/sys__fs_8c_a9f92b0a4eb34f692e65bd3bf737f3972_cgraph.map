@@ -1,0 +1,23 @@
+<map id="sys_faccessat" name="sys_faccessat">
+<area shape="rect" id="Node000001" title="faccessat — only AT_FDCWD and absolute paths are supported." alt="" coords="5,180,119,205"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" title="Check that path exists and is accessible; always grants access." alt="" coords="167,155,261,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,181,152,175,153,180,119,186"/>
+<area shape="rect" id="Node000006" href="$sys__fs_8c.html#a2b62b386a750a6392a02d67953da3095" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="340,205,444,231"/>
+<area shape="poly" id="edge11_Node000001_Node000006" title=" " alt="" coords="119,194,326,210,326,216,119,200"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a66b61fd8589babbbf716e2f2b54fdd6c" title="Return non&#45;zero if path refers to the /proc/self/exe virtual symlink." alt="" coords="309,104,475,129"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="259,152,333,131,334,136,260,157"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="719,80,821,105"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="262,168,340,171,443,170,557,161,614,152,670,139,705,126,736,110,739,115,707,131,671,145,615,157,557,166,443,176,340,177,261,174"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="260,178,334,199,333,204,259,183"/>
+<area shape="rect" id="Node000008" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="355,55,429,80"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="226,152,262,122,308,90,340,77,342,82,311,95,265,126,230,156"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="559,104,634,129"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="475,114,545,114,545,119,475,119"/>
+<area shape="rect" id="Node000007" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="529,205,664,231"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="444,215,516,215,516,221,444,221"/>
+<area shape="rect" id="Node000009" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="535,55,658,80"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="429,65,521,65,521,70,429,70"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="523,5,671,31"/>
+<area shape="poly" id="edge9_Node000008_Node000013" title=" " alt="" coords="429,56,529,31,530,37,430,61"/>
+<area shape="poly" id="edge10_Node000013_Node000005" title=" " alt="" coords="641,28,672,40,736,71,733,76,670,44,639,33"/>
+</map>

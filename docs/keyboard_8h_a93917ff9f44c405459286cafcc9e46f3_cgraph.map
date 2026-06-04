@@ -1,0 +1,7 @@
+<map id="keyboard_raw_peek" name="keyboard_raw_peek">
+<area shape="rect" id="Node000001" title="Copy pending scancodes without consuming (irq snapshot)." alt="" coords="5,31,157,56"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="205,5,375,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,31,191,27,192,33,158,37"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="207,55,373,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,49,193,54,193,59,157,55"/>
+</map>

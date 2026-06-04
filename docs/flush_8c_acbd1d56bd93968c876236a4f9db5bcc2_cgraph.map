@@ -1,0 +1,15 @@
+<map id="commit_cell_at" name="commit_cell_at">
+<area shape="rect" id="Node000001" title="Commit cp with the live SGR state into c and either mark dirty (batch mode) or blit immediately." alt="" coords="5,80,128,105"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="176,80,249,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,90,163,90,163,95,128,95"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="297,80,407,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="250,90,284,90,284,95,250,95"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="469,5,599,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="375,77,454,40,473,32,475,37,456,44,377,82"/>
+<area shape="rect" id="Node000016" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="475,55,593,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="407,82,461,75,461,80,408,88"/>
+<area shape="rect" id="Node000021" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="465,104,603,129"/>
+<area shape="poly" id="edge5_Node000003_Node000021" title=" " alt="" coords="407,97,451,103,450,108,407,103"/>
+<area shape="rect" id="Node000023" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="455,153,613,179"/>
+<area shape="poly" id="edge6_Node000003_Node000023" title=" " alt="" coords="379,103,456,138,478,147,476,152,454,143,377,108"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="caret_refresh" name="caret_refresh">
+<area shape="rect" id="Node000001" title="Convenience: caret_erase followed by caret_paint. Used after a write completes; cheap when the cursor..." alt="" coords="5,31,113,56"/>
+<area shape="rect" id="Node000002" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="161,5,260,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,32,148,26,148,31,114,37"/>
+<area shape="rect" id="Node000025" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="163,55,258,80"/>
+<area shape="poly" id="edge4_Node000001_Node000025" title=" " alt="" coords="114,49,150,55,149,60,113,54"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="308,31,381,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="261,25,295,31,294,37,260,30"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="429,31,539,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="382,41,416,41,416,46,382,46"/>
+<area shape="poly" id="edge5_Node000025_Node000003" title=" " alt="" coords="258,56,294,50,295,55,259,61"/>
+</map>

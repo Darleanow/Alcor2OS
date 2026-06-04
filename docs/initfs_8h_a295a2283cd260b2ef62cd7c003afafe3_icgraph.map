@@ -1,0 +1,5 @@
+<map id="initfs_register" name="initfs_register">
+<area shape="rect" id="Node000001" title="Add a virtual file to initfs." alt="" coords="180,5,292,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="5,5,132,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,21,133,21,133,15,166,15"/>
+</map>

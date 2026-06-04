@@ -1,0 +1,5 @@
+<map id="kbd_read_translated" name="kbd_read_translated">
+<area shape="rect" id="Node000001" title="Block until at least one layout&#45;translated byte is available." alt="" coords="129,5,284,31"/>
+<area shape="rect" id="Node000002" href="$dev__nodes_8c.html#a6687d841b4dafd7f557c59776162e139" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="5,5,81,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,21,82,21,82,15,116,15"/>
+</map>

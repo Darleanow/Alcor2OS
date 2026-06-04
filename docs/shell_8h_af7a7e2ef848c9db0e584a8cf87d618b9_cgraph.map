@@ -1,0 +1,5 @@
+<map id="sh_stdout_bytes" name="sh_stdout_bytes">
+<area shape="rect" id="Node000001" title="Write len raw bytes from buf to stdout (no NUL semantics)." alt="" coords="5,5,133,31"/>
+<area shape="rect" id="Node000002" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="181,5,259,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,15,168,15,168,21,133,21"/>
+</map>

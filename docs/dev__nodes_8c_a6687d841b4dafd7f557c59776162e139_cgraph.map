@@ -1,0 +1,49 @@
+<map id="tty_read" name="tty_read">
+<area shape="rect" id="Node000001" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="5,389,81,414"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a7563fa1166b876f198b727e912747c09" title="read(2) on stdin honoring the process&#39;s termios (ICANON, VMIN/VTIME)." alt="" coords="332,338,496,363"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,386,129,374,226,359,318,352,318,357,227,365,130,379,82,391"/>
+<area shape="rect" id="Node000146" href="$kbd__layout_8c.html#a79e8864bb2dd3b40d30c0698f74b0485" title="Block until at least one layout&#45;translated byte is available." alt="" coords="129,389,284,414"/>
+<area shape="poly" id="edge22_Node000001_Node000146" title=" " alt="" coords="82,399,116,399,116,404,82,404"/>
+<area shape="rect" id="Node000148" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="363,438,465,463"/>
+<area shape="poly" id="edge27_Node000001_Node000148" title=" " alt="" coords="82,411,130,423,246,438,349,446,349,451,245,444,129,428,81,416"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a69aaaa8b82d087686cfb75adb82d243f" title=" " alt="" coords="544,387,687,413"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="467,361,550,382,549,387,466,366"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="781,413,868,438"/>
+<area shape="poly" id="edge16_Node000002_Node000004" title=" " alt="" coords="470,361,497,374,512,387,521,400,530,412,545,422,602,438,661,443,718,441,768,435,768,440,719,446,661,448,601,443,543,427,527,416,517,403,508,390,495,378,467,366"/>
+<area shape="rect" id="Node000005" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="559,162,672,187"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="426,336,475,286,542,225,583,194,586,198,546,229,479,290,430,340"/>
+<area shape="rect" id="Node000059" href="$kbd__layout_8c.html#a6daec33a349a589e3e1c460d7a5d8d7e" title=" " alt="" coords="558,239,673,265"/>
+<area shape="poly" id="edge17_Node000002_Node000059" title=" " alt="" coords="433,336,482,306,543,274,559,267,561,272,545,279,485,310,436,340"/>
+<area shape="rect" id="Node000144" href="$kbd__layout_8c.html#a16b699983816072933124817dffd01f5" title=" " alt="" coords="555,338,676,363"/>
+<area shape="poly" id="edge19_Node000002_Node000144" title=" " alt="" coords="496,348,541,348,541,353,496,353"/>
+<area shape="rect" id="Node000145" href="$kbd__layout_8c.html#a342be6d76690ad784575a84da6983226" title=" " alt="" coords="559,289,672,314"/>
+<area shape="poly" id="edge21_Node000002_Node000145" title=" " alt="" coords="466,336,549,315,550,320,467,341"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="688,406,768,416,767,421,687,411"/>
+<area shape="rect" id="Node000006" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="963,237,1132,262"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="637,186,689,225,711,251,720,262,736,271,769,282,804,287,875,288,941,278,997,264,998,269,942,283,875,293,803,293,768,287,734,276,717,266,707,255,685,229,634,190"/>
+<area shape="rect" id="Node000007" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="964,39,1131,65"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="620,161,635,131,659,92,692,54,712,38,734,24,768,12,804,5,841,3,877,4,946,16,1002,32,1000,37,945,21,877,10,841,8,804,10,769,17,736,29,715,42,695,58,663,96,639,134,624,163"/>
+<area shape="rect" id="Node000008" href="$keyboard_8c.html#a66a8de728f8653f553e66cabe28e03cf" title="Check if the raw scancode ring buffer has data." alt="" coords="735,89,915,114"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="643,160,734,123,758,115,760,120,736,128,645,164"/>
+<area shape="rect" id="Node000009" href="$keyboard_8c.html#a7b13518cd53570d56fc125c0b1ac76ad" title="Pop one raw scancode from the ring buffer." alt="" coords="753,39,897,65"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="627,160,671,118,701,94,733,74,748,67,751,72,736,79,704,98,674,122,630,164"/>
+<area shape="rect" id="Node000010" href="$kbd__layout_8c.html#a8d5d5b0adb2ce783da6d8075494ceac0" title=" " alt="" coords="766,138,883,163"/>
+<area shape="poly" id="edge11_Node000005_Node000010" title=" " alt="" coords="672,166,752,156,753,162,672,171"/>
+<area shape="rect" id="Node000011" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="767,237,882,262"/>
+<area shape="poly" id="edge12_Node000005_Node000011" title=" " alt="" coords="645,185,736,222,762,230,761,235,734,227,643,190"/>
+<area shape="rect" id="Node000019" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="759,187,890,213"/>
+<area shape="poly" id="edge15_Node000005_Node000019" title=" " alt="" coords="672,179,746,188,745,193,672,184"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="894,63,916,74,957,108,990,149,1017,189,1036,223,1032,226,1013,192,986,152,953,112,913,78,891,67"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="897,49,950,49,950,55,897,55"/>
+<area shape="poly" id="edge13_Node000011_Node000006" title=" " alt="" coords="882,247,949,247,949,252,882,252"/>
+<area shape="poly" id="edge14_Node000011_Node000007" title=" " alt="" coords="881,237,913,222,952,188,986,149,1012,110,1031,76,1036,79,1017,112,990,152,956,192,916,226,883,242"/>
+<area shape="rect" id="Node000060" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="759,338,891,363"/>
+<area shape="poly" id="edge18_Node000059_Node000060" title=" " alt="" coords="663,262,688,274,703,285,713,296,722,306,736,317,766,331,764,336,733,321,718,310,709,299,699,289,685,278,661,267"/>
+<area shape="poly" id="edge20_Node000144_Node000060" title=" " alt="" coords="676,348,745,348,745,353,676,353"/>
+<area shape="poly" id="edge23_Node000146_Node000002" title=" " alt="" coords="259,386,348,364,349,369,260,391"/>
+<area shape="rect" id="Node000147" href="$ktermios_8c.html#a1a9811c2c69a777da120ed3d4dd28520" title="Reset t to the cooked&#45;TTY defaults a freshly forked PID would expect (ICRNL|ONLCR|CS8|CREAD|CLOCAL|IS..." alt="" coords="333,389,495,414"/>
+<area shape="poly" id="edge24_Node000146_Node000147" title=" " alt="" coords="284,399,320,399,320,404,284,404"/>
+<area shape="poly" id="edge26_Node000146_Node000148" title=" " alt="" coords="261,412,350,433,349,438,260,417"/>
+<area shape="rect" id="Node000087" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="586,489,645,514"/>
+<area shape="poly" id="edge25_Node000147_Node000087" title=" " alt="" coords="472,412,497,423,513,434,522,445,546,467,575,483,572,488,542,472,518,449,509,438,495,428,469,417"/>
+</map>

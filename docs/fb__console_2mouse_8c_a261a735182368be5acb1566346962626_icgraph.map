@@ -1,0 +1,9 @@
+<map id="mouse_cursor_render" name="mouse_cursor_render">
+<area shape="rect" id="Node000001" title="Paint or move the software mouse cursor to the current PS/2 position." alt="" coords="457,5,620,31"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="287,5,409,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,21,409,21,409,15,444,15"/>
+<area shape="rect" id="Node000003" href="$pit_8c.html#a1ec93c1a5802efe9e3925acb8ccb5f64" title=" " alt="" coords="120,5,239,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="273,21,239,21,239,15,273,15"/>
+<area shape="rect" id="Node000004" href="$pit_8c.html#aad83f0d07314d8845558b13050011b0d" title="Program the PIT and install the timer IRQ handler." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="106,21,72,21,72,15,106,15"/>
+</map>

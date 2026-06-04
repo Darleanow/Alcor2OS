@@ -1,0 +1,7 @@
+<map id="dir_is_empty" name="dir_is_empty">
+<area shape="rect" id="Node000001" title="Check whether dir_inode contains anything beyond . and .." alt="" coords="317,5,424,31"/>
+<area shape="rect" id="Node000002" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="176,5,269,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="304,21,269,21,269,15,304,15"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#ac522aded5a92cdfd53591e3881498544" title="fs_ops_t.rmdir shim." alt="" coords="5,5,128,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="162,21,128,21,128,15,162,15"/>
+</map>

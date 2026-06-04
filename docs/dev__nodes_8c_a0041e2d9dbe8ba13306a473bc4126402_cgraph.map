@@ -1,0 +1,43 @@
+<map id="fb_ioctl" name="fb_ioctl">
+<area shape="rect" id="Node000001" title="ioctl on /dev/fb — forwards FB_CONSOLE_YIELD, FB_CONSOLE_RECLAIM, and FB_CONSOLE_SET_ATLAS." alt="" coords="5,288,76,313"/>
+<area shape="rect" id="Node000002" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="124,288,308,313"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,298,110,298,110,303,76,303"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="569,148,717,173"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="254,285,562,183,588,175,589,180,563,189,256,291"/>
+<area shape="rect" id="Node000030" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="356,288,515,313"/>
+<area shape="poly" id="edge10_Node000002_Node000030" title=" " alt="" coords="309,298,342,298,342,303,309,303"/>
+<area shape="rect" id="Node000041" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="819,439,905,464"/>
+<area shape="poly" id="edge23_Node000002_Node000041" title=" " alt="" coords="239,311,294,342,372,381,465,420,563,449,627,458,693,461,805,455,805,461,693,466,627,463,562,454,463,425,370,386,291,347,237,316"/>
+<area shape="rect" id="Node000069" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="785,360,939,385"/>
+<area shape="poly" id="edge24_Node000002_Node000069" title=" " alt="" coords="282,311,356,323,580,350,772,365,771,370,580,355,356,329,281,316"/>
+<area shape="rect" id="Node000070" href="$api_8c.html#a460f3f181a121f95a380c7768036f825" title="Hand the framebuffer to a userspace mmap&#45;er (typically Doom)." alt="" coords="370,103,501,128"/>
+<area shape="poly" id="edge21_Node000002_Node000070" title=" " alt="" coords="229,286,354,173,404,135,407,139,358,177,233,290"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="1001,205,1075,231"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="660,146,708,117,738,103,770,93,822,79,865,71,906,74,955,93,981,113,1003,139,1030,192,1026,194,998,142,978,117,952,98,905,79,865,77,823,85,771,98,740,108,711,122,663,150"/>
+<area shape="rect" id="Node000026" href="$caret_8c.html#ae19ecefda194f357460e6a4f5bb4d456" title="Forget the tracker without repainting." alt="" coords="791,255,933,280"/>
+<area shape="poly" id="edge4_Node000003_Node000026" title=" " alt="" coords="699,171,724,184,740,199,749,214,757,228,772,241,783,247,780,252,769,246,753,231,744,216,736,202,721,188,696,176"/>
+<area shape="rect" id="Node000027" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="815,205,909,231"/>
+<area shape="poly" id="edge5_Node000003_Node000027" title=" " alt="" coords="693,171,802,200,801,205,691,176"/>
+<area shape="rect" id="Node000016" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html#af20729b3f28f794e0ac0570ac8ef9c9d" title="32&#45;bit splat using rep stosl. Inlined across every TU that touches pixels because the call overhead d..." alt="" coords="835,107,889,132"/>
+<area shape="poly" id="edge7_Node000003_Node000016" title=" " alt="" coords="710,145,821,124,822,129,711,151"/>
+<area shape="rect" id="Node000028" href="$fb__console_2mouse_8c.html#ae5f0507a92c6c100661c22cd379e2caa" title="Forget the painted&#45;at position without erasing pixels. Used by paths that are about to repaint the wh..." alt="" coords="787,5,937,31"/>
+<area shape="poly" id="edge8_Node000003_Node000028" title=" " alt="" coords="653,146,701,99,734,72,769,48,800,33,803,38,772,52,737,76,705,103,657,150"/>
+<area shape="rect" id="Node000029" href="$scrollback_8c.html#af25555e5a162a563860a3d8aab81343e" title="Forget pending scrolls without flushing them. Used by paths that are about to repaint the entire grid..." alt="" coords="771,156,953,181"/>
+<area shape="poly" id="edge9_Node000003_Node000029" title=" " alt="" coords="717,161,757,162,757,167,717,166"/>
+<area shape="poly" id="edge6_Node000027_Node000004" title=" " alt="" coords="910,215,988,215,988,221,910,221"/>
+<area shape="rect" id="Node000031" href="$atlas__install_8c.html#a54262a79f9deda2b5141bea67af7ce4f" title="Mirror the user&#45;side atlas into kernel&#45;owned buffers and publish every field of meta into fb_ctx...." alt="" coords="563,413,723,439"/>
+<area shape="poly" id="edge11_Node000030_Node000031" title=" " alt="" coords="459,311,610,404,608,408,456,316"/>
+<area shape="rect" id="Node000057" href="$atlas__install_8c.html#a71d659ad29efcff918c1d53668fe4bfc" title="Reflow the cell grid when the new atlas&#39;s cell size differs from the live one." alt="" coords="563,263,722,288"/>
+<area shape="poly" id="edge13_Node000030_Node000057" title=" " alt="" coords="515,288,549,284,550,289,516,294"/>
+<area shape="rect" id="Node000063" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="571,198,714,238"/>
+<area shape="poly" id="edge14_Node000030_Node000063" title=" " alt="" coords="467,285,578,241,580,246,469,290"/>
+<area shape="rect" id="Node000067" href="$atlas__install_8c.html#aad80a470b407d9bcef3f961c50f593f2" title="Validate meta and the user buffers it points at." alt="" coords="565,312,720,337"/>
+<area shape="poly" id="edge19_Node000030_Node000067" title=" " alt="" coords="516,307,552,311,551,317,515,313"/>
+<area shape="poly" id="edge12_Node000031_Node000041" title=" " alt="" coords="723,433,805,442,804,447,723,438"/>
+<area shape="poly" id="edge15_Node000063_Node000004" title=" " alt="" coords="699,236,724,249,738,261,748,272,757,282,772,290,821,306,862,311,903,306,952,290,988,268,1017,240,1020,244,992,272,954,295,904,311,862,317,820,311,770,295,754,286,744,276,735,265,721,254,696,240"/>
+<area shape="poly" id="edge16_Node000063_Node000026" title=" " alt="" coords="715,231,792,249,791,254,714,237"/>
+<area shape="poly" id="edge17_Node000063_Node000027" title=" " alt="" coords="714,215,801,215,801,221,714,221"/>
+<area shape="poly" id="edge18_Node000063_Node000029" title=" " alt="" coords="714,199,791,182,792,187,715,205"/>
+<area shape="poly" id="edge20_Node000067_Node000069" title=" " alt="" coords="702,335,791,354,789,360,701,340"/>
+<area shape="poly" id="edge22_Node000070_Node000028" title=" " alt="" coords="492,100,791,31,792,36,493,105"/>
+</map>

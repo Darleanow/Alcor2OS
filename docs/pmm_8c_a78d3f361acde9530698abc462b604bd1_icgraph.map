@@ -1,0 +1,39 @@
+<map id="bitmap_clear" name="bitmap_clear">
+<area shape="rect" id="Node000001" title="Mark page as free in bitmap." alt="" coords="871,197,977,223"/>
+<area shape="rect" id="Node000002" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="711,197,800,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="857,213,800,213,800,207,857,207"/>
+<area shape="rect" id="Node000029" href="$pmm_8c.html#a038dd8a14e1fd15596007bcc2bd9184c" title="Free multiple contiguous physical pages." alt="" coords="688,120,823,145"/>
+<area shape="poly" id="edge16_Node000001_Node000029" title=" " alt="" coords="882,194,783,148,785,143,884,189"/>
+<area shape="rect" id="Node000030" href="$pmm_8c.html#a0ceb2ad599b97e3e6cb48fd37f2b8136" title="Initialize the physical memory manager." alt="" coords="713,300,797,325"/>
+<area shape="poly" id="edge18_Node000001_Node000030" title=" " alt="" coords="892,232,779,302,776,297,889,228"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="500,91,579,116"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="726,191,679,155,639,130,609,119,578,112,580,106,610,114,641,125,682,151,729,187"/>
+<area shape="rect" id="Node000006" href="$sys__mm_8c.html#a4a9a3125254665467fbc3e506c768b9a" title=" " alt="" coords="452,140,627,165"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="697,196,639,181,591,168,592,163,641,175,698,191"/>
+<area shape="rect" id="Node000010" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="460,190,619,230"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="697,213,619,213,619,207,697,207"/>
+<area shape="rect" id="Node000014" href="$vmm_8c.html#a8966edc063e975473a71b57a1b39c886" title="Destroy all user mappings in an address space." alt="" coords="172,255,391,280"/>
+<area shape="poly" id="edge15_Node000002_Node000014" title=" " alt="" coords="704,229,640,245,511,261,391,268,391,263,511,255,640,239,702,224"/>
+<area shape="rect" id="Node000028" href="$vmm_8c.html#aca93d0285bf352c3551ae24b92a73744" title="Clone an address space for fork()." alt="" coords="439,305,640,331"/>
+<area shape="poly" id="edge13_Node000002_Node000028" title=" " alt="" coords="729,233,689,261,641,288,590,308,588,303,639,284,686,257,726,229"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="246,5,317,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="498,87,447,65,390,45,316,27,318,21,391,39,449,60,500,83"/>
+<area shape="rect" id="Node000007" href="$sys__mm_8c.html#abdac42378ec121cb3f3b48c5af03ded3" title=" " alt="" coords="191,55,372,80"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="463,139,438,130,413,116,390,102,334,83,336,77,392,97,416,111,440,125,464,134"/>
+<area shape="rect" id="Node000008" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="18,80,111,105"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="438,143,111,101,112,96,439,137"/>
+<area shape="rect" id="Node000009" href="$sys__mm_8c.html#a95d35a82f8059990e8f0598e18299f19" title=" " alt="" coords="227,156,336,181"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="438,162,336,168,336,163,438,156"/>
+<area shape="poly" id="edge6_Node000007_Node000008" title=" " alt="" coords="177,82,112,90,111,85,177,77"/>
+<area shape="rect" id="Node000011" href="$vmm_8c.html#ade320027ce15064748033ecf56abe4f5" title="Free every user&#45;space mapping in an address space (pages, PT, PD, PDPT) and zero the user&#45;space PML4 ..." alt="" coords="181,205,382,231"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="446,216,382,218,382,212,446,210"/>
+<area shape="poly" id="edge11_Node000010_Node000014" title=" " alt="" coords="447,233,340,257,339,252,446,228"/>
+<area shape="rect" id="Node000020" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="5,280,124,305"/>
+<area shape="poly" id="edge12_Node000014_Node000020" title=" " alt="" coords="159,284,124,288,124,283,158,279"/>
+<area shape="poly" id="edge14_Node000028_Node000020" title=" " alt="" coords="425,315,124,298,125,293,425,309"/>
+<area shape="poly" id="edge17_Node000029_Node000003" title=" " alt="" coords="674,124,579,111,579,106,675,119"/>
+<area shape="rect" id="Node000031" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="498,355,581,380"/>
+<area shape="poly" id="edge19_Node000030_Node000031" title=" " alt="" coords="700,330,641,346,581,360,580,355,639,341,699,325"/>
+<area shape="rect" id="Node000019" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="250,356,313,381"/>
+<area shape="poly" id="edge20_Node000031_Node000019" title=" " alt="" coords="484,370,313,371,313,366,484,365"/>
+</map>

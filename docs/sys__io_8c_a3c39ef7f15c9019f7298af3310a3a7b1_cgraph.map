@@ -1,0 +1,9 @@
+<map id="sys_ioctl" name="sys_ioctl">
+<area shape="rect" id="Node000001" title="Perform a device control operation on fd." alt="" coords="5,5,84,31"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#a95dc3ba04b65d9163fa966075e149b3c" title="Dispatch ioctl through the filesystem driver behind fd." alt="" coords="132,5,209,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,15,118,15,118,21,84,21"/>
+<area shape="rect" id="Node000003" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="257,5,336,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="209,15,244,15,244,21,209,21"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="384,5,487,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="336,15,370,15,370,21,336,21"/>
+</map>

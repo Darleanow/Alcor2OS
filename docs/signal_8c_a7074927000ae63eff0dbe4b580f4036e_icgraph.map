@@ -1,0 +1,29 @@
+<map id="proc_signal" name="proc_signal">
+<area shape="rect" id="Node000001" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="623,211,719,236"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="450,104,533,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="635,206,513,132,515,127,638,201"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#aa22e3da99e1e9e37ab34f672214545cb" title="Wake every process so TUIs re&#45;query TIOCGWINSZ after a reflow. Defined in proc/signal...." alt="" coords="408,211,575,236"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="609,226,575,226,575,221,609,221"/>
+<area shape="rect" id="Node000015" href="$signal_8c.html#aaf33b94444c34b265669722766ce7351" title="Send a signal to a process." alt="" coords="456,268,527,293"/>
+<area shape="poly" id="edge11_Node000001_Node000015" title=" " alt="" coords="618,243,528,272,526,267,616,238"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a8aed1703f7c57aac4497559a076d2162" title=" " alt="" coords="213,5,359,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="458,99,412,71,359,44,330,33,331,28,361,40,414,67,461,94"/>
+<area shape="rect" id="Node000005" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="212,55,360,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="436,106,339,83,340,77,437,101"/>
+<area shape="rect" id="Node000006" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="237,104,335,129"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="437,119,335,119,335,114,437,114"/>
+<area shape="rect" id="Node000007" href="$sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status." alt="" coords="248,153,324,179"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="438,132,325,160,324,154,436,127"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#af2a6510459a9078c19de386e065e36dd" title=" " alt="" coords="11,5,159,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="200,21,159,21,159,15,200,15"/>
+<area shape="rect" id="Node000008" href="$sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" title="Terminate all threads in the group — equivalent to sys_exit here." alt="" coords="25,153,145,179"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="234,169,145,169,145,163,234,163"/>
+<area shape="rect" id="Node000010" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="215,203,357,243"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="394,226,357,226,357,221,394,221"/>
+<area shape="rect" id="Node000011" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="5,211,164,236"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="201,226,164,226,164,221,201,221"/>
+<area shape="rect" id="Node000016" href="$signal_8c.html#abb4d7329079c42e646f8770eab5568cb" title=" " alt="" coords="244,268,328,293"/>
+<area shape="poly" id="edge12_Node000015_Node000016" title=" " alt="" coords="442,283,328,283,328,278,442,278"/>
+<area shape="rect" id="Node000017" href="$signal_8c.html#ab5f7c2b99e462d63a376becc8d503470" title=" " alt="" coords="248,317,324,343"/>
+<area shape="poly" id="edge13_Node000015_Node000017" title=" " alt="" coords="443,295,325,324,324,318,442,290"/>
+</map>

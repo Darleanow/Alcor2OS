@@ -1,0 +1,5 @@
+<map id="vfs_rmdir" name="vfs_rmdir">
+<area shape="rect" id="Node000001" title="Remove the empty directory at path." alt="" coords="140,5,224,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a5a0e70030b084d0a0fe76e4f0e18ce00" title="Remove the empty directory at pathname." alt="" coords="5,5,92,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
+</map>

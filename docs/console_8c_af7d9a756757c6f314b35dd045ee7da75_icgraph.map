@@ -1,0 +1,40 @@
+<map id="print_hex" name="print_hex">
+<area shape="rect" id="Node000001" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="648,279,731,304"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="485,279,600,304"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="634,294,600,294,600,289,634,289"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="331,5,401,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="535,265,525,218,507,159,477,97,458,69,436,44,419,33,400,26,402,21,422,28,439,40,462,66,482,94,511,157,530,217,540,264"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#ae65ed532860c590d0e567ec0487fee0a" title="Register /dev/null, /dev/zero, /dev/tty, and /dev/fb on the ramfs mounted at /dev." alt="" coords="306,55,426,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="532,266,520,228,500,181,472,134,436,93,418,82,421,78,439,89,476,131,504,179,525,226,537,265"/>
+<area shape="rect" id="Node000006" href="$idt_8c.html#a8a93c29846db4e5a2697c572d1e6bd7a" title=" " alt="" coords="295,104,437,129"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="528,267,492,205,466,172,436,143,416,132,419,127,439,139,470,168,497,202,533,265"/>
+<area shape="rect" id="Node000007" href="$super_8c.html#aa3b33fc4657b2e71defc951eeb6f2ada" title="Mount an ext2 partition: read the superblock, validate the magic, load the group descriptor table int..." alt="" coords="316,153,416,179"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="521,270,484,230,436,192,413,181,415,176,439,188,487,226,525,266"/>
+<area shape="rect" id="Node000009" href="$heap_8c.html#a7e7a6625a49b6a560a47ae7575575264" title="Initialize the kernel heap allocator." alt="" coords="325,203,407,228"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="499,276,395,231,398,226,501,271"/>
+<area shape="rect" id="Node000010" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="140,279,223,304"/>
+<area shape="poly" id="edge13_Node000002_Node000010" title=" " alt="" coords="472,294,223,294,223,289,472,289"/>
+<area shape="rect" id="Node000011" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,453,68,479"/>
+<area shape="poly" id="edge15_Node000002_Node000011" title=" " alt="" coords="534,318,520,348,500,383,473,417,439,443,390,465,339,479,286,487,233,490,138,485,68,475,68,470,138,480,233,485,285,482,337,474,388,460,436,438,469,413,495,380,515,346,529,316"/>
+<area shape="rect" id="Node000012" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="303,353,429,379"/>
+<area shape="poly" id="edge12_Node000002_Node000012" title=" " alt="" coords="505,313,438,343,406,356,404,351,436,338,503,308"/>
+<area shape="rect" id="Node000013" href="$idt_8c.html#af94018d2295ea8c5c8bb95e454c64784" title=" " alt="" coords="319,403,413,428"/>
+<area shape="poly" id="edge14_Node000002_Node000013" title=" " alt="" coords="523,317,486,355,439,392,412,405,410,400,436,388,483,351,520,313"/>
+<area shape="rect" id="Node000014" href="$src_2kernel_2main_8c.html#ae1d9b721e1a1c60b10f0baef1ce6e199" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="135,504,228,529"/>
+<area shape="poly" id="edge16_Node000002_Node000014" title=" " alt="" coords="538,319,526,357,506,403,478,449,460,470,439,487,414,501,387,512,330,524,275,528,228,525,229,520,275,522,330,519,385,507,412,496,436,482,456,466,474,446,502,401,521,355,533,317"/>
+<area shape="rect" id="Node000015" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="319,555,413,580"/>
+<area shape="poly" id="edge18_Node000002_Node000015" title=" " alt="" coords="539,318,528,364,509,422,480,483,461,511,439,537,410,557,407,552,436,533,457,508,475,480,504,420,523,362,534,317"/>
+<area shape="rect" id="Node000017" href="$src_2kernel_2main_8c.html#a45fb8b4cde988b83b15fe5713a6ecdca" title="Print boot banner." alt="" coords="314,304,418,329"/>
+<area shape="poly" id="edge20_Node000002_Node000017" title=" " alt="" coords="472,304,419,312,418,307,472,299"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="132,31,231,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="318,27,231,39,230,34,317,22"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="292,60,231,52,231,47,293,55"/>
+<area shape="rect" id="Node000008" href="$ops_8c.html#a7d42ab75249625e6a128b68687bc01c5" title="fs_type_t.mount shim — opens the default device." alt="" coords="116,153,247,179"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="302,169,247,169,247,163,302,163"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="323,236,214,281,212,276,321,231"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="163,317,50,455,46,452,159,313"/>
+<area shape="poly" id="edge17_Node000014_Node000011" title=" " alt="" coords="131,502,67,479,69,474,132,497"/>
+<area shape="rect" id="Node000016" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="140,555,223,580"/>
+<area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="305,570,223,570,223,565,305,565"/>
+<area shape="poly" id="edge21_Node000017_Node000010" title=" " alt="" coords="300,310,222,300,223,294,301,305"/>
+</map>

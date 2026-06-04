@@ -1,0 +1,49 @@
+<map id="proc_get" name="proc_get">
+<area shape="rect" id="Node000001" title="Get process by PID." alt="" coords="841,261,920,287"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="439,108,522,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="868,249,840,196,818,169,792,148,759,132,723,121,649,110,579,110,522,116,522,111,579,105,649,105,724,116,761,127,795,144,822,166,844,193,872,247"/>
+<area shape="rect" id="Node000009" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="655,211,751,236"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="827,262,747,239,749,234,829,257"/>
+<area shape="rect" id="Node000016" href="$signal_8c.html#aaf33b94444c34b265669722766ce7351" title="Send a signal to a process." alt="" coords="445,265,516,291"/>
+<area shape="poly" id="edge25_Node000001_Node000016" title=" " alt="" coords="828,277,517,280,517,275,828,272"/>
+<area shape="rect" id="Node000019" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="643,312,762,337"/>
+<area shape="poly" id="edge15_Node000001_Node000019" title=" " alt="" coords="829,291,749,314,747,309,827,286"/>
+<area shape="rect" id="Node000022" href="$proc_8c.html#a605acc71b74a4015f96530987df63a80" title=" " alt="" coords="612,159,793,184"/>
+<area shape="poly" id="edge18_Node000001_Node000022" title=" " alt="" coords="857,253,827,225,792,200,759,187,761,182,795,196,831,221,860,249"/>
+<area shape="rect" id="Node000024" href="$proc_8c.html#a6a505a763018bb704b23f24074faf131" title="Wait for a specific child process to exit." alt="" coords="660,361,745,387"/>
+<area shape="poly" id="edge22_Node000001_Node000024" title=" " alt="" coords="860,299,831,326,795,351,746,369,745,364,792,346,827,322,856,295"/>
+<area shape="rect" id="Node000025" href="$proc_8c.html#a6915d539f11de3b93e8316c67f23301b" title="Wait for child process(es) to change state." alt="" coords="650,411,755,436"/>
+<area shape="poly" id="edge23_Node000001_Node000025" title=" " alt="" coords="871,300,841,351,820,378,795,400,757,418,754,413,792,396,816,374,837,348,866,298"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a8aed1703f7c57aac4497559a076d2162" title=" " alt="" coords="203,5,348,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="449,103,402,73,348,44,320,33,322,28,350,40,405,69,451,98"/>
+<area shape="rect" id="Node000005" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="201,55,349,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="426,109,324,83,326,77,427,104"/>
+<area shape="rect" id="Node000006" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="227,153,324,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="427,135,325,158,324,153,426,130"/>
+<area shape="rect" id="Node000007" href="$sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status." alt="" coords="237,104,313,129"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="426,122,314,120,314,115,426,117"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#af2a6510459a9078c19de386e065e36dd" title=" " alt="" coords="5,5,153,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="189,21,154,21,154,15,189,15"/>
+<area shape="rect" id="Node000008" href="$sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" title="Terminate all threads in the group — equivalent to sys_exit here." alt="" coords="19,104,139,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="224,119,139,119,139,114,224,114"/>
+<area shape="poly" id="edge9_Node000009_Node000002" title=" " alt="" coords="640,212,611,198,595,185,586,171,577,159,563,147,521,130,523,125,565,142,581,155,590,168,599,181,613,193,643,207"/>
+<area shape="rect" id="Node000010" href="$proc_8c.html#aa22e3da99e1e9e37ab34f672214545cb" title="Wake every process so TUIs re&#45;query TIOCGWINSZ after a reflow. Defined in proc/signal...." alt="" coords="397,211,564,236"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="641,226,564,226,564,221,641,221"/>
+<area shape="poly" id="edge12_Node000009_Node000016" title=" " alt="" coords="642,241,517,272,515,267,640,236"/>
+<area shape="rect" id="Node000011" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="204,203,347,243"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="384,226,347,226,347,221,384,221"/>
+<area shape="rect" id="Node000017" href="$signal_8c.html#abb4d7329079c42e646f8770eab5568cb" title=" " alt="" coords="233,268,317,293"/>
+<area shape="poly" id="edge13_Node000016_Node000017" title=" " alt="" coords="431,281,318,283,317,277,431,276"/>
+<area shape="rect" id="Node000018" href="$signal_8c.html#ab5f7c2b99e462d63a376becc8d503470" title=" " alt="" coords="237,317,313,343"/>
+<area shape="poly" id="edge14_Node000016_Node000018" title=" " alt="" coords="432,293,314,323,313,318,431,288"/>
+<area shape="rect" id="Node000020" href="$src_2kernel_2main_8c.html#ae1d9b721e1a1c60b10f0baef1ce6e199" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="434,336,527,361"/>
+<area shape="poly" id="edge16_Node000019_Node000020" title=" " alt="" coords="630,335,528,346,527,341,629,330"/>
+<area shape="rect" id="Node000021" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="244,367,307,392"/>
+<area shape="poly" id="edge17_Node000020_Node000021" title=" " alt="" coords="421,360,307,377,307,372,420,355"/>
+<area shape="poly" id="edge19_Node000022_Node000002" title=" " alt="" coords="632,158,522,133,523,127,634,153"/>
+<area shape="rect" id="Node000023" href="$proc_8c.html#a5e1231c2ae377d286aa81bc975ce6c70" title="Called by sys_execve after exec succeeds and cloexec fds are closed." alt="" coords="415,157,546,183"/>
+<area shape="poly" id="edge20_Node000022_Node000023" title=" " alt="" coords="598,173,547,173,547,168,598,168"/>
+<area shape="poly" id="edge21_Node000023_Node000006" title=" " alt="" coords="402,171,324,170,324,164,402,166"/>
+<area shape="rect" id="Node000026" href="$sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" title="Wait for a child process to change state (wait4)." alt="" coords="437,411,524,436"/>
+<area shape="poly" id="edge24_Node000025_Node000026" title=" " alt="" coords="636,426,524,426,524,421,636,421"/>
+</map>

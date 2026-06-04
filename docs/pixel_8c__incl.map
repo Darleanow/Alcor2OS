@@ -1,0 +1,27 @@
+<map id="src/kernel/drivers/fb_console/pixel.c" name="src/kernel/drivers/fb_console/pixel.c">
+<area shape="rect" id="Node000001" title="Raw framebuffer pixel primitives for the fb_console module." alt="" coords="49,5,191,45"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="292,255,407,280"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,48,51,68,29,95,15,125,9,152,12,178,28,204,119,224,279,251,278,257,118,229,25,209,7,180,3,152,10,124,24,92,47,64,76,43"/>
+<area shape="rect" id="Node000006" href="$font_8h.html" title=" " alt="" coords="39,101,201,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="123,46,123,87,117,87,117,46"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html" title="Shared state, types, and hot&#45;path primitives for the fb_console module split." alt="" coords="263,93,449,133"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="173,43,292,86,291,91,171,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="319,328,401,353"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="354,280,359,314,354,315,348,281"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="447,328,521,353"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="372,278,451,319,449,324,370,282"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="187,328,258,353"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="330,282,257,323,254,319,328,278"/>
+<area shape="rect" id="Node000007" href="$font__bitmap_8h.html" title="8x16 monospace bitmap atlases used by the kernel boot logger." alt="" coords="39,181,153,207"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="119,127,106,169,101,167,114,125"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="137,204,296,248,294,253,136,209"/>
+<area shape="poly" id="edge13_Node000008_Node000002" title=" " alt="" coords="364,133,371,167,371,207,361,242,356,241,365,206,365,168,359,134"/>
+<area shape="poly" id="edge14_Node000008_Node000003" title=" " alt="" coords="370,132,398,186,411,219,421,254,424,268,421,281,407,303,389,321,386,318,403,300,416,279,418,268,416,255,406,221,393,188,365,135"/>
+<area shape="poly" id="edge15_Node000008_Node000004" title=" " alt="" coords="378,132,418,180,455,252,479,314,474,316,450,254,414,183,374,135"/>
+<area shape="rect" id="Node000009" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="229,181,355,207"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="343,135,312,172,308,169,338,132"/>
+<area shape="rect" id="Node000010" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="85,255,267,280"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="297,136,256,156,219,183,199,212,186,242,181,240,194,209,215,179,253,151,295,131"/>
+<area shape="poly" id="edge10_Node000009_Node000002" title=" " alt="" coords="304,205,333,242,329,246,299,209"/>
+<area shape="poly" id="edge12_Node000010_Node000005" title=" " alt="" coords="186,279,210,315,205,318,181,282"/>
+</map>

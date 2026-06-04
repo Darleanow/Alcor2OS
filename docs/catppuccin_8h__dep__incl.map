@@ -1,0 +1,19 @@
+<map id="user/include/catppuccin.h" name="user/include/catppuccin.h">
+<area shape="rect" id="Node000001" title="Catppuccin Mocha palette — xterm&#45;256 indices and true&#45;colour ANSI escapes." alt="" coords="500,5,687,31"/>
+<area shape="rect" id="Node000002" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="514,79,673,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="596,44,596,79,591,79,591,44"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2shell_2main_8c.html" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="5,159,173,185"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="501,108,187,155,147,162,146,157,186,149,500,102"/>
+<area shape="rect" id="Node000004" href="$edit_8c.html" title="Single&#45;line interactive editor: cursor motion, history navigation, tab completion display,..." alt="" coords="198,152,378,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="536,110,362,154,361,149,535,105"/>
+<area shape="rect" id="Node000005" href="$apps_2shell_2platform_2parse_8c.html" title="Multi&#45;line statement accumulator: brace/quote/heredoc&#45;aware test for whether the buffer is a complete..." alt="" coords="402,152,582,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="569,114,518,154,515,150,566,110"/>
+<area shape="rect" id="Node000006" href="$prompt_8c.html" title="Shell prompt rendering: decorative header (cwd) and one&#45;line input prompt with rounded box&#45;drawing ac..." alt="" coords="606,152,786,192"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="621,110,673,150,670,154,618,114"/>
+<area shape="rect" id="Node000007" href="$ls_8c.html" title="List directory contents with columnar layout and Catppuccin colors." alt="" coords="810,159,910,185"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="647,105,799,149,824,157,822,162,798,155,646,110"/>
+<area shape="rect" id="Node000008" href="$palette_8h.html" title="Spazer palette — re&#45;exports theme.h and boxdraw.h." alt="" coords="934,152,1082,192"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="675,104,923,149,934,152,933,157,922,155,674,109"/>
+<area shape="rect" id="Node000009" href="$spazer_8h.html" title=" " alt="" coords="934,240,1082,280"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1011,206,1011,240,1005,240,1005,206"/>
+</map>

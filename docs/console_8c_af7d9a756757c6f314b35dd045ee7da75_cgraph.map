@@ -1,0 +1,17 @@
+<map id="print_hex" name="print_hex">
+<area shape="rect" id="Node000001" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="5,80,88,105"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="136,55,245,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,83,122,77,123,82,89,88"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="293,80,421,105"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="88,90,280,90,280,95,88,95"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="246,73,280,78,279,84,245,78"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="469,5,589,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="385,77,468,40,483,33,485,38,470,44,387,82"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="481,55,578,80"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="421,81,466,74,467,79,422,86"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="637,80,739,105"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="422,90,623,90,623,95,422,95"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="501,156,558,181"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="388,103,489,148,486,153,386,108"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="579,72,624,80,623,85,578,78"/>
+</map>

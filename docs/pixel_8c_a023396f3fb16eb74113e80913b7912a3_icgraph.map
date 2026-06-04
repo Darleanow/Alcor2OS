@@ -1,0 +1,5 @@
+<map id="fb_draw_glyph" name="fb_draw_glyph">
+<area shape="rect" id="Node000001" title="Draws a monochrome 8x16 glyph onto the framebuffer." alt="" coords="221,5,339,31"/>
+<area shape="rect" id="Node000002" href="$pixel_8c.html#a39c7b03af1af41414c391ead38e9ec27" title="Draws a fallback character using the built&#45;in VGA font." alt="" coords="5,5,173,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,21,173,21,173,15,208,15"/>
+</map>

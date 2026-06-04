@@ -1,0 +1,5 @@
+<map id="pipe_wr_release" name="pipe_wr_release">
+<area shape="rect" id="Node000001" title="Release the write end of a pipe." alt="" coords="5,5,133,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="181,5,272,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,15,167,15,167,21,134,21"/>
+</map>

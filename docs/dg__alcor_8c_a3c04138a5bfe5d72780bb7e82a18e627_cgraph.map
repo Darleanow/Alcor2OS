@@ -1,0 +1,9 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,60,80"/>
+<area shape="rect" id="Node000002" href="$dg__alcor_8c.html#a103ccb3ce1ff922d2796ca1eecb591fb" title=" " alt="" coords="108,5,297,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="59,55,107,39,135,32,136,37,109,45,61,60"/>
+<area shape="rect" id="Node000003" href="$dg__alcor_8c.html#a5dc42eeb56b97106c2db4adabac6f54a" title="Drain all pending mouse packets and post one ev_mouse to Doom." alt="" coords="126,55,279,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="60,65,112,65,112,70,60,70"/>
+<area shape="rect" id="Node000004" href="$dg__alcor_8c.html#ac300bddac1ad8251ef774c546190a5fc" title=" " alt="" coords="136,104,269,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="61,74,109,89,140,98,139,103,107,94,59,79"/>
+</map>

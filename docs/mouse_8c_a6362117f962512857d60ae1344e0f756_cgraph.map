@@ -1,0 +1,30 @@
+<map id="mouse_read_block" name="mouse_read_block">
+<area shape="rect" id="Node000001" title="Block until one event is available, then dequeue it." alt="" coords="5,101,149,126"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="360,37,529,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,99,145,79,197,62,272,50,346,45,346,51,273,55,198,67,147,84,104,103"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="577,50,744,76"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="92,99,136,66,165,49,196,35,287,10,361,3,436,8,530,22,573,31,614,43,613,48,572,36,529,27,435,14,361,8,288,15,198,40,168,53,139,70,95,103"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#a7252d4cb0ebec561f76091963a6dbe6a" title="Block p (set state to BLOCKED). Call before proc_schedule()." alt="" coords="209,76,301,101"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,101,195,94,195,100,150,106"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="203,125,306,150"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="150,121,190,126,190,132,149,126"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="197,174,312,200"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="110,124,211,167,209,171,108,129"/>
+<area shape="rect" id="Node000014" href="$mouse_8c.html#a8f853150215c23b533736d67b98fbb69" title=" " alt="" coords="207,224,303,249"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="93,125,138,165,199,210,208,216,206,220,196,215,135,170,90,129"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="292,172,310,161,325,147,335,134,344,120,358,104,408,67,411,72,362,108,348,123,339,137,329,151,314,165,294,177"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="296,172,604,77,606,82,298,177"/>
+<area shape="rect" id="Node000007" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="395,174,494,200"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="312,184,381,184,381,190,312,190"/>
+<area shape="poly" id="edge10_Node000007_Node000003" title=" " alt="" coords="475,172,502,158,528,141,542,127,550,113,560,100,576,86,589,79,592,83,579,91,564,103,555,116,546,130,531,145,504,163,478,177"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a2b49e9b247efbece339a2f95a191ef64" title="Low&#45;level context switch function." alt="" coords="601,149,721,174"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="494,179,587,168,588,173,495,184"/>
+<area shape="rect" id="Node000009" href="$cpu_8c.html#a18a6945bd70a07d34d7133848b6fb519" title="Get the current FS base MSR value." alt="" coords="595,198,726,224"/>
+<area shape="poly" id="edge11_Node000007_Node000009" title=" " alt="" coords="495,190,582,200,581,205,494,195"/>
+<area shape="rect" id="Node000010" href="$cpu_8c.html#a1c5d89ceee7d8c90e90526e6fec26e6f" title="Set the FS base MSR for thread&#45;local storage." alt="" coords="596,248,725,273"/>
+<area shape="poly" id="edge12_Node000007_Node000010" title=" " alt="" coords="479,197,578,234,601,241,600,246,576,239,477,202"/>
+<area shape="rect" id="Node000011" href="$gdt_8c.html#af95c2c00bd26bfbb9016f228e3daaa26" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="609,297,712,322"/>
+<area shape="poly" id="edge13_Node000007_Node000011" title=" " alt="" coords="461,198,511,240,544,263,579,283,598,291,595,296,576,288,541,267,507,244,458,202"/>
+<area shape="rect" id="Node000012" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="608,100,713,125"/>
+<area shape="poly" id="edge14_Node000007_Node000012" title=" " alt="" coords="477,172,576,135,603,127,605,132,578,140,479,177"/>
+</map>

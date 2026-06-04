@@ -1,0 +1,22 @@
+<map id="mouse_cursor_render" name="mouse_cursor_render">
+<area shape="rect" id="Node000001" title="Paint or move the software mouse cursor to the current PS/2 position." alt="" coords="5,145,168,170"/>
+<area shape="rect" id="Node000002" href="$fb__console_2mouse_8c.html#a05afd0ea2119945dc3b079c2b5b99a66" title=" " alt="" coords="216,70,372,95"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,142,215,105,239,97,240,102,217,111,121,147"/>
+<area shape="rect" id="Node000027" href="$fb__console_2mouse_8c.html#a8ae650740465d27698738640e0836a96" title="Paint the arrow at (cx, cy) in two passes." alt="" coords="217,119,371,145"/>
+<area shape="poly" id="edge6_Node000001_Node000027" title=" " alt="" coords="168,145,204,140,204,146,169,150"/>
+<area shape="rect" id="Node000029" href="$mouse_8c.html#a5fac1665f6a22d0d0c8f82978394a7e5" title="Get the rendered cursor position (the centre in relative mode)." alt="" coords="223,169,365,194"/>
+<area shape="poly" id="edge9_Node000001_Node000029" title=" " alt="" coords="169,164,210,169,209,174,168,169"/>
+<area shape="rect" id="Node000030" href="$mouse_8c.html#a6811e40dadb781c9dd066da379b89db8" title="Whether the pointer has moved at least once since boot." alt="" coords="220,218,368,243"/>
+<area shape="poly" id="edge10_Node000001_Node000030" title=" " alt="" coords="120,168,217,204,238,211,237,216,215,209,118,173"/>
+<area shape="rect" id="Node000003" href="$fb__console_2mouse_8c.html#a5c8ae3f66b1a4b466f8f05de69c72cff" title="Wipe the arrow&#39;s footprint and restore the cells beneath." alt="" coords="420,70,591,95"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,80,407,80,407,85,372,85"/>
+<area shape="rect" id="Node000007" href="$fb__console_2mouse_8c.html#a906bc8eb5537d1c6fac0db66df2dad8e" title="Re&#45;blit every cell that the cursor footprint touched, restoring the characters under it." alt="" coords="437,5,574,45"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="341,67,423,45,424,50,342,73"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="639,119,740,145"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="554,93,628,113,627,118,553,98"/>
+<area shape="rect" id="Node000008" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="653,13,726,38"/>
+<area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="574,23,639,23,639,28,574,28"/>
+<area shape="poly" id="edge8_Node000027_Node000004" title=" " alt="" coords="346,142,420,155,505,161,590,155,635,146,636,151,591,160,505,166,420,160,345,147"/>
+<area shape="rect" id="Node000028" href="$fb__console_2mouse_8c.html#acc7b565443144b8f73deb03d66d54f16" title="Test whether the (row, col) of the arrow bitmap is set." alt="" coords="462,119,549,145"/>
+<area shape="poly" id="edge7_Node000027_Node000028" title=" " alt="" coords="371,129,448,129,448,135,371,135"/>
+</map>

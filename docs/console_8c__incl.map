@@ -1,0 +1,21 @@
+<map id="src/drivers/console/console.c" name="src/drivers/console/console.c">
+<area shape="rect" id="Node000001" title="Boot/panic logger on the linear framebuffer." alt="" coords="209,5,353,45"/>
+<area shape="rect" id="Node000002" href="$font_8h.html" title=" " alt="" coords="45,93,105,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,48,119,91,118,86,231,43"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="198,240,313,265"/>
+<area shape="poly" id="edge10_Node000001_Node000004" title=" " alt="" coords="264,47,221,98,200,132,185,168,182,180,184,191,201,213,222,231,219,235,197,217,180,193,176,180,179,166,195,129,217,95,260,44"/>
+<area shape="rect" id="Node000008" href="$io_8h.html" title="x86 I/O port access functions." alt="" coords="194,167,317,192"/>
+<area shape="poly" id="edge4_Node000001_Node000008" title=" " alt="" coords="280,46,262,153,257,153,275,45"/>
+<area shape="rect" id="Node000009" href="$console_8h.html" title="Kernel boot/panic logger on the linear framebuffer." alt="" coords="341,167,519,192"/>
+<area shape="poly" id="edge6_Node000001_Node000009" title=" " alt="" coords="290,44,307,80,333,117,362,140,392,158,389,163,359,145,329,120,302,83,285,47"/>
+<area shape="rect" id="Node000010" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="343,93,466,119"/>
+<area shape="poly" id="edge8_Node000001_Node000010" title=" " alt="" coords="312,43,376,84,373,88,309,48"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="490,93,565,119"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="341,43,479,87,478,92,339,48"/>
+<area shape="rect" id="Node000003" href="$font__bitmap_8h.html" title="8x16 monospace bitmap atlases used by the kernel boot logger." alt="" coords="5,167,119,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="76,119,69,154,64,153,71,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,190,212,233,210,238,92,195"/>
+<area shape="poly" id="edge5_Node000008_Node000004" title=" " alt="" coords="258,192,258,226,253,226,253,192"/>
+<area shape="poly" id="edge7_Node000009_Node000004" title=" " alt="" coords="403,194,298,237,296,232,401,190"/>
+<area shape="poly" id="edge9_Node000010_Node000004" title=" " alt="" coords="452,116,488,129,520,145,532,156,539,167,540,180,533,194,520,205,500,215,448,231,387,242,327,249,327,243,386,236,446,225,498,210,517,201,529,190,535,179,534,169,528,159,517,150,486,134,450,121"/>
+</map>

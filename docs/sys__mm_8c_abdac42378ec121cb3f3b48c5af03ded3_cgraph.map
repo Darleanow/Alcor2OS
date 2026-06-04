@@ -1,0 +1,42 @@
+<map id="map_zeroed_user_range" name="map_zeroed_user_range">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,253,187,279"/>
+<area shape="rect" id="Node000002" href="$sys__mm_8c.html#a4a9a3125254665467fbc3e506c768b9a" title=" " alt="" coords="235,200,409,225"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,251,254,226,255,231,151,256"/>
+<area shape="rect" id="Node000017" href="$vmm_8c.html#a6244b5d7fe137846a4daf0e46f73cac0" title="Allocate and map a range of consecutive virtual pages." alt="" coords="457,307,632,332"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="187,274,444,305,443,310,187,279"/>
+<area shape="rect" id="Node000003" href="$fb__user_8c.html#a34f0b0e8e8cce7e6b2cf4213f673a381" title="True if phys_page is a 4 KiB frame inside the framebuffer region." alt="" coords="462,193,627,233"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="410,210,449,210,449,215,410,215"/>
+<area shape="rect" id="Node000004" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="500,56,589,81"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="341,198,511,87,514,91,344,202"/>
+<area shape="rect" id="Node000007" href="$vmm_8c.html#a79058902336b9774ccdf1efa90360b18" title="Translate virtual address to physical address in current address space." alt="" coords="483,143,606,168"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="371,197,481,169,482,174,373,203"/>
+<area shape="rect" id="Node000015" href="$vmm_8c.html#aeaa0c698c155c448ca914e36088c2e23" title="Unmap a virtual page from the current address space." alt="" coords="491,257,599,283"/>
+<area shape="poly" id="edge14_Node000002_Node000015" title=" " alt="" coords="373,223,482,251,481,256,371,228"/>
+<area shape="rect" id="Node000005" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="686,5,793,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="589,55,676,32,677,37,590,60"/>
+<area shape="rect" id="Node000006" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="997,181,1097,207"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="590,76,799,126,986,175,985,180,798,131,589,81"/>
+<area shape="rect" id="Node000008" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="685,208,793,233"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="593,166,633,178,695,201,693,206,631,183,591,171"/>
+<area shape="rect" id="Node000009" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="680,257,799,283"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="607,165,634,179,650,195,659,212,667,228,682,244,688,249,685,253,678,248,662,231,654,214,646,198,630,183,605,170"/>
+<area shape="rect" id="Node000011" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="847,183,949,208"/>
+<area shape="poly" id="edge13_Node000007_Node000011" title=" " alt="" coords="606,144,698,139,749,141,799,149,834,160,865,174,862,179,832,165,798,154,748,147,698,144,607,149"/>
+<area shape="rect" id="Node000010" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="869,257,927,283"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="799,267,855,267,855,273,799,273"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="772,255,798,244,860,212,862,217,800,248,774,260"/>
+<area shape="rect" id="Node000013" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="851,307,945,332"/>
+<area shape="poly" id="edge11_Node000009_Node000013" title=" " alt="" coords="782,280,844,300,842,305,780,285"/>
+<area shape="poly" id="edge12_Node000013_Node000006" title=" " alt="" coords="929,304,948,293,991,255,1026,216,1030,220,995,258,951,297,932,309"/>
+<area shape="poly" id="edge16_Node000015_Node000008" title=" " alt="" coords="595,255,674,234,676,239,596,260"/>
+<area shape="poly" id="edge17_Node000015_Node000009" title=" " alt="" coords="599,267,666,267,666,273,599,273"/>
+<area shape="poly" id="edge18_Node000015_Node000011" title=" " alt="" coords="598,257,631,242,645,230,653,217,662,204,679,193,717,181,758,176,833,180,833,185,758,182,719,187,681,198,666,208,657,220,649,234,633,247,600,262"/>
+<area shape="rect" id="Node000016" href="$cpu_8c.html#a79c2518c5bb9a861f616254c974685b4" title="Invalidate a single page in the TLB." alt="" coords="693,307,785,332"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="596,280,681,302,679,307,595,285"/>
+<area shape="poly" id="edge21_Node000017_Node000008" title=" " alt="" coords="606,304,631,293,645,282,654,270,664,257,678,244,689,237,692,242,682,248,668,261,659,273,649,285,633,298,608,309"/>
+<area shape="poly" id="edge22_Node000017_Node000009" title=" " alt="" coords="595,304,674,284,676,289,596,309"/>
+<area shape="poly" id="edge23_Node000017_Node000010" title=" " alt="" coords="564,330,607,359,668,388,701,398,734,402,767,399,797,386,809,377,816,367,823,345,828,319,845,294,855,285,858,289,849,297,833,321,828,346,821,370,813,381,800,391,768,404,734,407,700,403,666,393,605,363,561,334"/>
+<area shape="poly" id="edge24_Node000017_Node000011" title=" " alt="" coords="574,330,619,347,678,360,709,363,740,362,770,355,797,342,817,323,825,300,831,274,844,245,870,216,874,219,849,247,836,275,830,301,822,325,800,347,771,360,740,367,709,369,677,366,618,352,572,335"/>
+<area shape="poly" id="edge25_Node000017_Node000013" title=" " alt="" coords="557,330,605,385,640,415,681,437,713,448,740,452,766,449,797,437,826,418,849,394,883,343,887,346,854,397,829,422,800,442,768,454,740,458,712,453,679,442,637,419,601,389,553,334"/>
+<area shape="poly" id="edge20_Node000017_Node000016" title=" " alt="" coords="632,317,679,317,679,322,632,322"/>
+</map>

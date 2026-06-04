@@ -1,0 +1,9 @@
+<map id="detect_run_length" name="detect_run_length">
+<area shape="rect" id="Node000001" title="Count how many on&#45;disk blocks following base_block_num are contiguous to it for this inode." alt="" coords="519,5,657,31"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#aa4ace95cb1d031a3141636122511c8fc" title="One iteration of the read loop: pick the right path for one block and copy as much as fits." alt="" coords="327,5,471,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="505,21,471,21,471,15,505,15"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a54bf1c29b72ee0ddfe0f61cca9f45e9e" title="Drive the read loop with pre&#45;allocated buffers." alt="" coords="140,5,279,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="313,21,279,21,279,15,313,15"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#ac244024eb57350647fc868bd02827b03" title="Read up to count bytes from file at byte offset." alt="" coords="5,5,92,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="src/drivers/pic/pic.c" name="src/drivers/pic/pic.c">
+<area shape="rect" id="Node000001" title="8259 PIC driver for IRQ management." alt="" coords="76,5,223,31"/>
+<area shape="rect" id="Node000002" href="$io_8h.html" title="x86 I/O port access functions." alt="" coords="13,79,136,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,33,99,71,95,67,136,29"/>
+<area shape="rect" id="Node000007" href="$pic_8h.html" title="8259 PIC (Programmable Interrupt Controller) driver." alt="" coords="161,79,290,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="163,29,205,67,201,71,160,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,152,207,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,102,129,141,125,144,85,106"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,225,88,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,180,76,219,73,215,131,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,225,187,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,178,152,212,147,212,147,178"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,225,282,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,175,221,215,218,219,163,180"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="215,106,174,144,170,141,211,102"/>
+</map>

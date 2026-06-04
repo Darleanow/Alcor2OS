@@ -1,0 +1,28 @@
+<map id="caret_clear_drawn" name="caret_clear_drawn">
+<area shape="rect" id="Node000001" title="Drop the last&#45;drawn tracker without repainting." alt="" coords="772,63,913,88"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="576,5,724,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="785,61,693,33,694,28,787,56"/>
+<area shape="rect" id="Node000006" href="$atlas__install_8c.html#aa151a6fa3f2f88fb24a73fabf68f89a1" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="579,55,721,95"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="758,78,722,78,722,73,758,73"/>
+<area shape="rect" id="Node000008" href="$scrollback_8c.html#a20a43904baf76078b5399667db4f67d3" title="Move the top row off the grid into the scrollback ring and shift every remaining row up...." alt="" coords="606,120,694,145"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="787,95,694,123,693,117,785,89"/>
+<area shape="rect" id="Node000003" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="137,40,321,65"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="562,28,322,48,321,42,562,23"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html#a0041e2d9dbe8ba13306a473bc4126402" title="ioctl on /dev/fb — forwards FB_CONSOLE_YIELD, FB_CONSOLE_RECLAIM, and FB_CONSOLE_SET_ATLAS." alt="" coords="12,20,83,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="123,44,82,39,83,34,124,38"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="10,69,85,95"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="137,70,85,79,85,73,137,65"/>
+<area shape="rect" id="Node000007" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="369,60,528,85"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="565,77,528,76,528,71,565,72"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="355,67,321,64,322,58,356,62"/>
+<area shape="rect" id="Node000009" href="$ansi_8c.html#a18c6ecf4c578965fdd84b8b25849cb88" title="Apply one C0 control character to the cursor/grid state." alt="" coords="170,117,289,143"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="592,135,289,133,289,128,592,130"/>
+<area shape="rect" id="Node000020" href="$flush_8c.html#a29200e8da98ef3a5bb44b516480c7ee7" title="Wrap the cursor to the next line, scrolling the grid when at the bottom." alt="" coords="398,168,499,193"/>
+<area shape="poly" id="edge12_Node000008_Node000020" title=" " alt="" coords="593,149,500,171,499,166,592,144"/>
+<area shape="rect" id="Node000010" href="$ansi_8c.html#a95caeb62a209e7d835114c4b18ef080b" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="5,151,89,176"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="157,146,90,158,89,153,156,141"/>
+<area shape="poly" id="edge11_Node000010_Node000010" title=" " alt="" coords="79,140,70,132,47,129,28,131,18,136,16,142,22,149,17,152,11,142,14,133,27,126,47,124,72,128,83,136"/>
+<area shape="rect" id="Node000021" href="$flush_8c.html#a44a71e48febb7915140c21fe215037ec" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="163,167,295,192"/>
+<area shape="poly" id="edge13_Node000020_Node000021" title=" " alt="" coords="384,183,295,182,295,177,384,178"/>
+<area shape="poly" id="edge14_Node000021_Node000010" title=" " alt="" coords="150,175,90,170,90,164,150,170"/>
+</map>

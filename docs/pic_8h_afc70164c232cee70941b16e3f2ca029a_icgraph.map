@@ -1,0 +1,5 @@
+<map id="pic_init" name="pic_init">
+<area shape="rect" id="Node000001" title="Initialize and remap the PIC." alt="" coords="167,5,236,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html#a9cf4a417b66a038c3dd1e074be9fde2e" title="Initialize interrupt controllers and drivers." alt="" coords="5,5,119,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,21,119,21,119,15,153,15"/>
+</map>

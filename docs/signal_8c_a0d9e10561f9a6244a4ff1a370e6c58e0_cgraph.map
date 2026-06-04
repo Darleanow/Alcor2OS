@@ -1,0 +1,9 @@
+<map id="sys_rt_sigaction" name="sys_rt_sigaction">
+<area shape="rect" id="Node000001" title="Register or query a signal action." alt="" coords="5,55,132,80"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="213,5,300,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,52,199,30,200,35,118,57"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="205,55,308,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,65,192,65,192,70,132,70"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="180,104,333,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="118,77,195,98,193,103,117,83"/>
+</map>

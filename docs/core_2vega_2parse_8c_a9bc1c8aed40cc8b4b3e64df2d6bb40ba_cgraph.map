@@ -1,0 +1,49 @@
+<map id="parse_fn" name="parse_fn">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,487,84,512"/>
+<area shape="rect" id="Node000002" href="$ast_8c.html#a4293834f4df4cf3d2741f68e1a9ac07d" title="Allocate an AST_FN node, taking ownership of name, arg_names (heap array of n_args heap strings; may ..." alt="" coords="339,5,435,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="48,485,78,412,134,297,172,232,215,167,264,104,318,48,337,35,340,39,322,52,268,108,219,170,176,235,139,299,83,414,53,488"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#a892d1d86bd325ddd4aec5ae1469db7e2" title=" " alt="" coords="320,461,453,487"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="84,494,306,477,307,483,84,499"/>
+<area shape="rect" id="Node000006" href="$lexer_8c.html#a84851e4cf3d14fcf913e267852e1ab08" title="Consume and return the next token." alt="" coords="679,309,757,335"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="84,502,203,516,359,528,437,529,509,524,568,514,591,506,609,496,625,480,633,463,635,426,636,385,643,365,657,344,665,337,668,341,661,348,648,367,642,386,641,426,638,465,629,483,612,500,593,511,569,519,509,530,437,534,358,533,202,522,84,507"/>
+<area shape="rect" id="Node000013" href="$lexer_8c.html#af5096e6d8a92971808526ba626a46bdc" title="Peek at the next token without consuming." alt="" coords="677,359,759,384"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="66,510,97,527,133,541,269,576,326,590,379,598,432,599,486,591,544,573,609,541,629,528,646,511,674,472,694,432,707,396,712,398,699,434,679,475,650,515,632,532,612,546,546,578,487,597,432,605,379,604,325,595,267,582,131,546,94,532,63,515"/>
+<area shape="rect" id="Node000014" href="$lexer_8c.html#abbbfdf6d2487ba0569a480f8bc1f24eb" title="Free a token&#39;s heap storage if any." alt="" coords="143,613,261,639"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="57,511,89,550,134,592,156,605,153,610,130,596,85,554,53,514"/>
+<area shape="rect" id="Node000015" href="$core_2vega_2parse_8c.html#a68174f6d7228992098025e21a088e734" title=" " alt="" coords="132,411,272,436"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="69,484,131,453,159,439,161,444,133,458,72,489"/>
+<area shape="rect" id="Node000003" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="829,107,904,132"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,11,504,8,591,10,686,22,733,32,778,48,816,69,846,95,842,99,813,73,776,52,732,38,685,27,590,15,504,13,435,16"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="843,108,838,98,841,89,851,82,867,80,886,84,894,92,890,96,883,88,867,85,852,87,845,92,843,98,848,105"/>
+<area shape="rect" id="Node000005" href="$lexer_8c.html#adb509730aa3f5613653d198ce99a75da" title="Human&#45;readable name for a token kind (for error messages)." alt="" coords="513,461,599,487"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="453,471,499,471,499,477,453,477"/>
+<area shape="rect" id="Node000007" href="$lexer_8c.html#a4f6b122799074ebf08f4ea10ade65b39" title=" " alt="" coords="825,333,908,359"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="758,326,812,335,811,340,757,331"/>
+<area shape="rect" id="Node000008" href="$lexer_8c.html#acbe69e56df80c5c4f737cfde6d9be873" title=" " alt="" coords="964,259,1051,284"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="888,331,955,293,965,288,967,293,957,298,890,336"/>
+<area shape="rect" id="Node000009" href="$lexer_8c.html#a89fb4c390705931605dfa96c5ba59d11" title=" " alt="" coords="956,308,1059,333"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="908,336,942,330,943,335,909,341"/>
+<area shape="rect" id="Node000010" href="$lexer_8c.html#abaab6431350f60fa9623b5b63b6b329a" title=" " alt="" coords="956,357,1059,383"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="909,350,943,356,942,362,908,356"/>
+<area shape="rect" id="Node000011" href="$lexer_8c.html#a38ea90df448960e553ef9a9629959a2c" title=" " alt="" coords="962,407,1053,432"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="892,356,957,392,969,398,967,403,955,396,890,361"/>
+<area shape="poly" id="edge13_Node000013_Node000007" title=" " alt="" coords="758,362,811,353,812,358,759,367"/>
+<area shape="poly" id="edge16_Node000015_Node000003" title=" " alt="" coords="209,409,270,305,290,259,300,240,318,219,360,183,398,157,435,138,473,125,555,112,658,103,718,100,778,103,816,108,815,113,777,109,718,105,659,109,556,117,474,130,437,143,401,161,363,187,322,223,304,243,295,261,274,307,213,412"/>
+<area shape="poly" id="edge17_Node000015_Node000004" title=" " alt="" coords="250,434,327,455,326,460,249,439"/>
+<area shape="poly" id="edge18_Node000015_Node000006" title=" " alt="" coords="250,408,319,391,510,354,664,328,665,333,511,359,321,397,251,413"/>
+<area shape="poly" id="edge19_Node000015_Node000013" title=" " alt="" coords="272,418,427,407,610,389,664,380,664,385,611,394,428,413,272,423"/>
+<area shape="rect" id="Node000016" href="$core_2vega_2parse_8c.html#a39c2363ce6301b51c1dc201986050d62" title=" " alt="" coords="344,233,429,259"/>
+<area shape="poly" id="edge20_Node000015_Node000016" title=" " alt="" coords="215,409,360,267,364,271,218,412"/>
+<area shape="poly" id="edge21_Node000016_Node000003" title=" " alt="" coords="400,231,443,197,470,179,500,165,585,139,671,125,751,118,816,116,816,121,751,123,672,130,586,145,502,170,473,184,446,202,403,235"/>
+<area shape="poly" id="edge24_Node000016_Node000006" title=" " alt="" coords="430,253,666,308,665,313,429,258"/>
+<area shape="poly" id="edge25_Node000016_Node000013" title=" " alt="" coords="412,256,502,301,587,331,665,355,663,360,586,337,500,306,409,261"/>
+<area shape="rect" id="Node000017" href="$ast_8c.html#a0cf89a1a6c99c9d1f1d5418a00857f49" title="Allocate a binary operator node (AND, OR or SEQ) taking ownership of left and right...." alt="" coords="659,157,777,183"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="410,231,451,211,501,193,575,178,645,170,646,176,575,183,502,198,453,216,412,236"/>
+<area shape="rect" id="Node000018" href="$core_2vega_2parse_8c.html#a24f34aac8be89baba9f81f4669552b8f" title=" " alt="" coords="501,208,611,233"/>
+<area shape="poly" id="edge26_Node000016_Node000018" title=" " alt="" coords="429,237,487,228,488,233,430,242"/>
+<area shape="poly" id="edge23_Node000017_Node000003" title=" " alt="" coords="755,155,815,134,817,139,757,160"/>
+<area shape="poly" id="edge27_Node000018_Node000003" title=" " alt="" coords="610,220,691,214,735,206,776,192,814,168,844,140,847,144,817,172,778,196,736,211,692,220,611,225"/>
+<area shape="poly" id="edge29_Node000018_Node000006" title=" " alt="" coords="581,231,612,250,688,299,685,304,609,255,578,236"/>
+<area shape="poly" id="edge30_Node000018_Node000013" title=" " alt="" coords="567,232,603,285,630,316,660,344,670,350,667,355,657,348,626,320,599,288,562,235"/>
+<area shape="poly" id="edge28_Node000018_Node000017" title=" " alt="" coords="597,205,663,184,664,189,598,210"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="proc_exec_replace_image" name="proc_exec_replace_image">
+<area shape="rect" id="Node000001" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="151,5,341,31"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="5,5,103,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,21,103,21,103,15,137,15"/>
+</map>

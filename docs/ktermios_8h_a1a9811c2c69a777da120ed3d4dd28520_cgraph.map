@@ -1,0 +1,5 @@
+<map id="ktermios_init_default" name="ktermios_init_default">
+<area shape="rect" id="Node000001" title="Reset t to the cooked&#45;TTY defaults a freshly forked PID would expect (ICRNL|ONLCR|CS8|CREAD|CLOCAL|IS..." alt="" coords="5,5,167,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="215,5,273,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,15,201,15,201,21,167,21"/>
+</map>

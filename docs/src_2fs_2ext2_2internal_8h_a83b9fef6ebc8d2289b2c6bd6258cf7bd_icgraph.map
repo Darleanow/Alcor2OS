@@ -1,0 +1,42 @@
+<map id="write_inode" name="write_inode">
+<area shape="rect" id="Node000001" title="Persist inode for inode number ino back to disk." alt="" coords="956,247,1055,273"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#a3a6ddc6334a7a3057601d6a7195bbfba" title="Allocate a fresh inode, link it into parent_inode under filename, and persist the metadata." alt="" coords="320,45,515,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="998,234,989,193,972,144,945,97,928,76,907,60,850,32,789,16,725,9,662,9,601,16,545,25,458,47,457,42,544,20,600,10,662,4,726,4,790,11,852,27,909,55,931,72,950,94,977,142,994,192,1003,233"/>
+<area shape="rect" id="Node000005" href="$dir__entry_8c.html#adf2d350ae9f5dd9c50229f1a45937965" title="Grow the directory by one block, seeded with the new entry." alt="" coords="753,70,908,95"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="991,236,958,177,934,145,906,117,873,98,876,93,910,113,938,141,962,174,995,234"/>
+<area shape="rect" id="Node000007" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="321,121,514,146"/>
+<area shape="poly" id="edge21_Node000001_Node000007" title=" " alt="" coords="986,238,952,200,931,182,907,168,858,149,806,136,701,121,600,118,513,123,513,118,600,113,701,115,807,130,859,144,909,163,934,177,956,196,990,234"/>
+<area shape="rect" id="Node000008" href="$dir_8c.html#a28d0deef2247c3e0c95faa3a132818cb" title="Create a directory on an ext2 volume." alt="" coords="175,146,271,171"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="973,242,942,226,907,212,851,200,776,190,594,175,271,162,271,157,595,170,777,185,852,195,909,207,944,221,975,238"/>
+<area shape="rect" id="Node000010" href="$file_8c.html#ab3496119d1da698296609134293d2a0a" title="Close an ext2 file handle." alt="" coords="785,222,877,247"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="942,254,877,244,877,239,942,248"/>
+<area shape="rect" id="Node000012" href="$file_8c.html#a05fc419557dcd893fe30c99a903b7d5b" title="Flush a file&#39;s dirty inode and metadata to disk." alt="" coords="786,271,875,297"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="943,271,876,281,876,275,942,266"/>
+<area shape="rect" id="Node000013" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="784,321,877,346"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="970,282,909,311,875,323,873,318,907,306,967,277"/>
+<area shape="rect" id="Node000015" href="$file_8c.html#ab7a3809fc66df5e495777427652c80b3" title="Truncate an ext2 file to length bytes." alt="" coords="775,370,887,395"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="988,286,954,324,909,360,883,372,880,368,907,355,950,320,984,283"/>
+<area shape="rect" id="Node000017" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="781,419,880,445"/>
+<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="996,287,963,348,939,381,910,409,882,424,879,419,906,405,935,377,959,345,991,284"/>
+<area shape="rect" id="Node000019" href="$file_8c.html#a92b60c4777893b900adbd384b1710e7e" title="Write data to a file." alt="" coords="785,469,876,494"/>
+<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="1001,287,990,325,972,371,945,419,910,459,894,470,877,476,875,472,892,465,906,455,941,415,967,369,985,323,996,285"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a0a9f5f8d942af3cc0b2c41f852c0a880" title="Create a new file on an ext2 volume." alt="" coords="173,45,272,70"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="306,60,272,60,272,55,306,55"/>
+<area shape="rect" id="Node000004" href="$ops_8c.html#a595f6c9fe7f4bf9922cc86d06469caa5" title="fs_ops_t.open shim — routes O_CREAT to ext2_create, else to ext2_open." alt="" coords="5,45,125,70"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="160,60,126,60,126,55,160,55"/>
+<area shape="rect" id="Node000006" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="579,70,689,95"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="740,85,690,85,690,80,740,80"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="565,77,514,71,515,66,565,72"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="566,101,473,123,472,118,565,96"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="308,150,271,155,270,150,307,145"/>
+<area shape="rect" id="Node000011" href="$ops_8c.html#a70bd34c87c3098559b390c7a2feb3cd6" title="fs_ops_t.close shim." alt="" coords="573,222,695,247"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="771,237,696,237,696,232,771,232"/>
+<area shape="rect" id="Node000014" href="$ops_8c.html#ac522aded5a92cdfd53591e3881498544" title="fs_ops_t.rmdir shim." alt="" coords="573,321,695,346"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="770,336,696,336,696,331,770,331"/>
+<area shape="rect" id="Node000016" href="$ops_8c.html#ad32ec2884cb0ef1cd8c3de607fa9651a" title="fs_ops_t.truncate shim." alt="" coords="563,370,705,395"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="761,385,705,385,705,380,761,380"/>
+<area shape="rect" id="Node000018" href="$ops_8c.html#a80c49e4d95295031cd2604075a37d7ce" title="fs_ops_t.unlink shim." alt="" coords="570,419,698,445"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="768,435,698,435,698,429,768,429"/>
+<area shape="rect" id="Node000020" href="$ops_8c.html#af5603f51c2625ed179e110d8d59f80dc" title="fs_ops_t.write shim." alt="" coords="573,469,695,494"/>
+<area shape="poly" id="edge20_Node000019_Node000020" title=" " alt="" coords="772,484,695,484,695,479,772,479"/>
+</map>

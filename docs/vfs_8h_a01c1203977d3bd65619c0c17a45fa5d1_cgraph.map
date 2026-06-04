@@ -1,0 +1,27 @@
+<map id="vfs_mkdir" name="vfs_mkdir">
+<area shape="rect" id="Node000001" title="Create a directory at path." alt="" coords="5,132,92,157"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="153,56,275,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,130,172,85,174,90,78,134"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="140,183,288,208"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="92,155,159,176,158,181,90,160"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="551,81,618,107"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="276,70,537,88,537,93,276,75"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="336,5,493,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="265,53,350,31,351,37,266,58"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="449,28,494,48,547,73,545,78,492,52,447,33"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#ab77d8981772dbf05f403fca1354eb314" title="Compare two strings up to n characters." alt="" coords="543,5,626,31"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="494,15,530,15,530,21,494,21"/>
+<area shape="poly" id="edge9_Node000006_Node000003" title=" " alt="" coords="241,180,284,161,335,142,444,115,538,98,538,103,445,120,337,147,286,166,243,185"/>
+<area shape="rect" id="Node000007" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="379,157,450,183"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="288,183,365,173,366,179,289,189"/>
+<area shape="rect" id="Node000008" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="545,233,624,259"/>
+<area shape="poly" id="edge10_Node000006_Node000008" title=" " alt="" coords="288,203,532,236,532,242,288,208"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="363,259,466,284"/>
+<area shape="poly" id="edge11_Node000006_Node000009" title=" " alt="" coords="249,206,368,251,366,256,248,211"/>
+<area shape="rect" id="Node000010" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="357,308,472,333"/>
+<area shape="poly" id="edge12_Node000006_Node000010" title=" " alt="" coords="229,206,274,249,304,273,337,294,351,301,348,306,335,299,301,278,271,253,225,210"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="447,155,492,136,545,110,547,115,494,140,449,160"/>
+<area shape="poly" id="edge14_Node000010_Node000008" title=" " alt="" coords="462,305,492,294,551,263,553,268,494,299,464,310"/>
+<area shape="rect" id="Node000011" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="541,308,628,333"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="472,318,528,318,528,323,472,323"/>
+</map>

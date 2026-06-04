@@ -1,0 +1,22 @@
+<map id="tty_poll" name="tty_poll">
+<area shape="rect" id="Node000001" title="Report read/write readiness for /dev/tty." alt="" coords="5,80,76,105"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#ab7822a94d62041bce4704de8f5b0bed1" title="Whether a read(2) on fd 0 could return a byte right now." alt="" coords="344,55,480,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,78,124,66,231,58,330,59,330,64,231,63,124,71,77,83"/>
+<area shape="rect" id="Node000049" href="$kbd__layout_8c.html#a194a31955e4d501a3274c1df551c274c" title=" " alt="" coords="124,80,296,105"/>
+<area shape="poly" id="edge8_Node000001_Node000049" title=" " alt="" coords="76,90,111,90,111,95,76,95"/>
+<area shape="rect" id="Node000050" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="159,129,261,155"/>
+<area shape="poly" id="edge10_Node000001_Node000050" title=" " alt="" coords="77,101,125,115,150,123,149,128,123,121,75,106"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="534,5,702,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="465,52,550,31,552,37,466,57"/>
+<area shape="rect" id="Node000045" href="$keyboard_8c.html#a66a8de728f8653f553e66cabe28e03cf" title="Check if the raw scancode ring buffer has data." alt="" coords="528,55,708,80"/>
+<area shape="poly" id="edge4_Node000002_Node000045" title=" " alt="" coords="480,65,514,65,514,70,480,70"/>
+<area shape="rect" id="Node000046" href="$keyboard_8c.html#a93917ff9f44c405459286cafcc9e46f3" title="Copy pending scancodes without consuming (irq snapshot)." alt="" coords="542,104,694,129"/>
+<area shape="poly" id="edge5_Node000002_Node000046" title=" " alt="" coords="466,77,552,98,550,103,465,83"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="775,5,906,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="703,15,762,15,762,21,703,21"/>
+<area shape="rect" id="Node000047" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="756,79,925,104"/>
+<area shape="poly" id="edge6_Node000046_Node000047" title=" " alt="" coords="694,105,742,100,743,105,695,111"/>
+<area shape="rect" id="Node000048" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="757,128,924,153"/>
+<area shape="poly" id="edge7_Node000046_Node000048" title=" " alt="" coords="695,122,744,128,743,133,694,128"/>
+<area shape="poly" id="edge9_Node000049_Node000002" title=" " alt="" coords="296,79,330,75,331,80,297,84"/>
+</map>

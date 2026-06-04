@@ -1,0 +1,6 @@
+<map id="ram_node" name="ram_node">
+<area shape="rect" id="Node000001" title="Internal ramfs node." alt="" coords="37,103,123,128"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="138,104,146,108,150,116,142,125,124,128,123,123,139,120,145,115,143,112,136,109"/>
+<area shape="rect" id="Node000002" href="$structramfs__chardev__ops.html" title="Driver&#45;supplied callback table for a character device." alt="" coords="5,5,155,31"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="83,44,83,102,77,102,77,44"/>
+</map>

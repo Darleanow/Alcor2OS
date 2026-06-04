@@ -1,0 +1,17 @@
+<map id="alloc_file_block" name="alloc_file_block">
+<area shape="rect" id="Node000001" title="Reserve the block at file&#45;relative index file_block." alt="" coords="631,80,753,105"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#adf2d350ae9f5dd9c50229f1a45937965" title="Grow the directory by one block, seeded with the new entry." alt="" coords="428,55,583,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="617,85,583,81,584,75,617,80"/>
+<area shape="rect" id="Node000010" href="$file_8c.html#a8b7d4942e79d8b4e76b87688e3686e72" title="Resolve file_block to an on&#45;disk block, allocating on hole." alt="" coords="433,104,577,129"/>
+<area shape="poly" id="edge5_Node000001_Node000010" title=" " alt="" coords="618,105,578,110,578,105,617,100"/>
+<area shape="rect" id="Node000003" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="259,55,369,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="414,70,370,70,370,65,414,65"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#a3a6ddc6334a7a3057601d6a7195bbfba" title="Allocate a fresh inode, link it into parent_inode under filename, and persist the metadata." alt="" coords="5,5,200,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="245,54,157,33,159,28,246,49"/>
+<area shape="rect" id="Node000007" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="6,55,199,80"/>
+<area shape="poly" id="edge4_Node000003_Node000007" title=" " alt="" coords="245,70,200,70,200,65,245,65"/>
+<area shape="rect" id="Node000011" href="$file_8c.html#ae37d4828b0eb47da6755a484e7876462" title="One iteration of the write loop: place one chunk into the file." alt="" coords="248,104,380,129"/>
+<area shape="poly" id="edge6_Node000010_Node000011" title=" " alt="" coords="420,119,380,119,380,114,420,114"/>
+<area shape="rect" id="Node000012" href="$file_8c.html#a1bf19aa4e4eb0e2f4cda410ebd135f37" title="Write count bytes to file at byte offset." alt="" coords="35,104,170,129"/>
+<area shape="poly" id="edge7_Node000011_Node000012" title=" " alt="" coords="234,119,170,119,170,114,234,114"/>
+</map>

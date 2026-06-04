@@ -1,0 +1,14 @@
+<map id="alloc_zeroed_block" name="alloc_zeroed_block">
+<area shape="rect" id="Node000001" title="Allocate a fresh block, zero it, and bill the inode for it." alt="" coords="580,31,727,56"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#a871be77d1ce03e491179610dd24933b6" title="Resolve slot slot_idx of indirect_block; allocate it if hole." alt="" coords="379,5,532,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="566,35,532,30,533,25,567,30"/>
+<area shape="rect" id="Node000017" href="$blockmap_8c.html#a2d96b97f05d3673cdd0ec0d5683fb866" title="Resolve top&#45;level inode slot slot_idx; allocate it if hole." alt="" coords="385,55,525,80"/>
+<area shape="poly" id="edge5_Node000001_Node000017" title=" " alt="" coords="567,56,526,61,526,56,566,51"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#ab4eb8bfa2badf37a0c74bd07e5dc145c" title="Reserve the block at file&#45;relative index file_block." alt="" coords="208,31,331,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,33,331,38,331,32,365,28"/>
+<area shape="rect" id="Node000004" href="$dir__entry_8c.html#adf2d350ae9f5dd9c50229f1a45937965" title="Grow the directory by one block, seeded with the new entry." alt="" coords="5,5,160,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="194,36,160,31,161,26,195,31"/>
+<area shape="rect" id="Node000012" href="$file_8c.html#a8b7d4942e79d8b4e76b87688e3686e72" title="Resolve file_block to an on&#45;disk block, allocating on hole." alt="" coords="11,55,155,80"/>
+<area shape="poly" id="edge4_Node000003_Node000012" title=" " alt="" coords="195,56,156,61,155,55,194,50"/>
+<area shape="poly" id="edge6_Node000017_Node000003" title=" " alt="" coords="371,59,330,54,331,49,372,54"/>
+</map>

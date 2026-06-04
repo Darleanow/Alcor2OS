@@ -1,0 +1,118 @@
+<map id="proc_current" name="proc_current">
+<area shape="rect" id="Node000001" title="Return the currently running process, or NULL in early boot." alt="" coords="623,1138,725,1163"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="213,34,324,59"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="670,1124,665,899,651,553,639,378,622,224,600,108,587,70,573,48,543,27,509,15,472,9,434,9,362,19,304,36,302,31,361,14,434,3,472,4,510,10,545,23,577,44,592,68,605,107,627,223,644,378,656,553,671,898,675,1124"/>
+<area shape="rect" id="Node000006" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="227,96,310,122"/>
+<area shape="poly" id="edge3_Node000001_Node000006" title=" " alt="" coords="669,1124,662,919,645,610,632,453,616,315,596,211,585,176,573,156,555,144,528,134,457,121,378,114,310,112,310,106,378,109,457,115,530,129,557,139,577,152,590,174,601,210,621,315,637,453,650,610,667,919,675,1124"/>
+<area shape="rect" id="Node000008" href="$ata_8c.html#a68e6896893fbe98c8eccac60438be274" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="432,59,560,84"/>
+<area shape="poly" id="edge5_Node000001_Node000008" title=" " alt="" coords="669,1124,661,911,642,588,629,423,613,277,594,166,583,128,572,105,562,95,549,87,552,82,565,90,577,102,588,126,599,165,618,277,634,423,647,587,666,911,674,1124"/>
+<area shape="rect" id="Node000009" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="457,442,535,467"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="669,1124,664,992,650,802,637,704,621,614,599,539,586,510,573,488,556,473,535,464,537,459,558,469,577,484,591,508,604,537,626,613,642,703,655,801,670,991,675,1124"/>
+<area shape="rect" id="Node000012" href="$sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e" title="Perform a file&#45;control operation on fd." alt="" coords="23,286,103,311"/>
+<area shape="poly" id="edge29_Node000001_Node000012" title=" " alt="" coords="669,1124,658,947,639,686,625,554,610,439,592,351,582,321,573,304,528,261,484,233,440,217,393,212,344,215,290,224,169,251,123,268,85,288,83,283,121,263,167,246,289,218,343,209,393,206,441,212,487,228,532,257,577,301,587,319,597,349,615,438,630,554,644,685,664,947,674,1124"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#a7112bdeddce07fa71080853029871d3b" title="Duplicate oldfd into the specific slot newfd." alt="" coords="228,558,309,583"/>
+<area shape="poly" id="edge54_Node000001_Node000013" title=" " alt="" coords="670,1123,668,996,655,815,643,724,626,641,603,575,589,550,573,532,548,515,525,507,502,505,480,509,430,526,370,547,310,563,309,558,369,542,428,521,478,503,502,500,526,501,551,510,576,528,593,547,608,573,631,640,649,723,661,815,673,995,675,1123"/>
+<area shape="rect" id="Node000058" href="$src_2kernel_2main_8c.html#a9925c726aee18fef90cefc803b1c7ced" title=" " alt="" coords="417,962,575,987"/>
+<area shape="poly" id="edge16_Node000001_Node000058" title=" " alt="" coords="659,1126,625,1067,601,1036,573,1008,539,989,542,985,576,1004,605,1032,629,1064,663,1123"/>
+<area shape="rect" id="Node000060" href="$kbd__layout_8c.html#a79e8864bb2dd3b40d30c0698f74b0485" title="Block until at least one layout&#45;translated byte is available." alt="" coords="419,1063,573,1088"/>
+<area shape="poly" id="edge17_Node000001_Node000060" title=" " alt="" coords="637,1133,574,1103,539,1091,541,1086,576,1098,639,1129"/>
+<area shape="rect" id="Node000061" href="$dev__nodes_8c.html#a6687d841b4dafd7f557c59776162e139" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="231,1038,307,1063"/>
+<area shape="poly" id="edge49_Node000001_Node000061" title=" " alt="" coords="655,1128,621,1087,599,1068,574,1054,539,1042,503,1035,429,1031,361,1036,307,1044,307,1039,361,1030,429,1025,504,1030,540,1037,576,1049,602,1064,625,1084,659,1124"/>
+<area shape="rect" id="Node000062" href="$mouse_8c.html#a6362117f962512857d60ae1344e0f756" title="Block until one event is available, then dequeue it." alt="" coords="424,1112,568,1138"/>
+<area shape="poly" id="edge19_Node000001_Node000062" title=" " alt="" coords="609,1144,568,1138,569,1132,609,1138"/>
+<area shape="rect" id="Node000063" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="439,1162,553,1187"/>
+<area shape="poly" id="edge20_Node000001_Node000063" title=" " alt="" coords="609,1162,553,1169,553,1164,608,1156"/>
+<area shape="rect" id="Node000064" href="$pipe_8c.html#a5c16a89b7c4822d4587cee68c0f93c49" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="437,1211,555,1236"/>
+<area shape="poly" id="edge21_Node000001_Node000064" title=" " alt="" coords="639,1172,576,1202,544,1213,542,1208,574,1197,637,1167"/>
+<area shape="rect" id="Node000065" href="$ata_8c.html#a524deb7a3ef94ba3b772585b0e311c54" title="Prepare a channel for IRQ&#45;driven command completion." alt="" coords="431,1260,561,1286"/>
+<area shape="poly" id="edge22_Node000001_Node000065" title=" " alt="" coords="657,1175,622,1214,576,1251,552,1263,549,1258,573,1247,619,1210,653,1172"/>
+<area shape="rect" id="Node000069" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="422,1310,570,1335"/>
+<area shape="poly" id="edge23_Node000001_Node000069" title=" " alt="" coords="665,1177,631,1239,607,1272,576,1300,556,1312,553,1307,573,1296,603,1268,627,1236,660,1174"/>
+<area shape="rect" id="Node000070" href="$sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" title="Check that path exists and is accessible; always grants access." alt="" coords="449,1359,543,1384"/>
+<area shape="poly" id="edge24_Node000001_Node000070" title=" " alt="" coords="669,1177,658,1215,639,1261,613,1309,576,1350,545,1366,542,1361,573,1345,608,1306,635,1259,653,1213,664,1175"/>
+<area shape="rect" id="Node000072" href="$sys__fb_8c.html#a574a5d0e75777f10f4f2acfaacf165fb" title=" " alt="" coords="420,1408,572,1434"/>
+<area shape="poly" id="edge25_Node000001_Node000072" title=" " alt="" coords="672,1177,664,1224,646,1284,618,1345,599,1374,576,1399,559,1410,556,1406,573,1395,595,1370,614,1343,641,1282,658,1223,667,1176"/>
+<area shape="rect" id="Node000073" href="$sys__proc_8c.html#affab6f1b0ea45def80ad50ccbeb86401" title=" " alt="" coords="439,1458,553,1483"/>
+<area shape="poly" id="edge26_Node000001_Node000073" title=" " alt="" coords="674,1177,668,1233,653,1305,641,1344,624,1382,603,1417,576,1448,555,1462,552,1457,573,1444,599,1414,619,1379,636,1342,648,1304,663,1232,669,1176"/>
+<area shape="rect" id="Node000074" href="$sys__mm_8c.html#a2d1d07fe317612d6d37d18174c73b63b" title=" " alt="" coords="460,1507,532,1532"/>
+<area shape="poly" id="edge27_Node000001_Node000074" title=" " alt="" coords="676,1177,673,1241,660,1327,647,1372,630,1418,607,1460,576,1497,556,1511,533,1519,532,1514,554,1506,573,1494,602,1457,625,1415,642,1371,654,1325,667,1240,671,1176"/>
+<area shape="rect" id="Node000039" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="14,759,111,784"/>
+<area shape="poly" id="edge28_Node000001_Node000039" title=" " alt="" coords="665,1124,655,1085,637,1037,611,990,593,970,573,952,546,935,520,924,471,912,423,913,376,920,328,928,278,931,225,924,196,915,167,900,132,875,104,843,68,786,72,783,108,839,136,871,169,896,198,910,226,919,278,926,327,923,375,915,423,908,471,907,522,919,549,931,576,948,597,966,615,987,642,1035,660,1083,671,1123"/>
+<area shape="rect" id="Node000075" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="453,1556,539,1582"/>
+<area shape="poly" id="edge30_Node000001_Node000075" title=" " alt="" coords="672,1177,660,1260,640,1371,612,1476,595,1518,577,1547,559,1559,540,1567,538,1562,557,1555,573,1543,591,1515,607,1475,635,1369,655,1259,667,1176"/>
+<area shape="rect" id="Node000076" href="$sys__proc_8c.html#a081835edaec6846f64003072244af565" title="Return the calling process&#39;s PID (or 1 if no process is running)." alt="" coords="450,1606,542,1631"/>
+<area shape="poly" id="edge31_Node000001_Node000076" title=" " alt="" coords="673,1177,663,1269,644,1394,615,1515,597,1563,577,1596,561,1608,543,1615,541,1610,558,1603,573,1592,593,1561,610,1514,638,1393,657,1269,668,1176"/>
+<area shape="rect" id="Node000078" href="$sys__proc_8c.html#a351915ba1475da0bcf53ea7c5d9c18b4" title="Return the calling process&#39;s parent PID." alt="" coords="446,1655,546,1680"/>
+<area shape="poly" id="edge32_Node000001_Node000078" title=" " alt="" coords="674,1177,665,1279,647,1419,634,1490,618,1555,599,1608,577,1645,563,1656,547,1663,545,1658,560,1652,573,1642,594,1606,613,1553,629,1489,641,1418,659,1278,668,1177"/>
+<area shape="rect" id="Node000041" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="449,1704,543,1730"/>
+<area shape="poly" id="edge33_Node000001_Node000041" title=" " alt="" coords="674,1177,667,1288,650,1443,637,1522,621,1594,601,1653,577,1695,562,1707,544,1714,542,1709,559,1702,573,1691,596,1651,616,1592,632,1521,644,1442,661,1288,669,1177"/>
+<area shape="rect" id="Node000079" href="$sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d" title=" " alt="" coords="229,262,308,287"/>
+<area shape="poly" id="edge34_Node000001_Node000079" title=" " alt="" coords="670,1124,670,969,660,740,648,621,630,512,605,422,590,388,573,361,545,335,513,315,477,299,441,289,368,277,308,275,309,270,369,272,442,283,479,294,515,310,548,331,577,358,595,385,610,420,635,511,653,620,665,739,675,969,676,1124"/>
+<area shape="rect" id="Node000080" href="$sys__fs_8c.html#abcbdbff193493e997cd9f83c1d102823" title=" " alt="" coords="19,211,106,236"/>
+<area shape="poly" id="edge36_Node000001_Node000080" title=" " alt="" coords="669,1124,661,935,642,652,629,510,613,384,594,290,584,258,573,240,547,218,520,200,490,186,458,176,391,166,323,166,256,173,194,186,99,213,97,208,192,181,255,168,322,160,392,161,459,171,492,182,522,196,551,214,577,236,589,256,599,288,619,384,635,509,648,652,666,934,674,1124"/>
+<area shape="rect" id="Node000081" href="$sys__fs_8c.html#a3c7030445954bf053945683539a885b4" title="Read the target of a symbolic link at path into buf." alt="" coords="444,1754,548,1779"/>
+<area shape="poly" id="edge37_Node000001_Node000081" title=" " alt="" coords="675,1177,668,1297,653,1466,640,1553,624,1633,603,1698,590,1724,577,1744,564,1754,549,1761,547,1757,561,1750,573,1740,586,1721,598,1696,619,1631,635,1552,648,1465,663,1296,669,1176"/>
+<area shape="rect" id="Node000082" href="$signal_8c.html#a0d9e10561f9a6244a4ff1a370e6c58e0" title="Register or query a signal action." alt="" coords="433,1803,559,1828"/>
+<area shape="poly" id="edge38_Node000001_Node000082" title=" " alt="" coords="675,1177,670,1306,656,1490,643,1585,627,1671,605,1743,591,1772,577,1793,561,1806,558,1801,573,1790,587,1769,600,1741,621,1670,638,1584,650,1489,665,1305,670,1177"/>
+<area shape="rect" id="Node000083" href="$signal_8c.html#acec5c387232178f47bb983308649f1f3" title="Examine and change the blocked signal mask." alt="" coords="421,1852,571,1878"/>
+<area shape="poly" id="edge39_Node000001_Node000083" title=" " alt="" coords="675,1177,672,1315,659,1513,646,1616,629,1710,606,1788,592,1819,577,1843,563,1854,559,1850,573,1839,588,1816,601,1787,624,1709,641,1615,653,1513,666,1314,670,1177"/>
+<area shape="rect" id="Node000084" href="$signal_8c.html#ac280ec41dc24bc5323e752f9499814b7" title="Return from a signal handler by restoring saved register context." alt="" coords="205,810,332,835"/>
+<area shape="poly" id="edge40_Node000001_Node000084" title=" " alt="" coords="670,1124,665,1068,651,997,638,960,622,924,600,892,573,864,546,846,517,832,453,817,389,812,332,815,332,810,389,807,454,811,518,827,549,841,576,860,604,889,626,922,643,958,656,996,670,1068,675,1124"/>
+<area shape="rect" id="Node000085" href="$sys__proc_8c.html#a3b1b5ea932b7bfeca8baa769a7dd512c" title="Store the clear&#45;child&#45;tid address (no&#45;op); returns the current TID." alt="" coords="419,1902,573,1927"/>
+<area shape="poly" id="edge41_Node000001_Node000085" title=" " alt="" coords="676,1177,673,1323,662,1536,650,1647,632,1749,608,1833,594,1866,577,1892,563,1903,559,1899,573,1888,589,1864,603,1832,627,1748,644,1646,656,1536,668,1322,670,1176"/>
+<area shape="rect" id="Node000086" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="458,1951,534,1976"/>
+<area shape="poly" id="edge42_Node000001_Node000086" title=" " alt="" coords="676,1177,675,1331,664,1560,653,1679,635,1788,610,1878,595,1914,577,1941,557,1956,535,1963,533,1958,555,1951,573,1938,590,1911,605,1877,630,1787,647,1678,659,1560,670,1331,670,1177"/>
+<area shape="rect" id="Node000089" href="$sys__dispatch_8c.html#a95f2b068e142b45d49e5ee46268e9c95" title="Dispatch a syscall from the architecture&#45;specific entry point." alt="" coords="431,2000,561,2026"/>
+<area shape="poly" id="edge43_Node000001_Node000089" title=" " alt="" coords="674,1176,663,1351,643,1609,629,1739,614,1854,596,1942,587,1972,577,1991,563,2002,559,1998,573,1987,582,1970,591,1940,609,1853,624,1739,638,1609,658,1351,669,1176"/>
+<area shape="rect" id="Node000090" href="$sys__dispatch_8c.html#a1d6ccbb408625c796ebdef967f3a3337" title="Return the syscall_frame_t for the currently executing syscall." alt="" coords="422,745,570,785"/>
+<area shape="poly" id="edge44_Node000001_Node000090" title=" " alt="" coords="670,1124,665,1062,650,978,638,932,621,887,600,844,573,805,551,787,554,783,577,802,604,841,626,885,643,931,655,976,670,1061,675,1124"/>
+<area shape="rect" id="Node000093" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="459,2050,533,2075"/>
+<area shape="poly" id="edge47_Node000001_Node000093" title=" " alt="" coords="674,1177,664,1361,644,1634,631,1773,615,1895,597,1988,587,2020,577,2040,557,2055,535,2062,533,2057,555,2050,573,2036,583,2018,592,1987,610,1894,626,1772,639,1634,659,1360,669,1176"/>
+<area shape="rect" id="Node000094" href="$dev__nodes_8c.html#a53ba066fbd825803a884309edf38a731" title="Report read/write readiness for /dev/tty." alt="" coords="461,2099,531,2124"/>
+<area shape="poly" id="edge48_Node000001_Node000094" title=" " alt="" coords="674,1177,665,1370,646,1659,633,1806,617,1935,598,2034,588,2068,577,2089,556,2105,532,2112,531,2107,554,2100,573,2086,583,2066,593,2033,611,1935,627,1805,641,1659,660,1370,669,1176"/>
+<area shape="rect" id="Node000095" href="$vfs_8c.html#a67bb6451b3cc29b98fdbdba7d9dd1594" title="Change the calling process&#39;s working directory to path." alt="" coords="228,708,309,734"/>
+<area shape="poly" id="edge50_Node000001_Node000095" title=" " alt="" coords="668,1124,658,1035,640,917,627,857,612,804,594,762,573,735,543,716,509,703,474,696,437,694,367,699,310,711,309,706,367,694,437,688,475,691,511,698,545,711,576,731,598,759,617,803,633,856,645,916,664,1034,673,1124"/>
+<area shape="rect" id="Node000097" href="$vfs_8c.html#a44d4878d7034e836fb13eff8587f0160" title="Release a file descriptor and decrement the OFT refcount." alt="" coords="455,543,537,568"/>
+<area shape="poly" id="edge51_Node000001_Node000097" title=" " alt="" coords="669,1124,661,1009,644,850,631,768,615,694,596,632,573,589,556,575,536,566,539,561,559,571,577,586,601,630,620,692,636,767,649,849,666,1009,674,1123"/>
+<area shape="rect" id="Node000099" href="$vfs_8c.html#ad37bc2e85a29eebdfa8a921075506e4e" title="Return a pointer to the calling process&#39;s current working directory." alt="" coords="448,2148,544,2174"/>
+<area shape="poly" id="edge55_Node000001_Node000099" title=" " alt="" coords="674,1177,666,1379,647,1684,634,1839,618,1976,599,2080,588,2116,577,2139,562,2151,545,2158,543,2153,560,2146,573,2135,584,2114,594,2079,613,1975,629,1838,642,1684,660,1379,669,1176"/>
+<area shape="rect" id="Node000101" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="441,372,551,398"/>
+<area shape="poly" id="edge56_Node000001_Node000101" title=" " alt="" coords="669,1124,664,983,649,777,637,670,620,571,599,488,586,456,573,430,555,413,533,400,536,395,558,408,577,427,591,454,604,487,625,570,642,669,655,777,670,983,675,1124"/>
+<area shape="rect" id="Node000102" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="228,659,309,684"/>
+<area shape="poly" id="edge64_Node000001_Node000102" title=" " alt="" coords="669,1124,664,1015,648,866,636,790,619,723,598,668,586,648,573,634,554,620,536,613,519,611,502,612,418,634,394,643,370,654,310,668,309,663,368,649,392,638,417,629,501,607,519,606,538,608,557,616,576,629,591,645,603,666,624,721,641,789,654,865,669,1015,675,1124"/>
+<area shape="rect" id="Node000106" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="422,644,570,670"/>
+<area shape="poly" id="edge61_Node000001_Node000106" title=" " alt="" coords="668,1124,657,1029,638,899,610,774,592,724,573,691,561,680,547,672,550,667,564,676,577,687,597,722,615,772,643,898,662,1028,673,1123"/>
+<area shape="rect" id="Node000117" href="$vfs_8c.html#af6327136c16b7ac891a514ec683d89d1" title="Close every fd in the calling process that has FD_CLOEXEC set." alt="" coords="168,860,369,886"/>
+<area shape="poly" id="edge65_Node000001_Node000117" title=" " alt="" coords="668,1124,661,1076,645,1016,632,985,617,956,597,929,573,907,548,891,521,879,463,865,404,860,350,863,349,857,404,855,463,859,523,874,551,886,576,903,601,926,621,953,637,983,650,1014,666,1074,673,1123"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="23,34,102,59"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="199,49,103,49,103,44,199,44"/>
+<area shape="rect" id="Node000007" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="5,96,120,122"/>
+<area shape="poly" id="edge4_Node000006_Node000007" title=" " alt="" coords="214,112,120,112,120,106,214,106"/>
+<area shape="poly" id="edge6_Node000008_Node000002" title=" " alt="" coords="418,66,324,55,325,50,418,60"/>
+<area shape="poly" id="edge7_Node000008_Node000006" title=" " alt="" coords="418,87,311,105,310,100,417,82"/>
+<area shape="rect" id="Node000010" href="$vfs_8c.html#aa95b572c24ee582d4faa2cc7097b2632" title="Duplicate oldfd into the lowest free fd ≥ 3 and retain the OFT entry." alt="" coords="232,311,305,336"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="454,437,416,411,401,394,392,378,383,363,368,350,337,336,305,329,306,324,339,331,371,345,387,360,397,375,405,391,419,407,457,433"/>
+<area shape="poly" id="edge11_Node000009_Node000013" title=" " alt="" coords="445,473,419,488,405,503,396,518,387,533,371,547,341,561,310,569,309,563,339,556,368,543,383,529,392,515,400,500,416,484,443,469"/>
+<area shape="rect" id="Node000018" href="$vfs_8c.html#a3cf77ba7faf6ee0b0b87877b6e4c0415" title="Return true if fd refers to either end of a pipe." alt="" coords="211,459,326,484"/>
+<area shape="poly" id="edge12_Node000009_Node000018" title=" " alt="" coords="443,461,326,470,326,465,443,456"/>
+<area shape="rect" id="Node000019" href="$vfs_8c.html#a6bcb1fe4944bfb99bfdb8bf7f325b703" title="Return true if fd is currently open in the calling process." alt="" coords="209,508,328,534"/>
+<area shape="poly" id="edge13_Node000009_Node000019" title=" " alt="" coords="446,474,370,498,323,511,322,506,369,493,444,469"/>
+<area shape="rect" id="Node000023" href="$vfs_8c.html#a35821b0927b2703fc2b521bc5eab8a1a" title="Stat an open file descriptor, returning synthetic metadata for pipes." alt="" coords="229,360,308,386"/>
+<area shape="poly" id="edge14_Node000009_Node000023" title=" " alt="" coords="457,438,368,399,308,383,309,378,370,394,459,433"/>
+<area shape="rect" id="Node000025" href="$vfs_8c.html#a4535fe94909a8928746ddae8c0081991" title="Truncate fd to exactly length bytes via the driver." alt="" coords="215,410,322,435"/>
+<area shape="poly" id="edge15_Node000009_Node000025" title=" " alt="" coords="443,449,322,432,323,427,444,444"/>
+<area shape="poly" id="edge10_Node000010_Node000012" title=" " alt="" coords="218,320,102,306,103,300,219,315"/>
+<area shape="poly" id="edge18_Node000060_Node000061" title=" " alt="" coords="405,1068,307,1057,307,1052,405,1063"/>
+<area shape="poly" id="edge35_Node000079_Node000080" title=" " alt="" coords="215,264,106,237,107,231,216,259"/>
+<area shape="poly" id="edge45_Node000090_Node000039" title=" " alt="" coords="408,769,111,773,111,768,408,764"/>
+<area shape="poly" id="edge46_Node000090_Node000084" title=" " alt="" coords="409,789,321,812,319,807,408,784"/>
+<area shape="poly" id="edge53_Node000097_Node000013" title=" " alt="" coords="441,562,310,570,309,565,441,556"/>
+<area shape="poly" id="edge52_Node000097_Node000039" title=" " alt="" coords="442,575,370,597,312,609,265,614,221,623,169,648,137,675,110,705,73,760,69,757,105,702,133,671,167,644,219,618,264,608,311,603,369,592,441,570"/>
+<area shape="poly" id="edge58_Node000101_Node000010" title=" " alt="" coords="440,371,369,350,305,334,306,329,370,345,441,365"/>
+<area shape="poly" id="edge57_Node000101_Node000079" title=" " alt="" coords="462,367,416,335,393,316,368,301,338,290,308,282,309,277,340,285,371,296,396,312,419,331,465,362"/>
+<area shape="poly" id="edge59_Node000101_Node000102" title=" " alt="" coords="449,406,433,417,419,431,406,452,398,472,394,511,391,551,384,572,372,596,354,616,335,634,296,661,293,657,331,630,351,613,367,593,379,570,386,550,389,510,393,470,401,449,415,427,430,413,446,402"/>
+<area shape="poly" id="edge60_Node000102_Node000039" title=" " alt="" coords="216,683,169,698,118,729,79,761,76,757,115,725,167,693,214,678"/>
+<area shape="poly" id="edge62_Node000106_Node000095" title=" " alt="" coords="443,676,370,698,310,714,309,709,369,693,441,671"/>
+<area shape="poly" id="edge63_Node000106_Node000102" title=" " alt="" coords="408,665,310,672,310,666,408,660"/>
+<area shape="poly" id="edge66_Node000117_Node000039" title=" " alt="" coords="188,858,167,850,115,818,76,786,79,782,118,814,169,845,190,854"/>
+</map>

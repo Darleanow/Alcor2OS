@@ -1,0 +1,6 @@
+<map id="ast_new_while" name="ast_new_while">
+<area shape="rect" id="Node000001" title="Allocate an AST_WHILE node, taking ownership of cond and body. body may be NULL for an empty { }." alt="" coords="5,29,124,55"/>
+<area shape="rect" id="Node000002" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="172,29,247,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,39,158,39,158,45,124,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="185,30,180,21,182,11,193,5,209,3,229,6,238,15,234,18,227,11,209,8,194,10,187,15,185,20,189,28"/>
+</map>

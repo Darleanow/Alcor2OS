@@ -1,0 +1,13 @@
+<map id="src/drivers/console/font_bitmap.h" name="src/drivers/console/font_bitmap.h">
+<area shape="rect" id="Node000001" title="8x16 monospace bitmap atlases used by the kernel boot logger." alt="" coords="248,5,392,45"/>
+<area shape="rect" id="Node000002" href="$font_8h.html" title=" " alt="" coords="248,93,392,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="323,59,323,93,317,93,317,59"/>
+<area shape="rect" id="Node000003" href="$console_8c.html" title="Boot/panic logger on the linear framebuffer." alt="" coords="5,181,149,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="255,140,131,184,130,179,253,135"/>
+<area shape="rect" id="Node000004" href="$api_8c.html" title="Runtime framebuffer text console with UTF&#45;8 and ANSI/CSI support." alt="" coords="174,181,309,221"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="295,145,261,183,257,179,291,142"/>
+<area shape="rect" id="Node000005" href="$cell_8c.html" title="Cell&#45;to&#45;pixel rendering for the framebuffer console." alt="" coords="333,181,467,221"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="349,142,384,179,380,183,345,145"/>
+<area shape="rect" id="Node000006" href="$pixel_8c.html" title="Raw framebuffer pixel primitives for the fb_console module." alt="" coords="491,181,634,221"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="387,135,510,179,509,184,385,140"/>
+</map>

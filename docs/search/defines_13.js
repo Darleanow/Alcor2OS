@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['vconf_5finitial_5fcap_0',['VCONF_INITIAL_CAP',['../vconf_8c.html#a5b9b5cf0e999dc8a26a9085797379c2b',1,'vconf.c']]],
+  ['vega_5fliteral_5fsentinel_1',['VEGA_LITERAL_SENTINEL',['../ast_8h.html#ae373a9c3f1d79c516229eaf5189807c2',1,'ast.h']]],
+  ['vega_5fversion_2',['vega_version',['../user_2apps_2shell_2main_8c.html#a90c252ad65c8a0f36d84572ebeff7d89',1,'VEGA_VERSION:&#160;main.c'],['../vega_8h.html#a90c252ad65c8a0f36d84572ebeff7d89',1,'VEGA_VERSION:&#160;vega.h']]],
+  ['vfs_5fdirectory_3',['VFS_DIRECTORY',['../vfs_8h.html#a37f1ba20ee8a7e2700d5b92cde691935',1,'vfs.h']]],
+  ['vfs_5ffifo_4',['VFS_FIFO',['../vfs_8h.html#a59c1fbf314396d9b53a146479676cb05',1,'vfs.h']]],
+  ['vfs_5ffile_5',['VFS_FILE',['../vfs_8h.html#a66277218fb801a2d11035ff3e781ba8b',1,'vfs.h']]],
+  ['vfs_5fkind_5ffile_6',['VFS_KIND_FILE',['../vfs_8h.html#aaa8eac3ba2b99ac43105bb73b6e1ed26',1,'vfs.h']]],
+  ['vfs_5fkind_5fpipe_5frd_7',['VFS_KIND_PIPE_RD',['../vfs_8h.html#a44ef4db96c0b385f81fd09bb020df948',1,'vfs.h']]],
+  ['vfs_5fkind_5fpipe_5fwr_8',['VFS_KIND_PIPE_WR',['../vfs_8h.html#a41d7714677d30af82c3ab1c11e0f7c5f',1,'vfs.h']]],
+  ['vfs_5fmax_5ffd_9',['VFS_MAX_FD',['../limits_8h.html#a276107750d8a099090c6fde8acded3a0',1,'limits.h']]],
+  ['vfs_5fmax_5fmounts_10',['VFS_MAX_MOUNTS',['../vfs_8c.html#ab24097d7de8f991cb21c138576c07d04',1,'vfs.c']]],
+  ['vfs_5fmax_5foft_11',['VFS_MAX_OFT',['../vfs_8c.html#ac239aa5554a3d3c50934ed97978f92ad',1,'vfs.c']]],
+  ['vfs_5fname_5fmax_12',['VFS_NAME_MAX',['../limits_8h.html#a818372246f79e5e859a10eb24517a3df',1,'limits.h']]],
+  ['vfs_5fpath_5fmax_13',['VFS_PATH_MAX',['../limits_8h.html#a94bf92a5854bb303584a955515cf6d7d',1,'limits.h']]],
+  ['vfs_5framfs_5fst_5fdev_14',['VFS_RAMFS_ST_DEV',['../vfs_8h.html#aaf35d50cbff9e75cdee3798f0302cc63',1,'vfs.h']]],
+  ['vmm_5fmmio_15',['VMM_MMIO',['../vmm_8h.html#a71ec7054a82482b9ccd96ff85a14073e',1,'vmm.h']]],
+  ['vmm_5fnx_16',['VMM_NX',['../vmm_8h.html#abbbaa2552e84af13046e42dae61b5382',1,'vmm.h']]],
+  ['vmm_5fpat_17',['VMM_PAT',['../vmm_8h.html#a01b062b60a20641d0b990ae2b107fc54',1,'vmm.h']]],
+  ['vmm_5fpcd_18',['VMM_PCD',['../vmm_8h.html#a243b5edc266380c82de3b15622e80f92',1,'vmm.h']]],
+  ['vmm_5fpresent_19',['VMM_PRESENT',['../vmm_8h.html#a723cb142e8a57c4d51b3443e47fd3b28',1,'vmm.h']]],
+  ['vmm_5fpwt_20',['VMM_PWT',['../vmm_8h.html#a2804bb591368012c54a5b3c745bdc114',1,'vmm.h']]],
+  ['vmm_5fuser_21',['VMM_USER',['../vmm_8h.html#ad6654e60fb2ff8425ae83f5a127dc2e5',1,'vmm.h']]],
+  ['vmm_5fwc_22',['VMM_WC',['../vmm_8h.html#a9e752eb95001787b7b1d62e19eab6bb2',1,'vmm.h']]],
+  ['vmm_5fwrite_23',['VMM_WRITE',['../vmm_8h.html#a0720045cd654221613b8594a95415bf6',1,'vmm.h']]]
+];

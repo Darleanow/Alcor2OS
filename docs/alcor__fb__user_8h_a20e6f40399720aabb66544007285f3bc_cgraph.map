@@ -1,0 +1,5 @@
+<map id="alcor_fb_mmap" name="alcor_fb_mmap">
+<area shape="rect" id="Node000001" title="Map the full framebuffer at a kernel&#45;chosen address." alt="" coords="5,5,128,31"/>
+<area shape="rect" id="Node000002" href="$alcor__fb__user_8h.html#a6973e05658fddc317f424d4fce724d7f" title="Map the linear framebuffer into the calling process&#39;s address space." alt="" coords="176,5,331,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,15,162,15,162,21,128,21"/>
+</map>

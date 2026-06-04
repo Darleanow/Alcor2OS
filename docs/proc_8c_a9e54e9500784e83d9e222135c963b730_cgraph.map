@@ -1,0 +1,69 @@
+<map id="proc_exec_replace_image" name="proc_exec_replace_image">
+<area shape="rect" id="Node000001" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="5,158,196,183"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1c5d89ceee7d8c90e90526e6fec26e6f" title="Set the FS base MSR for thread&#45;local storage." alt="" coords="250,83,379,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,155,264,111,265,116,139,160"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="275,133,354,158"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,157,261,149,262,154,197,162"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="244,347,385,373"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="118,181,290,336,287,340,114,185"/>
+<area shape="rect" id="Node000062" href="$vmm_8c.html#ade320027ce15064748033ecf56abe4f5" title="Free every user&#45;space mapping in an address space (pages, PT, PD, PDPT) and zero the user&#45;space PML4 ..." alt="" coords="433,70,635,95"/>
+<area shape="poly" id="edge35_Node000001_Node000062" title=" " alt="" coords="153,181,204,189,263,193,325,187,356,180,384,168,400,156,408,140,416,123,432,107,448,98,451,103,435,111,420,126,413,143,404,159,387,173,357,185,326,192,263,198,203,194,152,186"/>
+<area shape="rect" id="Node000005" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="497,322,571,347"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="385,349,483,338,483,343,386,354"/>
+<area shape="rect" id="Node000034" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="487,470,581,495"/>
+<area shape="poly" id="edge13_Node000004_Node000034" title=" " alt="" coords="329,371,373,413,402,437,434,456,474,471,472,476,432,461,399,441,369,417,325,375"/>
+<area shape="rect" id="Node000040" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="464,371,604,397"/>
+<area shape="poly" id="edge25_Node000004_Node000040" title=" " alt="" coords="386,365,450,372,450,378,385,370"/>
+<area shape="rect" id="Node000059" href="$proc_8c.html#a9977cd45155a9de8f2ca9dbd520fe283" title="Push a string onto user stack and return the new stack pointer." alt="" coords="485,421,583,446"/>
+<area shape="poly" id="edge26_Node000004_Node000059" title=" " alt="" coords="344,370,434,407,473,418,471,423,432,412,342,375"/>
+<area shape="rect" id="Node000060" href="$vmm_8c.html#a480dab99f31b160283283ec482141d9c" title="Get current PML4 physical address from CR3." alt="" coords="445,643,623,669"/>
+<area shape="poly" id="edge27_Node000004_Node000060" title=" " alt="" coords="327,371,518,631,513,634,323,374"/>
+<area shape="rect" id="Node000061" href="$vmm_8c.html#a8558a335feee5b72f59e28085c1716d7" title="Map a page in a specific address space." alt="" coords="479,171,589,197"/>
+<area shape="poly" id="edge29_Node000004_Node000061" title=" " alt="" coords="330,345,505,203,508,208,334,349"/>
+<area shape="rect" id="Node000055" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="481,121,587,146"/>
+<area shape="poly" id="edge33_Node000004_Node000055" title=" " alt="" coords="320,346,370,247,402,193,432,158,467,140,470,145,435,162,406,196,374,250,324,348"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="916,421,1025,446"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="553,320,609,287,647,269,690,253,735,242,781,237,826,242,869,259,889,273,907,290,934,330,953,371,965,406,960,408,948,373,929,333,902,294,886,277,867,264,825,248,781,243,736,247,691,258,649,274,612,292,555,324"/>
+<area shape="rect" id="Node000018" href="$elf_8c.html#ad6a2ec668bb3290e664ab1a581e8eaac" title=" " alt="" coords="697,470,854,495"/>
+<area shape="poly" id="edge6_Node000005_Node000018" title=" " alt="" coords="572,334,605,341,636,358,648,370,655,383,661,409,667,434,673,445,684,457,691,461,688,466,681,461,669,448,662,435,656,410,650,385,644,373,633,362,603,346,571,339"/>
+<area shape="rect" id="Node000028" href="$elf_8c.html#ad4b57f2c151d810ce6cb1cb4f64eb099" title=" " alt="" coords="726,273,825,298"/>
+<area shape="poly" id="edge7_Node000005_Node000028" title=" " alt="" coords="571,325,712,295,713,301,572,330"/>
+<area shape="rect" id="Node000029" href="$elf_8c.html#ab9ec509c77bdfedfe64da0e0977797ce" title=" " alt="" coords="688,322,863,347"/>
+<area shape="poly" id="edge8_Node000005_Node000029" title=" " alt="" coords="572,332,674,332,674,337,572,337"/>
+<area shape="rect" id="Node000030" href="$elf_8c.html#ac1396569a9a8edc3e72a606e32adfe98" title=" " alt="" coords="683,371,868,397"/>
+<area shape="poly" id="edge9_Node000005_Node000030" title=" " alt="" coords="572,340,699,366,698,371,571,345"/>
+<area shape="rect" id="Node000033" href="$elf_8c.html#aa96bf6caa2146da9ef5e8b118c3be087" title="Validate ELF64 header." alt="" coords="726,421,825,446"/>
+<area shape="poly" id="edge11_Node000005_Node000033" title=" " alt="" coords="572,336,604,344,636,358,652,370,661,383,670,395,684,407,714,420,712,425,681,412,666,399,657,386,648,374,633,362,602,349,571,342"/>
+<area shape="poly" id="edge10_Node000030_Node000006" title=" " alt="" coords="827,394,907,415,906,420,826,399"/>
+<area shape="poly" id="edge12_Node000033_Node000006" title=" " alt="" coords="825,431,902,431,902,436,825,436"/>
+<area shape="poly" id="edge14_Node000034_Node000006" title=" " alt="" coords="576,493,634,507,708,518,788,520,828,515,867,506,911,483,945,454,949,458,913,487,869,510,829,520,789,525,707,524,633,512,575,498"/>
+<area shape="poly" id="edge15_Node000034_Node000018" title=" " alt="" coords="581,480,683,480,683,485,581,485"/>
+<area shape="poly" id="edge16_Node000034_Node000028" title=" " alt="" coords="581,479,609,471,633,457,647,439,654,422,656,385,659,347,666,328,681,309,695,298,712,291,714,296,698,303,685,313,671,330,664,348,662,385,659,423,652,442,636,461,611,476,582,484"/>
+<area shape="poly" id="edge17_Node000034_Node000029" title=" " alt="" coords="581,477,608,470,633,457,644,445,650,434,656,409,662,383,669,370,681,358,690,352,693,356,684,362,674,374,667,385,661,410,655,436,648,449,636,461,610,475,582,483"/>
+<area shape="poly" id="edge18_Node000034_Node000030" title=" " alt="" coords="581,475,608,468,633,456,648,445,657,433,666,420,681,407,697,399,699,404,684,412,670,423,661,436,652,449,636,461,609,473,582,480"/>
+<area shape="poly" id="edge19_Node000034_Node000033" title=" " alt="" coords="581,471,712,443,713,449,582,476"/>
+<area shape="rect" id="Node000035" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="747,571,803,597"/>
+<area shape="poly" id="edge20_Node000034_Node000035" title=" " alt="" coords="562,493,684,550,735,569,733,574,682,554,559,498"/>
+<area shape="rect" id="Node000037" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="738,670,813,695"/>
+<area shape="poly" id="edge22_Node000034_Node000037" title=" " alt="" coords="545,494,565,527,596,571,636,617,684,656,704,666,725,673,724,678,702,671,681,661,632,621,591,575,560,530,540,497"/>
+<area shape="rect" id="Node000043" href="$vfs_8c.html#aa43ccf694fc49a889902be97e38e32db" title="Read up to count bytes from fd into buf." alt="" coords="736,719,815,745"/>
+<area shape="poly" id="edge23_Node000034_Node000043" title=" " alt="" coords="546,494,637,631,657,672,667,689,684,706,703,716,723,723,722,728,701,721,681,710,663,693,652,675,632,633,542,497"/>
+<area shape="rect" id="Node000058" href="$vfs_8c.html#aa33cf8868e6f6f052627be5ea9e75a15" title="Reposition the file offset of fd." alt="" coords="735,621,815,646"/>
+<area shape="poly" id="edge24_Node000034_Node000058" title=" " alt="" coords="548,494,603,549,642,580,684,607,723,622,721,627,681,612,638,584,600,553,545,497"/>
+<area shape="poly" id="edge21_Node000035_Node000006" title=" " alt="" coords="803,576,835,566,867,550,893,528,916,504,952,456,956,459,920,507,896,532,869,554,837,571,804,581"/>
+<area shape="rect" id="Node000021" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="721,769,829,794"/>
+<area shape="poly" id="edge28_Node000060_Node000021" title=" " alt="" coords="552,667,608,710,645,734,684,755,709,765,707,770,682,760,642,739,605,714,549,671"/>
+<area shape="rect" id="Node000022" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="716,171,835,197"/>
+<area shape="poly" id="edge30_Node000061_Node000022" title=" " alt="" coords="589,181,702,181,702,187,589,187"/>
+<area shape="rect" id="Node000024" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="919,121,1022,146"/>
+<area shape="poly" id="edge32_Node000061_Node000024" title=" " alt="" coords="589,172,682,157,905,135,906,141,683,163,590,177"/>
+<area shape="poly" id="edge31_Node000022_Node000024" title=" " alt="" coords="825,169,907,147,909,152,826,174"/>
+<area shape="rect" id="Node000056" href="$cpu_8c.html#a3509e1de421fbf18b46fad5dc211d7d1" title="Set the current CR3 (PML4) value and flush the TLB." alt="" coords="719,70,831,95"/>
+<area shape="poly" id="edge34_Node000055_Node000056" title=" " alt="" coords="587,120,705,95,706,100,588,125"/>
+<area shape="poly" id="edge36_Node000062_Node000056" title=" " alt="" coords="635,80,706,80,706,85,635,85"/>
+<area shape="rect" id="Node000063" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="696,5,855,45"/>
+<area shape="poly" id="edge37_Node000062_Node000063" title=" " alt="" coords="588,67,682,45,683,50,589,73"/>
+<area shape="poly" id="edge38_Node000063_Node000024" title=" " alt="" coords="840,43,869,56,910,82,946,109,942,114,907,87,867,61,838,48"/>
+<area shape="rect" id="Node000064" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="926,13,1015,38"/>
+<area shape="poly" id="edge39_Node000063_Node000064" title=" " alt="" coords="855,23,912,23,912,28,855,28"/>
+</map>

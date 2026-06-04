@@ -1,0 +1,16 @@
+<map id="src/kernel/ktermios.c" name="src/kernel/ktermios.c">
+<area shape="rect" id="Node000001" title="Default termios (canonical + echo) for new processes." alt="" coords="70,5,229,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="12,79,135,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,33,98,71,94,67,135,29"/>
+<area shape="rect" id="Node000007" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="159,79,295,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="164,29,206,67,202,71,160,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,152,207,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,102,129,141,125,144,84,106"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,225,88,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,180,76,219,73,215,131,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,225,187,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,178,152,212,147,212,147,178"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,225,282,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,175,221,215,218,219,163,180"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="216,106,174,144,170,141,212,102"/>
+</map>

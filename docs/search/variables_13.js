@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['u_0',['u',['../structast__node.html#a9f609a2b2f5acc8b174fdf1fea0697ab',1,'ast_node']]],
+  ['underline_1',['underline',['../structflush__cell__cache.html#ab2db076d96a6957835c0fec1e298b95d',1,'flush_cell_cache']]],
+  ['unlink_2',['unlink',['../structfs__ops__t.html#a9399c61bad82879501f3d227caec1876',1,'fs_ops_t']]],
+  ['unused_3',['unused',['../structstat__buf.html#a0e46791f2e40440d773123e8e045e12a',1,'stat_buf::unused'],['../structlimine__framebuffer.html#a8b60e672993af04ebd6629929eb759fe',1,'limine_framebuffer::unused'],['../structlimine__file.html#a6d68f8cdc4e0179a5478828f99994890',1,'limine_file::unused']]],
+  ['us_5fpl_4',['us_pl',['../kbd__layout_8c.html#acb88dec37e8d40a4047b2af62d0066ce',1,'kbd_layout.c']]],
+  ['us_5fsh_5',['us_sh',['../kbd__layout_8c.html#abdf06a481c179b8319b6b1e7b634861c',1,'kbd_layout.c']]],
+  ['usage_6',['usage',['../structgr__spec.html#a9545147f6dcdc01c266460a573baf9a9',1,'gr_spec']]],
+  ['user_5fcode_7',['user_code',['../gdt_8c.html#a461399220b7363298b89027645944fa6',1,'gdt.c']]],
+  ['user_5fdata_8',['user_data',['../gdt_8c.html#ada87234717fbf476927bd548d7129c84',1,'gdt.c']]],
+  ['user_5frflags_9',['user_rflags',['../structproc.html#a761e0bcf241ad85fd4f3390a0e22f52d',1,'proc']]],
+  ['user_5frip_10',['user_rip',['../structproc.html#aa84bcb5784f13936f0b68bfc41b47e90',1,'proc']]],
+  ['user_5frsp_11',['user_rsp',['../structproc.html#a7634935631b92575488371d62c5a8260',1,'proc']]],
+  ['user_5fstack_12',['user_stack',['../structproc.html#ac7bbec3072d807fb928a3a7db5849c50',1,'proc']]],
+  ['user_5fstack_5ftop_13',['user_stack_top',['../structproc.html#a226663fac9db07f79a978c0050918076',1,'proc']]],
+  ['userdata_14',['userdata',['../structgr__app.html#ac28d882fcc3a31bb65a660c683fc8c87',1,'gr_app']]],
+  ['utf8_5fpartial_15',['utf8_partial',['../structfb__console__ctx__t.html#a7b0f6a0121f123cef8d00ca73fc353b6',1,'fb_console_ctx_t']]],
+  ['utf8_5frem_16',['utf8_rem',['../structfb__console__ctx__t.html#a011ee7c3d5ae730c83a8cece78799b0a',1,'fb_console_ctx_t']]]
+];

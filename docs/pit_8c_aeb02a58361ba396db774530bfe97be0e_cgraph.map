@@ -1,0 +1,5 @@
+<map id="pit_program" name="pit_program">
+<area shape="rect" id="Node000001" title="Program PIT channel 0 for frequency Hz (clamped to a sane range)." alt="" coords="5,5,107,31"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="155,5,205,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,15,141,15,141,21,107,21"/>
+</map>

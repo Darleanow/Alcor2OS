@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['real_5fclang_0',['REAL_CLANG',['../cc_8c.html#a46637b47f863f14f53856927d53a8693',1,'cc.c']]],
+  ['rename_5fchunk_1',['RENAME_CHUNK',['../vfs_8c.html#a9a90055371decf30593a76a24d8d53fa',1,'vfs.c']]],
+  ['rgb565_5fb_5floss_2',['RGB565_B_LOSS',['../pixel_8c.html#a45b83355a3ff6a619de456d8cad1f5b5',1,'pixel.c']]],
+  ['rgb565_5fg_5floss_3',['RGB565_G_LOSS',['../pixel_8c.html#afd2a0e8cb54e0bf2f2490b4fd47a840d',1,'pixel.c']]],
+  ['rgb565_5fg_5fshift_4',['RGB565_G_SHIFT',['../pixel_8c.html#a35c28c1a1f0591ed0de5c2489b23b173',1,'pixel.c']]],
+  ['rgb565_5fhi_5',['RGB565_HI',['../pixel_8c.html#a64b09524c3e8d52a1fdf4c07b4ece13c',1,'pixel.c']]],
+  ['rgb565_5flo_6',['RGB565_LO',['../pixel_8c.html#ac2fbd2e5a06aff982e23bdc01a96d459',1,'pixel.c']]],
+  ['rgb565_5fr_5floss_7',['RGB565_R_LOSS',['../pixel_8c.html#a42f25e9d0ef0835805e54359cdef8090',1,'pixel.c']]],
+  ['rgb565_5fr_5fshift_8',['RGB565_R_SHIFT',['../pixel_8c.html#ab8874454ad0c56a88f95a2e6e0e3ac5d',1,'pixel.c']]],
+  ['ring_5fcap_9',['RING_CAP',['../mouse_8c.html#ad027a13ce39a6c6675fd8b71ac90d13c',1,'mouse.c']]],
+  ['rlimit_5fas_10',['RLIMIT_AS',['../sys__misc_8c.html#aad124f77d8cc4e40cc1870cfd9cd9276',1,'sys_misc.c']]],
+  ['rlimit_5fcore_11',['RLIMIT_CORE',['../sys__misc_8c.html#a6caff2df3f486837746f7f1bbef96ff0',1,'sys_misc.c']]],
+  ['rlimit_5fcpu_12',['RLIMIT_CPU',['../sys__misc_8c.html#a2dfc31bf865952e7a21f30a06c5b58ff',1,'sys_misc.c']]],
+  ['rlimit_5fdata_13',['RLIMIT_DATA',['../sys__misc_8c.html#a9eff0322f4c2f18835c6773848a8d21f',1,'sys_misc.c']]],
+  ['rlimit_5ffsize_14',['RLIMIT_FSIZE',['../sys__misc_8c.html#a9d5002c1bdef042c84c919143ada3909',1,'sys_misc.c']]],
+  ['rlimit_5fnofile_15',['RLIMIT_NOFILE',['../sys__misc_8c.html#a23b0ddddd76c48b173a903da632e3623',1,'sys_misc.c']]],
+  ['rlimit_5fnproc_16',['RLIMIT_NPROC',['../sys__misc_8c.html#aa368f25ca5adfaaeced92e6570376fc4',1,'sys_misc.c']]],
+  ['rlimit_5frss_17',['RLIMIT_RSS',['../sys__misc_8c.html#a40808e6c696894318efe11e285ac9563',1,'sys_misc.c']]],
+  ['rlimit_5fstack_18',['RLIMIT_STACK',['../sys__misc_8c.html#a7f3294b42b45c2aa8f0f012c556a0a57',1,'sys_misc.c']]]
+];

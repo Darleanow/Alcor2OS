@@ -1,0 +1,17 @@
+<map id="kstrrchr" name="kstrrchr">
+<area shape="rect" id="Node000001" title="Find the last occurrence of a character in a string." alt="" coords="544,55,616,80"/>
+<area shape="rect" id="Node000002" href="$ramfs_8c.html#a30e0ae82a2105bc9a8b929931029145c" title=" " alt="" coords="361,5,455,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="530,55,495,45,454,33,456,28,497,39,532,50"/>
+<area shape="rect" id="Node000003" href="$ramfs_8c.html#ad7ed46498570f58ce0f21fc5510b240d" title=" " alt="" coords="365,55,451,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="530,70,452,70,452,65,530,65"/>
+<area shape="rect" id="Node000004" href="$ramfs_8c.html#a9d21ebf7315f835ae07f5d47014a72d0" title="Register a character device under path inside the ramfs tree." alt="" coords="320,104,496,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="532,84,454,107,452,101,530,79"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#ae65ed532860c590d0e567ec0487fee0a" title="Register /dev/null, /dev/zero, /dev/tty, and /dev/fb on the ramfs mounted at /dev." alt="" coords="152,79,272,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="306,106,272,102,273,96,306,101"/>
+<area shape="rect" id="Node000007" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="165,128,259,153"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="306,132,260,138,259,132,306,127"/>
+<area shape="rect" id="Node000006" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,79,104,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="138,94,104,94,104,89,138,89"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="13,128,96,153"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="151,143,96,143,96,138,151,138"/>
+</map>

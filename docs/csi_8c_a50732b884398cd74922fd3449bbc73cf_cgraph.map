@@ -1,0 +1,7 @@
+<map id="csi_dec_private" name="csi_dec_private">
+<area shape="rect" id="Node000001" title="CSI ?N h / CSI ?N l — DEC private mode set/reset." alt="" coords="5,31,128,56"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#afb4b84b02d0bdac03d9b1a8cd26cc839" title="Apply one parsed DEC private&#45;mode number with set/reset polarity." alt="" coords="204,5,320,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,33,190,25,190,30,129,38"/>
+<area shape="rect" id="Node000003" href="$csi_8c.html#aa1974503471d82e5a1f8c1f465d20f21" title="Parse the DEC private&#45;mode param list out of esc_buf." alt="" coords="176,55,348,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="129,48,163,52,162,58,128,54"/>
+</map>

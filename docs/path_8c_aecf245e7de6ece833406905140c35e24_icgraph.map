@@ -1,0 +1,5 @@
+<map id="ext2_stat" name="ext2_stat">
+<area shape="rect" id="Node000001" title="Get file status information." alt="" coords="167,5,249,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#ab0bb1a8ce17f5f904d45fe5b02f347df" title="fs_ops_t.stat shim — path&#45;based stat." alt="" coords="5,5,119,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,21,119,21,119,15,153,15"/>
+</map>

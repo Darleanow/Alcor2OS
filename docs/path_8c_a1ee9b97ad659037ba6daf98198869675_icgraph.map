@@ -1,0 +1,26 @@
+<map id="follow_symlink_step" name="follow_symlink_step">
+<area shape="rect" id="Node000001" title="Reparent a path through a symlink and recurse." alt="" coords="720,162,876,187"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="521,162,672,187"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="706,186,673,186,673,180,706,181"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="686,163,720,163,720,168,686,168"/>
+<area shape="rect" id="Node000003" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="367,162,473,187"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="508,177,474,177,474,172,508,172"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#a0a9f5f8d942af3cc0b2c41f852c0a880" title="Create a new file on an ext2 volume." alt="" coords="5,38,104,63"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="408,150,395,119,376,85,350,52,317,27,288,15,257,9,225,8,193,11,133,24,86,40,84,35,131,19,192,6,224,3,257,4,290,10,320,23,354,48,380,82,400,117,413,148"/>
+<area shape="rect" id="Node000006" href="$file_8c.html#a44480ce10fd065fd4b2284bdcf226743" title="Open a file or directory on an ext2 volume." alt="" coords="190,38,281,63"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="399,152,364,113,317,77,280,61,282,56,320,72,367,109,403,149"/>
+<area shape="rect" id="Node000007" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="180,87,291,112"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="383,157,318,126,285,115,287,110,320,121,386,152"/>
+<area shape="rect" id="Node000009" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="189,136,282,162"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="353,168,282,158,282,153,353,162"/>
+<area shape="rect" id="Node000011" href="$path_8c.html#aecf245e7de6ece833406905140c35e24" title="Get file status information." alt="" coords="194,186,277,211"/>
+<area shape="poly" id="edge9_Node000003_Node000011" title=" " alt="" coords="353,186,277,196,276,190,353,180"/>
+<area shape="rect" id="Node000013" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="186,235,285,260"/>
+<area shape="poly" id="edge10_Node000003_Node000013" title=" " alt="" coords="383,196,320,225,283,237,281,232,318,220,381,191"/>
+<area shape="rect" id="Node000015" href="$dir_8c.html#a040966dd0c8ee506f6df4f40a6729ad2" title="Validate the path&#45;target / split&#45;name / resolve&#45;parent triple." alt="" coords="152,284,319,310"/>
+<area shape="poly" id="edge11_Node000003_Node000015" title=" " alt="" coords="402,199,367,237,320,274,292,287,290,282,317,269,363,233,399,196"/>
+<area shape="rect" id="Node000018" href="$file_8c.html#a8b16240eab2a88be309772739fa684cd" title="Resolve and validate the parent directory for a creation op." alt="" coords="161,334,310,374"/>
+<area shape="poly" id="edge12_Node000003_Node000018" title=" " alt="" coords="410,201,375,261,350,294,320,323,299,336,297,332,317,319,346,290,371,258,405,198"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="176,53,104,53,104,48,176,48"/>
+<area shape="poly" id="edge13_Node000018_Node000004" title=" " alt="" coords="156,328,150,323,125,291,104,255,76,180,60,111,54,64,60,63,66,111,81,179,109,253,129,288,154,319,160,324"/>
+</map>

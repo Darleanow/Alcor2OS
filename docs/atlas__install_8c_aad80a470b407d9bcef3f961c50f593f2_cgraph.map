@@ -1,0 +1,7 @@
+<map id="validate_atlas_meta" name="validate_atlas_meta">
+<area shape="rect" id="Node000001" title="Validate meta and the user buffers it points at." alt="" coords="5,31,160,56"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a80010209c461f64d700230b38fc907dd" title="Reject a userspace atlas descriptor whose fields would misbehave inside the renderer." alt="" coords="209,5,360,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,31,195,27,196,32,161,36"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="208,55,361,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,50,194,54,194,59,160,55"/>
+</map>

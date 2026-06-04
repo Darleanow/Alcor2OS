@@ -1,0 +1,5 @@
+<map id="vfs_install_fd" name="vfs_install_fd">
+<area shape="rect" id="Node000001" title="Install a new fd pointing to an existing OFT slot." alt="" coords="5,5,115,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="163,5,265,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,15,149,15,149,21,115,21"/>
+</map>

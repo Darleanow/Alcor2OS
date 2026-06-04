@@ -1,0 +1,5 @@
+<map id="path_is_proc_self_exe" name="path_is_proc_self_exe">
+<area shape="rect" id="Node000001" title="Return non&#45;zero if path refers to the /proc/self/exe virtual symlink." alt="" coords="5,5,171,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="219,5,293,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,15,205,15,205,21,171,21"/>
+</map>

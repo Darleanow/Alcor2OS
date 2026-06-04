@@ -1,0 +1,5 @@
+<map id="diag_expected_after" name="diag_expected_after">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,160,31"/>
+<area shape="rect" id="Node000002" href="$lexer_8c.html#adb509730aa3f5613653d198ce99a75da" title="Human&#45;readable name for a token kind (for error messages)." alt="" coords="208,5,295,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,15,194,15,194,21,160,21"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="user_cstr_ok" name="user_cstr_ok">
+<area shape="rect" id="Node000001" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="333,31,437,56"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#acf40044c5e098f736e0e2f32a76717ed" title="Copy a null&#45;terminated user&#45;space string vector into kernel storage." alt="" coords="151,5,285,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="319,36,285,31,286,26,320,31"/>
+<area shape="rect" id="Node000003" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="5,31,103,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="320,46,103,46,103,41,320,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="138,33,103,39,102,33,137,28"/>
+</map>

@@ -1,0 +1,34 @@
+<map id="reg_read" name="reg_read">
+<area shape="rect" id="Node000001" title=" " alt="" coords="671,158,749,184"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="174,108,245,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="697,146,669,93,648,68,621,48,579,28,541,15,506,9,472,9,438,13,401,22,316,48,288,60,263,76,225,109,222,105,260,72,286,56,314,43,400,16,437,8,472,3,507,4,542,10,581,23,624,43,652,64,674,90,702,144"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#abde118a713492fc92ec9f7b6258933db" title="ATA IRQ handler — reading status clears the device&#39;s IRQ line." alt="" coords="530,58,597,84"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="685,150,656,123,621,97,596,85,598,80,624,93,660,119,689,146"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#a2dbd463b4d0069e223eab48b63d80977" title="Check whether a device is present (0xFF = floating bus)." alt="" coords="504,108,623,133"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="659,156,600,136,602,131,660,151"/>
+<area shape="rect" id="Node000008" href="$ata_8c.html#a69cc2f51d9f7c84d9f7ae376cbb59ffb" title="Run IDENTIFY and populate drive descriptor." alt="" coords="350,158,421,184"/>
+<area shape="poly" id="edge11_Node000001_Node000008" title=" " alt="" coords="657,174,421,174,421,168,657,168"/>
+<area shape="rect" id="Node000009" href="$ata_8c.html#ad23c5f0ba707314019c13a32973d6c0d" title="Write sectors using PIO with cache flush." alt="" coords="522,308,605,333"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="699,197,670,248,649,275,624,298,606,310,603,305,621,294,645,271,665,245,695,195"/>
+<area shape="rect" id="Node000012" href="$ata_8c.html#ab080ebc34772e3b0ce3cc2ee637005ac" title="Poll until BSY clears." alt="" coords="525,209,601,234"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="660,191,602,211,600,206,659,186"/>
+<area shape="rect" id="Node000013" href="$ata_8c.html#afece4807d5a19ec91aa03298b05f7351" title="Poll until DRQ asserted (BSY clear)." alt="" coords="526,258,601,284"/>
+<area shape="poly" id="edge18_Node000001_Node000013" title=" " alt="" coords="688,196,659,222,624,248,600,261,597,256,621,243,656,218,685,192"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,158,104,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="162,138,95,161,93,156,160,133"/>
+<area shape="rect" id="Node000005" href="$ata_8c.html#a8fb7c02769509cb3a7399f56dd42681b" title=" " alt="" coords="323,58,448,84"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="516,74,448,74,448,68,516,68"/>
+<area shape="rect" id="Node000006" href="$ata_8c.html#ae320cdeb9f17d5b97075bf4f22b76bcc" title=" " alt="" coords="315,108,456,133"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="518,86,433,110,431,105,516,81"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="327,90,245,113,244,108,326,85"/>
+<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="301,123,245,123,245,118,301,118"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="505,139,422,164,420,159,504,134"/>
+<area shape="poly" id="edge10_Node000008_Node000002" title=" " alt="" coords="336,160,244,133,246,128,337,155"/>
+<area shape="rect" id="Node000010" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="344,257,427,282"/>
+<area shape="poly" id="edge13_Node000009_Node000010" title=" " alt="" coords="508,308,426,284,427,279,510,302"/>
+<area shape="rect" id="Node000011" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="152,182,267,208"/>
+<area shape="poly" id="edge14_Node000010_Node000011" title=" " alt="" coords="341,254,239,210,241,205,343,249"/>
+<area shape="poly" id="edge15_Node000011_Node000003" title=" " alt="" coords="138,187,104,181,105,176,139,181"/>
+<area shape="poly" id="edge17_Node000012_Node000008" title=" " alt="" coords="512,210,420,183,422,178,513,205"/>
+<area shape="poly" id="edge19_Node000013_Node000008" title=" " alt="" coords="517,255,503,248,448,216,403,186,406,182,451,211,505,243,519,250"/>
+</map>

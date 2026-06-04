@@ -1,0 +1,9 @@
+<map id="page_align_up_u64" name="page_align_up_u64">
+<area shape="rect" id="Node000001" title=" " alt="" coords="429,5,576,31"/>
+<area shape="rect" id="Node000002" href="$fb__user_8c.html#a367d4cd28645a1a3122995b6582fd42e" title="Capture framebuffer geometry and physical span from Limine." alt="" coords="247,5,381,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="415,21,382,21,382,15,415,15"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="116,5,199,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="233,21,199,21,199,15,233,15"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,5,68,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="102,21,68,21,68,15,102,15"/>
+</map>

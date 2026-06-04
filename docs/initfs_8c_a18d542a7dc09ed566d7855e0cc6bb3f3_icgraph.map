@@ -1,0 +1,7 @@
+<map id="strip_slash" name="strip_slash">
+<area shape="rect" id="Node000001" title="Strip the leading slash from a VFS&#45;relative path." alt="" coords="136,31,228,56"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#a8f527b0cda5d28c2b882c0bedc0a7e96" title="Open the root directory or a registered file." alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,35,88,28,89,23,123,30"/>
+<area shape="rect" id="Node000003" href="$initfs_8c.html#a7b313c1adfe6feb8320abb829e59cc91" title="Stat a path. The empty/root path resolves to the directory stub." alt="" coords="9,55,84,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,56,85,63,84,58,122,51"/>
+</map>

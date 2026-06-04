@@ -1,0 +1,41 @@
+<map id="kbd_peek_would_emit" name="kbd_peek_would_emit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,280,173,305"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="221,280,352,305"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,290,208,290,208,295,174,295"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a4d967a46a4825890d9fed20d49337bf9" title=" " alt="" coords="449,153,558,179"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="298,278,340,238,368,215,399,196,434,180,436,185,401,200,371,220,343,242,302,282"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a021bcda8746ce32783a0c2cfa9774a50" title=" " alt="" coords="665,304,785,329"/>
+<area shape="poly" id="edge11_Node000002_Node000004" title=" " alt="" coords="308,278,349,257,399,239,457,228,504,222,550,226,607,239,634,250,659,263,701,293,698,297,656,268,632,254,606,245,549,231,504,228,458,233,401,245,351,261,310,282"/>
+<area shape="rect" id="Node000005" href="$api_8c.html#acb3341aad43b4d1cf1c2121189cf2cc2" title="Report DECCKM state to the keyboard layer." alt="" coords="400,104,607,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="291,278,306,249,329,211,360,172,398,138,409,133,411,137,402,143,364,175,334,214,311,252,296,281"/>
+<area shape="rect" id="Node000006" href="$scrollback_8c.html#a81d1fb9846695e15207aab71a96d8ff9" title="Scroll the view lines rows toward the live tail." alt="" coords="400,5,607,31"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="287,279,296,234,315,169,330,134,348,99,371,67,398,40,405,35,408,39,402,44,375,71,353,102,335,136,320,171,301,235,292,280"/>
+<area shape="rect" id="Node000033" href="$scrollback_8c.html#a8a8b369ad40c10e99dc55ebc36ced5b9" title="Scroll the view lines rows back into history." alt="" coords="409,55,597,80"/>
+<area shape="poly" id="edge8_Node000002_Node000033" title=" " alt="" coords="289,279,300,241,322,190,354,135,375,111,398,89,406,84,409,88,402,93,378,114,358,139,327,192,305,243,294,281"/>
+<area shape="rect" id="Node000034" href="$kbd__layout_8c.html#a413dc2531e15506de68f25d6cb1693d5" title=" " alt="" coords="450,255,557,280"/>
+<area shape="poly" id="edge10_Node000002_Node000034" title=" " alt="" coords="352,282,436,272,436,278,353,288"/>
+<area shape="rect" id="Node000035" href="$kbd__layout_8c.html#afb4eeac601bdc564089037a49f624dbd" title=" " alt="" coords="464,403,543,428"/>
+<area shape="poly" id="edge12_Node000002_Node000035" title=" " alt="" coords="301,304,342,345,370,368,401,388,451,405,449,410,399,392,367,373,339,349,297,307"/>
+<area shape="rect" id="Node000036" href="$kbd__layout_8c.html#ae8a7493c17484612ceb39c2bf4bc2830" title=" " alt="" coords="446,304,561,329"/>
+<area shape="poly" id="edge14_Node000002_Node000036" title=" " alt="" coords="353,297,433,306,432,311,352,303"/>
+<area shape="rect" id="Node000037" href="$kbd__layout_8c.html#a59b6591d34ccf01d64cda05b6b4fb91e" title=" " alt="" coords="462,353,545,379"/>
+<area shape="poly" id="edge16_Node000002_Node000037" title=" " alt="" coords="315,303,401,338,449,352,448,357,399,343,313,308"/>
+<area shape="rect" id="Node000038" href="$kbd__layout_8c.html#ab10c1db0dadab7b18be6f2f04c7a19df" title=" " alt="" coords="469,452,537,477"/>
+<area shape="poly" id="edge18_Node000002_Node000038" title=" " alt="" coords="296,304,334,369,365,407,401,438,428,451,456,458,455,463,426,456,399,443,361,411,330,372,292,307"/>
+<area shape="rect" id="Node000041" href="$kbd__layout_8c.html#aaf069fd4dd3d3d6f4ec3e93f870f1c79" title=" " alt="" coords="468,501,539,527"/>
+<area shape="poly" id="edge20_Node000002_Node000041" title=" " alt="" coords="294,305,306,342,327,392,359,444,379,468,402,488,427,501,455,508,454,513,425,506,398,492,375,471,355,447,323,394,301,344,289,307"/>
+<area shape="rect" id="Node000042" href="$kbd__layout_8c.html#a3a2bd71121089eac43b72bcf44d8d139" title=" " alt="" coords="448,551,559,576"/>
+<area shape="poly" id="edge22_Node000002_Node000042" title=" " alt="" coords="292,305,302,350,321,413,335,447,353,480,375,511,402,537,418,547,436,554,434,559,415,552,398,541,371,514,349,483,330,450,316,415,296,351,287,306"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="559,175,608,196,639,218,666,243,709,292,705,295,663,247,635,222,605,200,557,180"/>
+<area shape="rect" id="Node000007" href="$scrollback_8c.html#af989847d8b5c175f9a490656bfa1010a" title="Snap back to the live view (offset = 0) and force a full repaint." alt="" coords="665,5,785,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="607,15,652,15,652,21,607,21"/>
+<area shape="rect" id="Node000008" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid blending scrollback history with live cells." alt="" coords="655,55,796,80"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="562,28,655,49,653,54,561,33"/>
+<area shape="poly" id="edge9_Node000033_Node000008" title=" " alt="" coords="598,65,640,65,640,70,598,70"/>
+<area shape="poly" id="edge13_Node000035_Node000004" title=" " alt="" coords="542,406,606,388,654,362,695,335,698,340,657,367,608,392,544,411"/>
+<area shape="poly" id="edge15_Node000036_Node000004" title=" " alt="" coords="561,314,651,314,651,319,561,319"/>
+<area shape="poly" id="edge17_Node000037_Node000004" title=" " alt="" coords="544,354,653,330,655,335,545,360"/>
+<area shape="rect" id="Node000039" href="$kbd__layout_8c.html#adae7d5761e3e62f8fe27ddfa1d9f0496" title=" " alt="" coords="672,476,779,501"/>
+<area shape="poly" id="edge19_Node000038_Node000039" title=" " alt="" coords="538,466,658,479,658,484,537,471"/>
+<area shape="poly" id="edge21_Node000041_Node000039" title=" " alt="" coords="539,507,658,494,658,499,539,513"/>
+</map>

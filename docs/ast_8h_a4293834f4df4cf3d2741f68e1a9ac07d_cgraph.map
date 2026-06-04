@@ -1,0 +1,6 @@
+<map id="ast_new_fn" name="ast_new_fn">
+<area shape="rect" id="Node000001" title="Allocate an AST_FN node, taking ownership of name, arg_names (heap array of n_args heap strings; may ..." alt="" coords="5,29,101,55"/>
+<area shape="rect" id="Node000002" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="149,29,224,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,39,135,39,135,45,101,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="164,30,159,21,162,11,171,5,187,3,205,6,213,14,209,18,202,11,187,8,173,10,166,14,164,20,168,28"/>
+</map>

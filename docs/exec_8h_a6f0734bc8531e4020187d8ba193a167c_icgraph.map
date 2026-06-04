@@ -1,0 +1,35 @@
+<map id="vega_exec" name="vega_exec">
+<area shape="rect" id="Node000001" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="544,98,635,123"/>
+<area shape="poly" id="edge9_Node000001_Node000001" title=" " alt="" coords="614,87,607,80,589,77,574,79,567,83,565,89,569,97,565,99,560,90,562,80,573,74,589,71,609,75,618,83"/>
+<area shape="rect" id="Node000002" href="$exec_8c.html#af380c909e0c9b94aa47bb10f1e682d9f" title=" " alt="" coords="391,47,496,73"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="538,96,480,75,482,70,540,91"/>
+<area shape="rect" id="Node000005" href="$exec_8c.html#ad8c357e186435f9520d738f6271e9cf9" title=" " alt="" coords="177,98,329,123"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="530,113,330,113,330,108,530,108"/>
+<area shape="rect" id="Node000007" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="402,274,485,299"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="571,136,457,276,453,272,567,133"/>
+<area shape="rect" id="Node000003" href="$exec_8c.html#ab7dead3657ee4c8808e9366db9a0e5f6" title=" " alt="" coords="164,47,343,73"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="377,63,343,63,343,57,377,57"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="382,79,303,101,301,95,381,74"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html#ae80adbc2156956a944b33f5d1be0cc55" title=" " alt="" coords="17,22,104,47"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="150,49,104,43,105,38,150,44"/>
+<area shape="poly" id="edge4_Node000004_Node000001" title=" " alt="" coords="117,20,194,9,290,3,395,9,447,18,497,32,523,45,546,62,580,96,576,100,543,66,520,50,495,37,446,23,394,14,290,8,195,15,118,26"/>
+<area shape="rect" id="Node000006" href="$exec_8c.html#a71ef69197a1c04bbcd7e6216c03506f3" title=" " alt="" coords="5,123,116,149"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="164,125,116,132,116,126,163,120"/>
+<area shape="poly" id="edge7_Node000006_Node000001" title=" " alt="" coords="130,135,230,135,343,132,451,124,543,114,544,119,452,129,343,137,230,140,130,140"/>
+<area shape="rect" id="Node000008" href="$user_2apps_2shell_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="33,325,88,350"/>
+<area shape="poly" id="edge11_Node000007_Node000008" title=" " alt="" coords="388,297,89,337,88,331,388,291"/>
+<area shape="rect" id="Node000009" href="$user_2apps_2vega_2main_8c.html#ae3a067ea1e9a6422d4961a492ef99534" title=" " alt="" coords="218,249,289,274"/>
+<area shape="poly" id="edge12_Node000007_Node000009" title=" " alt="" coords="388,282,289,269,289,263,389,277"/>
+<area shape="rect" id="Node000011" href="$user_2apps_2vega_2main_8c.html#a96d656030559612d7fc9ebe5b3421bf1" title=" " alt="" coords="212,199,295,225"/>
+<area shape="poly" id="edge14_Node000007_Node000011" title=" " alt="" coords="407,270,342,239,294,224,296,219,344,234,409,265"/>
+<area shape="rect" id="Node000012" href="$expand_8c.html#af26464f800cc1e25fdbc77618c17abd9" title=" " alt="" coords="190,399,317,425"/>
+<area shape="poly" id="edge16_Node000007_Node000012" title=" " alt="" coords="427,312,392,352,369,373,344,390,318,402,316,397,341,386,366,369,388,349,423,309"/>
+<area shape="rect" id="Node000020" href="$vconf_8c.html#afeca6cfc6a44d8a8bdef9d340e11dd66" title="Source path as a vega script with stdout redirected to /dev/null." alt="" coords="188,350,319,375"/>
+<area shape="poly" id="edge18_Node000007_Node000020" title=" " alt="" coords="403,308,344,333,292,353,290,348,342,328,401,303"/>
+<area shape="rect" id="Node000010" href="$user_2apps_2vega_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="33,225,88,250"/>
+<area shape="poly" id="edge13_Node000009_Node000010" title=" " alt="" coords="204,258,88,243,89,238,205,253"/>
+<area shape="poly" id="edge15_Node000011_Node000010" title=" " alt="" coords="199,222,89,237,88,231,198,217"/>
+<area shape="rect" id="Node000013" href="$expand_8c.html#a8fad758a4b43ef0f6249301c7aa31727" title=" " alt="" coords="10,399,111,425"/>
+<area shape="poly" id="edge17_Node000012_Node000013" title=" " alt="" coords="176,415,112,415,112,409,176,409"/>
+<area shape="poly" id="edge19_Node000020_Node000008" title=" " alt="" coords="174,355,88,344,89,338,175,350"/>
+</map>

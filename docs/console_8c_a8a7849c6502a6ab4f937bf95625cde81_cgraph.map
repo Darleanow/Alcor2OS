@@ -1,0 +1,5 @@
+<map id="debugcon_putc" name="debugcon_putc">
+<area shape="rect" id="Node000001" title="Mirror a byte to the debug&#45;console port." alt="" coords="5,5,125,31"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="173,5,224,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,15,160,15,160,21,126,21"/>
+</map>

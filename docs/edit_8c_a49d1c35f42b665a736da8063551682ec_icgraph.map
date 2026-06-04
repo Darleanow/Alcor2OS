@@ -1,0 +1,10 @@
+<map id="redraw_line" name="redraw_line">
+<area shape="rect" id="Node000001" title="Repaint the input row in&#45;place: clear, prompt, buffer, cursor." alt="" coords="563,31,661,56"/>
+<area shape="rect" id="Node000002" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="420,5,515,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="549,35,514,29,515,24,550,30"/>
+<area shape="rect" id="Node000003" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="268,31,372,56"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="549,46,372,46,372,41,549,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="407,31,373,37,372,32,406,26"/>
+<area shape="rect" id="Node000004" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="5,31,220,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="254,46,220,46,220,41,254,41"/>
+</map>

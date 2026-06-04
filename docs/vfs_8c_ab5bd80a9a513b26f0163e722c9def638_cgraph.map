@@ -1,0 +1,44 @@
+<map id="vfs_open" name="vfs_open">
+<area shape="rect" id="Node000001" title="Open or create a file and install a file descriptor." alt="" coords="5,132,87,157"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#a7a6905322835d34f51e6b34bd87075da" title="Allocate and zero a free OFT slot; refcount is initialised to 1." alt="" coords="170,5,247,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,130,87,90,133,48,157,34,159,39,136,52,91,94,59,133"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="358,56,461,81"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="63,130,95,109,134,91,188,78,244,70,344,64,345,70,245,75,189,83,136,97,97,114,66,134"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="147,156,270,181"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="87,148,134,155,133,160,86,153"/>
+<area shape="rect" id="Node000009" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="154,107,263,132"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="86,136,140,127,141,133,87,141"/>
+<area shape="rect" id="Node000010" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="135,232,283,257"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="70,155,177,223,174,227,67,160"/>
+<area shape="rect" id="Node000015" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="148,408,269,433"/>
+<area shape="poly" id="edge20_Node000001_Node000015" title=" " alt="" coords="57,156,195,394,191,397,53,159"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="380,5,439,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="248,15,366,15,366,21,248,21"/>
+<area shape="rect" id="Node000006" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="548,181,615,207"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="270,170,534,188,534,194,270,175"/>
+<area shape="rect" id="Node000007" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="331,105,488,131"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="259,153,345,131,346,137,261,158"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="443,128,489,148,543,173,541,178,487,152,441,133"/>
+<area shape="rect" id="Node000008" href="$kstdlib_8c.html#ab77d8981772dbf05f403fca1354eb314" title="Compare two strings up to n characters." alt="" coords="540,105,623,131"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="488,115,526,115,526,121,488,121"/>
+<area shape="poly" id="edge10_Node000009_Node000004" title=" " alt="" coords="259,104,345,82,346,87,261,109"/>
+<area shape="poly" id="edge16_Node000010_Node000004" title=" " alt="" coords="232,230,257,213,281,191,296,165,302,140,310,115,329,91,344,81,347,85,332,95,314,118,307,141,301,167,285,194,261,217,235,234"/>
+<area shape="poly" id="edge14_Node000010_Node000006" title=" " alt="" coords="283,232,534,198,535,203,283,237"/>
+<area shape="rect" id="Node000011" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="374,257,445,283"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="284,251,361,261,360,267,283,257"/>
+<area shape="rect" id="Node000012" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="542,308,621,333"/>
+<area shape="poly" id="edge15_Node000010_Node000012" title=" " alt="" coords="236,255,280,274,331,291,436,310,528,317,528,322,435,315,330,297,278,279,234,260"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="352,359,467,384"/>
+<area shape="poly" id="edge17_Node000010_Node000013" title=" " alt="" coords="225,255,271,294,332,337,360,351,358,356,329,342,268,299,222,259"/>
+<area shape="poly" id="edge13_Node000011_Node000006" title=" " alt="" coords="441,255,487,236,541,210,543,215,489,240,443,260"/>
+<area shape="poly" id="edge19_Node000013_Node000012" title=" " alt="" coords="453,356,528,333,530,338,454,361"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="538,359,625,384"/>
+<area shape="poly" id="edge18_Node000013_Node000014" title=" " alt="" coords="467,369,524,369,524,374,467,374"/>
+<area shape="rect" id="Node000016" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="347,408,472,433"/>
+<area shape="poly" id="edge21_Node000015_Node000016" title=" " alt="" coords="269,418,333,418,333,423,269,423"/>
+<area shape="rect" id="Node000018" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="345,457,473,483"/>
+<area shape="poly" id="edge23_Node000015_Node000018" title=" " alt="" coords="262,431,344,451,343,457,260,436"/>
+<area shape="rect" id="Node000017" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="536,432,627,457"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="473,427,522,434,522,439,472,432"/>
+<area shape="poly" id="edge24_Node000018_Node000017" title=" " alt="" coords="473,458,522,451,523,456,474,463"/>
+</map>

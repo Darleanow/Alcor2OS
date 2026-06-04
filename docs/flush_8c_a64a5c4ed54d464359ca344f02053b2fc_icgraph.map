@@ -1,0 +1,25 @@
+<map id="flush_ci_ensure" name="flush_ci_ensure">
+<area shape="rect" id="Node000001" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="655,68,777,93"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a102acf1b69477c1b5bf081501a4970c0" title="Bring the framebuffer console online and allocate its cell grid." alt="" coords="467,12,587,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="659,67,571,40,572,35,660,62"/>
+<area shape="rect" id="Node000005" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="479,68,575,93"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="641,83,576,83,576,78,641,78"/>
+<area shape="rect" id="Node000019" href="$atlas__install_8c.html#a71d659ad29efcff918c1d53668fe4bfc" title="Reflow the cell grid when the new atlas&#39;s cell size differs from the live one." alt="" coords="448,129,607,155"/>
+<area shape="poly" id="edge9_Node000001_Node000019" title=" " alt="" coords="664,100,568,132,566,127,662,95"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="277,5,360,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="453,25,360,22,360,17,453,20"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="66,5,129,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="263,21,129,21,129,15,263,15"/>
+<area shape="rect" id="Node000006" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="276,55,361,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="466,79,361,73,362,67,466,74"/>
+<area shape="rect" id="Node000011" href="$api_8c.html#a7654752ac7d61f4811d1c6b0cd53f56c" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="237,104,400,129"/>
+<area shape="poly" id="edge7_Node000005_Node000011" title=" " alt="" coords="466,94,393,107,392,101,465,89"/>
+<area shape="rect" id="Node000007" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="36,55,159,80"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="262,70,159,70,159,65,262,65"/>
+<area shape="rect" id="Node000012" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="31,104,163,129"/>
+<area shape="poly" id="edge8_Node000011_Node000012" title=" " alt="" coords="223,119,163,119,163,114,223,114"/>
+<area shape="rect" id="Node000020" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="239,153,398,179"/>
+<area shape="poly" id="edge10_Node000019_Node000020" title=" " alt="" coords="434,155,399,160,398,154,434,150"/>
+<area shape="rect" id="Node000021" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="5,153,189,179"/>
+<area shape="poly" id="edge11_Node000020_Node000021" title=" " alt="" coords="226,169,189,169,189,163,226,163"/>
+</map>

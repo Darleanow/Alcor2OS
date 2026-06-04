@@ -1,0 +1,17 @@
+<map id="vmm_clear_user_mappings" name="vmm_clear_user_mappings">
+<area shape="rect" id="Node000001" title="Free every user&#45;space mapping in an address space (pages, PT, PD, PDPT) and zero the user&#45;space PML4 ..." alt="" coords="5,35,207,60"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a3509e1de421fbf18b46fad5dc211d7d1" title="Set the current CR3 (PML4) value and flush the TLB." alt="" coords="278,5,390,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,32,264,24,265,30,205,37"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="255,55,413,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,57,241,61,241,67,206,62"/>
+<area shape="rect" id="Node000004" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="461,37,564,63"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="413,61,448,56,448,62,414,67"/>
+<area shape="rect" id="Node000006" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="468,87,557,112"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="414,83,454,89,454,94,413,89"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="612,37,740,63"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="564,47,598,47,598,53,564,53"/>
+<area shape="rect" id="Node000007" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="623,87,729,112"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="557,97,609,97,609,102,557,102"/>
+<area shape="rect" id="Node000008" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="626,136,726,161"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="556,109,621,129,619,134,555,115"/>
+</map>

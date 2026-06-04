@@ -1,0 +1,17 @@
+<map id="ram_unlink" name="ram_unlink">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,100,105"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="175,55,231,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,82,161,72,162,77,100,87"/>
+<area shape="rect" id="Node000016" href="$ramfs_8c.html#a4e3acc197dd9bee00d37e6e305106e11" title="Walk path from the ramfs root and return the matching node." alt="" coords="148,104,259,129"/>
+<area shape="poly" id="edge5_Node000001_Node000016" title=" " alt="" coords="100,97,135,103,134,108,100,103"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="322,5,401,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="231,56,308,32,309,37,232,61"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="307,55,416,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="231,65,293,65,293,70,231,70"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="464,55,592,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="416,65,450,65,450,70,416,70"/>
+<area shape="rect" id="Node000017" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="330,104,393,129"/>
+<area shape="poly" id="edge6_Node000016_Node000017" title=" " alt="" coords="259,114,316,114,316,119,259,119"/>
+<area shape="rect" id="Node000018" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="491,104,565,129"/>
+<area shape="poly" id="edge7_Node000017_Node000018" title=" " alt="" coords="393,114,477,114,477,119,393,119"/>
+</map>

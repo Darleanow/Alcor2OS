@@ -1,0 +1,5 @@
+<map id="ext2_unlink" name="ext2_unlink">
+<area shape="rect" id="Node000001" title="Delete a file from the filesystem." alt="" coords="181,5,280,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#a80c49e4d95295031cd2604075a37d7ce" title="fs_ops_t.unlink shim." alt="" coords="5,5,133,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,21,134,21,134,15,168,15"/>
+</map>

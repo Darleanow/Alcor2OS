@@ -1,0 +1,41 @@
+<map id="tss_set_rsp0" name="tss_set_rsp0">
+<area shape="rect" id="Node000001" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="536,179,639,204"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="369,80,488,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="553,173,449,108,452,103,556,169"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="379,203,478,228"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="523,204,479,211,478,205,522,198"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#ae1d9b721e1a1c60b10f0baef1ce6e199" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="217,43,311,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,79,310,68,311,63,359,74"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="51,5,113,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="203,46,113,27,114,22,204,40"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="207,351,321,376"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="405,240,281,352,278,348,401,236"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#a68e6896893fbe98c8eccac60438be274" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="18,55,146,80"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="257,337,249,286,231,220,202,152,181,121,157,93,141,82,144,78,160,89,186,118,206,150,236,218,254,285,263,336"/>
+<area shape="rect" id="Node000014" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="25,104,139,129"/>
+<area shape="poly" id="edge7_Node000006_Node000014" title=" " alt="" coords="255,338,244,296,225,243,196,189,178,164,157,143,137,131,140,126,160,139,182,161,201,186,230,241,249,294,260,337"/>
+<area shape="rect" id="Node000018" href="$mouse_8c.html#a6362117f962512857d60ae1344e0f756" title="Block until one event is available, then dequeue it." alt="" coords="10,153,154,179"/>
+<area shape="poly" id="edge8_Node000006_Node000018" title=" " alt="" coords="251,339,238,305,217,266,191,226,157,192,138,181,141,177,160,188,195,223,222,263,243,303,256,336"/>
+<area shape="rect" id="Node000019" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="25,203,139,228"/>
+<area shape="poly" id="edge9_Node000006_Node000019" title=" " alt="" coords="246,340,209,290,185,264,157,242,135,230,138,226,160,237,189,260,214,287,250,337"/>
+<area shape="rect" id="Node000032" href="$pipe_8c.html#a5c16a89b7c4822d4587cee68c0f93c49" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="23,252,141,277"/>
+<area shape="poly" id="edge10_Node000006_Node000032" title=" " alt="" coords="236,344,200,317,157,291,130,280,132,275,160,286,203,312,239,340"/>
+<area shape="rect" id="Node000037" href="$proc_8c.html#ae82260def3c053c895a522d59223af06" title="If a timer tick requested preemption, run the process scheduler." alt="" coords="5,301,159,327"/>
+<area shape="poly" id="edge11_Node000006_Node000037" title=" " alt="" coords="203,350,129,329,131,324,204,345"/>
+<area shape="rect" id="Node000039" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="41,351,123,376"/>
+<area shape="poly" id="edge12_Node000006_Node000039" title=" " alt="" coords="193,366,123,366,123,361,193,361"/>
+<area shape="rect" id="Node000045" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="23,400,141,425"/>
+<area shape="poly" id="edge13_Node000006_Node000045" title=" " alt="" coords="204,382,131,402,129,397,203,377"/>
+<area shape="rect" id="Node000050" href="$proc_8c.html#a6a505a763018bb704b23f24074faf131" title="Wait for a specific child process to exit." alt="" coords="39,449,125,475"/>
+<area shape="poly" id="edge14_Node000006_Node000050" title=" " alt="" coords="239,387,202,413,160,439,126,453,124,448,157,434,199,409,235,383"/>
+<area shape="rect" id="Node000051" href="$proc_8c.html#a6915d539f11de3b93e8316c67f23301b" title="Wait for child process(es) to change state." alt="" coords="29,499,135,524"/>
+<area shape="poly" id="edge15_Node000006_Node000051" title=" " alt="" coords="250,389,213,439,188,465,160,488,135,501,133,496,157,484,185,461,209,435,246,386"/>
+<area shape="rect" id="Node000053" href="$sys__io_8c.html#acb10234426dd92c5d297320fd5f3aebb" title="Yield the CPU for one ~10 ms timer tick, then yield to any other READY user proc." alt="" coords="31,548,133,573"/>
+<area shape="poly" id="edge16_Node000006_Node000053" title=" " alt="" coords="256,390,242,423,222,463,194,503,160,537,135,552,132,547,157,533,190,499,217,460,237,421,251,388"/>
+<area shape="rect" id="Node000056" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="39,597,125,623"/>
+<area shape="poly" id="edge17_Node000006_Node000056" title=" " alt="" coords="260,390,249,433,229,485,200,539,182,565,160,587,144,598,126,605,124,600,141,593,157,583,178,561,196,537,224,483,243,431,255,389"/>
+<area shape="rect" id="Node000057" href="$sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536" title=" " alt="" coords="18,647,146,672"/>
+<area shape="poly" id="edge18_Node000006_Node000057" title=" " alt="" coords="263,390,254,441,236,507,206,576,185,608,160,636,141,649,138,644,157,632,181,604,201,573,231,505,249,440,257,389"/>
+<area shape="rect" id="Node000058" href="$ata_8c.html#a8b4d3c021710bacc1b78076d406b7f48" title="Wait for ATA command completion." alt="" coords="45,696,119,721"/>
+<area shape="poly" id="edge19_Node000006_Node000058" title=" " alt="" coords="264,390,258,450,242,529,229,571,212,612,189,651,160,685,142,698,121,706,119,701,139,694,157,681,184,648,207,610,224,569,237,527,253,449,259,390"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="src/drivers/console/font.h" name="src/drivers/console/font.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="77,5,221,45"/>
+<area shape="rect" id="Node000002" href="$font__bitmap_8h.html" title="8x16 monospace bitmap atlases used by the kernel boot logger." alt="" coords="93,93,206,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,46,152,79,147,79,147,46"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,167,207,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,119,152,153,147,153,147,119"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,240,88,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,194,76,234,73,230,131,190"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,240,187,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,192,152,226,147,226,147,192"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,240,282,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,190,221,229,218,234,163,194"/>
+</map>

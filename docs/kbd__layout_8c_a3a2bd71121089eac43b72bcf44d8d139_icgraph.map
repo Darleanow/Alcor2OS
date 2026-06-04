@@ -1,0 +1,13 @@
+<map id="us_caps_scan" name="us_caps_scan">
+<area shape="rect" id="Node000001" title=" " alt="" coords="612,31,723,56"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="433,31,564,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="598,46,564,46,564,41,598,41"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="217,5,385,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="419,36,385,31,386,26,420,31"/>
+<area shape="rect" id="Node000007" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="245,55,358,80"/>
+<area shape="poly" id="edge4_Node000002_Node000007" title=" " alt="" coords="420,56,359,63,358,58,419,50"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#ab7822a94d62041bce4704de8f5b0bed1" title="Whether a read(2) on fd 0 could return a byte right now." alt="" coords="19,5,155,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="204,21,156,21,156,15,204,15"/>
+<area shape="rect" id="Node000008" href="$kbd__layout_8c.html#a7563fa1166b876f198b727e912747c09" title="read(2) on stdin honoring the process&#39;s termios (ICANON, VMIN/VTIME)." alt="" coords="5,55,169,80"/>
+<area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="231,70,170,70,170,65,231,65"/>
+</map>

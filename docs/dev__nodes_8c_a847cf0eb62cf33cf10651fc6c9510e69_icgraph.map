@@ -1,0 +1,5 @@
+<map id="copy_from_user" name="copy_from_user">
+<area shape="rect" id="Node000001" title="Helper to safely copy n bytes from user&#45;space to a kernel buffer." alt="" coords="128,5,255,31"/>
+<area shape="rect" id="Node000002" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="5,5,80,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,21,80,21,80,15,114,15"/>
+</map>

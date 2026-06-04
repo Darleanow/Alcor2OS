@@ -1,0 +1,5 @@
+<map id="scrollback_shift_grid_up" name="scrollback_shift_grid_up">
+<area shape="rect" id="Node000001" title="Shift every grid row up by one and blank the freshly exposed bottom." alt="" coords="5,5,184,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="232,5,319,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,15,218,15,218,21,184,21"/>
+</map>

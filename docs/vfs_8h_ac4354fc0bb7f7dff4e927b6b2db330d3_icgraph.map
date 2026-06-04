@@ -1,0 +1,7 @@
+<map id="vfs_mount" name="vfs_mount">
+<area shape="rect" id="Node000001" title="Mount source at target using the named filesystem driver." alt="" coords="180,31,271,56"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="5,5,132,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,37,132,31,133,26,167,31"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="19,55,118,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="167,55,119,62,118,57,166,50"/>
+</map>

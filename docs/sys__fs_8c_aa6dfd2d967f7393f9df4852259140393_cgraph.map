@@ -1,0 +1,47 @@
+<map id="sys_rename" name="sys_rename">
+<area shape="rect" id="Node000001" title="Rename oldpath to newpath, copying across mount points if necessary." alt="" coords="5,155,107,180"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a2b62b386a750a6392a02d67953da3095" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="155,92,259,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,152,161,120,163,125,88,157"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#a9381581b42a850046ecb0593a98bd3af" title="Rename (move) a file, copying across mount points if necessary." alt="" coords="157,179,256,204"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="107,173,144,179,143,184,107,178"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="307,31,441,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="240,89,306,65,324,58,325,63,308,70,242,94"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="346,80,402,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="228,176,338,110,341,115,231,181"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="337,153,411,179"/>
+<area shape="poly" id="edge7_Node000004_Node000019" title=" " alt="" coords="256,181,323,171,323,176,256,187"/>
+<area shape="rect" id="Node000034" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="502,252,625,277"/>
+<area shape="poly" id="edge11_Node000004_Node000034" title=" " alt="" coords="257,199,489,247,488,252,256,204"/>
+<area shape="rect" id="Node000038" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="489,341,637,367"/>
+<area shape="poly" id="edge15_Node000004_Node000038" title=" " alt="" coords="219,203,255,246,280,269,308,289,349,308,392,323,476,342,475,347,391,329,347,313,305,294,276,273,251,249,215,206"/>
+<area shape="rect" id="Node000043" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="337,255,411,280"/>
+<area shape="poly" id="edge23_Node000004_Node000043" title=" " alt="" coords="237,202,334,247,332,251,234,206"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="524,5,603,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="402,81,440,65,488,40,510,31,512,36,490,44,442,70,404,86"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="509,55,618,80"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="402,86,495,74,495,79,402,92"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="503,104,624,129"/>
+<area shape="poly" id="edge8_Node000019_Node000020" title=" " alt="" coords="411,154,500,130,502,135,412,159"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="509,153,618,179"/>
+<area shape="poly" id="edge9_Node000019_Node000021" title=" " alt="" coords="412,163,495,163,495,169,412,169"/>
+<area shape="rect" id="Node000033" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="517,203,609,228"/>
+<area shape="poly" id="edge10_Node000019_Node000033" title=" " alt="" coords="412,173,505,197,503,203,411,178"/>
+<area shape="rect" id="Node000035" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="897,265,963,291"/>
+<area shape="poly" id="edge12_Node000034_Node000035" title=" " alt="" coords="601,249,685,225,765,214,800,215,843,225,875,238,903,255,900,259,873,242,842,230,799,221,765,219,686,230,603,254"/>
+<area shape="rect" id="Node000036" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="685,240,843,265"/>
+<area shape="poly" id="edge13_Node000034_Node000036" title=" " alt="" coords="625,258,671,256,672,261,625,264"/>
+<area shape="poly" id="edge14_Node000036_Node000035" title=" " alt="" coords="843,262,883,268,883,274,842,267"/>
+<area shape="poly" id="edge18_Node000038_Node000035" title=" " alt="" coords="625,339,882,285,883,290,626,344"/>
+<area shape="rect" id="Node000039" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="729,341,799,367"/>
+<area shape="poly" id="edge16_Node000038_Node000039" title=" " alt="" coords="638,351,715,351,715,357,638,357"/>
+<area shape="rect" id="Node000040" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="891,441,969,467"/>
+<area shape="poly" id="edge19_Node000038_Node000040" title=" " alt="" coords="612,364,878,437,877,442,610,369"/>
+<area shape="rect" id="Node000041" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="713,443,815,468"/>
+<area shape="poly" id="edge20_Node000038_Node000041" title=" " alt="" coords="586,365,687,421,718,435,716,440,684,426,584,369"/>
+<area shape="rect" id="Node000042" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="707,492,821,517"/>
+<area shape="poly" id="edge21_Node000038_Node000042" title=" " alt="" coords="575,365,619,420,651,451,687,478,698,484,695,489,684,483,647,455,615,423,571,368"/>
+<area shape="poly" id="edge17_Node000039_Node000035" title=" " alt="" coords="797,339,842,320,892,295,894,300,844,324,799,344"/>
+<area shape="poly" id="edge22_Node000042_Node000040" title=" " alt="" coords="806,489,877,467,878,472,807,494"/>
+<area shape="poly" id="edge24_Node000043_Node000034" title=" " alt="" coords="412,264,488,263,488,268,412,269"/>
+<area shape="poly" id="edge25_Node000043_Node000038" title=" " alt="" coords="404,278,523,333,521,338,402,283"/>
+</map>

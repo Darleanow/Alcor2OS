@@ -1,0 +1,29 @@
+<map id="load_group_descriptors" name="load_group_descriptors">
+<area shape="rect" id="Node000001" title="Allocate vol&#45;&gt;groups and fill it from disk." alt="" coords="5,179,179,204"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="259,55,315,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,176,252,85,255,90,115,181"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="249,153,324,179"/>
+<area shape="poly" id="edge5_Node000001_Node000016" title=" " alt="" coords="179,177,235,170,236,175,180,183"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="243,203,330,228"/>
+<area shape="poly" id="edge11_Node000001_Node000015" title=" " alt="" coords="180,199,230,206,229,211,179,205"/>
+<area shape="rect" id="Node000031" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one ext2 block worth of bytes into buf." alt="" coords="227,252,347,277"/>
+<area shape="poly" id="edge12_Node000001_Node000031" title=" " alt="" coords="128,202,240,244,238,249,126,207"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="421,5,500,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="314,57,407,30,409,35,316,62"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="406,55,515,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="315,65,392,65,392,70,315,70"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="581,55,709,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="515,65,566,65,566,70,515,70"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="400,104,521,129"/>
+<area shape="poly" id="edge6_Node000016_Node000017" title=" " alt="" coords="324,153,401,131,403,136,325,158"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="406,153,515,179"/>
+<area shape="poly" id="edge7_Node000016_Node000018" title=" " alt="" coords="324,163,392,163,392,169,324,169"/>
+<area shape="rect" id="Node000030" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="415,203,507,228"/>
+<area shape="poly" id="edge10_Node000016_Node000030" title=" " alt="" coords="325,174,403,196,401,201,324,179"/>
+<area shape="rect" id="Node000019" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="575,128,715,153"/>
+<area shape="poly" id="edge8_Node000018_Node000019" title=" " alt="" coords="515,156,560,150,561,155,516,161"/>
+<area shape="rect" id="Node000022" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="599,177,691,203"/>
+<area shape="poly" id="edge9_Node000018_Node000022" title=" " alt="" coords="516,170,585,180,584,185,515,176"/>
+<area shape="rect" id="Node000032" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="395,252,527,277"/>
+<area shape="poly" id="edge13_Node000031_Node000032" title=" " alt="" coords="347,262,381,262,381,267,347,267"/>
+</map>

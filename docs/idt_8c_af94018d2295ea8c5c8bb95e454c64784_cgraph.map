@@ -1,0 +1,24 @@
+<map id="irq_handler" name="irq_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,181,100,207"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="148,131,263,156"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,179,153,158,154,163,93,184"/>
+<area shape="rect" id="Node000018" href="$pic_8c.html#a696b3d439ddfe29006b7ac96a100794d" title="Send End&#45;Of&#45;Interrupt signal to the PIC." alt="" coords="171,205,239,231"/>
+<area shape="poly" id="edge12_Node000001_Node000018" title=" " alt="" coords="101,199,158,208,157,213,100,204"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="441,55,551,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="227,128,265,109,310,91,369,78,427,70,428,75,370,83,311,97,267,114,230,133"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="599,105,727,131"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="263,142,393,141,585,124,585,130,393,146,263,147"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="311,105,393,131"/>
+<area shape="poly" id="edge5_Node000002_Node000015" title=" " alt="" coords="262,131,297,125,298,130,263,136"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="458,207,534,232"/>
+<area shape="poly" id="edge8_Node000002_Node000016" title=" " alt="" coords="233,154,270,170,311,185,381,201,445,211,444,216,380,206,310,190,268,175,231,158"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="454,5,538,31"/>
+<area shape="poly" id="edge10_Node000002_Node000017" title=" " alt="" coords="219,128,258,96,309,64,376,39,440,24,441,29,378,44,312,68,261,100,222,132"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="540,78,607,99,606,104,538,83"/>
+<area shape="poly" id="edge6_Node000015_Node000003" title=" " alt="" coords="388,103,446,82,447,87,390,108"/>
+<area shape="poly" id="edge7_Node000015_Node000004" title=" " alt="" coords="394,115,585,115,585,121,394,121"/>
+<area shape="poly" id="edge9_Node000016_Node000004" title=" " alt="" coords="517,204,549,185,628,136,631,140,552,190,520,209"/>
+<area shape="poly" id="edge11_Node000017_Node000004" title=" " alt="" coords="528,29,552,41,635,95,632,99,549,46,525,33"/>
+<area shape="rect" id="Node000006" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="327,257,377,283"/>
+<area shape="poly" id="edge13_Node000018_Node000006" title=" " alt="" coords="240,227,315,254,313,259,238,232"/>
+</map>

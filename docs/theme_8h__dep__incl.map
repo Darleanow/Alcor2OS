@@ -1,0 +1,21 @@
+<map id="user/include/theme.h" name="user/include/theme.h">
+<area shape="rect" id="Node000001" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="514,5,673,31"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2shell_2main_8c.html" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="5,86,173,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="501,34,187,81,147,89,146,83,186,76,500,29"/>
+<area shape="rect" id="Node000003" href="$edit_8c.html" title="Single&#45;line interactive editor: cursor motion, history navigation, tab completion display,..." alt="" coords="198,79,378,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="536,37,362,81,361,76,535,31"/>
+<area shape="rect" id="Node000004" href="$apps_2shell_2platform_2parse_8c.html" title="Multi&#45;line statement accumulator: brace/quote/heredoc&#45;aware test for whether the buffer is a complete..." alt="" coords="402,79,582,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="569,41,518,81,515,76,566,37"/>
+<area shape="rect" id="Node000005" href="$prompt_8c.html" title="Shell prompt rendering: decorative header (cwd) and one&#45;line input prompt with rounded box&#45;drawing ac..." alt="" coords="606,79,786,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="621,37,673,76,670,81,618,41"/>
+<area shape="rect" id="Node000006" href="$ls_8c.html" title="List directory contents with columnar layout and Catppuccin colors." alt="" coords="810,86,910,111"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="647,32,799,76,824,83,822,89,798,81,646,37"/>
+<area shape="rect" id="Node000007" href="$palette_8h.html" title="Spazer palette — re&#45;exports theme.h and boxdraw.h." alt="" coords="934,79,1082,119"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="675,30,923,76,934,78,933,83,922,81,674,36"/>
+<area shape="rect" id="Node000008" href="$spazer_8h.html" title=" " alt="" coords="934,167,1082,207"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="1011,133,1011,166,1005,166,1005,133"/>
+<area shape="rect" id="Node000009" href="$user_2apps_2ncurses-hello_2main_8c.html" title=" " alt="" coords="820,255,996,295"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="977,218,932,256,928,252,974,214"/>
+<area shape="rect" id="Node000010" href="$spazer_8c.html" title=" " alt="" coords="1021,262,1195,287"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="1042,214,1096,260,1092,264,1039,218"/>
+</map>

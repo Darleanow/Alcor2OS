@@ -1,0 +1,37 @@
+<map id="cpu_get_fs_base" name="cpu_get_fs_base">
+<area shape="rect" id="Node000001" title="Get the current FS base MSR value." alt="" coords="532,352,663,377"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="377,327,476,352"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="518,356,476,349,477,344,518,350"/>
+<area shape="rect" id="Node000062" href="$sys__proc_8c.html#affab6f1b0ea45def80ad50ccbeb86401" title=" " alt="" coords="369,376,484,401"/>
+<area shape="poly" id="edge17_Node000001_Node000062" title=" " alt="" coords="519,378,485,383,484,378,518,373"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="207,327,321,352"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="364,342,322,342,322,337,364,337"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a68e6896893fbe98c8eccac60438be274" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="18,5,146,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="258,313,251,258,235,185,222,147,205,110,183,75,157,44,141,33,144,28,160,40,187,72,209,107,227,145,240,184,257,257,264,313"/>
+<area shape="rect" id="Node000011" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="25,55,139,80"/>
+<area shape="poly" id="edge4_Node000003_Node000011" title=" " alt="" coords="256,313,246,266,228,207,199,146,180,118,157,93,138,81,140,77,160,89,184,115,204,143,233,205,252,265,262,312"/>
+<area shape="rect" id="Node000015" href="$mouse_8c.html#a6362117f962512857d60ae1344e0f756" title="Block until one event is available, then dequeue it." alt="" coords="10,104,154,129"/>
+<area shape="poly" id="edge5_Node000003_Node000015" title=" " alt="" coords="254,314,241,276,221,230,193,183,157,143,139,132,142,127,160,139,198,180,226,227,246,274,259,313"/>
+<area shape="rect" id="Node000016" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="25,153,139,179"/>
+<area shape="poly" id="edge6_Node000003_Node000016" title=" " alt="" coords="249,316,214,254,188,220,157,192,137,181,139,176,160,188,192,217,218,251,254,313"/>
+<area shape="rect" id="Node000032" href="$pipe_8c.html#a5c16a89b7c4822d4587cee68c0f93c49" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="23,203,141,228"/>
+<area shape="poly" id="edge7_Node000003_Node000032" title=" " alt="" coords="242,317,205,279,157,242,133,231,136,226,160,237,209,275,246,314"/>
+<area shape="rect" id="Node000037" href="$proc_8c.html#ae82260def3c053c895a522d59223af06" title="If a timer tick requested preemption, run the process scheduler." alt="" coords="5,252,159,277"/>
+<area shape="poly" id="edge8_Node000003_Node000037" title=" " alt="" coords="226,323,158,291,126,280,128,275,160,286,228,318"/>
+<area shape="rect" id="Node000039" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="41,301,123,327"/>
+<area shape="poly" id="edge9_Node000003_Node000039" title=" " alt="" coords="192,332,123,322,124,317,193,327"/>
+<area shape="rect" id="Node000045" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="23,351,141,376"/>
+<area shape="poly" id="edge10_Node000003_Node000045" title=" " alt="" coords="193,351,142,358,142,353,193,346"/>
+<area shape="rect" id="Node000050" href="$proc_8c.html#a6a505a763018bb704b23f24074faf131" title="Wait for a specific child process to exit." alt="" coords="39,400,125,425"/>
+<area shape="poly" id="edge11_Node000003_Node000050" title=" " alt="" coords="226,360,160,390,125,402,123,397,158,385,224,356"/>
+<area shape="rect" id="Node000051" href="$proc_8c.html#a6915d539f11de3b93e8316c67f23301b" title="Wait for child process(es) to change state." alt="" coords="29,449,135,475"/>
+<area shape="poly" id="edge12_Node000003_Node000051" title=" " alt="" coords="245,365,208,403,160,439,132,452,130,447,157,434,204,399,241,361"/>
+<area shape="rect" id="Node000053" href="$sys__io_8c.html#acb10234426dd92c5d297320fd5f3aebb" title="Yield the CPU for one ~10 ms timer tick, then yield to any other READY user proc." alt="" coords="31,499,133,524"/>
+<area shape="poly" id="edge13_Node000003_Node000053" title=" " alt="" coords="253,366,217,427,191,460,160,488,135,502,132,497,157,484,187,456,213,424,249,363"/>
+<area shape="rect" id="Node000056" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="39,548,125,573"/>
+<area shape="poly" id="edge14_Node000003_Node000056" title=" " alt="" coords="258,366,245,404,225,450,197,497,160,537,144,548,126,555,124,550,141,543,157,533,193,494,221,448,240,402,253,365"/>
+<area shape="rect" id="Node000057" href="$sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536" title=" " alt="" coords="18,597,146,623"/>
+<area shape="poly" id="edge15_Node000003_Node000057" title=" " alt="" coords="261,366,251,413,232,472,203,533,184,562,160,587,141,599,138,595,157,583,179,558,198,530,228,470,246,412,256,365"/>
+<area shape="rect" id="Node000058" href="$ata_8c.html#a8b4d3c021710bacc1b78076d406b7f48" title="Wait for ATA command completion." alt="" coords="45,647,119,672"/>
+<area shape="poly" id="edge16_Node000003_Node000058" title=" " alt="" coords="264,366,256,421,239,494,226,532,209,569,187,605,160,636,142,649,120,657,119,652,139,644,157,632,183,602,204,567,221,530,234,492,251,420,258,365"/>
+</map>

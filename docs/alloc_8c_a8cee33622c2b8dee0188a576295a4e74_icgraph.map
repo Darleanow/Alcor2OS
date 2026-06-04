@@ -1,0 +1,26 @@
+<map id="free_block" name="free_block">
+<area shape="rect" id="Node000001" title="Mark block as free in its owning group&#39;s bitmap." alt="" coords="609,153,700,179"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#ac1186d8d194bfb877678c89302286c51" title="Recursively free an indirect&#45;block subtree." alt="" coords="385,77,545,103"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="616,150,560,124,507,105,509,100,562,120,618,145"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#a14a27d30b184dac4588f28bfa35d7fe5" title="Free every block referenced by inode and reset its counters." alt="" coords="180,104,320,129"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="595,162,320,128,320,122,596,156"/>
+<area shape="rect" id="Node000012" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="368,179,561,204"/>
+<area shape="poly" id="edge9_Node000001_Node000012" title=" " alt="" coords="596,176,560,181,560,176,595,171"/>
+<area shape="rect" id="Node000015" href="$dir_8c.html#ae8b1d460d057e6b7e793044f392a1274" title="Allocate the first data block, seed it with ./.., persist it, and wire it into inode." alt="" coords="379,228,551,253"/>
+<area shape="poly" id="edge12_Node000001_Node000015" title=" " alt="" coords="623,188,562,219,527,231,525,225,560,214,621,184"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="498,67,489,59,465,56,445,58,434,63,432,68,438,76,433,79,427,69,430,59,443,53,465,51,491,54,502,63"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="371,104,321,111,320,105,371,99"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#ab3496119d1da698296609134293d2a0a" title="Close an ext2 file handle." alt="" coords="23,5,115,31"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="219,98,178,71,131,44,106,33,108,28,133,40,181,67,222,94"/>
+<area shape="rect" id="Node000006" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="22,55,115,80"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="189,103,115,83,117,77,190,98"/>
+<area shape="rect" id="Node000008" href="$file_8c.html#ab7a3809fc66df5e495777427652c80b3" title="Truncate an ext2 file to length bytes." alt="" coords="13,104,125,129"/>
+<area shape="poly" id="edge6_Node000003_Node000008" title=" " alt="" coords="166,119,125,119,125,114,166,114"/>
+<area shape="rect" id="Node000010" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="19,153,118,179"/>
+<area shape="poly" id="edge7_Node000003_Node000010" title=" " alt="" coords="190,136,117,156,116,151,188,131"/>
+<area shape="rect" id="Node000013" href="$dir_8c.html#a28d0deef2247c3e0c95faa3a132818cb" title="Create a directory on an ext2 volume." alt="" coords="202,203,298,228"/>
+<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="355,206,299,213,298,207,354,201"/>
+<area shape="rect" id="Node000014" href="$ops_8c.html#a12b5cd2d51351317cef643a21c9dd342" title="fs_ops_t.mkdir shim." alt="" coords="5,203,132,228"/>
+<area shape="poly" id="edge11_Node000013_Node000014" title=" " alt="" coords="188,218,132,218,132,213,188,213"/>
+<area shape="poly" id="edge13_Node000015_Node000013" title=" " alt="" coords="365,232,298,224,299,218,365,226"/>
+</map>

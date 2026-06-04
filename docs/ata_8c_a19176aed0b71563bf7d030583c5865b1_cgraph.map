@@ -1,0 +1,7 @@
+<map id="delay_400ns" name="delay_400ns">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,109,31"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a210a41152ac79a3588f1869164b196f2" title=" " alt="" coords="157,5,244,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,15,144,15,144,21,109,21"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="292,5,335,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="244,15,278,15,278,21,244,21"/>
+</map>

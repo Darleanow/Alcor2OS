@@ -1,0 +1,16 @@
+<map id="src/arch/x86_64/gdt.c" name="src/arch/x86_64/gdt.c">
+<area shape="rect" id="Node000001" title="Global Descriptor Table and TSS setup." alt="" coords="69,5,229,31"/>
+<area shape="rect" id="Node000002" href="$gdt_8h.html" title="Global Descriptor Table and Task State Segment setup." alt="" coords="84,152,215,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,32,131,79,132,110,140,139,135,140,126,111,125,78,141,30"/>
+<area shape="rect" id="Node000007" href="$gdt__internal_8h.html" title=" " alt="" coords="140,79,252,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="159,30,183,66,179,69,155,32"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,225,207,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="152,178,152,212,147,212,147,178"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,299,88,324"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,253,76,293,73,288,131,248"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,299,187,324"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,251,152,285,147,285,147,251"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,299,282,324"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,249,221,288,218,292,163,253"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="191,106,167,142,162,139,186,103"/>
+</map>

@@ -1,0 +1,70 @@
+<map id="ata_read" name="ata_read">
+<area shape="rect" id="Node000001" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="5,636,84,661"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="140,259,251,284"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,635,181,296,186,298,54,637"/>
+<area shape="rect" id="Node000019" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="486,661,573,687"/>
+<area shape="poly" id="edge44_Node000001_Node000019" title=" " alt="" coords="83,633,132,622,226,617,319,625,405,639,473,655,472,661,404,645,319,630,226,623,132,627,84,638"/>
+<area shape="rect" id="Node000034" href="$ata_8c.html#a5ecb7f0821ee058c29e04c52937db12a" title=" " alt="" coords="146,636,245,661"/>
+<area shape="poly" id="edge41_Node000001_Node000034" title=" " alt="" coords="84,646,132,646,132,651,84,651"/>
+<area shape="rect" id="Node000035" href="$ata_8c.html#a29513e85ae228a27f9dfe8b9a106acc8" title=" " alt="" coords="132,685,259,711"/>
+<area shape="poly" id="edge42_Node000001_Node000035" title=" " alt="" coords="85,659,143,678,142,683,83,664"/>
+<area shape="rect" id="Node000036" href="$ata_8c.html#ae8480a9ebd2209cd3d6c96ff7aea0a12" title=" " alt="" coords="140,735,251,760"/>
+<area shape="poly" id="edge43_Node000001_Node000036" title=" " alt="" coords="60,660,92,690,133,721,144,727,141,731,131,726,88,694,56,664"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a68e6896893fbe98c8eccac60438be274" title="Acquire exclusive access to a channel (blocks if busy)." alt="" coords="465,159,593,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="238,256,472,185,474,190,240,261"/>
+<area shape="rect" id="Node000007" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="655,55,758,80"/>
+<area shape="poly" id="edge40_Node000002_Node000007" title=" " alt="" coords="213,256,255,229,305,201,395,162,486,129,641,81,643,86,488,134,397,167,308,206,257,234,216,261"/>
+<area shape="rect" id="Node000016" href="$ata_8c.html#a6db50a62b7a5faa883c988e3301ac67f" title="Release exclusive access and wake any waiting caller." alt="" coords="643,5,771,31"/>
+<area shape="poly" id="edge10_Node000002_Node000016" title=" " alt="" coords="205,257,245,210,274,184,305,160,388,114,475,78,559,51,631,31,632,36,560,56,477,83,390,119,308,164,277,188,249,214,209,260"/>
+<area shape="rect" id="Node000018" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="307,460,416,485"/>
+<area shape="poly" id="edge14_Node000002_Node000018" title=" " alt="" coords="209,283,343,447,339,451,205,286"/>
+<area shape="rect" id="Node000032" href="$ata_8c.html#a86b888e981bed8edbc644d872c9139a9" title="Read sectors using PIO." alt="" coords="322,309,401,335"/>
+<area shape="poly" id="edge33_Node000002_Node000032" title=" " alt="" coords="239,282,309,304,308,309,237,287"/>
+<area shape="rect" id="Node000004" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="819,207,988,232"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="593,181,643,190,805,209,805,214,642,195,592,187"/>
+<area shape="rect" id="Node000005" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="820,131,987,156"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="571,156,642,141,726,135,806,135,806,140,726,140,643,146,572,161"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#a7252d4cb0ebec561f76091963a6dbe6a" title="Block p (set state to BLOCKED). Call before proc_schedule()." alt="" coords="661,257,753,283"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="568,182,596,196,621,216,644,236,666,249,663,253,641,240,617,220,593,200,565,186"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="548,156,641,97,665,84,668,89,644,102,551,161"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="649,156,764,181"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="594,168,636,167,636,172,594,173"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="758,179,841,201,839,206,756,184"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="764,159,806,153,807,158,764,164"/>
+<area shape="poly" id="edge11_Node000016_Node000004" title=" " alt="" coords="757,29,772,40,786,56,793,72,799,103,804,134,810,149,821,166,840,184,861,198,859,202,836,188,817,169,805,152,799,135,794,104,788,74,781,59,769,44,754,33"/>
+<area shape="poly" id="edge12_Node000016_Node000005" title=" " alt="" coords="748,28,772,40,832,80,880,120,877,124,829,84,769,44,745,33"/>
+<area shape="rect" id="Node000017" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="858,5,949,31"/>
+<area shape="poly" id="edge13_Node000016_Node000017" title=" " alt="" coords="771,15,844,15,844,21,771,21"/>
+<area shape="poly" id="edge15_Node000018_Node000019" title=" " alt="" coords="372,484,421,576,448,623,466,648,475,655,472,659,462,652,444,626,417,579,367,487"/>
+<area shape="rect" id="Node000020" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="878,511,929,536"/>
+<area shape="poly" id="edge16_Node000018_Node000020" title=" " alt="" coords="387,483,423,501,465,517,549,540,616,551,684,553,770,546,864,530,865,535,771,551,684,558,615,557,547,545,463,522,421,506,385,488"/>
+<area shape="rect" id="Node000021" href="$ata_8c.html#a524deb7a3ef94ba3b772585b0e311c54" title="Prepare a channel for IRQ&#45;driven command completion." alt="" coords="464,260,595,285"/>
+<area shape="poly" id="edge17_Node000018_Node000021" title=" " alt="" coords="364,459,376,426,396,382,425,336,462,295,468,290,471,294,466,299,429,339,401,385,381,428,369,461"/>
+<area shape="rect" id="Node000022" href="$ata_8c.html#aac0ce9774302791de96fdba30cfbc3b9" title=" " alt="" coords="665,511,748,536"/>
+<area shape="poly" id="edge20_Node000018_Node000022" title=" " alt="" coords="411,483,464,494,563,508,651,517,651,522,563,513,464,499,410,488"/>
+<area shape="rect" id="Node000023" href="$ata_8c.html#ad40ebb2a3659dfbd39dca2fc63914a08" title="Program task&#45;file registers for LBA28." alt="" coords="479,460,580,485"/>
+<area shape="poly" id="edge22_Node000018_Node000023" title=" " alt="" coords="416,470,465,470,465,475,416,475"/>
+<area shape="rect" id="Node000027" href="$ata_8c.html#a9cbc0b43bfa6357113351d33bb77583e" title="Program task&#45;file registers for LBA48 (HOB first)." alt="" coords="479,411,580,436"/>
+<area shape="poly" id="edge24_Node000018_Node000027" title=" " alt="" coords="404,457,471,438,473,443,406,463"/>
+<area shape="rect" id="Node000028" href="$ata_8c.html#a4047066faa8d5af5cda5f5be40eb03bf" title="Load PRDT with a single bounce&#45;buffer entry." alt="" coords="484,612,575,637"/>
+<area shape="poly" id="edge26_Node000018_Node000028" title=" " alt="" coords="373,484,410,534,436,564,466,591,485,603,482,608,462,595,432,567,406,537,369,487"/>
+<area shape="rect" id="Node000030" href="$ata_8c.html#a8b4d3c021710bacc1b78076d406b7f48" title="Wait for ATA command completion." alt="" coords="492,309,567,335"/>
+<area shape="poly" id="edge27_Node000018_Node000030" title=" " alt="" coords="375,458,502,342,505,346,379,462"/>
+<area shape="poly" id="edge18_Node000021_Node000004" title=" " alt="" coords="575,283,617,292,666,298,718,299,770,291,799,281,827,268,873,238,876,243,829,272,801,286,771,297,719,304,665,304,616,297,574,288"/>
+<area shape="poly" id="edge19_Node000021_Node000007" title=" " alt="" coords="574,258,593,245,612,221,620,198,626,172,640,142,681,89,686,92,645,145,631,174,625,199,616,224,596,249,577,262"/>
+<area shape="poly" id="edge21_Node000022_Node000020" title=" " alt="" coords="748,521,864,521,864,526,748,526"/>
+<area shape="poly" id="edge23_Node000023_Node000022" title=" " alt="" coords="575,483,653,505,651,510,574,488"/>
+<area shape="poly" id="edge25_Node000027_Node000022" title=" " alt="" coords="573,434,596,445,621,467,644,489,666,502,663,507,641,493,617,471,593,450,571,438"/>
+<area shape="poly" id="edge28_Node000030_Node000004" title=" " alt="" coords="567,323,661,325,716,319,770,306,801,293,830,275,877,239,880,243,833,280,803,297,772,311,717,324,661,330,567,329"/>
+<area shape="poly" id="edge29_Node000030_Node000005" title=" " alt="" coords="567,325,612,329,665,327,720,316,745,306,769,292,781,281,788,270,795,246,800,220,817,192,837,174,859,160,862,165,840,179,821,196,805,222,800,248,793,273,785,285,772,296,748,311,721,321,665,332,612,334,567,331"/>
+<area shape="poly" id="edge31_Node000030_Node000006" title=" " alt="" coords="566,309,649,284,650,289,568,314"/>
+<area shape="poly" id="edge32_Node000030_Node000008" title=" " alt="" coords="566,309,593,295,632,253,684,191,688,194,636,256,596,299,568,314"/>
+<area shape="poly" id="edge30_Node000030_Node000020" title=" " alt="" coords="558,332,596,352,869,501,866,506,593,356,556,337"/>
+<area shape="poly" id="edge35_Node000032_Node000021" title=" " alt="" coords="400,308,471,287,473,292,402,313"/>
+<area shape="poly" id="edge36_Node000032_Node000022" title=" " alt="" coords="401,329,508,360,560,378,596,396,613,409,623,423,645,454,686,499,682,502,641,457,619,426,609,413,593,400,558,383,506,365,400,334"/>
+<area shape="poly" id="edge37_Node000032_Node000023" title=" " alt="" coords="372,333,408,387,435,418,466,445,476,452,473,456,462,449,431,422,404,390,368,336"/>
+<area shape="poly" id="edge38_Node000032_Node000027" title=" " alt="" coords="381,333,465,389,489,402,487,407,463,394,378,337"/>
+<area shape="poly" id="edge39_Node000032_Node000030" title=" " alt="" coords="401,319,478,319,478,325,401,325"/>
+<area shape="rect" id="Node000033" href="$io_8h.html#aae25743490c4dc54e9a713c64e79d7af" title="Read a word from an I/O port." alt="" coords="507,211,552,236"/>
+<area shape="poly" id="edge34_Node000032_Node000033" title=" " alt="" coords="376,307,414,277,463,245,493,232,495,237,465,250,417,281,379,311"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="put_cp_at_cursor" name="put_cp_at_cursor">
+<area shape="rect" id="Node000001" title="Emit one codepoint at the cell cursor and advance, wrapping or scrolling as needed." alt="" coords="5,53,137,79"/>
+<area shape="rect" id="Node000002" href="$flush_8c.html#acbd1d56bd93968c876236a4f9db5bcc2" title="Commit cp with the live SGR state into c and either mark dirty (batch mode) or blit immediately." alt="" coords="185,16,308,41"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,51,173,42,174,47,132,56"/>
+<area shape="rect" id="Node000025" href="$flush_8c.html#a29200e8da98ef3a5bb44b516480c7ee7" title="Wrap the cursor to the next line, scrolling the grid when at the bottom." alt="" coords="196,77,297,103"/>
+<area shape="poly" id="edge4_Node000001_Node000025" title=" " alt="" coords="138,72,183,79,182,84,137,78"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="363,9,437,35"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="308,23,349,22,349,27,309,29"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="530,5,639,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="437,19,517,17,517,22,437,24"/>
+<area shape="rect" id="Node000026" href="$scrollback_8c.html#a20a43904baf76078b5399667db4f67d3" title="Move the top row off the grid into the scrollback ring and shift every remaining row up...." alt="" coords="356,101,444,127"/>
+<area shape="poly" id="edge5_Node000025_Node000026" title=" " alt="" coords="298,95,343,102,342,108,297,100"/>
+<area shape="rect" id="Node000027" href="$caret_8c.html#ae19ecefda194f357460e6a4f5bb4d456" title="Forget the tracker without repainting." alt="" coords="514,55,655,80"/>
+<area shape="poly" id="edge6_Node000026_Node000027" title=" " alt="" coords="443,100,520,81,521,86,445,106"/>
+<area shape="rect" id="Node000028" href="$scrollback_8c.html#ace0c1c0bfd0ca2353793c3ff5df4f44d" title="Copy the live top row into the scrollback ring before it gets shifted off." alt="" coords="492,104,677,129"/>
+<area shape="poly" id="edge7_Node000026_Node000028" title=" " alt="" coords="444,112,478,112,478,118,444,117"/>
+<area shape="rect" id="Node000030" href="$scrollback_8c.html#a083a9e1e7a449ba0ec97ef40a16af296" title="Shift every grid row up by one and blank the freshly exposed bottom." alt="" coords="495,153,674,179"/>
+<area shape="poly" id="edge8_Node000026_Node000030" title=" " alt="" coords="445,124,493,138,524,147,523,152,491,143,443,129"/>
+</map>

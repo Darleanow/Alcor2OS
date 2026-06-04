@@ -1,0 +1,11 @@
+<map id="vfs_getdents" name="vfs_getdents">
+<area shape="rect" id="Node000001" title="Fill buf with dirent64 entries from an open directory." alt="" coords="5,55,112,80"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="160,5,239,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,52,148,33,150,38,96,57"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="166,55,233,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="112,65,152,65,152,70,112,70"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="160,104,239,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="96,78,150,97,148,102,95,83"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="287,5,389,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="239,15,273,15,273,21,239,21"/>
+</map>

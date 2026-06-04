@@ -1,0 +1,23 @@
+<map id="swap_grid_for_dims" name="swap_grid_for_dims">
+<area shape="rect" id="Node000001" title="Allocate a fresh empty grid sized cols x rows and replace fb_ctx.cells with it." alt="" coords="5,104,157,129"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="215,55,271,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,101,201,77,203,82,124,107"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="205,128,280,153"/>
+<area shape="poly" id="edge5_Node000001_Node000016" title=" " alt="" coords="158,125,192,131,191,136,157,131"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="349,5,428,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="270,56,337,33,338,38,272,61"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="334,55,443,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="271,65,320,65,320,70,271,70"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="503,55,631,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="444,65,490,65,490,70,444,70"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="328,104,449,129"/>
+<area shape="poly" id="edge6_Node000016_Node000017" title=" " alt="" coords="280,132,314,126,315,132,281,137"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="334,153,443,179"/>
+<area shape="poly" id="edge7_Node000016_Node000018" title=" " alt="" coords="281,144,321,152,320,157,280,150"/>
+<area shape="rect" id="Node000030" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="343,203,435,228"/>
+<area shape="poly" id="edge10_Node000016_Node000030" title=" " alt="" coords="265,151,329,189,342,195,339,200,327,194,262,156"/>
+<area shape="rect" id="Node000019" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="497,128,637,153"/>
+<area shape="poly" id="edge8_Node000018_Node000019" title=" " alt="" coords="443,156,483,150,484,155,444,161"/>
+<area shape="rect" id="Node000022" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="521,177,613,203"/>
+<area shape="poly" id="edge9_Node000018_Node000022" title=" " alt="" coords="444,171,507,179,507,185,443,176"/>
+</map>

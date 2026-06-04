@@ -1,0 +1,18 @@
+<map id="user/bin/wc.c" name="user/bin/wc.c">
+<area shape="rect" id="Node000001" title="Count lines, words and bytes." alt="" coords="223,5,330,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,76,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,33,90,78,88,73,238,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="100,79,163,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="254,33,168,75,166,70,252,28"/>
+<area shape="rect" id="Node000004" href="$grendizer_8h.html" title="Single&#45;header CLI parsing library for Alcor2 userland." alt="" coords="187,79,281,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="272,32,250,68,246,66,267,30"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="286,152,353,177"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="283,30,315,138,309,139,278,32"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="357,79,428,104"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="297,28,363,69,361,74,294,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="453,79,527,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="312,28,443,72,442,77,310,33"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="187,152,262,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="235,105,231,139,225,138,230,104"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="249,102,297,141,293,145,246,106"/>
+</map>

@@ -1,0 +1,70 @@
+<map id="proc_wake" name="proc_wake">
+<area shape="rect" id="Node000001" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="793,255,884,280"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#abde118a713492fc92ec9f7b6258933db" title="ATA IRQ handler — reading status clears the device&#39;s IRQ line." alt="" coords="639,55,706,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="819,245,785,197,743,142,686,82,690,78,747,139,790,193,824,242"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#a6db50a62b7a5faa883c988e3301ac67f" title="Release exclusive access and wake any waiting caller." alt="" coords="609,153,737,179"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="813,247,782,220,744,194,717,181,719,176,747,189,785,215,817,243"/>
+<area shape="rect" id="Node000013" href="$mouse_8c.html#a7549de64e1ca943611685af5f4907fd9" title="Post one movement/button report into the broker." alt="" coords="600,204,745,229"/>
+<area shape="poly" id="edge11_Node000001_Node000013" title=" " alt="" coords="782,253,714,232,716,227,784,248"/>
+<area shape="rect" id="Node000017" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="610,255,735,280"/>
+<area shape="poly" id="edge14_Node000001_Node000017" title=" " alt="" coords="780,270,735,270,735,265,780,265"/>
+<area shape="rect" id="Node000041" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="616,427,729,452"/>
+<area shape="poly" id="edge23_Node000001_Node000041" title=" " alt="" coords="818,292,688,428,684,424,814,288"/>
+<area shape="rect" id="Node000053" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="609,304,737,329"/>
+<area shape="poly" id="edge29_Node000001_Node000053" title=" " alt="" coords="783,287,717,306,716,301,782,281"/>
+<area shape="rect" id="Node000054" href="$pipe_8c.html#a5c16a89b7c4822d4587cee68c0f93c49" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="614,624,731,649"/>
+<area shape="poly" id="edge32_Node000001_Node000054" title=" " alt="" coords="829,294,682,625,677,623,824,292"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a8fb7c02769509cb3a7399f56dd42681b" title=" " alt="" coords="419,5,544,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="626,58,530,33,532,28,627,53"/>
+<area shape="rect" id="Node000006" href="$ata_8c.html#ae320cdeb9f17d5b97075bf4f22b76bcc" title=" " alt="" coords="411,55,552,80"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="626,70,552,70,552,65,626,65"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="227,29,297,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="405,29,298,41,297,36,404,24"/>
+<area shape="poly" id="edge5_Node000006_Node000004" title=" " alt="" coords="396,60,297,49,298,43,397,55"/>
+<area shape="rect" id="Node000008" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="426,104,537,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="609,152,531,132,532,127,610,147"/>
+<area shape="rect" id="Node000011" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="440,153,523,179"/>
+<area shape="poly" id="edge9_Node000007_Node000011" title=" " alt="" coords="595,169,523,169,523,163,595,163"/>
+<area shape="rect" id="Node000009" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="223,104,301,129"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="412,119,301,119,301,114,412,114"/>
+<area shape="rect" id="Node000012" href="$src_2kernel_2main_8c.html#a5840daf4c2181ba31d490fb54cd9fbf1" title=" " alt="" coords="205,153,319,179"/>
+<area shape="poly" id="edge10_Node000011_Node000012" title=" " alt="" coords="426,169,320,169,320,163,426,163"/>
+<area shape="rect" id="Node000014" href="$mouse__ps2_8c.html#a059fb6ffb95c8c6a22097d748a2aa357" title="IRQ 12 handler: accumulate one mouse packet byte, post on completion." alt="" coords="421,203,541,228"/>
+<area shape="poly" id="edge12_Node000013_Node000014" title=" " alt="" coords="586,219,541,218,541,213,586,213"/>
+<area shape="rect" id="Node000015" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="200,203,324,228"/>
+<area shape="poly" id="edge13_Node000014_Node000015" title=" " alt="" coords="407,218,324,218,324,213,407,213"/>
+<area shape="rect" id="Node000018" href="$sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d" title=" " alt="" coords="223,253,301,279"/>
+<area shape="poly" id="edge15_Node000017_Node000018" title=" " alt="" coords="596,270,301,269,301,263,596,264"/>
+<area shape="rect" id="Node000020" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="421,355,542,380"/>
+<area shape="poly" id="edge17_Node000017_Node000020" title=" " alt="" coords="616,287,601,294,545,326,501,357,498,352,542,321,599,289,614,282"/>
+<area shape="rect" id="Node000019" href="$sys__fs_8c.html#abcbdbff193493e997cd9f83c1d102823" title=" " alt="" coords="16,253,103,279"/>
+<area shape="poly" id="edge16_Node000018_Node000019" title=" " alt="" coords="209,269,103,269,103,263,209,263"/>
+<area shape="poly" id="edge18_Node000020_Node000018" title=" " alt="" coords="433,351,409,338,395,325,385,313,376,303,361,292,332,280,301,273,302,268,333,275,364,288,379,299,389,310,398,321,412,333,436,346"/>
+<area shape="rect" id="Node000021" href="$vfs_8c.html#a44d4878d7034e836fb13eff8587f0160" title="Release a file descriptor and decrement the OFT refcount." alt="" coords="221,303,303,328"/>
+<area shape="poly" id="edge19_Node000020_Node000021" title=" " alt="" coords="413,354,303,328,304,322,414,349"/>
+<area shape="rect" id="Node000029" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="221,352,303,377"/>
+<area shape="poly" id="edge20_Node000020_Node000029" title=" " alt="" coords="407,369,303,368,303,362,407,364"/>
+<area shape="rect" id="Node000033" href="$vfs_8c.html#af6327136c16b7ac891a514ec683d89d1" title="Close every fd in the calling process that has FD_CLOEXEC set." alt="" coords="161,401,363,427"/>
+<area shape="poly" id="edge21_Node000020_Node000033" title=" " alt="" coords="408,386,323,404,322,399,407,380"/>
+<area shape="rect" id="Node000034" href="$vfs_8c.html#a54d444c54dfa18b4b8a15ea152b8d300" title="Release all file descriptors held by an exiting process." alt="" coords="183,451,341,476"/>
+<area shape="poly" id="edge22_Node000020_Node000034" title=" " alt="" coords="453,390,412,416,364,440,326,453,324,448,362,436,409,411,450,385"/>
+<area shape="rect" id="Node000042" href="$vfs_8c.html#aa43ccf694fc49a889902be97e38e32db" title="Read up to count bytes from fd into buf." alt="" coords="442,549,521,575"/>
+<area shape="poly" id="edge24_Node000041_Node000042" title=" " alt="" coords="642,462,504,552,501,547,639,457"/>
+<area shape="rect" id="Node000043" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="215,549,309,575"/>
+<area shape="poly" id="edge25_Node000042_Node000043" title=" " alt="" coords="428,565,309,565,309,559,428,559"/>
+<area shape="rect" id="Node000048" href="$sys__mm_8c.html#a0d76fce616e6b2bfc5a09e0fa5df3ecd" title=" " alt="" coords="180,599,344,624"/>
+<area shape="poly" id="edge26_Node000042_Node000048" title=" " alt="" coords="429,576,320,601,318,596,428,571"/>
+<area shape="rect" id="Node000050" href="$sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635" title="Read count bytes from fd at absolute offset without moving the seek position." alt="" coords="210,648,314,673"/>
+<area shape="poly" id="edge27_Node000042_Node000050" title=" " alt="" coords="454,585,413,612,364,638,315,653,314,648,362,633,410,608,451,580"/>
+<area shape="rect" id="Node000051" href="$sys__io_8c.html#a9e0ba6a136c04452cb4759138652bb88" title="Read up to count bytes from fd into buf." alt="" coords="222,500,302,525"/>
+<area shape="poly" id="edge28_Node000042_Node000051" title=" " alt="" coords="428,553,302,524,303,519,429,548"/>
+<area shape="poly" id="edge30_Node000053_Node000018" title=" " alt="" coords="595,310,301,273,302,268,595,305"/>
+<area shape="poly" id="edge31_Node000053_Node000020" title=" " alt="" coords="611,336,531,357,530,352,610,330"/>
+<area shape="rect" id="Node000055" href="$vfs_8c.html#a802e2397ea43dd94acf2feae98d44cba" title="Write count bytes from buf to fd." alt="" coords="440,699,523,724"/>
+<area shape="poly" id="edge33_Node000054_Node000055" title=" " alt="" coords="627,657,516,701,514,696,625,652"/>
+<area shape="rect" id="Node000056" href="$sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237" title="Write count bytes to fd at absolute offset without moving the seek position." alt="" coords="5,724,113,749"/>
+<area shape="poly" id="edge34_Node000055_Node000056" title=" " alt="" coords="426,717,114,736,113,731,426,712"/>
+<area shape="rect" id="Node000057" href="$sys__io_8c.html#aaf2c4002d448ac156bcf915154c831bb" title="Write count bytes from buf to fd." alt="" coords="220,749,304,775"/>
+<area shape="poly" id="edge35_Node000055_Node000057" title=" " alt="" coords="427,726,305,755,303,750,426,721"/>
+<area shape="poly" id="edge36_Node000057_Node000056" title=" " alt="" coords="206,758,113,746,114,741,206,752"/>
+</map>

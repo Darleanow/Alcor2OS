@@ -1,0 +1,16 @@
+<map id="lex_peek" name="lex_peek">
+<area shape="rect" id="Node000001" title="Peek at the next token without consuming." alt="" coords="5,54,87,80"/>
+<area shape="rect" id="Node000002" href="$lexer_8c.html#a4f6b122799074ebf08f4ea10ade65b39" title=" " alt="" coords="135,54,217,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,64,121,64,121,70,87,70"/>
+<area shape="rect" id="Node000003" href="$lexer_8c.html#acbe69e56df80c5c4f737cfde6d9be873" title=" " alt="" coords="580,53,667,78"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="192,52,224,31,265,14,307,6,351,3,437,10,516,26,578,46,576,51,514,32,436,15,351,8,308,11,266,19,227,36,195,56"/>
+<area shape="rect" id="Node000004" href="$lexer_8c.html#a89fb4c390705931605dfa96c5ba59d11" title=" " alt="" coords="265,29,368,54"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="217,57,251,51,252,56,218,62"/>
+<area shape="rect" id="Node000005" href="$lexer_8c.html#abaab6431350f60fa9623b5b63b6b329a" title=" " alt="" coords="265,78,368,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="218,71,252,77,251,83,217,77"/>
+<area shape="rect" id="Node000006" href="$lexer_8c.html#a38ea90df448960e553ef9a9629959a2c" title=" " alt="" coords="271,128,362,153"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="200,77,267,114,277,119,274,124,264,119,198,82"/>
+<area shape="rect" id="Node000007" href="$lexer_8c.html#abb4d930b3739653552f511ecf3e02c08" title=" " alt="" coords="416,78,532,104"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="357,125,419,105,420,111,359,130"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="532,79,566,73,567,78,532,84"/>
+</map>

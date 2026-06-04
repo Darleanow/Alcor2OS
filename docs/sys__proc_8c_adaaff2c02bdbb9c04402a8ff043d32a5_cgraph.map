@@ -1,0 +1,43 @@
+<map id="sys_exit" name="sys_exit">
+<area shape="rect" id="Node000001" title="Terminate the calling process with status." alt="" coords="5,231,81,256"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="129,231,212,256"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,241,115,241,115,246,81,246"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="296,7,405,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="171,230,179,193,194,143,220,89,237,64,258,43,282,28,285,33,262,47,242,68,225,92,199,145,184,194,176,231"/>
+<area shape="rect" id="Node000015" href="$cpu_8c.html#a914a92c64f247056c5432b0caf50f547" title="Halt the CPU indefinitely." alt="" coords="312,156,389,181"/>
+<area shape="poly" id="edge4_Node000002_Node000015" title=" " alt="" coords="189,228,221,209,259,190,298,177,300,182,261,195,224,214,192,233"/>
+<area shape="rect" id="Node000017" href="$kbd__layout_8c.html#a00b1c813a1bcb350df46f9d55810696a" title="Toggle \x00&lt;char&gt; key&#45;release sentinels." alt="" coords="261,107,440,132"/>
+<area shape="poly" id="edge6_Node000002_Node000017" title=" " alt="" coords="178,229,209,186,232,162,259,141,270,135,273,139,261,146,236,166,213,189,182,232"/>
+<area shape="rect" id="Node000018" href="$mouse_8c.html#abf17473a267e0d4c04fe3d6e89835775" title="Enable or disable relative mode (cursor pinned to centre, raw deltas passed through)...." alt="" coords="275,205,426,231"/>
+<area shape="poly" id="edge7_Node000002_Node000018" title=" " alt="" coords="212,235,261,228,262,233,213,240"/>
+<area shape="rect" id="Node000020" href="$pit_8c.html#a3337be496f83d39022cfe60700673475" title="Clear all fast&#45;rate votes; called on process exit." alt="" coords="295,255,406,280"/>
+<area shape="poly" id="edge10_Node000002_Node000020" title=" " alt="" coords="213,246,282,256,281,261,212,251"/>
+<area shape="rect" id="Node000022" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="535,356,613,381"/>
+<area shape="poly" id="edge12_Node000002_Node000022" title=" " alt="" coords="193,254,225,272,261,289,380,323,521,355,520,360,379,328,259,294,222,277,191,258"/>
+<area shape="rect" id="Node000023" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="293,57,408,83"/>
+<area shape="poly" id="edge13_Node000002_Node000023" title=" " alt="" coords="173,229,184,201,201,164,226,125,258,92,279,80,281,85,262,96,230,128,206,166,189,203,178,231"/>
+<area shape="rect" id="Node000031" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="303,356,399,381"/>
+<area shape="poly" id="edge18_Node000002_Node000031" title=" " alt="" coords="183,254,215,294,237,315,261,334,291,349,289,354,259,339,233,319,211,297,179,258"/>
+<area shape="rect" id="Node000032" href="$proc_8c.html#a605acc71b74a4015f96530987df63a80" title=" " alt="" coords="260,405,441,431"/>
+<area shape="poly" id="edge20_Node000002_Node000032" title=" " alt="" coords="178,255,206,320,230,358,262,391,272,397,269,402,258,395,226,362,201,323,173,257"/>
+<area shape="rect" id="Node000033" href="$vfs_8c.html#a54d444c54dfa18b4b8a15ea152b8d300" title="Release all file descriptors held by an exiting process." alt="" coords="271,455,430,480"/>
+<area shape="poly" id="edge22_Node000002_Node000033" title=" " alt="" coords="176,256,184,293,199,343,224,396,241,420,262,441,267,446,264,450,258,445,237,424,220,399,194,345,179,294,171,257"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="510,5,638,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="405,16,496,16,496,21,405,22"/>
+<area shape="rect" id="Node000016" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="489,156,659,181"/>
+<area shape="poly" id="edge5_Node000015_Node000016" title=" " alt="" coords="389,166,476,166,476,171,389,171"/>
+<area shape="poly" id="edge8_Node000018_Node000016" title=" " alt="" coords="408,203,502,182,503,187,409,208"/>
+<area shape="rect" id="Node000019" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="707,107,873,132"/>
+<area shape="poly" id="edge9_Node000018_Node000019" title=" " alt="" coords="426,218,537,213,598,204,658,190,713,166,759,138,762,142,716,171,660,195,599,210,538,218,426,223"/>
+<area shape="rect" id="Node000021" href="$pit_8c.html#aeb02a58361ba396db774530bfe97be0e" title="Program PIT channel 0 for frequency Hz (clamped to a sane range)." alt="" coords="523,257,625,283"/>
+<area shape="poly" id="edge11_Node000020_Node000021" title=" " alt="" coords="407,265,510,267,510,272,407,271"/>
+<area shape="poly" id="edge14_Node000023_Node000016" title=" " alt="" coords="409,78,443,92,458,104,468,117,476,129,491,141,505,149,503,153,488,146,473,133,463,120,454,108,440,96,407,83"/>
+<area shape="poly" id="edge15_Node000023_Node000019" title=" " alt="" coords="408,70,524,77,659,91,718,101,717,107,658,97,524,83,408,75"/>
+<area shape="rect" id="Node000024" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="525,107,623,132"/>
+<area shape="poly" id="edge16_Node000023_Node000024" title=" " alt="" coords="409,80,512,103,510,108,408,85"/>
+<area shape="poly" id="edge17_Node000024_Node000019" title=" " alt="" coords="624,117,693,117,693,122,624,122"/>
+<area shape="poly" id="edge19_Node000031_Node000022" title=" " alt="" coords="399,366,521,366,521,371,399,371"/>
+<area shape="poly" id="edge21_Node000032_Node000022" title=" " alt="" coords="408,403,521,378,522,383,409,408"/>
+<area shape="rect" id="Node000034" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="513,455,635,480"/>
+<area shape="poly" id="edge23_Node000033_Node000034" title=" " alt="" coords="430,465,500,465,500,470,430,470"/>
+</map>

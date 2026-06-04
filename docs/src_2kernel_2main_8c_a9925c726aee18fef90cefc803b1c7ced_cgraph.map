@@ -1,0 +1,7 @@
+<map id="idt_hook_proc_name" name="idt_hook_proc_name">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,163,56"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="211,5,313,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,30,197,25,197,30,163,35"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#aa1fdd5c3164575fee39e9ba0fd76b1f0" title="Return the name string of p (NULL&#45;safe)." alt="" coords="215,55,309,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,51,201,57,201,62,162,57"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="src/fs/ext2/internal.h" name="src/fs/ext2/internal.h">
+<area shape="rect" id="Node000001" title="Shared state, sizing macros, and private helpers for the ext2 module split." alt="" coords="758,5,914,31"/>
+<area shape="rect" id="Node000002" href="$alloc_8c.html" title="Block + inode allocation bitmap operations." alt="" coords="5,79,141,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="744,28,479,49,154,81,142,83,141,77,153,76,478,44,744,23"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html" title="Direct + indirect block resolution and reservation for ext2." alt="" coords="166,79,335,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="745,33,336,82,335,77,744,28"/>
+<area shape="rect" id="Node000004" href="$cache_8c.html" title="Single&#45;block scratch pool for one&#45;off ext2 metadata reads." alt="" coords="359,79,502,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="758,36,496,81,496,76,757,30"/>
+<area shape="rect" id="Node000005" href="$dir_8c.html" title="High&#45;level directory operations — readdir, mkdir, unlink, rmdir." alt="" coords="526,79,647,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="783,37,628,81,626,76,782,32"/>
+<area shape="rect" id="Node000006" href="$dir__entry_8c.html" title="On&#45;disk directory entry primitives — lookup, insert, remove, emptiness check." alt="" coords="671,79,833,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="814,42,767,80,764,76,810,38"/>
+<area shape="rect" id="Node000007" href="$file_8c.html" title="File open / close / read / write / truncate / flush — the public ext2 byte&#45;oriented API." alt="" coords="857,79,983,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="862,38,908,76,905,80,858,42"/>
+<area shape="rect" id="Node000008" href="$inode_8c.html" title="On&#45;disk inode read + write." alt="" coords="1007,79,1148,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="889,32,1039,76,1038,81,887,37"/>
+<area shape="rect" id="Node000009" href="$ops_8c.html" title="fs_ops_t bridge for ext2." alt="" coords="1172,79,1300,104"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="914,30,1172,76,1171,81,913,36"/>
+<area shape="rect" id="Node000010" href="$path_8c.html" title="Path resolution, symlink following, and the ext2_stat / ext2_readlink endpoints." alt="" coords="1325,79,1459,104"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="928,28,1312,76,1325,78,1324,83,1312,81,928,33"/>
+<area shape="rect" id="Node000011" href="$super_8c.html" title="Block&#45;level I/O, superblock + GDT writeback, volume bring&#45;up." alt="" coords="1483,79,1623,104"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="928,24,1174,45,1472,76,1484,77,1483,83,1472,81,1174,51,928,29"/>
+</map>

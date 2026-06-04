@@ -1,0 +1,9 @@
+<map id="include/alcor2/fs/ramfs.h" name="include/alcor2/fs/ramfs.h">
+<area shape="rect" id="Node000001" title="Public ramfs API: init + character&#45;device registration." alt="" coords="116,5,299,31"/>
+<area shape="rect" id="Node000002" href="$ramfs_8c.html" title="Standalone ramfs driver for Alcor2." alt="" coords="5,86,116,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,40,84,88,81,83,172,35"/>
+<area shape="rect" id="Node000003" href="$dev__nodes_8c.html" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="140,79,275,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,44,210,79,205,79,205,44"/>
+<area shape="rect" id="Node000004" href="$mouse_8c.html" title="Kernel mouse broker." alt="" coords="299,79,433,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="244,34,329,76,326,81,242,39"/>
+</map>

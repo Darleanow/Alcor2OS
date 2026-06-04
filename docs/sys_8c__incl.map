@@ -1,0 +1,29 @@
+<map id="user/apps/shell/platform/sys.c" name="user/apps/shell/platform/sys.c">
+<area shape="rect" id="Node000001" title="Thin syscall wrappers that back the shell platform interface." alt="" coords="317,5,497,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,167,77,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="317,31,264,37,206,48,150,67,98,95,71,124,53,155,48,153,66,120,94,91,147,62,205,43,263,31,316,25"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="109,93,171,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="344,48,185,94,184,89,342,43"/>
+<area shape="rect" id="Node000004" href="$shell_8h.html" title="Shell&#45;internal helpers (sh_*) used by main.c, builtins.c, and the shell&#39;s platform layer...." alt="" coords="195,93,295,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="369,48,283,90,280,85,367,43"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="403,167,488,192"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="388,47,375,63,364,81,359,99,362,118,381,141,406,158,403,162,378,145,358,120,353,99,359,79,370,60,384,44"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="371,93,442,119"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="409,46,409,79,404,79,404,46"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="466,93,537,119"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="431,43,478,82,475,86,428,48"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="561,93,649,119"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="455,43,565,86,563,91,453,48"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="673,93,761,119"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="482,43,660,88,659,93,480,48"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="785,93,860,119"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="497,39,772,90,771,96,496,45"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="213,121,88,165,86,160,212,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="101,167,184,192"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="230,121,172,161,169,156,227,116"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="208,167,283,192"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="248,119,248,153,243,153,243,119"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="307,167,378,192"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="263,117,317,156,314,160,259,121"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="278,116,400,159,399,164,277,121"/>
+</map>

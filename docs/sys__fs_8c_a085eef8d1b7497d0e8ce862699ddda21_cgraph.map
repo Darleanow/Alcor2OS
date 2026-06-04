@@ -1,0 +1,19 @@
+<map id="sys_fstat" name="sys_fstat">
+<area shape="rect" id="Node000001" title="Stat the open file descriptor fd into a POSIX stat buffer." alt="" coords="5,81,87,107"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#abf135f96082ac0697aa765c3fbdfd02d" title="Translate an internal vfs_stat_t into the POSIX stat layout." alt="" coords="136,5,235,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,79,148,35,151,40,72,83"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="331,56,390,81"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="87,88,317,69,318,75,87,93"/>
+<area shape="rect" id="Node000004" href="$sys__fs_8c.html#a8a3d72124ddacfcc1825b04f29980211" title="Return true if ptr..ptr+size is a valid user&#45;space range." alt="" coords="135,156,236,181"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="70,104,136,142,146,147,143,152,133,147,67,109"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#a35821b0927b2703fc2b521bc5eab8a1a" title="Stat an open file descriptor, returning synthetic metadata for pipes." alt="" coords="146,107,225,132"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="87,99,133,107,132,112,86,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="231,28,319,54,317,59,229,33"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="284,156,437,181"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="236,166,270,166,270,171,236,171"/>
+<area shape="poly" id="edge9_Node000006_Node000003" title=" " alt="" coords="224,106,317,78,319,83,226,111"/>
+<area shape="rect" id="Node000007" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="321,107,400,132"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="225,117,308,117,308,122,225,122"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="485,107,588,132"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="400,117,471,117,471,122,400,122"/>
+</map>

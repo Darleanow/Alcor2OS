@@ -1,0 +1,18 @@
+<map id="ext2_ops_stat" name="ext2_ops_stat">
+<area shape="rect" id="Node000001" title="fs_ops_t.stat shim — path&#45;based stat." alt="" coords="5,57,119,83"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#aecf245e7de6ece833406905140c35e24" title="Get file status information." alt="" coords="167,57,249,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,67,153,67,153,73,119,73"/>
+<area shape="rect" id="Node000003" href="$path_8c.html#a47c361e00db58a5352f49a7539b9cb5f" title="Copy the basename of path into name." alt="" coords="297,8,440,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,55,313,35,314,40,250,60"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#af6799af86f8398614f9347195f7a81a1" title="Translate an ext2 on&#45;disk mode field to a directory&#45;entry file_type code." alt="" coords="297,57,440,83"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="250,67,284,67,284,73,250,73"/>
+<area shape="rect" id="Node000007" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a path to an inode." alt="" coords="315,107,422,132"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="250,80,314,100,313,105,249,85"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="530,5,597,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="440,17,516,16,516,21,440,22"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="687,81,765,107"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="432,31,674,81,673,86,431,36"/>
+<area shape="rect" id="Node000008" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="488,107,639,132"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="422,117,474,117,474,122,422,122"/>
+<area shape="poly" id="edge8_Node000008_Node000005" title=" " alt="" coords="639,105,673,99,674,105,639,110"/>
+</map>

@@ -1,0 +1,47 @@
+<map id="process_raw_ctx" name="process_raw_ctx">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,280,136,305"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a4d967a46a4825890d9fed20d49337bf9" title=" " alt="" coords="233,153,342,179"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,278,124,238,152,215,183,196,218,180,220,185,185,200,155,220,127,242,86,282"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a021bcda8746ce32783a0c2cfa9774a50" title=" " alt="" coords="449,304,569,329"/>
+<area shape="poly" id="edge13_Node000001_Node000003" title=" " alt="" coords="92,278,133,257,183,239,241,228,288,222,334,226,391,239,418,250,443,263,485,293,482,297,440,268,416,254,390,245,333,231,288,228,242,233,185,245,135,261,94,282"/>
+<area shape="rect" id="Node000004" href="$api_8c.html#acb3341aad43b4d1cf1c2121189cf2cc2" title="Report DECCKM state to the keyboard layer." alt="" coords="184,104,391,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="75,278,90,249,113,211,144,172,182,138,193,133,195,137,186,143,148,175,118,214,95,252,80,281"/>
+<area shape="rect" id="Node000005" href="$scrollback_8c.html#a81d1fb9846695e15207aab71a96d8ff9" title="Scroll the view lines rows toward the live tail." alt="" coords="184,5,391,31"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="71,279,80,234,99,169,114,134,132,99,155,67,182,40,189,35,192,39,186,44,159,71,137,102,119,136,104,171,85,235,76,280"/>
+<area shape="rect" id="Node000032" href="$scrollback_8c.html#a8a8b369ad40c10e99dc55ebc36ced5b9" title="Scroll the view lines rows back into history." alt="" coords="193,55,381,80"/>
+<area shape="poly" id="edge10_Node000001_Node000032" title=" " alt="" coords="73,279,84,241,106,190,138,135,159,111,182,89,190,84,193,88,186,93,162,114,142,139,111,192,89,243,78,281"/>
+<area shape="rect" id="Node000033" href="$kbd__layout_8c.html#a413dc2531e15506de68f25d6cb1693d5" title=" " alt="" coords="234,255,341,280"/>
+<area shape="poly" id="edge12_Node000001_Node000033" title=" " alt="" coords="136,282,220,272,220,278,137,288"/>
+<area shape="rect" id="Node000034" href="$kbd__layout_8c.html#afb4eeac601bdc564089037a49f624dbd" title=" " alt="" coords="248,403,327,428"/>
+<area shape="poly" id="edge14_Node000001_Node000034" title=" " alt="" coords="85,304,126,345,154,368,185,388,235,405,233,410,183,392,151,373,123,349,81,307"/>
+<area shape="rect" id="Node000035" href="$kbd__layout_8c.html#ae8a7493c17484612ceb39c2bf4bc2830" title=" " alt="" coords="230,304,345,329"/>
+<area shape="poly" id="edge16_Node000001_Node000035" title=" " alt="" coords="137,297,217,306,216,311,136,303"/>
+<area shape="rect" id="Node000036" href="$kbd__layout_8c.html#a59b6591d34ccf01d64cda05b6b4fb91e" title=" " alt="" coords="246,353,329,379"/>
+<area shape="poly" id="edge18_Node000001_Node000036" title=" " alt="" coords="99,303,185,338,233,352,232,357,183,343,97,308"/>
+<area shape="rect" id="Node000037" href="$kbd__layout_8c.html#ab10c1db0dadab7b18be6f2f04c7a19df" title=" " alt="" coords="253,452,321,477"/>
+<area shape="poly" id="edge20_Node000001_Node000037" title=" " alt="" coords="80,304,118,369,149,407,185,438,212,451,240,458,239,463,210,456,183,443,145,411,114,372,76,307"/>
+<area shape="rect" id="Node000040" href="$kbd__layout_8c.html#aaf069fd4dd3d3d6f4ec3e93f870f1c79" title=" " alt="" coords="252,501,323,527"/>
+<area shape="poly" id="edge23_Node000001_Node000040" title=" " alt="" coords="78,305,90,342,111,392,143,444,163,468,186,488,211,501,239,508,238,513,209,506,182,492,159,471,139,447,107,394,85,344,73,307"/>
+<area shape="rect" id="Node000041" href="$kbd__layout_8c.html#a3a2bd71121089eac43b72bcf44d8d139" title=" " alt="" coords="232,551,343,576"/>
+<area shape="poly" id="edge25_Node000001_Node000041" title=" " alt="" coords="76,305,86,350,105,413,119,447,137,480,159,511,186,537,202,547,220,554,218,559,199,552,182,541,155,514,133,483,114,450,100,415,80,351,71,306"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="343,175,392,196,423,218,450,243,493,292,489,295,447,247,419,222,389,200,341,180"/>
+<area shape="rect" id="Node000006" href="$scrollback_8c.html#af989847d8b5c175f9a490656bfa1010a" title="Snap back to the live view (offset = 0) and force a full repaint." alt="" coords="449,5,569,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="391,15,436,15,436,21,391,21"/>
+<area shape="rect" id="Node000007" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid blending scrollback history with live cells." alt="" coords="439,55,580,80"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="346,28,439,49,437,54,345,33"/>
+<area shape="rect" id="Node000008" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="628,55,737,80"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="580,65,614,65,614,70,580,70"/>
+<area shape="rect" id="Node000029" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="633,104,732,129"/>
+<area shape="poly" id="edge8_Node000007_Node000029" title=" " alt="" coords="555,77,625,98,623,103,554,83"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#a53f4ad004ca51ec3d2aa9dbe906a23c0" title="Fill memory with a byte value." alt="" coords="641,5,725,31"/>
+<area shape="poly" id="edge9_Node000007_Node000031" title=" " alt="" coords="554,52,626,31,628,36,555,57"/>
+<area shape="poly" id="edge11_Node000032_Node000007" title=" " alt="" coords="382,65,424,65,424,70,382,70"/>
+<area shape="poly" id="edge15_Node000034_Node000003" title=" " alt="" coords="326,406,390,388,438,362,479,335,482,340,441,367,392,392,328,411"/>
+<area shape="poly" id="edge17_Node000035_Node000003" title=" " alt="" coords="345,314,435,314,435,319,345,319"/>
+<area shape="poly" id="edge19_Node000036_Node000003" title=" " alt="" coords="328,354,437,330,439,335,329,360"/>
+<area shape="rect" id="Node000038" href="$kbd__layout_8c.html#adae7d5761e3e62f8fe27ddfa1d9f0496" title=" " alt="" coords="456,476,563,501"/>
+<area shape="poly" id="edge21_Node000037_Node000038" title=" " alt="" coords="322,466,442,479,442,484,321,471"/>
+<area shape="rect" id="Node000039" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="639,476,726,501"/>
+<area shape="poly" id="edge22_Node000038_Node000039" title=" " alt="" coords="563,486,626,486,626,491,563,491"/>
+<area shape="poly" id="edge24_Node000040_Node000038" title=" " alt="" coords="323,507,442,494,442,499,323,513"/>
+</map>

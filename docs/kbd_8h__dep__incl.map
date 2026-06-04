@@ -1,0 +1,11 @@
+<map id="include/alcor2/kbd.h" name="include/alcor2/kbd.h">
+<area shape="rect" id="Node000001" title="Keyboard layouts and tty&#45;line translation (scancode → characters)." alt="" coords="247,5,400,31"/>
+<area shape="rect" id="Node000002" href="$dev__nodes_8c.html" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="5,79,140,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="275,37,134,81,132,76,273,32"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html" title="PS/2 scancode translator: layout mapping, line discipline, and TTY I/O." alt="" coords="164,79,315,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="303,42,261,80,258,77,299,38"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="339,79,478,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="348,38,390,77,386,80,344,42"/>
+<area shape="rect" id="Node000005" href="$kbd_8c.html" title="Set the active keyboard layout (us|fr) via ioctl." alt="" coords="503,86,616,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="371,32,526,83,524,89,370,37"/>
+</map>

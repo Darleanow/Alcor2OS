@@ -1,0 +1,9 @@
+<map id="ensure_data_block" name="ensure_data_block">
+<area shape="rect" id="Node000001" title="Resolve file_block to an on&#45;disk block, allocating on hole." alt="" coords="507,5,651,31"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#ae37d4828b0eb47da6755a484e7876462" title="One iteration of the write loop: place one chunk into the file." alt="" coords="327,5,459,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="493,21,459,21,459,15,493,15"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a1bf19aa4e4eb0e2f4cda410ebd135f37" title="Write count bytes to file at byte offset." alt="" coords="144,5,279,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="313,21,279,21,279,15,313,15"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#a92b60c4777893b900adbd384b1710e7e" title="Write data to a file." alt="" coords="5,5,96,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="130,21,96,21,96,15,130,15"/>
+</map>

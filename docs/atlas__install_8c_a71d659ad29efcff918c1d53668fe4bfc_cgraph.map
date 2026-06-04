@@ -1,0 +1,37 @@
+<map id="reflow_grid_for_atlas" name="reflow_grid_for_atlas">
+<area shape="rect" id="Node000001" title="Reflow the cell grid when the new atlas&#39;s cell size differs from the live one." alt="" coords="5,160,164,185"/>
+<area shape="rect" id="Node000002" href="$atlas__install_8c.html#a45db6d74b02b3bdec3631033f7bd5dc6" title="Bg&#45;fill the whole framebuffer (margins included) at the current default bg colour." alt="" coords="212,46,371,86"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,158,152,128,211,96,224,89,227,94,213,100,155,133,107,162"/>
+<area shape="rect" id="Node000006" href="$atlas__install_8c.html#a3f77609d8b2cc8f3771672dbc3c7b840" title="Compute the new column/row counts that fit new_cell_w/h pixels inside the framebuffer with FB_CONSOLE..." alt="" coords="216,111,367,136"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="138,157,223,137,225,142,139,163"/>
+<area shape="rect" id="Node000007" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="230,160,353,185"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="164,170,217,170,217,175,164,175"/>
+<area shape="rect" id="Node000034" href="$scrollback_8c.html#ad9b94f482326d916380acf246bc7d759" title="(Re)allocate the scrollback ring for cols columns; existing contents are dropped (cell coordinates do..." alt="" coords="216,209,367,235"/>
+<area shape="poly" id="edge14_Node000001_Node000034" title=" " alt="" coords="139,183,225,203,223,209,138,188"/>
+<area shape="rect" id="Node000035" href="$atlas__install_8c.html#a57284827ed88c70143141190e87f3a91" title="Allocate a fresh empty grid sized cols x rows and replace fb_ctx.cells with it." alt="" coords="215,259,367,284"/>
+<area shape="poly" id="edge17_Node000001_Node000035" title=" " alt="" coords="106,183,153,214,213,245,230,252,228,257,211,250,151,218,103,188"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="419,53,520,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,63,405,63,405,69,371,69"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="583,55,674,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="520,64,569,64,569,70,520,69"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="583,5,674,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="511,51,572,32,573,37,513,56"/>
+<area shape="rect" id="Node000008" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="441,256,497,281"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="344,183,372,194,411,219,445,245,442,249,408,223,369,199,342,188"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="432,184,507,209"/>
+<area shape="poly" id="edge10_Node000007_Node000019" title=" " alt="" coords="353,178,419,187,418,192,353,184"/>
+<area shape="rect" id="Node000009" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="589,305,668,331"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="498,275,577,299,575,304,497,280"/>
+<area shape="rect" id="Node000010" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="574,256,683,281"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="498,266,560,266,560,271,498,271"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="568,157,689,183"/>
+<area shape="poly" id="edge11_Node000019_Node000020" title=" " alt="" coords="507,188,554,180,555,185,507,193"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="574,207,683,232"/>
+<area shape="poly" id="edge12_Node000019_Node000021" title=" " alt="" coords="507,199,561,207,560,212,507,205"/>
+<area shape="rect" id="Node000033" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="583,108,675,133"/>
+<area shape="poly" id="edge13_Node000019_Node000033" title=" " alt="" coords="492,181,567,142,580,136,582,141,569,147,494,186"/>
+<area shape="poly" id="edge15_Node000034_Node000008" title=" " alt="" coords="341,232,428,255,427,261,340,237"/>
+<area shape="poly" id="edge16_Node000034_Node000019" title=" " alt="" coords="367,209,418,201,419,206,367,214"/>
+<area shape="poly" id="edge18_Node000035_Node000008" title=" " alt="" coords="367,268,428,267,428,272,368,273"/>
+<area shape="poly" id="edge19_Node000035_Node000019" title=" " alt="" coords="338,256,370,245,433,214,435,219,372,250,340,261"/>
+</map>

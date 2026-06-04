@@ -1,0 +1,9 @@
+<map id="clear_framebuffer_to_default_bg" name="clear_framebuffer_to_default_bg">
+<area shape="rect" id="Node000001" title="Bg&#45;fill the whole framebuffer (margins included) at the current default bg colour." alt="" coords="651,5,809,45"/>
+<area shape="rect" id="Node000002" href="$atlas__install_8c.html#a71d659ad29efcff918c1d53668fe4bfc" title="Reflow the cell grid when the new atlas&#39;s cell size differs from the live one." alt="" coords="444,13,603,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="637,28,603,28,603,23,637,23"/>
+<area shape="rect" id="Node000003" href="$atlas__install_8c.html#aa893c0530d1ff8368c0154a908c544c3" title="Register a userspace glyph atlas and reflow the cell grid to its cell size." alt="" coords="237,13,396,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,28,396,28,396,23,430,23"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="5,13,189,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="224,28,190,28,190,23,224,23"/>
+</map>

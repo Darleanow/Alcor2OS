@@ -1,0 +1,7 @@
+<map id="buf_append" name="buf_append">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,104,31"/>
+<area shape="rect" id="Node000002" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="152,5,231,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,15,138,15,138,21,104,21"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="279,5,365,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="231,15,265,15,265,21,231,21"/>
+</map>

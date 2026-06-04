@@ -1,0 +1,16 @@
+<map id="vfs_register_fs" name="vfs_register_fs">
+<area shape="rect" id="Node000001" title="Register a filesystem driver in the type registry." alt="" coords="399,55,517,80"/>
+<area shape="rect" id="Node000002" href="$super_8c.html#a33024e70ff9fc8299e2c55f91fd17a77" title="Initialise the ext2 driver: clear the volume + file pools and register the fs type with the VFS." alt="" coords="267,5,346,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="405,53,345,33,347,28,406,48"/>
+<area shape="rect" id="Node000004" href="$initfs_8c.html#a41f86ef438912e9d4f217ec4786b847b" title="Register the initfs driver with the VFS. Idempotent." alt="" coords="265,55,348,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="385,70,348,70,348,65,385,65"/>
+<area shape="rect" id="Node000007" href="$ramfs_8c.html#af637621c8cf4b54bce326f48174772ff" title="Initialise ramfs (idempotent)." alt="" coords="263,104,351,129"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="406,87,348,106,346,101,405,82"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="116,5,215,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="254,21,215,21,215,15,254,15"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="124,79,207,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="252,79,207,87,206,82,251,74"/>
+<area shape="rect" id="Node000006" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,79,68,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="110,94,68,94,68,89,110,89"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="249,109,207,101,208,96,250,104"/>
+</map>

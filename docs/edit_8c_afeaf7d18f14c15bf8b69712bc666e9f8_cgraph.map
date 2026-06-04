@@ -1,0 +1,57 @@
+<map id="sh_read_line" name="sh_read_line">
+<area shape="rect" id="Node000001" title="Read one input line with editing, history, and tab completion." alt="" coords="5,281,109,307"/>
+<area shape="rect" id="Node000002" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="187,205,282,231"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,279,156,248,189,234,191,239,158,252,88,284"/>
+<area shape="rect" id="Node000005" href="$io_8c.html#ac3e98303df49d2058bbde227fbe73286" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="564,5,636,31"/>
+<area shape="poly" id="edge30_Node000001_Node000005" title=" " alt="" coords="59,281,68,244,87,194,115,141,134,117,156,96,202,65,254,41,308,25,364,15,468,7,550,10,550,15,468,12,364,20,310,30,256,46,205,69,159,100,138,121,120,144,92,196,74,246,64,282"/>
+<area shape="rect" id="Node000007" href="$edit_8c.html#abd409a02af078b9a9096d611ef989a19" title="Count visible UTF&#45;8 glyphs in s." alt="" coords="559,104,641,129"/>
+<area shape="poly" id="edge31_Node000001_Node000007" title=" " alt="" coords="65,280,100,235,126,210,156,190,201,170,241,157,278,151,313,149,387,148,430,145,480,138,545,125,546,130,480,143,431,150,388,153,314,154,279,156,243,163,203,175,159,195,130,215,104,238,69,283"/>
+<area shape="rect" id="Node000010" href="$compiler__abi_8c.html#a67a32512b988260592273ddf743c5c3c" title=" " alt="" coords="373,381,467,407"/>
+<area shape="poly" id="edge24_Node000001_Node000010" title=" " alt="" coords="109,279,154,272,207,269,262,275,313,293,331,308,340,325,348,342,362,360,379,372,376,377,358,364,343,345,335,327,327,311,311,298,260,280,207,275,155,277,110,284"/>
+<area shape="rect" id="Node000011" href="$edit_8c.html#a49d1c35f42b665a736da8063551682ec" title="Repaint the input row in&#45;place: clear, prompt, buffer, cursor." alt="" coords="371,55,469,80"/>
+<area shape="poly" id="edge27_Node000001_Node000011" title=" " alt="" coords="62,280,95,216,122,179,156,147,204,117,257,96,310,81,357,72,358,77,311,87,259,101,207,122,159,151,126,182,99,219,66,282"/>
+<area shape="rect" id="Node000025" href="$edit_8c.html#a8cc47725f64996d06197dfe3d5690be7" title="Move idx right to the next UTF&#45;8 character boundary." alt="" coords="157,307,312,332"/>
+<area shape="poly" id="edge25_Node000001_Node000025" title=" " alt="" coords="110,299,144,304,144,309,109,304"/>
+<area shape="rect" id="Node000026" href="$edit_8c.html#a730c92e29ad74b9c6da4cc4bfd29aa6a" title="Move idx left to the previous UTF&#45;8 character boundary." alt="" coords="157,356,312,381"/>
+<area shape="poly" id="edge26_Node000001_Node000026" title=" " alt="" coords="82,304,158,342,177,349,175,354,156,347,80,309"/>
+<area shape="rect" id="Node000027" href="$history_8c.html#a49968f00b1bd25fd8f6652c451d82f36" title="Look up history entry at idx (0 = oldest)." alt="" coords="191,405,279,431"/>
+<area shape="poly" id="edge28_Node000001_Node000027" title=" " alt="" coords="70,305,106,348,131,371,159,392,179,402,176,406,156,396,127,375,102,351,66,308"/>
+<area shape="rect" id="Node000028" href="$history_8c.html#ab7cb53e6f1fc98abca0bbdd95a9bfd56" title="Return the number of entries currently held." alt="" coords="179,455,290,480"/>
+<area shape="poly" id="edge29_Node000001_Node000028" title=" " alt="" coords="66,306,99,371,125,409,159,441,169,447,166,452,156,445,121,412,94,373,61,308"/>
+<area shape="rect" id="Node000029" href="$edit_8c.html#a89eff61e38e725b9f70be86f28e8ac28" title="Count visible columns in s, skipping ESC[...m sequences." alt="" coords="185,504,284,529"/>
+<area shape="poly" id="edge32_Node000001_Node000029" title=" " alt="" coords="64,306,74,343,92,392,120,445,138,469,159,491,174,500,171,505,156,495,134,473,116,448,87,394,69,344,59,308"/>
+<area shape="rect" id="Node000003" href="$edit_8c.html#ad639ab0386e6acda4129570616eff51e" title="Print completion candidates in coloured columns (double&#45;tab)." alt="" coords="360,104,480,129"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="258,203,382,134,385,138,260,207"/>
+<area shape="poly" id="edge23_Node000002_Node000007" title=" " alt="" coords="282,215,375,207,428,198,479,183,528,161,569,135,572,140,530,166,481,189,429,203,375,212,282,220"/>
+<area shape="rect" id="Node000008" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="561,501,639,527"/>
+<area shape="poly" id="edge6_Node000002_Node000008" title=" " alt="" coords="262,229,314,263,338,290,347,303,361,316,394,332,423,339,452,347,482,368,494,384,501,400,506,430,511,460,518,474,530,488,549,501,547,505,526,492,513,477,506,461,501,431,496,401,490,387,478,372,450,351,422,344,392,337,359,320,343,306,333,294,310,267,259,233"/>
+<area shape="poly" id="edge8_Node000002_Node000010" title=" " alt="" coords="284,229,314,248,326,263,333,277,339,305,345,332,362,360,376,372,373,376,358,364,340,334,334,306,328,279,321,266,310,252,281,233"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="244,203,289,150,322,118,358,89,367,84,370,88,362,94,326,122,293,153,248,207"/>
+<area shape="rect" id="Node000012" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="367,280,473,305"/>
+<area shape="poly" id="edge12_Node000002_Node000012" title=" " alt="" coords="268,228,376,272,374,277,266,233"/>
+<area shape="rect" id="Node000004" href="$edit_8c.html#aa7654baef48ef9a60e7973387009299f" title="Return the display name for a completion entry (strip dir prefix)." alt="" coords="528,55,672,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="466,101,538,81,540,86,468,107"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="456,101,478,89,493,77,502,65,511,52,527,40,549,28,552,33,529,44,515,56,506,68,496,80,482,94,459,106"/>
+<area shape="poly" id="edge5_Node000003_Node000007" title=" " alt="" coords="480,114,545,114,545,119,480,119"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="720,527,807,552"/>
+<area shape="poly" id="edge7_Node000008_Node000009" title=" " alt="" coords="640,517,707,528,706,533,639,523"/>
+<area shape="poly" id="edge9_Node000010_Node000009" title=" " alt="" coords="428,406,441,435,462,472,492,509,510,525,529,537,573,552,620,557,665,556,706,550,707,556,666,561,619,563,572,557,527,542,506,529,488,513,458,475,437,437,424,408"/>
+<area shape="poly" id="edge11_Node000011_Node000005" title=" " alt="" coords="466,52,550,29,552,34,468,57"/>
+<area shape="poly" id="edge14_Node000012_Node000008" title=" " alt="" coords="457,304,482,323,496,346,503,367,505,409,508,449,515,468,530,488,549,501,546,506,526,492,510,471,502,450,499,409,498,368,491,348,478,326,454,308"/>
+<area shape="rect" id="Node000013" href="$complete_8c.html#afe1c4a00bc178d85024f218962e226da" title="Compute the longest common prefix across all entries in out." alt="" coords="529,403,671,428"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="453,303,482,323,497,341,506,358,514,374,530,389,537,394,534,399,526,393,510,377,501,360,493,344,478,327,450,308"/>
+<area shape="rect" id="Node000014" href="$compiler__abi_8c.html#a1aeb4017ca34da59589e381fd2d963ee" title=" " alt="" coords="562,452,638,477"/>
+<area shape="poly" id="edge15_Node000012_Node000014" title=" " alt="" coords="456,303,482,323,493,339,500,354,505,383,511,411,518,425,530,439,550,452,547,456,526,443,514,428,506,413,500,384,495,356,489,341,478,327,452,308"/>
+<area shape="rect" id="Node000016" href="$complete_8c.html#a098b0148d9bc1cb0deca349abb5b98a2" title="Scan a directory for command&#45;name entries matching prefix." alt="" coords="545,205,655,231"/>
+<area shape="poly" id="edge16_Node000012_Node000016" title=" " alt="" coords="445,278,527,240,545,233,546,238,529,244,447,282"/>
+<area shape="rect" id="Node000020" href="$complete_8c.html#a622c44c54e814a2b4a3e7575b069aa62" title="Add a candidate to out if it matches prefix and isn&#39;t a duplicate." alt="" coords="728,205,799,231"/>
+<area shape="poly" id="edge22_Node000012_Node000020" title=" " alt="" coords="433,278,527,190,577,179,628,179,676,187,718,198,716,203,675,192,627,184,577,184,529,195,437,282"/>
+<area shape="rect" id="Node000021" href="$complete_8c.html#aa61f9f2bc47d14007ed6b24c853a44bd" title="Scan a directory for path&#45;completion entries matching name_prefix." alt="" coords="544,255,656,280"/>
+<area shape="poly" id="edge18_Node000012_Node000021" title=" " alt="" coords="473,283,530,275,530,280,473,288"/>
+<area shape="rect" id="Node000023" href="$builtins_8c.html#ac0a66823926a43ef1a8789fe46191936" title="Return the NULL&#45;terminated array of builtin command names." alt="" coords="544,304,656,329"/>
+<area shape="poly" id="edge20_Node000012_Node000023" title=" " alt="" coords="473,297,530,305,530,310,473,302"/>
+<area shape="rect" id="Node000024" href="$sys_8c.html#abb1d3053a2319560989362c984cdd2a7" title="Get the current working directory into buf of size bytes." alt="" coords="555,353,645,379"/>
+<area shape="poly" id="edge21_Node000012_Node000024" title=" " alt="" coords="448,303,529,340,547,346,545,351,527,344,446,308"/>
+<area shape="poly" id="edge17_Node000016_Node000020" title=" " alt="" coords="656,215,714,215,714,221,656,221"/>
+<area shape="poly" id="edge19_Node000021_Node000020" title=" " alt="" coords="642,252,714,230,716,235,643,257"/>
+</map>

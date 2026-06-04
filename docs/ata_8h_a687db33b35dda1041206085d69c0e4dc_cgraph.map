@@ -1,0 +1,125 @@
+<map id="ata_init" name="ata_init">
+<area shape="rect" id="Node000001" title="Initialize ATA subsystem and detect drives." alt="" coords="5,633,76,659"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a8fb7c02769509cb3a7399f56dd42681b" title=" " alt="" coords="132,5,257,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="39,633,41,521,52,344,62,251,76,164,96,92,108,64,122,42,126,37,130,41,126,45,113,66,101,94,81,165,67,251,57,345,47,521,45,633"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="1081,559,1132,584"/>
+<area shape="poly" id="edge72_Node000001_Node000005" title=" " alt="" coords="77,647,217,661,399,669,777,669,819,666,860,660,941,639,1013,613,1068,588,1070,593,1015,618,943,644,862,665,819,672,777,674,399,674,217,666,76,653"/>
+<area shape="rect" id="Node000007" href="$ata_8c.html#a2e42765bdca6c8d40cafe008a9c35e7e" title=" " alt="" coords="561,207,639,232"/>
+<area shape="poly" id="edge76_Node000001_Node000007" title=" " alt="" coords="41,633,60,543,78,478,105,405,140,332,186,264,213,233,243,205,276,181,312,162,360,146,399,142,440,148,489,162,504,169,514,176,537,193,550,199,548,204,535,198,511,181,501,173,487,167,439,154,399,147,361,151,314,167,279,186,246,209,217,237,190,267,145,335,110,408,83,479,65,544,46,634"/>
+<area shape="rect" id="Node000008" href="$ata_8c.html#ae320cdeb9f17d5b97075bf4f22b76bcc" title=" " alt="" coords="124,55,265,80"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="40,633,44,530,56,371,67,287,81,209,99,144,122,98,135,85,139,89,126,101,104,146,86,210,72,288,62,372,49,531,45,633"/>
+<area shape="rect" id="Node000009" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="545,912,655,937"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="66,656,125,688,227,733,309,765,389,797,489,848,572,901,569,906,487,852,387,802,307,770,225,738,123,692,63,661"/>
+<area shape="rect" id="Node000020" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="137,836,252,861"/>
+<area shape="poly" id="edge18_Node000001_Node000020" title=" " alt="" coords="54,657,178,824,174,827,49,660"/>
+<area shape="rect" id="Node000024" href="$ata_8c.html#a69cc2f51d9f7c84d9f7ae376cbb59ffb" title="Run IDENTIFY and populate drive descriptor." alt="" coords="159,381,230,407"/>
+<area shape="poly" id="edge28_Node000001_Node000024" title=" " alt="" coords="47,632,176,418,181,420,52,635"/>
+<area shape="rect" id="Node000035" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="155,1139,234,1164"/>
+<area shape="poly" id="edge48_Node000001_Node000035" title=" " alt="" coords="48,658,188,1124,183,1126,43,660"/>
+<area shape="rect" id="Node000058" href="$idt_8c.html#a667ec0b02033ad55d73e9b8b32b034a5" title="Register a callback for a hardware IRQ line." alt="" coords="147,1188,243,1213"/>
+<area shape="poly" id="edge71_Node000001_Node000058" title=" " alt="" coords="45,659,49,759,61,914,71,995,85,1071,103,1133,126,1175,136,1184,133,1188,122,1178,98,1135,80,1072,66,996,55,914,43,759,40,659"/>
+<area shape="rect" id="Node000059" href="$pic_8c.html#a3e514f789fbbbf7edfd418e7982743fd" title="Unmask (enable) an IRQ line." alt="" coords="726,559,826,584"/>
+<area shape="poly" id="edge73_Node000001_Node000059" title=" " alt="" coords="76,640,712,575,713,580,77,645"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#abde118a713492fc92ec9f7b6258933db" title="ATA IRQ handler — reading status clears the device&#39;s IRQ line." alt="" coords="367,55,434,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,28,354,54,353,59,248,33"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="927,305,969,331"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="435,74,462,83,489,97,504,109,514,120,523,130,537,141,601,169,688,196,775,223,841,248,883,271,920,295,917,299,880,275,839,252,773,228,686,201,599,174,535,146,520,134,510,123,501,112,487,102,460,88,433,79"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="434,64,538,68,602,76,665,91,774,127,858,161,895,183,932,211,970,247,1010,292,1032,323,1051,357,1079,427,1096,493,1105,544,1100,545,1091,495,1074,429,1046,359,1028,326,1006,296,966,250,929,215,892,187,856,166,772,132,663,97,601,81,538,73,434,69"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="555,105,645,131"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="435,73,542,101,541,106,433,78"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="435,71,463,81,490,97,508,120,515,142,522,163,538,185,554,198,551,202,534,189,517,166,510,143,503,122,486,101,461,86,433,76"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="640,228,914,306,913,311,639,233"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="265,65,354,65,354,70,265,70"/>
+<area shape="rect" id="Node000010" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="712,836,840,861"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="629,910,732,864,734,869,631,914"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="888,711,1008,736"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="793,834,917,742,920,746,796,838"/>
+<area shape="rect" id="Node000012" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="899,787,997,812"/>
+<area shape="poly" id="edge14_Node000010_Node000012" title=" " alt="" coords="820,833,889,813,891,818,822,839"/>
+<area shape="rect" id="Node000013" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="1056,836,1157,861"/>
+<area shape="poly" id="edge16_Node000010_Node000013" title=" " alt="" coords="823,859,888,871,948,876,1008,871,1052,862,1053,868,1008,877,948,881,888,877,822,864"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="919,836,977,861"/>
+<area shape="poly" id="edge17_Node000010_Node000017" title=" " alt="" coords="840,846,906,846,906,851,840,851"/>
+<area shape="poly" id="edge13_Node000011_Node000005" title=" " alt="" coords="975,708,1006,688,1053,640,1088,594,1092,597,1057,643,1010,692,978,713"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="990,809,1053,829,1051,834,989,815"/>
+<area shape="poly" id="edge19_Node000020_Node000009" title=" " alt="" coords="221,859,263,879,314,897,371,908,428,916,532,922,532,927,428,921,370,914,313,902,261,884,218,864"/>
+<area shape="poly" id="edge20_Node000020_Node000010" title=" " alt="" coords="212,859,255,893,284,911,314,925,410,959,451,970,489,977,528,979,568,975,612,965,663,948,691,933,717,913,756,870,760,874,720,916,694,937,665,952,614,970,569,980,528,984,489,982,450,975,409,964,312,930,281,916,252,898,208,863"/>
+<area shape="rect" id="Node000021" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="359,861,442,887"/>
+<area shape="poly" id="edge21_Node000020_Node000021" title=" " alt="" coords="252,853,346,865,345,870,252,858"/>
+<area shape="rect" id="Node000022" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="562,761,638,787"/>
+<area shape="poly" id="edge24_Node000020_Node000022" title=" " alt="" coords="237,833,313,814,440,792,548,777,549,782,441,797,314,819,239,838"/>
+<area shape="rect" id="Node000023" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="558,811,642,836"/>
+<area shape="poly" id="edge26_Node000020_Node000023" title=" " alt="" coords="252,842,544,824,545,829,253,848"/>
+<area shape="poly" id="edge22_Node000021_Node000009" title=" " alt="" coords="443,882,537,906,535,911,442,887"/>
+<area shape="poly" id="edge23_Node000021_Node000010" title=" " alt="" coords="442,869,698,851,698,857,442,874"/>
+<area shape="poly" id="edge25_Node000022_Node000010" title=" " alt="" coords="634,784,665,797,735,828,733,833,663,802,632,789"/>
+<area shape="poly" id="edge27_Node000023_Node000010" title=" " alt="" coords="643,827,699,835,698,840,642,832"/>
+<area shape="poly" id="edge41_Node000024_Node000007" title=" " alt="" coords="196,380,208,341,230,289,264,235,286,212,312,193,343,180,375,172,408,170,442,171,505,183,557,199,556,204,504,188,441,177,409,175,376,177,344,185,315,198,290,216,268,238,235,291,213,343,201,382"/>
+<area shape="rect" id="Node000025" href="$ata_8c.html#a2dbd463b4d0069e223eab48b63d80977" title="Check whether a device is present (0xFF = floating bus)." alt="" coords="341,207,460,232"/>
+<area shape="poly" id="edge29_Node000024_Node000025" title=" " alt="" coords="200,380,241,314,273,276,312,242,327,234,330,239,315,247,277,279,245,317,205,382"/>
+<area shape="rect" id="Node000026" href="$ata_8c.html#a19176aed0b71563bf7d030583c5865b1" title=" " alt="" coords="548,356,652,381"/>
+<area shape="poly" id="edge31_Node000024_Node000026" title=" " alt="" coords="230,389,534,370,534,375,230,395"/>
+<area shape="rect" id="Node000028" href="$io_8h.html#aae25743490c4dc54e9a713c64e79d7af" title="Read a word from an I/O port." alt="" coords="378,508,423,533"/>
+<area shape="poly" id="edge34_Node000024_Node000028" title=" " alt="" coords="211,405,255,444,315,486,366,508,364,513,312,491,252,448,207,409"/>
+<area shape="rect" id="Node000029" href="$ata_8c.html#ab080ebc34772e3b0ce3cc2ee637005ac" title="Poll until BSY clears." alt="" coords="363,256,439,281"/>
+<area shape="poly" id="edge35_Node000024_Node000029" title=" " alt="" coords="206,379,249,337,279,313,312,292,348,277,350,282,315,296,283,317,253,341,209,383"/>
+<area shape="rect" id="Node000031" href="$ata_8c.html#afece4807d5a19ec91aa03298b05f7351" title="Poll until DRQ asserted (BSY clear)." alt="" coords="363,305,438,331"/>
+<area shape="poly" id="edge38_Node000024_Node000031" title=" " alt="" coords="229,379,312,348,351,333,353,338,314,352,231,384"/>
+<area shape="rect" id="Node000032" href="$ata_8c.html#aac0ce9774302791de96fdba30cfbc3b9" title=" " alt="" coords="559,457,641,483"/>
+<area shape="poly" id="edge42_Node000024_Node000032" title=" " alt="" coords="221,404,263,425,314,442,375,454,437,462,545,468,545,473,437,467,374,460,313,447,261,429,218,409"/>
+<area shape="rect" id="Node000033" href="$ata_8c.html#a76551fd547f6d7ea4a7da3efc4bce305" title="Select a drive on its channel (master or slave)." alt="" coords="350,407,451,432"/>
+<area shape="poly" id="edge44_Node000024_Node000033" title=" " alt="" coords="230,396,337,409,336,414,230,401"/>
+<area shape="rect" id="Node000034" href="$ata_8c.html#ab63f05247c2c72f1ddc451636dde2cbf" title="Right&#45;trim spaces and NULs from an ATA identify string." alt="" coords="354,557,447,583"/>
+<area shape="poly" id="edge47_Node000024_Node000034" title=" " alt="" coords="205,405,245,472,277,511,315,544,342,557,339,561,312,548,273,514,240,475,200,408"/>
+<area shape="poly" id="edge30_Node000025_Node000007" title=" " alt="" coords="460,217,547,217,547,222,460,222"/>
+<area shape="rect" id="Node000027" href="$ata_8c.html#a210a41152ac79a3588f1869164b196f2" title=" " alt="" coords="733,332,819,357"/>
+<area shape="poly" id="edge32_Node000026_Node000027" title=" " alt="" coords="652,359,718,350,719,355,653,364"/>
+<area shape="poly" id="edge33_Node000027_Node000004" title=" " alt="" coords="819,335,913,321,914,326,820,341"/>
+<area shape="poly" id="edge37_Node000029_Node000007" title=" " alt="" coords="438,257,547,230,548,235,440,262"/>
+<area shape="rect" id="Node000030" href="$cpu_8c.html#a72dd5d1604adc49aa410d8bd39714cb5" title="CPU pause instruction for spinlock optimization." alt="" coords="555,280,645,305"/>
+<area shape="poly" id="edge36_Node000029_Node000030" title=" " alt="" coords="439,271,541,283,541,288,439,276"/>
+<area shape="poly" id="edge40_Node000031_Node000007" title=" " alt="" coords="437,308,487,292,532,266,571,239,574,243,535,270,489,296,439,313"/>
+<area shape="poly" id="edge39_Node000031_Node000030" title=" " alt="" coords="438,311,541,297,542,303,438,316"/>
+<area shape="poly" id="edge43_Node000032_Node000005" title=" " alt="" coords="642,476,1068,561,1067,566,641,481"/>
+<area shape="poly" id="edge45_Node000033_Node000026" title=" " alt="" coords="451,404,536,382,537,387,452,409"/>
+<area shape="poly" id="edge46_Node000033_Node000032" title=" " alt="" coords="452,430,546,454,544,459,451,435"/>
+<area shape="poly" id="edge49_Node000035_Node000009" title=" " alt="" coords="207,1137,252,1096,312,1050,374,1015,437,985,548,940,550,944,440,990,376,1020,315,1055,255,1100,211,1140"/>
+<area shape="rect" id="Node000036" href="$pci_8c.html#a4a3a26341cdca867f78928565db5bc8a" title="Enable bus mastering for a PCI device." alt="" coords="313,1064,488,1089"/>
+<area shape="poly" id="edge50_Node000035_Node000036" title=" " alt="" coords="224,1136,312,1101,342,1091,344,1096,314,1106,226,1141"/>
+<area shape="rect" id="Node000044" href="$pci_8c.html#accf929056b06889454a27d9013ef3aee" title="Find PCI device by class and subclass." alt="" coords="339,1115,462,1140"/>
+<area shape="poly" id="edge53_Node000035_Node000044" title=" " alt="" coords="234,1144,325,1133,326,1139,235,1149"/>
+<area shape="rect" id="Node000049" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="349,1164,452,1189"/>
+<area shape="poly" id="edge57_Node000035_Node000049" title=" " alt="" coords="235,1153,336,1166,335,1171,234,1159"/>
+<area shape="rect" id="Node000051" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="353,1213,448,1239"/>
+<area shape="poly" id="edge59_Node000035_Node000051" title=" " alt="" coords="235,1162,266,1174,314,1200,341,1209,339,1214,312,1204,264,1179,233,1167"/>
+<area shape="rect" id="Node000054" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="331,1263,471,1288"/>
+<area shape="poly" id="edge62_Node000035_Node000054" title=" " alt="" coords="236,1158,267,1175,284,1194,291,1213,299,1232,315,1249,323,1255,321,1259,312,1253,295,1235,287,1215,279,1197,264,1179,233,1163"/>
+<area shape="rect" id="Node000055" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="356,1312,445,1337"/>
+<area shape="poly" id="edge65_Node000035_Node000055" title=" " alt="" coords="235,1156,252,1164,267,1175,280,1191,287,1207,291,1239,296,1270,303,1284,315,1299,344,1315,341,1319,312,1303,298,1287,291,1271,286,1240,282,1209,275,1194,263,1179,249,1168,233,1161"/>
+<area shape="rect" id="Node000057" href="$pmm_8c.html#a038dd8a14e1fd15596007bcc2bd9184c" title="Free multiple contiguous physical pages." alt="" coords="333,1361,468,1387"/>
+<area shape="poly" id="edge68_Node000035_Node000057" title=" " alt="" coords="235,1156,252,1163,267,1175,283,1197,290,1220,291,1264,292,1307,300,1327,315,1348,323,1355,320,1359,311,1352,295,1330,287,1308,286,1264,285,1221,278,1200,263,1179,250,1168,233,1161"/>
+<area shape="rect" id="Node000037" href="$pci_8c.html#a04b573b20a07f8bfa9ccefb89e1f3115" title="Read 16&#45;bit value from PCI configuration space." alt="" coords="729,1113,823,1139"/>
+<area shape="poly" id="edge51_Node000036_Node000037" title=" " alt="" coords="489,1081,664,1101,716,1110,715,1115,664,1106,488,1086"/>
+<area shape="rect" id="Node000042" href="$pci_8c.html#a3a1084d4226e71015aa3ad09f78b161a" title="Write 16&#45;bit value to PCI configuration space." alt="" coords="551,1013,649,1039"/>
+<area shape="poly" id="edge52_Node000036_Node000042" title=" " alt="" coords="451,1061,537,1039,539,1044,452,1066"/>
+<area shape="rect" id="Node000045" href="$pci_8c.html#a80249f702c08b4245285096d47a68d00" title=" " alt="" coords="549,1115,651,1140"/>
+<area shape="poly" id="edge54_Node000044_Node000045" title=" " alt="" coords="462,1125,535,1125,535,1130,462,1130"/>
+<area shape="rect" id="Node000046" href="$pci_8c.html#a21f2f28f1e12177e4ea4f88554ae3ae6" title="Iterate all PCI devices and invoke cb until it returns true." alt="" coords="548,1164,652,1189"/>
+<area shape="poly" id="edge55_Node000044_Node000046" title=" " alt="" coords="453,1137,535,1158,534,1163,452,1143"/>
+<area shape="poly" id="edge56_Node000046_Node000037" title=" " alt="" coords="644,1161,717,1140,718,1145,646,1166"/>
+<area shape="rect" id="Node000050" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="536,1213,664,1239"/>
+<area shape="poly" id="edge58_Node000049_Node000050" title=" " alt="" coords="453,1187,535,1207,534,1213,451,1192"/>
+<area shape="rect" id="Node000052" href="$pmm_8c.html#aaed7a89cb2264555f10bf9e03b06676e" title="Mark page as allocated in bitmap." alt="" coords="553,1263,647,1288"/>
+<area shape="poly" id="edge60_Node000051_Node000052" title=" " alt="" coords="449,1235,540,1258,539,1263,447,1240"/>
+<area shape="rect" id="Node000053" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="550,1312,650,1337"/>
+<area shape="poly" id="edge61_Node000051_Node000053" title=" " alt="" coords="449,1232,489,1249,505,1261,514,1274,523,1286,538,1298,547,1304,544,1309,534,1303,519,1290,510,1277,501,1265,487,1254,447,1237"/>
+<area shape="poly" id="edge63_Node000054_Node000052" title=" " alt="" coords="471,1273,539,1273,539,1278,471,1278"/>
+<area shape="poly" id="edge64_Node000054_Node000053" title=" " alt="" coords="453,1285,537,1307,536,1312,452,1291"/>
+<area shape="poly" id="edge67_Node000055_Node000053" title=" " alt="" coords="446,1322,536,1322,536,1327,446,1327"/>
+<area shape="rect" id="Node000056" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="547,1361,653,1387"/>
+<area shape="poly" id="edge66_Node000055_Node000056" title=" " alt="" coords="446,1333,535,1355,534,1361,445,1338"/>
+<area shape="poly" id="edge70_Node000057_Node000053" title=" " alt="" coords="452,1359,536,1338,537,1343,453,1364"/>
+<area shape="poly" id="edge69_Node000057_Node000056" title=" " alt="" coords="468,1371,533,1371,533,1377,468,1377"/>
+<area shape="poly" id="edge74_Node000059_Node000004" title=" " alt="" coords="784,557,928,341,933,344,788,560"/>
+<area shape="poly" id="edge75_Node000059_Node000005" title=" " alt="" coords="826,569,1067,569,1067,574,826,574"/>
+</map>

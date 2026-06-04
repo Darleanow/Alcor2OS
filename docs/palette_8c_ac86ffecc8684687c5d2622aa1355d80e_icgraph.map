@@ -1,0 +1,9 @@
+<map id="ansi256_to_rgb" name="ansi256_to_rgb">
+<area shape="rect" id="Node000001" title="Map an xterm 256&#45;colour index to a 0xRRGGBB triplet." alt="" coords="460,13,581,38"/>
+<area shape="rect" id="Node000002" href="$sgr_8c.html#a3125f4bf8200627647a7427cf49a7587" title="Handle the multi&#45;param extended colour forms 38;5;N, 38;2;R;G;B, 48;5;N, 48;2;R;G;B." alt="" coords="259,5,412,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="446,28,413,28,413,23,446,23"/>
+<area shape="rect" id="Node000003" href="$sgr_8c.html#ac4f95099e325c3abc02d3bb6dba97b98" title="CSI m — Select Graphic Rendition. Defined in sgr.c; called from csi.c&#39;s handle_csi switch." alt="" coords="144,13,211,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="245,28,211,28,211,23,245,23"/>
+<area shape="rect" id="Node000004" href="$csi_8c.html#a13481ca709daa8398739bba14a24f240" title="Final&#45;byte dispatcher for the assembled CSI sequence." alt="" coords="5,13,96,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="130,28,96,28,96,23,130,23"/>
+</map>

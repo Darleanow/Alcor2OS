@@ -1,0 +1,15 @@
+<map id="cache_get_block" name="cache_get_block">
+<area shape="rect" id="Node000001" title="Borrow a one&#45;block scratch buffer from the pool." alt="" coords="5,55,136,80"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="184,55,259,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,65,170,65,170,70,136,70"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="307,5,428,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="258,52,315,33,317,38,260,57"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="313,55,422,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="259,65,299,65,299,70,259,70"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="321,104,413,129"/>
+<area shape="poly" id="edge6_Node000002_Node000016" title=" " alt="" coords="260,77,317,97,315,102,258,82"/>
+<area shape="rect" id="Node000005" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="476,31,616,56"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="422,57,462,52,463,57,423,63"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="500,80,592,105"/>
+<area shape="poly" id="edge5_Node000004_Node000008" title=" " alt="" coords="423,72,486,82,485,87,422,78"/>
+</map>

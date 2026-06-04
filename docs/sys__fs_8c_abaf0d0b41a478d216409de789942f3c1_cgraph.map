@@ -1,0 +1,13 @@
+<map id="sys_close" name="sys_close">
+<area shape="rect" id="Node000001" title="Release fd and decrement its OFT refcount." alt="" coords="5,31,91,56"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#a44d4878d7034e836fb13eff8587f0160" title="Release a file descriptor and decrement the OFT refcount." alt="" coords="139,31,221,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,41,125,41,125,46,91,46"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="279,5,381,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="221,34,265,26,266,32,222,39"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="269,55,391,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="222,47,256,53,255,58,221,53"/>
+<area shape="rect" id="Node000005" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="440,29,565,55"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="390,56,426,51,427,56,391,61"/>
+<area shape="rect" id="Node000007" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="439,79,567,104"/>
+<area shape="poly" id="edge5_Node000004_Node000007" title=" " alt="" coords="391,73,425,78,425,83,390,78"/>
+</map>

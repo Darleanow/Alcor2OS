@@ -1,0 +1,54 @@
+<map id="init_interrupts" name="init_interrupts">
+<area shape="rect" id="Node000001" title="Initialize interrupt controllers and drivers." alt="" coords="5,332,119,357"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="179,157,289,183"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,330,209,191,213,195,78,333"/>
+<area shape="rect" id="Node000014" href="$keyboard_8c.html#a5aae8263abc1dec4671638e7ed4af681" title="Initialize the PS/2 keyboard driver." alt="" coords="179,283,289,308"/>
+<area shape="poly" id="edge9_Node000001_Node000014" title=" " alt="" coords="106,329,175,309,177,314,108,335"/>
+<area shape="rect" id="Node000021" href="$pic_8c.html#afc70164c232cee70941b16e3f2ca029a" title="Initialize and remap the 8259 PIC." alt="" coords="396,532,465,557"/>
+<area shape="poly" id="edge18_Node000001_Node000021" title=" " alt="" coords="81,355,120,385,168,417,285,479,387,524,385,529,283,483,165,422,117,389,78,360"/>
+<area shape="rect" id="Node000023" href="$pit_8c.html#a2313126b212ea1f3f119b317f5de6245" title="Run the scheduler on each tick (enable preemption)." alt="" coords="167,381,301,407"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="108,355,177,375,175,380,106,360"/>
+<area shape="rect" id="Node000024" href="$pit_8c.html#aad83f0d07314d8845558b13050011b0d" title="Program the PIT and install the timer IRQ handler." alt="" coords="201,332,267,357"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="119,342,187,342,187,347,119,347"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="367,80,495,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,155,384,108,386,113,268,160"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="561,129,681,155"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="481,103,559,123,557,128,480,108"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="573,31,670,56"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="480,77,559,57,560,62,481,83"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="731,5,832,31"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="446,78,494,44,526,28,559,15,600,8,641,4,717,7,717,12,641,10,600,13,561,21,528,33,497,49,449,82"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="593,80,650,105"/>
+<area shape="poly" id="edge8_Node000003_Node000011" title=" " alt="" coords="495,90,579,90,579,95,495,95"/>
+<area shape="rect" id="Node000005" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="756,383,807,408"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="636,153,685,218,734,300,770,369,765,372,729,303,680,221,631,156"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="670,33,717,26,717,31,671,38"/>
+<area shape="rect" id="Node000015" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="760,231,803,256"/>
+<area shape="poly" id="edge10_Node000014_Node000015" title=" " alt="" coords="247,280,290,247,318,231,349,218,440,197,514,195,589,203,683,217,747,230,746,236,682,222,588,209,514,200,441,203,350,223,321,235,293,252,251,285"/>
+<area shape="rect" id="Node000016" href="$idt_8c.html#a667ec0b02033ad55d73e9b8b32b034a5" title="Register a callback for a hardware IRQ line." alt="" coords="383,332,479,357"/>
+<area shape="poly" id="edge11_Node000014_Node000016" title=" " alt="" coords="286,305,370,327,368,332,285,311"/>
+<area shape="rect" id="Node000017" href="$keyboard_8c.html#a91e1bd244fa1ddc661eeeed18f4bcb38" title=" " alt="" coords="349,232,512,257"/>
+<area shape="poly" id="edge12_Node000014_Node000017" title=" " alt="" coords="284,280,367,258,368,263,285,285"/>
+<area shape="rect" id="Node000020" href="$pic_8c.html#a3e514f789fbbbf7edfd418e7982743fd" title="Unmask (enable) an IRQ line." alt="" coords="381,283,481,308"/>
+<area shape="poly" id="edge15_Node000014_Node000020" title=" " alt="" coords="289,293,367,293,367,298,289,298"/>
+<area shape="rect" id="Node000018" href="$keyboard_8c.html#a46b78f9b5f3f9a5e5d24871774db270c" title=" " alt="" coords="568,231,675,256"/>
+<area shape="poly" id="edge13_Node000017_Node000018" title=" " alt="" coords="512,241,554,241,554,246,512,247"/>
+<area shape="poly" id="edge14_Node000018_Node000015" title=" " alt="" coords="675,241,746,241,746,246,675,246"/>
+<area shape="poly" id="edge17_Node000020_Node000005" title=" " alt="" coords="477,306,744,382,742,387,476,311"/>
+<area shape="poly" id="edge16_Node000020_Node000015" title=" " alt="" coords="481,290,574,281,682,266,746,251,747,256,683,271,575,287,481,295"/>
+<area shape="poly" id="edge21_Node000021_Node000005" title=" " alt="" coords="460,555,506,571,563,585,594,587,624,586,654,580,681,568,700,554,717,537,743,497,761,456,772,420,777,422,766,458,748,500,721,540,704,558,684,572,655,585,625,591,593,593,562,590,504,576,459,560"/>
+<area shape="rect" id="Node000022" href="$io_8h.html#a488d1b3600792ee3aac5be4b7e0be16b" title="Short I/O delay (write to port 0x80)." alt="" coords="587,532,656,557"/>
+<area shape="poly" id="edge19_Node000021_Node000022" title=" " alt="" coords="466,542,572,542,572,547,466,547"/>
+<area shape="poly" id="edge20_Node000022_Node000005" title=" " alt="" coords="655,533,681,518,707,495,730,469,764,418,769,421,734,472,711,499,684,523,657,537"/>
+<area shape="poly" id="edge24_Node000024_Node000016" title=" " alt="" coords="267,342,369,342,369,347,267,347"/>
+<area shape="poly" id="edge25_Node000024_Node000020" title=" " alt="" coords="267,334,367,309,368,314,268,339"/>
+<area shape="rect" id="Node000025" href="$pit_8c.html#a1ec93c1a5802efe9e3925acb8ccb5f64" title=" " alt="" coords="371,433,490,459"/>
+<area shape="poly" id="edge26_Node000024_Node000025" title=" " alt="" coords="269,351,303,368,318,381,327,394,336,406,351,418,365,426,362,431,348,423,332,410,323,397,314,385,300,372,266,356"/>
+<area shape="rect" id="Node000083" href="$pit_8c.html#aeb02a58361ba396db774530bfe97be0e" title="Program PIT channel 0 for frequency Hz (clamped to a sane range)." alt="" coords="380,383,481,408"/>
+<area shape="poly" id="edge29_Node000024_Node000083" title=" " alt="" coords="268,350,368,377,367,382,267,356"/>
+<area shape="rect" id="Node000026" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="560,483,683,508"/>
+<area shape="poly" id="edge27_Node000025_Node000026" title=" " alt="" coords="481,456,559,476,557,482,480,461"/>
+<area shape="rect" id="Node000082" href="$proc_8c.html#a916f6799bcbfee16430e01cb28f57514" title="Timer hook: request a reschedule at the next syscall boundary." alt="" coords="581,433,662,459"/>
+<area shape="poly" id="edge28_Node000025_Node000082" title=" " alt="" coords="490,443,567,443,567,449,490,449"/>
+<area shape="poly" id="edge30_Node000083_Node000005" title=" " alt="" coords="481,393,742,393,742,398,481,398"/>
+</map>

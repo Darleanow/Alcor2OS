@@ -1,0 +1,5 @@
+<map id="init_directory_inode" name="init_directory_inode">
+<area shape="rect" id="Node000001" title="Initialise the in&#45;memory new&#45;directory inode." alt="" coords="5,5,156,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="204,5,263,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,15,190,15,190,21,156,21"/>
+</map>

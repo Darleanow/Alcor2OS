@@ -1,0 +1,9 @@
+<map id="mouse_cursor_invalidate_for_scroll" name="mouse_cursor_invalidate_for_scroll">
+<area shape="rect" id="Node000001" title="Erase the cursor (if drawn) so an imminent scrollback pixel&#45;move doesn&#39;t kmemcpy a stale arrow into a..." alt="" coords="599,5,784,45"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a5eb39721ae7c9e68a54d078fc0fa6033" title="Drain the pending&#45;scroll counter: copies pixels up in one MMIO blit and marks the freshly exposed row..." alt="" coords="396,13,551,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="585,28,551,28,551,23,585,23"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#a7654752ac7d61f4811d1c6b0cd53f56c" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="185,13,348,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="382,28,348,28,348,23,382,23"/>
+<area shape="rect" id="Node000004" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="5,13,137,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="172,28,138,28,138,23,172,23"/>
+</map>

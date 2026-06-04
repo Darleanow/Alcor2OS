@@ -1,0 +1,7 @@
+<map id="load_group_descriptors" name="load_group_descriptors">
+<area shape="rect" id="Node000001" title="Allocate vol&#45;&gt;groups and fill it from disk." alt="" coords="332,5,505,31"/>
+<area shape="rect" id="Node000002" href="$super_8c.html#aa3b33fc4657b2e71defc951eeb6f2ada" title="Mount an ext2 partition: read the superblock, validate the magic, load the group descriptor table int..." alt="" coords="184,5,284,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="318,21,284,21,284,15,318,15"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#a7d42ab75249625e6a128b68687bc01c5" title="fs_type_t.mount shim — opens the default device." alt="" coords="5,5,136,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="170,21,136,21,136,15,170,15"/>
+</map>

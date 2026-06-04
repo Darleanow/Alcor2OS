@@ -1,0 +1,22 @@
+<map id="free_indirect_subtree" name="free_indirect_subtree">
+<area shape="rect" id="Node000001" title="Recursively free an indirect&#45;block subtree." alt="" coords="544,80,704,105"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="659,70,649,62,624,59,603,61,592,65,590,71,596,78,591,81,585,72,588,62,602,56,624,53,651,57,662,66"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#a14a27d30b184dac4588f28bfa35d7fe5" title="Free every block referenced by inode and reset its counters." alt="" coords="356,80,496,105"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="530,95,496,95,496,90,530,90"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#ab3496119d1da698296609134293d2a0a" title="Close an ext2 file handle." alt="" coords="206,5,298,31"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="382,77,281,33,283,28,384,72"/>
+<area shape="rect" id="Node000005" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="205,55,299,80"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="342,83,299,77,299,71,343,78"/>
+<area shape="rect" id="Node000007" href="$file_8c.html#ab7a3809fc66df5e495777427652c80b3" title="Truncate an ext2 file to length bytes." alt="" coords="196,104,308,129"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="343,107,309,112,308,106,342,102"/>
+<area shape="rect" id="Node000009" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="203,153,301,179"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="383,113,284,156,282,151,381,108"/>
+<area shape="rect" id="Node000004" href="$ops_8c.html#a70bd34c87c3098559b390c7a2feb3cd6" title="fs_ops_t.close shim." alt="" coords="15,5,138,31"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="192,21,138,21,138,15,192,15"/>
+<area shape="rect" id="Node000006" href="$ops_8c.html#ac522aded5a92cdfd53591e3881498544" title="fs_ops_t.rmdir shim." alt="" coords="15,55,138,80"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="192,70,138,70,138,65,192,65"/>
+<area shape="rect" id="Node000008" href="$ops_8c.html#ad32ec2884cb0ef1cd8c3de607fa9651a" title="fs_ops_t.truncate shim." alt="" coords="5,104,148,129"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="182,119,148,119,148,114,182,114"/>
+<area shape="rect" id="Node000010" href="$ops_8c.html#a80c49e4d95295031cd2604075a37d7ce" title="fs_ops_t.unlink shim." alt="" coords="13,153,141,179"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="189,169,141,169,141,163,189,163"/>
+</map>

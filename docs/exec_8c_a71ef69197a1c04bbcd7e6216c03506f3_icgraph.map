@@ -1,0 +1,27 @@
+<map id="exec_pipeline" name="exec_pipeline">
+<area shape="rect" id="Node000001" title=" " alt="" coords="627,329,737,355"/>
+<area shape="rect" id="Node000002" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="488,279,579,304"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="630,327,571,307,572,302,632,322"/>
+<area shape="poly" id="edge7_Node000002_Node000002" title=" " alt="" coords="558,268,551,260,533,257,518,259,511,264,509,270,513,277,509,280,504,270,506,261,517,254,533,252,553,256,562,264"/>
+<area shape="rect" id="Node000003" href="$exec_8c.html#af380c909e0c9b94aa47bb10f1e682d9f" title=" " alt="" coords="335,253,440,279"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="474,284,440,278,441,273,475,279"/>
+<area shape="rect" id="Node000006" href="$exec_8c.html#ad8c357e186435f9520d738f6271e9cf9" title=" " alt="" coords="121,304,273,329"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="474,298,274,314,274,308,474,293"/>
+<area shape="rect" id="Node000007" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="346,131,429,156"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="508,270,399,158,403,154,512,267"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html#ab7dead3657ee4c8808e9366db9a0e5f6" title=" " alt="" coords="108,255,287,280"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="321,269,287,269,287,264,321,264"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="326,285,247,306,245,301,325,280"/>
+<area shape="poly" id="edge5_Node000006_Node000001" title=" " alt="" coords="287,319,626,336,626,342,287,324"/>
+<area shape="rect" id="Node000008" href="$user_2apps_2shell_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,80,60,105"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="332,138,60,99,60,94,333,133"/>
+<area shape="rect" id="Node000009" href="$user_2apps_2vega_2main_8c.html#ae3a067ea1e9a6422d4961a492ef99534" title=" " alt="" coords="162,156,233,181"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="333,153,233,167,233,161,332,148"/>
+<area shape="rect" id="Node000011" href="$user_2apps_2vega_2main_8c.html#a96d656030559612d7fc9ebe5b3421bf1" title=" " alt="" coords="156,205,239,231"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="353,165,288,196,240,211,238,206,286,192,351,160"/>
+<area shape="rect" id="Node000012" href="$expand_8c.html#af26464f800cc1e25fdbc77618c17abd9" title=" " alt="" coords="134,5,261,31"/>
+<area shape="poly" id="edge12_Node000007_Node000012" title=" " alt="" coords="367,121,332,82,310,61,285,44,260,33,262,28,288,40,313,57,336,78,371,118"/>
+<area shape="rect" id="Node000020" href="$vconf_8c.html#afeca6cfc6a44d8a8bdef9d340e11dd66" title="Source path as a vega script with stdout redirected to /dev/null." alt="" coords="132,55,263,80"/>
+<area shape="poly" id="edge13_Node000007_Node000020" title=" " alt="" coords="345,127,286,102,234,83,236,78,288,97,347,122"/>
+<area shape="poly" id="edge14_Node000020_Node000008" title=" " alt="" coords="119,82,60,91,60,86,118,77"/>
+</map>

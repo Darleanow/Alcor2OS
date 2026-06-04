@@ -1,0 +1,7 @@
+<map id="user/core/vega/include/vega/internal/lexer.h" name="user/core/vega/include/vega/internal/lexer.h">
+<area shape="rect" id="Node000001" title="vega tokenizer." alt="" coords="97,5,267,45"/>
+<area shape="rect" id="Node000002" href="$lexer_8c.html" title="vega tokenizer implementation." alt="" coords="5,93,169,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,56,103,95,100,91,147,52"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html" title="Recursive&#45;descent parser building vega AST nodes from tokens." alt="" coords="193,93,363,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,52,265,91,262,95,214,56"/>
+</map>

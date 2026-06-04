@@ -1,0 +1,5 @@
+<map id="init_early" name="init_early">
+<area shape="rect" id="Node000001" title="Initialize early boot subsystems." alt="" coords="116,5,199,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,5,68,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,21,68,21,68,15,102,15"/>
+</map>

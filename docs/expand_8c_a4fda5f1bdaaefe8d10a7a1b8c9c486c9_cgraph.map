@@ -1,0 +1,39 @@
+<map id="expand_word" name="expand_word">
+<area shape="rect" id="Node000001" title="Expand $&#45;syntax in src and return a new heap&#45;allocated string. The caller takes ownership and must fr..." alt="" coords="5,207,115,232"/>
+<area shape="rect" id="Node000002" href="$expand_8c.html#ac4648bb165875a636b911892835620fc" title=" " alt="" coords="338,5,437,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,205,102,151,129,119,161,92,201,69,243,50,323,27,325,32,245,55,203,73,164,96,133,123,106,154,71,208"/>
+<area shape="rect" id="Node000005" href="$expand_8c.html#ad793565e867c053513ab67fe5a576e6d" title=" " alt="" coords="163,107,276,132"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="80,204,185,137,188,142,83,209"/>
+<area shape="rect" id="Node000010" href="$expand_8c.html#a8fad758a4b43ef0f6249301c7aa31727" title=" " alt="" coords="169,207,270,232"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="115,217,155,217,155,222,115,222"/>
+<area shape="rect" id="Node000012" href="$expand_8c.html#a4a9780eaaaed0d8279db200e86bd2982" title=" " alt="" coords="499,359,613,384"/>
+<area shape="poly" id="edge21_Node000001_Node000012" title=" " alt="" coords="76,230,114,266,173,313,245,359,284,379,325,394,371,402,419,402,465,395,505,385,506,391,466,400,420,407,371,408,323,399,282,384,242,364,170,317,111,270,72,234"/>
+<area shape="rect" id="Node000025" href="$expand_8c.html#a260ce47bc8601621fc414e086955dd21" title=" " alt="" coords="168,460,271,485"/>
+<area shape="poly" id="edge22_Node000001_Node000025" title=" " alt="" coords="67,232,78,270,97,325,126,384,165,439,178,451,175,455,161,442,121,387,92,327,73,272,62,233"/>
+<area shape="rect" id="Node000003" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="517,5,595,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="437,15,503,15,503,21,437,21"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="661,5,748,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="596,15,648,15,648,21,596,21"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="237,104,323,48,346,35,349,39,325,52,240,109"/>
+<area shape="rect" id="Node000006" href="$expand_8c.html#a5f970f9d54abe8cf119ab67b13bb9149" title="Look up a user variable." alt="" coords="328,107,447,132"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="276,117,314,117,314,122,276,122"/>
+<area shape="rect" id="Node000008" href="$expand_8c.html#a332cf6505b09f54625e60e45922c306c" title=" " alt="" coords="343,156,431,181"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="264,129,331,149,329,154,262,135"/>
+<area shape="rect" id="Node000009" href="$expand_8c.html#a7de4d94867727af01a33f62c7ac656cc" title=" " alt="" coords="508,156,604,181"/>
+<area shape="poly" id="edge10_Node000005_Node000009" title=" " alt="" coords="251,104,292,91,343,81,398,79,425,83,452,92,468,102,478,115,487,128,500,141,510,147,507,152,497,145,483,132,474,118,465,106,450,96,424,88,398,84,343,86,293,96,252,109"/>
+<area shape="rect" id="Node000007" href="$expand_8c.html#a1f81d950bc683addc1556f5a10292a50" title=" " alt="" coords="519,107,593,132"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="447,117,505,117,505,122,447,122"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="431,166,495,166,495,171,431,171"/>
+<area shape="poly" id="edge12_Node000010_Node000002" title=" " alt="" coords="229,204,364,40,369,43,234,208"/>
+<area shape="poly" id="edge13_Node000010_Node000006" title=" " alt="" coords="234,204,273,174,323,141,334,135,337,140,325,146,276,178,237,208"/>
+<area shape="poly" id="edge17_Node000010_Node000008" title=" " alt="" coords="262,204,331,183,332,188,263,209"/>
+<area shape="poly" id="edge18_Node000010_Node000009" title=" " alt="" coords="270,213,354,204,450,190,494,181,495,186,451,195,355,209,271,218"/>
+<area shape="rect" id="Node000011" href="$expand_8c.html#a03fe61c7df4ba04ad788e5743659d8af" title=" " alt="" coords="331,359,443,384"/>
+<area shape="poly" id="edge14_Node000010_Node000011" title=" " alt="" coords="231,231,269,281,296,310,326,337,345,350,342,354,322,341,292,314,265,284,227,234"/>
+<area shape="poly" id="edge16_Node000010_Node000012" title=" " alt="" coords="237,230,276,260,325,292,410,327,490,353,488,358,408,332,323,296,273,265,234,234"/>
+<area shape="rect" id="Node000013" href="$expand_8c.html#af26464f800cc1e25fdbc77618c17abd9" title=" " alt="" coords="324,257,451,283"/>
+<area shape="poly" id="edge19_Node000010_Node000013" title=" " alt="" coords="263,230,332,251,331,256,262,235"/>
+<area shape="poly" id="edge15_Node000011_Node000012" title=" " alt="" coords="443,369,485,369,485,374,443,374"/>
+<area shape="rect" id="Node000014" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="515,257,597,283"/>
+<area shape="poly" id="edge20_Node000013_Node000014" title=" " alt="" coords="451,267,501,267,501,273,451,273"/>
+</map>

@@ -1,0 +1,54 @@
+<map id="src/kernel/sys/sys_mm.c" name="src/kernel/sys/sys_mm.c">
+<area shape="rect" id="Node000001" title="Memory syscalls: mmap, mprotect, munmap, brk." alt="" coords="575,5,757,31"/>
+<area shape="rect" id="Node000002" href="$fb__user_8h.html" title="Export Limine framebuffer to user processes (shared scanout buffer)." alt="" coords="5,152,180,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="575,27,364,46,263,61,192,81,169,94,148,110,113,143,109,140,144,106,166,89,190,76,262,56,364,41,575,22"/>
+<area shape="rect" id="Node000009" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="1079,79,1191,104"/>
+<area shape="poly" id="edge7_Node000001_Node000009" title=" " alt="" coords="746,28,1066,76,1066,81,745,33"/>
+<area shape="rect" id="Node000010" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="587,152,702,177"/>
+<area shape="poly" id="edge8_Node000001_Node000010" title=" " alt="" coords="694,28,718,42,741,60,754,81,755,93,751,105,728,131,698,149,695,144,724,127,746,103,750,92,749,83,737,63,715,46,691,33"/>
+<area shape="rect" id="Node000012" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="214,79,337,104"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="604,33,351,79,350,74,603,28"/>
+<area shape="rect" id="Node000013" href="$memory__layout_8h.html" title="Virtual memory layout constants for x86_64." alt="" coords="361,79,571,104"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="635,33,513,76,511,71,633,28"/>
+<area shape="rect" id="Node000014" href="$pmm_8h.html" title="Physical memory manager (page allocator)." alt="" coords="204,152,347,177"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="575,27,350,47,253,62,221,71,204,81,199,88,198,96,206,112,222,129,243,143,240,147,219,133,202,115,193,97,194,86,200,77,219,66,252,57,349,42,575,22"/>
+<area shape="rect" id="Node000015" href="$vmm_8h.html" title="Virtual memory manager (paging)." alt="" coords="595,79,737,104"/>
+<area shape="poly" id="edge18_Node000001_Node000015" title=" " alt="" coords="669,31,669,65,663,65,663,31"/>
+<area shape="rect" id="Node000016" href="$proc_8h.html" title="Process management and scheduling." alt="" coords="757,152,895,177"/>
+<area shape="poly" id="edge20_Node000001_Node000016" title=" " alt="" coords="695,28,733,48,772,77,798,107,817,138,812,141,793,111,768,81,730,53,692,33"/>
+<area shape="rect" id="Node000019" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="901,79,1055,104"/>
+<area shape="poly" id="edge27_Node000001_Node000019" title=" " alt="" coords="717,28,915,73,914,78,716,33"/>
+<area shape="rect" id="Node000003" href="$alcor__fb_8h.html" title="Userspace API: Limine linear framebuffer info and mmap helpers." alt="" coords="27,225,158,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,178,95,212,90,212,90,178"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="459,299,574,324"/>
+<area shape="poly" id="edge6_Node000002_Node000004" title=" " alt="" coords="70,180,46,194,24,212,12,231,12,240,17,249,37,259,76,269,192,285,327,297,446,304,445,309,327,302,191,291,75,274,36,264,13,253,7,241,7,230,20,208,43,190,68,175"/>
+<area shape="rect" id="Node000008" href="$limine_8h.html" title="Limine bootloader protocol definitions." alt="" coords="183,225,301,251"/>
+<area shape="poly" id="edge4_Node000002_Node000008" title=" " alt="" coords="118,175,206,217,204,222,116,180"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="159,248,446,296,445,301,158,253"/>
+<area shape="poly" id="edge5_Node000008_Node000004" title=" " alt="" coords="287,248,460,293,458,298,285,253"/>
+<area shape="poly" id="edge10_Node000010_Node000004" title=" " alt="" coords="627,180,599,200,569,227,547,257,530,287,526,285,543,254,565,224,595,196,624,175"/>
+<area shape="rect" id="Node000011" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="579,225,710,251"/>
+<area shape="poly" id="edge9_Node000010_Node000011" title=" " alt="" coords="647,178,647,212,642,212,642,178"/>
+<area shape="poly" id="edge12_Node000012_Node000004" title=" " alt="" coords="295,102,360,150,439,223,499,287,495,290,435,227,356,154,291,106"/>
+<area shape="poly" id="edge14_Node000013_Node000004" title=" " alt="" coords="467,104,463,168,466,209,475,250,485,269,498,287,494,290,480,272,470,252,460,210,458,168,462,104"/>
+<area shape="poly" id="edge17_Node000014_Node000004" title=" " alt="" coords="288,176,324,211,373,248,420,273,467,292,465,297,418,278,370,253,320,215,284,180"/>
+<area shape="poly" id="edge16_Node000014_Node000008" title=" " alt="" coords="272,179,256,214,251,212,267,177"/>
+<area shape="poly" id="edge19_Node000015_Node000004" title=" " alt="" coords="642,106,609,126,577,154,556,186,541,222,523,286,518,284,536,220,551,184,573,150,606,122,639,102"/>
+<area shape="poly" id="edge26_Node000016_Node000004" title=" " alt="" coords="817,180,778,216,723,253,655,281,588,299,587,294,654,276,721,248,774,211,813,176"/>
+<area shape="poly" id="edge21_Node000016_Node000011" title=" " alt="" coords="798,180,688,223,686,218,796,175"/>
+<area shape="rect" id="Node000017" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="785,225,921,251"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="833,177,846,212,841,214,828,179"/>
+<area shape="rect" id="Node000018" href="$signal_8h.html" title="POSIX signal handling infrastructure (Linux x86_64 compatible)." alt="" coords="945,225,1094,251"/>
+<area shape="poly" id="edge24_Node000016_Node000018" title=" " alt="" coords="858,175,976,218,974,223,856,180"/>
+<area shape="poly" id="edge23_Node000017_Node000004" title=" " alt="" coords="799,253,585,298,584,293,798,248"/>
+<area shape="poly" id="edge25_Node000018_Node000004" title=" " alt="" coords="945,252,588,303,587,297,944,247"/>
+<area shape="rect" id="Node000020" href="$fs_2pipe_8h.html" title="Kernel pipe object interface shared by the VFS and syscall layers." alt="" coords="954,152,1077,177"/>
+<area shape="poly" id="edge28_Node000019_Node000020" title=" " alt="" coords="987,103,1005,139,1001,141,982,106"/>
+<area shape="rect" id="Node000021" href="$syscall_8h.html" title="x86_64 syscall interface and definitions." alt="" coords="1161,152,1310,177"/>
+<area shape="poly" id="edge30_Node000019_Node000021" title=" " alt="" coords="1020,101,1181,146,1180,151,1019,107"/>
+<area shape="poly" id="edge29_Node000020_Node000004" title=" " alt="" coords="1045,175,1073,189,1100,207,1114,229,1115,241,1108,253,1081,266,1032,278,890,294,727,305,588,311,588,305,727,300,890,289,1031,272,1079,261,1104,249,1109,239,1109,230,1096,211,1071,194,1043,180"/>
+<area shape="poly" id="edge33_Node000021_Node000004" title=" " alt="" coords="1261,175,1286,190,1310,209,1323,230,1322,241,1316,253,1301,262,1277,271,1206,285,1112,295,1002,303,773,311,588,313,588,307,773,305,1002,297,1111,290,1206,279,1276,266,1299,258,1312,249,1317,240,1318,231,1306,212,1283,194,1258,180"/>
+<area shape="rect" id="Node000022" href="$cpu_8h.html" title="x86_64 CPU control and state management." alt="" coords="1169,225,1302,251"/>
+<area shape="poly" id="edge31_Node000021_Node000022" title=" " alt="" coords="1238,178,1238,212,1233,212,1233,178"/>
+<area shape="poly" id="edge32_Node000022_Node000004" title=" " alt="" coords="1169,251,1150,253,837,285,588,307,587,302,836,280,1150,248,1168,246"/>
+</map>

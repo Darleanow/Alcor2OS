@@ -1,0 +1,5 @@
+<map id="strip_elf_suffix" name="strip_elf_suffix">
+<area shape="rect" id="Node000001" title="Strip a trailing .elf extension in&#45;place." alt="" coords="180,5,299,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="5,5,132,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,21,132,21,132,15,166,15"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="atlas_lookup_attr" name="atlas_lookup_attr">
+<area shape="rect" id="Node000001" title="Like atlas_lookup, but follow the bold/italic sub&#45;atlas offset when the requested attribute is set...." alt="" coords="5,5,140,31"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#aeae8440c475694814764f9a01f8d82d8" title="Resolve a Unicode codepoint to its slot in the userspace atlas." alt="" coords="188,5,292,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,15,174,15,174,21,140,21"/>
+</map>

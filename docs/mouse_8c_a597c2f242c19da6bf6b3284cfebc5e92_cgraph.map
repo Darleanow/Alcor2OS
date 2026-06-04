@@ -1,0 +1,7 @@
+<map id="mouse_set_screen" name="mouse_set_screen">
+<area shape="rect" id="Node000001" title="Set the screen geometry used to clamp the cursor." alt="" coords="5,31,148,56"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="196,5,365,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,32,182,28,183,33,149,37"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="197,55,364,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,49,184,53,184,59,148,54"/>
+</map>

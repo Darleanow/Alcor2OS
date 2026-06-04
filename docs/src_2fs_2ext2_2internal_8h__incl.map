@@ -1,0 +1,24 @@
+<map id="src/fs/ext2/internal.h" name="src/fs/ext2/internal.h">
+<area shape="rect" id="Node000001" title="Shared state, sizing macros, and private helpers for the ext2 module split." alt="" coords="91,5,247,31"/>
+<area shape="rect" id="Node000002" href="$blockdev_8h.html" title="Generic block device interface." alt="" coords="43,152,195,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,32,130,140,125,138,163,30"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,225,207,251"/>
+<area shape="poly" id="edge13_Node000001_Node000003" title=" " alt="" coords="151,33,122,52,89,79,57,113,33,153,30,164,32,174,44,192,66,207,92,218,90,223,63,211,40,196,27,176,25,164,28,151,53,110,85,76,119,48,148,29"/>
+<area shape="rect" id="Node000007" href="$ext2_8h.html" title="ext2 filesystem driver." alt="" coords="163,79,285,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="180,29,209,66,205,69,176,33"/>
+<area shape="rect" id="Node000008" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="269,152,384,177"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="216,28,260,47,281,60,299,77,317,107,326,138,321,139,312,109,295,80,278,64,257,51,214,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="126,177,141,212,137,214,121,179"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,299,88,324"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,253,76,293,73,288,131,248"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,299,187,324"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,251,152,285,147,285,147,251"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,299,282,324"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,249,221,288,218,292,163,253"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="209,106,148,147,146,142,206,102"/>
+<area shape="poly" id="edge11_Node000007_Node000003" title=" " alt="" coords="226,105,222,139,209,179,194,200,177,218,173,214,190,197,204,176,217,138,221,104"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="242,102,300,142,297,146,239,106"/>
+<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="299,180,192,223,190,218,297,175"/>
+<area shape="rect" id="Node000009" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="261,225,392,251"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="329,178,329,212,324,212,324,178"/>
+</map>

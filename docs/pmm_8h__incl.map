@@ -1,0 +1,14 @@
+<map id="include/alcor2/mm/pmm.h" name="include/alcor2/mm/pmm.h">
+<area shape="rect" id="Node000001" title="Physical memory manager (page allocator)." alt="" coords="53,5,246,31"/>
+<area shape="rect" id="Node000002" href="$limine_8h.html" title="Limine bootloader protocol definitions." alt="" coords="42,79,161,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,33,119,69,114,66,139,30"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,152,207,177"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="158,30,167,52,175,78,174,111,164,140,159,139,168,110,169,79,162,53,153,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,103,136,139,132,142,107,106"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,225,88,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,180,76,219,73,215,131,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,225,187,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,178,152,212,147,212,147,178"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,225,282,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,175,221,215,218,219,163,180"/>
+</map>

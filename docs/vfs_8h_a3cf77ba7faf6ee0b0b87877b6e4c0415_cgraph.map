@@ -1,0 +1,7 @@
+<map id="vfs_fd_is_pipe" name="vfs_fd_is_pipe">
+<area shape="rect" id="Node000001" title="Return true if fd refers to either end of a pipe." alt="" coords="5,5,120,31"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="168,5,247,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,15,154,15,154,21,120,21"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="295,5,397,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="247,15,281,15,281,21,247,21"/>
+</map>

@@ -1,0 +1,28 @@
+<map id="pit_program" name="pit_program">
+<area shape="rect" id="Node000001" title="Program PIT channel 0 for frequency Hz (clamped to a sane range)." alt="" coords="549,104,651,129"/>
+<area shape="rect" id="Node000002" href="$pit_8c.html#aad83f0d07314d8845558b13050011b0d" title="Program the PIT and install the timer IRQ handler." alt="" coords="399,5,465,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="573,97,539,70,500,44,464,29,466,25,503,40,542,66,576,93"/>
+<area shape="rect" id="Node000004" href="$pit_8c.html#a7648353ebceab14930fa5ff52956590c" title="Remove one fast&#45;rate vote." alt="" coords="369,55,495,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="542,103,476,83,477,78,544,97"/>
+<area shape="rect" id="Node000006" href="$pit_8c.html#afbb1440cae170bf53f12baad3967b1df" title="Add a vote for PIT_TICK_HZ_FAST (refcounted)." alt="" coords="369,104,495,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="535,119,496,119,496,114,535,114"/>
+<area shape="rect" id="Node000007" href="$pit_8c.html#a3337be496f83d39022cfe60700673475" title="Clear all fast&#45;rate votes; called on process exit." alt="" coords="377,153,487,179"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="544,136,477,156,476,151,542,131"/>
+<area shape="rect" id="Node000015" href="$pit_8c.html#a1fa2544090eef3d62fc723f67b0b3c67" title="Change the tick rate at runtime." alt="" coords="363,203,501,228"/>
+<area shape="poly" id="edge13_Node000001_Node000015" title=" " alt="" coords="575,141,542,167,503,192,474,205,472,200,500,188,539,163,572,137"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a9cf4a417b66a038c3dd1e074be9fde2e" title="Initialize interrupt controllers and drivers." alt="" coords="201,5,315,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="385,21,315,21,315,15,385,15"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="221,79,295,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="355,81,296,89,295,84,355,75"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="355,108,295,99,296,94,355,103"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="217,153,299,179"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="363,169,300,169,300,163,363,163"/>
+<area shape="rect" id="Node000009" href="$src_2kernel_2main_8c.html#a8aed1703f7c57aac4497559a076d2162" title=" " alt="" coords="7,79,152,104"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="220,149,152,118,122,107,123,102,154,113,222,144"/>
+<area shape="rect" id="Node000011" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="5,128,153,153"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="203,161,153,154,154,148,203,156"/>
+<area shape="rect" id="Node000012" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="31,177,128,203"/>
+<area shape="poly" id="edge11_Node000008_Node000012" title=" " alt="" coords="203,176,129,186,128,181,202,171"/>
+<area shape="rect" id="Node000013" href="$sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status." alt="" coords="41,227,117,252"/>
+<area shape="poly" id="edge12_Node000008_Node000013" title=" " alt="" coords="220,187,154,216,118,230,117,225,152,212,218,182"/>
+</map>

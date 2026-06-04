@@ -1,0 +1,9 @@
+<map id="read_single_block_chunk" name="read_single_block_chunk">
+<area shape="rect" id="Node000001" title="Read one block, copy a slice of it into dst." alt="" coords="5,31,191,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="255,5,342,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,29,241,22,242,28,191,34"/>
+<area shape="rect" id="Node000003" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="239,55,359,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="191,52,225,56,225,61,190,57"/>
+<area shape="rect" id="Node000004" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="407,55,539,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="359,65,393,65,393,70,359,70"/>
+</map>

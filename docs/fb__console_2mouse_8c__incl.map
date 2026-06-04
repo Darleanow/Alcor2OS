@@ -1,0 +1,28 @@
+<map id="src/kernel/drivers/fb_console/mouse.c" name="src/kernel/drivers/fb_console/mouse.c">
+<area shape="rect" id="Node000001" title="Software mouse cursor overlay for the framebuffer console." alt="" coords="453,5,607,45"/>
+<area shape="rect" id="Node000002" href="$drivers_2mouse_8h.html" title="Kernel&#45;side mouse broker: accepts events from a low&#45;level driver and serves them to userspace via /de..." alt="" coords="567,101,738,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="559,43,627,91,624,95,556,48"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="371,255,486,280"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="529,46,511,119,496,164,476,208,451,246,446,243,472,205,491,162,506,117,524,45"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2drivers_2fb__console_2internal_8h.html" title="Shared state, types, and hot&#45;path primitives for the fb_console module split." alt="" coords="235,93,420,133"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="487,48,385,91,383,86,484,43"/>
+<area shape="rect" id="Node000003" href="$mouse_8h.html" title="Shared user/kernel ABI for /dev/mouse events and mode control." alt="" coords="618,181,741,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="659,125,674,168,669,169,654,127"/>
+<area shape="poly" id="edge7_Node000002_Node000004" title=" " alt="" coords="643,128,604,166,550,209,510,232,471,251,468,247,507,228,547,204,600,162,640,125"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="640,209,483,253,482,248,638,204"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="210,328,293,353"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="401,282,294,325,292,320,399,278"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="366,328,441,353"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="427,281,414,316,409,314,422,279"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="101,328,172,353"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="382,283,186,330,185,325,381,277"/>
+<area shape="poly" id="edge14_Node000008_Node000004" title=" " alt="" coords="395,131,429,151,444,164,456,180,462,196,461,213,448,244,443,242,455,212,456,197,452,183,440,168,426,155,392,136"/>
+<area shape="poly" id="edge15_Node000008_Node000005" title=" " alt="" coords="301,135,278,156,260,182,250,217,246,252,250,315,244,315,241,252,245,216,256,180,274,153,297,131"/>
+<area shape="poly" id="edge16_Node000008_Node000006" title=" " alt="" coords="319,135,305,168,303,187,306,206,321,238,340,269,382,316,378,320,336,272,316,241,301,207,298,187,300,167,314,133"/>
+<area shape="rect" id="Node000009" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="315,181,441,207"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="342,132,365,168,361,171,337,135"/>
+<area shape="rect" id="Node000010" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="5,255,188,280"/>
+<area shape="poly" id="edge12_Node000008_Node000010" title=" " alt="" coords="292,136,209,184,122,248,119,244,206,179,289,131"/>
+<area shape="poly" id="edge11_Node000009_Node000004" title=" " alt="" coords="389,205,415,242,410,245,384,209"/>
+<area shape="poly" id="edge13_Node000010_Node000007" title=" " alt="" coords="106,279,126,315,121,317,101,282"/>
+</map>

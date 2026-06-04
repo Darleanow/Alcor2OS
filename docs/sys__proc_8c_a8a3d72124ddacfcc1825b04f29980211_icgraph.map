@@ -1,0 +1,10 @@
+<map id="user_buf_ok" name="user_buf_ok">
+<area shape="rect" id="Node000001" title="Return true if ptr..ptr+size is a valid user&#45;space range." alt="" coords="333,56,435,81"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#acf40044c5e098f736e0e2f32a76717ed" title="Copy a null&#45;terminated user&#45;space string vector into kernel storage." alt="" coords="151,5,285,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="327,54,260,33,261,28,329,49"/>
+<area shape="rect" id="Node000003" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="5,31,103,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="320,66,103,50,103,44,320,61"/>
+<area shape="rect" id="Node000004" href="$sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" title="Wait for a child process to change state (wait4)." alt="" coords="175,107,261,132"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="329,88,261,109,260,104,327,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="138,33,103,39,102,33,137,28"/>
+</map>

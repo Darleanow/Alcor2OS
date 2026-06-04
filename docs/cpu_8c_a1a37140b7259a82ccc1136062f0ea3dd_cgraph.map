@@ -1,0 +1,18 @@
+<map id="cpu_enable_sse" name="cpu_enable_sse">
+<area shape="rect" id="Node000001" title="Enable SSE and FPU instructions." alt="" coords="5,105,131,131"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="217,80,327,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,108,203,98,204,104,131,113"/>
+<area shape="rect" id="Node000014" href="$proc_8c.html#a1bf1bc3792c1cefd3aa9eaef50059dec" title=" " alt="" coords="179,129,365,155"/>
+<area shape="poly" id="edge8_Node000001_Node000014" title=" " alt="" coords="131,123,165,127,165,132,131,128"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="413,80,541,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="327,90,399,90,399,95,327,95"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="589,5,709,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="505,77,588,40,603,33,605,38,590,44,507,82"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="601,55,698,80"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="541,81,586,74,587,79,542,86"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="757,80,859,105"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="542,90,743,90,743,95,542,95"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="621,156,678,181"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="508,103,609,148,606,153,506,108"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="699,72,744,80,743,85,698,78"/>
+</map>

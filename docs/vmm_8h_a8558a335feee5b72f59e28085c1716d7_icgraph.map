@@ -1,0 +1,23 @@
+<map id="vmm_map_in" name="vmm_map_in">
+<area shape="rect" id="Node000001" title="Map a page in a specific address space." alt="" coords="680,79,791,104"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="461,29,602,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="670,78,631,69,585,57,586,52,633,63,671,73"/>
+<area shape="rect" id="Node000010" href="$sys__fb_8c.html#a574a5d0e75777f10f4f2acfaacf165fb" title=" " alt="" coords="455,79,607,104"/>
+<area shape="poly" id="edge6_Node000001_Node000010" title=" " alt="" coords="666,94,608,94,608,89,666,89"/>
+<area shape="rect" id="Node000011" href="$vmm_8c.html#aca93d0285bf352c3551ae24b92a73744" title="Clone an address space for fork()." alt="" coords="431,128,632,153"/>
+<area shape="poly" id="edge7_Node000001_Node000011" title=" " alt="" coords="670,110,585,131,584,125,668,105"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="218,5,357,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="446,36,357,27,357,22,447,31"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="192,55,383,80"/>
+<area shape="poly" id="edge4_Node000002_Node000008" title=" " alt="" coords="447,53,383,60,383,55,447,48"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#af54f572ae171e2176cb67d7b16b30f50" title="Create a process from an ELF image held in kernel memory." alt="" coords="5,5,144,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="204,21,144,21,144,15,204,15"/>
+<area shape="rect" id="Node000009" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="26,55,123,80"/>
+<area shape="poly" id="edge5_Node000008_Node000009" title=" " alt="" coords="178,70,124,70,124,65,178,65"/>
+<area shape="rect" id="Node000012" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="228,128,347,153"/>
+<area shape="poly" id="edge8_Node000011_Node000012" title=" " alt="" coords="417,143,347,143,347,138,417,138"/>
+<area shape="rect" id="Node000013" href="$proc_8c.html#a8e1df0d5a8bdad3e0d90a18187ba3406" title="Clone the task like fork, but the child resumes with user RSP child_stack when non&#45;zero (musl posix_s..." alt="" coords="29,116,121,141"/>
+<area shape="poly" id="edge9_Node000012_Node000013" title=" " alt="" coords="214,139,121,134,121,129,214,134"/>
+<area shape="rect" id="Node000015" href="$proc_8c.html#a343bbb181246db8a2491f82d14f9d26e" title="Fork the current process." alt="" coords="33,165,116,191"/>
+<area shape="poly" id="edge10_Node000012_Node000015" title=" " alt="" coords="215,156,117,173,116,168,214,151"/>
+</map>

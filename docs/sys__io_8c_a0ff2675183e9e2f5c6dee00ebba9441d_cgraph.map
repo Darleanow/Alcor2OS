@@ -1,0 +1,26 @@
+<map id="select_scan" name="select_scan">
+<area shape="rect" id="Node000001" title="Scan nfds descriptors and fill rout / wout / eout." alt="" coords="5,129,104,155"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="171,5,258,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,128,99,85,123,61,150,40,160,34,162,39,154,44,127,65,103,89,67,131"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="185,55,244,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="77,127,151,89,171,80,173,85,153,94,80,132"/>
+<area shape="rect" id="Node000004" href="$sys__io_8c.html#a0f8410b55ad52c145430bc482682b0aa" title="Clear bit fd in the fd_set s." alt="" coords="176,104,253,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="104,132,161,122,162,128,104,137"/>
+<area shape="rect" id="Node000005" href="$sys__io_8c.html#a5e9ecb143ebffa8dea15274bc8d5f056" title="Test whether bit fd is set in the fd_set s." alt="" coords="169,153,261,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="104,147,155,154,154,160,104,152"/>
+<area shape="rect" id="Node000006" href="$sys__io_8c.html#a8db5c97966f8c11296f9880f4ca2e004" title="Return positive if fd has data available, 0 if not, negative on error." alt="" coords="154,203,275,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="81,152,153,188,170,195,168,200,151,192,79,157"/>
+<area shape="rect" id="Node000011" href="$sys__io_8c.html#aed4832c1dab09925c297ad6e51b40f92" title="Return positive if fd can accept a write, 0 if not, negative on error." alt="" coords="152,252,277,277"/>
+<area shape="poly" id="edge9_Node000001_Node000011" title=" " alt="" coords="68,153,103,194,154,237,165,244,162,248,150,241,100,198,64,157"/>
+<area shape="rect" id="Node000007" href="$vfs_8c.html#ad9f22619a86ca604e464d7a1def4ce1f" title="Poll fd&#39;s read end for non&#45;blocking readiness." alt="" coords="327,203,495,228"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="276,213,314,213,314,218,276,218"/>
+<area shape="rect" id="Node000008" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="589,227,667,252"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="496,222,575,231,575,236,495,227"/>
+<area shape="rect" id="Node000010" href="$pipe_8c.html#a62f7491c178fbe7b1df4adce79090bb9" title="Check whether a read would return data immediately." alt="" coords="547,177,709,203"/>
+<area shape="poly" id="edge8_Node000007_Node000010" title=" " alt="" coords="495,203,534,198,534,204,496,208"/>
+<area shape="rect" id="Node000012" href="$vfs_8c.html#ada46d60f30b8d948b3d2c6892ce9b9cf" title="Poll fd&#39;s write end for non&#45;blocking readiness." alt="" coords="325,252,497,277"/>
+<area shape="poly" id="edge10_Node000011_Node000012" title=" " alt="" coords="277,262,312,262,312,267,277,267"/>
+<area shape="poly" id="edge11_Node000012_Node000008" title=" " alt="" coords="498,252,575,243,575,248,498,257"/>
+<area shape="rect" id="Node000013" href="$pipe_8c.html#a30403a0609edca58ce6c8bebd7bc6193" title="Check whether a write would proceed without blocking." alt="" coords="545,276,711,301"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="498,272,532,275,531,281,498,277"/>
+</map>

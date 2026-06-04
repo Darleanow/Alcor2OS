@@ -1,0 +1,11 @@
+<map id="ext2_init" name="ext2_init">
+<area shape="rect" id="Node000001" title="Initialise the ext2 driver: clear the volume + file pools and register the fs type with the VFS." alt="" coords="5,31,84,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="162,5,221,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,34,148,23,149,28,85,39"/>
+<area shape="rect" id="Node000003" href="$vfs_8c.html#accf204077f65d2cb4cf3098f18100985" title="Register a filesystem driver in the type registry." alt="" coords="132,55,251,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="85,47,119,53,118,58,84,52"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="299,55,361,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="251,65,285,65,285,70,251,70"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="409,55,484,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="362,65,395,65,395,70,362,70"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="atlas_lookup" name="atlas_lookup">
+<area shape="rect" id="Node000001" title="Resolve cp to an atlas glyph slot." alt="" coords="548,80,652,105"/>
+<area shape="rect" id="Node000002" href="$src_2kernel_2drivers_2fb__console_2atlas_8c.html#a5a024efc6ccd9545de342ac39a77ef3f" title="Resolve to the bold or italic sub&#45;atlas slot when SGR asks for one." alt="" coords="365,80,500,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="534,95,500,95,500,90,534,90"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#adc43e1a6950e650d97d104d9410bc4f7" title="Resolve cp / attr to an atlas glyph base pointer, or NULL when no glyph is registered." alt="" coords="183,55,317,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,84,318,79,318,74,352,79"/>
+<area shape="rect" id="Node000059" href="$flush_8c.html#a78b9c1602b135454913114b75737f27f" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="191,104,309,129"/>
+<area shape="poly" id="edge5_Node000002_Node000059" title=" " alt="" coords="352,106,310,112,309,106,352,101"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="5,5,135,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="189,53,117,33,118,28,190,48"/>
+<area shape="rect" id="Node000058" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="11,55,129,80"/>
+<area shape="poly" id="edge4_Node000003_Node000058" title=" " alt="" coords="169,70,130,70,130,65,169,65"/>
+<area shape="rect" id="Node000052" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="22,104,118,129"/>
+<area shape="poly" id="edge6_Node000059_Node000052" title=" " alt="" coords="177,119,118,119,118,114,177,114"/>
+</map>

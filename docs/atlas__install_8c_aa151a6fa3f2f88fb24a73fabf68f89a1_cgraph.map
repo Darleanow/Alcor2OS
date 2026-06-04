@@ -1,0 +1,28 @@
+<map id="repaint_and_notify_winsize" name="repaint_and_notify_winsize">
+<area shape="rect" id="Node000001" title="Repaint the whole grid and wake every TUI when the geometry changed." alt="" coords="5,122,148,162"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="438,80,511,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,120,142,89,168,75,195,65,257,55,319,56,377,64,425,75,424,80,376,69,318,61,257,60,197,70,170,80,145,94,102,124"/>
+<area shape="rect" id="Node000024" href="$caret_8c.html#ae19ecefda194f357460e6a4f5bb4d456" title="Forget the tracker without repainting." alt="" coords="217,80,358,105"/>
+<area shape="poly" id="edge7_Node000001_Node000024" title=" " alt="" coords="148,123,218,106,219,111,149,128"/>
+<area shape="rect" id="Node000025" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="240,129,335,155"/>
+<area shape="poly" id="edge8_Node000001_Node000025" title=" " alt="" coords="148,139,226,139,226,145,148,145"/>
+<area shape="rect" id="Node000026" href="$proc_8c.html#aa22e3da99e1e9e37ab34f672214545cb" title="Wake every process so TUIs re&#45;query TIOCGWINSZ after a reflow. Defined in proc/signal...." alt="" coords="204,179,371,204"/>
+<area shape="poly" id="edge10_Node000001_Node000026" title=" " alt="" coords="149,156,219,173,218,178,148,161"/>
+<area shape="rect" id="Node000029" href="$scrollback_8c.html#af25555e5a162a563860a3d8aab81343e" title="Forget pending scrolls without flushing them. Used by paths that are about to repaint the entire grid..." alt="" coords="196,228,379,253"/>
+<area shape="poly" id="edge13_Node000001_Node000029" title=" " alt="" coords="106,160,148,188,197,214,216,221,214,226,195,219,145,193,103,165"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="571,80,680,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="511,90,557,90,557,95,511,95"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="743,5,872,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="648,77,727,40,747,32,748,37,729,44,651,82"/>
+<area shape="rect" id="Node000016" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="748,55,867,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="680,82,734,75,735,80,681,88"/>
+<area shape="rect" id="Node000021" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="738,104,877,129"/>
+<area shape="poly" id="edge5_Node000003_Node000021" title=" " alt="" coords="681,97,724,103,724,108,680,103"/>
+<area shape="rect" id="Node000023" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="728,153,887,179"/>
+<area shape="poly" id="edge6_Node000003_Node000023" title=" " alt="" coords="652,103,729,138,752,147,750,152,727,143,650,108"/>
+<area shape="poly" id="edge9_Node000025_Node000002" title=" " alt="" coords="334,127,424,103,425,108,335,132"/>
+<area shape="rect" id="Node000027" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="427,179,523,204"/>
+<area shape="poly" id="edge11_Node000026_Node000027" title=" " alt="" coords="371,189,413,189,413,194,371,194"/>
+<area shape="rect" id="Node000028" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="586,179,665,204"/>
+<area shape="poly" id="edge12_Node000027_Node000028" title=" " alt="" coords="523,189,572,189,572,194,523,194"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="klog_putint" name="klog_putint">
+<area shape="rect" id="Node000001" title="Emit a signed integer in base 10." alt="" coords="285,5,380,31"/>
+<area shape="rect" id="Node000002" href="$klog_8c.html#aea21daace6c756e7867a08fa2e9fc03a" title="Format a message to the kernel debug log (debugcon)." alt="" coords="183,5,237,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="272,21,238,21,238,15,272,15"/>
+<area shape="rect" id="Node000003" href="$sys__dispatch_8c.html#a95f2b068e142b45d49e5ee46268e9c95" title="Dispatch a syscall from the architecture&#45;specific entry point." alt="" coords="5,5,135,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="169,21,135,21,135,15,169,15"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="vfs_proc_release_fds" name="vfs_proc_release_fds">
+<area shape="rect" id="Node000001" title="Release all file descriptors held by an exiting process." alt="" coords="5,31,164,56"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="212,31,333,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,41,198,41,198,46,164,46"/>
+<area shape="rect" id="Node000003" href="$pipe_8c.html#a7d66e396964519ed6952f9c60577644f" title="Release the read end of a pipe." alt="" coords="383,5,508,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="333,32,369,27,370,32,334,37"/>
+<area shape="rect" id="Node000005" href="$pipe_8c.html#ac2e75fc6920fc0eca44b783714aa1544" title="Release the write end of a pipe." alt="" coords="381,55,509,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="334,49,368,54,367,59,333,54"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="557,31,648,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="509,25,544,31,543,37,508,31"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="509,55,543,50,544,55,510,60"/>
+</map>

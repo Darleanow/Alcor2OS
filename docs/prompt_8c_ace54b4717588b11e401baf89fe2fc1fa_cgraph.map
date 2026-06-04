@@ -1,0 +1,9 @@
+<map id="sh_write_prompt_header" name="sh_write_prompt_header">
+<area shape="rect" id="Node000001" title="Paint the decorative header line: ╭─ alcor2 ─ &lt;cwd&gt;." alt="" coords="5,31,188,56"/>
+<area shape="rect" id="Node000002" href="$sys_8c.html#abb1d3053a2319560989362c984cdd2a7" title="Get the current working directory into buf of size bytes." alt="" coords="236,5,327,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,28,222,23,223,29,189,33"/>
+<area shape="rect" id="Node000003" href="$io_8c.html#ac3e98303df49d2058bbde227fbe73286" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="245,55,317,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,53,232,58,231,64,188,58"/>
+<area shape="rect" id="Node000004" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="375,55,452,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="318,65,361,65,361,70,318,70"/>
+</map>

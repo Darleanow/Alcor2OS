@@ -1,0 +1,10 @@
+<map id="acs_to_unicode" name="acs_to_unicode">
+<area shape="rect" id="Node000001" title="Translate a DEC ACS (Special Graphics) printable ASCII byte to its Unicode equivalent." alt="" coords="409,29,532,55"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#ae17d9b8bddeae69976a74a6dc8e2202d" title="Emit a single ASCII byte to the cursor, applying DEC ACS translation when the G0 set is the special&#45;g..." alt="" coords="272,29,361,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="396,45,362,45,362,39,396,39"/>
+<area shape="rect" id="Node000003" href="$ansi_8c.html#a95caeb62a209e7d835114c4b18ef080b" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="140,29,224,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="258,45,224,45,224,39,258,39"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="205,18,198,11,182,8,168,10,161,14,160,20,164,28,159,30,154,21,157,11,166,5,182,3,200,6,208,14"/>
+<area shape="rect" id="Node000004" href="$ansi_8c.html#aed57f05021fc0a714155c4f892ef5cee" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="5,29,92,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="126,45,92,45,92,39,126,39"/>
+</map>

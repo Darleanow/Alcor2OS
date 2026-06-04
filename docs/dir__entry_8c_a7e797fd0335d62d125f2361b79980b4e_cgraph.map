@@ -1,0 +1,5 @@
+<map id="dir_block_find_name" name="dir_block_find_name">
+<area shape="rect" id="Node000001" title="Locate the dirent named name inside a single block buffer." alt="" coords="5,5,161,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#ab77d8981772dbf05f403fca1354eb314" title="Compare two strings up to n characters." alt="" coords="209,5,292,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,15,195,15,195,21,162,21"/>
+</map>

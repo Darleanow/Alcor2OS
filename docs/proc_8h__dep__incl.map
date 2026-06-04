@@ -1,0 +1,29 @@
+<map id="include/alcor2/proc/proc.h" name="include/alcor2/proc/proc.h">
+<area shape="rect" id="Node000001" title="Process management and scheduling." alt="" coords="961,5,1107,45"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html" title="Virtual File System orchestration layer." alt="" coords="5,101,97,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="948,29,790,31,581,40,345,60,226,76,109,96,83,103,81,98,108,91,225,71,345,55,580,35,790,25,948,23"/>
+<area shape="rect" id="Node000003" href="$dev__nodes_8c.html" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="121,93,256,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="948,33,646,52,457,70,268,96,257,98,256,93,267,91,457,65,645,47,947,27"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html" title="PS/2 scancode translator: layout mapping, line discipline, and TTY I/O." alt="" coords="280,93,431,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="948,36,719,59,444,96,432,98,431,93,443,91,719,54,947,31"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="455,101,589,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="948,41,787,64,601,96,568,103,567,98,600,91,786,59,947,35"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="613,93,751,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="948,50,752,98,751,92,947,45"/>
+<area shape="rect" id="Node000007" href="$signal_8c.html" title="POSIX signal system calls and delivery mechanism." alt="" coords="775,101,941,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="984,54,883,103,880,98,982,49"/>
+<area shape="rect" id="Node000008" href="$sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch." alt="" coords="965,93,1103,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1037,59,1037,93,1031,93,1031,59"/>
+<area shape="rect" id="Node000009" href="$sys__fb_8c.html" title="Syscalls: framebuffer info + mmap (userspace drawing / font stacks)." alt="" coords="1127,101,1295,126"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1087,49,1189,98,1187,103,1084,54"/>
+<area shape="rect" id="Node000010" href="$sys__fs_8c.html" title="Filesystem syscalls: open, close, stat, seek, rename, chdir, …" alt="" coords="1320,101,1487,126"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1121,44,1355,98,1354,103,1120,49"/>
+<area shape="rect" id="Node000011" href="$sys__io_8c.html" title="I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep, select, poll." alt="" coords="1511,101,1677,126"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1120,35,1296,59,1500,91,1540,98,1539,103,1499,96,1295,64,1120,40"/>
+<area shape="rect" id="Node000012" href="$sys__misc_8c.html" title="Misc syscalls: uname, time, minimal futex, sched_yield." alt="" coords="1701,93,1839,133"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1121,29,1377,50,1534,68,1690,91,1702,93,1701,98,1690,96,1533,73,1376,56,1120,35"/>
+<area shape="rect" id="Node000013" href="$sys__mm_8c.html" title="Memory syscalls: mmap, mprotect, munmap, brk." alt="" coords="1863,101,2045,126"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1121,28,1443,49,1647,67,1852,91,1898,98,1897,103,1851,96,1646,73,1442,55,1120,34"/>
+<area shape="rect" id="Node000014" href="$sys__proc_8c.html" title="Process syscalls: PID queries, fork, exec, wait, clone, identity." alt="" coords="2069,93,2207,133"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1121,25,1293,29,1526,40,1790,60,2057,91,2069,93,2068,98,2056,96,1790,65,1526,45,1293,35,1121,30"/>
+</map>

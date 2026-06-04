@@ -1,0 +1,12 @@
+<map id="vfs_dup" name="vfs_dup">
+<area shape="rect" id="Node000001" title="Duplicate oldfd, placing the clone at the lowest free fd ≥ 3." alt="" coords="5,55,79,80"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="143,5,221,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,52,131,33,133,38,80,57"/>
+<area shape="rect" id="Node000004" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="127,55,237,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="79,65,114,65,114,70,79,70"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#aa6ae139c297636a7f4ab9c9980b856e1" title="Increment the OFT refcount for slot idx." alt="" coords="127,104,237,129"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="80,78,133,97,131,102,78,83"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="285,31,388,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="222,22,272,30,271,35,221,27"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="237,56,271,51,272,56,237,62"/>
+</map>

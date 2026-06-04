@@ -1,0 +1,7 @@
+<map id="pmm_free_pages" name="pmm_free_pages">
+<area shape="rect" id="Node000001" title="Free multiple contiguous physical pages." alt="" coords="5,31,140,56"/>
+<area shape="rect" id="Node000002" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="188,5,295,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,31,174,25,175,31,140,36"/>
+<area shape="rect" id="Node000003" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="191,55,291,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,50,178,56,177,61,140,56"/>
+</map>

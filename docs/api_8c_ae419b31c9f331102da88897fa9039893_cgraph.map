@@ -1,0 +1,15 @@
+<map id="fb_console_alloc_grid" name="fb_console_alloc_grid">
+<area shape="rect" id="Node000001" title="Allocate the cell grid and prime every cell with the default empty state." alt="" coords="5,55,168,80"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="216,55,291,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,65,202,65,202,70,168,70"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="339,5,460,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,52,347,33,349,38,292,57"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="345,55,454,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="291,65,331,65,331,70,291,70"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="353,104,445,129"/>
+<area shape="poly" id="edge6_Node000002_Node000016" title=" " alt="" coords="292,77,349,97,347,102,290,82"/>
+<area shape="rect" id="Node000005" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="508,31,648,56"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="454,57,494,52,495,57,455,63"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="532,80,624,105"/>
+<area shape="poly" id="edge5_Node000004_Node000008" title=" " alt="" coords="455,72,518,82,517,87,454,78"/>
+</map>

@@ -1,0 +1,40 @@
+<map id="run_file" name="run_file">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,141,76,166"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2vega_2main_8c.html#ab770146bd9a4ad2a22ed5d4f90d2bb25" title=" " alt="" coords="138,115,193,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,144,124,134,125,139,77,149"/>
+<area shape="rect" id="Node000003" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="124,165,207,190"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="77,158,111,164,110,169,76,163"/>
+<area shape="rect" id="Node000004" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="594,338,669,363"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="186,162,205,150,258,111,297,78,339,49,399,26,441,12,476,4,509,6,546,26,563,47,578,79,603,163,620,253,630,324,624,325,615,254,598,164,573,81,559,50,542,30,508,12,476,9,442,18,401,31,342,54,300,82,261,116,208,154,188,167"/>
+<area shape="rect" id="Node000005" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="258,165,349,190"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="207,175,244,175,244,180,207,180"/>
+<area shape="rect" id="Node000040" href="$core_2vega_2parse_8c.html#a37fb9f6bddc87aa3381e31f183663b88" title="Parse line into an AST." alt="" coords="255,438,352,463"/>
+<area shape="poly" id="edge13_Node000003_Node000040" title=" " alt="" coords="175,189,292,424,287,427,171,191"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="605,339,599,330,602,320,613,314,631,311,653,315,662,323,659,327,651,320,631,317,615,319,606,323,605,329,609,337"/>
+<area shape="poly" id="edge11_Node000005_Node000005" title=" " alt="" coords="280,166,275,156,278,147,287,140,303,138,322,141,330,150,326,153,319,146,303,143,289,145,282,150,281,156,285,163"/>
+<area shape="rect" id="Node000006" href="$exec_8c.html#ae80adbc2156956a944b33f5d1be0cc55" title=" " alt="" coords="429,90,515,115"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="325,162,399,124,416,117,418,122,401,129,327,167"/>
+<area shape="rect" id="Node000035" href="$exec_8c.html#a71ef69197a1c04bbcd7e6216c03506f3" title=" " alt="" coords="417,139,527,165"/>
+<area shape="poly" id="edge7_Node000005_Node000035" title=" " alt="" coords="348,168,402,160,403,165,349,173"/>
+<area shape="rect" id="Node000037" href="$expand_8c.html#a6c6e8f6f4d0e9d5a0b001d74e308843e" title="Record the exit status of the most recently completed command." alt="" coords="400,189,544,214"/>
+<area shape="poly" id="edge8_Node000005_Node000037" title=" " alt="" coords="349,181,386,186,386,192,348,186"/>
+<area shape="rect" id="Node000008" href="$expand_8c.html#a4fda5f1bdaaefe8d10a7a1b8c9c486c9" title="Expand $&#45;syntax in src and return a new heap&#45;allocated string. The caller takes ownership and must fr..." alt="" coords="417,238,527,263"/>
+<area shape="poly" id="edge9_Node000005_Node000008" title=" " alt="" coords="328,188,401,224,418,231,416,236,399,229,326,192"/>
+<area shape="rect" id="Node000038" href="$fntab_8c.html#a1df92697cea4c74361d14515422c10ac" title="Insert or replace a function. Takes ownership of name, arg_names (and each string therein) and body." alt="" coords="431,287,513,313"/>
+<area shape="poly" id="edge10_Node000005_Node000038" title=" " alt="" coords="316,188,351,230,375,253,401,274,419,283,417,288,399,278,371,258,347,234,312,192"/>
+<area shape="rect" id="Node000027" href="$expand_8c.html#a8d600c1ad95fcb65708123c14c09769b" title="Assign value to vega variable name." alt="" coords="421,41,523,66"/>
+<area shape="poly" id="edge12_Node000005_Node000027" title=" " alt="" coords="312,163,347,120,371,96,399,75,409,69,412,74,401,80,375,100,350,124,316,166"/>
+<area shape="poly" id="edge14_Node000040_Node000004" title=" " alt="" coords="315,436,350,404,374,388,399,375,446,360,494,352,580,346,581,352,495,357,447,365,401,380,376,392,354,408,319,440"/>
+<area shape="rect" id="Node000041" href="$core_2vega_2parse_8c.html#a892d1d86bd325ddd4aec5ae1469db7e2" title=" " alt="" coords="405,438,539,463"/>
+<area shape="poly" id="edge15_Node000040_Node000041" title=" " alt="" coords="352,448,392,448,392,453,352,453"/>
+<area shape="rect" id="Node000043" href="$lexer_8c.html#ac36c645bf8348db018cfeb9588978b84" title="Initialise a lexer over the given line. The line is not modified." alt="" coords="437,487,507,513"/>
+<area shape="poly" id="edge16_Node000040_Node000043" title=" " alt="" coords="348,461,424,483,423,489,347,466"/>
+<area shape="rect" id="Node000044" href="$lexer_8c.html#a84851e4cf3d14fcf913e267852e1ab08" title="Consume and return the next token." alt="" coords="592,463,671,489"/>
+<area shape="poly" id="edge17_Node000040_Node000044" title=" " alt="" coords="318,462,353,495,376,511,401,523,440,534,471,537,503,533,543,523,574,511,601,495,604,499,576,516,545,528,504,538,472,542,439,539,399,528,373,515,349,499,314,466"/>
+<area shape="rect" id="Node000051" href="$lexer_8c.html#abbbfdf6d2487ba0569a480f8bc1f24eb" title="Free a token&#39;s heap storage if any." alt="" coords="413,589,531,614"/>
+<area shape="poly" id="edge18_Node000040_Node000051" title=" " alt="" coords="314,462,348,512,373,541,402,567,423,580,420,585,398,571,369,545,344,515,310,465"/>
+<area shape="rect" id="Node000052" href="$core_2vega_2parse_8c.html#a39c2363ce6301b51c1dc201986050d62" title=" " alt="" coords="429,389,515,414"/>
+<area shape="poly" id="edge19_Node000040_Node000052" title=" " alt="" coords="347,435,415,415,417,420,348,441"/>
+<area shape="poly" id="edge20_Node000052_Node000004" title=" " alt="" coords="512,386,580,364,581,369,514,391"/>
+<area shape="poly" id="edge21_Node000052_Node000044" title=" " alt="" coords="514,412,545,424,599,454,597,458,543,429,512,417"/>
+</map>

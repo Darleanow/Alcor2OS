@@ -1,0 +1,18 @@
+<map id="kfree" name="kfree">
+<area shape="rect" id="Node000001" title="Free memory." alt="" coords="5,56,61,81"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="125,31,203,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,61,111,51,112,56,62,66"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="109,80,219,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="62,71,97,78,96,83,61,76"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="267,80,395,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="219,90,253,90,253,95,219,95"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="443,5,563,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="358,77,442,40,456,33,458,38,444,44,360,82"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="454,55,551,80"/>
+<area shape="poly" id="edge5_Node000004_Node000007" title=" " alt="" coords="395,81,440,74,440,79,395,86"/>
+<area shape="rect" id="Node000008" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="611,80,712,105"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="395,90,597,90,597,95,395,95"/>
+<area shape="rect" id="Node000012" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="474,156,531,181"/>
+<area shape="poly" id="edge8_Node000004_Node000012" title=" " alt="" coords="361,103,462,148,460,153,359,108"/>
+<area shape="poly" id="edge6_Node000007_Node000008" title=" " alt="" coords="552,72,597,80,596,85,551,78"/>
+</map>

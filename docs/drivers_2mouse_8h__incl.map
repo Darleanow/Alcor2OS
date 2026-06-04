@@ -1,0 +1,14 @@
+<map id="include/alcor2/drivers/mouse.h" name="include/alcor2/drivers/mouse.h">
+<area shape="rect" id="Node000001" title="Kernel&#45;side mouse broker: accepts events from a low&#45;level driver and serves them to userspace via /de..." alt="" coords="68,5,231,45"/>
+<area shape="rect" id="Node000002" href="$mouse_8h.html" title="Shared user/kernel ABI for /dev/mouse events and mode control." alt="" coords="39,93,161,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,47,117,83,112,80,135,44"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,167,207,192"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="162,45,174,79,177,99,176,119,164,155,159,154,171,118,172,99,169,80,157,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="110,117,136,154,131,157,106,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,240,88,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,194,76,234,73,230,131,190"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,240,187,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,192,152,226,147,226,147,192"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,240,282,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,190,221,229,218,234,163,194"/>
+</map>

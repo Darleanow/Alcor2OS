@@ -1,0 +1,10 @@
+<map id="keyboard_raw_peek" name="keyboard_raw_peek">
+<area shape="rect" id="Node000001" title="Copy pending scancodes without consuming (irq snapshot)." alt="" coords="528,31,680,56"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#ab7822a94d62041bce4704de8f5b0bed1" title="Whether a read(2) on fd 0 could return a byte right now." alt="" coords="344,31,480,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="514,46,480,46,480,41,514,41"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a194a31955e4d501a3274c1df551c274c" title=" " alt="" coords="124,5,296,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="330,36,296,31,296,26,331,30"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html#a53ba066fbd825803a884309edf38a731" title="Report read/write readiness for /dev/tty." alt="" coords="5,31,76,56"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="331,46,76,46,76,41,331,41"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="112,35,77,41,76,35,111,30"/>
+</map>

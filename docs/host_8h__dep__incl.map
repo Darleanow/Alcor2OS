@@ -1,0 +1,29 @@
+<map id="user/include/vega/host.h" name="user/include/vega/host.h">
+<area shape="rect" id="Node000001" title="libvega embedding interface." alt="" coords="757,5,939,31"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2shell_2main_8c.html" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="5,86,173,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="744,28,489,47,337,62,186,81,143,89,142,83,185,76,337,57,489,42,743,23"/>
+<area shape="rect" id="Node000003" href="$builtins_8c.html" title=" " alt="" coords="198,79,378,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="744,34,578,55,390,81,378,83,378,78,389,76,577,49,744,29"/>
+<area shape="rect" id="Node000004" href="$host_8c.html" title="vega CLI host implementation." alt="" coords="402,86,566,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="783,36,538,89,536,83,781,31"/>
+<area shape="rect" id="Node000005" href="$user_2apps_2vega_2main_8c.html" title="Standalone vega interpreter CLI." alt="" coords="590,86,759,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="811,39,701,88,699,84,809,34"/>
+<area shape="rect" id="Node000006" href="$lexer_8c.html" title="vega tokenizer implementation." alt="" coords="614,167,778,192"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="835,44,807,81,773,121,715,168,711,164,769,117,803,78,831,40"/>
+<area shape="rect" id="Node000007" href="$core_2vega_2parse_8c.html" title="Recursive&#45;descent parser building vega AST nodes from tokens." alt="" coords="802,167,971,192"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="857,43,886,166,881,167,851,44"/>
+<area shape="rect" id="Node000008" href="$internal_2host_8h.html" title="libvega&#45;internal access to the registered host ops. Do not include from outside libvega — use &lt;vega/h..." alt="" coords="886,79,1077,119"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="881,35,951,76,948,81,878,40"/>
+<area shape="rect" id="Node000009" href="$exec_8c.html" title="Walks vega AST nodes and runs them." alt="" coords="995,167,1154,192"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="953,29,1036,48,1070,61,1091,77,1101,100,1100,125,1093,149,1084,167,1079,165,1088,147,1094,124,1096,101,1087,80,1067,66,1035,53,952,35"/>
+<area shape="rect" id="Node000010" href="$vega_8c.html" title="vega top&#45;level: host registration + lex → parse → execute → free." alt="" coords="1179,167,1339,192"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="950,30,1031,48,1113,76,1153,97,1191,121,1247,164,1244,169,1188,126,1151,102,1111,81,1030,53,949,36"/>
+<area shape="rect" id="Node000011" href="$expand_8c.html" title="vega expansion: $&#45;syntax in words, special vars, user vars." alt="" coords="1203,86,1379,111"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="926,30,1227,83,1226,89,925,36"/>
+<area shape="rect" id="Node000012" href="$fntab_8c.html" title="Fixed&#45;capacity function table." alt="" coords="1403,86,1565,111"/>
+<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="953,25,1156,46,1391,76,1432,83,1431,89,1390,81,1155,51,952,31"/>
+<area shape="poly" id="edge8_Node000008_Node000006" title=" " alt="" coords="901,125,738,169,737,164,899,120"/>
+<area shape="poly" id="edge9_Node000008_Node000007" title=" " alt="" coords="949,130,903,168,899,164,946,126"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="1016,126,1062,164,1059,168,1013,130"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="1062,120,1219,164,1217,169,1060,125"/>
+</map>

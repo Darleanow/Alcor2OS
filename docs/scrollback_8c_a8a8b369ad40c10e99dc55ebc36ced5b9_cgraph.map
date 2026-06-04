@@ -1,0 +1,22 @@
+<map id="fb_console_scrollback_up" name="fb_console_scrollback_up">
+<area shape="rect" id="Node000001" title="Scroll the view lines rows back into history." alt="" coords="5,105,193,131"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid blending scrollback history with live cells." alt="" coords="241,105,383,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,115,228,115,228,121,193,121"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="699,80,808,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="364,103,430,91,566,85,685,86,685,92,566,90,431,97,365,108"/>
+<area shape="rect" id="Node000024" href="$caret_8c.html#aff670354979bdf3982f14170a545fce8" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath...." alt="" coords="431,105,529,131"/>
+<area shape="poly" id="edge7_Node000002_Node000024" title=" " alt="" coords="383,115,417,115,417,121,383,121"/>
+<area shape="rect" id="Node000026" href="$kstdlib_8c.html#a53f4ad004ca51ec3d2aa9dbe906a23c0" title="Fill memory with a byte value." alt="" coords="438,155,522,180"/>
+<area shape="poly" id="edge10_Node000002_Node000026" title=" " alt="" coords="357,128,425,149,424,154,355,133"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="871,5,1000,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="776,77,855,40,875,32,876,37,857,44,779,82"/>
+<area shape="rect" id="Node000016" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="876,55,995,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="808,82,862,75,863,80,809,88"/>
+<area shape="rect" id="Node000021" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="866,104,1005,129"/>
+<area shape="poly" id="edge5_Node000003_Node000021" title=" " alt="" coords="809,97,852,103,852,108,808,103"/>
+<area shape="rect" id="Node000023" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="856,153,1015,179"/>
+<area shape="poly" id="edge6_Node000003_Node000023" title=" " alt="" coords="779,103,857,140,876,147,875,152,855,144,777,108"/>
+<area shape="rect" id="Node000025" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="577,105,651,131"/>
+<area shape="poly" id="edge8_Node000024_Node000025" title=" " alt="" coords="529,115,564,115,564,121,529,121"/>
+<area shape="poly" id="edge9_Node000025_Node000003" title=" " alt="" coords="650,109,685,102,686,108,651,114"/>
+</map>

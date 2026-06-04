@@ -1,0 +1,16 @@
+<map id="vmm_map_range_alloc" name="vmm_map_range_alloc">
+<area shape="rect" id="Node000001" title="Allocate and map a range of consecutive virtual pages." alt="" coords="571,80,745,105"/>
+<area shape="rect" id="Node000002" href="$elf_8c.html#ac1396569a9a8edc3e72a606e32adfe98" title=" " alt="" coords="337,55,523,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="556,84,523,80,523,75,557,79"/>
+<area shape="rect" id="Node000013" href="$sys__mm_8c.html#abdac42378ec121cb3f3b48c5af03ded3" title=" " alt="" coords="339,104,521,129"/>
+<area shape="poly" id="edge6_Node000001_Node000013" title=" " alt="" coords="557,106,521,110,521,104,557,101"/>
+<area shape="rect" id="Node000003" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="205,5,279,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,54,279,30,280,25,369,49"/>
+<area shape="rect" id="Node000012" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="195,55,289,80"/>
+<area shape="poly" id="edge4_Node000002_Node000012" title=" " alt="" coords="324,70,290,70,290,65,324,65"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="5,31,147,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="191,28,147,35,147,30,191,23"/>
+<area shape="poly" id="edge5_Node000012_Node000004" title=" " alt="" coords="180,61,147,56,147,51,181,56"/>
+<area shape="rect" id="Node000014" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="195,104,289,129"/>
+<area shape="poly" id="edge7_Node000013_Node000014" title=" " alt="" coords="326,119,289,119,289,114,326,114"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="blend_glyph_row" name="blend_glyph_row">
+<area shape="rect" id="Node000001" title="Alpha&#45;blend one row of an atlas glyph into the framebuffer." alt="" coords="569,80,701,105"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="379,55,509,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="555,85,509,79,509,73,556,80"/>
+<area shape="rect" id="Node000056" href="$flush_8c.html#a5947c6def1d20a4175990821e4f4a74c" title="Paint one scanline of one dirty cell using its prepared scratch." alt="" coords="367,104,521,129"/>
+<area shape="poly" id="edge5_Node000001_Node000056" title=" " alt="" coords="556,105,522,110,521,104,555,100"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="202,55,311,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="366,70,312,70,312,65,366,65"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="39,5,113,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="196,54,112,30,114,25,197,48"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="5,55,147,80"/>
+<area shape="poly" id="edge4_Node000003_Node000012" title=" " alt="" coords="188,70,147,70,147,65,188,65"/>
+<area shape="rect" id="Node000057" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="195,104,319,129"/>
+<area shape="poly" id="edge6_Node000056_Node000057" title=" " alt="" coords="353,119,319,119,319,114,353,114"/>
+<area shape="rect" id="Node000050" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="28,104,124,129"/>
+<area shape="poly" id="edge7_Node000057_Node000050" title=" " alt="" coords="181,119,124,119,124,114,181,114"/>
+</map>

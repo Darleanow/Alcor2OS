@@ -1,0 +1,5 @@
+<map id="vol_write_block" name="vol_write_block">
+<area shape="rect" id="Node000001" title="Companion of vol_read_block for writes." alt="" coords="5,5,129,31"/>
+<area shape="rect" id="Node000002" href="$src_2fs_2ext2_2internal_8h.html#a92bf399aefd098ef22b483f7aa903291" title="Companion of vol_read_sectors for writes." alt="" coords="177,5,313,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,15,164,15,164,21,129,21"/>
+</map>

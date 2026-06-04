@@ -1,0 +1,5 @@
+<map id="vfs_readlink" name="vfs_readlink">
+<area shape="rect" id="Node000001" title="Read the target of the symbolic link at path into buf." alt="" coords="157,5,260,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a3c7030445954bf053945683539a885b4" title="Read the target of a symbolic link at path into buf." alt="" coords="5,5,109,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,21,109,21,109,15,143,15"/>
+</map>

@@ -1,0 +1,33 @@
+<map id="sys_fork" name="sys_fork">
+<area shape="rect" id="Node000001" title="Duplicate the calling process (fork)." alt="" coords="5,261,83,287"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a343bbb181246db8a2491f82d14f9d26e" title="Fork the current process." alt="" coords="163,232,246,257"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,264,149,252,150,257,83,270"/>
+<area shape="rect" id="Node000055" href="$sys__dispatch_8c.html#a1d6ccbb408625c796ebdef967f3a3337" title="Return the syscall_frame_t for the currently executing syscall." alt="" coords="131,282,279,322"/>
+<area shape="poly" id="edge15_Node000001_Node000055" title=" " alt="" coords="83,278,117,284,116,289,82,283"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#a2b513f19f4d4b38efc0a7da4d3d7cfe5" title="Fork / clone (no threads): duplicate the calling task." alt="" coords="327,232,445,257"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="246,242,313,242,313,247,246,247"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="548,5,657,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="388,231,398,193,418,141,448,86,468,61,492,40,512,28,534,21,535,26,514,33,495,44,472,65,453,89,423,143,403,195,393,232"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="565,55,640,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="391,230,427,167,456,129,492,97,521,82,551,72,553,77,523,87,495,102,460,133,431,170,396,233"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="760,305,847,331"/>
+<area shape="poly" id="edge5_Node000003_Node000015" title=" " alt="" coords="445,231,503,224,571,222,643,227,713,244,753,266,784,293,780,297,750,270,711,248,642,232,570,227,503,230,446,236"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="764,131,843,156"/>
+<area shape="poly" id="edge6_Node000003_Node000031" title=" " alt="" coords="394,230,432,184,460,159,492,141,526,130,560,123,630,118,696,122,751,129,750,135,695,127,630,123,561,128,527,135,494,146,463,164,435,188,398,234"/>
+<area shape="rect" id="Node000032" href="$proc_8c.html#a40d46395d176126b25c230734917a8a1" title="Allocate a free process slot from the process table." alt="" coords="559,156,647,181"/>
+<area shape="poly" id="edge7_Node000003_Node000032" title=" " alt="" coords="415,229,492,198,545,182,546,187,494,203,417,234"/>
+<area shape="rect" id="Node000035" href="$proc_8c.html#a05cb45e33877daf7c114aa14309b4613" title="Entry point for forked child processes." alt="" coords="521,257,684,283"/>
+<area shape="poly" id="edge9_Node000003_Node000035" title=" " alt="" coords="446,249,508,256,507,262,445,254"/>
+<area shape="rect" id="Node000036" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="545,307,660,332"/>
+<area shape="poly" id="edge10_Node000003_Node000036" title=" " alt="" coords="411,255,450,274,494,293,533,304,531,309,492,298,447,279,409,260"/>
+<area shape="rect" id="Node000046" href="$vfs_8c.html#a70fac88fc076d7652f7f0956468e0046" title="Copy the parent&#39;s fd table into the child&#39;s after fork." alt="" coords="526,356,679,381"/>
+<area shape="poly" id="edge11_Node000003_Node000046" title=" " alt="" coords="416,255,447,276,462,294,470,312,479,328,495,342,514,352,512,357,492,347,475,331,466,314,458,297,444,280,413,260"/>
+<area shape="rect" id="Node000048" href="$vmm_8c.html#aca93d0285bf352c3551ae24b92a73744" title="Clone an address space for fork()." alt="" coords="502,405,703,431"/>
+<area shape="poly" id="edge12_Node000003_Node000048" title=" " alt="" coords="420,256,447,276,459,292,465,308,470,338,475,366,483,379,495,392,501,396,497,400,492,396,478,382,470,368,464,339,460,309,454,295,443,280,417,260"/>
+<area shape="rect" id="Node000053" href="$vmm_8c.html#a8966edc063e975473a71b57a1b39c886" title="Destroy all user mappings in an address space." alt="" coords="493,455,712,480"/>
+<area shape="poly" id="edge14_Node000003_Node000053" title=" " alt="" coords="421,255,447,276,461,299,468,321,469,363,472,403,479,422,495,441,500,445,496,449,491,445,475,425,466,404,463,364,462,322,456,301,443,280,418,260"/>
+<area shape="poly" id="edge8_Node000032_Node000031" title=" " alt="" coords="647,161,750,147,751,153,647,166"/>
+<area shape="poly" id="edge13_Node000048_Node000015" title=" " alt="" coords="682,403,711,392,749,367,779,339,783,343,752,371,713,396,684,408"/>
+<area shape="rect" id="Node000056" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="335,289,437,315"/>
+<area shape="poly" id="edge16_Node000055_Node000056" title=" " alt="" coords="279,299,321,299,321,305,279,305"/>
+</map>

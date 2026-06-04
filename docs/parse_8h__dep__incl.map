@@ -1,0 +1,7 @@
+<map id="user/core/vega/include/vega/parse.h" name="user/core/vega/include/vega/parse.h">
+<area shape="rect" id="Node000001" title="vega parser entry point." alt="" coords="100,5,269,45"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html" title="Recursive&#45;descent parser building vega AST nodes from tokens." alt="" coords="5,93,175,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,56,106,95,102,91,149,52"/>
+<area shape="rect" id="Node000003" href="$vega_8c.html" title="vega top&#45;level: host registration + lex → parse → execute → free." alt="" coords="199,93,359,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="220,52,267,91,263,95,217,56"/>
+</map>

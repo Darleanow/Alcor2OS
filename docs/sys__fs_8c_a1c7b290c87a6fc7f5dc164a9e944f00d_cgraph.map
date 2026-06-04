@@ -1,0 +1,9 @@
+<map id="sys_ftruncate" name="sys_ftruncate">
+<area shape="rect" id="Node000001" title="Truncate the file open as fd to exactly length bytes." alt="" coords="5,5,115,31"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#a4535fe94909a8928746ddae8c0081991" title="Truncate fd to exactly length bytes via the driver." alt="" coords="163,5,269,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,15,149,15,149,21,115,21"/>
+<area shape="rect" id="Node000003" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="317,5,396,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="270,15,304,15,304,21,270,21"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="444,5,547,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="396,15,430,15,430,21,396,21"/>
+</map>

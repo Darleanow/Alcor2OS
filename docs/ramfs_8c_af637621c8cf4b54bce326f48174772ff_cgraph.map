@@ -1,0 +1,19 @@
+<map id="ramfs_init" name="ramfs_init">
+<area shape="rect" id="Node000001" title="Initialise ramfs (idempotent)." alt="" coords="5,80,93,105"/>
+<area shape="rect" id="Node000002" href="$ramfs_8c.html#aec74d885a86466ccf3ca6a7893e9001a" title="Allocate and zero a new ramfs node with the given name and type." alt="" coords="141,55,284,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,83,127,78,128,83,94,89"/>
+<area shape="rect" id="Node000020" href="$vfs_8c.html#accf204077f65d2cb4cf3098f18100985" title="Register a filesystem driver in the type registry." alt="" coords="153,104,272,129"/>
+<area shape="poly" id="edge6_Node000001_Node000020" title=" " alt="" coords="94,96,140,103,139,109,93,102"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="332,5,411,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="253,52,318,32,319,37,255,57"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a4d46efddfad41d6c402283b85b3b15b6" title="Allocate zeroed memory from kernel heap." alt="" coords="337,55,405,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="284,65,324,65,324,70,284,70"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="459,5,533,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="403,52,449,33,451,38,405,57"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="467,55,525,80"/>
+<area shape="poly" id="edge5_Node000004_Node000015" title=" " alt="" coords="405,65,453,65,453,70,405,70"/>
+<area shape="rect" id="Node000021" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="340,104,403,129"/>
+<area shape="poly" id="edge7_Node000020_Node000021" title=" " alt="" coords="272,114,326,114,326,119,272,119"/>
+<area shape="rect" id="Node000022" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="459,104,533,129"/>
+<area shape="poly" id="edge8_Node000021_Node000022" title=" " alt="" coords="403,114,445,114,445,119,403,119"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="caret_refresh" name="caret_refresh">
+<area shape="rect" id="Node000001" title="Convenience: caret_erase followed by caret_paint. Used after a write completes; cheap when the cursor..." alt="" coords="476,5,584,31"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="343,5,428,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="462,21,428,21,428,15,462,15"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="172,5,295,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="329,21,295,21,295,15,329,15"/>
+<area shape="rect" id="Node000004" href="$pit_8c.html#a1ec93c1a5802efe9e3925acb8ccb5f64" title=" " alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="158,21,124,21,124,15,158,15"/>
+</map>

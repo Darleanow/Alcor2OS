@@ -1,0 +1,5 @@
+<map id="vfs_fstat" name="vfs_fstat">
+<area shape="rect" id="Node000001" title="Stat an open file descriptor." alt="" coords="135,5,213,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21" title="Stat the open file descriptor fd into a POSIX stat buffer." alt="" coords="5,5,87,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,21,87,21,87,15,121,15"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="vfs_read" name="vfs_read">
+<area shape="rect" id="Node000001" title="Read up to count bytes from fd into buf." alt="" coords="5,31,84,56"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="149,5,228,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,34,135,25,136,30,85,39"/>
+<area shape="rect" id="Node000004" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="132,55,245,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="85,47,119,53,118,58,84,52"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="299,5,402,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="228,15,285,15,285,21,228,21"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="230,52,294,32,295,37,232,57"/>
+<area shape="rect" id="Node000005" href="$proc_8c.html#a7252d4cb0ebec561f76091963a6dbe6a" title="Block p (set state to BLOCKED). Call before proc_schedule()." alt="" coords="305,55,397,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="246,65,291,65,291,70,246,70"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="293,104,408,129"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="232,77,295,97,294,102,230,83"/>
+<area shape="rect" id="Node000016" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="305,153,396,179"/>
+<area shape="poly" id="edge11_Node000004_Node000016" title=" " alt="" coords="207,78,246,107,295,138,307,145,305,150,292,143,243,111,204,82"/>
+<area shape="rect" id="Node000007" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="456,53,625,79"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="399,101,478,80,480,85,400,106"/>
+<area shape="rect" id="Node000008" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="673,129,840,155"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="408,118,660,133,659,139,408,123"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="491,155,590,180"/>
+<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="400,127,480,148,478,154,399,132"/>
+<area shape="poly" id="edge10_Node000009_Node000008" title=" " alt="" coords="590,159,660,151,660,156,591,164"/>
+</map>

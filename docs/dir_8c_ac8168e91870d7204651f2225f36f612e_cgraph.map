@@ -1,0 +1,5 @@
+<map id="seed_dot_dotdot" name="seed_dot_dotdot">
+<area shape="rect" id="Node000001" title="Populate block_buf with the . and .. dirents." alt="" coords="5,5,136,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="184,5,243,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,15,170,15,170,21,136,21"/>
+</map>

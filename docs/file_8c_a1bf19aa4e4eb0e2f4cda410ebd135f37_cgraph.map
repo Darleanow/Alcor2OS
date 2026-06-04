@@ -1,0 +1,17 @@
+<map id="write_with_buffer" name="write_with_buffer">
+<area shape="rect" id="Node000001" title="Write count bytes to file at byte offset." alt="" coords="5,104,140,129"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#ae37d4828b0eb47da6755a484e7876462" title="One iteration of the write loop: place one chunk into the file." alt="" coords="188,104,320,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,114,174,114,174,119,140,119"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a8b7d4942e79d8b4e76b87688e3686e72" title="Resolve file_block to an on&#45;disk block, allocating on hole." alt="" coords="368,29,512,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="281,101,367,64,386,57,387,62,369,68,283,106"/>
+<area shape="rect" id="Node000024" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="397,79,483,104"/>
+<area shape="poly" id="edge5_Node000002_Node000024" title=" " alt="" coords="320,105,383,96,384,102,321,110"/>
+<area shape="rect" id="Node000040" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="380,128,500,153"/>
+<area shape="poly" id="edge6_Node000002_Node000040" title=" " alt="" coords="321,123,367,129,366,134,320,128"/>
+<area shape="rect" id="Node000042" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="378,177,502,203"/>
+<area shape="poly" id="edge7_Node000002_Node000042" title=" " alt="" coords="285,127,369,162,390,170,388,175,367,167,283,132"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#ab4eb8bfa2badf37a0c74bd07e5dc145c" title="Reserve the block at file&#45;relative index file_block." alt="" coords="560,5,683,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="512,30,546,25,546,31,513,35"/>
+<area shape="rect" id="Node000046" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="561,55,682,80"/>
+<area shape="poly" id="edge4_Node000003_Node000046" title=" " alt="" coords="513,49,548,54,547,60,512,55"/>
+</map>

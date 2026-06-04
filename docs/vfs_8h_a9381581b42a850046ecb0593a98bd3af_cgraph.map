@@ -1,0 +1,51 @@
+<map id="vfs_rename" name="vfs_rename">
+<area shape="rect" id="Node000001" title="Rename (move) a file, copying across mount points if necessary." alt="" coords="5,223,104,248"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="161,55,217,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,221,167,90,171,93,68,224"/>
+<area shape="rect" id="Node000016" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="152,160,227,185"/>
+<area shape="poly" id="edge5_Node000001_Node000016" title=" " alt="" coords="82,220,147,189,149,194,84,225"/>
+<area shape="rect" id="Node000031" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="287,253,410,279"/>
+<area shape="poly" id="edge11_Node000001_Node000031" title=" " alt="" coords="104,238,274,256,273,261,104,243"/>
+<area shape="rect" id="Node000035" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="275,355,423,380"/>
+<area shape="poly" id="edge16_Node000001_Node000035" title=" " alt="" coords="71,246,107,277,153,308,211,332,270,349,268,354,210,337,151,312,103,281,67,250"/>
+<area shape="rect" id="Node000040" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="152,273,227,299"/>
+<area shape="poly" id="edge25_Node000001_Node000040" title=" " alt="" coords="90,246,143,266,141,271,88,251"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="309,5,388,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,56,295,32,297,37,218,61"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="294,55,403,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="218,65,280,65,280,70,218,70"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="485,55,613,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="404,65,471,65,471,70,404,70"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="288,104,409,129"/>
+<area shape="poly" id="edge6_Node000016_Node000017" title=" " alt="" coords="222,157,274,138,294,131,296,136,276,143,224,162"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="294,153,403,179"/>
+<area shape="poly" id="edge7_Node000016_Node000018" title=" " alt="" coords="227,168,280,166,280,172,227,174"/>
+<area shape="rect" id="Node000030" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="303,203,395,228"/>
+<area shape="poly" id="edge10_Node000016_Node000030" title=" " alt="" coords="228,180,290,197,288,202,226,185"/>
+<area shape="rect" id="Node000019" href="$pmm_8c.html#abbcb83f4f3be161d39d232b00050e6f6" title="Allocate multiple contiguous physical pages." alt="" coords="479,104,619,129"/>
+<area shape="poly" id="edge8_Node000018_Node000019" title=" " alt="" coords="400,151,483,130,484,135,402,156"/>
+<area shape="rect" id="Node000022" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="503,153,595,179"/>
+<area shape="poly" id="edge9_Node000018_Node000022" title=" " alt="" coords="404,163,490,163,490,169,404,169"/>
+<area shape="rect" id="Node000032" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="686,279,753,304"/>
+<area shape="poly" id="edge12_Node000031_Node000032" title=" " alt="" coords="411,267,672,286,672,291,410,273"/>
+<area shape="rect" id="Node000033" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="471,203,628,228"/>
+<area shape="poly" id="edge13_Node000031_Node000033" title=" " alt="" coords="399,251,485,229,486,234,401,256"/>
+<area shape="poly" id="edge14_Node000033_Node000032" title=" " alt="" coords="584,226,629,245,682,270,680,275,627,250,582,231"/>
+<area shape="rect" id="Node000034" href="$kstdlib_8c.html#ab77d8981772dbf05f403fca1354eb314" title="Compare two strings up to n characters." alt="" coords="678,203,761,228"/>
+<area shape="poly" id="edge15_Node000033_Node000034" title=" " alt="" coords="628,213,664,213,664,218,628,218"/>
+<area shape="poly" id="edge19_Node000035_Node000032" title=" " alt="" coords="411,352,672,298,673,303,412,357"/>
+<area shape="rect" id="Node000036" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="514,355,585,380"/>
+<area shape="poly" id="edge17_Node000035_Node000036" title=" " alt="" coords="423,365,500,365,500,370,423,370"/>
+<area shape="rect" id="Node000037" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="680,431,759,456"/>
+<area shape="poly" id="edge20_Node000035_Node000037" title=" " alt="" coords="411,377,471,390,667,430,666,435,470,395,410,383"/>
+<area shape="rect" id="Node000038" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="498,456,601,481"/>
+<area shape="poly" id="edge21_Node000035_Node000038" title=" " alt="" coords="372,378,472,434,503,448,501,453,469,439,369,383"/>
+<area shape="rect" id="Node000039" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="492,505,607,531"/>
+<area shape="poly" id="edge22_Node000035_Node000039" title=" " alt="" coords="361,378,405,433,436,465,472,492,483,498,481,502,469,496,433,469,401,437,357,382"/>
+<area shape="poly" id="edge18_Node000036_Node000032" title=" " alt="" coords="582,352,627,333,680,308,682,313,629,338,584,357"/>
+<area shape="poly" id="edge24_Node000039_Node000037" title=" " alt="" coords="597,503,627,492,686,461,688,465,629,496,598,508"/>
+<area shape="rect" id="Node000015" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="676,505,763,531"/>
+<area shape="poly" id="edge23_Node000039_Node000015" title=" " alt="" coords="607,515,662,515,662,521,607,521"/>
+<area shape="poly" id="edge26_Node000040_Node000031" title=" " alt="" coords="227,279,273,273,274,278,227,284"/>
+<area shape="poly" id="edge27_Node000040_Node000035" title=" " alt="" coords="216,296,312,346,309,351,214,301"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="fill_cursor_footprint_bg" name="fill_cursor_footprint_bg">
+<area shape="rect" id="Node000001" title="Wipe the arrow&#39;s footprint and restore the cells beneath." alt="" coords="5,31,176,56"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="224,31,325,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,41,210,41,210,46,176,46"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="373,5,464,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="325,32,359,26,360,31,326,37"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="373,55,464,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="326,49,360,55,359,60,325,54"/>
+</map>

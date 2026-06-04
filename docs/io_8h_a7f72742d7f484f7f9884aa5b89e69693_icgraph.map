@@ -1,0 +1,27 @@
+<map id="inl" name="inl">
+<area shape="rect" id="Node000001" title="Read a dword from an I/O port." alt="" coords="671,119,709,144"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#ae8802a65150faad75ccd3af146dbfdff" title="Read 32&#45;bit value from PCI configuration space." alt="" coords="529,119,623,144"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="657,134,623,134,623,129,657,129"/>
+<area shape="rect" id="Node000003" href="$pci_8c.html#a04b573b20a07f8bfa9ccefb89e1f3115" title="Read 16&#45;bit value from PCI configuration space." alt="" coords="386,93,479,119"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="515,123,479,117,480,112,516,118"/>
+<area shape="rect" id="Node000011" href="$pci_8c.html#a64c38b3266cb57b1ff1417e1e8e5da2a" title=" " alt="" coords="183,156,310,181"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="516,141,311,164,310,159,516,135"/>
+<area shape="rect" id="Node000012" href="$pci_8c.html#a723f5f1bea79b9954324982481e994d4" title="Read 8&#45;bit value from PCI configuration space." alt="" coords="390,195,475,220"/>
+<area shape="poly" id="edge8_Node000002_Node000012" title=" " alt="" coords="540,153,459,197,456,192,538,148"/>
+<area shape="rect" id="Node000014" href="$pci_8c.html#a3a1084d4226e71015aa3ad09f78b161a" title="Write 16&#45;bit value to PCI configuration space." alt="" coords="384,19,481,44"/>
+<area shape="poly" id="edge14_Node000002_Node000014" title=" " alt="" coords="544,112,450,46,453,42,547,108"/>
+<area shape="rect" id="Node000004" href="$pci_8c.html#a4a3a26341cdca867f78928565db5bc8a" title="Enable bus mastering for a PCI device." alt="" coords="159,5,334,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="399,88,335,52,287,33,289,28,337,48,401,83"/>
+<area shape="rect" id="Node000008" href="$pci_8c.html#ab5eb74aae5d07f53b3fd81158cbf04a3" title="Walk the capability list looking for cap_id." alt="" coords="175,107,318,132"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="372,113,318,117,318,112,372,108"/>
+<area shape="rect" id="Node000009" href="$pci_8c.html#a21f2f28f1e12177e4ea4f88554ae3ae6" title="Iterate all PCI devices and invoke cb until it returns true." alt="" coords="5,156,109,181"/>
+<area shape="poly" id="edge5_Node000003_Node000009" title=" " alt="" coords="372,94,325,86,270,82,213,85,158,97,132,109,108,125,72,157,69,154,105,120,130,104,156,91,213,79,270,77,325,81,373,89"/>
+<area shape="poly" id="edge6_Node000003_Node000011" title=" " alt="" coords="389,126,337,146,296,158,295,153,335,141,387,121"/>
+<area shape="poly" id="edge7_Node000011_Node000009" title=" " alt="" coords="169,171,109,171,109,166,169,166"/>
+<area shape="poly" id="edge9_Node000012_Node000008" title=" " alt="" coords="403,188,371,166,335,146,304,135,306,130,337,141,374,161,406,184"/>
+<area shape="poly" id="edge11_Node000012_Node000009" title=" " alt="" coords="376,211,274,208,157,197,100,184,101,179,158,191,274,203,376,205"/>
+<area shape="poly" id="edge12_Node000012_Node000011" title=" " alt="" coords="376,198,308,184,309,179,377,193"/>
+<area shape="rect" id="Node000013" href="$pci_8c.html#a2d659beb32f7b094b11c2cb603152b93" title="Continue walking the capability list from current." alt="" coords="157,257,336,283"/>
+<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="382,227,287,260,285,255,381,222"/>
+<area shape="poly" id="edge15_Node000014_Node000004" title=" " alt="" coords="370,30,334,27,334,22,370,24"/>
+</map>

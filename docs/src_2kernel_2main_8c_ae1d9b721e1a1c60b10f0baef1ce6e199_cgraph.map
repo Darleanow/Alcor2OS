@@ -1,0 +1,77 @@
+<map id="launch_init" name="launch_init">
+<area shape="rect" id="Node000001" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="5,257,99,283"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="702,232,811,257"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,266,688,244,688,250,99,271"/>
+<area shape="rect" id="Node000014" href="$console_8c.html#a47df046791fa999ff0b4c7bd98345708" title="Formatted console output (printf&#45;style)." alt="" coords="325,131,440,156"/>
+<area shape="poly" id="edge8_Node000001_Node000014" title=" " alt="" coords="86,255,335,158,337,163,88,260"/>
+<area shape="rect" id="Node000018" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="147,508,265,533"/>
+<area shape="poly" id="edge18_Node000001_Node000018" title=" " alt="" coords="63,281,192,494,187,497,59,284"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="865,105,993,131"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="774,229,898,137,901,141,777,234"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="1041,29,1161,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="958,103,1058,58,1060,63,960,108"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="1053,131,1150,156"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="994,125,1039,132,1038,137,993,130"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="1209,105,1311,131"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="994,115,1195,115,1195,121,994,121"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="1073,180,1130,205"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="960,128,1042,165,1061,173,1059,178,1040,170,958,133"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="1150,133,1195,126,1196,131,1151,138"/>
+<area shape="poly" id="edge9_Node000014_Node000002" title=" " alt="" coords="411,154,453,172,501,190,599,215,689,232,688,237,598,220,499,195,451,177,409,158"/>
+<area shape="poly" id="edge10_Node000014_Node000003" title=" " alt="" coords="440,138,852,119,852,124,440,143"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="533,156,615,181"/>
+<area shape="poly" id="edge11_Node000014_Node000015" title=" " alt="" coords="440,148,520,159,519,164,440,154"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="719,5,795,31"/>
+<area shape="poly" id="edge14_Node000014_Node000016" title=" " alt="" coords="398,128,442,98,499,68,553,49,608,36,705,20,706,25,609,41,554,54,501,72,445,102,401,133"/>
+<area shape="rect" id="Node000017" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="715,55,799,80"/>
+<area shape="poly" id="edge16_Node000014_Node000017" title=" " alt="" coords="411,128,452,112,499,97,606,77,701,68,701,73,607,83,501,102,454,117,413,133"/>
+<area shape="poly" id="edge12_Node000015_Node000002" title=" " alt="" coords="606,179,714,224,712,229,604,184"/>
+<area shape="poly" id="edge13_Node000015_Node000003" title=" " alt="" coords="615,161,817,134,851,129,852,134,818,139,616,166"/>
+<area shape="poly" id="edge15_Node000016_Node000003" title=" " alt="" coords="794,28,819,40,864,67,902,95,899,99,861,72,816,44,792,33"/>
+<area shape="poly" id="edge17_Node000017_Node000003" title=" " alt="" coords="799,77,873,99,872,104,798,82"/>
+<area shape="poly" id="edge19_Node000018_Node000002" title=" " alt="" coords="208,507,220,474,241,429,271,382,290,361,312,344,356,318,397,304,436,299,473,298,552,301,597,297,647,286,716,260,718,265,649,291,597,302,552,306,473,304,436,304,398,310,359,323,315,348,294,365,275,386,246,431,225,476,213,509"/>
+<area shape="rect" id="Node000019" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="717,409,796,435"/>
+<area shape="poly" id="edge20_Node000018_Node000019" title=" " alt="" coords="228,506,267,486,313,469,420,444,528,430,626,422,704,419,704,425,627,427,529,435,421,450,314,474,269,491,230,510"/>
+<area shape="rect" id="Node000020" href="$proc_8c.html#af54f572ae171e2176cb67d7b16b30f50" title="Create a process from an ELF image held in kernel memory." alt="" coords="313,359,452,384"/>
+<area shape="poly" id="edge21_Node000018_Node000020" title=" " alt="" coords="214,506,253,457,281,428,312,401,333,388,336,392,315,405,285,431,257,460,218,510"/>
+<area shape="rect" id="Node000078" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="343,484,422,509"/>
+<area shape="poly" id="edge25_Node000018_Node000078" title=" " alt="" coords="265,510,329,501,330,506,266,515"/>
+<area shape="rect" id="Node000065" href="$gdt_8c.html#af95c2c00bd26bfbb9016f228e3daaa26" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="331,583,434,608"/>
+<area shape="poly" id="edge26_Node000018_Node000065" title=" " alt="" coords="234,531,314,568,334,575,332,580,312,572,232,536"/>
+<area shape="rect" id="Node000079" href="$vfs_8c.html#a44d4878d7034e836fb13eff8587f0160" title="Release a file descriptor and decrement the OFT refcount." alt="" coords="533,911,615,936"/>
+<area shape="poly" id="edge27_Node000018_Node000079" title=" " alt="" coords="210,533,214,590,228,675,241,721,260,767,284,809,315,847,337,865,362,880,416,901,470,914,519,919,518,925,469,919,414,907,359,885,334,869,311,851,280,812,255,769,236,723,223,676,209,591,205,534"/>
+<area shape="rect" id="Node000083" href="$vfs_8c.html#a7112bdeddce07fa71080853029871d3b" title="Duplicate oldfd into the specific slot newfd." alt="" coords="342,811,423,836"/>
+<area shape="poly" id="edge30_Node000018_Node000083" title=" " alt="" coords="217,532,369,797,365,800,212,535"/>
+<area shape="rect" id="Node000085" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="342,533,423,559"/>
+<area shape="poly" id="edge36_Node000018_Node000085" title=" " alt="" coords="266,527,329,536,328,541,265,532"/>
+<area shape="rect" id="Node000066" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="330,632,435,657"/>
+<area shape="poly" id="edge46_Node000018_Node000066" title=" " alt="" coords="220,532,260,573,286,597,315,617,328,624,325,629,312,622,283,601,256,577,216,536"/>
+<area shape="rect" id="Node000021" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="505,359,643,384"/>
+<area shape="poly" id="edge22_Node000020_Node000021" title=" " alt="" coords="452,369,491,369,491,374,452,374"/>
+<area shape="poly" id="edge23_Node000021_Node000002" title=" " alt="" coords="609,356,647,337,693,301,732,266,735,270,697,305,649,342,611,361"/>
+<area shape="poly" id="edge24_Node000021_Node000019" title=" " alt="" coords="621,382,705,405,703,410,620,387"/>
+<area shape="rect" id="Node000055" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="705,685,808,711"/>
+<area shape="poly" id="edge28_Node000079_Node000055" title=" " alt="" coords="614,914,631,907,646,897,663,872,690,824,741,722,746,724,694,827,668,875,650,901,634,912,616,918"/>
+<area shape="rect" id="Node000080" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="696,835,817,860"/>
+<area shape="poly" id="edge29_Node000079_Node000080" title=" " alt="" coords="615,909,647,897,718,864,721,869,649,902,617,914"/>
+<area shape="poly" id="edge34_Node000083_Node000079" title=" " alt="" coords="402,834,446,865,501,897,521,905,519,910,499,902,443,869,399,838"/>
+<area shape="poly" id="edge33_Node000083_Node000055" title=" " alt="" coords="423,811,525,784,647,745,717,715,719,719,649,750,527,789,424,817"/>
+<area shape="rect" id="Node000054" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="535,709,613,735"/>
+<area shape="poly" id="edge31_Node000083_Node000054" title=" " alt="" coords="407,808,536,739,538,744,409,813"/>
+<area shape="rect" id="Node000084" href="$vfs_8c.html#aa6ae139c297636a7f4ab9c9980b856e1" title="Increment the OFT refcount for slot idx." alt="" coords="519,861,629,887"/>
+<area shape="poly" id="edge35_Node000083_Node000084" title=" " alt="" coords="424,831,513,855,512,860,423,837"/>
+<area shape="poly" id="edge32_Node000054_Node000055" title=" " alt="" coords="613,714,692,704,692,709,614,720"/>
+<area shape="poly" id="edge38_Node000085_Node000055" title=" " alt="" coords="424,556,453,568,501,593,575,619,649,645,719,677,717,682,647,650,573,624,499,598,451,572,422,561"/>
+<area shape="poly" id="edge45_Node000085_Node000080" title=" " alt="" coords="424,550,440,557,454,568,470,591,478,614,479,658,480,702,487,724,502,746,542,780,589,805,637,823,683,834,682,840,636,828,586,810,539,784,498,749,482,726,475,703,474,658,473,615,465,594,450,572,437,562,422,555"/>
+<area shape="rect" id="Node000086" href="$vfs_8c.html#a7a6905322835d34f51e6b34bd87075da" title="Allocate and zero a free OFT slot; refcount is initialised to 1." alt="" coords="535,460,613,485"/>
+<area shape="poly" id="edge37_Node000085_Node000086" title=" " alt="" coords="419,531,451,518,499,494,522,486,524,491,501,499,453,523,421,536"/>
+<area shape="rect" id="Node000087" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="513,509,635,535"/>
+<area shape="poly" id="edge39_Node000085_Node000087" title=" " alt="" coords="423,538,498,529,499,534,424,544"/>
+<area shape="rect" id="Node000091" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="519,660,629,685"/>
+<area shape="poly" id="edge40_Node000085_Node000091" title=" " alt="" coords="425,553,454,568,470,586,479,604,487,621,502,639,522,652,519,656,498,643,482,624,474,606,466,589,450,572,422,558"/>
+<area shape="rect" id="Node000092" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="500,559,648,584"/>
+<area shape="poly" id="edge42_Node000085_Node000092" title=" " alt="" coords="424,549,486,557,486,562,423,554"/>
+<area shape="poly" id="edge41_Node000091_Node000055" title=" " alt="" coords="629,678,691,686,691,692,628,683"/>
+<area shape="poly" id="edge43_Node000092_Node000019" title=" " alt="" coords="622,556,647,544,675,521,700,495,738,445,742,448,704,498,678,525,649,548,625,561"/>
+<area shape="poly" id="edge44_Node000092_Node000055" title=" " alt="" coords="611,582,649,601,697,637,735,673,732,677,693,641,647,606,609,586"/>
+</map>

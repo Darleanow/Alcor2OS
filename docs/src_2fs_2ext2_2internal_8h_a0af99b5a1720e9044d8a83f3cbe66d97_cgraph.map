@@ -1,0 +1,5 @@
+<map id="vol_read_block" name="vol_read_block">
+<area shape="rect" id="Node000001" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="5,5,125,31"/>
+<area shape="rect" id="Node000002" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="173,5,305,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,15,159,15,159,21,126,21"/>
+</map>

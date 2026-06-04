@@ -1,0 +1,18 @@
+<map id="vmm_map_in" name="vmm_map_in">
+<area shape="rect" id="Node000001" title="Map a page in a specific address space." alt="" coords="5,103,116,128"/>
+<area shape="rect" id="Node000002" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="164,77,283,103"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,104,150,99,151,104,117,109"/>
+<area shape="rect" id="Node000004" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="331,128,433,153"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="116,117,317,133,317,138,116,122"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="353,79,411,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="283,88,339,88,339,94,283,93"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="265,100,329,121,328,126,263,105"/>
+<area shape="rect" id="Node000006" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="335,29,429,55"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="265,75,325,56,327,61,267,80"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="481,128,609,153"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="434,138,467,138,467,143,434,143"/>
+<area shape="rect" id="Node000007" href="$pmm_8c.html#aaed7a89cb2264555f10bf9e03b06676e" title="Mark page as allocated in bitmap." alt="" coords="498,55,593,80"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="430,47,485,55,484,61,429,52"/>
+<area shape="rect" id="Node000008" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="495,5,595,31"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="429,32,481,25,482,30,430,38"/>
+</map>

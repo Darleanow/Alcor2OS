@@ -1,0 +1,15 @@
+<map id="detect_run_length" name="detect_run_length">
+<area shape="rect" id="Node000001" title="Count how many on&#45;disk blocks following base_block_num are contiguous to it for this inode." alt="" coords="5,31,144,56"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="192,31,313,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,41,178,41,178,46,144,46"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#ae0cee49141d18668ec4dd1734d0a3e45" title="Number of u32 block&#45;pointer slots per indirect block." alt="" coords="372,5,489,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="313,32,358,26,359,31,314,37"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#a94ad86b6cd7f847465e1f8d336a02947" title="Read slot slot_idx out of indirect block indirect_block." alt="" coords="361,55,500,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="314,49,348,53,347,59,313,54"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="580,5,636,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="476,52,566,27,567,32,478,57"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="571,55,645,80"/>
+<area shape="poly" id="edge5_Node000004_Node000019" title=" " alt="" coords="500,65,557,65,557,70,500,70"/>
+<area shape="rect" id="Node000034" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="548,104,668,129"/>
+<area shape="poly" id="edge6_Node000004_Node000034" title=" " alt="" coords="478,77,549,98,547,103,476,83"/>
+</map>

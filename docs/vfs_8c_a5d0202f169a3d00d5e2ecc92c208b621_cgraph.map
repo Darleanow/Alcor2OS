@@ -1,0 +1,7 @@
+<map id="vfs_normalize" name="vfs_normalize">
+<area shape="rect" id="Node000001" title="Normalise an absolute path in&#45;place." alt="" coords="5,31,120,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="168,5,255,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,31,154,25,155,30,120,36"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="172,55,251,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="120,50,159,56,158,62,120,55"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sh_puts" name="sh_puts">
+<area shape="rect" id="Node000001" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="Node000002" href="$sys_8c.html#a3407f6541775740dc13d0acd6257630c" title="Write len bytes from buf to fd." alt="" coords="125,5,203,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,15,111,15,111,21,77,21"/>
+</map>

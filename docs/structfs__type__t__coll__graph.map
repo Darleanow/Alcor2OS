@@ -1,0 +1,5 @@
+<map id="fs_type_t" name="fs_type_t">
+<area shape="rect" id="Node000001" title="Filesystem type descriptor — registered once, instantiated per mount." alt="" coords="5,93,88,119"/>
+<area shape="rect" id="Node000002" href="$structfs__ops__t.html" title="Filesystem driver operations table." alt="" coords="9,5,85,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,45,49,93,44,93,44,45"/>
+</map>

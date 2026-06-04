@@ -1,0 +1,5 @@
+<map id="init_fstat" name="init_fstat">
+<area shape="rect" id="Node000001" title="Stat an open handle (root sentinel or file node)." alt="" coords="5,5,85,31"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#a80562396dba282f389263379a39dfff5" title="Populate a stat buffer from a file node, or fill the directory stub when no node is given." alt="" coords="133,5,204,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,15,120,15,120,21,86,21"/>
+</map>

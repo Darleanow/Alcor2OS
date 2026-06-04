@@ -1,0 +1,11 @@
+<map id="ramfs_chardev_register" name="ramfs_chardev_register">
+<area shape="rect" id="Node000001" title="Register a character device under path inside the ramfs tree." alt="" coords="320,31,496,56"/>
+<area shape="rect" id="Node000002" href="$dev__nodes_8c.html#ae65ed532860c590d0e567ec0487fee0a" title="Register /dev/null, /dev/zero, /dev/tty, and /dev/fb on the ramfs mounted at /dev." alt="" coords="152,5,272,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="306,33,272,28,273,23,306,28"/>
+<area shape="rect" id="Node000004" href="$mouse_8c.html#aaa387243b8a8817be409b44abf308ac3" title="Initialise the broker: clear the ring, cursor, and waiter slot." alt="" coords="165,55,259,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="306,58,260,64,259,59,306,53"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="138,21,104,21,104,15,138,15"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#a4f5b111cee41d984dcf4ae5c45789e2d" title=" " alt="" coords="13,55,96,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="151,70,96,70,96,65,151,65"/>
+</map>

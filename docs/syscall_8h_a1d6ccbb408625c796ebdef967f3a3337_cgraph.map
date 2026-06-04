@@ -1,0 +1,5 @@
+<map id="syscall_get_current_frame" name="syscall_get_current_frame">
+<area shape="rect" id="Node000001" title="Return the syscall_frame_t for the currently executing syscall." alt="" coords="5,5,153,45"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="201,13,304,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,23,187,23,187,28,154,28"/>
+</map>

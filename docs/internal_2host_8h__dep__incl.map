@@ -1,0 +1,11 @@
+<map id="user/include/vega/internal/host.h" name="user/include/vega/internal/host.h">
+<area shape="rect" id="Node000001" title="libvega&#45;internal access to the registered host ops. Do not include from outside libvega — use &lt;vega/h..." alt="" coords="276,5,467,45"/>
+<area shape="rect" id="Node000002" href="$lexer_8c.html" title="vega tokenizer implementation." alt="" coords="5,93,169,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="291,52,130,96,128,91,290,46"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html" title="Recursive&#45;descent parser building vega AST nodes from tokens." alt="" coords="193,93,363,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="340,56,294,95,290,91,337,52"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html" title="Walks vega AST nodes and runs them." alt="" coords="387,93,545,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="407,52,454,91,450,95,403,56"/>
+<area shape="rect" id="Node000005" href="$vega_8c.html" title="vega top&#45;level: host registration + lex → parse → execute → free." alt="" coords="570,93,730,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="452,47,610,91,609,96,451,52"/>
+</map>

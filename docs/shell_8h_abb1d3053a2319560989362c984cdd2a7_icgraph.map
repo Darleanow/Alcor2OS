@@ -1,0 +1,18 @@
+<map id="sh_getcwd" name="sh_getcwd">
+<area shape="rect" id="Node000001" title="Get the current working directory into buf of size bytes." alt="" coords="813,55,904,80"/>
+<area shape="rect" id="Node000002" href="$builtins_8c.html#a92ba9d4bb1736306f2339a923e431f0b" title=" " alt="" coords="671,5,755,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="807,53,750,33,752,28,808,48"/>
+<area shape="rect" id="Node000004" href="$complete_8c.html#a95e6a6a7a934dd84cddf2a15ac83b1c8" title="Compute completions for prefix." alt="" coords="660,55,765,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="800,70,766,70,766,65,800,65"/>
+<area shape="rect" id="Node000009" href="$prompt_8c.html#ace54b4717588b11e401baf89fe2fc1fa" title="Paint the decorative header line above the primary prompt." alt="" coords="268,105,451,131"/>
+<area shape="poly" id="edge7_Node000001_Node000009" title=" " alt="" coords="806,86,766,95,683,107,599,114,451,120,451,115,599,109,682,101,765,90,804,81"/>
+<area shape="rect" id="Node000003" href="$builtins_8c.html#ab1947aa01143b8cc05b36952bfacbac4" title="Execute a shell builtin." alt="" coords="499,5,612,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="657,21,612,21,612,15,657,15"/>
+<area shape="rect" id="Node000005" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="508,55,603,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="646,70,603,70,603,65,646,65"/>
+<area shape="rect" id="Node000006" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="307,56,411,81"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="494,70,411,71,411,66,494,65"/>
+<area shape="rect" id="Node000007" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="5,81,220,107"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="294,78,221,86,220,80,293,73"/>
+<area shape="poly" id="edge8_Node000009_Node000007" title=" " alt="" coords="254,110,220,107,221,102,255,105"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="utf8_try_start" name="utf8_try_start">
+<area shape="rect" id="Node000001" title="Try to start a UTF&#45;8 multi&#45;byte sequence based on the high bits of b." alt="" coords="5,5,116,31"/>
+<area shape="rect" id="Node000002" href="$ansi_8c.html#abe5d0937fa54ec7f4b665fb7a7a514ba" title="Begin a multi&#45;byte UTF&#45;8 sequence: store the lead bits and remaining continuation&#45;byte count,..." alt="" coords="164,5,255,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,15,150,15,150,21,116,21"/>
+</map>

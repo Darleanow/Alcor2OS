@@ -1,0 +1,27 @@
+<map id="console_printf" name="console_printf">
+<area shape="rect" id="Node000001" title="Formatted console output (printf&#45;style)." alt="" coords="5,80,120,105"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="300,29,409,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,77,168,65,286,47,287,52,168,70,113,82"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="457,80,585,105"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="85,78,142,50,223,21,269,10,316,4,364,5,410,14,435,25,459,38,498,68,495,72,456,43,433,29,409,19,363,10,316,9,270,15,224,26,144,55,87,82"/>
+<area shape="rect" id="Node000014" href="$console_8c.html#af7d9a756757c6f314b35dd045ee7da75" title="Print an unsigned 64&#45;bit value as 0x&#45;prefixed 16&#45;digit hex." alt="" coords="169,80,251,105"/>
+<area shape="poly" id="edge9_Node000001_Node000014" title=" " alt="" coords="120,90,155,90,155,95,120,95"/>
+<area shape="rect" id="Node000015" href="$console_8c.html#adbd2807fced4cf063269c95e8302395c" title="Print a signed decimal integer." alt="" coords="317,131,393,156"/>
+<area shape="poly" id="edge12_Node000001_Node000015" title=" " alt="" coords="116,103,168,114,303,135,303,140,168,119,115,108"/>
+<area shape="rect" id="Node000016" href="$console_8c.html#a3b2edafdfe0a05ed0b8a08bf175c5857" title="Print an unsigned 64&#45;bit decimal integer." alt="" coords="168,181,252,207"/>
+<area shape="poly" id="edge14_Node000001_Node000016" title=" " alt="" coords="84,103,181,171,178,176,81,108"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="398,52,466,73,465,78,397,57"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a8a7849c6502a6ab4f937bf95625cde81" title="Mirror a byte to the debug&#45;console port." alt="" coords="633,5,753,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="549,77,632,40,647,33,649,38,634,44,551,82"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a9dab109008b0029f53536481cb3d8181" title="Render glyph c from the Latin&#45;1 atlas at (px, py)." alt="" coords="645,55,742,80"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="585,81,630,74,631,79,586,86"/>
+<area shape="rect" id="Node000007" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="801,80,903,105"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="586,90,787,90,787,95,586,95"/>
+<area shape="rect" id="Node000011" href="$console_8c.html#ac2a70eb4d61b269e4257b88e53f9d6f7" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="665,156,722,181"/>
+<area shape="poly" id="edge7_Node000003_Node000011" title=" " alt="" coords="552,103,653,148,650,153,550,108"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="743,72,788,80,787,85,742,78"/>
+<area shape="poly" id="edge10_Node000014_Node000002" title=" " alt="" coords="246,77,304,57,306,62,248,82"/>
+<area shape="poly" id="edge11_Node000014_Node000003" title=" " alt="" coords="252,90,444,90,444,95,252,95"/>
+<area shape="poly" id="edge13_Node000015_Node000003" title=" " alt="" coords="392,129,465,107,467,112,394,135"/>
+<area shape="poly" id="edge15_Node000016_Node000003" title=" " alt="" coords="252,192,326,186,368,178,408,166,455,141,494,112,497,117,458,146,410,171,369,183,327,191,252,197"/>
+</map>

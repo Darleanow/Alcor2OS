@@ -1,0 +1,18 @@
+<map id="buf_append" name="buf_append">
+<area shape="rect" id="Node000001" title=" " alt="" coords="533,56,632,81"/>
+<area shape="rect" id="Node000002" href="$expand_8c.html#ad793565e867c053513ab67fe5a576e6d" title=" " alt="" coords="372,5,485,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="529,54,467,33,469,28,531,49"/>
+<area shape="rect" id="Node000003" href="$expand_8c.html#a4fda5f1bdaaefe8d10a7a1b8c9c486c9" title="Expand $&#45;syntax in src and return a new heap&#45;allocated string. The caller takes ownership and must fr..." alt="" coords="215,56,324,81"/>
+<area shape="poly" id="edge9_Node000001_Node000003" title=" " alt="" coords="520,71,324,71,324,66,520,66"/>
+<area shape="rect" id="Node000018" href="$expand_8c.html#a8fad758a4b43ef0f6249301c7aa31727" title=" " alt="" coords="378,107,479,132"/>
+<area shape="poly" id="edge7_Node000001_Node000018" title=" " alt="" coords="531,88,469,109,467,104,529,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="376,37,311,58,309,53,374,32"/>
+<area shape="rect" id="Node000004" href="$exec_8c.html#aa80df9fa56a7e6325a532357ded2847c" title=" " alt="" coords="23,7,149,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="208,55,134,35,135,30,209,50"/>
+<area shape="rect" id="Node000022" href="$exec_8c.html#acbb7ff6148e8d1243a60bc1bc22f440e" title=" " alt="" coords="5,56,167,81"/>
+<area shape="poly" id="edge4_Node000003_Node000022" title=" " alt="" coords="201,71,167,71,167,66,201,66"/>
+<area shape="rect" id="Node000008" href="$exec_8c.html#a6f0734bc8531e4020187d8ba193a167c" title="Execute node and return its exit status (0 on success, non&#45;zero on failure, 127 if a command was not ..." alt="" coords="41,129,131,155"/>
+<area shape="poly" id="edge5_Node000003_Node000008" title=" " alt="" coords="225,89,120,132,118,127,223,84"/>
+<area shape="poly" id="edge6_Node000008_Node000008" title=" " alt="" coords="118,119,109,111,86,108,67,110,57,115,55,120,60,128,56,131,50,121,53,111,65,105,86,103,111,106,121,115"/>
+<area shape="poly" id="edge8_Node000018_Node000003" title=" " alt="" coords="374,105,309,84,311,79,376,100"/>
+</map>

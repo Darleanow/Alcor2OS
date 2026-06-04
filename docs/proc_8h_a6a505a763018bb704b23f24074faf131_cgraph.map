@@ -1,0 +1,45 @@
+<map id="proc_wait" name="proc_wait">
+<area shape="rect" id="Node000001" title="Wait for a child process to exit." alt="" coords="5,131,91,156"/>
+<area shape="rect" id="Node000002" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="220,55,276,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="67,128,99,109,138,90,206,71,207,77,140,95,102,113,69,133"/>
+<area shape="rect" id="Node000016" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="209,105,287,131"/>
+<area shape="poly" id="edge5_Node000001_Node000016" title=" " alt="" coords="90,135,194,122,195,127,91,141"/>
+<area shape="rect" id="Node000017" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="191,155,305,180"/>
+<area shape="poly" id="edge6_Node000001_Node000017" title=" " alt="" coords="91,146,177,156,177,162,90,151"/>
+<area shape="rect" id="Node000027" href="$vmm_8c.html#a8966edc063e975473a71b57a1b39c886" title="Destroy all user mappings in an address space." alt="" coords="139,368,357,393"/>
+<area shape="poly" id="edge16_Node000001_Node000027" title=" " alt="" coords="62,154,229,356,225,359,58,158"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="451,5,529,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="276,59,437,26,438,31,277,64"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="435,55,545,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="276,65,421,65,421,70,276,70"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#ac156aa97dae8b45e5aea8f6534d38946" title="Write a single character to the console." alt="" coords="642,55,770,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="545,65,628,65,628,70,545,70"/>
+<area shape="rect" id="Node000018" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="405,104,575,129"/>
+<area shape="poly" id="edge7_Node000017_Node000018" title=" " alt="" coords="305,153,415,130,416,135,306,158"/>
+<area shape="rect" id="Node000019" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="623,105,789,131"/>
+<area shape="poly" id="edge8_Node000017_Node000019" title=" " alt="" coords="305,162,429,153,574,138,625,130,626,136,575,143,429,158,306,167"/>
+<area shape="rect" id="Node000020" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="441,205,539,231"/>
+<area shape="poly" id="edge9_Node000017_Node000020" title=" " alt="" coords="306,177,428,202,427,208,305,182"/>
+<area shape="poly" id="edge11_Node000020_Node000019" title=" " alt="" coords="532,203,573,184,587,173,596,162,606,151,621,140,635,133,637,138,624,144,610,155,600,165,591,177,576,188,535,208"/>
+<area shape="rect" id="Node000021" href="$proc_8c.html#a2b49e9b247efbece339a2f95a191ef64" title="Low&#45;level context switch function." alt="" coords="646,155,766,180"/>
+<area shape="poly" id="edge10_Node000020_Node000021" title=" " alt="" coords="539,204,637,181,639,186,540,209"/>
+<area shape="rect" id="Node000022" href="$cpu_8c.html#a18a6945bd70a07d34d7133848b6fb519" title="Get the current FS base MSR value." alt="" coords="641,204,771,229"/>
+<area shape="poly" id="edge12_Node000020_Node000022" title=" " alt="" coords="540,215,627,214,627,220,540,220"/>
+<area shape="rect" id="Node000023" href="$cpu_8c.html#a1c5d89ceee7d8c90e90526e6fec26e6f" title="Set the FS base MSR for thread&#45;local storage." alt="" coords="641,253,771,279"/>
+<area shape="poly" id="edge13_Node000020_Node000023" title=" " alt="" coords="540,226,636,248,635,253,539,231"/>
+<area shape="rect" id="Node000024" href="$gdt_8c.html#af95c2c00bd26bfbb9016f228e3daaa26" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="655,303,757,328"/>
+<area shape="poly" id="edge14_Node000020_Node000024" title=" " alt="" coords="513,229,563,257,624,288,646,296,644,301,622,292,560,262,510,233"/>
+<area shape="rect" id="Node000025" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="653,352,759,377"/>
+<area shape="poly" id="edge15_Node000020_Node000025" title=" " alt="" coords="504,229,552,281,586,311,624,337,642,346,639,350,621,342,583,315,549,285,500,233"/>
+<area shape="rect" id="Node000028" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="661,401,751,427"/>
+<area shape="poly" id="edge17_Node000027_Node000028" title=" " alt="" coords="358,386,648,407,647,412,358,391"/>
+<area shape="rect" id="Node000031" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="411,418,569,458"/>
+<area shape="poly" id="edge20_Node000027_Node000031" title=" " alt="" coords="303,391,398,413,397,419,302,396"/>
+<area shape="rect" id="Node000029" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="837,377,944,403"/>
+<area shape="poly" id="edge18_Node000028_Node000029" title=" " alt="" coords="751,406,823,396,824,401,751,411"/>
+<area shape="rect" id="Node000030" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="841,427,941,452"/>
+<area shape="poly" id="edge19_Node000028_Node000030" title=" " alt="" coords="751,417,827,428,826,433,751,423"/>
+<area shape="poly" id="edge22_Node000031_Node000028" title=" " alt="" coords="569,427,647,418,648,423,570,432"/>
+<area shape="rect" id="Node000032" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="655,451,757,476"/>
+<area shape="poly" id="edge21_Node000031_Node000032" title=" " alt="" coords="570,445,641,453,640,458,569,450"/>
+</map>

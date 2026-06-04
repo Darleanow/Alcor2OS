@@ -1,0 +1,11 @@
+<map id="lookup" name="lookup">
+<area shape="rect" id="Node000001" title="Linear lookup in the registered&#45;file list." alt="" coords="340,55,405,80"/>
+<area shape="rect" id="Node000002" href="$initfs_8c.html#a8f527b0cda5d28c2b882c0bedc0a7e96" title="Open the root directory or a registered file." alt="" coords="195,5,277,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="326,54,271,33,273,28,328,49"/>
+<area shape="rect" id="Node000003" href="$initfs_8c.html#a7b313c1adfe6feb8320abb829e59cc91" title="Stat a path. The empty/root path resolves to the directory stub." alt="" coords="199,55,273,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="326,70,274,70,274,65,326,65"/>
+<area shape="rect" id="Node000004" href="$initfs_8c.html#a295a2283cd260b2ef62cd7c003afafe3" title="Add a virtual file to initfs." alt="" coords="180,104,292,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="328,86,273,106,271,101,326,81"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="5,104,132,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="166,119,133,119,133,114,166,114"/>
+</map>

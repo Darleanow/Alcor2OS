@@ -1,0 +1,5 @@
+<map id="lex_read_heredoc_body" name="lex_read_heredoc_body">
+<area shape="rect" id="Node000001" title="Consume a heredoc body from the lexer&#39;s stream. Skips the rest of the current line (up to and includi..." alt="" coords="5,5,181,31"/>
+<area shape="rect" id="Node000002" href="$lexer_8c.html#a280140ced7662af7757a60a7a9d4145e" title=" " alt="" coords="229,5,304,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,15,216,15,216,21,181,21"/>
+</map>

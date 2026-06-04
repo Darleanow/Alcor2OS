@@ -1,0 +1,33 @@
+<map id="src/fs/ext2/ops.c" name="src/fs/ext2/ops.c">
+<area shape="rect" id="Node000001" title="fs_ops_t bridge for ext2." alt="" coords="289,5,417,31"/>
+<area shape="rect" id="Node000002" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="5,79,117,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="307,33,122,78,121,73,306,28"/>
+<area shape="rect" id="Node000003" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="97,225,212,251"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="337,33,272,81,234,115,201,154,182,184,167,214,162,211,177,181,197,150,231,112,269,77,334,29"/>
+<area shape="rect" id="Node000005" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="361,299,476,324"/>
+<area shape="poly" id="edge10_Node000001_Node000005" title=" " alt="" coords="378,29,407,49,434,77,455,115,464,147,472,225,474,238,472,252,460,273,445,291,441,288,456,270,467,250,469,238,467,226,459,148,450,117,430,80,404,53,375,33"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="564,152,687,177"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="418,28,482,46,516,60,547,76,584,107,612,139,607,143,580,111,544,81,513,65,481,51,417,33"/>
+<area shape="rect" id="Node000010" href="$src_2fs_2ext2_2internal_8h.html" title="Shared state, sizing macros, and private helpers for the ext2 module split." alt="" coords="287,79,420,104"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="356,31,356,65,351,65,351,31"/>
+<area shape="rect" id="Node000004" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="89,299,220,324"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,251,157,285,152,285,152,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="198,248,363,292,362,298,196,253"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="275,372,357,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="404,326,346,366,343,362,401,322"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="381,372,456,397"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="421,324,421,358,416,358,416,324"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="481,372,551,397"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="436,322,490,361,487,366,433,326"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="619,179,589,215,547,253,506,277,465,296,463,291,504,273,544,249,585,211,615,176"/>
+<area shape="poly" id="edge18_Node000010_Node000003" title=" " alt="" coords="322,107,278,126,232,154,199,185,173,216,169,212,195,181,229,150,275,122,320,102"/>
+<area shape="poly" id="edge19_Node000010_Node000005" title=" " alt="" coords="368,103,412,152,436,186,453,225,456,242,453,259,438,289,433,286,447,257,450,242,448,226,431,189,408,155,364,106"/>
+<area shape="rect" id="Node000011" href="$blockdev_8h.html" title="Generic block device interface." alt="" coords="287,225,439,251"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="362,103,372,125,380,152,381,183,374,213,369,211,375,183,375,152,367,127,357,105"/>
+<area shape="rect" id="Node000012" href="$ext2_8h.html" title="ext2 filesystem driver." alt="" coords="243,152,365,177"/>
+<area shape="poly" id="edge14_Node000010_Node000012" title=" " alt="" coords="347,106,322,142,318,139,343,103"/>
+<area shape="poly" id="edge13_Node000011_Node000005" title=" " alt="" coords="374,249,403,286,399,289,370,253"/>
+<area shape="poly" id="edge16_Node000012_Node000003" title=" " alt="" coords="281,180,193,222,190,217,279,175"/>
+<area shape="poly" id="edge17_Node000012_Node000005" title=" " alt="" coords="296,179,276,213,272,232,277,249,291,265,309,278,349,296,347,301,306,283,287,269,272,252,266,232,271,211,291,176"/>
+<area shape="poly" id="edge15_Node000012_Node000011" title=" " alt="" coords="316,176,347,213,343,217,312,179"/>
+</map>

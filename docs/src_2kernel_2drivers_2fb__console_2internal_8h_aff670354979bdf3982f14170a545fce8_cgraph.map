@@ -1,0 +1,15 @@
+<map id="caret_erase" name="caret_erase">
+<area shape="rect" id="Node000001" title="Re&#45;blit the cell currently showing the inverted caret block, restoring the glyph beneath it...." alt="" coords="5,80,104,105"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="152,80,225,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,90,138,90,138,95,104,95"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="273,80,383,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="226,90,260,90,260,95,226,95"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="445,5,575,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="351,77,430,40,449,32,451,37,432,44,353,82"/>
+<area shape="rect" id="Node000016" href="$cell_8c.html#a5a99b119fceec460b19c42e859586949" title="Atlas blit for non&#45;32&#45;bpp framebuffers — per&#45;pixel marshalling via fb_put_pixel." alt="" coords="451,55,569,80"/>
+<area shape="poly" id="edge4_Node000003_Node000016" title=" " alt="" coords="383,82,437,75,437,80,384,88"/>
+<area shape="rect" id="Node000021" href="$cell_8c.html#af3ef8eabc30b3f42b8c5586d906042ad" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="441,104,579,129"/>
+<area shape="poly" id="edge5_Node000003_Node000021" title=" " alt="" coords="383,97,427,103,426,108,383,103"/>
+<area shape="rect" id="Node000023" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="431,153,589,179"/>
+<area shape="poly" id="edge6_Node000003_Node000023" title=" " alt="" coords="355,103,432,138,454,147,452,152,430,143,353,108"/>
+</map>

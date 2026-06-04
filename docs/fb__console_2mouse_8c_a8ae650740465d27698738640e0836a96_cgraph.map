@@ -1,0 +1,11 @@
+<map id="mouse_cursor_paint" name="mouse_cursor_paint">
+<area shape="rect" id="Node000001" title="Paint the arrow at (cx, cy) in two passes." alt="" coords="5,31,159,56"/>
+<area shape="rect" id="Node000002" href="$fb__console_2mouse_8c.html#acc7b565443144b8f73deb03d66d54f16" title="Test whether the (row, col) of the arrow bitmap is set." alt="" coords="214,5,301,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,30,200,23,201,29,159,35"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="207,55,308,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,51,194,56,193,61,159,57"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="356,29,447,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="308,56,342,50,343,55,309,61"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="356,79,447,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="309,73,343,79,342,84,308,78"/>
+</map>

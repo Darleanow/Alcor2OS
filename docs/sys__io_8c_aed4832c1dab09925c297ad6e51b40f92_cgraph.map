@@ -1,0 +1,11 @@
+<map id="sel_write_ready" name="sel_write_ready">
+<area shape="rect" id="Node000001" title="Return positive if fd can accept a write, 0 if not, negative on error." alt="" coords="5,31,131,56"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#ada46d60f30b8d948b3d2c6892ce9b9cf" title="Poll fd&#39;s write end for non&#45;blocking readiness." alt="" coords="179,31,351,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,41,165,41,165,46,131,46"/>
+<area shape="rect" id="Node000003" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="442,5,521,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="351,31,428,21,429,27,352,36"/>
+<area shape="rect" id="Node000005" href="$pipe_8c.html#a30403a0609edca58ce6c8bebd7bc6193" title="Check whether a write would proceed without blocking." alt="" coords="399,55,564,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="351,50,385,54,385,59,351,56"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="612,5,715,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="521,15,598,15,598,21,521,21"/>
+</map>

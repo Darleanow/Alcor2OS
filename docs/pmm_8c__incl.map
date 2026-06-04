@@ -1,0 +1,21 @@
+<map id="src/mm/pmm.c" name="src/mm/pmm.c">
+<area shape="rect" id="Node000001" title="Physical memory manager using bitmap allocator." alt="" coords="84,5,204,31"/>
+<area shape="rect" id="Node000002" href="$limine_8h.html" title="Limine bootloader protocol definitions." alt="" coords="42,152,161,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,32,119,79,106,139,101,138,113,78,135,30"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="92,225,207,251"/>
+<area shape="poly" id="edge11_Node000001_Node000003" title=" " alt="" coords="126,33,89,59,50,94,35,114,26,135,24,155,32,176,56,201,87,218,85,223,53,205,27,179,19,156,21,133,30,111,46,90,85,54,123,29"/>
+<area shape="rect" id="Node000007" href="$memory__layout_8h.html" title="Virtual memory layout constants for x86_64." alt="" coords="236,152,447,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="188,28,236,47,284,77,312,107,332,138,328,141,308,110,281,81,234,52,186,33"/>
+<area shape="rect" id="Node000008" href="$pmm_8h.html" title="Physical memory manager (page allocator)." alt="" coords="127,79,270,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="155,29,184,66,179,69,151,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,176,136,213,132,216,107,179"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,299,88,324"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,253,76,293,73,288,131,248"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="112,299,187,324"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="152,251,152,285,147,285,147,251"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="211,299,282,324"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="167,249,221,288,218,292,163,253"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="311,180,195,223,193,218,310,175"/>
+<area shape="poly" id="edge9_Node000008_Node000002" title=" " alt="" coords="185,106,130,146,127,141,181,102"/>
+<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="198,105,175,178,162,213,157,211,169,176,193,103"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="fb_console_write" name="fb_console_write">
+<area shape="rect" id="Node000001" title="Feed len bytes into the terminal. Parses UTF&#45;8 + ANSI/CSI; renders to the framebuffer...." alt="" coords="713,55,845,80"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a6daec33a349a589e3e1c460d7a5d8d7e" title=" " alt="" coords="547,5,662,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="720,53,650,33,651,28,721,48"/>
+<area shape="rect" id="Node000006" href="$kbd__layout_8c.html#a16b699983816072933124817dffd01f5" title=" " alt="" coords="544,55,665,80"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="700,70,665,70,665,65,700,65"/>
+<area shape="rect" id="Node000007" href="$dev__nodes_8c.html#ab43944d5ee5d8a1e7a2ebece7102cbac" title="Write to /dev/tty — delegates to fb_console." alt="" coords="565,104,645,129"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="721,86,646,108,644,103,720,81"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a7563fa1166b876f198b727e912747c09" title="read(2) on stdin honoring the process&#39;s termios (ICANON, VMIN/VTIME)." alt="" coords="332,31,496,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="534,30,496,35,496,30,533,25"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a79e8864bb2dd3b40d30c0698f74b0485" title="Block until at least one layout&#45;translated byte is available." alt="" coords="129,5,284,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="318,34,284,30,285,25,319,29"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#a6687d841b4dafd7f557c59776162e139" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="5,31,81,56"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="318,46,82,46,82,41,318,41"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="116,35,82,40,81,35,116,29"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="530,61,496,56,496,51,531,55"/>
+</map>

@@ -1,0 +1,47 @@
+<map id="src/kernel/input/kbd_layout.c" name="src/kernel/input/kbd_layout.c">
+<area shape="rect" id="Node000001" title="PS/2 scancode translator: layout mapping, line discipline, and TTY I/O." alt="" coords="511,5,662,45"/>
+<area shape="rect" id="Node000002" href="$cpu_8h.html" title="x86_64 CPU control and state management." alt="" coords="317,167,451,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="563,48,412,160,409,156,560,43"/>
+<area shape="rect" id="Node000007" href="$console_8h.html" title="Kernel boot/panic logger on the linear framebuffer." alt="" coords="757,93,934,119"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="649,43,795,87,794,92,648,48"/>
+<area shape="rect" id="Node000008" href="$fb__console_8h.html" title="Kernel framebuffer text console." alt="" coords="1019,93,1216,119"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="663,35,1027,89,1026,94,662,40"/>
+<area shape="rect" id="Node000010" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="904,167,1040,192"/>
+<area shape="poly" id="edge23_Node000001_Node000010" title=" " alt="" coords="663,29,741,37,825,49,899,67,928,78,948,91,959,105,967,120,974,152,969,153,962,122,955,108,945,95,925,83,897,72,823,54,740,42,662,34"/>
+<area shape="rect" id="Node000011" href="$keyboard_8h.html" title="PS/2 keyboard driver." alt="" coords="5,167,192,192"/>
+<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="511,35,321,56,230,74,194,84,168,96,151,108,136,123,113,156,109,153,132,120,147,104,165,91,193,79,229,68,321,51,511,29"/>
+<area shape="rect" id="Node000012" href="$kbd_8h.html" title="Keyboard layouts and tty&#45;line translation (scancode → characters)." alt="" coords="178,93,281,119"/>
+<area shape="poly" id="edge18_Node000001_Node000012" title=" " alt="" coords="512,46,295,93,294,88,511,41"/>
+<area shape="rect" id="Node000013" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="328,93,451,119"/>
+<area shape="poly" id="edge21_Node000001_Node000013" title=" " alt="" coords="540,48,432,91,430,86,538,43"/>
+<area shape="rect" id="Node000014" href="$proc_8h.html" title="Process management and scheduling." alt="" coords="593,93,732,119"/>
+<area shape="poly" id="edge24_Node000001_Node000014" title=" " alt="" coords="607,44,644,81,640,85,603,47"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="784,240,899,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="451,188,771,238,770,243,451,194"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="1020,313,1103,339"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="877,263,1014,307,1012,312,876,268"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="1147,313,1221,339"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="897,263,1134,312,1133,317,896,268"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="885,313,955,339"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="856,263,899,302,895,306,852,267"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="848,119,845,226,839,226,842,119"/>
+<area shape="poly" id="edge13_Node000008_Node000003" title=" " alt="" coords="1114,121,1091,157,1074,177,1054,194,1020,213,984,228,913,245,912,240,982,222,1018,208,1050,190,1070,173,1087,154,1109,118"/>
+<area shape="poly" id="edge14_Node000008_Node000004" title=" " alt="" coords="1125,118,1136,145,1146,183,1148,225,1145,246,1138,267,1121,290,1098,308,1095,304,1117,287,1134,264,1140,245,1143,225,1140,184,1131,147,1120,120"/>
+<area shape="poly" id="edge15_Node000008_Node000005" title=" " alt="" coords="1130,117,1147,139,1162,166,1174,201,1181,237,1186,299,1181,300,1176,238,1169,202,1158,168,1143,142,1126,121"/>
+<area shape="rect" id="Node000009" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="941,240,1123,265"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="1119,120,1113,154,1098,193,1081,215,1062,233,1058,230,1077,212,1094,191,1108,152,1114,119"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="1095,121,1009,163,1007,158,1093,116"/>
+<area shape="poly" id="edge10_Node000009_Node000006" title=" " alt="" coords="1015,268,952,308,949,303,1013,263"/>
+<area shape="poly" id="edge12_Node000010_Node000003" title=" " alt="" coords="952,194,876,236,873,231,950,190"/>
+<area shape="poly" id="edge17_Node000011_Node000003" title=" " alt="" coords="192,188,211,189,771,242,770,247,210,195,192,193"/>
+<area shape="poly" id="edge20_Node000012_Node000003" title=" " alt="" coords="237,118,258,155,275,174,295,190,332,205,384,217,513,235,652,244,770,248,770,253,652,249,513,240,383,222,331,210,292,194,271,178,254,158,232,120"/>
+<area shape="poly" id="edge19_Node000012_Node000011" title=" " alt="" coords="210,121,133,162,131,158,207,116"/>
+<area shape="poly" id="edge22_Node000013_Node000003" title=" " alt="" coords="365,121,338,135,315,153,302,172,302,181,307,190,329,201,372,212,497,228,643,239,770,246,770,251,643,245,497,233,371,217,327,206,303,194,297,182,297,171,311,149,335,131,362,116"/>
+<area shape="poly" id="edge29_Node000014_Node000003" title=" " alt="" coords="703,116,748,135,792,165,817,195,834,225,829,228,813,197,789,169,746,140,701,121"/>
+<area shape="poly" id="edge26_Node000014_Node000010" title=" " alt="" coords="713,116,909,161,908,166,712,121"/>
+<area shape="rect" id="Node000015" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="475,167,605,192"/>
+<area shape="poly" id="edge25_Node000014_Node000015" title=" " alt="" coords="644,121,573,162,570,157,642,116"/>
+<area shape="rect" id="Node000016" href="$signal_8h.html" title="POSIX signal handling infrastructure (Linux x86_64 compatible)." alt="" coords="629,167,779,192"/>
+<area shape="poly" id="edge27_Node000014_Node000016" title=" " alt="" coords="672,118,693,153,688,156,667,120"/>
+<area shape="poly" id="edge28_Node000016_Node000003" title=" " alt="" coords="727,190,808,231,806,236,725,194"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="dir_block_find_name" name="dir_block_find_name">
+<area shape="rect" id="Node000001" title="Locate the dirent named name inside a single block buffer." alt="" coords="575,31,731,56"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a44847a1e74b0df6de11296fd8980308e" title="Find a directory entry by name." alt="" coords="416,31,527,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="561,46,527,46,527,41,561,41"/>
+<area shape="rect" id="Node000003" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="231,5,341,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="402,37,341,28,342,23,403,31"/>
+<area shape="rect" id="Node000005" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="204,55,368,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="403,55,368,59,368,54,402,50"/>
+<area shape="rect" id="Node000004" href="$ops_8c.html#a2fc366e280a85e6ef6f5b18663c7d6c5" title="fs_ops_t.readlink shim." alt="" coords="10,5,151,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="217,21,151,21,151,15,217,15"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="5,55,156,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="191,70,156,70,156,65,191,65"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="cache_lookup" name="cache_lookup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="437,5,548,31"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a86b1650d02a0245f1c6671a9489ae671" title="Read sectors from an ATA drive (cache + DMA/PIO fallback)." alt="" coords="311,5,389,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="424,21,390,21,390,15,424,15"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a06dcb29ace09bf90167814b75b3d2f7e" title="Initialize storage and filesystems." alt="" coords="152,5,263,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="297,21,263,21,263,15,297,15"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="138,21,104,21,104,15,138,15"/>
+</map>

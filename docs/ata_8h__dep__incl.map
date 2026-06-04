@@ -1,0 +1,10 @@
+<map id="include/alcor2/drivers/ata.h" name="include/alcor2/drivers/ata.h">
+<area shape="rect" id="Node000001" title="ATA/IDE DMA driver." alt="" coords="54,5,217,45"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html" title="ATA/IDE disk driver (DMA + PIO fallback, LBA28/48)." alt="" coords="5,181,156,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,55,70,73,55,94,51,117,55,141,75,180,70,182,50,142,45,117,50,92,66,69,86,51"/>
+<area shape="rect" id="Node000003" href="$ata__internal_8h.html" title=" " alt="" coords="65,93,205,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,59,138,93,133,93,133,59"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="230,101,363,126"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="184,49,276,98,274,103,182,54"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="116,146,91,183,87,179,112,143"/>
+</map>

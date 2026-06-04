@@ -1,0 +1,5 @@
+<map id="proc_check_resched" name="proc_check_resched">
+<area shape="rect" id="Node000001" title="If a timer tick requested preemption, run the process scheduler." alt="" coords="183,5,336,31"/>
+<area shape="rect" id="Node000002" href="$sys__dispatch_8c.html#a95f2b068e142b45d49e5ee46268e9c95" title="Dispatch a syscall from the architecture&#45;specific entry point." alt="" coords="5,5,135,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,21,135,21,135,15,169,15"/>
+</map>

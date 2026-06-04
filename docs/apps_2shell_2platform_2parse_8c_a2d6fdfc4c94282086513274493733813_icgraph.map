@@ -1,0 +1,9 @@
+<map id="handle_normal" name="handle_normal">
+<area shape="rect" id="Node000001" title="Top&#45;level dispatch: brace counting, quote/heredoc triggers." alt="" coords="560,5,679,31"/>
+<area shape="rect" id="Node000002" href="$apps_2shell_2platform_2parse_8c.html#a6efaee64a50f1ee34d84d90b42760775" title="True if buf parses as a complete vega statement." alt="" coords="371,5,512,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="546,21,512,21,512,15,546,15"/>
+<area shape="rect" id="Node000003" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="108,5,323,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="357,21,323,21,323,15,357,15"/>
+<area shape="rect" id="Node000004" href="$user_2apps_2shell_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,60,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,21,60,21,60,15,94,15"/>
+</map>

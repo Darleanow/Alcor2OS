@@ -1,0 +1,9 @@
+<map id="keyboard_irq_handler" name="keyboard_irq_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,168,56"/>
+<area shape="rect" id="Node000002" href="$keyboard_8c.html#a46b78f9b5f3f9a5e5d24871774db270c" title=" " alt="" coords="216,31,323,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,41,202,41,202,46,169,46"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="387,5,430,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,31,373,22,374,27,323,36"/>
+<area shape="rect" id="Node000004" href="$keyboard_8c.html#a2d4a97aa9193a5098506f35f6de07697" title=" " alt="" coords="371,55,447,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="323,50,358,56,357,61,322,55"/>
+</map>

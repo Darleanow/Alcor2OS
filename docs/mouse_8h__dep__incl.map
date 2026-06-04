@@ -1,0 +1,19 @@
+<map id="include/alcor2/mouse.h" name="include/alcor2/mouse.h">
+<area shape="rect" id="Node000001" title="Shared user/kernel ABI for /dev/mouse events and mode control." alt="" coords="517,5,691,31"/>
+<area shape="rect" id="Node000002" href="$drivers_2mouse_8h.html" title="Kernel&#45;side mouse broker: accepts events from a low&#45;level driver and serves them to userspace via /de..." alt="" coords="523,79,685,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="607,44,607,79,601,79,601,44"/>
+<area shape="rect" id="Node000003" href="$mouse__ps2_8c.html" title="PS/2 mouse driver (i8042 second port)." alt="" coords="5,167,173,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="510,117,186,169,174,171,173,166,185,164,509,112"/>
+<area shape="rect" id="Node000004" href="$api_8c.html" title="Runtime framebuffer text console with UTF&#45;8 and ANSI/CSI support." alt="" coords="198,167,333,207"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="517,125,334,171,333,166,516,119"/>
+<area shape="rect" id="Node000005" href="$fb__console_2mouse_8c.html" title="Software mouse cursor overlay for the framebuffer console." alt="" coords="357,167,512,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="556,127,473,169,471,164,554,122"/>
+<area shape="rect" id="Node000006" href="$mouse_8c.html" title="Kernel mouse broker." alt="" coords="537,167,671,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="607,133,607,166,601,166,601,133"/>
+<area shape="rect" id="Node000007" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="696,174,829,199"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="652,123,743,172,740,176,650,128"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="853,167,992,207"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="688,120,854,164,852,169,687,125"/>
+<area shape="rect" id="Node000009" href="$dg__alcor_8c.html" title="doomgeneric platform backend for Alcor2OS." alt="" coords="1016,167,1179,207"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="699,112,1004,164,1016,166,1015,172,1004,169,698,118"/>
+</map>

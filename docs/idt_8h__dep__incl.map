@@ -1,0 +1,18 @@
+<map id="include/alcor2/arch/idt.h" name="include/alcor2/arch/idt.h">
+<area shape="rect" id="Node000001" title="Interrupt Descriptor Table setup." alt="" coords="416,5,561,45"/>
+<area shape="rect" id="Node000002" href="$idt_8c.html" title="Interrupt Descriptor Table and exception handlers." alt="" coords="5,181,161,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="402,30,306,34,202,45,154,53,112,64,78,78,56,95,50,105,48,115,52,138,63,161,76,179,71,182,59,164,47,140,43,115,45,103,52,92,76,74,110,59,153,48,202,39,306,29,402,24"/>
+<area shape="rect" id="Node000003" href="$idt__internal_8h.html" title=" " alt="" coords="67,93,212,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="404,50,213,97,211,92,402,45"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html" title="ATA/IDE disk driver (DMA + PIO fallback, LBA28/48)." alt="" coords="236,101,387,126"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="438,54,336,103,334,98,436,49"/>
+<area shape="rect" id="Node000005" href="$keyboard_8c.html" title="PS/2 keyboard driver with scancode translation." alt="" coords="411,93,566,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="491,59,491,93,486,93,486,59"/>
+<area shape="rect" id="Node000006" href="$mouse__ps2_8c.html" title="PS/2 mouse driver (i8042 second port)." alt="" coords="590,93,758,133"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="543,49,635,91,632,96,541,54"/>
+<area shape="rect" id="Node000007" href="$pit_8c.html" title="8253/8254 PIT timer driver with a runtime&#45;adjustable tick rate." alt="" coords="783,101,925,126"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="575,44,806,98,804,103,574,49"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="950,101,1083,126"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="575,35,744,58,939,91,972,98,971,103,937,96,743,63,575,40"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="120,146,94,183,90,179,116,143"/>
+</map>

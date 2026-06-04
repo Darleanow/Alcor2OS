@@ -1,0 +1,21 @@
+<map id="include/alcor2/alcor_fb.h" name="include/alcor2/alcor_fb.h">
+<area shape="rect" id="Node000001" title="Userspace API: Limine linear framebuffer info and mmap helpers." alt="" coords="268,5,449,31"/>
+<area shape="rect" id="Node000002" href="$alcor__fb__user_8h.html" title="Userland helpers for the Alcor2 custom framebuffer syscalls." alt="" coords="63,79,212,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="314,38,191,81,190,76,313,33"/>
+<area shape="rect" id="Node000004" href="$fb__user_8h.html" title="Export Limine framebuffer to user processes (shared scanout buffer)." alt="" coords="416,79,579,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="392,35,465,76,463,81,390,40"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html" title="/dev/null, /dev/zero, and /dev/tty character devices." alt="" coords="193,167,327,207"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="347,44,274,168,269,165,343,41"/>
+<area shape="rect" id="Node000008" href="$sys__fb_8c.html" title="Syscalls: framebuffer info + mmap (userspace drawing / font stacks)." alt="" coords="873,174,1041,199"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="419,31,591,76,920,171,919,176,590,81,418,37"/>
+<area shape="rect" id="Node000003" href="$dg__alcor_8c.html" title="doomgeneric platform backend for Alcor2OS." alt="" coords="5,167,168,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,132,100,168,96,165,117,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="433,126,313,169,311,164,431,121"/>
+<area shape="rect" id="Node000006" href="$fb__user_8c.html" title="Framebuffer physical range + geometry for user mmap." alt="" coords="351,167,486,207"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="473,131,438,168,434,165,469,127"/>
+<area shape="rect" id="Node000007" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="511,174,644,199"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="526,127,568,172,564,175,523,131"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="593,114,862,164,900,171,899,177,861,169,592,120"/>
+<area shape="rect" id="Node000009" href="$sys__mm_8c.html" title="Memory syscalls: mmap, mprotect, munmap, brk." alt="" coords="668,174,849,199"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="569,120,725,171,723,177,567,126"/>
+</map>

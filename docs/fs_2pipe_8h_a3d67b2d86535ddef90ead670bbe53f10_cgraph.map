@@ -1,0 +1,28 @@
+<map id="pipe_write_obj" name="pipe_write_obj">
+<area shape="rect" id="Node000001" title="Write up to count bytes to the pipe&#39;s write end." alt="" coords="5,80,123,105"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a7252d4cb0ebec561f76091963a6dbe6a" title="Block p (set state to BLOCKED). Call before proc_schedule()." alt="" coords="182,5,274,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,77,170,40,183,34,185,39,172,44,92,82"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="177,55,279,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,81,163,75,163,80,123,86"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="171,104,285,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="123,99,158,104,157,109,122,104"/>
+<area shape="rect" id="Node000014" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="183,153,273,179"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="95,103,172,138,187,145,185,150,170,143,92,108"/>
+<area shape="rect" id="Node000005" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="333,53,503,79"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="276,101,356,80,357,85,277,106"/>
+<area shape="rect" id="Node000006" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="551,80,717,105"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="285,111,537,96,537,101,286,116"/>
+<area shape="rect" id="Node000007" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="369,179,467,204"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="263,127,373,171,372,176,261,132"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="437,176,487,146,550,114,568,107,570,112,552,119,490,150,440,181"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#a2b49e9b247efbece339a2f95a191ef64" title="Low&#45;level context switch function." alt="" coords="574,129,694,155"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="467,178,564,155,565,160,468,183"/>
+<area shape="rect" id="Node000009" href="$cpu_8c.html#a18a6945bd70a07d34d7133848b6fb519" title="Get the current FS base MSR value." alt="" coords="569,179,699,204"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="468,189,555,189,555,194,468,194"/>
+<area shape="rect" id="Node000010" href="$cpu_8c.html#a1c5d89ceee7d8c90e90526e6fec26e6f" title="Set the FS base MSR for thread&#45;local storage." alt="" coords="569,228,699,253"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="468,200,565,222,564,228,467,205"/>
+<area shape="rect" id="Node000011" href="$gdt_8c.html#af95c2c00bd26bfbb9016f228e3daaa26" title="Update the TSS ring&#45;0 stack pointer." alt="" coords="583,277,685,303"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="441,202,490,231,552,262,574,271,572,276,550,267,488,236,438,206"/>
+<area shape="rect" id="Node000012" href="$vmm_8c.html#ab55265f7043436d4b146780d748143dd" title="Switch to a different page table." alt="" coords="581,327,687,352"/>
+<area shape="poly" id="edge12_Node000007_Node000012" title=" " alt="" coords="431,203,480,256,514,287,552,313,570,321,567,326,549,318,511,291,476,260,427,206"/>
+</map>

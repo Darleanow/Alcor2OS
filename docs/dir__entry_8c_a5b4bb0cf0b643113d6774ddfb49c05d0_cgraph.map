@@ -1,0 +1,7 @@
+<map id="dir_block_try_insert" name="dir_block_try_insert">
+<area shape="rect" id="Node000001" title="Try to insert a new dirent into a single block by splicing slack." alt="" coords="5,31,156,56"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a968c380ff8926124e81fe6d71c38dee0" title="Aligned on&#45;disk size of a dirent with name_len bytes of name." alt="" coords="204,5,347,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,31,190,26,191,32,157,36"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="232,55,319,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,50,218,58,218,63,156,55"/>
+</map>

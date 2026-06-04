@@ -1,0 +1,9 @@
+<map id="sh_complete" name="sh_complete">
+<area shape="rect" id="Node000001" title="Compute completions for prefix." alt="" coords="563,5,668,31"/>
+<area shape="rect" id="Node000002" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="420,5,515,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="549,21,515,21,515,15,549,15"/>
+<area shape="rect" id="Node000003" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="268,5,372,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="406,21,372,21,372,15,406,15"/>
+<area shape="rect" id="Node000004" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="5,5,220,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="254,21,220,21,220,15,254,15"/>
+</map>

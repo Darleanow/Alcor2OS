@@ -1,0 +1,108 @@
+<map id="kstrlen" name="kstrlen">
+<area shape="rect" id="Node000001" title="Get string length." alt="" coords="1041,607,1108,633"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="859,283,970,309"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1069,594,1063,544,1050,479,1027,409,1011,376,991,346,970,326,946,311,948,306,973,321,995,342,1016,374,1032,407,1056,477,1069,543,1075,593"/>
+<area shape="rect" id="Node000009" href="$dir__entry_8c.html#a44847a1e74b0df6de11296fd8980308e" title="Find a directory entry by name." alt="" coords="859,133,970,158"/>
+<area shape="poly" id="edge6_Node000001_Node000009" title=" " alt="" coords="1068,594,1044,453,1022,362,991,272,957,207,924,160,928,157,961,205,996,270,1027,360,1049,452,1073,593"/>
+<area shape="rect" id="Node000014" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="175,83,331,109"/>
+<area shape="poly" id="edge22_Node000001_Node000014" title=" " alt="" coords="1070,594,1066,490,1054,348,1044,276,1030,211,1013,158,991,122,954,88,912,60,867,40,819,25,769,15,718,10,613,12,513,25,421,45,344,67,288,86,286,81,343,62,420,40,512,20,613,6,718,5,770,10,820,19,869,35,915,56,957,83,995,118,1018,156,1035,210,1049,276,1059,348,1071,490,1076,593"/>
+<area shape="rect" id="Node000025" href="$dir__entry_8c.html#af34fc009f5ec9683665f000e226a64bd" title="Remove a directory entry." alt="" coords="846,431,983,457"/>
+<area shape="poly" id="edge13_Node000001_Node000025" title=" " alt="" coords="1064,595,1039,532,1018,499,992,470,973,459,976,454,995,466,1022,495,1043,530,1069,593"/>
+<area shape="rect" id="Node000026" href="$path_8c.html#a47c361e00db58a5352f49a7539b9cb5f" title="Copy the basename of path into name." alt="" coords="843,481,986,506"/>
+<area shape="poly" id="edge16_Node000001_Node000026" title=" " alt="" coords="1056,598,1028,562,992,528,956,508,958,504,995,523,1032,558,1060,595"/>
+<area shape="rect" id="Node000027" href="$sys__fs_8c.html#a164058ad94666dca91b684102b1faad4" title="Fill st with synthetic stat data for the /proc/self/exe virtual symlink." alt="" coords="379,430,545,455"/>
+<area shape="poly" id="edge18_Node000001_Node000027" title=" " alt="" coords="1046,601,1020,585,992,572,934,555,883,546,837,544,794,545,704,544,652,536,592,520,483,458,486,453,594,515,653,531,704,538,794,539,838,539,884,541,935,549,994,567,1023,581,1048,597"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="879,582,950,607"/>
+<area shape="poly" id="edge23_Node000001_Node000031" title=" " alt="" coords="1027,615,950,603,951,598,1028,610"/>
+<area shape="rect" id="Node000032" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="617,633,765,658"/>
+<area shape="poly" id="edge61_Node000001_Node000032" title=" " alt="" coords="1028,626,765,643,765,638,1027,620"/>
+<area shape="rect" id="Node000046" href="$sys__fs_8c.html#a3c7030445954bf053945683539a885b4" title="Read the target of a symbolic link at path into buf." alt="" coords="201,831,305,857"/>
+<area shape="poly" id="edge49_Node000001_Node000046" title=" " alt="" coords="1073,647,1064,713,1048,796,1025,873,1011,903,995,922,968,937,927,949,873,957,805,960,721,957,623,947,508,929,378,901,321,882,275,859,277,854,323,877,379,896,509,923,623,942,722,951,805,954,873,951,926,943,966,932,992,918,1007,900,1020,872,1043,795,1058,712,1068,646"/>
+<area shape="rect" id="Node000056" href="$src_2kernel_2main_8c.html#a361b3a2c5772decce68f395a53108323" title="Return true when path ends with suffix (case&#45;sensitive)." alt="" coords="853,783,977,809"/>
+<area shape="poly" id="edge37_Node000001_Node000056" title=" " alt="" coords="1069,647,1043,710,1022,744,995,773,974,786,971,781,992,769,1018,740,1038,707,1064,645"/>
+<area shape="rect" id="Node000058" href="$path_8c.html#a3b165d99d5585b3187f4caf5c427723a" title="Split a path into its parent and final component." alt="" coords="871,357,958,382"/>
+<area shape="poly" id="edge39_Node000001_Node000058" title=" " alt="" coords="1066,595,1042,512,1020,464,991,420,968,400,943,384,946,380,972,395,995,417,1025,462,1047,510,1071,593"/>
+<area shape="rect" id="Node000059" href="$src_2kernel_2main_8c.html#ab6ec631451acb0eed8e92c147115ea34" title="Strip a trailing .elf extension in&#45;place." alt="" coords="855,882,974,907"/>
+<area shape="poly" id="edge46_Node000001_Node000059" title=" " alt="" coords="1075,647,1070,694,1057,754,1034,817,1017,846,995,871,976,885,973,880,992,867,1012,842,1029,814,1052,753,1065,693,1070,646"/>
+<area shape="rect" id="Node000060" href="$sys__fs_8c.html#a66f6c5b7f67e1321644f27a4f71daf77" title="Copy the calling process&#39;s CWD string into the user buffer buf." alt="" coords="865,833,964,858"/>
+<area shape="poly" id="edge48_Node000001_Node000060" title=" " alt="" coords="1073,647,1065,686,1051,732,1028,780,995,822,965,839,963,834,992,818,1023,778,1046,731,1060,684,1067,646"/>
+<area shape="rect" id="Node000061" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="629,731,752,757"/>
+<area shape="poly" id="edge50_Node000001_Node000061" title=" " alt="" coords="1029,637,732,734,730,729,1027,632"/>
+<area shape="rect" id="Node000062" href="$vfs_8c.html#a0114e9b3e710d4dd31434dfb195b9fe8" title="Fill buf with dirent64 entries from an open directory fd." alt="" coords="861,983,968,1009"/>
+<area shape="poly" id="edge58_Node000001_Node000062" title=" " alt="" coords="1073,647,1063,720,1047,814,1024,905,1011,941,995,966,983,977,968,986,965,981,979,973,991,962,1006,938,1019,903,1041,813,1058,719,1068,646"/>
+<area shape="rect" id="Node000065" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="836,734,993,759"/>
+<area shape="poly" id="edge62_Node000001_Node000065" title=" " alt="" coords="1060,646,1032,682,995,717,958,736,956,732,992,713,1028,678,1056,642"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a3a6ddc6334a7a3057601d6a7195bbfba" title="Allocate a fresh inode, link it into parent_inode under filename, and persist the metadata." alt="" coords="593,182,788,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="880,279,787,229,735,210,737,205,789,224,883,274"/>
+<area shape="rect" id="Node000006" href="$dir_8c.html#a458de0420c3306a94856dd0c8d688879" title="Persist the new directory or roll back its allocations." alt="" coords="594,283,787,309"/>
+<area shape="poly" id="edge4_Node000002_Node000006" title=" " alt="" coords="846,299,787,299,787,293,846,293"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#a0a9f5f8d942af3cc0b2c41f852c0a880" title="Create a new file on an ext2 volume." alt="" coords="413,207,511,233"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="579,210,512,217,511,212,579,204"/>
+<area shape="rect" id="Node000007" href="$dir_8c.html#a28d0deef2247c3e0c95faa3a132818cb" title="Create a directory on an ext2 volume." alt="" coords="414,307,510,333"/>
+<area shape="poly" id="edge5_Node000006_Node000007" title=" " alt="" coords="580,310,510,318,510,312,580,305"/>
+<area shape="rect" id="Node000010" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="635,133,746,158"/>
+<area shape="poly" id="edge7_Node000009_Node000010" title=" " alt="" coords="845,148,746,148,746,143,845,143"/>
+<area shape="rect" id="Node000012" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="609,83,773,109"/>
+<area shape="poly" id="edge9_Node000009_Node000012" title=" " alt="" coords="845,133,748,111,750,106,846,128"/>
+<area shape="rect" id="Node000011" href="$ops_8c.html#a2fc366e280a85e6ef6f5b18663c7d6c5" title="fs_ops_t.readlink shim." alt="" coords="391,133,533,158"/>
+<area shape="poly" id="edge8_Node000010_Node000011" title=" " alt="" coords="622,148,533,148,533,143,622,143"/>
+<area shape="rect" id="Node000013" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="387,83,537,109"/>
+<area shape="poly" id="edge10_Node000012_Node000013" title=" " alt="" coords="595,99,538,99,538,93,595,93"/>
+<area shape="poly" id="edge11_Node000013_Node000014" title=" " alt="" coords="373,108,331,107,331,102,373,102"/>
+<area shape="poly" id="edge12_Node000014_Node000013" title=" " alt="" coords="344,84,387,85,387,90,344,90"/>
+<area shape="rect" id="Node000017" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="644,431,737,457"/>
+<area shape="poly" id="edge14_Node000025_Node000017" title=" " alt="" coords="832,447,738,447,738,441,832,441"/>
+<area shape="rect" id="Node000021" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="641,382,740,407"/>
+<area shape="poly" id="edge15_Node000025_Node000021" title=" " alt="" coords="843,431,740,408,741,403,844,426"/>
+<area shape="rect" id="Node000019" href="$path_8c.html#aecf245e7de6ece833406905140c35e24" title="Get file status information." alt="" coords="649,481,732,506"/>
+<area shape="poly" id="edge17_Node000026_Node000019" title=" " alt="" coords="830,496,733,496,733,491,830,491"/>
+<area shape="rect" id="Node000028" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="215,455,291,481"/>
+<area shape="poly" id="edge19_Node000027_Node000028" title=" " alt="" coords="365,457,291,466,290,461,365,452"/>
+<area shape="rect" id="Node000029" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="26,431,106,457"/>
+<area shape="poly" id="edge20_Node000028_Node000029" title=" " alt="" coords="201,464,106,452,107,447,201,459"/>
+<area shape="rect" id="Node000030" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="5,481,127,506"/>
+<area shape="poly" id="edge21_Node000028_Node000030" title=" " alt="" coords="201,478,127,488,127,483,201,472"/>
+<area shape="poly" id="edge24_Node000031_Node000032" title=" " alt="" coords="867,608,748,635,747,630,866,603"/>
+<area shape="rect" id="Node000033" href="$vfs_8c.html#a67bb6451b3cc29b98fdbdba7d9dd1594" title="Change the calling process&#39;s working directory to path." alt="" coords="212,518,293,543"/>
+<area shape="poly" id="edge25_Node000032_Node000033" title=" " alt="" coords="662,626,591,565,569,539,560,529,544,521,512,511,478,506,410,504,346,511,294,522,293,517,345,506,409,499,479,500,513,506,546,516,563,525,573,536,595,561,666,622"/>
+<area shape="rect" id="Node000035" href="$vfs_8c.html#a01c1203977d3bd65619c0c17a45fa5d1" title="Create a directory at path via the responsible driver." alt="" coords="419,633,505,658"/>
+<area shape="poly" id="edge26_Node000032_Node000035" title=" " alt="" coords="603,648,506,648,506,643,603,643"/>
+<area shape="rect" id="Node000037" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="421,682,503,707"/>
+<area shape="poly" id="edge27_Node000032_Node000037" title=" " alt="" coords="619,664,503,689,502,683,617,658"/>
+<area shape="rect" id="Node000045" href="$vfs_8c.html#ad7ec41d06faa2ce0fc58d46873948f75" title="Read the target of the symbolic link at path into buf." alt="" coords="411,731,513,757"/>
+<area shape="poly" id="edge28_Node000032_Node000045" title=" " alt="" coords="656,667,605,694,546,721,510,734,508,729,544,716,603,689,654,663"/>
+<area shape="rect" id="Node000047" href="$vfs_8c.html#a9381581b42a850046ecb0593a98bd3af" title="Rename (move) a file, copying across mount points if necessary." alt="" coords="203,582,302,607"/>
+<area shape="poly" id="edge30_Node000032_Node000047" title=" " alt="" coords="610,633,545,623,413,609,302,600,302,595,414,603,546,617,611,628"/>
+<area shape="rect" id="Node000049" href="$vfs_8c.html#a30b9db50187eccd6bf2e1cd0cef5b7a9" title="Remove the empty directory at path." alt="" coords="420,830,504,855"/>
+<area shape="poly" id="edge31_Node000032_Node000049" title=" " alt="" coords="657,668,625,691,595,720,580,747,574,771,566,795,547,819,527,832,505,839,503,834,525,827,544,815,562,793,569,770,576,745,591,717,622,687,654,663"/>
+<area shape="rect" id="Node000051" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="425,531,499,557"/>
+<area shape="poly" id="edge32_Node000032_Node000051" title=" " alt="" coords="651,629,544,578,497,559,499,554,546,574,653,624"/>
+<area shape="rect" id="Node000054" href="$vfs_8c.html#ae501b60ae231b75a9b8efbf7cac10324" title="Delete the file at path; fails if it is a directory." alt="" coords="417,781,507,806"/>
+<area shape="poly" id="edge36_Node000032_Node000054" title=" " alt="" coords="661,668,595,721,573,747,562,758,547,770,508,787,506,782,544,766,559,754,569,743,591,717,658,664"/>
+<area shape="poly" id="edge29_Node000045_Node000046" title=" " alt="" coords="398,763,380,770,320,802,273,833,270,829,318,798,378,766,396,758"/>
+<area shape="poly" id="edge33_Node000051_Node000028" title=" " alt="" coords="412,529,288,483,290,478,414,524"/>
+<area shape="poly" id="edge34_Node000051_Node000033" title=" " alt="" coords="410,543,293,536,294,531,411,538"/>
+<area shape="poly" id="edge35_Node000051_Node000047" title=" " alt="" coords="412,559,303,585,302,580,411,554"/>
+<area shape="rect" id="Node000057" href="$src_2kernel_2main_8c.html#a4cf57e75983bd297b300249f1e299c40" title="Classify boot modules into initfs entries (the /init overlay) and the shell module (PID 1)...." alt="" coords="627,833,754,858"/>
+<area shape="poly" id="edge38_Node000056_Node000057" title=" " alt="" coords="844,814,750,835,749,830,843,809"/>
+<area shape="poly" id="edge40_Node000058_Node000004" title=" " alt="" coords="877,352,834,322,820,308,811,295,802,284,787,273,752,258,716,245,640,230,570,222,511,221,511,216,570,217,641,224,717,240,754,253,789,268,805,280,815,292,824,304,838,318,880,348"/>
+<area shape="poly" id="edge41_Node000058_Node000010" title=" " alt="" coords="870,352,851,339,834,322,821,301,815,280,812,242,809,206,801,189,786,171,767,159,745,152,747,147,770,154,790,167,805,186,814,205,818,242,820,279,826,298,838,318,854,335,873,348"/>
+<area shape="poly" id="edge42_Node000058_Node000017" title=" " alt="" coords="872,390,789,421,738,436,737,431,787,416,870,385"/>
+<area shape="poly" id="edge43_Node000058_Node000021" title=" " alt="" coords="858,378,740,392,740,387,858,373"/>
+<area shape="rect" id="Node000023" href="$dir_8c.html#a040966dd0c8ee506f6df4f40a6729ad2" title="Validate the path&#45;target / split&#45;name / resolve&#45;parent triple." alt="" coords="607,333,774,358"/>
+<area shape="poly" id="edge44_Node000058_Node000023" title=" " alt="" coords="857,366,774,357,775,352,858,361"/>
+<area shape="poly" id="edge45_Node000023_Node000007" title=" " alt="" coords="593,337,510,328,511,323,594,332"/>
+<area shape="poly" id="edge47_Node000059_Node000057" title=" " alt="" coords="843,882,749,861,750,856,844,876"/>
+<area shape="poly" id="edge51_Node000061_Node000035" title=" " alt="" coords="655,727,604,699,544,672,505,659,506,654,546,667,606,694,658,722"/>
+<area shape="poly" id="edge52_Node000061_Node000037" title=" " alt="" coords="617,731,502,706,503,701,619,726"/>
+<area shape="poly" id="edge53_Node000061_Node000045" title=" " alt="" coords="615,747,513,747,513,741,615,741"/>
+<area shape="poly" id="edge54_Node000061_Node000047" title=" " alt="" coords="663,767,595,822,573,848,563,860,546,869,500,887,460,895,421,890,377,869,358,850,339,821,303,745,274,665,255,608,260,607,279,664,308,743,344,819,362,847,380,865,422,885,460,889,498,882,544,864,560,855,569,845,591,818,659,763"/>
+<area shape="poly" id="edge55_Node000061_Node000049" title=" " alt="" coords="656,766,605,793,546,820,505,834,503,829,544,815,603,788,654,761"/>
+<area shape="poly" id="edge56_Node000061_Node000051" title=" " alt="" coords="659,725,592,671,543,622,476,559,479,555,547,618,595,667,662,721"/>
+<area shape="poly" id="edge57_Node000061_Node000054" title=" " alt="" coords="619,762,507,787,506,781,617,757"/>
+<area shape="rect" id="Node000063" href="$sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" title="Fill dirp with dirent64 entries from the open directory fd." alt="" coords="637,983,745,1009"/>
+<area shape="poly" id="edge59_Node000062_Node000063" title=" " alt="" coords="847,999,745,999,745,993,847,993"/>
+<area shape="rect" id="Node000064" href="$sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395" title="getdents64 — identical to sys_getdents on this platform." alt="" coords="400,983,524,1009"/>
+<area shape="poly" id="edge60_Node000063_Node000064" title=" " alt="" coords="623,999,524,999,524,993,623,993"/>
+<area shape="poly" id="edge63_Node000065_Node000061" title=" " alt="" coords="822,748,752,747,752,742,822,743"/>
+</map>

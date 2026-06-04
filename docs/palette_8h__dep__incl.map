@@ -1,0 +1,9 @@
+<map id="user/include/spazer/palette.h" name="user/include/spazer/palette.h">
+<area shape="rect" id="Node000001" title="Spazer palette — re&#45;exports theme.h and boxdraw.h." alt="" coords="119,5,267,45"/>
+<area shape="rect" id="Node000002" href="$spazer_8h.html" title=" " alt="" coords="119,93,267,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,59,196,93,191,93,191,59"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2ncurses-hello_2main_8c.html" title=" " alt="" coords="5,181,181,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="163,144,117,183,114,179,159,140"/>
+<area shape="rect" id="Node000004" href="$spazer_8c.html" title=" " alt="" coords="206,189,381,214"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="227,140,281,186,278,190,224,144"/>
+</map>

@@ -1,0 +1,38 @@
+<map id="free_inode_blocks" name="free_inode_blocks">
+<area shape="rect" id="Node000001" title="Free every block referenced by inode, including indirect blocks themselves." alt="" coords="5,151,145,176"/>
+<area shape="rect" id="Node000002" href="$alloc_8c.html#a8cee33622c2b8dee0188a576295a4e74" title="Mark block as free in its owning group&#39;s bitmap." alt="" coords="415,100,505,125"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,152,400,118,401,123,146,157"/>
+<area shape="rect" id="Node000037" href="$blockmap_8c.html#ac1186d8d194bfb877678c89302286c51" title="Recursively free an indirect&#45;block subtree." alt="" coords="193,188,353,213"/>
+<area shape="poly" id="edge14_Node000001_Node000037" title=" " alt="" coords="144,173,193,183,192,188,143,179"/>
+<area shape="rect" id="Node000003" href="$alloc_8c.html#aaf32cc8e8581249543bad140a3d2998a" title="Clear bit bit in the bitmap rooted at bitmap." alt="" coords="575,89,682,115"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="505,107,561,104,562,109,506,112"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="601,252,657,277"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="471,124,509,178,537,209,568,237,589,249,587,254,565,242,533,213,505,181,467,127"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="591,139,666,164"/>
+<area shape="poly" id="edge6_Node000002_Node000018" title=" " alt="" coords="506,120,579,137,577,142,505,126"/>
+<area shape="rect" id="Node000033" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="569,201,689,227"/>
+<area shape="poly" id="edge10_Node000002_Node000033" title=" " alt="" coords="484,123,596,192,594,197,481,128"/>
+<area shape="rect" id="Node000035" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="567,17,691,43"/>
+<area shape="poly" id="edge12_Node000002_Node000035" title=" " alt="" coords="486,98,588,47,590,51,488,102"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="767,252,846,277"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="657,262,753,262,753,267,657,267"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="752,301,861,327"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="658,270,748,295,746,300,656,275"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="746,104,867,129"/>
+<area shape="poly" id="edge7_Node000018_Node000019" title=" " alt="" coords="666,142,732,128,733,134,667,147"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="752,153,861,179"/>
+<area shape="poly" id="edge8_Node000018_Node000020" title=" " alt="" coords="667,152,739,158,738,163,666,157"/>
+<area shape="rect" id="Node000032" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="761,55,853,80"/>
+<area shape="poly" id="edge9_Node000018_Node000032" title=" " alt="" coords="664,136,689,124,713,106,737,89,751,83,753,88,740,94,716,111,692,128,666,141"/>
+<area shape="rect" id="Node000034" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="741,203,873,228"/>
+<area shape="poly" id="edge11_Node000033_Node000034" title=" " alt="" coords="689,212,727,212,727,217,689,217"/>
+<area shape="rect" id="Node000036" href="$src_2fs_2ext2_2internal_8h.html#a92bf399aefd098ef22b483f7aa903291" title="Companion of vol_read_sectors for writes." alt="" coords="739,5,875,31"/>
+<area shape="poly" id="edge13_Node000035_Node000036" title=" " alt="" coords="691,23,725,21,725,26,691,28"/>
+<area shape="poly" id="edge15_Node000037_Node000002" title=" " alt="" coords="300,185,418,129,421,134,303,190"/>
+<area shape="poly" id="edge17_Node000037_Node000004" title=" " alt="" coords="345,211,588,255,587,260,344,216"/>
+<area shape="poly" id="edge18_Node000037_Node000018" title=" " alt="" coords="353,187,578,156,578,161,354,192"/>
+<area shape="poly" id="edge20_Node000037_Node000033" title=" " alt="" coords="353,201,555,209,555,214,353,206"/>
+<area shape="poly" id="edge16_Node000037_Node000037" title=" " alt="" coords="242,189,236,180,239,170,252,164,273,161,299,165,310,174,306,178,297,170,273,167,254,169,243,173,241,179,247,186"/>
+<area shape="rect" id="Node000038" href="$blockmap_8c.html#ae0cee49141d18668ec4dd1734d0a3e45" title="Number of u32 block&#45;pointer slots per indirect block." alt="" coords="401,303,519,328"/>
+<area shape="poly" id="edge19_Node000037_Node000038" title=" " alt="" coords="295,211,403,281,425,294,422,298,400,286,292,216"/>
+</map>

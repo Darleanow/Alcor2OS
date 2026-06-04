@@ -1,0 +1,7 @@
+<map id="sys_kill" name="sys_kill">
+<area shape="rect" id="Node000001" title="Send a signal to a process." alt="" coords="137,31,208,56"/>
+<area shape="rect" id="Node000002" href="$signal_8c.html#abb4d7329079c42e646f8770eab5568cb" title=" " alt="" coords="5,5,89,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,36,89,29,90,24,124,31"/>
+<area shape="rect" id="Node000003" href="$signal_8c.html#ab5f7c2b99e462d63a376becc8d503470" title=" " alt="" coords="9,55,85,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="124,55,86,63,85,57,123,50"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="poll_bsy" name="poll_bsy">
+<area shape="rect" id="Node000001" title="Poll until BSY clears." alt="" coords="389,5,465,31"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a69cc2f51d9f7c84d9f7ae376cbb59ffb" title="Run IDENTIFY and populate drive descriptor." alt="" coords="271,5,341,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="375,21,341,21,341,15,375,15"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="152,5,223,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,21,223,21,223,15,257,15"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a5e52bd125ec22329ebd5250747daf2cc" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="138,21,104,21,104,15,138,15"/>
+</map>

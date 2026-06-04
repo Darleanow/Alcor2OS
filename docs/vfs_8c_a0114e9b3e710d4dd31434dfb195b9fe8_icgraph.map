@@ -1,0 +1,7 @@
+<map id="vfs_getdents" name="vfs_getdents">
+<area shape="rect" id="Node000001" title="Fill buf with dirent64 entries from an open directory fd." alt="" coords="333,5,440,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" title="Fill dirp with dirent64 entries from the open directory fd." alt="" coords="177,5,285,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="320,21,286,21,286,15,320,15"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395" title="getdents64 — identical to sys_getdents on this platform." alt="" coords="5,5,129,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="164,21,129,21,129,15,164,15"/>
+</map>

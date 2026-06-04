@@ -1,0 +1,7 @@
+<map id="sys_open" name="sys_open">
+<area shape="rect" id="Node000001" title="Open or create a file and return a file descriptor." alt="" coords="149,31,232,56"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#abb5ff8d1a9032c4f32ad1f65a4a5133e" title="Create or truncate a file at pathname (open with O_WRONLY|O_CREAT|O_TRUNC)." alt="" coords="11,5,95,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,36,95,28,96,23,137,31"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a22b2ac6b30d04a46bf880d289a4aea46" title="openat — only AT_FDCWD is supported; delegates to sys_open." alt="" coords="5,55,101,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,56,102,62,101,56,135,50"/>
+</map>

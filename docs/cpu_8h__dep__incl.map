@@ -1,0 +1,51 @@
+<map id="include/alcor2/arch/cpu.h" name="include/alcor2/arch/cpu.h">
+<area shape="rect" id="Node000001" title="x86_64 CPU control and state management." alt="" coords="1629,5,1774,45"/>
+<area shape="rect" id="Node000002" href="$syscall_8h.html" title="x86_64 syscall interface and definitions." alt="" coords="684,93,823,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1615,37,823,108,823,103,1615,32"/>
+<area shape="rect" id="Node000009" href="$sys__io_8c.html" title="I/O syscalls: read, readv, write, writev, lseek, ioctl, nanosleep, select, poll." alt="" coords="1106,277,1273,302"/>
+<area shape="poly" id="edge24_Node000001_Node000009" title=" " alt="" coords="1615,29,1508,32,1389,43,1333,51,1283,63,1244,77,1216,95,1201,116,1191,139,1182,191,1184,240,1189,276,1184,277,1178,241,1176,191,1185,138,1196,113,1213,91,1241,72,1282,57,1332,46,1388,37,1507,27,1615,24"/>
+<area shape="rect" id="Node000012" href="$sys__proc_8c.html" title="Process syscalls: PID queries, fork, exec, wait, clone, identity." alt="" coords="1297,269,1434,309"/>
+<area shape="poly" id="edge25_Node000001_Node000012" title=" " alt="" coords="1615,29,1511,32,1398,42,1345,51,1298,62,1261,77,1237,95,1225,117,1224,140,1233,164,1248,188,1293,233,1338,267,1335,271,1289,237,1244,192,1228,167,1219,141,1220,116,1233,92,1259,72,1297,57,1344,45,1397,37,1511,27,1615,23"/>
+<area shape="rect" id="Node000013" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="959,189,1092,214"/>
+<area shape="poly" id="edge22_Node000001_Node000013" title=" " alt="" coords="1615,33,1495,40,1358,53,1230,71,1179,83,1141,96,1107,117,1077,143,1036,190,1032,187,1073,139,1104,112,1139,91,1178,77,1229,66,1357,47,1495,35,1615,28"/>
+<area shape="rect" id="Node000015" href="$cpu_8c.html" title="CPU control and management implementation." alt="" coords="1247,101,1409,126"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="1616,49,1379,103,1377,98,1615,44"/>
+<area shape="rect" id="Node000016" href="$idt_8c.html" title="Interrupt Descriptor Table and exception handlers." alt="" coords="1434,101,1590,126"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="1649,53,1538,103,1536,98,1646,49"/>
+<area shape="rect" id="Node000017" href="$syscall__arch_8c.html" title="Syscall hardware setup (STAR/LSTAR/SFMASK MSRs, syscall_init)." alt="" coords="1615,93,1788,133"/>
+<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="1704,59,1704,93,1699,93,1699,59"/>
+<area shape="rect" id="Node000018" href="$ata_8c.html" title="ATA/IDE disk driver (DMA + PIO fallback, LBA28/48)." alt="" coords="1813,101,1963,126"/>
+<area shape="poly" id="edge18_Node000001_Node000018" title=" " alt="" coords="1756,49,1864,98,1862,103,1753,53"/>
+<area shape="rect" id="Node000019" href="$keyboard_8c.html" title="PS/2 keyboard driver with scancode translation." alt="" coords="1988,93,2143,133"/>
+<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="1788,44,1988,91,1987,96,1787,49"/>
+<area shape="rect" id="Node000020" href="$mouse_8c.html" title="Kernel mouse broker." alt="" coords="2167,93,2302,133"/>
+<area shape="poly" id="edge20_Node000001_Node000020" title=" " alt="" coords="1788,35,1958,58,2155,91,2168,93,2167,98,2154,96,1958,63,1788,40"/>
+<area shape="rect" id="Node000021" href="$kbd__layout_8c.html" title="PS/2 scancode translator: layout mapping, line discipline, and TTY I/O." alt="" coords="2326,93,2477,133"/>
+<area shape="poly" id="edge21_Node000001_Node000021" title=" " alt="" coords="1788,31,2026,53,2171,70,2315,91,2326,93,2325,98,2314,96,2170,75,2025,58,1787,36"/>
+<area shape="rect" id="Node000022" href="$proc_8c.html" title="Process lifecycle, scheduling, fork/exec/exit, and context switching." alt="" coords="2501,93,2640,133"/>
+<area shape="poly" id="edge23_Node000001_Node000022" title=" " alt="" coords="1788,27,2099,47,2294,65,2490,91,2502,93,2501,98,2489,96,2293,70,2098,52,1788,33"/>
+<area shape="rect" id="Node000023" href="$vmm_8c.html" title="x86_64 virtual memory manager (PML4 → PT, address&#45;space clone, tear down user maps)." alt="" coords="2664,101,2784,126"/>
+<area shape="poly" id="edge26_Node000001_Node000023" title=" " alt="" coords="1788,25,1949,29,2164,39,2408,59,2652,91,2686,98,2685,103,2652,96,2407,64,2164,45,1949,34,1788,30"/>
+<area shape="rect" id="Node000003" href="$alcor__fb__user_8h.html" title="Userland helpers for the Alcor2 custom framebuffer syscalls." alt="" coords="513,181,663,221"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="706,142,625,184,623,179,704,137"/>
+<area shape="rect" id="Node000005" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="737,181,876,221"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="775,144,797,180,793,183,770,146"/>
+<area shape="rect" id="Node000006" href="$sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch." alt="" coords="193,269,330,309"/>
+<area shape="poly" id="edge14_Node000002_Node000006" title=" " alt="" coords="741,147,715,188,697,208,676,224,631,247,590,260,552,266,516,266,438,264,394,265,343,272,331,274,330,269,342,267,394,260,438,258,516,261,552,260,589,255,629,242,673,219,693,204,711,185,737,144"/>
+<area shape="poly" id="edge12_Node000002_Node000013" title=" " alt="" coords="827,135,990,186,988,191,825,140"/>
+<area shape="rect" id="Node000014" href="$signal_8c.html" title="POSIX signal system calls and delivery mechanism." alt="" coords="324,189,489,214"/>
+<area shape="poly" id="edge13_Node000002_Node000014" title=" " alt="" coords="671,138,454,191,452,186,670,133"/>
+<area shape="rect" id="Node000004" href="$dg__alcor_8c.html" title="doomgeneric platform backend for Alcor2OS." alt="" coords="5,269,168,309"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="500,224,339,249,180,272,169,274,168,269,180,267,338,243,499,219"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="724,223,719,224,613,239,531,247,448,256,343,272,331,274,330,269,342,267,448,251,530,242,613,234,718,219,723,218"/>
+<area shape="rect" id="Node000007" href="$sys__fb_8c.html" title="Syscalls: framebuffer info + mmap (userspace drawing / font stacks)." alt="" coords="355,277,523,302"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="724,224,489,279,487,274,723,219"/>
+<area shape="rect" id="Node000008" href="$sys__fs_8c.html" title="Filesystem syscalls: open, close, stat, seek, rename, chdir, …" alt="" coords="547,277,714,302"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="757,230,655,279,653,274,755,225"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="890,219,1139,274,1138,279,889,224"/>
+<area shape="rect" id="Node000010" href="$sys__misc_8c.html" title="Misc syscalls: uname, time, minimal futex, sched_yield." alt="" coords="738,269,875,309"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="809,235,809,269,804,269,804,235"/>
+<area shape="rect" id="Node000011" href="$sys__mm_8c.html" title="Memory syscalls: mmap, mprotect, munmap, brk." alt="" coords="900,277,1081,302"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="861,225,967,274,965,279,858,230"/>
+<area shape="poly" id="edge11_Node000005_Node000012" title=" " alt="" coords="890,211,1286,267,1297,269,1296,274,1285,272,889,216"/>
+</map>

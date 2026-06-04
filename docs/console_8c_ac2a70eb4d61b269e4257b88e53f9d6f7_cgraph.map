@@ -1,0 +1,13 @@
+<map id="scroll" name="scroll">
+<area shape="rect" id="Node000001" title="Shift the framebuffer up by one cell row and clear the bottom row." alt="" coords="5,56,63,81"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#a2b43e87d614b0efffcde543dfa509e53" title="Fill rows [y0, y1) with ctx.bg, fast&#45;path on 32 bpp." alt="" coords="111,31,253,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="62,61,97,55,97,61,63,67"/>
+<area shape="rect" id="Node000006" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="139,80,225,105"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="63,71,125,81,125,86,62,76"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="301,31,403,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="254,41,287,41,287,46,254,46"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="451,5,541,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="402,32,436,26,437,31,403,37"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="451,55,541,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="403,49,437,55,436,60,402,54"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="limine_module_request" name="limine_module_request">
+<area shape="rect" id="Node000001" title="Module request structure." alt="" coords="11,181,186,207"/>
+<area shape="rect" id="Node000002" href="$structlimine__module__response.html" title="Module response from bootloader." alt="" coords="171,93,357,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,127,122,183,120,179,228,123"/>
+<area shape="rect" id="Node000003" href="$structlimine__file.html" title="Limine file descriptor (module or kernel file)." alt="" coords="5,5,96,31"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="46,44,41,80,41,99,45,118,65,153,88,179,84,183,60,156,40,120,36,100,35,80,41,43"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,34,236,91,234,96,91,38"/>
+</map>

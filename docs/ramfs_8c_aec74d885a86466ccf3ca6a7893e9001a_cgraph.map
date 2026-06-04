@@ -1,0 +1,17 @@
+<map id="ram__create_node" name="ram__create_node">
+<area shape="rect" id="Node000001" title="Allocate and zero a new ramfs node with the given name and type." alt="" coords="5,56,148,81"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="196,31,275,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,55,182,49,183,54,149,60"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a4d46efddfad41d6c402283b85b3b15b6" title="Allocate zeroed memory from kernel heap." alt="" coords="201,80,269,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,77,188,83,187,88,148,82"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="323,55,397,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="269,83,309,75,310,80,270,88"/>
+<area shape="rect" id="Node000014" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="331,104,389,129"/>
+<area shape="poly" id="edge7_Node000003_Node000014" title=" " alt="" coords="270,96,318,106,317,111,269,102"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="445,5,567,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="397,52,454,33,456,38,398,57"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="451,55,561,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="398,65,438,65,438,70,398,70"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="460,104,552,129"/>
+<area shape="poly" id="edge6_Node000004_Node000018" title=" " alt="" coords="398,77,456,97,454,102,397,82"/>
+</map>

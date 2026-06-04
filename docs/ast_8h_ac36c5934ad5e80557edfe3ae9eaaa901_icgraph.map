@@ -1,0 +1,9 @@
+<map id="ast_new_cmd" name="ast_new_cmd">
+<area shape="rect" id="Node000001" title="Allocate a new AST_CMD node with empty argv." alt="" coords="488,5,599,31"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#af11d1e381b4ab40b77eb1a695e0b1eab" title=" " alt="" coords="309,5,440,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="474,21,440,21,440,15,474,15"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="171,5,261,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,21,262,21,262,15,295,15"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="5,5,123,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,21,123,21,123,15,157,15"/>
+</map>

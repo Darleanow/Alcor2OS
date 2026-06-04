@@ -1,0 +1,19 @@
+<map id="src/drivers/pci/pci.c" name="src/drivers/pci/pci.c">
+<area shape="rect" id="Node000001" title="PCI bus driver." alt="" coords="168,5,315,31"/>
+<area shape="rect" id="Node000002" href="$io_8h.html" title="x86 I/O port access functions." alt="" coords="5,79,128,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,33,109,76,107,71,212,28"/>
+<area shape="rect" id="Node000007" href="$console_8h.html" title="Kernel boot/panic logger on the linear framebuffer." alt="" coords="153,79,330,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="244,31,244,65,239,65,239,31"/>
+<area shape="rect" id="Node000008" href="$pci_8h.html" title="PCI bus driver: config&#45;space access, enumeration, capability list." alt="" coords="355,79,501,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="272,28,386,71,384,76,270,33"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="184,152,299,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,102,201,144,199,149,94,106"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="97,225,180,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="226,180,168,219,165,215,223,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="204,225,279,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="244,178,244,212,239,212,239,178"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="303,225,374,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="259,175,313,215,310,219,255,180"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="244,104,244,138,239,138,239,104"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="399,107,285,149,284,145,397,102"/>
+</map>

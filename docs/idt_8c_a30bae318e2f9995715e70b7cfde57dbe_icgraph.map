@@ -1,0 +1,5 @@
+<map id="idt_set_gate" name="idt_set_gate">
+<area shape="rect" id="Node000001" title="Set an IDT entry." alt="" coords="120,5,223,31"/>
+<area shape="rect" id="Node000002" href="$idt_8c.html#a164d38a0163ec2c36993b803b8c7fdcb" title="Initialize the IDT and install default handlers." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,21,72,21,72,15,106,15"/>
+</map>

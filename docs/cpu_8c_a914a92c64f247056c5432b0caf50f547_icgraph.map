@@ -1,0 +1,21 @@
+<map id="cpu_halt" name="cpu_halt">
+<area shape="rect" id="Node000001" title="Halt the CPU indefinitely." alt="" coords="588,55,665,80"/>
+<area shape="rect" id="Node000002" href="$idt_8c.html#a8a93c29846db4e5a2697c572d1e6bd7a" title=" " alt="" coords="397,5,540,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="574,54,509,33,511,28,575,49"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="437,55,500,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="574,70,500,70,500,65,574,65"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#a3848d0c4990c787eb0cce2d17e029c38" title="Exit the current process with the given exit code." alt="" coords="427,104,510,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="575,86,511,107,509,101,574,81"/>
+<area shape="rect" id="Node000005" href="$src_2kernel_2main_8c.html#a8aed1703f7c57aac4497559a076d2162" title=" " alt="" coords="203,29,348,55"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="415,102,396,94,348,68,318,57,320,52,350,64,398,89,417,97"/>
+<area shape="rect" id="Node000007" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="201,79,349,104"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="413,112,349,104,350,98,414,107"/>
+<area shape="rect" id="Node000008" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="227,128,324,153"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="414,126,324,137,324,132,413,121"/>
+<area shape="rect" id="Node000009" href="$sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status." alt="" coords="237,177,313,203"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="425,137,350,167,314,180,312,175,348,162,424,132"/>
+<area shape="rect" id="Node000006" href="$src_2kernel_2main_8c.html#af2a6510459a9078c19de386e065e36dd" title=" " alt="" coords="5,29,153,55"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="189,45,154,45,154,39,189,39"/>
+<area shape="rect" id="Node000010" href="$sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" title="Terminate all threads in the group — equivalent to sys_exit here." alt="" coords="19,177,139,203"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="224,193,139,193,139,187,224,187"/>
+</map>

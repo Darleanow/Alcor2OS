@@ -1,0 +1,7 @@
+<map id="fb_put_pixel" name="fb_put_pixel">
+<area shape="rect" id="Node000001" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="5,31,107,56"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="155,5,245,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,32,140,26,141,31,107,37"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="155,55,245,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="107,49,141,55,140,60,106,54"/>
+</map>

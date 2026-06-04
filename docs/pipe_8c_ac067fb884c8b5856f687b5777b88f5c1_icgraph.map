@@ -1,0 +1,19 @@
+<map id="pipe_read_obj" name="pipe_read_obj">
+<area shape="rect" id="Node000001" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="533,80,647,105"/>
+<area shape="rect" id="Node000002" href="$vfs_8c.html#aa43ccf694fc49a889902be97e38e32db" title="Read up to count bytes from fd into buf." alt="" coords="407,80,485,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="520,95,486,95,486,90,520,90"/>
+<area shape="rect" id="Node000003" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="229,5,324,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="413,75,358,44,323,32,325,27,360,40,416,70"/>
+<area shape="rect" id="Node000012" href="$sys__mm_8c.html#a0d76fce616e6b2bfc5a09e0fa5df3ecd" title=" " alt="" coords="195,55,359,80"/>
+<area shape="poly" id="edge4_Node000002_Node000012" title=" " alt="" coords="393,87,358,82,359,77,394,82"/>
+<area shape="rect" id="Node000014" href="$sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635" title="Read count bytes from fd at absolute offset without moving the seek position." alt="" coords="225,104,329,129"/>
+<area shape="poly" id="edge6_Node000002_Node000014" title=" " alt="" coords="393,103,329,112,328,107,392,97"/>
+<area shape="rect" id="Node000015" href="$sys__io_8c.html#a9e0ba6a136c04452cb4759138652bb88" title="Read up to count bytes from fd into buf." alt="" coords="237,153,317,179"/>
+<area shape="poly" id="edge7_Node000002_Node000015" title=" " alt="" coords="414,115,360,143,318,158,316,153,358,138,411,110"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="5,5,147,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="215,21,147,21,147,15,215,15"/>
+<area shape="rect" id="Node000013" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="29,55,123,80"/>
+<area shape="poly" id="edge5_Node000012_Node000013" title=" " alt="" coords="180,70,123,70,123,65,180,65"/>
+<area shape="rect" id="Node000016" href="$sys__io_8c.html#a20b06db6011d3c71ba1ce6b1de28c1f5" title=" " alt="" coords="32,153,120,179"/>
+<area shape="poly" id="edge8_Node000015_Node000016" title=" " alt="" coords="223,169,120,169,120,163,223,163"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="pci_read32" name="pci_read32">
+<area shape="rect" id="Node000001" title="Read 32&#45;bit value from PCI configuration space." alt="" coords="5,55,99,80"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a7f72742d7f484f7f9884aa5b89e69693" title="Read a dword from an I/O port." alt="" coords="166,5,205,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,52,152,27,154,32,88,57"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#afc646bf3a7c97a44d32ec4f9b4ab2984" title="Write a dword to an I/O port." alt="" coords="162,55,209,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="99,65,148,65,148,70,99,70"/>
+<area shape="rect" id="Node000004" href="$pci_8c.html#aaa6afa93d90d8f830d099a700a818f7d" title=" " alt="" coords="147,104,224,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="88,78,138,96,136,101,86,83"/>
+</map>

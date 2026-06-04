@@ -1,0 +1,26 @@
+<map id="ensure_indirect_slot" name="ensure_indirect_slot">
+<area shape="rect" id="Node000001" title="Resolve slot slot_idx of indirect_block; allocate it if hole." alt="" coords="5,116,159,141"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#a4888ff3d79af7bc66c91c7f9d349c3c0" title="Allocate a fresh block, zero it, and bill the inode for it." alt="" coords="207,116,353,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,126,193,126,193,131,159,131"/>
+<area shape="rect" id="Node000007" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="785,116,841,141"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="115,113,184,90,278,65,386,49,442,46,496,50,574,62,650,79,772,113,771,118,649,84,573,67,496,55,441,52,386,54,279,70,185,95,117,118"/>
+<area shape="rect" id="Node000021" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="775,14,850,40"/>
+<area shape="poly" id="edge13_Node000001_Node000021" title=" " alt="" coords="97,113,144,80,174,63,206,50,282,28,361,14,441,6,519,3,659,7,762,17,762,22,658,13,519,9,441,12,362,20,283,34,208,55,176,68,147,85,100,118"/>
+<area shape="rect" id="Node000036" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="753,292,873,317"/>
+<area shape="poly" id="edge14_Node000001_Node000036" title=" " alt="" coords="97,139,142,182,174,205,208,223,277,249,350,268,424,283,497,293,632,303,739,304,739,310,631,309,496,298,423,288,349,273,276,254,206,228,171,209,139,186,93,143"/>
+<area shape="rect" id="Node000038" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="751,217,875,242"/>
+<area shape="poly" id="edge15_Node000001_Node000038" title=" " alt="" coords="116,138,240,184,320,208,402,228,485,242,551,247,702,240,737,237,737,243,703,246,551,252,485,248,401,233,318,213,238,189,114,144"/>
+<area shape="rect" id="Node000003" href="$alloc_8c.html#ad132e225f76cc34a8971d2fcd30e55b8" title="Allocate a free block, preferring preferred_group." alt="" coords="401,166,496,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="324,138,393,160,392,165,322,144"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="353,126,771,126,771,131,353,131"/>
+<area shape="poly" id="edge9_Node000002_Node000021" title=" " alt="" coords="294,113,339,80,369,63,400,50,449,36,499,27,598,17,689,16,761,19,761,25,689,21,599,23,499,32,450,42,402,55,371,68,342,84,298,118"/>
+<area shape="poly" id="edge11_Node000002_Node000038" title=" " alt="" coords="298,139,343,171,372,188,402,200,490,221,580,232,665,234,737,233,737,238,665,240,580,237,489,226,401,205,369,192,340,176,295,143"/>
+<area shape="rect" id="Node000031" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="419,65,478,90"/>
+<area shape="poly" id="edge10_Node000002_Node000031" title=" " alt="" coords="322,113,405,88,407,93,324,118"/>
+<area shape="rect" id="Node000004" href="$alloc_8c.html#a10b951f10689e7635a7c2695c6e1b795" title="Try to allocate one block inside group." alt="" coords="544,166,703,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="496,176,530,176,530,182,496,182"/>
+<area shape="poly" id="edge4_Node000004_Node000007" title=" " alt="" coords="671,164,771,136,772,142,672,169"/>
+<area shape="poly" id="edge5_Node000004_Node000021" title=" " alt="" coords="639,164,783,46,787,50,642,168"/>
+<area shape="poly" id="edge6_Node000004_Node000036" title=" " alt="" coords="645,189,783,282,780,286,642,194"/>
+<area shape="poly" id="edge7_Node000004_Node000038" title=" " alt="" coords="672,189,752,211,750,216,671,194"/>
+</map>

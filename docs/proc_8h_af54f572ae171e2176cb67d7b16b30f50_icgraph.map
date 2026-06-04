@@ -1,0 +1,9 @@
+<map id="proc_create_mem" name="proc_create_mem">
+<area shape="rect" id="Node000001" title="Create a process from an ELF image held in kernel memory." alt="" coords="424,5,563,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="257,5,376,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="410,21,376,21,376,15,410,15"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#ae1d9b721e1a1c60b10f0baef1ce6e199" title="Launch first user process from the shell module identified by init_bin_overlay." alt="" coords="116,5,209,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="244,21,209,21,209,15,244,15"/>
+<area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="5,5,68,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="102,21,68,21,68,15,102,15"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="channel_release" name="channel_release">
+<area shape="rect" id="Node000001" title="Release exclusive access and wake any waiting caller." alt="" coords="5,55,133,80"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="181,5,351,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,52,201,31,202,37,121,57"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="183,55,349,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,65,169,65,169,70,134,70"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="221,104,311,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="121,77,208,99,206,105,120,83"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sys_sched_yield" name="sys_sched_yield">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,133,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="181,5,296,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,15,167,15,167,21,134,21"/>
+</map>

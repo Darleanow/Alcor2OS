@@ -1,0 +1,5 @@
+<map id="flush_scroll_32bpp" name="flush_scroll_32bpp">
+<area shape="rect" id="Node000001" title="Drain the pending&#45;scroll counter in one VRAM copy plus dirty marks." alt="" coords="5,5,148,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="196,5,283,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,15,182,15,182,21,148,21"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="mouse_has_moved" name="mouse_has_moved">
+<area shape="rect" id="Node000001" title="Whether the pointer has moved at least once since boot." alt="" coords="553,5,701,31"/>
+<area shape="rect" id="Node000002" href="$fb__console_2mouse_8c.html#a261a735182368be5acb1566346962626" title="Paint or move the software mouse cursor. Early&#45;outs when the pointer has not moved since the last cal..." alt="" coords="343,5,505,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="539,21,505,21,505,15,539,15"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="172,5,295,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="329,21,295,21,295,15,329,15"/>
+<area shape="rect" id="Node000004" href="$pit_8c.html#a1ec93c1a5802efe9e3925acb8ccb5f64" title=" " alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="158,21,124,21,124,15,158,15"/>
+</map>

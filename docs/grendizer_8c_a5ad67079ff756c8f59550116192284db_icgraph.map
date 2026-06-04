@@ -1,0 +1,10 @@
+<map id="gr__needs_value" name="gr__needs_value">
+<area shape="rect" id="Node000001" title="Return non&#45;zero if the option kind requires a value token." alt="" coords="364,5,495,31"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a856ce27279fc9ff59cc800cb6b638444" title="Parse command&#45;line arguments according to spec." alt="" coords="108,5,187,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="350,21,187,21,187,15,350,15"/>
+<area shape="rect" id="Node000004" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="235,31,316,56"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="351,34,317,39,316,34,350,28"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2vega_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,60,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,21,60,21,60,15,94,15"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="221,35,186,28,187,23,222,30"/>
+</map>

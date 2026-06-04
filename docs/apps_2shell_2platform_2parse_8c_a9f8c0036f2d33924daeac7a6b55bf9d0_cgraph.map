@@ -1,0 +1,5 @@
+<map id="handle_hd_body" name="handle_hd_body">
+<area shape="rect" id="Node000001" title="Heredoc body: accumulate one line at a time, exit on delim match." alt="" coords="5,5,133,31"/>
+<area shape="rect" id="Node000002" href="$apps_2shell_2platform_2parse_8c.html#a8dc470e879ef5de373517a4594653dbc" title="Compare st&#45;&gt;line_buf (length st&#45;&gt;ln) against st&#45;&gt;delim (length st&#45;&gt;dn)." alt="" coords="181,5,304,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,15,167,15,167,21,134,21"/>
+</map>

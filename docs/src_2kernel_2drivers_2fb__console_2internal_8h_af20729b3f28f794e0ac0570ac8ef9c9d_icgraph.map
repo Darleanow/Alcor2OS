@@ -1,0 +1,25 @@
+<map id="fill32" name="fill32">
+<area shape="rect" id="Node000001" title="32&#45;bit splat using rep stosl. Inlined across every TU that touches pixels because the call overhead d..." alt="" coords="957,80,1012,105"/>
+<area shape="rect" id="Node000002" href="$cell_8c.html#aed699f0f7a784f41a33e19210235423b" title="Paint the SGR underline bar at the bottom of the cell — 32&#45;bpp only." alt="" coords="548,5,707,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="957,73,934,57,908,44,858,30,805,22,707,17,707,11,806,17,859,25,910,40,937,53,960,69"/>
+<area shape="rect" id="Node000025" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="5,56,153,81"/>
+<area shape="poly" id="edge6_Node000001_Node000025" title=" " alt="" coords="944,100,805,113,629,121,444,121,360,117,277,108,138,84,139,79,277,103,361,112,444,115,629,115,804,108,943,95"/>
+<area shape="rect" id="Node000056" href="$cell_8c.html#ad1ec4964107f67e9686ac7aee48cd5e6" title="Bg&#45;fill every framebuffer row inside the cell at (px_x, px_y)." alt="" coords="763,55,901,80"/>
+<area shape="poly" id="edge7_Node000001_Node000056" title=" " alt="" coords="944,89,901,82,902,76,944,83"/>
+<area shape="rect" id="Node000058" href="$flush_8c.html#a5947c6def1d20a4175990821e4f4a74c" title="Paint one scanline of one dirty cell using its prepared scratch." alt="" coords="755,156,909,181"/>
+<area shape="poly" id="edge10_Node000001_Node000058" title=" " alt="" coords="953,115,911,139,867,158,865,153,908,134,951,110"/>
+<area shape="rect" id="Node000003" href="$cell_8c.html#af5f3e7c39e55096a9396dfeb400f209c" title="Render c at grid (col, row)." alt="" coords="391,31,500,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="535,34,501,38,500,33,534,28"/>
+<area shape="rect" id="Node000004" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="235,5,309,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="377,36,308,26,309,21,377,31"/>
+<area shape="rect" id="Node000012" href="$scrollback_8c.html#a61ff43d3d5b3019856f6a9344c9f0c60" title="Repaint the visible grid from the scrollback ring blended with the live cells, based on the current s..." alt="" coords="201,55,343,80"/>
+<area shape="poly" id="edge5_Node000003_Node000012" title=" " alt="" coords="377,55,343,60,343,55,377,50"/>
+<area shape="poly" id="edge4_Node000004_Node000025" title=" " alt="" coords="223,34,129,59,128,53,221,28"/>
+<area shape="rect" id="Node000057" href="$cell_8c.html#aa618e3fec5dd90fafa86db23ace7be5a" title="32&#45;bpp atlas blit — row&#45;by&#45;row alpha&#45;blend with at most one bg fill." alt="" coords="563,55,692,80"/>
+<area shape="poly" id="edge8_Node000056_Node000057" title=" " alt="" coords="749,70,692,70,692,65,749,65"/>
+<area shape="poly" id="edge9_Node000057_Node000003" title=" " alt="" coords="548,60,500,53,500,48,549,54"/>
+<area shape="rect" id="Node000059" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="565,156,689,181"/>
+<area shape="poly" id="edge11_Node000058_Node000059" title=" " alt="" coords="741,171,689,171,689,166,741,166"/>
+<area shape="rect" id="Node000050" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="397,156,493,181"/>
+<area shape="poly" id="edge12_Node000059_Node000050" title=" " alt="" coords="552,171,494,171,494,166,552,166"/>
+</map>

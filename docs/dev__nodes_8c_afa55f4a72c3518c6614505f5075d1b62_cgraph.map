@@ -1,0 +1,9 @@
+<map id="fb_read" name="fb_read">
+<area shape="rect" id="Node000001" title="Read from /dev/fb — returns an alcor_fb_info_t with the framebuffer geometry." alt="" coords="5,31,76,56"/>
+<area shape="rect" id="Node000002" href="$fb__user_8c.html#a9acad3f6f1ce2d619deb50535884a04d" title="Fill out for SYS_ALCOR_FB_INFO." alt="" coords="124,5,249,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,35,110,29,111,34,77,40"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="143,55,230,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="77,46,130,55,129,61,76,52"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="297,5,356,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,15,284,15,284,21,249,21"/>
+</map>

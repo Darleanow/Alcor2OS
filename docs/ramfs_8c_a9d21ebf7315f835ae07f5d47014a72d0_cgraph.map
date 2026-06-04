@@ -1,0 +1,26 @@
+<map id="ramfs_chardev_register" name="ramfs_chardev_register">
+<area shape="rect" id="Node000001" title="Register a character device under path inside the ramfs tree." alt="" coords="5,132,181,157"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="257,5,344,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,130,161,91,228,48,255,34,257,39,231,52,164,96,112,134"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="420,107,499,132"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="119,129,169,108,229,91,301,84,372,91,411,100,410,105,372,97,301,89,230,97,171,113,121,134"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a8a0a6ba19f294ca025d4afe7b776444e" title="Find the last occurrence of a character in a string." alt="" coords="265,107,337,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="181,131,250,123,251,128,182,137"/>
+<area shape="rect" id="Node000005" href="$ramfs_8c.html#a12678cdafc9b669f5cdda769c7ace312" title="Prepend child to parent&#39;s children list and set its parent pointer." alt="" coords="239,156,363,181"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="182,152,225,157,225,163,181,157"/>
+<area shape="rect" id="Node000006" href="$ramfs_8c.html#aec74d885a86466ccf3ca6a7893e9001a" title="Allocate and zero a new ramfs node with the given name and type." alt="" coords="229,205,372,231"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="131,155,252,198,250,203,129,160"/>
+<area shape="rect" id="Node000023" href="$ramfs_8c.html#a4e3acc197dd9bee00d37e6e305106e11" title="Walk path from the ramfs root and return the matching node." alt="" coords="245,255,356,280"/>
+<area shape="poly" id="edge10_Node000001_Node000023" title=" " alt="" coords="111,155,162,197,231,241,244,247,242,252,228,246,159,201,107,160"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="344,203,371,190,405,166,434,140,438,144,408,170,373,195,346,208"/>
+<area shape="rect" id="Node000007" href="$heap_8c.html#a4d46efddfad41d6c402283b85b3b15b6" title="Allocate zeroed memory from kernel heap." alt="" coords="425,205,493,231"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="372,215,412,215,412,221,372,221"/>
+<area shape="rect" id="Node000008" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="547,156,621,181"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="491,203,537,184,539,189,493,208"/>
+<area shape="rect" id="Node000018" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="555,205,613,231"/>
+<area shape="poly" id="edge9_Node000007_Node000018" title=" " alt="" coords="493,215,541,215,541,221,493,221"/>
+<area shape="rect" id="Node000024" href="$kstdlib_8c.html#a13f97656a8217c7abb73091bfb616684" title="Check if two strings are equal." alt="" coords="428,255,491,280"/>
+<area shape="poly" id="edge11_Node000023_Node000024" title=" " alt="" coords="356,265,414,265,414,270,356,270"/>
+<area shape="rect" id="Node000025" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="547,255,621,280"/>
+<area shape="poly" id="edge12_Node000024_Node000025" title=" " alt="" coords="491,265,533,265,533,270,491,270"/>
+</map>

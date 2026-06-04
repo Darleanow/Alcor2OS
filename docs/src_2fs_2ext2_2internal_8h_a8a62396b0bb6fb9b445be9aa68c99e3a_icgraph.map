@@ -1,0 +1,26 @@
+<map id="cache_get_block" name="cache_get_block">
+<area shape="rect" id="Node000001" title="Acquire a single&#45;block scratch buffer from the static pool." alt="" coords="612,80,743,105"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#ac244024eb57350647fc868bd02827b03" title="Read up to count bytes from file at byte offset." alt="" coords="443,5,529,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="637,76,563,44,529,33,530,28,565,40,639,71"/>
+<area shape="rect" id="Node000004" href="$dir_8c.html#ababeb4e8c776d2b2c367e0f49234c2f9" title="Read the entry at index from an open directory." alt="" coords="434,55,538,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="598,85,538,77,539,72,598,80"/>
+<area shape="rect" id="Node000006" href="$file_8c.html#a92b60c4777893b900adbd384b1710e7e" title="Write data to a file." alt="" coords="441,104,531,129"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="598,105,532,114,532,108,597,100"/>
+<area shape="rect" id="Node000008" href="$path_8c.html#ad0de4eb9c0f14ca118d0cfff9e07b598" title="Read the target of a symlink inode into a buffer." alt="" coords="408,153,564,179"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="637,113,565,143,529,156,527,151,563,138,635,108"/>
+<area shape="rect" id="Node000003" href="$ops_8c.html#a7d4c82aac4f89abf698c21972978b332" title="fs_ops_t.read shim." alt="" coords="223,5,341,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="429,21,341,21,341,15,429,15"/>
+<area shape="rect" id="Node000005" href="$ops_8c.html#a8b01b0f12e74e9ca626d34d91d6f9e65" title="fs_ops_t.readdir shim — copies one entry&#39;s name + stat." alt="" coords="215,55,349,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="420,70,349,70,349,65,420,65"/>
+<area shape="rect" id="Node000007" href="$ops_8c.html#af5603f51c2625ed179e110d8d59f80dc" title="fs_ops_t.write shim." alt="" coords="221,104,343,129"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="427,119,343,119,343,114,427,114"/>
+<area shape="rect" id="Node000009" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="227,153,337,179"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="394,169,338,169,338,163,394,163"/>
+<area shape="rect" id="Node000011" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="204,203,360,228"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="420,184,336,205,335,200,419,179"/>
+<area shape="rect" id="Node000010" href="$ops_8c.html#a2fc366e280a85e6ef6f5b18663c7d6c5" title="fs_ops_t.readlink shim." alt="" coords="10,153,151,179"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="213,169,152,169,152,163,213,163"/>
+<area shape="rect" id="Node000012" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="5,203,156,228"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="190,227,157,227,157,221,190,222"/>
+<area shape="poly" id="edge12_Node000012_Node000011" title=" " alt="" coords="170,204,204,204,204,209,170,209"/>
+</map>

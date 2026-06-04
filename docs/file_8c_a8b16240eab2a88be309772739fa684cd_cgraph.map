@@ -1,0 +1,20 @@
+<map id="validate_parent_for_create" name="validate_parent_for_create">
+<area shape="rect" id="Node000001" title="Resolve and validate the parent directory for a creation op." alt="" coords="5,74,155,114"/>
+<area shape="rect" id="Node000002" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="203,81,309,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,91,189,91,189,97,155,97"/>
+<area shape="rect" id="Node000003" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="357,81,508,107"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="310,91,344,91,344,97,310,97"/>
+<area shape="rect" id="Node000004" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="565,5,721,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="490,79,609,34,611,39,492,84"/>
+<area shape="rect" id="Node000007" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="787,31,865,56"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="508,82,773,47,773,53,509,87"/>
+<area shape="rect" id="Node000042" href="$path_8c.html#aafde89a77c03337dd6c31bf0fb23a814" title="Advance *p past one path component into component." alt="" coords="556,107,731,132"/>
+<area shape="poly" id="edge7_Node000003_Node000042" title=" " alt="" coords="509,100,543,105,542,110,508,106"/>
+<area shape="rect" id="Node000043" href="$inode_8c.html#aba1cf116b95090ec043930c6efaa8dce" title="Load on&#45;disk inode ino into the caller&#45;provided inode." alt="" coords="779,183,873,208"/>
+<area shape="poly" id="edge8_Node000003_Node000043" title=" " alt="" coords="462,104,506,123,557,141,667,167,766,185,765,190,666,173,555,146,504,128,460,109"/>
+<area shape="rect" id="Node000044" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="561,208,725,233"/>
+<area shape="poly" id="edge9_Node000003_Node000044" title=" " alt="" coords="449,105,495,144,557,186,588,201,586,206,555,191,492,148,446,109"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="586,33,467,78,465,73,584,28"/>
+<area shape="poly" id="edge4_Node000004_Node000007" title=" " alt="" coords="722,26,773,33,772,39,721,31"/>
+<area shape="poly" id="edge10_Node000044_Node000043" title=" " alt="" coords="725,207,765,201,766,206,726,212"/>
+</map>

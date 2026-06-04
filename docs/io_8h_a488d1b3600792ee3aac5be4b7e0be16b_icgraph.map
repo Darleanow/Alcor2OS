@@ -1,0 +1,26 @@
+<map id="io_wait" name="io_wait">
+<area shape="rect" id="Node000001" title="Short I/O delay (write to port 0x80)." alt="" coords="703,68,772,93"/>
+<area shape="rect" id="Node000002" href="$pic_8c.html#afc70164c232cee70941b16e3f2ca029a" title="Initialize and remap the 8259 PIC." alt="" coords="541,12,610,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="689,67,609,39,611,34,691,62"/>
+<area shape="rect" id="Node000004" href="$mouse__ps2_8c.html#a2c86d21aafe1ed28adf9fb89f6019dc5" title="Spin until the input buffer is free." alt="" coords="496,68,655,93"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="689,83,655,83,655,78,689,78"/>
+<area shape="rect" id="Node000010" href="$mouse__ps2_8c.html#a16aef608030c66970d3ac07b5762eff6" title="Spin until a byte is available to read." alt="" coords="497,129,654,155"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="691,101,611,132,609,127,690,96"/>
+<area shape="rect" id="Node000003" href="$src_2kernel_2main_8c.html#a9cf4a417b66a038c3dd1e074be9fde2e" title="Initialize interrupt controllers and drivers." alt="" coords="331,5,444,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="527,26,444,23,444,17,527,20"/>
+<area shape="rect" id="Node000005" href="$mouse__ps2_8c.html#a16ddfad4f1a5feb09d3b53f7893b703f" title="Send a command byte to the controller (port 0x64)." alt="" coords="347,55,427,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="482,77,428,73,428,67,483,71"/>
+<area shape="rect" id="Node000009" href="$mouse__ps2_8c.html#a67fb73771a785ab88414bf6622c194c3" title="Send a data byte to the controller (port 0x60)." alt="" coords="327,104,448,129"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="496,99,449,108,448,102,495,93"/>
+<area shape="rect" id="Node000006" href="$mouse__ps2_8c.html#a24c01f5f20bd1823b7ba8ea033d68acc" title="Send a command to the mouse via the AUX port." alt="" coords="177,79,279,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="334,78,279,86,278,81,333,73"/>
+<area shape="rect" id="Node000007" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="5,104,129,129"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="333,63,259,60,218,62,178,69,130,85,90,106,88,102,128,81,177,63,217,57,259,55,333,58"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="164,104,130,110,129,104,163,99"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="313,107,279,102,280,97,313,102"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="313,119,130,119,130,114,313,114"/>
+<area shape="rect" id="Node000011" href="$mouse__ps2_8c.html#ad166364dae9026806e72b787a51fc2f7" title="Read one byte from the controller." alt="" coords="329,153,446,179"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="483,156,446,161,446,156,483,151"/>
+<area shape="poly" id="edge13_Node000011_Node000006" title=" " alt="" coords="339,150,326,144,251,106,253,102,328,140,341,145"/>
+<area shape="poly" id="edge14_Node000011_Node000007" title=" " alt="" coords="315,158,129,129,130,123,316,152"/>
+</map>

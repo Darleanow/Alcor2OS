@@ -1,0 +1,26 @@
+<map id="ext2_unmount" name="ext2_unmount">
+<area shape="rect" id="Node000001" title="Unmount an ext2 volume." alt="" coords="5,79,121,104"/>
+<area shape="rect" id="Node000002" href="$super_8c.html#aa50c8585de644b8e72f4a802b28ba90f" title="Persist superblock + GDT in a single call." alt="" coords="169,104,292,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,97,156,103,155,108,121,103"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="605,5,661,31"/>
+<area shape="poly" id="edge13_Node000001_Node000004" title=" " alt="" coords="121,81,591,21,591,26,122,87"/>
+<area shape="rect" id="Node000003" href="$super_8c.html#ab583d07e6992607105e3b289df85efc6" title="Persist the group descriptor table back to disk." alt="" coords="340,104,519,129"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="292,114,326,114,326,119,292,119"/>
+<area shape="rect" id="Node000035" href="$super_8c.html#a9317379514987ab108f12351bd0aa464" title="Persist the in&#45;memory superblock back to disk." alt="" coords="363,228,496,253"/>
+<area shape="poly" id="edge9_Node000002_Node000035" title=" " alt="" coords="254,127,397,218,395,223,251,132"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="451,101,502,72,566,40,591,29,593,34,568,44,505,77,453,106"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="595,55,670,80"/>
+<area shape="poly" id="edge4_Node000003_Node000018" title=" " alt="" coords="482,101,581,77,582,82,483,107"/>
+<area shape="rect" id="Node000017" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="589,203,676,228"/>
+<area shape="poly" id="edge5_Node000003_Node000017" title=" " alt="" coords="454,127,568,188,585,195,583,200,566,192,451,132"/>
+<area shape="rect" id="Node000028" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="603,104,662,129"/>
+<area shape="poly" id="edge6_Node000003_Node000028" title=" " alt="" coords="519,114,590,114,590,119,519,119"/>
+<area shape="rect" id="Node000033" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Write one ext2 block worth of bytes from buf." alt="" coords="571,153,695,179"/>
+<area shape="poly" id="edge7_Node000003_Node000033" title=" " alt="" coords="483,127,567,147,566,153,482,132"/>
+<area shape="rect" id="Node000034" href="$src_2fs_2ext2_2internal_8h.html#a92bf399aefd098ef22b483f7aa903291" title="Companion of vol_read_sectors for writes." alt="" coords="747,204,883,229"/>
+<area shape="poly" id="edge8_Node000033_Node000034" title=" " alt="" coords="680,176,756,198,754,203,679,181"/>
+<area shape="poly" id="edge10_Node000035_Node000017" title=" " alt="" coords="496,230,575,220,576,225,497,235"/>
+<area shape="poly" id="edge12_Node000035_Node000034" title=" " alt="" coords="496,241,592,242,698,237,746,229,747,235,699,242,592,247,496,246"/>
+<area shape="rect" id="Node000036" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="567,304,699,329"/>
+<area shape="poly" id="edge11_Node000035_Node000036" title=" " alt="" coords="465,251,586,297,584,302,463,256"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sys_getpid" name="sys_getpid">
+<area shape="rect" id="Node000001" title="Return the calling process&#39;s PID (or 1 if no process is running)." alt="" coords="5,5,97,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="145,5,248,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,15,132,15,132,21,97,21"/>
+</map>

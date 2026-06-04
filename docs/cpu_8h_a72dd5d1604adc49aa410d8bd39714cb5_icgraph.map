@@ -1,0 +1,12 @@
+<map id="cpu_pause" name="cpu_pause">
+<area shape="rect" id="Node000001" title="Pause instruction (hint for spinlocks)." alt="" coords="367,31,457,56"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#ab080ebc34772e3b0ce3cc2ee637005ac" title="Poll until BSY clears." alt="" coords="243,5,319,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="352,35,318,28,319,23,353,29"/>
+<area shape="rect" id="Node000006" href="$ata_8c.html#afece4807d5a19ec91aa03298b05f7351" title="Poll until DRQ asserted (BSY clear)." alt="" coords="243,55,318,80"/>
+<area shape="poly" id="edge4_Node000001_Node000006" title=" " alt="" coords="354,57,319,63,318,58,353,51"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#a69cc2f51d9f7c84d9f7ae376cbb59ffb" title="Run IDENTIFY and populate drive descriptor." alt="" coords="124,31,195,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="230,31,195,39,194,33,229,26"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a687db33b35dda1041206085d69c0e4dc" title="Initialize the ATA subsystem (channels, drives, IRQs, DMA)." alt="" coords="5,31,76,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="110,46,76,46,76,41,110,41"/>
+<area shape="poly" id="edge5_Node000006_Node000003" title=" " alt="" coords="229,60,194,53,195,48,231,55"/>
+</map>

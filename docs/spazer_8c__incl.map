@@ -1,0 +1,17 @@
+<map id="user/lib/spazer/spazer.c" name="user/lib/spazer/spazer.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="140,5,315,31"/>
+<area shape="rect" id="Node000002" href="$spazer_8h.html" title=" " alt="" coords="45,79,167,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,33,139,74,136,69,206,28"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="192,79,263,104"/>
+<area shape="poly" id="edge6_Node000001_Node000008" title=" " alt="" coords="230,31,230,65,225,65,225,31"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="287,79,357,104"/>
+<area shape="poly" id="edge7_Node000001_Node000009" title=" " alt="" coords="244,29,297,68,294,72,241,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,81,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="98,106,65,143,61,140,94,103"/>
+<area shape="rect" id="Node000004" href="$palette_8h.html" title="Spazer palette — re&#45;exports theme.h and boxdraw.h." alt="" coords="105,152,232,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="118,103,151,140,147,143,114,106"/>
+<area shape="rect" id="Node000005" href="$boxdraw_8h.html" title="UTF&#45;8 box&#45;drawing character literals for write()/printf() output." alt="" coords="71,225,160,251"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="162,179,134,216,130,213,158,176"/>
+<area shape="rect" id="Node000006" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="184,225,260,251"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="180,176,207,213,203,216,175,179"/>
+</map>

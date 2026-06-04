@@ -1,0 +1,14 @@
+<map id="DG_Init" name="DG_Init">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,76,105"/>
+<area shape="rect" id="Node000002" href="$alcor__fb__user_8h.html#a4a69208b81ab3b7cf7d539a6727a9301" title="Query framebuffer geometry (dimensions, pitch, pixel offset)." alt="" coords="132,5,239,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,77,123,40,136,34,138,38,125,44,62,82"/>
+<area shape="rect" id="Node000003" href="$alcor__fb__user_8h.html#a20e6f40399720aabb66544007285f3bc" title="Map the full framebuffer at a kernel&#45;chosen address." alt="" coords="124,55,247,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="76,84,110,78,111,83,76,89"/>
+<area shape="rect" id="Node000005" href="$dg__alcor_8c.html#a00e6445ee5df87ae0aa9e55e5701f2d3" title=" " alt="" coords="307,131,437,156"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="77,95,293,129,292,134,76,101"/>
+<area shape="rect" id="Node000006" href="$dg__alcor_8c.html#a1ee1c53cf345098b4cbfd9d7517cd203" title=" " alt="" coords="137,156,234,181"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="67,103,125,134,149,147,147,152,123,139,64,108"/>
+<area shape="rect" id="Node000004" href="$alcor__fb__user_8h.html#a6973e05658fddc317f424d4fce724d7f" title="Map the linear framebuffer into the calling process&#39;s address space." alt="" coords="295,55,449,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="247,65,281,65,281,70,247,70"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="234,160,292,151,293,157,234,165"/>
+</map>

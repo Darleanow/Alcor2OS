@@ -1,0 +1,47 @@
+<map id="fb_console_write" name="fb_console_write">
+<area shape="rect" id="Node000001" title="Convenience: begin + raw + end as one call." alt="" coords="5,169,137,194"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a8c908a73a21b548d5b02de14d05fb068" title="Open a writev&#45;style batch: subsequent feed bytes go through the dirty&#45;cell pipeline rather than blitt..." alt="" coords="185,70,360,95"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,166,232,99,234,104,99,171"/>
+<area shape="rect" id="Node000005" href="$api_8c.html#a7654752ac7d61f4811d1c6b0cd53f56c" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="191,169,354,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="138,179,178,179,178,184,138,184"/>
+<area shape="rect" id="Node000067" href="$api_8c.html#af6749d9339bf3beb3f2a7d2dfbcf686d" title="Feed len bytes through the ANSI/UTF&#45;8 parser without flushing." alt="" coords="191,349,354,374"/>
+<area shape="poly" id="edge17_Node000001_Node000067" title=" " alt="" coords="89,192,249,337,245,341,85,196"/>
+<area shape="rect" id="Node000003" href="$caret_8c.html#a9f5f1f6a98a99fcfdab0f741080e934f" title="Mark the caret&#39;s cell dirty for the next flush_batch and forget the tracker." alt="" coords="412,5,559,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="320,67,398,46,400,51,321,73"/>
+<area shape="rect" id="Node000004" href="$scrollback_8c.html#af989847d8b5c175f9a490656bfa1010a" title="Drop back to the live view (scroll offset = 0) and mark every cell dirty so the next flush_batch repa..." alt="" coords="425,70,545,95"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="360,80,411,80,411,85,360,85"/>
+<area shape="rect" id="Node000006" href="$caret_8c.html#a223a1d2101ec698b1f4cd82cbf2077b1" title="Paint the caret at fb_ctx.cx/cy by drawing the cell with fg/bg swapped." alt="" coords="438,119,533,145"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="327,166,424,143,426,148,329,171"/>
+<area shape="rect" id="Node000029" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="437,169,533,194"/>
+<area shape="poly" id="edge7_Node000005_Node000029" title=" " alt="" coords="355,179,423,179,423,184,355,184"/>
+<area shape="rect" id="Node000060" href="$scrollback_8c.html#a5eb39721ae7c9e68a54d078fc0fa6033" title="Drain the pending&#45;scroll counter: copies pixels up in one MMIO blit and marks the freshly exposed row..." alt="" coords="408,291,563,317"/>
+<area shape="poly" id="edge13_Node000005_Node000060" title=" " alt="" coords="297,192,452,282,449,287,295,197"/>
+<area shape="rect" id="Node000007" href="$cell_8c.html#a7d59eeeb30ee24818187cc25c9b4ea85" title="Render the cell at the live grid position (col, row)." alt="" coords="844,45,917,70"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="532,118,561,104,575,92,584,79,593,66,610,55,667,39,727,34,783,37,831,44,830,49,782,42,727,39,668,44,612,60,597,70,588,82,579,96,564,109,534,123"/>
+<area shape="rect" id="Node000030" href="$flush_8c.html#a2dabde3cffa3ed745cdc5c88d3951ce9" title="Slow&#45;path repaint used when the framebuffer is not 32&#45;bpp." alt="" coords="637,70,770,95"/>
+<area shape="poly" id="edge8_Node000029_Node000030" title=" " alt="" coords="533,167,561,154,575,142,584,129,594,117,609,104,622,98,625,103,612,109,598,120,589,133,579,145,564,158,535,172"/>
+<area shape="rect" id="Node000031" href="$flush_8c.html#a64a5c4ed54d464359ca344f02053b2fc" title="Grow the per&#45;row scratch to hold at least cols entries." alt="" coords="642,119,765,145"/>
+<area shape="poly" id="edge10_Node000029_Node000031" title=" " alt="" coords="533,168,633,145,634,150,534,173"/>
+<area shape="rect" id="Node000057" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="641,169,765,194"/>
+<area shape="poly" id="edge11_Node000029_Node000057" title=" " alt="" coords="533,179,627,179,627,184,533,184"/>
+<area shape="rect" id="Node000059" href="$flush_8c.html#a78b9c1602b135454913114b75737f27f" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="644,218,763,243"/>
+<area shape="poly" id="edge12_Node000029_Node000059" title=" " alt="" coords="534,189,634,212,633,218,533,195"/>
+<area shape="poly" id="edge9_Node000030_Node000007" title=" " alt="" coords="770,71,830,62,831,67,771,76"/>
+<area shape="rect" id="Node000061" href="$scrollback_8c.html#a0ea5237a11f029affd80c362f8b6d665" title="Drain the pending&#45;scroll counter in one VRAM copy plus dirty marks." alt="" coords="632,267,775,293"/>
+<area shape="poly" id="edge14_Node000060_Node000061" title=" " alt="" coords="563,293,618,287,618,292,563,298"/>
+<area shape="rect" id="Node000062" href="$scrollback_8c.html#ad8079ac6535b6104193f726ba136caeb" title="Slow&#45;path scroll for non&#45;32&#45;bpp framebuffers: mark every cell dirty and let flush_batch re&#45;blit them." alt="" coords="637,317,769,342"/>
+<area shape="poly" id="edge15_Node000060_Node000062" title=" " alt="" coords="564,310,624,317,623,323,563,316"/>
+<area shape="rect" id="Node000063" href="$fb__console_2mouse_8c.html#a677e4373c35c0f708dfa5c99ce5051ba" title="Erase the software mouse cursor if it is painted, so the scrollback pixel&#45;move does not drag a stale ..." alt="" coords="611,367,796,407"/>
+<area shape="poly" id="edge16_Node000060_Node000063" title=" " alt="" coords="519,314,612,351,634,359,633,364,610,356,517,319"/>
+<area shape="rect" id="Node000068" href="$ansi_8c.html#aed57f05021fc0a714155c4f892ef5cee" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="442,481,529,506"/>
+<area shape="poly" id="edge18_Node000067_Node000068" title=" " alt="" coords="296,372,454,471,451,476,293,376"/>
+<area shape="rect" id="Node000069" href="$ansi_8c.html#a7fd1926dc1bcdd98794488807df72221" title="Handle one byte while the parser is waiting for a G0 charset designator after ESC(/)." alt="" coords="632,431,775,457"/>
+<area shape="poly" id="edge19_Node000068_Node000069" title=" " alt="" coords="528,481,633,457,634,462,529,486"/>
+<area shape="rect" id="Node000070" href="$ansi_8c.html#a02fc143e65dd6786ede77f13e0d80641" title="Handle one byte while the parser is accumulating a CSI sequence." alt="" coords="647,481,759,506"/>
+<area shape="poly" id="edge20_Node000068_Node000070" title=" " alt="" coords="529,491,634,491,634,496,529,496"/>
+<area shape="rect" id="Node000102" href="$ansi_8c.html#a862bec20ffdb4a79ec0e9b93ed56c94a" title="Handle one byte while the parser is in the ESC&#45;was&#45;just&#45;seen state." alt="" coords="645,530,761,555"/>
+<area shape="poly" id="edge21_Node000068_Node000102" title=" " alt="" coords="529,500,634,524,633,530,528,506"/>
+<area shape="rect" id="Node000103" href="$ansi_8c.html#a95caeb62a209e7d835114c4b18ef080b" title="Stream one byte through the UTF&#45;8 decoder; emit a codepoint when a sequence completes." alt="" coords="661,603,745,629"/>
+<area shape="poly" id="edge22_Node000068_Node000103" title=" " alt="" coords="509,504,612,564,667,594,664,599,609,569,506,508"/>
+<area shape="poly" id="edge23_Node000103_Node000103" title=" " alt="" coords="674,605,668,595,671,585,683,579,703,577,728,580,738,589,734,593,725,585,703,582,685,584,675,589,673,594,678,602"/>
+</map>

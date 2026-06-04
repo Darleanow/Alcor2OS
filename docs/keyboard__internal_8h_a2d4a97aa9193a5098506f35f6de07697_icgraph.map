@@ -1,0 +1,9 @@
+<map id="kb_push" name="kb_push">
+<area shape="rect" id="Node000001" title=" " alt="" coords="529,5,605,31"/>
+<area shape="rect" id="Node000002" href="$keyboard_8c.html#a46b78f9b5f3f9a5e5d24871774db270c" title=" " alt="" coords="375,5,481,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="516,21,482,21,482,15,516,15"/>
+<area shape="rect" id="Node000003" href="$keyboard_8c.html#a91e1bd244fa1ddc661eeeed18f4bcb38" title=" " alt="" coords="164,5,327,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,21,327,21,327,15,361,15"/>
+<area shape="rect" id="Node000004" href="$keyboard_8c.html#a5aae8263abc1dec4671638e7ed4af681" title="Initialize the PS/2 keyboard driver." alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="150,21,116,21,116,15,150,15"/>
+</map>

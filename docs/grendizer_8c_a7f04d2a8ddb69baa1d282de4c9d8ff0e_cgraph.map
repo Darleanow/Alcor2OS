@@ -1,0 +1,25 @@
+<map id="gr_dispatch" name="gr_dispatch">
+<area shape="rect" id="Node000001" title="Dispatch main arguments through the subcommand tree." alt="" coords="5,96,103,121"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a7d6ef8a050fe5a3a15a0b94a05ea96b8" title="Resolve the display program name for a gr_app." alt="" coords="151,32,260,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,93,161,60,163,65,86,98"/>
+<area shape="rect" id="Node000004" href="$grendizer_8c.html#a5b16cdadb1b76fdf108957680297aa16" title="Core recursive command dispatcher: resolves tokens and calls the leaf handler." alt="" coords="153,132,257,157"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="103,118,140,126,139,132,102,123"/>
+<area shape="rect" id="Node000003" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="308,5,425,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="260,33,294,27,295,33,261,38"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="180,133,175,124,178,114,188,108,205,105,226,109,235,117,231,121,223,114,205,111,190,113,182,117,180,123,185,131"/>
+<area shape="rect" id="Node000005" href="$grendizer_8c.html#a179c0df2ca45d2cc6fb2f1999c3aad2a" title="Linear search for a subcommand by name in a table slice." alt="" coords="477,257,585,283"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="215,156,228,182,248,213,275,244,309,268,347,280,386,286,426,286,462,282,463,287,426,291,386,291,345,285,307,272,272,248,244,216,223,184,210,159"/>
+<area shape="rect" id="Node000006" href="$grendizer_8c.html#a226832e33d4fd0b34c462c97f1099e8c" title="Recursively resolve a command path for &#39;help &lt;command&gt; [subcommand]&#39;." alt="" coords="309,232,424,257"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="229,155,335,222,332,227,226,160"/>
+<area shape="rect" id="Node000007" href="$grendizer_8c.html#a5243b40b2661b9b66ab0583548fb1542" title="Build a space&#45;joined &quot;prefix seg&quot; command path string into dst." alt="" coords="476,107,585,132"/>
+<area shape="poly" id="edge12_Node000004_Node000007" title=" " alt="" coords="257,138,462,122,463,127,258,143"/>
+<area shape="rect" id="Node000008" href="$grendizer_8c.html#a6f728f3677542ee90fa06b52840c4eef" title="Print detailed usage for a single command node to stream." alt="" coords="473,157,588,183"/>
+<area shape="poly" id="edge13_Node000004_Node000008" title=" " alt="" coords="258,146,460,162,459,167,257,151"/>
+<area shape="rect" id="Node000009" href="$grendizer_8c.html#a3a87ca84afedecfa023ec02b1b7115a1" title="Print a help listing of all commands in a group to stream." alt="" coords="636,107,759,132"/>
+<area shape="poly" id="edge14_Node000004_Node000009" title=" " alt="" coords="240,129,307,110,385,95,447,87,509,86,588,93,636,101,635,106,588,98,509,91,447,92,386,100,309,115,242,135"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="425,251,464,257,463,262,424,256"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="340,233,334,224,337,214,348,208,367,205,389,209,398,217,395,221,386,214,367,211,350,213,341,217,339,223,344,231"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="377,230,417,189,472,144,485,136,488,140,475,148,421,193,381,234"/>
+<area shape="poly" id="edge10_Node000006_Node000008" title=" " alt="" coords="395,229,489,186,491,191,397,234"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="573,155,641,134,642,139,574,160"/>
+</map>

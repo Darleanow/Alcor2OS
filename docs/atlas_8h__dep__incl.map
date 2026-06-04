@@ -1,0 +1,11 @@
+<map id="user/apps/shell/include/shell/atlas.h" name="user/apps/shell/include/shell/atlas.h">
+<area shape="rect" id="Node000001" title="Rasterize a TTF (Fira Code) into a glyph atlas and submit it to the kernel framebuffer console via io..." alt="" coords="304,5,475,45"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2shell_2main_8c.html" title="Shell entry point: bring up ncurses input, atlas, termios snapshot, source /home/...." alt="" coords="5,101,173,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="311,52,130,103,129,98,310,46"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2shell_2platform_2atlas_8c.html" title=" " alt="" coords="198,93,378,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="358,56,312,95,309,91,355,52"/>
+<area shape="rect" id="Node000004" href="$atlas__stub_8c.html" title="Stub used when FreeType isn&#39;t built. Kernel keeps the CP437 bitmap fallback when atlas_submit returns..." alt="" coords="402,93,582,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="424,52,471,91,468,95,421,56"/>
+<area shape="rect" id="Node000005" href="$edit_8c.html" title="Single&#45;line interactive editor: cursor motion, history navigation, tab completion display,..." alt="" coords="606,93,786,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="470,46,630,91,628,96,469,52"/>
+</map>

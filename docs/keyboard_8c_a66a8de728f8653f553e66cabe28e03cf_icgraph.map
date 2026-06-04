@@ -1,0 +1,19 @@
+<map id="keyboard_raw_available" name="keyboard_raw_available">
+<area shape="rect" id="Node000001" title="Check if the raw scancode ring buffer has data." alt="" coords="736,68,916,93"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="563,43,677,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="722,71,677,65,677,60,722,65"/>
+<area shape="rect" id="Node000006" href="$kbd__layout_8c.html#ab7822a94d62041bce4704de8f5b0bed1" title="Whether a read(2) on fd 0 could return a byte right now." alt="" coords="552,92,688,117"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="722,95,689,99,688,94,722,90"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a7563fa1166b876f198b727e912747c09" title="read(2) on stdin honoring the process&#39;s termios (ICANON, VMIN/VTIME)." alt="" coords="336,43,500,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="550,58,500,58,500,53,550,53"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a79e8864bb2dd3b40d30c0698f74b0485" title="Block until at least one layout&#45;translated byte is available." alt="" coords="129,5,284,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="332,43,278,33,279,28,333,38"/>
+<area shape="rect" id="Node000005" href="$dev__nodes_8c.html#a6687d841b4dafd7f557c59776162e139" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="5,31,81,56"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="322,55,82,47,82,42,322,50"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="116,35,82,40,81,35,116,29"/>
+<area shape="rect" id="Node000007" href="$kbd__layout_8c.html#a194a31955e4d501a3274c1df551c274c" title=" " alt="" coords="332,92,504,117"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="538,107,504,107,504,102,538,102"/>
+<area shape="rect" id="Node000008" href="$dev__nodes_8c.html#a53ba066fbd825803a884309edf38a731" title="Report read/write readiness for /dev/tty." alt="" coords="171,119,242,144"/>
+<area shape="poly" id="edge9_Node000006_Node000008" title=" " alt="" coords="559,123,504,133,431,138,359,140,242,136,242,131,359,134,431,133,504,127,558,118"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="319,120,243,130,242,124,318,115"/>
+</map>

@@ -1,0 +1,25 @@
+<map id="user/apps/shell/platform/builtins.c" name="user/apps/shell/platform/builtins.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="266,5,446,45"/>
+<area shape="rect" id="Node000002" href="$shell_8h.html" title="Shell&#45;internal helpers (sh_*) used by main.c, builtins.c, and the shell&#39;s platform layer...." alt="" coords="197,93,297,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="331,48,275,87,272,83,328,43"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="321,93,391,119"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="359,46,359,79,353,79,353,46"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="415,93,486,119"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="381,43,427,82,424,86,377,48"/>
+<area shape="rect" id="Node000010" href="$host_8h.html" title="libvega embedding interface." alt="" coords="73,93,172,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="301,48,171,91,169,86,299,43"/>
+<area shape="rect" id="Node000011" href="$vega_8h.html" title="vega — Alcor2&#39;s shell scripting language. Public entry points." alt="" coords="510,93,613,119"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="406,43,519,86,517,91,404,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="211,167,283,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,119,249,153,244,153,244,119"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="104,167,187,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="232,121,175,161,172,156,229,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,167,80,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="215,121,89,165,88,160,213,116"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="307,167,378,192"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="264,117,317,156,314,160,261,121"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="403,167,488,192"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="279,116,401,159,399,164,278,121"/>
+<area shape="poly" id="edge10_Node000010_Node000004" title=" " alt="" coords="129,118,140,153,135,154,124,120"/>
+<area shape="poly" id="edge11_Node000010_Node000005" title=" " alt="" coords="112,121,68,160,64,156,108,117"/>
+</map>

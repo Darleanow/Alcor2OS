@@ -1,0 +1,28 @@
+<map id="src/drivers/keyboard/keyboard.c" name="src/drivers/keyboard/keyboard.c">
+<area shape="rect" id="Node000001" title="PS/2 keyboard driver with scancode translation." alt="" coords="373,5,528,45"/>
+<area shape="rect" id="Node000002" href="$cpu_8h.html" title="x86_64 CPU control and state management." alt="" coords="5,93,139,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="374,45,141,93,140,88,373,40"/>
+<area shape="rect" id="Node000007" href="$idt_8h.html" title="Interrupt Descriptor Table setup." alt="" coords="163,93,290,119"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="398,48,273,91,271,86,396,43"/>
+<area shape="rect" id="Node000008" href="$io_8h.html" title="x86 I/O port access functions." alt="" coords="315,93,437,119"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="435,47,399,85,395,81,431,44"/>
+<area shape="rect" id="Node000009" href="$pic_8h.html" title="8259 PIC (Programmable Interrupt Controller) driver." alt="" coords="462,93,591,119"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="471,44,508,81,504,85,467,47"/>
+<area shape="rect" id="Node000010" href="$keyboard_8h.html" title="PS/2 keyboard driver." alt="" coords="616,93,803,119"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="513,43,659,87,658,92,512,48"/>
+<area shape="rect" id="Node000011" href="$keyboard__internal_8h.html" title=" " alt="" coords="827,93,978,119"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="529,37,824,88,823,94,528,43"/>
+<area shape="rect" id="Node000003" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="393,167,508,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="133,116,380,162,379,167,132,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="307,240,389,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="436,194,378,234,375,230,433,190"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="413,240,488,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="453,192,453,226,448,226,448,192"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="513,240,583,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="468,190,522,229,519,234,465,194"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="263,116,402,160,401,165,262,121"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="390,117,430,155,427,159,386,121"/>
+<area shape="poly" id="edge11_Node000009_Node000003" title=" " alt="" coords="516,121,475,159,471,155,513,117"/>
+<area shape="poly" id="edge13_Node000010_Node000003" title=" " alt="" coords="668,121,506,166,505,160,667,116"/>
+<area shape="poly" id="edge15_Node000011_Node000003" title=" " alt="" coords="830,121,522,170,521,164,830,116"/>
+</map>

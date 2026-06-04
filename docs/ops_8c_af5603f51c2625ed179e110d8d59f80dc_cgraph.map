@@ -1,0 +1,30 @@
+<map id="ext2_ops_write" name="ext2_ops_write">
+<area shape="rect" id="Node000001" title="fs_ops_t.write shim." alt="" coords="5,81,127,107"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#a92b60c4777893b900adbd384b1710e7e" title="Write data to a file." alt="" coords="175,81,265,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,91,161,91,161,97,127,97"/>
+<area shape="rect" id="Node000003" href="$cache_8c.html#a8a62396b0bb6fb9b445be9aa68c99e3a" title="Borrow a one&#45;block scratch buffer from the pool." alt="" coords="315,7,446,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="241,79,312,41,327,34,330,39,314,46,244,84"/>
+<area shape="rect" id="Node000019" href="$cache_8c.html#a3f836c60fb5837ae4127d5de332b462e" title="Return a buffer obtained from cache_get_block." alt="" coords="315,56,446,81"/>
+<area shape="poly" id="edge4_Node000002_Node000019" title=" " alt="" coords="265,84,301,79,302,84,266,90"/>
+<area shape="rect" id="Node000034" href="$inode_8c.html#a83b9fef6ebc8d2289b2c6bd6258cf7bd" title="Persist inode to its on&#45;disk slot for inode number ino." alt="" coords="331,105,430,131"/>
+<area shape="poly" id="edge6_Node000002_Node000034" title=" " alt="" coords="266,98,318,106,317,111,265,103"/>
+<area shape="rect" id="Node000039" href="$file_8c.html#a1bf19aa4e4eb0e2f4cda410ebd135f37" title="Write count bytes to file at byte offset." alt="" coords="313,180,448,205"/>
+<area shape="poly" id="edge12_Node000002_Node000039" title=" " alt="" coords="243,105,348,170,346,175,241,109"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="525,5,599,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="446,16,510,16,511,21,447,22"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="534,55,590,80"/>
+<area shape="poly" id="edge5_Node000019_Node000020" title=" " alt="" coords="446,66,520,65,520,70,447,71"/>
+<area shape="poly" id="edge8_Node000034_Node000004" title=" " alt="" coords="422,103,447,90,461,78,470,66,479,53,494,40,510,31,513,36,498,44,483,57,474,69,465,82,449,95,425,108"/>
+<area shape="poly" id="edge7_Node000034_Node000020" title=" " alt="" coords="426,103,520,76,521,81,428,108"/>
+<area shape="rect" id="Node000033" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="695,119,781,144"/>
+<area shape="poly" id="edge9_Node000034_Node000033" title=" " alt="" coords="430,117,681,127,681,132,430,122"/>
+<area shape="rect" id="Node000035" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="678,193,798,219"/>
+<area shape="poly" id="edge10_Node000034_Node000035" title=" " alt="" coords="431,127,673,187,672,193,430,133"/>
+<area shape="rect" id="Node000037" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="676,243,800,268"/>
+<area shape="poly" id="edge11_Node000034_Node000037" title=" " alt="" coords="405,129,428,145,450,166,465,188,472,209,480,227,497,242,537,259,579,267,622,269,662,267,662,272,622,274,579,273,535,264,495,247,475,230,467,211,460,190,446,169,424,149,402,133"/>
+<area shape="rect" id="Node000040" href="$file_8c.html#ae37d4828b0eb47da6755a484e7876462" title="One iteration of the write loop: place one chunk into the file." alt="" coords="496,207,628,232"/>
+<area shape="poly" id="edge13_Node000039_Node000040" title=" " alt="" coords="448,200,483,205,482,210,448,205"/>
+<area shape="poly" id="edge14_Node000040_Node000033" title=" " alt="" coords="587,204,698,148,701,153,590,209"/>
+<area shape="poly" id="edge15_Node000040_Node000035" title=" " alt="" coords="628,212,664,209,664,214,629,217"/>
+<area shape="poly" id="edge16_Node000040_Node000037" title=" " alt="" coords="625,229,663,237,662,242,624,235"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="read_one_iteration" name="read_one_iteration">
+<area shape="rect" id="Node000001" title="One iteration of the read loop: pick the right path for one block and copy as much as fits." alt="" coords="492,5,636,31"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#a54bf1c29b72ee0ddfe0f61cca9f45e9e" title="Drive the read loop with pre&#45;allocated buffers." alt="" coords="305,5,444,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,21,444,21,444,15,478,15"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#ac244024eb57350647fc868bd02827b03" title="Read up to count bytes from file at byte offset." alt="" coords="171,5,257,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="292,21,257,21,257,15,292,15"/>
+<area shape="rect" id="Node000004" href="$ops_8c.html#a7d4c82aac4f89abf698c21972978b332" title="fs_ops_t.read shim." alt="" coords="5,5,123,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="157,21,123,21,123,15,157,15"/>
+</map>

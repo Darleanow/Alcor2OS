@@ -1,0 +1,18 @@
+<map id="csi_param1" name="csi_param1">
+<area shape="rect" id="Node000001" title="Convenience for cursor&#45;movement sequences: parse first param, default to 1 when missing or zero." alt="" coords="489,80,587,105"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a622e3df5e2c60fd455043e5a1d8ef75a" title="CSI G (CHA) / CSI d (VPA) — absolute column or row positioning. Both are 1&#45;based on the wire and clam..." alt="" coords="304,5,441,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="502,76,440,44,412,33,414,28,442,40,504,71"/>
+<area shape="rect" id="Node000014" href="$csi_8c.html#a054574007ff5c6dea6a9a9806d66829d" title="CSI A/B/C/D — relative cursor motion, clamped to the grid edge." alt="" coords="307,55,438,80"/>
+<area shape="poly" id="edge4_Node000001_Node000014" title=" " alt="" coords="475,86,438,80,439,75,476,81"/>
+<area shape="rect" id="Node000015" href="$csi_8c.html#a70429ceb320ba5d04cd0d21ea2b0983f" title="CSI X (ECH) — erase Pn chars at the cursor, no cursor move." alt="" coords="310,104,435,129"/>
+<area shape="poly" id="edge6_Node000001_Node000015" title=" " alt="" coords="476,104,436,110,435,105,475,99"/>
+<area shape="rect" id="Node000016" href="$csi_8c.html#a7db7ffbb34457f15e761ac21391d95f5" title="CSI b (REP) — repeat the last emitted codepoint Pn times." alt="" coords="328,153,417,179"/>
+<area shape="poly" id="edge8_Node000001_Node000016" title=" " alt="" coords="502,114,442,143,411,156,409,151,440,138,500,109"/>
+<area shape="rect" id="Node000003" href="$csi_8c.html#a13481ca709daa8398739bba14a24f240" title="Final&#45;byte dispatcher for the assembled CSI sequence." alt="" coords="165,80,256,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="320,38,305,44,234,82,232,77,303,40,318,33"/>
+<area shape="rect" id="Node000004" href="$ansi_8c.html#a02fc143e65dd6786ede77f13e0d80641" title="Handle one byte while the parser is accumulating a CSI sequence." alt="" coords="5,80,117,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="152,95,118,95,118,90,152,90"/>
+<area shape="poly" id="edge5_Node000014_Node000003" title=" " alt="" coords="294,82,256,88,256,83,293,77"/>
+<area shape="poly" id="edge7_Node000015_Node000003" title=" " alt="" coords="296,108,256,102,257,97,297,103"/>
+<area shape="poly" id="edge9_Node000016_Node000003" title=" " alt="" coords="321,151,303,143,233,108,236,103,305,138,323,146"/>
+</map>

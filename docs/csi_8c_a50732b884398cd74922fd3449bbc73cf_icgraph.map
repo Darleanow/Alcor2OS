@@ -1,0 +1,9 @@
+<map id="csi_dec_private" name="csi_dec_private">
+<area shape="rect" id="Node000001" title="CSI ?N h / CSI ?N l — DEC private mode set/reset." alt="" coords="439,5,561,31"/>
+<area shape="rect" id="Node000002" href="$csi_8c.html#a13481ca709daa8398739bba14a24f240" title="Final&#45;byte dispatcher for the assembled CSI sequence." alt="" coords="300,5,391,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="425,21,391,21,391,15,425,15"/>
+<area shape="rect" id="Node000003" href="$ansi_8c.html#a02fc143e65dd6786ede77f13e0d80641" title="Handle one byte while the parser is accumulating a CSI sequence." alt="" coords="140,5,252,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="287,21,252,21,252,15,287,15"/>
+<area shape="rect" id="Node000004" href="$ansi_8c.html#aed57f05021fc0a714155c4f892ef5cee" title="Top&#45;level byte sink: drive the ESC/CSI state machine, fall through to UTF&#45;8 on plain bytes." alt="" coords="5,5,92,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
+</map>

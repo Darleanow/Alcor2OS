@@ -1,0 +1,13 @@
+<map id="caret_invalidate_in_batch" name="caret_invalidate_in_batch">
+<area shape="rect" id="Node000001" title="Mark the cell currently under the caret dirty for the next flush_batch and forget the tracker...." alt="" coords="577,47,724,87"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a8c908a73a21b548d5b02de14d05fb068" title="Open a writev&#45;style batch: subsequent feed bytes go through the dirty&#45;cell pipeline rather than blitt..." alt="" coords="355,55,529,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="564,70,529,70,529,65,564,65"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="175,55,307,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,70,307,70,307,65,341,65"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a6daec33a349a589e3e1c460d7a5d8d7e" title=" " alt="" coords="9,5,123,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="181,53,111,33,113,28,183,48"/>
+<area shape="rect" id="Node000008" href="$kbd__layout_8c.html#a16b699983816072933124817dffd01f5" title=" " alt="" coords="5,55,127,80"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="161,70,127,70,127,65,161,65"/>
+<area shape="rect" id="Node000009" href="$dev__nodes_8c.html#ab43944d5ee5d8a1e7a2ebece7102cbac" title="Write to /dev/tty — delegates to fb_console." alt="" coords="26,104,106,129"/>
+<area shape="poly" id="edge5_Node000003_Node000009" title=" " alt="" coords="183,86,107,108,105,103,181,81"/>
+</map>

@@ -1,0 +1,21 @@
+<map id="user/lib/grendizer.c" name="user/lib/grendizer.c">
+<area shape="rect" id="Node000001" title="Grendizer argument&#45;parsing library — flags, options, subcommands, and help generation." alt="" coords="310,5,455,31"/>
+<area shape="rect" id="Node000002" href="$grendizer_8h.html" title="Single&#45;header CLI parsing library for Alcor2 userland." alt="" coords="42,79,137,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="336,33,151,78,149,73,335,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="161,79,231,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="354,33,240,76,238,71,352,28"/>
+<area shape="rect" id="Node000006" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="255,79,323,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="369,33,317,72,314,68,366,29"/>
+<area shape="rect" id="Node000007" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="347,79,418,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="385,31,385,65,380,65,380,31"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="443,79,517,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="400,29,454,68,451,72,397,33"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="542,79,613,104"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="415,28,534,71,532,76,413,33"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="637,79,707,104"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="430,28,624,76,623,81,429,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,80,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="84,106,60,142,56,139,79,103"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="104,152,171,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="99,103,124,139,120,142,95,106"/>
+</map>

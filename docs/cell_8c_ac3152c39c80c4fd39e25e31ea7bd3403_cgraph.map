@@ -1,0 +1,9 @@
+<map id="blend_atlas_pixel" name="blend_atlas_pixel">
+<area shape="rect" id="Node000001" title="Blend one atlas pixel onto the framebuffer at (x, y)." alt="" coords="5,31,140,56"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="188,31,289,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,41,175,41,175,46,140,46"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="337,5,428,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="289,32,323,26,324,31,290,37"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="337,55,428,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="290,49,324,55,323,60,289,54"/>
+</map>

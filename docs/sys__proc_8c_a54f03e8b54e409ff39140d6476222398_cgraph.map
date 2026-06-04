@@ -1,0 +1,33 @@
+<map id="sys_wait4" name="sys_wait4">
+<area shape="rect" id="Node000001" title="Wait for a child process to change state (wait4)." alt="" coords="5,229,92,255"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#a6915d539f11de3b93e8316c67f23301b" title="Wait for child process(es) to change state." alt="" coords="140,180,245,205"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,227,141,207,143,212,87,232"/>
+<area shape="rect" id="Node000035" href="$sys__proc_8c.html#a8a3d72124ddacfcc1825b04f29980211" title="Return true if ptr..ptr+size is a valid user&#45;space range." alt="" coords="142,253,243,279"/>
+<area shape="poly" id="edge15_Node000001_Node000035" title=" " alt="" coords="92,247,129,253,128,258,92,252"/>
+<area shape="rect" id="Node000003" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="375,55,431,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="208,177,245,148,292,116,361,81,363,86,295,120,248,152,211,182"/>
+<area shape="rect" id="Node000017" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="363,131,442,156"/>
+<area shape="poly" id="edge5_Node000002_Node000017" title=" " alt="" coords="242,177,293,165,349,152,351,157,294,170,243,183"/>
+<area shape="rect" id="Node000018" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="345,180,460,205"/>
+<area shape="poly" id="edge6_Node000002_Node000018" title=" " alt="" coords="246,190,332,190,332,195,246,195"/>
+<area shape="rect" id="Node000028" href="$vmm_8c.html#a8966edc063e975473a71b57a1b39c886" title="Destroy all user mappings in an address space." alt="" coords="293,229,512,255"/>
+<area shape="poly" id="edge11_Node000002_Node000028" title=" " alt="" coords="246,203,294,214,334,224,333,229,293,219,245,208"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="605,5,684,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="430,59,591,26,592,31,432,64"/>
+<area shape="rect" id="Node000005" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="590,55,699,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="431,65,576,65,576,70,431,70"/>
+<area shape="rect" id="Node000019" href="$cpu_8c.html#a1f3ae9aa674e5b660124c7e9fad54928" title="Disable hardware interrupts (CLI instruction)." alt="" coords="560,104,729,129"/>
+<area shape="poly" id="edge7_Node000018_Node000019" title=" " alt="" coords="460,178,511,165,559,146,596,132,598,137,561,151,513,170,461,184"/>
+<area shape="rect" id="Node000020" href="$cpu_8c.html#a741f34982afa41a0146c74aa5cf2c89d" title="Enable hardware interrupts (STI instruction)." alt="" coords="777,180,944,205"/>
+<area shape="poly" id="edge8_Node000018_Node000020" title=" " alt="" coords="460,190,763,190,763,195,460,195"/>
+<area shape="rect" id="Node000021" href="$proc_8c.html#a42b0a4a25611290b8068406072f8d171" title="Switch to a different process." alt="" coords="595,205,694,231"/>
+<area shape="poly" id="edge9_Node000018_Node000021" title=" " alt="" coords="460,196,582,209,582,214,460,201"/>
+<area shape="poly" id="edge10_Node000021_Node000020" title=" " alt="" coords="694,210,764,201,764,207,695,215"/>
+<area shape="rect" id="Node000029" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="816,284,905,309"/>
+<area shape="poly" id="edge12_Node000028_Node000029" title=" " alt="" coords="510,252,803,287,802,292,509,257"/>
+<area shape="rect" id="Node000032" href="$vmm_8c.html#a3eadd86d1ef97e747a31e69e7f5f834f" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="565,306,724,346"/>
+<area shape="poly" id="edge13_Node000028_Node000032" title=" " alt="" coords="472,252,513,263,589,298,587,303,511,269,471,257"/>
+<area shape="poly" id="edge14_Node000032_Node000029" title=" " alt="" coords="724,313,802,302,803,307,725,318"/>
+<area shape="rect" id="Node000036" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="326,279,479,304"/>
+<area shape="poly" id="edge16_Node000035_Node000036" title=" " alt="" coords="244,269,312,278,312,283,243,275"/>
+</map>

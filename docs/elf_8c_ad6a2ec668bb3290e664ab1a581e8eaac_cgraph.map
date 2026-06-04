@@ -1,0 +1,21 @@
+<map id="elf_copy_to_mapped" name="elf_copy_to_mapped">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,163,81"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="229,5,315,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,53,215,31,216,36,133,58"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="699,131,827,156"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,60,262,57,384,59,518,69,586,78,651,91,692,105,728,122,726,126,690,110,650,97,585,83,518,74,384,64,262,62,163,66"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#a79058902336b9774ccdf1efa90360b18" title="Translate virtual address to physical address in current address space." alt="" coords="211,131,333,156"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="118,79,228,123,226,128,116,84"/>
+<area shape="rect" id="Node000005" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="387,107,495,132"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="333,132,373,126,373,132,334,137"/>
+<area shape="rect" id="Node000006" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="381,156,500,181"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="334,150,368,155,367,160,333,155"/>
+<area shape="rect" id="Node000008" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="548,205,651,231"/>
+<area shape="poly" id="edge10_Node000004_Node000008" title=" " alt="" coords="297,154,336,173,382,190,461,206,534,213,534,218,460,211,381,195,334,178,295,158"/>
+<area shape="rect" id="Node000007" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="570,107,629,132"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="481,153,556,130,558,135,483,159"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="483,179,545,199,544,204,481,184"/>
+<area shape="rect" id="Node000009" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="552,156,647,181"/>
+<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="500,166,538,166,538,171,500,171"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="627,203,721,159,723,164,629,208"/>
+</map>

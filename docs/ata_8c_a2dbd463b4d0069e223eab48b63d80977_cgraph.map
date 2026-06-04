@@ -1,0 +1,7 @@
+<map id="channel_exists" name="channel_exists">
+<area shape="rect" id="Node000001" title="Check whether a device is present (0xFF = floating bus)." alt="" coords="5,5,124,31"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a2e42765bdca6c8d40cafe008a9c35e7e" title=" " alt="" coords="172,5,251,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,15,158,15,158,21,124,21"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="299,5,341,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="251,15,285,15,285,21,251,21"/>
+</map>

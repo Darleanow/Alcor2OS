@@ -1,0 +1,10 @@
+<map id="tty_echo_erase" name="tty_echo_erase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="544,31,665,56"/>
+<area shape="rect" id="Node000002" href="$kbd__layout_8c.html#a7563fa1166b876f198b727e912747c09" title="read(2) on stdin honoring the process&#39;s termios (ICANON, VMIN/VTIME)." alt="" coords="332,31,496,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="530,46,496,46,496,41,530,41"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a79e8864bb2dd3b40d30c0698f74b0485" title="Block until at least one layout&#45;translated byte is available." alt="" coords="129,5,284,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="318,34,284,30,285,25,319,29"/>
+<area shape="rect" id="Node000004" href="$dev__nodes_8c.html#a6687d841b4dafd7f557c59776162e139" title="Read from /dev/tty — delegates to the keyboard line discipline." alt="" coords="5,31,81,56"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="318,46,82,46,82,41,318,41"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="116,35,82,40,81,35,116,29"/>
+</map>

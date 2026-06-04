@@ -1,0 +1,11 @@
+<map id="flush_paint_scanline" name="flush_paint_scanline">
+<area shape="rect" id="Node000001" title="Paint one scanline of one dirty cell using its prepared scratch." alt="" coords="532,31,687,56"/>
+<area shape="rect" id="Node000002" href="$flush_8c.html#a984113b561a25595c581b446ee4cbc8a" title="Walk the scratch across one cell&#45;row&#39;s scanlines and clear the dirty bits when done." alt="" coords="360,31,484,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="518,46,484,46,484,41,518,41"/>
+<area shape="rect" id="Node000003" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="216,31,312,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,46,312,46,312,41,346,41"/>
+<area shape="rect" id="Node000004" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="44,5,129,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,37,129,27,130,21,203,32"/>
+<area shape="rect" id="Node000009" href="$api_8c.html#a7654752ac7d61f4811d1c6b0cd53f56c" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="5,55,168,80"/>
+<area shape="poly" id="edge4_Node000003_Node000009" title=" " alt="" coords="203,54,169,59,168,54,202,49"/>
+</map>

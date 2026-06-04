@@ -1,0 +1,24 @@
+<map id="ext2_open" name="ext2_open">
+<area shape="rect" id="Node000001" title="Open a file or directory on an ext2 volume." alt="" coords="5,55,96,80"/>
+<area shape="rect" id="Node000002" href="$file_8c.html#aa3c8beeea4f60f26421b5a976665fd73" title="Claim the first free slot in g_files." alt="" coords="144,5,293,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,52,160,32,162,37,95,57"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#aebf35ae67d090bcb845d2751fc1be7c8" title="Populate a file handle from a resolved inode." alt="" coords="161,55,277,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="96,65,147,65,147,70,96,70"/>
+<area shape="rect" id="Node000004" href="$path_8c.html#a52cd8a353f2fd5f102cc93c1c54edc15" title="Resolve a full path to an inode number + inode struct." alt="" coords="165,104,272,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="95,77,162,97,160,102,94,83"/>
+<area shape="rect" id="Node000005" href="$path_8c.html#aefec2dd09b8bfaabb8e23f1572eaaf4b" title="Resolve a path to an inode, following symlinks." alt="" coords="341,104,492,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="272,114,328,114,328,119,272,119"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#a1ee9b97ad659037ba6daf98198869675" title="Reparent a path through a symlink and recurse." alt="" coords="549,28,705,53"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="474,101,593,57,595,62,476,106"/>
+<area shape="rect" id="Node000009" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="771,53,849,79"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="492,104,757,70,757,75,493,110"/>
+<area shape="rect" id="Node000044" href="$path_8c.html#aafde89a77c03337dd6c31bf0fb23a814" title="Advance *p past one path component into component." alt="" coords="540,129,715,155"/>
+<area shape="poly" id="edge9_Node000005_Node000044" title=" " alt="" coords="493,123,527,127,526,133,492,128"/>
+<area shape="rect" id="Node000045" href="$inode_8c.html#aba1cf116b95090ec043930c6efaa8dce" title="Load on&#45;disk inode ino into the caller&#45;provided inode." alt="" coords="763,205,857,231"/>
+<area shape="poly" id="edge10_Node000005_Node000045" title=" " alt="" coords="446,127,490,146,541,163,651,190,750,207,749,212,650,195,539,169,488,151,444,132"/>
+<area shape="rect" id="Node000046" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="545,231,709,256"/>
+<area shape="poly" id="edge11_Node000005_Node000046" title=" " alt="" coords="433,128,479,167,541,209,572,223,570,228,539,214,476,171,430,132"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="570,56,451,101,449,96,568,51"/>
+<area shape="poly" id="edge6_Node000006_Node000009" title=" " alt="" coords="706,49,757,56,756,61,705,54"/>
+<area shape="poly" id="edge12_Node000046_Node000045" title=" " alt="" coords="709,229,749,224,750,229,710,235"/>
+</map>

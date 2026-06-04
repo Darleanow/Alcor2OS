@@ -1,0 +1,24 @@
+<map id="user/bin/ls.c" name="user/bin/ls.c">
+<area shape="rect" id="Node000001" title="List directory contents with columnar layout and Catppuccin colors." alt="" coords="305,5,405,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,77,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="305,33,91,81,90,76,304,28"/>
+<area shape="rect" id="Node000003" href="$grendizer_8h.html" title="Single&#45;header CLI parsing library for Alcor2 userland." alt="" coords="102,79,197,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="323,33,196,77,195,72,321,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="201,152,268,177"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="327,33,293,52,262,80,247,109,240,139,235,138,242,107,258,77,290,48,325,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="273,79,343,104"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="349,32,325,69,321,66,345,30"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="367,79,438,104"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="365,30,390,66,385,69,360,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="463,79,551,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="380,28,471,70,469,75,378,33"/>
+<area shape="rect" id="Node000009" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="575,79,651,104"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="397,28,563,73,562,79,396,33"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="676,79,751,104"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="406,26,663,76,662,81,405,31"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="103,152,177,177"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="150,105,146,139,141,138,145,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="165,102,212,141,209,145,161,106"/>
+<area shape="rect" id="Node000010" href="$catppuccin_8h.html" title="Catppuccin Mocha palette — xterm&#45;256 indices and true&#45;colour ANSI escapes." alt="" coords="561,152,665,177"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="616,104,616,138,611,138,611,104"/>
+</map>

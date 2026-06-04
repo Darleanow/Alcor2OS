@@ -1,0 +1,11 @@
+<map id="pci_read16" name="pci_read16">
+<area shape="rect" id="Node000001" title="Read 16&#45;bit value from PCI configuration space." alt="" coords="5,55,99,80"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#ae8802a65150faad75ccd3af146dbfdff" title="Read 32&#45;bit value from PCI configuration space." alt="" coords="147,55,240,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,65,133,65,133,70,99,70"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a7f72742d7f484f7f9884aa5b89e69693" title="Read a dword from an I/O port." alt="" coords="307,5,346,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="227,52,293,27,295,32,229,57"/>
+<area shape="rect" id="Node000004" href="$io_8h.html#afc646bf3a7c97a44d32ec4f9b4ab2984" title="Write a dword to an I/O port." alt="" coords="303,55,350,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="240,65,290,65,290,70,240,70"/>
+<area shape="rect" id="Node000005" href="$pci_8c.html#aaa6afa93d90d8f830d099a700a818f7d" title=" " alt="" coords="288,104,365,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="229,78,279,96,278,101,227,83"/>
+</map>

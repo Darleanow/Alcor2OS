@@ -1,0 +1,22 @@
+<map id="vmm_map" name="vmm_map">
+<area shape="rect" id="Node000001" title="Map a virtual page to a physical page." alt="" coords="5,80,97,105"/>
+<area shape="rect" id="Node000002" href="$cpu_8c.html#a79c2518c5bb9a861f616254c974685b4" title="Invalidate a single page in the TLB." alt="" coords="159,5,251,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,78,144,40,157,34,159,39,147,44,76,82"/>
+<area shape="rect" id="Node000003" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="151,55,259,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="97,83,137,76,138,81,98,88"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="145,104,264,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="98,97,132,103,131,108,97,102"/>
+<area shape="rect" id="Node000006" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="312,155,415,180"/>
+<area shape="poly" id="edge10_Node000001_Node000006" title=" " alt="" coords="73,103,106,123,146,139,224,156,298,163,298,169,224,162,145,145,104,127,70,108"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="334,105,393,131"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="264,114,320,115,320,120,264,120"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="246,127,311,148,309,153,245,132"/>
+<area shape="rect" id="Node000008" href="$pmm_8c.html#aaf1cb4d4ed39fc7c0f16f239076e2817" title="Allocate a single 4KB physical page." alt="" coords="316,56,411,81"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="247,101,306,83,308,88,248,106"/>
+<area shape="rect" id="Node000007" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="463,155,591,180"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="415,165,448,165,448,170,415,170"/>
+<area shape="rect" id="Node000009" href="$pmm_8c.html#aaed7a89cb2264555f10bf9e03b06676e" title="Mark page as allocated in bitmap." alt="" coords="479,81,574,107"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="411,73,466,82,465,87,410,79"/>
+<area shape="rect" id="Node000010" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="477,32,577,57"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="410,59,462,51,463,57,411,64"/>
+</map>

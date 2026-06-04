@@ -1,0 +1,7 @@
+<map id="vfs_path_starts_with" name="vfs_path_starts_with">
+<area shape="rect" id="Node000001" title="Return true if path begins with prefix as a path component." alt="" coords="5,31,163,56"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="219,5,285,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,29,204,22,205,28,163,34"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#ab77d8981772dbf05f403fca1354eb314" title="Compare two strings up to n characters." alt="" coords="211,55,293,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,52,197,57,197,62,162,57"/>
+</map>

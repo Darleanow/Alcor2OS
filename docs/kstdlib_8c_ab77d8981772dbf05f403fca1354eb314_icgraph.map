@@ -1,0 +1,38 @@
+<map id="kstrncmp" name="kstrncmp">
+<area shape="rect" id="Node000001" title="Compare two strings up to n characters." alt="" coords="780,141,863,167"/>
+<area shape="rect" id="Node000002" href="$dir__entry_8c.html#a7e797fd0335d62d125f2361b79980b4e" title="Locate the dirent named name inside a single block buffer." alt="" coords="563,68,719,93"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="775,139,672,96,674,91,777,134"/>
+<area shape="rect" id="Node000023" href="$dir__entry_8c.html#a1c2bfaa849681e0907cbb210cfd55bde" title="Remove the dirent named name from a single block buffer." alt="" coords="549,141,732,167"/>
+<area shape="poly" id="edge5_Node000001_Node000023" title=" " alt="" coords="766,157,732,157,732,151,766,151"/>
+<area shape="rect" id="Node000025" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="562,240,719,265"/>
+<area shape="poly" id="edge9_Node000001_Node000025" title=" " alt="" coords="787,175,667,242,664,237,784,171"/>
+<area shape="rect" id="Node000003" href="$dir__entry_8c.html#a44847a1e74b0df6de11296fd8980308e" title="Find a directory entry by name." alt="" coords="377,55,488,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="549,77,488,74,489,68,549,72"/>
+<area shape="rect" id="Node000004" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="179,5,289,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="367,54,285,33,287,28,368,49"/>
+<area shape="rect" id="Node000006" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="152,55,316,80"/>
+<area shape="poly" id="edge4_Node000003_Node000006" title=" " alt="" coords="364,70,316,70,316,65,364,65"/>
+<area shape="rect" id="Node000024" href="$dir__entry_8c.html#af34fc009f5ec9683665f000e226a64bd" title="Remove a directory entry." alt="" coords="364,141,501,167"/>
+<area shape="poly" id="edge6_Node000023_Node000024" title=" " alt="" coords="536,157,502,157,502,151,536,151"/>
+<area shape="rect" id="Node000013" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="187,104,281,129"/>
+<area shape="poly" id="edge7_Node000024_Node000013" title=" " alt="" coords="351,141,280,128,281,123,352,136"/>
+<area shape="rect" id="Node000017" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="185,153,283,179"/>
+<area shape="poly" id="edge8_Node000024_Node000017" title=" " alt="" coords="350,162,284,166,284,160,350,156"/>
+<area shape="rect" id="Node000026" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="371,327,494,352"/>
+<area shape="poly" id="edge10_Node000025_Node000026" title=" " alt="" coords="597,273,465,329,463,324,595,268"/>
+<area shape="rect" id="Node000027" href="$vfs_8c.html#a01c1203977d3bd65619c0c17a45fa5d1" title="Create a directory at path via the responsible driver." alt="" coords="191,203,277,228"/>
+<area shape="poly" id="edge11_Node000026_Node000027" title=" " alt="" coords="409,319,368,279,315,242,277,227,279,222,317,237,371,275,413,315"/>
+<area shape="rect" id="Node000029" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="193,252,275,277"/>
+<area shape="poly" id="edge12_Node000026_Node000029" title=" " alt="" coords="391,323,315,291,274,278,276,273,317,286,393,318"/>
+<area shape="rect" id="Node000037" href="$vfs_8c.html#ad7ec41d06faa2ce0fc58d46873948f75" title="Read the target of the symbolic link at path into buf." alt="" coords="183,301,285,327"/>
+<area shape="poly" id="edge13_Node000026_Node000037" title=" " alt="" coords="357,332,285,323,286,318,358,327"/>
+<area shape="rect" id="Node000039" href="$vfs_8c.html#a9381581b42a850046ecb0593a98bd3af" title="Rename (move) a file, copying across mount points if necessary." alt="" coords="5,403,104,428"/>
+<area shape="poly" id="edge14_Node000026_Node000039" title=" " alt="" coords="358,354,153,393,102,405,101,400,151,387,357,348"/>
+<area shape="rect" id="Node000041" href="$vfs_8c.html#a30b9db50187eccd6bf2e1cd0cef5b7a9" title="Remove the empty directory at path." alt="" coords="192,403,276,428"/>
+<area shape="poly" id="edge15_Node000026_Node000041" title=" " alt="" coords="387,359,269,405,267,400,385,354"/>
+<area shape="rect" id="Node000043" href="$vfs_8c.html#ac63ecbe35faf5ad2dbbddfc026f86428" title="Stat the node at path via the responsible driver." alt="" coords="197,452,271,477"/>
+<area shape="poly" id="edge16_Node000026_Node000043" title=" " alt="" coords="412,364,371,404,317,442,273,459,271,454,315,437,367,399,409,360"/>
+<area shape="rect" id="Node000051" href="$vfs_8c.html#ae501b60ae231b75a9b8efbf7cac10324" title="Delete the file at path; fails if it is a directory." alt="" coords="189,501,279,527"/>
+<area shape="poly" id="edge18_Node000026_Node000051" title=" " alt="" coords="421,366,380,428,351,462,317,491,280,508,278,503,315,486,347,458,376,425,416,363"/>
+<area shape="poly" id="edge17_Node000043_Node000039" title=" " alt="" coords="183,454,101,431,102,425,184,448"/>
+</map>

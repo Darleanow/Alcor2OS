@@ -1,0 +1,36 @@
+<map id="src/fs/vfs.c" name="src/fs/vfs.c">
+<area shape="rect" id="Node000001" title="Virtual File System orchestration layer." alt="" coords="293,5,385,31"/>
+<area shape="rect" id="Node000002" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="5,79,117,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="295,33,120,78,119,73,293,28"/>
+<area shape="rect" id="Node000003" href="$fs_2pipe_8h.html" title="Kernel pipe object interface shared by the VFS and syscall layers." alt="" coords="885,152,1008,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="385,24,509,45,658,76,790,112,900,145,898,150,788,117,657,81,508,50,384,29"/>
+<area shape="rect" id="Node000008" href="$vfs_8h.html" title="Virtual File System orchestration layer." alt="" coords="357,79,472,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="353,29,394,67,390,71,349,33"/>
+<area shape="rect" id="Node000010" href="$kstdlib_8h.html" title="Kernel micro standard library." alt="" coords="97,152,220,177"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="293,28,235,45,207,60,183,80,168,108,162,139,157,138,163,107,179,77,204,56,233,40,292,23"/>
+<area shape="rect" id="Node000011" href="$heap_8h.html" title="Kernel heap allocator." alt="" coords="193,79,333,104"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="328,33,287,71,283,67,325,29"/>
+<area shape="rect" id="Node000012" href="$proc_8h.html" title="Process management and scheduling." alt="" coords="507,79,645,104"/>
+<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="378,28,525,72,524,77,376,33"/>
+<area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="519,225,633,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="888,180,648,226,647,221,887,175"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="432,299,515,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="561,253,503,293,500,288,558,248"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="539,299,613,324"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="579,251,579,285,573,285,573,251"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="638,299,709,324"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="593,249,648,288,645,292,590,253"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="391,106,366,120,344,138,332,157,332,166,337,176,362,193,405,207,505,226,504,231,403,212,360,198,333,179,327,167,327,156,340,134,363,116,388,102"/>
+<area shape="rect" id="Node000009" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="347,152,477,177"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="417,104,416,139,410,138,412,104"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="221,174,505,222,504,227,220,179"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="270,103,290,139,305,159,324,175,368,198,415,215,462,225,505,231,505,236,461,230,413,220,365,203,321,180,302,162,286,142,265,105"/>
+<area shape="poly" id="edge20_Node000012_Node000004" title=" " alt="" coords="607,102,639,121,654,134,665,151,668,172,658,192,640,208,618,221,615,217,637,204,654,189,663,172,660,153,650,138,636,125,604,106"/>
+<area shape="poly" id="edge15_Node000012_Node000009" title=" " alt="" coords="551,106,452,149,450,144,549,102"/>
+<area shape="rect" id="Node000013" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="725,152,861,177"/>
+<area shape="poly" id="edge16_Node000012_Node000013" title=" " alt="" coords="612,101,746,145,744,150,610,107"/>
+<area shape="rect" id="Node000014" href="$signal_8h.html" title="POSIX signal handling infrastructure (Linux x86_64 compatible)." alt="" coords="501,152,651,177"/>
+<area shape="poly" id="edge18_Node000012_Node000014" title=" " alt="" coords="579,104,579,138,573,138,573,104"/>
+<area shape="poly" id="edge17_Node000013_Node000004" title=" " alt="" coords="759,180,625,224,623,218,758,175"/>
+<area shape="poly" id="edge19_Node000014_Node000004" title=" " alt="" coords="579,178,579,212,573,212,573,178"/>
+</map>

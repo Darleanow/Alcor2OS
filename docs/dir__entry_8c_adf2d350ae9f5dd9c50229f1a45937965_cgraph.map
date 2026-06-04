@@ -1,0 +1,40 @@
+<map id="dir_grow_with_entry" name="dir_grow_with_entry">
+<area shape="rect" id="Node000001" title="Grow the directory by one block, seeded with the new entry." alt="" coords="5,233,160,259"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#ab4eb8bfa2badf37a0c74bd07e5dc145c" title="Reserve the block at file&#45;relative index file_block." alt="" coords="208,207,331,232"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,232,194,227,195,233,161,238"/>
+<area shape="rect" id="Node000040" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="775,207,899,232"/>
+<area shape="poly" id="edge18_Node000001_Node000040" title=" " alt="" coords="142,256,252,275,398,290,479,293,562,291,645,283,726,267,750,257,773,242,789,235,792,240,776,247,753,261,727,273,646,288,563,296,479,298,398,295,251,280,141,261"/>
+<area shape="rect" id="Node000044" href="$dir__entry_8c.html#a4a174295910c4180d3a7eb81d689b6f9" title="Lay a single dirent in a freshly allocated, zeroed block." alt="" coords="583,333,723,359"/>
+<area shape="poly" id="edge15_Node000001_Node000044" title=" " alt="" coords="103,256,149,286,209,311,304,333,401,344,492,348,570,348,570,353,492,354,400,349,303,338,207,317,147,290,100,261"/>
+<area shape="rect" id="Node000045" href="$inode_8c.html#a83b9fef6ebc8d2289b2c6bd6258cf7bd" title="Persist inode to its on&#45;disk slot for inode number ino." alt="" coords="604,80,703,105"/>
+<area shape="poly" id="edge19_Node000001_Node000045" title=" " alt="" coords="106,231,220,174,297,142,378,117,433,105,490,97,590,91,590,96,490,103,434,110,379,122,299,147,222,179,108,236"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html#a871be77d1ce03e491179610dd24933b6" title="Resolve slot slot_idx of indirect_block; allocate it if hole." alt="" coords="379,132,532,157"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,204,378,168,399,159,401,164,380,172,298,209"/>
+<area shape="rect" id="Node000042" href="$blockmap_8c.html#a2d96b97f05d3673cdd0ec0d5683fb866" title="Resolve top&#45;level inode slot slot_idx; allocate it if hole." alt="" coords="385,232,525,257"/>
+<area shape="poly" id="edge12_Node000002_Node000042" title=" " alt="" coords="331,225,372,231,371,236,330,230"/>
+<area shape="rect" id="Node000043" href="$blockmap_8c.html#ae0cee49141d18668ec4dd1734d0a3e45" title="Number of u32 block&#45;pointer slots per indirect block." alt="" coords="397,183,514,208"/>
+<area shape="poly" id="edge14_Node000002_Node000043" title=" " alt="" coords="330,209,382,202,383,207,331,214"/>
+<area shape="rect" id="Node000004" href="$blockmap_8c.html#a4888ff3d79af7bc66c91c7f9d349c3c0" title="Allocate a fresh block, zero it, and bill the inode for it." alt="" coords="580,232,727,257"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="505,155,533,168,558,189,582,210,606,224,604,229,578,215,554,193,531,172,503,160"/>
+<area shape="rect" id="Node000009" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="809,131,865,156"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="532,142,795,141,795,146,532,147"/>
+<area shape="rect" id="Node000023" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="799,80,874,105"/>
+<area shape="poly" id="edge9_Node000003_Node000023" title=" " alt="" coords="469,130,516,95,546,78,579,65,634,56,690,57,742,64,787,74,786,80,741,69,689,62,634,61,581,70,549,83,519,100,472,134"/>
+<area shape="poly" id="edge11_Node000003_Node000040" title=" " alt="" coords="522,155,761,202,760,207,521,160"/>
+<area shape="rect" id="Node000038" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="777,5,897,31"/>
+<area shape="poly" id="edge10_Node000003_Node000038" title=" " alt="" coords="466,130,512,85,544,61,579,42,625,27,673,18,762,12,763,17,674,23,626,32,581,47,546,66,515,89,470,134"/>
+<area shape="poly" id="edge4_Node000004_Node000009" title=" " alt="" coords="676,230,799,160,802,165,679,234"/>
+<area shape="poly" id="edge5_Node000004_Node000023" title=" " alt="" coords="662,230,706,176,738,144,773,116,785,109,788,113,776,120,741,148,710,180,666,234"/>
+<area shape="rect" id="Node000033" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="807,307,866,332"/>
+<area shape="poly" id="edge6_Node000004_Node000033" title=" " alt="" coords="687,255,796,300,794,305,685,260"/>
+<area shape="poly" id="edge7_Node000004_Node000040" title=" " alt="" coords="727,232,761,227,761,232,727,237"/>
+<area shape="poly" id="edge13_Node000042_Node000004" title=" " alt="" coords="526,242,566,242,566,247,526,247"/>
+<area shape="poly" id="edge17_Node000044_Node000033" title=" " alt="" coords="723,333,793,323,794,328,724,338"/>
+<area shape="rect" id="Node000022" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="793,256,880,281"/>
+<area shape="poly" id="edge16_Node000044_Node000022" title=" " alt="" coords="683,331,792,284,794,289,686,336"/>
+<area shape="poly" id="edge20_Node000045_Node000009" title=" " alt="" coords="701,103,796,130,795,135,700,108"/>
+<area shape="poly" id="edge21_Node000045_Node000023" title=" " alt="" coords="703,90,785,90,785,95,703,95"/>
+<area shape="poly" id="edge24_Node000045_Node000040" title=" " alt="" coords="675,103,807,196,804,201,671,108"/>
+<area shape="poly" id="edge23_Node000045_Node000038" title=" " alt="" coords="685,77,791,33,793,38,687,82"/>
+<area shape="poly" id="edge22_Node000045_Node000022" title=" " alt="" coords="664,104,706,169,738,208,776,243,783,247,780,251,773,247,735,212,702,172,659,107"/>
+</map>

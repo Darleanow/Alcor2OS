@@ -1,0 +1,5 @@
+<map id="fb_console_fill_winsize" name="fb_console_fill_winsize">
+<area shape="rect" id="Node000001" title="Fill out with the live grid dimensions, packaged as a Linux winsize struct ready to be copied to user..." alt="" coords="5,5,176,31"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a5c057f90ed9057e3beacb7d7f8b31849" title="Read the live cell grid dimensions." alt="" coords="224,5,377,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,15,210,15,210,21,176,21"/>
+</map>

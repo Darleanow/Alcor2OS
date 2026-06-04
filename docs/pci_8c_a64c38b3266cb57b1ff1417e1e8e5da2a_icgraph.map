@@ -1,0 +1,9 @@
+<map id="pci_read_device" name="pci_read_device">
+<area shape="rect" id="Node000001" title=" " alt="" coords="455,5,581,31"/>
+<area shape="rect" id="Node000002" href="$pci_8c.html#a21f2f28f1e12177e4ea4f88554ae3ae6" title="Iterate all PCI devices and invoke cb until it returns true." alt="" coords="303,5,407,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="441,21,407,21,407,15,441,15"/>
+<area shape="rect" id="Node000003" href="$pci_8c.html#accf929056b06889454a27d9013ef3aee" title="Find PCI device by class and subclass." alt="" coords="132,5,255,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="289,21,255,21,255,15,289,15"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a28e51cbdfc72a78f22af56e7efe44236" title="Detect and configure PCI IDE Bus Master for DMA." alt="" coords="5,5,84,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,21,84,21,84,15,118,15"/>
+</map>

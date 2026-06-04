@@ -1,0 +1,21 @@
+<map id="scrollback_exit" name="scrollback_exit">
+<area shape="rect" id="Node000001" title="Drop back to the live view (scroll offset = 0) and mark every cell dirty so the next flush_batch repa..." alt="" coords="656,116,776,141"/>
+<area shape="rect" id="Node000002" href="$scrollback_8c.html#a81d1fb9846695e15207aab71a96d8ff9" title="Scroll the view lines rows toward the live tail." alt="" coords="401,67,608,92"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="647,115,559,95,561,89,648,110"/>
+<area shape="rect" id="Node000012" href="$api_8c.html#a8c908a73a21b548d5b02de14d05fb068" title="Open a writev&#45;style batch: subsequent feed bytes go through the dirty&#45;cell pipeline rather than blitt..." alt="" coords="417,140,592,165"/>
+<area shape="poly" id="edge5_Node000001_Node000012" title=" " alt="" coords="643,140,593,145,592,140,642,134"/>
+<area shape="rect" id="Node000003" href="$kbd__layout_8c.html#a980cb551e7569e9ee094ee4c6b8ccca7" title=" " alt="" coords="222,55,353,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,76,353,74,353,68,388,70"/>
+<area shape="rect" id="Node000004" href="$kbd__layout_8c.html#a1ac75f5164cb14a680356883f85d10e4" title=" " alt="" coords="5,5,173,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="222,54,140,33,142,28,223,49"/>
+<area shape="rect" id="Node000008" href="$kbd__layout_8c.html#a16444d2bcad1c95d52d0d2393000abc3" title=" " alt="" coords="33,55,146,80"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="208,70,147,70,147,65,208,65"/>
+<area shape="rect" id="Node000013" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="221,147,353,172"/>
+<area shape="poly" id="edge6_Node000012_Node000013" title=" " alt="" coords="404,158,354,160,354,155,404,153"/>
+<area shape="rect" id="Node000014" href="$kbd__layout_8c.html#a6daec33a349a589e3e1c460d7a5d8d7e" title=" " alt="" coords="32,104,147,129"/>
+<area shape="poly" id="edge7_Node000013_Node000014" title=" " alt="" coords="214,146,146,132,147,126,215,141"/>
+<area shape="rect" id="Node000015" href="$kbd__layout_8c.html#a16b699983816072933124817dffd01f5" title=" " alt="" coords="29,153,150,179"/>
+<area shape="poly" id="edge8_Node000013_Node000015" title=" " alt="" coords="207,165,150,167,150,161,207,159"/>
+<area shape="rect" id="Node000016" href="$dev__nodes_8c.html#ab43944d5ee5d8a1e7a2ebece7102cbac" title="Write to /dev/tty — delegates to fb_console." alt="" coords="49,203,129,228"/>
+<area shape="poly" id="edge9_Node000013_Node000016" title=" " alt="" coords="229,178,130,207,129,202,228,173"/>
+</map>

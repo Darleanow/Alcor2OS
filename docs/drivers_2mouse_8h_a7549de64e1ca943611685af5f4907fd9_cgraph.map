@@ -1,0 +1,9 @@
+<map id="mouse_post_event" name="mouse_post_event">
+<area shape="rect" id="Node000001" title="Post one movement/button report into the broker." alt="" coords="5,31,151,56"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="199,5,289,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,30,184,24,185,30,151,35"/>
+<area shape="rect" id="Node000003" href="$mouse_8c.html#a891abdb34285e0a8f405c83e3f2857ff" title=" " alt="" coords="207,55,281,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,51,194,57,193,63,151,56"/>
+<area shape="rect" id="Node000004" href="$mouse_8c.html#afed7e7efe587c54d7af20d4235fc93cf" title=" " alt="" coords="337,55,428,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="281,65,324,65,324,70,281,70"/>
+</map>

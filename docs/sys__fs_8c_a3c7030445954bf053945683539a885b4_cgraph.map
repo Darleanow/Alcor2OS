@@ -1,0 +1,42 @@
+<map id="sys_readlink" name="sys_readlink">
+<area shape="rect" id="Node000001" title="Read the target of a symbolic link at path into buf." alt="" coords="5,278,109,303"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="777,26,864,51"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,276,98,220,124,187,156,158,211,119,260,89,305,67,350,51,447,30,572,11,651,3,730,11,770,19,769,25,729,16,651,8,572,16,448,35,352,57,307,72,262,94,214,123,159,162,128,190,102,223,68,279"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a31caf3300c489531baba99bcea216c59" title="Get the length of a null&#45;terminated string." alt="" coords="787,278,854,303"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="110,288,773,288,773,293,110,293"/>
+<area shape="rect" id="Node000004" href="$sys__fs_8c.html#a66b61fd8589babbbf716e2f2b54fdd6c" title="Return non&#45;zero if path refers to the /proc/self/exe virtual symlink." alt="" coords="157,335,323,361"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="99,301,187,329,185,334,98,306"/>
+<area shape="rect" id="Node000006" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="599,26,702,51"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="71,276,108,245,156,212,271,157,389,111,498,76,586,52,587,57,500,81,391,116,273,162,159,217,111,249,74,280"/>
+<area shape="rect" id="Node000007" href="$sys__fs_8c.html#a8a3d72124ddacfcc1825b04f29980211" title="Return true if ptr..ptr+size is a valid user&#45;space range." alt="" coords="189,397,291,422"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="74,301,111,334,159,370,195,389,192,393,156,374,107,338,70,305"/>
+<area shape="rect" id="Node000009" href="$sys__fs_8c.html#a2b62b386a750a6392a02d67953da3095" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="188,470,292,495"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="67,302,102,362,129,398,159,431,201,461,198,465,156,435,125,401,98,364,63,305"/>
+<area shape="rect" id="Node000011" href="$vfs_8c.html#ad7ec41d06faa2ce0fc58d46873948f75" title="Read the target of the symbolic link at path into buf." alt="" coords="189,227,291,253"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="103,275,180,254,181,259,105,280"/>
+<area shape="rect" id="Node000005" href="$kstdlib_8c.html#ac76d947802db6f4391f575d987f48b06" title="Compare two strings lexicographically." alt="" coords="410,378,485,403"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="303,358,397,378,396,383,302,363"/>
+<area shape="rect" id="Node000008" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="371,427,524,453"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="291,414,358,424,357,429,290,419"/>
+<area shape="rect" id="Node000010" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="380,477,515,502"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="293,482,366,484,366,489,292,487"/>
+<area shape="rect" id="Node000012" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="386,329,509,354"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="268,250,409,320,407,325,266,255"/>
+<area shape="rect" id="Node000015" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="373,151,521,177"/>
+<area shape="poly" id="edge15_Node000011_Node000015" title=" " alt="" coords="275,225,398,179,400,184,277,230"/>
+<area shape="poly" id="edge12_Node000012_Node000003" title=" " alt="" coords="509,333,612,322,729,307,773,298,774,303,730,312,613,328,509,339"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#ac42cb3bc178697221980c90dfc9a1a1c" title="Return true if path begins with prefix as a path component." alt="" coords="572,379,729,405"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="500,351,586,373,585,378,499,357"/>
+<area shape="poly" id="edge14_Node000013_Node000003" title=" " alt="" coords="687,377,728,358,763,334,793,310,796,315,766,339,731,362,689,382"/>
+<area shape="poly" id="edge18_Node000015_Node000003" title=" " alt="" coords="522,164,623,178,678,192,731,212,769,237,800,265,797,269,766,241,728,217,676,197,622,183,521,169"/>
+<area shape="poly" id="edge20_Node000015_Node000006" title=" " alt="" coords="459,149,505,106,537,82,571,60,585,53,588,58,573,65,540,86,509,110,463,153"/>
+<area shape="rect" id="Node000016" href="$kstdlib_8c.html#a60bff60a47ea068c9e7014bc077d7d91" title="Bounded strcat (BSD strlcat semantics)." alt="" coords="615,227,686,253"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="483,174,604,220,602,225,481,179"/>
+<area shape="rect" id="Node000017" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="781,101,860,126"/>
+<area shape="poly" id="edge19_Node000015_Node000017" title=" " alt="" coords="521,151,768,118,768,123,522,157"/>
+<area shape="rect" id="Node000018" href="$vfs_8c.html#a5d0202f169a3d00d5e2ecc92c208b621" title="Normalise an absolute path in&#45;place." alt="" coords="593,75,708,101"/>
+<area shape="poly" id="edge21_Node000015_Node000018" title=" " alt="" coords="481,149,602,103,604,108,483,154"/>
+<area shape="poly" id="edge17_Node000016_Node000003" title=" " alt="" coords="687,248,775,274,773,279,685,253"/>
+<area shape="poly" id="edge22_Node000018_Node000002" title=" " alt="" coords="694,73,763,52,765,57,696,78"/>
+<area shape="poly" id="edge23_Node000018_Node000017" title=" " alt="" coords="709,94,768,103,767,108,708,99"/>
+</map>

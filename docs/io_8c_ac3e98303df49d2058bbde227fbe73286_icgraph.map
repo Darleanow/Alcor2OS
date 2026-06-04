@@ -1,0 +1,35 @@
+<map id="sh_puts" name="sh_puts">
+<area shape="rect" id="Node000001" title="Write a NUL&#45;terminated string to stdout, retrying on short writes." alt="" coords="931,204,1003,229"/>
+<area shape="rect" id="Node000002" href="$builtins_8c.html#aa31aee232b0ead46f489bca572719991" title=" " alt="" coords="787,55,859,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="952,193,924,143,904,116,881,93,857,80,860,75,884,89,908,113,928,140,957,190"/>
+<area shape="rect" id="Node000004" href="$builtins_8c.html#a6dff31ee4789340df2661d51566b8d32" title=" " alt="" coords="780,104,865,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="943,196,915,169,881,143,860,132,862,127,884,138,918,165,947,192"/>
+<area shape="rect" id="Node000005" href="$builtins_8c.html#a92ba9d4bb1736306f2339a923e431f0b" title=" " alt="" coords="781,153,865,179"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="917,202,859,181,860,176,919,197"/>
+<area shape="rect" id="Node000006" href="$builtins_8c.html#a2211091fcc0277909cceb8ec7e1663cc" title=" " alt="" coords="770,5,875,31"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="957,191,947,158,931,119,910,79,881,44,865,33,868,28,884,40,914,76,936,117,952,157,962,190"/>
+<area shape="rect" id="Node000007" href="$edit_8c.html#ad639ab0386e6acda4129570616eff51e" title="Print completion candidates in coloured columns (double&#45;tab)." alt="" coords="763,255,883,280"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="919,236,860,257,859,252,917,231"/>
+<area shape="rect" id="Node000009" href="$edit_8c.html#afeaf7d18f14c15bf8b69712bc666e9f8" title="Read one logical input line, with history navigation, tab completion, and UTF&#45;8&#45;aware cursor movement..." alt="" coords="410,305,514,331"/>
+<area shape="poly" id="edge18_Node000001_Node000009" title=" " alt="" coords="959,244,932,297,911,324,884,344,833,365,779,376,723,379,668,375,569,356,495,333,497,328,570,351,669,370,723,373,778,371,831,360,881,340,907,320,928,294,954,241"/>
+<area shape="rect" id="Node000011" href="$user_2apps_2shell_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,356,60,381"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="962,244,953,276,937,314,915,351,884,381,855,401,829,413,804,421,779,425,725,424,659,422,461,422,343,417,228,404,60,377,61,371,229,399,343,411,461,417,659,417,725,419,778,419,802,416,827,408,853,396,881,377,910,347,932,311,948,274,957,242"/>
+<area shape="rect" id="Node000012" href="$edit_8c.html#a49d1c35f42b665a736da8063551682ec" title="Repaint the input row in&#45;place: clear, prompt, buffer, cursor." alt="" coords="773,304,872,329"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="946,241,918,268,884,294,860,306,858,301,881,289,914,264,942,237"/>
+<area shape="rect" id="Node000013" href="$prompt_8c.html#ace54b4717588b11e401baf89fe2fc1fa" title="Paint the decorative header line above the primary prompt." alt="" coords="371,231,553,256"/>
+<area shape="poly" id="edge19_Node000001_Node000013" title=" " alt="" coords="917,222,554,241,553,236,917,217"/>
+<area shape="rect" id="Node000003" href="$builtins_8c.html#ab1947aa01143b8cc05b36952bfacbac4" title="Execute a shell builtin." alt="" coords="601,80,715,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="774,77,715,87,715,81,773,72"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="766,111,715,104,715,98,767,106"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="778,150,762,143,685,108,688,103,764,138,780,145"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="778,38,764,44,685,82,683,78,762,40,775,34"/>
+<area shape="rect" id="Node000008" href="$edit_8c.html#aef85398be164e56341e0058981c07026" title="Handle a Tab keypress: complete or list candidates." alt="" coords="611,255,705,280"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="749,270,706,270,706,265,749,265"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="598,285,513,308,511,303,597,280"/>
+<area shape="rect" id="Node000010" href="$apps_2shell_2platform_2parse_8c.html#a0107f87d69a64a4bf1e2b32eb36a24ca" title="Read input lines into buf until they form a complete statement." alt="" coords="108,305,323,331"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="396,321,323,321,323,315,396,315"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="156,337,61,364,60,359,155,332"/>
+<area shape="poly" id="edge16_Node000012_Node000008" title=" " alt="" coords="766,303,701,283,702,278,768,297"/>
+<area shape="poly" id="edge17_Node000012_Node000009" title=" " alt="" coords="759,320,514,320,514,315,759,314"/>
+<area shape="poly" id="edge20_Node000013_Node000010" title=" " alt="" coords="406,263,259,308,257,303,405,258"/>
+</map>

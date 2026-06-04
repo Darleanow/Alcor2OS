@@ -1,0 +1,5 @@
+<map id="ext2_write" name="ext2_write">
+<area shape="rect" id="Node000001" title="Write data to a file." alt="" coords="175,5,265,31"/>
+<area shape="rect" id="Node000002" href="$ops_8c.html#af5603f51c2625ed179e110d8d59f80dc" title="fs_ops_t.write shim." alt="" coords="5,5,127,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,21,127,21,127,15,161,15"/>
+</map>

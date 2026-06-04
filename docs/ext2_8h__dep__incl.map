@@ -1,0 +1,32 @@
+<map id="include/alcor2/fs/ext2.h" name="include/alcor2/fs/ext2.h">
+<area shape="rect" id="Node000001" title="ext2 filesystem driver." alt="" coords="639,5,813,31"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html" title="Direct + indirect block resolution and reservation for ext2." alt="" coords="5,152,175,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="662,36,461,81,140,154,139,149,460,76,661,31"/>
+<area shape="rect" id="Node000003" href="$dir_8c.html" title="High&#45;level directory operations — readdir, mkdir, unlink, rmdir." alt="" coords="199,152,320,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="677,37,297,154,296,149,675,32"/>
+<area shape="rect" id="Node000004" href="$file_8c.html" title="File open / close / read / write / truncate / flush — the public ext2 byte&#45;oriented API." alt="" coords="345,152,470,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="689,39,434,154,431,150,687,34"/>
+<area shape="rect" id="Node000005" href="$src_2fs_2ext2_2internal_8h.html" title="Shared state, sizing macros, and private helpers for the ext2 module split." alt="" coords="648,79,804,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="729,44,729,79,723,79,723,44"/>
+<area shape="rect" id="Node000011" href="$path_8c.html" title="Path resolution, symlink following, and the ext2_stat / ext2_readlink endpoints." alt="" coords="1325,152,1460,177"/>
+<area shape="poly" id="edge15_Node000001_Node000011" title=" " alt="" coords="753,36,808,71,841,88,875,101,939,120,994,131,1090,139,1188,140,1313,149,1325,151,1325,156,1312,155,1188,145,1090,144,993,136,938,125,873,107,838,93,805,75,750,41"/>
+<area shape="rect" id="Node000012" href="$super_8c.html" title="Block&#45;level I/O, superblock + GDT writeback, volume bring&#45;up." alt="" coords="1484,152,1624,177"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="767,34,866,76,892,90,919,101,1001,121,1071,132,1134,138,1193,139,1316,139,1388,142,1473,149,1484,151,1484,156,1472,155,1388,147,1316,145,1193,145,1133,143,1071,138,1000,126,917,107,890,95,864,81,765,38"/>
+<area shape="rect" id="Node000013" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="930,79,1063,104"/>
+<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="783,32,954,76,952,81,782,37"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="635,105,186,155,175,156,174,151,186,149,634,100"/>
+<area shape="poly" id="edge8_Node000005_Node000003" title=" " alt="" coords="637,109,333,155,321,157,320,151,332,149,636,103"/>
+<area shape="poly" id="edge10_Node000005_Node000004" title=" " alt="" coords="662,110,460,154,458,149,661,104"/>
+<area shape="rect" id="Node000006" href="$alloc_8c.html" title="Block + inode allocation bitmap operations." alt="" coords="494,152,630,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="688,112,590,154,588,149,686,107"/>
+<area shape="rect" id="Node000007" href="$cache_8c.html" title="Single&#45;block scratch pool for one&#45;off ext2 metadata reads." alt="" coords="655,152,797,177"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="729,118,729,152,723,152,723,118"/>
+<area shape="rect" id="Node000008" href="$dir__entry_8c.html" title="On&#45;disk directory entry primitives — lookup, insert, remove, emptiness check." alt="" coords="821,152,983,177"/>
+<area shape="poly" id="edge9_Node000005_Node000008" title=" " alt="" coords="768,107,874,149,872,154,766,112"/>
+<area shape="rect" id="Node000009" href="$inode_8c.html" title="On&#45;disk inode read + write." alt="" coords="1007,152,1149,177"/>
+<area shape="poly" id="edge11_Node000005_Node000009" title=" " alt="" coords="796,104,1022,149,1020,155,795,109"/>
+<area shape="rect" id="Node000010" href="$ops_8c.html" title="fs_ops_t bridge for ext2." alt="" coords="1173,152,1301,177"/>
+<area shape="poly" id="edge12_Node000005_Node000010" title=" " alt="" coords="818,102,1161,149,1173,151,1172,156,1160,155,818,108"/>
+<area shape="poly" id="edge13_Node000005_Node000011" title=" " alt="" coords="818,101,824,101,1068,124,1313,149,1325,151,1325,156,1312,155,1068,130,823,107,817,106"/>
+<area shape="poly" id="edge14_Node000005_Node000012" title=" " alt="" coords="818,97,1473,149,1484,151,1484,156,1472,155,817,102"/>
+</map>

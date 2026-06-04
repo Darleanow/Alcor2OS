@@ -1,0 +1,5 @@
+<map id="sys_read" name="sys_read">
+<area shape="rect" id="Node000001" title="Read up to count bytes from fd into buf." alt="" coords="141,5,221,31"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#a20b06db6011d3c71ba1ce6b1de28c1f5" title=" " alt="" coords="5,5,93,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,21,94,21,94,15,128,15"/>
+</map>

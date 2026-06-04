@@ -1,0 +1,5 @@
+<map id="sys_set_tid_address" name="sys_set_tid_address">
+<area shape="rect" id="Node000001" title="Store the clear&#45;child&#45;tid address (no&#45;op); returns the current TID." alt="" coords="5,5,159,31"/>
+<area shape="rect" id="Node000002" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="207,5,309,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,15,193,15,193,21,159,21"/>
+</map>

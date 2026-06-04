@@ -1,0 +1,20 @@
+<map id="mouse_cursor_drop" name="mouse_cursor_drop">
+<area shape="rect" id="Node000001" title="Forget the painted&#45;at position without erasing pixels. Used by paths that are about to repaint the wh..." alt="" coords="600,55,749,80"/>
+<area shape="rect" id="Node000002" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="435,5,521,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="610,54,521,31,522,26,611,49"/>
+<area shape="rect" id="Node000007" href="$api_8c.html#a69b71c7f1ec9416b4b2246c8583ddd1b" title="Resume kernel rendering after a fb_console_yield, fully repainting the framebuffer." alt="" coords="404,55,552,80"/>
+<area shape="poly" id="edge4_Node000001_Node000007" title=" " alt="" coords="587,70,552,70,552,65,587,65"/>
+<area shape="rect" id="Node000011" href="$api_8c.html#a460f3f181a121f95a380c7768036f825" title="Hand the framebuffer to a userspace mmap&#45;er (typically Doom)." alt="" coords="413,104,543,129"/>
+<area shape="poly" id="edge8_Node000001_Node000011" title=" " alt="" coords="611,86,530,107,529,101,610,81"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="203,5,325,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="421,21,325,21,325,15,421,15"/>
+<area shape="rect" id="Node000004" href="$pit_8c.html#a1ec93c1a5802efe9e3925acb8ccb5f64" title=" " alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="189,21,124,21,124,15,189,15"/>
+<area shape="rect" id="Node000008" href="$dev__nodes_8c.html#a6ad4b8e0a1ef2f0c0a833751c453da3e" title="Forward an ioctl request to fb_console." alt="" coords="172,80,356,105"/>
+<area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="391,80,356,84,356,79,390,75"/>
+<area shape="rect" id="Node000009" href="$dev__nodes_8c.html#a0041e2d9dbe8ba13306a473bc4126402" title="ioctl on /dev/fb — forwards FB_CONSOLE_YIELD, FB_CONSOLE_RECLAIM, and FB_CONSOLE_SET_ATLAS." alt="" coords="29,67,100,92"/>
+<area shape="poly" id="edge6_Node000008_Node000009" title=" " alt="" coords="158,88,100,84,100,79,158,83"/>
+<area shape="rect" id="Node000010" href="$dev__nodes_8c.html#a5f707c744ac66a4bd2e0e0375e926904" title="ioctl on /dev/tty — handles termios, winsize, keyboard layout, and fb_console controls." alt="" coords="27,116,102,141"/>
+<area shape="poly" id="edge7_Node000008_Node000010" title=" " alt="" coords="181,110,103,125,102,119,180,105"/>
+<area shape="poly" id="edge9_Node000011_Node000008" title=" " alt="" coords="398,110,356,106,357,100,399,105"/>
+</map>

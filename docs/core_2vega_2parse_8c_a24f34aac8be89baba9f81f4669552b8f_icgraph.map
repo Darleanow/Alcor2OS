@@ -1,0 +1,30 @@
+<map id="parse_and_or" name="parse_and_or">
+<area shape="rect" id="Node000001" title=" " alt="" coords="779,199,888,224"/>
+<area shape="rect" id="Node000002" href="$core_2vega_2parse_8c.html#a56e786533d4f52b9b9c4013b71cb224a" title=" " alt="" coords="322,227,397,252"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="765,218,397,240,397,235,765,213"/>
+<area shape="rect" id="Node000005" href="$core_2vega_2parse_8c.html#a39c2363ce6301b51c1dc201986050d62" title=" " alt="" coords="645,107,731,132"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="799,193,708,134,710,130,802,189"/>
+<area shape="rect" id="Node000009" href="$core_2vega_2parse_8c.html#acd97c7ea67e9c6549e462a92ba006cb6" title=" " alt="" coords="309,153,409,179"/>
+<area shape="poly" id="edge17_Node000001_Node000009" title=" " alt="" coords="765,207,730,203,410,173,410,168,731,198,765,202"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="384,216,376,208,359,205,345,207,337,212,336,218,340,225,335,228,330,218,333,209,343,202,359,200,379,204,387,212"/>
+<area shape="rect" id="Node000003" href="$core_2vega_2parse_8c.html#a7ab921730b4c53cdbc22ae1072900c6d" title=" " alt="" coords="171,153,261,179"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="320,223,241,181,243,177,323,218"/>
+<area shape="rect" id="Node000004" href="$core_2vega_2parse_8c.html#aec2969ee30e6e008c5dbd817c66770ad" title=" " alt="" coords="5,216,123,241"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="173,186,97,218,95,213,171,181"/>
+<area shape="poly" id="edge5_Node000004_Node000001" title=" " alt="" coords="116,243,226,272,292,283,358,287,529,287,607,280,684,263,751,241,802,222,804,227,753,246,685,268,608,285,529,293,358,293,291,288,225,277,114,248"/>
+<area shape="rect" id="Node000006" href="$core_2vega_2parse_8c.html#a68174f6d7228992098025e21a088e734" title=" " alt="" coords="457,107,597,132"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="632,122,597,122,597,117,632,117"/>
+<area shape="rect" id="Node000010" href="$core_2vega_2parse_8c.html#a37fb9f6bddc87aa3381e31f183663b88" title="Parse line into an AST." alt="" coords="479,31,576,56"/>
+<area shape="poly" id="edge15_Node000005_Node000010" title=" " alt="" coords="647,103,554,58,556,54,649,98"/>
+<area shape="poly" id="edge12_Node000006_Node000002" title=" " alt="" coords="499,142,380,229,377,224,496,138"/>
+<area shape="rect" id="Node000007" href="$core_2vega_2parse_8c.html#a9bc1c8aed40cc8b4b3e64df2d6bb40ba" title=" " alt="" coords="320,104,399,129"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="444,121,399,120,399,115,444,115"/>
+<area shape="rect" id="Node000008" href="$core_2vega_2parse_8c.html#a214fd6eb4dcf7e6a104f94d9e7094dd4" title=" " alt="" coords="318,55,401,80"/>
+<area shape="poly" id="edge10_Node000006_Node000008" title=" " alt="" coords="472,105,400,82,401,77,473,100"/>
+<area shape="poly" id="edge13_Node000006_Node000009" title=" " alt="" coords="469,138,407,156,405,151,467,133"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="310,136,255,156,253,151,308,131"/>
+<area shape="poly" id="edge11_Node000008_Node000003" title=" " alt="" coords="319,89,311,94,267,126,233,155,229,151,264,121,308,89,316,84"/>
+<area shape="poly" id="edge14_Node000009_Node000003" title=" " alt="" coords="296,169,261,169,261,163,296,163"/>
+<area shape="rect" id="Node000011" href="$vega_8c.html#a95d9a07c640e9123954c98285e304307" title="Parse and execute one line of vega input." alt="" coords="318,5,401,31"/>
+<area shape="poly" id="edge16_Node000010_Node000011" title=" " alt="" coords="465,37,400,27,401,22,465,31"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ast_node" name="ast_node">
+<area shape="rect" id="Node000001" title="AST node. CMD nodes own a heap argv and an optional redir list; binary nodes own their two children...." alt="" coords="5,132,87,157"/>
+<area shape="poly" id="edge3_Node000001_Node000001" title=" " alt="" coords="82,127,103,130,111,136,113,145,109,156,98,161,68,160,69,155,97,156,105,152,108,145,106,139,101,135,81,132"/>
+<area shape="rect" id="Node000002" href="$structredir.html" title="Linked list of file redirections attached to an AST_CMD. The target string is heap&#45;owned...." alt="" coords="20,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,44,49,132,43,132,43,44"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="87,8,95,11,99,18,90,27,72,28,72,23,88,22,93,18,91,15,85,13"/>
+</map>

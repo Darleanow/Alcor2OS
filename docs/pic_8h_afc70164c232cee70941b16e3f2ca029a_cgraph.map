@@ -1,0 +1,8 @@
+<map id="pic_init" name="pic_init">
+<area shape="rect" id="Node000001" title="Initialize and remap the PIC." alt="" coords="5,31,75,56"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a488d1b3600792ee3aac5be4b7e0be16b" title="Short I/O delay (write to port 0x80)." alt="" coords="123,5,192,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,33,109,26,110,31,76,38"/>
+<area shape="rect" id="Node000003" href="$io_8h.html#a6932901bf7ae9a3e81166b99b36b6ecf" title="Write a byte to an I/O port." alt="" coords="240,31,291,56"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="75,41,226,41,226,46,75,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="193,24,227,32,226,37,192,29"/>
+</map>

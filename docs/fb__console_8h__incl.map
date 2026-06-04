@@ -1,0 +1,19 @@
+<map id="include/alcor2/drivers/fb_console.h" name="include/alcor2/drivers/fb_console.h">
+<area shape="rect" id="Node000001" title="Kernel framebuffer text console." alt="" coords="233,5,395,45"/>
+<area shape="rect" id="Node000002" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="5,167,188,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,43,179,62,153,77,131,95,112,123,103,154,98,152,107,121,127,92,150,73,176,58,231,38"/>
+<area shape="rect" id="Node000004" href="$ktermios_8h.html" title="musl&#45;compatible termios blob (60 bytes) for per&#45;process TTY discipline." alt="" coords="141,93,277,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="290,48,237,87,234,83,287,43"/>
+<area shape="rect" id="Node000005" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="213,167,327,192"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="312,46,291,119,280,154,275,153,286,118,306,45"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="239,240,322,265"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="326,45,337,74,347,112,350,153,342,193,328,215,310,233,306,230,324,212,337,191,345,152,342,112,332,76,321,47"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="367,240,442,265"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="332,44,363,92,389,164,403,226,398,227,384,166,358,95,328,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="108,240,179,265"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="107,191,130,227,126,230,102,194"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="221,117,253,154,249,158,217,121"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="251,194,177,235,175,231,248,190"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="274,192,280,226,274,227,269,193"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="293,190,372,231,369,236,290,194"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="user_mappings_walk_and_free" name="user_mappings_walk_and_free">
+<area shape="rect" id="Node000001" title="Walk the user half (PML4 entries 0..255) of pml4_phys and free every leaf page plus every PT/PD/PDPT ..." alt="" coords="5,23,164,63"/>
+<area shape="rect" id="Node000002" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="212,5,315,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,29,198,24,199,30,165,35"/>
+<area shape="rect" id="Node000004" href="$pmm_8c.html#a1748abf05ac6d0d75cca5c6152b9005e" title="Free a single physical page." alt="" coords="219,55,308,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="165,51,205,57,204,62,164,57"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#ab76ee5d33dce15d1c5c60ba558dffd77" title="Get the higher&#45;half direct map offset." alt="" coords="363,5,491,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="315,15,348,15,348,21,315,21"/>
+<area shape="rect" id="Node000005" href="$pmm_8c.html#a78d3f361acde9530698abc462b604bd1" title="Mark page as free in bitmap." alt="" coords="373,55,480,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="308,65,360,65,360,70,308,70"/>
+<area shape="rect" id="Node000006" href="$pmm_8c.html#a4f500963d3ac59e31b3e3cae70359e3a" title="Test if page is allocated." alt="" coords="377,104,477,129"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="307,77,372,97,370,102,305,83"/>
+</map>

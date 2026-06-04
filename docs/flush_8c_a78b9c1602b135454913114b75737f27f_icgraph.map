@@ -1,0 +1,13 @@
+<map id="flush_prep_cell" name="flush_prep_cell">
+<area shape="rect" id="Node000001" title="Populate a single flush_cell_cache entry from its source cell." alt="" coords="540,31,659,56"/>
+<area shape="rect" id="Node000002" href="$flush_8c.html#ae697d8dd44245a3287fe4df39c1873fb" title="Repaint every dirty cell in the [batch_r0, batch_r1] row range in one VRAM pass." alt="" coords="396,31,492,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="526,46,492,46,492,41,526,41"/>
+<area shape="rect" id="Node000003" href="$api_8c.html#a28ca04a43ead72c5ecda14458f745a2c" title="Flip the blink phase and repaint every cell that depends on it." alt="" coords="224,5,309,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="382,37,309,27,310,21,383,32"/>
+<area shape="rect" id="Node000008" href="$api_8c.html#a7654752ac7d61f4811d1c6b0cd53f56c" title="Close a batch: flush queued pixel&#45;scrolls, repaint every dirty cell in one VRAM pass,..." alt="" coords="185,55,348,80"/>
+<area shape="poly" id="edge4_Node000002_Node000008" title=" " alt="" coords="383,54,349,59,348,54,382,49"/>
+<area shape="rect" id="Node000004" href="$api_8c.html#a43fb2ac849792070c6ad47b5b3c75087" title="PIT tick callback: advance blink phase and reposition the mouse cursor." alt="" coords="10,5,133,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="210,21,133,21,133,15,210,15"/>
+<area shape="rect" id="Node000009" href="$api_8c.html#aded4c255c4f1f8e44ae3f666ca54aae8" title="Convenience: begin + raw + end as one call." alt="" coords="5,55,137,80"/>
+<area shape="poly" id="edge5_Node000008_Node000009" title=" " alt="" coords="172,70,138,70,138,65,172,65"/>
+</map>

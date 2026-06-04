@@ -1,0 +1,26 @@
+<map id="fill_entry_from_dirent" name="fill_entry_from_dirent">
+<area shape="rect" id="Node000001" title="Fill entry with the public&#45;facing view of a dirent." alt="" coords="5,44,168,69"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="375,19,462,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,48,361,33,362,38,168,53"/>
+<area shape="rect" id="Node000003" href="$inode_8c.html#aba1cf116b95090ec043930c6efaa8dce" title="Load on&#45;disk inode ino into the caller&#45;provided inode." alt="" coords="216,69,311,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,66,203,71,202,76,168,71"/>
+<area shape="poly" id="edge10_Node000003_Node000002" title=" " alt="" coords="302,67,365,46,367,51,304,72"/>
+<area shape="rect" id="Node000004" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="391,68,447,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="311,79,376,78,377,84,311,84"/>
+<area shape="rect" id="Node000017" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="381,141,456,167"/>
+<area shape="poly" id="edge6_Node000003_Node000017" title=" " alt="" coords="293,92,379,133,377,138,290,97"/>
+<area shape="rect" id="Node000032" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="359,215,479,240"/>
+<area shape="poly" id="edge11_Node000003_Node000032" title=" " alt="" coords="278,93,360,176,392,204,389,208,357,180,275,97"/>
+<area shape="rect" id="Node000005" href="$heap_8c.html#a22e8b9bfac2a832aee6c31062daba8e7" title="Merge block with adjacent free blocks." alt="" coords="553,5,632,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="446,68,543,33,545,38,448,73"/>
+<area shape="rect" id="Node000006" href="$console_8c.html#a84d730ed3d7296809059cb503c36d415" title="Write a null&#45;terminated string to the console." alt="" coords="538,55,647,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="447,76,524,70,525,75,447,81"/>
+<area shape="rect" id="Node000018" href="$heap_8c.html#a80a00553c707307fbe9a99e6bd049c93" title="Find first free block that fits requested size." alt="" coords="532,104,653,129"/>
+<area shape="poly" id="edge7_Node000017_Node000018" title=" " alt="" coords="456,143,519,130,520,135,457,149"/>
+<area shape="rect" id="Node000019" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="538,153,647,179"/>
+<area shape="poly" id="edge8_Node000017_Node000019" title=" " alt="" coords="457,154,524,159,524,164,456,159"/>
+<area shape="rect" id="Node000031" href="$heap_8c.html#a15c68711db9e68012ef973207327d37e" title="Split block if remaining space is sufficient." alt="" coords="547,203,639,228"/>
+<area shape="poly" id="edge9_Node000017_Node000031" title=" " alt="" coords="456,164,544,196,542,201,455,169"/>
+<area shape="rect" id="Node000033" href="$src_2fs_2ext2_2internal_8h.html#aa5bd870dfa18380a27b8bebacc06bea6" title="Read a sector run from a volume." alt="" coords="527,252,659,277"/>
+<area shape="poly" id="edge12_Node000032_Node000033" title=" " alt="" coords="479,237,521,247,519,252,478,243"/>
+</map>

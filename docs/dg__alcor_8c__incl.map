@@ -1,0 +1,54 @@
+<map id="user/games/doom/src/dg_alcor.c" name="user/games/doom/src/dg_alcor.c">
+<area shape="rect" id="Node000001" title="doomgeneric platform backend for Alcor2OS." alt="" coords="790,5,953,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,92,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="790,33,492,53,301,72,106,96,105,91,301,66,492,48,790,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="116,93,235,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="790,37,552,60,249,96,248,91,551,55,790,31"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="259,93,361,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="790,40,380,96,375,97,374,91,379,91,789,34"/>
+<area shape="rect" id="Node000005" href="$alcor__fb__user_8h.html" title="Userland helpers for the Alcor2 custom framebuffer syscalls." alt="" coords="729,93,893,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="859,47,831,84,826,81,855,44"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="760,387,831,412"/>
+<area shape="poly" id="edge25_Node000001_Node000010" title=" " alt="" coords="790,38,638,61,568,77,521,96,481,125,455,155,438,192,423,241,420,264,422,285,430,304,442,320,479,347,529,367,585,381,644,389,746,396,746,401,643,395,584,386,527,372,477,352,438,324,425,307,417,287,414,264,418,239,433,190,451,152,477,121,518,91,567,72,637,55,789,33"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="682,167,757,192"/>
+<area shape="poly" id="edge30_Node000001_Node000013" title=" " alt="" coords="791,45,750,64,733,78,719,95,713,108,711,123,714,153,709,154,705,123,708,107,714,92,729,74,748,60,789,40"/>
+<area shape="rect" id="Node000014" href="$pit_8h.html" title="8253/8254 PIT (Programmable Interval Timer) driver." alt="" coords="433,240,560,265"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="790,31,711,42,624,65,582,83,542,105,507,134,478,168,472,182,473,197,484,227,479,229,467,198,467,181,473,165,503,130,539,101,579,78,622,60,710,37,789,26"/>
+<area shape="rect" id="Node000015" href="$drivers_2mouse_8h.html" title="Kernel&#45;side mouse broker: accepts events from a low&#45;level driver and serves them to userspace via /de..." alt="" coords="487,167,658,192"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="818,48,763,69,706,96,649,129,601,161,598,156,646,124,703,91,761,64,816,43"/>
+<area shape="rect" id="Node000017" href="$fb__console__ioctl_8h.html" title="Userspace&#45;facing ioctl interface for the framebuffer console." alt="" coords="969,313,1152,339"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="954,34,1058,56,1102,72,1129,91,1144,114,1154,135,1159,156,1159,176,1150,218,1130,267,1114,289,1094,307,1090,303,1110,286,1125,264,1145,217,1154,176,1153,156,1149,137,1140,117,1125,95,1099,77,1056,61,953,40"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="969,93,1032,119"/>
+<area shape="poly" id="edge21_Node000001_Node000018" title=" " alt="" coords="904,43,971,84,969,88,901,48"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1057,93,1115,119"/>
+<area shape="poly" id="edge22_Node000001_Node000019" title=" " alt="" coords="924,43,1045,87,1043,92,922,48"/>
+<area shape="rect" id="Node000020" href="$signal_8h.html" title="POSIX signal handling infrastructure (Linux x86_64 compatible)." alt="" coords="1041,240,1115,265"/>
+<area shape="poly" id="edge23_Node000001_Node000020" title=" " alt="" coords="888,44,919,80,960,116,985,131,1009,137,1032,146,1055,165,1071,195,1078,225,1073,227,1066,197,1051,168,1029,150,1007,142,983,135,956,121,915,83,884,47"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1191,93,1261,119"/>
+<area shape="poly" id="edge26_Node000001_Node000021" title=" " alt="" coords="953,42,1178,91,1177,97,952,47"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="1286,93,1374,119"/>
+<area shape="poly" id="edge27_Node000001_Node000022" title=" " alt="" coords="953,37,1273,90,1272,96,952,42"/>
+<area shape="rect" id="Node000023" title=" " alt="" coords="1399,93,1483,119"/>
+<area shape="poly" id="edge28_Node000001_Node000023" title=" " alt="" coords="953,33,1146,56,1385,91,1384,96,1145,61,952,38"/>
+<area shape="rect" id="Node000024" title=" " alt="" coords="1507,93,1571,119"/>
+<area shape="poly" id="edge29_Node000001_Node000024" title=" " alt="" coords="953,29,1192,49,1341,67,1494,91,1494,96,1341,72,1192,55,953,34"/>
+<area shape="rect" id="Node000006" href="$alcor__fb_8h.html" title="Userspace API: Limine linear framebuffer info and mmap helpers." alt="" coords="910,167,1041,192"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="839,116,937,159,935,164,837,121"/>
+<area shape="rect" id="Node000011" href="$syscall_8h.html" title="x86_64 syscall interface and definitions." alt="" coords="781,167,887,192"/>
+<area shape="poly" id="edge8_Node000005_Node000011" title=" " alt="" coords="818,118,829,153,824,154,813,120"/>
+<area shape="poly" id="edge12_Node000005_Node000013" title=" " alt="" coords="798,121,747,160,743,156,795,117"/>
+<area shape="rect" id="Node000007" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="738,313,853,339"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="982,192,990,227,988,248,980,267,957,290,929,306,898,317,867,324,866,318,897,312,927,302,954,286,976,264,983,247,984,228,977,193"/>
+<area shape="poly" id="edge7_Node000007_Node000010" title=" " alt="" coords="798,339,798,373,793,373,793,339"/>
+<area shape="poly" id="edge11_Node000011_Node000007" title=" " alt="" coords="833,193,805,301,799,299,828,192"/>
+<area shape="rect" id="Node000012" href="$cpu_8h.html" title="x86_64 CPU control and state management." alt="" coords="833,240,966,265"/>
+<area shape="poly" id="edge9_Node000011_Node000012" title=" " alt="" coords="847,191,881,228,878,232,843,194"/>
+<area shape="poly" id="edge10_Node000012_Node000007" title=" " alt="" coords="884,268,825,307,822,303,881,263"/>
+<area shape="poly" id="edge14_Node000014_Node000007" title=" " alt="" coords="545,263,734,307,733,313,544,268"/>
+<area shape="poly" id="edge18_Node000015_Node000007" title=" " alt="" coords="616,190,668,209,721,238,755,269,782,301,778,304,752,272,718,242,666,214,614,195"/>
+<area shape="rect" id="Node000016" href="$mouse_8h.html" title="Shared user/kernel ABI for /dev/mouse events and mode control." alt="" coords="585,240,707,265"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="587,190,626,228,622,232,583,194"/>
+<area shape="poly" id="edge17_Node000016_Node000007" title=" " alt="" coords="671,263,760,305,757,310,669,268"/>
+<area shape="poly" id="edge20_Node000017_Node000010" title=" " alt="" coords="1019,341,845,388,844,382,1017,336"/>
+<area shape="poly" id="edge24_Node000020_Node000007" title=" " alt="" coords="1042,266,854,313,853,307,1040,261"/>
+</map>

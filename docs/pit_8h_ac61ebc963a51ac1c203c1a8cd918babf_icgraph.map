@@ -1,0 +1,17 @@
+<map id="pit_get_ticks" name="pit_get_ticks">
+<area shape="rect" id="Node000001" title="Raw tick count since init." alt="" coords="444,55,549,80"/>
+<area shape="rect" id="Node000002" href="$ata_8c.html#a8b4d3c021710bacc1b78076d406b7f48" title="Wait for ATA command completion." alt="" coords="321,55,396,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="430,70,396,70,396,65,430,65"/>
+<area shape="rect" id="Node000003" href="$ata_8c.html#af5df8b58e0e16175a37f55bacaeacd00" title="DMA read/write through bounce buffer with retries." alt="" coords="164,55,273,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="308,70,273,70,273,65,308,65"/>
+<area shape="rect" id="Node000010" href="$ata_8c.html#a86b888e981bed8edbc644d872c9139a9" title="Read sectors using PIO." alt="" coords="179,5,258,31"/>
+<area shape="poly" id="edge5_Node000002_Node000010" title=" " alt="" coords="308,52,255,33,257,28,310,47"/>
+<area shape="rect" id="Node000011" href="$ata_8c.html#ad23c5f0ba707314019c13a32973d6c0d" title="Write sectors using PIO with cache flush." alt="" coords="177,104,260,129"/>
+<area shape="poly" id="edge7_Node000002_Node000011" title=" " alt="" coords="310,87,257,106,255,101,308,82"/>
+<area shape="rect" id="Node000004" href="$ata_8c.html#a0a0cb85808989e1454bfaf46cd4dcfec" title=" " alt="" coords="5,31,116,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="150,60,116,54,116,49,151,54"/>
+<area shape="rect" id="Node000008" href="$ata_8c.html#a14eec1963cfa48aff8940f77398f1e93" title="Write sectors to an ATA drive (DMA if available, else PIO)." alt="" coords="19,92,102,117"/>
+<area shape="poly" id="edge4_Node000003_Node000008" title=" " alt="" coords="152,86,103,98,101,92,151,81"/>
+<area shape="poly" id="edge6_Node000010_Node000004" title=" " alt="" coords="166,29,117,37,116,32,165,24"/>
+<area shape="poly" id="edge8_Node000011_Node000008" title=" " alt="" coords="164,115,102,110,103,105,164,110"/>
+</map>

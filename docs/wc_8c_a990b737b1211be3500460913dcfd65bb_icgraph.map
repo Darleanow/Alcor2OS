@@ -1,0 +1,5 @@
+<map id="count_fd" name="count_fd">
+<area shape="rect" id="Node000001" title="Count lines, words, bytes, and the longest line length from a file descriptor." alt="" coords="108,5,187,31"/>
+<area shape="rect" id="Node000002" href="$wc_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="Entry point for the wc utility." alt="" coords="5,5,60,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,21,60,21,60,15,94,15"/>
+</map>

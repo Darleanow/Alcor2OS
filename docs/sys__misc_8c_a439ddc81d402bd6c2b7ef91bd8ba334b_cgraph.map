@@ -1,0 +1,31 @@
+<map id="sys_futex" name="sys_futex">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,257,91,283"/>
+<area shape="rect" id="Node000002" href="$sys__misc_8c.html#a728f404e37f7caa2842ea7bea366b61e" title=" " alt="" coords="153,107,263,132"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,256,83,201,108,169,137,141,145,136,148,140,140,145,112,173,88,204,57,259"/>
+<area shape="rect" id="Node000012" href="$sys__misc_8c.html#a4040fd018bf7e62a552bcdb77ba8a5b9" title=" " alt="" coords="147,156,269,181"/>
+<area shape="poly" id="edge7_Node000001_Node000012" title=" " alt="" coords="62,255,95,228,137,198,162,185,165,189,140,203,99,232,65,259"/>
+<area shape="rect" id="Node000013" href="$sys__misc_8c.html#a8a3d72124ddacfcc1825b04f29980211" title=" " alt="" coords="336,207,437,232"/>
+<area shape="poly" id="edge16_Node000001_Node000013" title=" " alt="" coords="90,255,138,243,235,229,322,221,323,226,235,234,139,249,91,260"/>
+<area shape="rect" id="Node000015" href="$sys__misc_8c.html#a086c3dd1bd0460a55026af21041eef62" title=" " alt="" coords="139,257,277,283"/>
+<area shape="poly" id="edge12_Node000001_Node000015" title=" " alt="" coords="91,267,125,267,125,273,91,273"/>
+<area shape="rect" id="Node000016" href="$sys__misc_8c.html#a5c861eace4b8c156047d774a9e28809b" title=" " alt="" coords="148,307,268,332"/>
+<area shape="poly" id="edge13_Node000001_Node000016" title=" " alt="" coords="91,280,153,300,152,305,89,285"/>
+<area shape="rect" id="Node000017" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="157,356,259,381"/>
+<area shape="poly" id="edge14_Node000001_Node000017" title=" " alt="" coords="63,281,96,311,140,342,152,348,149,353,137,347,93,315,60,285"/>
+<area shape="rect" id="Node000018" href="$proc_8c.html#af5326db3dd023e5ba163fb0b7c4cfc78" title="Schedule the next ready process to run." alt="" coords="151,405,265,431"/>
+<area shape="poly" id="edge15_Node000001_Node000018" title=" " alt="" coords="58,282,88,335,112,365,140,392,148,397,145,401,137,396,108,369,84,338,53,284"/>
+<area shape="rect" id="Node000003" href="$vmm_8c.html#a79058902336b9774ccdf1efa90360b18" title="Translate virtual address to physical address in current address space." alt="" coords="325,105,448,131"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="263,116,312,116,312,121,263,122"/>
+<area shape="rect" id="Node000004" href="$cpu_8c.html#ad54396d8de90b403e89f908d3ea11421" title="Get the current CR3 (PML4) value." alt="" coords="519,5,627,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="402,103,442,72,495,40,510,33,512,38,497,44,445,76,405,107"/>
+<area shape="rect" id="Node000005" href="$vmm_8c.html#a9edcd8664adaa1d5febbd974756ca760" title="Get or create next page table level." alt="" coords="513,55,632,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="434,103,511,81,513,86,435,108"/>
+<area shape="rect" id="Node000007" href="$vmm_8h.html#acfde1af0ea5a7f8a4a36bf179efeeab8" title="Convert physical address to virtual (HHDM)." alt="" coords="697,105,800,131"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="448,115,683,115,683,121,448,121"/>
+<area shape="poly" id="edge5_Node000005_Node000007" title=" " alt="" coords="618,78,691,99,689,104,617,83"/>
+<area shape="poly" id="edge11_Node000012_Node000003" title=" " alt="" coords="253,153,327,132,329,137,254,158"/>
+<area shape="poly" id="edge8_Node000012_Node000007" title=" " alt="" coords="269,160,683,121,684,127,270,166"/>
+<area shape="poly" id="edge9_Node000012_Node000013" title=" " alt="" coords="254,179,329,200,327,205,253,184"/>
+<area shape="rect" id="Node000014" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="496,207,649,232"/>
+<area shape="poly" id="edge10_Node000013_Node000014" title=" " alt="" coords="438,217,482,217,482,222,438,222"/>
+</map>

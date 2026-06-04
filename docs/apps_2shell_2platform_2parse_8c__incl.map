@@ -1,0 +1,23 @@
+<map id="user/apps/shell/platform/parse.c" name="user/apps/shell/platform/parse.c">
+<area shape="rect" id="Node000001" title="Multi&#45;line statement accumulator: brace/quote/heredoc&#45;aware test for whether the buffer is a complete..." alt="" coords="237,5,417,45"/>
+<area shape="rect" id="Node000002" href="$boxdraw_8h.html" title="UTF&#45;8 box&#45;drawing character literals for write()/printf() output." alt="" coords="110,93,199,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="287,48,193,90,191,85,284,43"/>
+<area shape="rect" id="Node000003" href="$shell_8h.html" title="Shell&#45;internal helpers (sh_*) used by main.c, builtins.c, and the shell&#39;s platform layer...." alt="" coords="223,93,323,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="316,47,291,83,287,80,312,44"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="348,93,415,119"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="342,44,368,80,363,84,338,47"/>
+<area shape="rect" id="Node000010" href="$theme_8h.html" title="Semantic colour roles — swap this file to change the active theme." alt="" coords="497,93,573,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="377,43,492,86,490,91,376,48"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,167,77,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="237,121,91,166,89,161,235,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="101,167,184,192"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="254,121,177,162,175,158,251,116"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="208,167,283,192"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="271,120,257,155,252,153,266,118"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="307,167,378,192"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="287,117,324,155,320,159,283,121"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="403,167,488,192"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="302,116,406,159,404,164,300,121"/>
+<area shape="rect" id="Node000011" href="$catppuccin_8h.html" title="Catppuccin Mocha palette — xterm&#45;256 indices and true&#45;colour ANSI escapes." alt="" coords="512,167,616,192"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="542,118,556,153,552,155,537,120"/>
+</map>

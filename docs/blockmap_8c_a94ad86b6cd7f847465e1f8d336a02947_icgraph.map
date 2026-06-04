@@ -1,0 +1,37 @@
+<map id="read_indirect_slot" name="read_indirect_slot">
+<area shape="rect" id="Node000001" title="Read slot slot_idx out of indirect block indirect_block." alt="" coords="579,181,717,207"/>
+<area shape="rect" id="Node000002" href="$blockmap_8c.html#a1edf31213aa3aa87731e42641099f46d" title="Resolve a file&#45;relative block index to an on&#45;disk block number." alt="" coords="409,181,531,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="565,197,531,197,531,191,565,191"/>
+<area shape="rect" id="Node000003" href="$file_8c.html#a845ca06242d90d0b72a0f50c2d615c95" title="Count how many on&#45;disk blocks following base_block_num are contiguous to it for this inode." alt="" coords="220,5,359,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="453,171,415,112,389,80,360,52,327,33,329,28,363,48,393,77,420,109,458,168"/>
+<area shape="rect" id="Node000004" href="$file_8c.html#aa4ace95cb1d031a3141636122511c8fc" title="One iteration of the read loop: pick the right path for one block and copy as much as fits." alt="" coords="15,7,159,32"/>
+<area shape="poly" id="edge18_Node000002_Node000004" title=" " alt="" coords="448,172,409,133,360,96,321,80,266,64,147,35,149,29,267,59,323,75,363,92,413,129,451,169"/>
+<area shape="rect" id="Node000008" href="$dir__entry_8c.html#a44847a1e74b0df6de11296fd8980308e" title="Find a directory entry by name." alt="" coords="234,107,345,132"/>
+<area shape="poly" id="edge4_Node000002_Node000008" title=" " alt="" coords="431,178,360,146,330,135,331,130,362,141,433,173"/>
+<area shape="rect" id="Node000028" href="$dir__entry_8c.html#a846f948811faccd55e96a7bcf1eb8747" title="Check if a directory is empty." alt="" coords="236,156,343,181"/>
+<area shape="poly" id="edge7_Node000002_Node000028" title=" " alt="" coords="395,186,342,179,343,173,396,181"/>
+<area shape="rect" id="Node000029" href="$dir__entry_8c.html#af34fc009f5ec9683665f000e226a64bd" title="Remove a directory entry." alt="" coords="221,205,358,231"/>
+<area shape="poly" id="edge9_Node000002_Node000029" title=" " alt="" coords="396,207,359,211,358,206,395,201"/>
+<area shape="rect" id="Node000030" href="$dir__entry_8c.html#a636acc589597366c76316781d88c4505" title="Try to splice the new entry into any existing block&#39;s slack." alt="" coords="219,255,359,295"/>
+<area shape="poly" id="edge12_Node000002_Node000030" title=" " alt="" coords="430,215,336,258,333,253,428,210"/>
+<area shape="rect" id="Node000034" href="$file_8c.html#a8b7d4942e79d8b4e76b87688e3686e72" title="Resolve file_block to an on&#45;disk block, allocating on hole." alt="" coords="217,320,361,345"/>
+<area shape="poly" id="edge14_Node000002_Node000034" title=" " alt="" coords="454,219,415,265,390,289,363,310,337,322,335,317,360,305,387,285,411,261,450,216"/>
+<area shape="rect" id="Node000039" href="$dir_8c.html#ababeb4e8c776d2b2c367e0f49234c2f9" title="Read the entry at index from an open directory." alt="" coords="237,369,341,395"/>
+<area shape="poly" id="edge16_Node000002_Node000039" title=" " alt="" coords="461,221,424,290,397,327,363,360,343,372,340,367,360,356,393,324,420,287,456,218"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,21,159,22,159,16,206,16"/>
+<area shape="rect" id="Node000009" href="$path_8c.html#a26da330aa71fa2bf5d5c8c70862c4030" title="Read the target of the symlink at path into buf." alt="" coords="32,57,143,83"/>
+<area shape="poly" id="edge5_Node000008_Node000009" title=" " alt="" coords="223,106,140,85,141,80,224,101"/>
+<area shape="rect" id="Node000011" href="$path_8c.html#a668589c43a9199cc39eff8bb62e9143b" title="Look up component inside current_inode and advance the cursor to the resolved inode." alt="" coords="5,107,169,132"/>
+<area shape="poly" id="edge6_Node000008_Node000011" title=" " alt="" coords="220,122,170,122,170,117,220,117"/>
+<area shape="rect" id="Node000018" href="$dir_8c.html#aa4c996b297c8e722153eb3b32cd065ca" title="Remove an empty directory from an ext2 volume." alt="" coords="41,156,134,181"/>
+<area shape="poly" id="edge8_Node000028_Node000018" title=" " alt="" coords="222,171,135,171,135,166,222,166"/>
+<area shape="poly" id="edge10_Node000029_Node000018" title=" " alt="" coords="223,205,134,183,135,177,224,199"/>
+<area shape="rect" id="Node000022" href="$dir_8c.html#ab2db24d7e702d63816085153ecf3eef7" title="Remove a file from an ext2 volume." alt="" coords="38,205,137,231"/>
+<area shape="poly" id="edge11_Node000029_Node000022" title=" " alt="" coords="207,221,137,221,137,215,207,215"/>
+<area shape="rect" id="Node000031" href="$dir__entry_8c.html#a4f4dc40dd4d7fa626fb34219002c1637" title="Add a directory entry." alt="" coords="32,263,143,288"/>
+<area shape="poly" id="edge13_Node000030_Node000031" title=" " alt="" coords="205,278,143,278,143,273,205,273"/>
+<area shape="rect" id="Node000035" href="$file_8c.html#ae37d4828b0eb47da6755a484e7876462" title="One iteration of the write loop: place one chunk into the file." alt="" coords="21,320,153,345"/>
+<area shape="poly" id="edge15_Node000034_Node000035" title=" " alt="" coords="203,335,154,335,154,330,203,330"/>
+<area shape="rect" id="Node000040" href="$ops_8c.html#a8b01b0f12e74e9ca626d34d91d6f9e65" title="fs_ops_t.readdir shim — copies one entry&#39;s name + stat." alt="" coords="20,369,155,395"/>
+<area shape="poly" id="edge17_Node000039_Node000040" title=" " alt="" coords="224,385,155,385,155,379,224,379"/>
+</map>

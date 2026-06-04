@@ -1,0 +1,76 @@
+<map id="cpu_read_cr3" name="cpu_read_cr3">
+<area shape="rect" id="Node000001" title="Get the current CR3 (PML4) value." alt="" coords="1285,273,1393,298"/>
+<area shape="rect" id="Node000002" href="$vmm_8c.html#a480dab99f31b160283283ec482141d9c" title="Get current PML4 physical address from CR3." alt="" coords="433,22,611,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1318,263,1279,214,1221,154,1148,95,1108,70,1066,50,1004,31,940,18,874,11,810,8,690,13,593,25,593,19,689,8,810,3,875,6,940,13,1005,26,1068,45,1110,65,1151,91,1224,150,1283,211,1322,259"/>
+<area shape="rect" id="Node000011" href="$vmm_8c.html#a79058902336b9774ccdf1efa90360b18" title="Translate virtual address to physical address in current address space." alt="" coords="1115,197,1237,222"/>
+<area shape="poly" id="edge5_Node000001_Node000011" title=" " alt="" coords="1298,269,1203,224,1205,220,1300,264"/>
+<area shape="rect" id="Node000025" href="$vmm_8c.html#ad88914a67f0dc1a691e35e81f47751fb" title="Initialize the virtual memory manager." alt="" coords="1134,495,1218,521"/>
+<area shape="poly" id="edge25_Node000001_Node000025" title=" " alt="" coords="1325,311,1239,435,1190,497,1186,493,1235,432,1320,308"/>
+<area shape="rect" id="Node000027" href="$vmm_8c.html#ae21b8be99797e7a1be0d7a5b328ef934" title="Map a virtual page to a physical page in the current address space." alt="" coords="1130,395,1222,421"/>
+<area shape="poly" id="edge28_Node000001_Node000027" title=" " alt="" coords="1312,309,1196,397,1193,393,1308,305"/>
+<area shape="rect" id="Node000148" href="$vmm_8c.html#a6244b5d7fe137846a4daf0e46f73cac0" title="Allocate and map a range of consecutive virtual pages." alt="" coords="892,247,1067,273"/>
+<area shape="poly" id="edge38_Node000001_Node000148" title=" " alt="" coords="1272,283,1067,269,1067,263,1272,278"/>
+<area shape="rect" id="Node000150" href="$vmm_8c.html#aeaa0c698c155c448ca914e36088c2e23" title="Unmap a virtual page from the current address space." alt="" coords="1122,298,1230,323"/>
+<area shape="poly" id="edge43_Node000001_Node000150" title=" " alt="" coords="1272,298,1231,305,1230,300,1271,293"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#ae492ca9b3388c1829a98e7108c497153" title="Create a new process from an ELF binary." alt="" coords="244,122,385,147"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="483,56,343,124,341,119,481,51"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="31,258,170,283"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="283,157,123,260,121,256,281,153"/>
+<area shape="rect" id="Node000009" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="5,122,196,147"/>
+<area shape="poly" id="edge4_Node000003_Node000009" title=" " alt="" coords="230,137,196,137,196,132,230,132"/>
+<area shape="rect" id="Node000012" href="$sys__mm_8c.html#a7da07ec899f677a888d630e40f1635c2" title=" " alt="" coords="916,395,1043,421"/>
+<area shape="poly" id="edge6_Node000011_Node000012" title=" " alt="" coords="1156,234,1117,287,1104,315,1098,339,1089,363,1068,386,1044,400,1042,395,1065,382,1084,360,1092,338,1099,313,1112,284,1152,231"/>
+<area shape="rect" id="Node000014" href="$elf_8c.html#ad6a2ec668bb3290e664ab1a581e8eaac" title=" " alt="" coords="673,47,830,73"/>
+<area shape="poly" id="edge8_Node000011_Node000014" title=" " alt="" coords="1159,186,1122,133,1096,107,1065,86,1007,65,946,54,885,51,831,53,831,47,885,45,946,49,1009,60,1068,82,1099,103,1126,130,1164,183"/>
+<area shape="rect" id="Node000017" href="$sys__mm_8c.html#a0d76fce616e6b2bfc5a09e0fa5df3ecd" title=" " alt="" coords="669,195,833,221"/>
+<area shape="poly" id="edge13_Node000011_Node000017" title=" " alt="" coords="1101,212,833,211,833,206,1101,206"/>
+<area shape="rect" id="Node000018" href="$sys__misc_8c.html#a728f404e37f7caa2842ea7bea366b61e" title=" " alt="" coords="925,97,1034,122"/>
+<area shape="poly" id="edge15_Node000011_Node000018" title=" " alt="" coords="1148,190,1110,162,1066,136,1033,124,1035,119,1068,131,1113,157,1151,186"/>
+<area shape="rect" id="Node000020" href="$sys__misc_8c.html#a4040fd018bf7e62a552bcdb77ba8a5b9" title=" " alt="" coords="918,146,1041,171"/>
+<area shape="poly" id="edge17_Node000011_Node000020" title=" " alt="" coords="1112,196,1029,174,1030,169,1113,190"/>
+<area shape="rect" id="Node000021" href="$sys__mm_8c.html#a5d85ae596caf7c76319a5ae5690f0d33" title=" " alt="" coords="924,346,1035,371"/>
+<area shape="poly" id="edge19_Node000011_Node000021" title=" " alt="" coords="1158,234,1107,296,1068,337,1036,351,1034,346,1065,332,1103,292,1154,231"/>
+<area shape="rect" id="Node000022" href="$sys__mm_8c.html#a4a9a3125254665467fbc3e506c768b9a" title=" " alt="" coords="892,297,1067,322"/>
+<area shape="poly" id="edge20_Node000011_Node000022" title=" " alt="" coords="1151,233,1113,260,1068,286,1034,299,1033,294,1066,282,1110,256,1147,228"/>
+<area shape="rect" id="Node000013" href="$sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" title=" " alt="" coords="475,282,569,307"/>
+<area shape="poly" id="edge7_Node000012_Node000013" title=" " alt="" coords="902,399,786,377,658,347,553,310,555,305,659,341,787,372,903,393"/>
+<area shape="rect" id="Node000015" href="$elf_8c.html#a32d95081601786965b46c48021ed9d6f" title="Load an ELF64 executable into memory." alt="" coords="485,97,559,122"/>
+<area shape="poly" id="edge9_Node000014_Node000015" title=" " alt="" coords="679,78,560,104,559,99,678,73"/>
+<area shape="rect" id="Node000016" href="$elf_8c.html#aa766915043a1a1e12b0bec3dda410d5d" title="Load an ELF64 executable streaming directly from a file descriptor." alt="" coords="475,146,569,171"/>
+<area shape="poly" id="edge11_Node000014_Node000016" title=" " alt="" coords="673,80,660,86,646,98,637,110,627,123,612,136,571,152,569,147,609,131,624,119,632,107,642,94,657,82,670,75"/>
+<area shape="poly" id="edge10_Node000015_Node000003" title=" " alt="" coords="471,118,386,129,385,123,471,113"/>
+<area shape="poly" id="edge12_Node000016_Node000003" title=" " alt="" coords="461,154,385,145,386,140,461,149"/>
+<area shape="poly" id="edge14_Node000017_Node000013" title=" " alt="" coords="683,227,660,234,599,260,549,284,547,279,597,255,658,229,681,222"/>
+<area shape="rect" id="Node000019" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="709,97,794,122"/>
+<area shape="poly" id="edge16_Node000018_Node000019" title=" " alt="" coords="911,112,794,112,794,107,911,107"/>
+<area shape="poly" id="edge18_Node000020_Node000019" title=" " alt="" coords="906,146,794,121,795,116,907,140"/>
+<area shape="poly" id="edge23_Node000022_Node000013" title=" " alt="" coords="903,327,844,335,751,341,658,335,605,324,558,310,560,305,607,319,659,329,751,336,844,329,902,322"/>
+<area shape="rect" id="Node000023" href="$sys__mm_8c.html#abdac42378ec121cb3f3b48c5af03ded3" title=" " alt="" coords="661,245,842,270"/>
+<area shape="poly" id="edge21_Node000022_Node000023" title=" " alt="" coords="909,296,807,273,808,267,910,291"/>
+<area shape="rect" id="Node000024" href="$sys__mm_8c.html#a95d35a82f8059990e8f0598e18299f19" title=" " alt="" coords="697,294,806,319"/>
+<area shape="poly" id="edge24_Node000022_Node000024" title=" " alt="" coords="878,311,807,310,807,305,878,305"/>
+<area shape="poly" id="edge22_Node000023_Node000013" title=" " alt="" coords="660,275,570,290,569,284,659,270"/>
+<area shape="rect" id="Node000026" href="$src_2kernel_2main_8c.html#adeb869107f7d13d18c40424087d0da85" title="Initialize early boot subsystems." alt="" coords="481,521,563,546"/>
+<area shape="poly" id="edge26_Node000025_Node000026" title=" " alt="" coords="1121,526,1067,536,922,546,779,548,563,539,564,534,779,543,922,541,1066,531,1120,521"/>
+<area shape="rect" id="Node000008" href="$src_2kernel_2main_8c.html#a406c20548822065e144564476378f8a1" title="Kernel main entry point." alt="" coords="283,521,346,546"/>
+<area shape="poly" id="edge27_Node000026_Node000008" title=" " alt="" coords="467,536,346,536,346,531,467,531"/>
+<area shape="poly" id="edge29_Node000027_Node000012" title=" " alt="" coords="1116,411,1043,411,1043,405,1116,405"/>
+<area shape="poly" id="edge37_Node000027_Node000021" title=" " alt="" coords="1116,396,1030,374,1031,369,1117,391"/>
+<area shape="rect" id="Node000028" href="$heap_8c.html#a8985c8323224b4f211c0f852ac4cfb2c" title="Expand heap by allocating and mapping new physical pages." alt="" coords="925,446,1034,471"/>
+<area shape="poly" id="edge30_Node000027_Node000028" title=" " alt="" coords="1117,426,1030,448,1029,443,1116,421"/>
+<area shape="rect" id="Node000147" href="$sys__mm_8c.html#a2d1d07fe317612d6d37d18174c73b63b" title=" " alt="" coords="943,495,1015,521"/>
+<area shape="poly" id="edge36_Node000027_Node000147" title=" " alt="" coords="1151,432,1113,460,1068,486,1016,504,1015,499,1066,482,1110,455,1148,427"/>
+<area shape="rect" id="Node000029" href="$heap_8c.html#a7e7a6625a49b6a560a47ae7575575264" title="Initialize the kernel heap allocator." alt="" coords="710,495,793,521"/>
+<area shape="poly" id="edge31_Node000028_Node000029" title=" " alt="" coords="912,476,794,502,792,497,911,471"/>
+<area shape="rect" id="Node000030" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="714,446,789,471"/>
+<area shape="poly" id="edge33_Node000028_Node000030" title=" " alt="" coords="911,461,789,461,789,456,911,456"/>
+<area shape="poly" id="edge32_Node000029_Node000026" title=" " alt="" coords="697,517,564,531,563,526,696,511"/>
+<area shape="poly" id="edge35_Node000030_Node000004" title=" " alt="" coords="700,447,145,286,147,281,702,442"/>
+<area shape="poly" id="edge34_Node000030_Node000016" title=" " alt="" coords="731,436,609,271,532,173,536,170,613,268,735,433"/>
+<area shape="poly" id="edge42_Node000148_Node000023" title=" " alt="" coords="878,261,842,261,842,256,878,256"/>
+<area shape="rect" id="Node000149" href="$elf_8c.html#ac1396569a9a8edc3e72a606e32adfe98" title=" " alt="" coords="659,146,844,171"/>
+<area shape="poly" id="edge39_Node000148_Node000149" title=" " alt="" coords="947,242,899,213,843,185,810,174,811,169,845,180,902,208,950,237"/>
+<area shape="poly" id="edge40_Node000149_Node000015" title=" " alt="" coords="678,146,559,120,560,115,679,140"/>
+<area shape="poly" id="edge41_Node000149_Node000016" title=" " alt="" coords="645,161,570,161,570,156,645,156"/>
+<area shape="poly" id="edge44_Node000150_Node000022" title=" " alt="" coords="1108,313,1067,313,1067,307,1108,307"/>
+</map>

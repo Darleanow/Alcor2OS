@@ -1,0 +1,12 @@
+<map id="proc_alloc" name="proc_alloc">
+<area shape="rect" id="Node000001" title="Allocate a free process slot from the process table." alt="" coords="5,80,93,105"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#a17077b431dac6188d17946bde91629f6" title="Copy a string with a size limit." alt="" coords="183,5,261,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,78,140,40,169,29,171,34,142,44,72,82"/>
+<area shape="rect" id="Node000003" href="$ktermios_8c.html#a1a9811c2c69a777da120ed3d4dd28520" title="Reset t to the cooked&#45;TTY defaults a freshly forked PID would expect (ICRNL|ONLCR|CS8|CREAD|CLOCAL|IS..." alt="" coords="141,55,303,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="93,84,127,79,128,84,94,89"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="351,80,409,105"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="94,90,337,90,337,95,94,95"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#a80c978da31292631e5055bf9b776eaa3" title="Initialise fds to the &quot;all closed&quot; state (&#45;1 in every slot)." alt="" coords="156,156,288,181"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="77,103,142,134,176,148,174,153,140,139,75,108"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="302,77,338,83,337,89,301,83"/>
+</map>

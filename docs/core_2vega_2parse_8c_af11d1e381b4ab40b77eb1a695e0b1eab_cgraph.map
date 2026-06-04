@@ -1,0 +1,39 @@
+<map id="parse_command" name="parse_command">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,252,136,277"/>
+<area shape="rect" id="Node000002" href="$ast_8c.html#a2809c5109cc9403e8bba31e284d6306b" title="Append a redirection to a CMD node. target is taken by ownership." alt="" coords="199,5,345,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,251,83,210,104,153,136,92,157,64,182,40,189,35,192,39,186,44,161,68,141,95,108,155,88,212,77,252"/>
+<area shape="rect" id="Node000003" href="$ast_8c.html#a7463447262f92b4fb53f9b02fe6af8fd" title="Append arg (taking ownership of the heap pointer) to a CMD node&#39;s argv. Grows the array as needed and..." alt="" coords="201,55,343,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="74,251,88,218,110,175,142,129,182,89,190,84,193,88,186,93,146,132,115,177,93,221,79,253"/>
+<area shape="rect" id="Node000004" href="$ast_8c.html#aae44fe1727e0225285b3c5b0af4faa46" title="Free an AST node and everything it owns. NULL&#45;safe." alt="" coords="235,128,309,153"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="81,250,122,207,151,183,183,162,220,148,222,153,185,167,154,187,126,211,85,254"/>
+<area shape="rect" id="Node000005" href="$ast_8c.html#ac36c5934ad5e80557edfe3ae9eaaa901" title="Allocate a new AST_CMD node with empty argv." alt="" coords="217,177,327,203"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="96,249,183,212,206,204,207,209,185,216,98,254"/>
+<area shape="rect" id="Node000006" href="$core_2vega_2parse_8c.html#aff2f216010f09e97a4d1831e7638d7cc" title=" " alt="" coords="195,227,349,252"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="136,254,180,248,181,253,137,259"/>
+<area shape="rect" id="Node000008" href="$lexer_8c.html#a84851e4cf3d14fcf913e267852e1ab08" title="Consume and return the next token." alt="" coords="233,276,311,301"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="137,270,219,280,219,285,136,275"/>
+<area shape="rect" id="Node000015" href="$lexer_8c.html#af5096e6d8a92971808526ba626a46bdc" title="Peek at the next token without consuming." alt="" coords="231,325,313,351"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="100,275,185,310,219,321,217,326,183,315,98,280"/>
+<area shape="rect" id="Node000016" href="$lexer_8c.html#aba1602b225af0ade361f379d113d4193" title="Consume a heredoc body from the lexer&#39;s stream. Skips the rest of the current line (up to and includi..." alt="" coords="184,375,360,400"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="85,275,127,317,155,340,185,360,202,367,200,372,183,364,152,344,123,321,81,279"/>
+<area shape="rect" id="Node000018" href="$lexer_8c.html#abbbfdf6d2487ba0569a480f8bc1f24eb" title="Free a token&#39;s heap storage if any." alt="" coords="213,424,331,449"/>
+<area shape="poly" id="edge18_Node000001_Node000018" title=" " alt="" coords="80,276,119,340,149,377,186,409,201,418,199,423,182,414,145,381,114,343,76,279"/>
+<area shape="rect" id="Node000019" href="$core_2vega_2parse_8c.html#afb081c431e49b30aa86f5c6e8c78137c" title=" " alt="" coords="188,473,356,499"/>
+<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="78,277,90,313,112,362,144,414,163,438,186,459,195,465,192,469,182,463,159,442,139,417,107,364,85,315,73,278"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="242,129,236,120,239,110,252,104,272,101,297,105,307,114,303,118,294,110,272,107,253,109,243,113,241,119,247,126"/>
+<area shape="rect" id="Node000007" href="$lexer_8c.html#adb509730aa3f5613653d198ce99a75da" title="Human&#45;readable name for a token kind (for error messages)." alt="" coords="408,227,495,252"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="350,237,394,237,394,242,350,242"/>
+<area shape="rect" id="Node000009" href="$lexer_8c.html#a4f6b122799074ebf08f4ea10ade65b39" title=" " alt="" coords="410,300,493,325"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="312,291,397,303,396,308,311,297"/>
+<area shape="rect" id="Node000010" href="$lexer_8c.html#acbe69e56df80c5c4f737cfde6d9be873" title=" " alt="" coords="551,225,637,251"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="473,298,541,260,552,255,554,259,544,264,476,302"/>
+<area shape="rect" id="Node000011" href="$lexer_8c.html#a89fb4c390705931605dfa96c5ba59d11" title=" " alt="" coords="543,275,645,300"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="492,303,529,296,530,301,493,308"/>
+<area shape="rect" id="Node000012" href="$lexer_8c.html#abaab6431350f60fa9623b5b63b6b329a" title=" " alt="" coords="543,324,645,349"/>
+<area shape="poly" id="edge12_Node000009_Node000012" title=" " alt="" coords="493,317,530,323,529,328,492,322"/>
+<area shape="rect" id="Node000013" href="$lexer_8c.html#a38ea90df448960e553ef9a9629959a2c" title=" " alt="" coords="549,373,639,399"/>
+<area shape="poly" id="edge13_Node000009_Node000013" title=" " alt="" coords="478,323,544,358,556,365,554,369,541,363,475,328"/>
+<area shape="poly" id="edge15_Node000015_Node000009" title=" " alt="" coords="313,330,396,318,397,323,313,335"/>
+<area shape="rect" id="Node000017" href="$lexer_8c.html#a280140ced7662af7757a60a7a9d4145e" title=" " alt="" coords="414,375,489,400"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="360,385,400,385,400,390,360,390"/>
+</map>

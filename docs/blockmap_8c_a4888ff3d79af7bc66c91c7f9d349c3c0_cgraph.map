@@ -1,0 +1,24 @@
+<map id="alloc_zeroed_block" name="alloc_zeroed_block">
+<area shape="rect" id="Node000001" title="Allocate a fresh block, zero it, and bill the inode for it." alt="" coords="5,204,152,229"/>
+<area shape="rect" id="Node000002" href="$alloc_8c.html#ad132e225f76cc34a8971d2fcd30e55b8" title="Allocate a free block, preferring preferred_group." alt="" coords="200,103,295,128"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,202,212,133,215,137,102,206"/>
+<area shape="rect" id="Node000006" href="$heap_8c.html#a069f85a5001d71bc44d8be6532a4e432" title="Free previously allocated memory." alt="" coords="591,153,647,179"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="152,202,200,195,412,176,577,165,577,171,412,181,200,201,153,207"/>
+<area shape="rect" id="Node000020" href="$heap_8c.html#ad228097e37d00d3d57eae3f5f44bc9eb" title="Allocate memory from kernel heap." alt="" coords="581,204,656,229"/>
+<area shape="poly" id="edge10_Node000001_Node000020" title=" " alt="" coords="152,214,567,214,567,219,152,219"/>
+<area shape="rect" id="Node000037" href="$super_8c.html#a2369a1747e05d7ea520926662b2c7fce" title="Companion of vol_read_block for writes." alt="" coords="557,253,681,279"/>
+<area shape="poly" id="edge12_Node000001_Node000037" title=" " alt="" coords="153,221,543,257,543,262,152,226"/>
+<area shape="rect" id="Node000030" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="218,305,277,331"/>
+<area shape="poly" id="edge11_Node000001_Node000030" title=" " alt="" coords="102,227,215,296,212,301,100,232"/>
+<area shape="rect" id="Node000003" href="$alloc_8c.html#a10b951f10689e7635a7c2695c6e1b795" title="Try to allocate one block inside group." alt="" coords="343,103,501,128"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,113,329,113,329,118,295,118"/>
+<area shape="rect" id="Node000004" href="$alloc_8c.html#a2d0514ac6e7fe9a08bb405700cedef38" title="Locate the first clear bit in a bitmap." alt="" coords="549,5,688,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="441,100,489,71,548,40,563,33,566,38,550,44,492,75,444,105"/>
+<area shape="rect" id="Node000005" href="$alloc_8c.html#a92112ad41af262ed304b3f6385d01899" title="Set bit bit in the bitmap rooted at bitmap." alt="" coords="571,55,666,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="474,100,557,79,559,85,475,105"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="473,126,578,153,577,158,472,131"/>
+<area shape="poly" id="edge6_Node000003_Node000020" title=" " alt="" coords="444,126,492,156,551,188,570,196,568,201,548,192,489,160,441,131"/>
+<area shape="rect" id="Node000035" href="$super_8c.html#a0af99b5a1720e9044d8a83f3cbe66d97" title="Read one filesystem block (vol&#45;relative) into buf." alt="" coords="559,104,679,129"/>
+<area shape="poly" id="edge7_Node000003_Node000035" title=" " alt="" coords="502,113,545,114,545,119,502,119"/>
+<area shape="poly" id="edge8_Node000003_Node000037" title=" " alt="" coords="435,127,481,181,514,212,551,240,561,245,558,250,548,244,511,216,477,184,431,130"/>
+</map>

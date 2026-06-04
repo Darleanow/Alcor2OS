@@ -1,0 +1,18 @@
+<map id="gr__apply_value" name="gr__apply_value">
+<area shape="rect" id="Node000001" title="Dispatch value parsing to the correct typed handler for o." alt="" coords="5,53,133,79"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a567dd32fb181a8127afb574abb37fb6b" title="Write a formatted diagnostic to buf or fallback stream. Truncates with &quot;...&quot; when buf is too small; f..." alt="" coords="351,53,423,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,51,131,30,181,13,242,3,270,5,303,13,334,26,361,43,358,47,332,30,302,18,269,10,242,8,182,18,133,35,93,56"/>
+<area shape="rect" id="Node000005" href="$grendizer_8c.html#a0eae8d348350684f2fa1b77435cd0c0e" title="Parse a floating&#45;point value from text into out. Hand&#45;rolled to avoid a strtod dependency in freestan..." alt="" coords="181,28,303,53"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="133,54,167,49,168,54,134,59"/>
+<area shape="rect" id="Node000006" href="$grendizer_8c.html#a91c2a6ae03cea75ee7262316b3c395f2" title="Parse a signed decimal integer from text into out." alt="" coords="187,77,297,103"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="134,72,174,78,173,83,133,78"/>
+<area shape="rect" id="Node000007" href="$grendizer_8c.html#a8e70c9e2b4b39959c3a210f3aae769ce" title="Parse an unsigned decimal integer from text into out." alt="" coords="183,127,301,152"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="101,76,182,112,199,119,197,124,180,116,99,81"/>
+<area shape="rect" id="Node000003" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="471,53,549,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="423,63,457,63,457,69,423,69"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="597,53,684,79"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="549,63,584,63,584,69,549,69"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="303,49,338,55,337,60,302,54"/>
+<area shape="poly" id="edge7_Node000006_Node000002" title=" " alt="" coords="297,78,337,72,337,77,297,84"/>
+<area shape="poly" id="edge9_Node000007_Node000002" title=" " alt="" coords="274,124,301,112,352,84,354,88,304,116,276,129"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="read_sparse_chunk" name="read_sparse_chunk">
+<area shape="rect" id="Node000001" title="Fill dst with zeros for a sparse&#45;file hole." alt="" coords="5,5,152,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="200,5,259,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,15,186,15,186,21,152,21"/>
+</map>

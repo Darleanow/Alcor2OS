@@ -1,0 +1,13 @@
+<map id="mouse_ps2_irq" name="mouse_ps2_irq">
+<area shape="rect" id="Node000001" title="IRQ 12 handler: accumulate one mouse packet byte, post on completion." alt="" coords="5,31,125,56"/>
+<area shape="rect" id="Node000002" href="$io_8h.html#a72469337290ae306e228d538970aef1d" title="Read a byte from an I/O port." alt="" coords="225,5,267,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,32,211,20,212,25,126,38"/>
+<area shape="rect" id="Node000003" href="$mouse_8c.html#a7549de64e1ca943611685af5f4907fd9" title="Post one movement/button report into the broker." alt="" coords="173,55,319,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="126,49,160,53,159,58,125,54"/>
+<area shape="rect" id="Node000004" href="$proc_8c.html#ac88ca3415dfbf7f7ceac9528d43b4951" title="Wake p if it is blocked (set state to READY). Safe from IRQ." alt="" coords="367,29,457,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="319,54,352,48,353,54,319,59"/>
+<area shape="rect" id="Node000005" href="$mouse_8c.html#a891abdb34285e0a8f405c83e3f2857ff" title=" " alt="" coords="375,79,449,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="319,75,362,81,361,87,319,80"/>
+<area shape="rect" id="Node000006" href="$mouse_8c.html#afed7e7efe587c54d7af20d4235fc93cf" title=" " alt="" coords="505,79,596,104"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="449,89,492,89,492,94,449,94"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="slurp" name="slurp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="239,31,293,56"/>
+<area shape="rect" id="Node000002" href="$user_2apps_2vega_2main_8c.html#ae3a067ea1e9a6422d4961a492ef99534" title=" " alt="" coords="114,5,185,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,37,184,28,185,23,226,32"/>
+<area shape="rect" id="Node000004" href="$user_2apps_2vega_2main_8c.html#a96d656030559612d7fc9ebe5b3421bf1" title=" " alt="" coords="108,55,191,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="225,54,191,61,190,56,224,49"/>
+<area shape="rect" id="Node000003" href="$user_2apps_2vega_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,31,60,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,31,61,40,60,35,100,26"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="94,59,60,51,61,46,95,53"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="ps2_wait_output_full" name="ps2_wait_output_full">
+<area shape="rect" id="Node000001" title="Spin until a byte is available to read." alt="" coords="492,31,649,56"/>
+<area shape="rect" id="Node000002" href="$mouse__ps2_8c.html#ad166364dae9026806e72b787a51fc2f7" title="Read one byte from the controller." alt="" coords="327,31,444,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,46,444,46,444,41,478,41"/>
+<area shape="rect" id="Node000003" href="$mouse__ps2_8c.html#a24c01f5f20bd1823b7ba8ea033d68acc" title="Send a command to the mouse via the AUX port." alt="" coords="177,5,279,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="313,34,278,29,279,23,313,29"/>
+<area shape="rect" id="Node000004" href="$mouse__ps2_8c.html#aae1fe78162e3f9185c9c26d7deffa668" title="Enable the AUX port, configure IRQs/clocks, start data reporting." alt="" coords="5,31,129,56"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="313,46,130,46,130,41,313,41"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="164,31,130,36,129,31,163,25"/>
+</map>

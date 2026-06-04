@@ -1,0 +1,36 @@
+<map id="include/alcor2/fs/blockdev.h" name="include/alcor2/fs/blockdev.h">
+<area shape="rect" id="Node000001" title="Generic block device interface." alt="" coords="741,5,943,31"/>
+<area shape="rect" id="Node000002" href="$ext2_8h.html" title="ext2 filesystem driver." alt="" coords="755,79,929,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="845,44,845,79,839,79,839,44"/>
+<area shape="rect" id="Node000006" href="$src_2fs_2ext2_2internal_8h.html" title="Shared state, sizing macros, and private helpers for the ext2 module split." alt="" coords="648,152,804,177"/>
+<area shape="poly" id="edge19_Node000001_Node000006" title=" " alt="" coords="799,39,770,56,745,80,736,98,731,118,728,152,723,152,726,117,731,96,741,77,766,52,796,34"/>
+<area shape="rect" id="Node000014" href="$src_2kernel_2main_8c.html" title="Kernel entry point and bring&#45;up sequence." alt="" coords="930,152,1063,177"/>
+<area shape="poly" id="edge20_Node000001_Node000014" title=" " alt="" coords="882,35,914,53,944,77,974,115,994,150,989,153,970,118,940,81,911,57,879,39"/>
+<area shape="rect" id="Node000003" href="$blockmap_8c.html" title="Direct + indirect block resolution and reservation for ext2." alt="" coords="5,225,175,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="747,109,465,155,283,193,137,228,135,223,281,188,464,149,746,103"/>
+<area shape="rect" id="Node000004" href="$dir_8c.html" title="High&#45;level directory operations — readdir, mkdir, unlink, rmdir." alt="" coords="199,225,320,251"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="770,109,561,155,415,194,297,228,296,223,413,189,560,149,769,104"/>
+<area shape="rect" id="Node000005" href="$file_8c.html" title="File open / close / read / write / truncate / flush — the public ext2 byte&#45;oriented API." alt="" coords="345,225,470,251"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="786,110,636,155,437,228,435,223,634,149,785,105"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="813,113,746,154,744,149,810,109"/>
+<area shape="rect" id="Node000012" href="$path_8c.html" title="Path resolution, symlink following, and the ext2_stat / ext2_readlink endpoints." alt="" coords="1325,225,1460,251"/>
+<area shape="poly" id="edge16_Node000002_Node000012" title=" " alt="" coords="847,117,856,148,864,163,876,175,912,194,962,206,1021,213,1086,217,1214,218,1313,223,1325,224,1325,230,1312,228,1214,224,1086,222,1021,218,961,211,910,199,872,179,860,166,851,150,842,118"/>
+<area shape="rect" id="Node000013" href="$super_8c.html" title="Block&#45;level I/O, superblock + GDT writeback, volume bring&#45;up." alt="" coords="1484,225,1624,251"/>
+<area shape="poly" id="edge17_Node000002_Node000013" title=" " alt="" coords="858,115,884,148,900,163,919,175,969,192,1034,204,1110,210,1191,214,1350,217,1473,223,1484,224,1484,229,1472,228,1350,222,1191,220,1110,216,1034,209,968,197,917,180,897,167,880,151,854,118"/>
+<area shape="poly" id="edge18_Node000002_Node000014" title=" " alt="" coords="880,107,972,149,970,154,878,112"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="635,178,186,228,175,229,174,224,186,223,634,173"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="637,182,333,228,321,230,320,225,332,223,636,177"/>
+<area shape="poly" id="edge11_Node000006_Node000005" title=" " alt="" coords="662,183,460,228,458,223,661,178"/>
+<area shape="rect" id="Node000007" href="$alloc_8c.html" title="Block + inode allocation bitmap operations." alt="" coords="494,225,630,251"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="688,185,590,228,588,223,686,180"/>
+<area shape="rect" id="Node000008" href="$cache_8c.html" title="Single&#45;block scratch pool for one&#45;off ext2 metadata reads." alt="" coords="655,225,797,251"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="729,191,729,225,723,225,723,191"/>
+<area shape="rect" id="Node000009" href="$dir__entry_8c.html" title="On&#45;disk directory entry primitives — lookup, insert, remove, emptiness check." alt="" coords="821,225,983,251"/>
+<area shape="poly" id="edge10_Node000006_Node000009" title=" " alt="" coords="768,180,874,223,872,228,766,185"/>
+<area shape="rect" id="Node000010" href="$inode_8c.html" title="On&#45;disk inode read + write." alt="" coords="1007,225,1149,251"/>
+<area shape="poly" id="edge12_Node000006_Node000010" title=" " alt="" coords="796,177,1022,223,1020,228,795,183"/>
+<area shape="rect" id="Node000011" href="$ops_8c.html" title="fs_ops_t bridge for ext2." alt="" coords="1173,225,1301,251"/>
+<area shape="poly" id="edge13_Node000006_Node000011" title=" " alt="" coords="818,176,1161,223,1173,224,1172,230,1160,228,818,181"/>
+<area shape="poly" id="edge14_Node000006_Node000012" title=" " alt="" coords="818,174,824,175,1068,198,1313,223,1325,224,1325,230,1312,228,1068,203,823,180,817,179"/>
+<area shape="poly" id="edge15_Node000006_Node000013" title=" " alt="" coords="818,170,1473,223,1484,224,1484,229,1472,228,817,176"/>
+</map>

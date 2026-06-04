@@ -1,0 +1,5 @@
+<map id="alloc_pipe" name="alloc_pipe">
+<area shape="rect" id="Node000001" title="Find a free pipe slot, zero it, and mark both ends open." alt="" coords="5,5,93,31"/>
+<area shape="rect" id="Node000002" href="$kstdlib_8c.html#af89a730289a9a2436276d147a8fa5ff1" title="Zero&#45;fill a memory region." alt="" coords="141,5,200,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,15,128,15,128,21,94,21"/>
+</map>

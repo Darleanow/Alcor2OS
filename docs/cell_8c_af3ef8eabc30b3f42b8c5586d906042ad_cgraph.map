@@ -1,0 +1,11 @@
+<map id="blit_bitmap_glyph" name="blit_bitmap_glyph">
+<area shape="rect" id="Node000001" title="CP437 bitmap fallback — bg&#45;fill the cell, then plot the set bits of the 8x16 font glyph centred insid..." alt="" coords="5,55,144,80"/>
+<area shape="rect" id="Node000002" href="$console_8c.html#ae9c3b5db44210cdbd47ac966f140000d" title="Paint one pixel at (x, y) honoring the framebuffer&#39;s bpp." alt="" coords="209,29,310,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,55,195,48,196,53,145,60"/>
+<area shape="rect" id="Node000005" href="$font__bitmap_8h.html#aa872bd8d398352cd9c51ed4151e6f056" title="Each byte indexes directly into the atlas." alt="" coords="192,79,327,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="145,74,179,78,178,83,144,79"/>
+<area shape="rect" id="Node000003" href="$console_8c.html#ae3f4f5ee0dd478d1795f578e759a9e17" title="Write a 16bpp pixel by reducing c to RGB565." alt="" coords="375,5,465,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="310,32,361,24,361,29,311,37"/>
+<area shape="rect" id="Node000004" href="$console_8c.html#acc49ff20a10272e2bf3e806ae3d6e37c" title="Write a 24bpp pixel as B,G,R in little&#45;endian order." alt="" coords="375,55,465,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="311,47,361,55,361,61,310,53"/>
+</map>

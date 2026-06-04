@@ -1,0 +1,5 @@
+<map id="sig_default_ignore" name="sig_default_ignore">
+<area shape="rect" id="Node000001" title="Return true if the default action for a signal is to ignore it." alt="" coords="201,5,344,31"/>
+<area shape="rect" id="Node000002" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="5,5,153,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,21,153,21,153,15,187,15"/>
+</map>
