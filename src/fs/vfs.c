@@ -258,8 +258,6 @@ void vfs_oft_release(i32 idx)
 i64 vfs_install_fd(i32 oft_idx)
 {
   proc_t *p = proc_current();
-  if(!p)
-    return -EINVAL;
   for(i64 i = 3; i < VFS_MAX_FD; i++) {
     if(p->fds[i] < 0) {
       p->fds[i] = oft_idx;
@@ -915,8 +913,6 @@ void vfs_proc_release_fds(i32 *fds)
 void vfs_proc_close_cloexec_fds(void)
 {
   proc_t *p = proc_current();
-  if(!p)
-    return;
   for(int i = 0; i < VFS_MAX_FD; i++) {
     if(p->fd_cloexec[i] && p->fds[i] >= 0) {
       vfs_oft_release(p->fds[i]);
