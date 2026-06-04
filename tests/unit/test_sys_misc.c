@@ -24,11 +24,12 @@ char *kstrncpy(char *d, const char *s, u64 m)
   return d;
 }
 
+static bool g_vmm_user_range_ok = true;
 /* vmm_is_user_range: treat every non-NULL pointer as user. */
 bool vmm_is_user_range(const void *p, u64 n)
 {
   (void)n;
-  return p != NULL;
+  return g_vmm_user_range_ok && p != NULL;
 }
 void console_print(const char *s)
 {
@@ -116,6 +117,7 @@ static int setup(void **state)
   g_cur_proc = NULL;
   /* reset the futex queue between tests */
   memset(g_futex_q, 0, sizeof(g_futex_q));
+  g_vmm_user_range_ok = true;
   return 0;
 }
 
@@ -715,6 +717,50 @@ static void sys_prlimit64_bad_old_limit_efault(void **state) {
   assert_int_equal(ret, 0);
 }
 
+/* sys_futex FUTEX_WAIT: futex_read_u32 fails → EFAULT (line 183) */
+static void sys_futex_wait_read_u32_fails_efault(void **state) {
+  (void)state;
+  /* Make futex_read_u32 fail by making vmm_get_phys return 0 */
+  g_phys_ok = false;
+  u32 word   = 1;
+  static proc_t p = {.state = PROC_STATE_RUNNING};
+  g_cur_proc = &p;
+  u64 ret = sys_futex((u64)&word, FUTEX_WAIT, 1, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_phys_ok  = true;
+  g_cur_proc = NULL;
+}
+
+/* sys_futex FUTEX_CMP_REQUEUE: futex_read_u32 fails → EFAULT (line 234) */
+static void sys_futex_cmp_requeue_read_fails_efault(void **state) {
+  (void)state;
+  g_phys_ok = false;
+  u32 word1 = 1, word2 = 0;
+  u64 ret = sys_futex((u64)&word1, FUTEX_CMP_REQUEUE, 0, 0, (u64)&word2, 1);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_phys_ok = true;
+}
+
+/* sys_sched_getaffinity: vmm_is_user_range fails → EFAULT (line 312) */
+static void sys_sched_getaffinity_vmm_fails_efault(void **state) {
+  (void)state;
+  u8 buf[8] = {0};
+  g_vmm_user_range_ok = false;
+  u64 ret = sys_sched_getaffinity(0, 8, (u64)buf, 0, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_vmm_user_range_ok = true;
+}
+
+/* sys_prlimit64: user_buf_ok fails for old_limit → EFAULT (line 388) */
+static void sys_prlimit64_vmm_fails_efault(void **state) {
+  (void)state;
+  u8 buf[64] = {0};
+  g_vmm_user_range_ok = false;
+  u64 ret = sys_prlimit64(0, 0, 0, (u64)buf, 0, 0);
+  assert_int_equal((i64)ret, -EFAULT);
+  g_vmm_user_range_ok = true;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -791,6 +837,10 @@ int main(void)
       cmocka_unit_test_setup(sys_futex_requeue_success, setup),
       cmocka_unit_test_setup(sys_sched_getaffinity_bad_mask_efault, setup),
       cmocka_unit_test_setup(sys_prlimit64_bad_old_limit_efault, setup),
+      cmocka_unit_test_setup(sys_futex_wait_read_u32_fails_efault, setup),
+      cmocka_unit_test_setup(sys_futex_cmp_requeue_read_fails_efault, setup),
+      cmocka_unit_test_setup(sys_sched_getaffinity_vmm_fails_efault, setup),
+      cmocka_unit_test_setup(sys_prlimit64_vmm_fails_efault, setup),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

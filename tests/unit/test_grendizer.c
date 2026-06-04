@@ -873,6 +873,23 @@ static void test_gr_path_join_null_seg_noop(void **state) {
   assert_string_equal(dst, "original");
 }
 
+/* gr_parse: --flag with null storage → GR_ERR propagated (line 435) */
+static void test_gr_parse_flag_null_storage_propagates_error(void **state) {
+  (void)state;
+  /* FLAG option with storage=NULL → gr__apply_flag returns GR_ERR → line 435 */
+  gr_opt opts[] = {
+    {.kind = GR_KIND_FLAG, .short_name = 'v', .long_name = "verbose",
+     .storage = NULL, .help = "verbose"},
+    GR_END
+  };
+  gr_spec spec = {"prog", "usage", opts, NULL};
+  gr_rest rest = {0};
+  char errbuf[64];
+  char *argv[] = {"prog", "--verbose"};
+  int rc = gr_parse(&spec, 2, argv, &rest, errbuf, sizeof(errbuf));
+  assert_int_equal(rc, GR_ERR);
+}
+
 static int help_walk_dummy_run(int argc, char **argv, void *ud) {
   (void)argc; (void)argv; (void)ud; return 0;
 }
@@ -1025,6 +1042,7 @@ int main(void)
       cmocka_unit_test(test_gr_find_cmd_null_name_returns_null),
       cmocka_unit_test(test_gr_path_join_null_seg_noop),
       cmocka_unit_test(test_gr_dispatch_help_walk_argc_zero),
+      cmocka_unit_test(test_gr_parse_flag_null_storage_propagates_error),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

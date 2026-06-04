@@ -1125,6 +1125,44 @@ static void ext2_readdir_name_len_clamped(void **state) {
   assert_int_equal(ret, 0);
 }
 
+/* fill_entry_from_dirent: name_len > EXT2_NAME_MAX → clamped (line 51) */
+static void ext2_readdir_name_len_over_max_clamped(void **state) {
+  (void)state;
+  ext2_volume_t vol = create_mock_vol();
+  static u8 block_buf[1024];
+  memset(block_buf, 0, sizeof(block_buf));
+
+  ext2_dirent_t *de = (ext2_dirent_t *)block_buf;
+  de->inode     = 5;
+  de->rec_len   = 1024;
+  de->name_len  = 255; /* EXT2_NAME_MAX is typically 255; use value > it if less */
+  de->file_type = EXT2_FT_REG_FILE;
+  /* Fill name with 255 bytes */
+  memset(de->name, 'a', 255);
+
+  ext2_file_t dir = {.in_use = true, .is_dir = true, .vol = &vol};
+  dir.inode.i_size = 1024;
+
+  will_return(cache_get_block, block_buf);
+  expect_any(get_block_num, vol);
+  expect_any(get_block_num, inode);
+  expect_value(get_block_num, file_block, 0);
+  will_return(get_block_num, 7);
+
+  expect_any(vol_read_block, vol);
+  expect_value(vol_read_block, block, 7);
+  expect_any(vol_read_block, buf);
+  will_return(vol_read_block, 0);
+
+  expect_any(read_inode, vol);
+  expect_value(read_inode, ino, 5);
+  will_return(read_inode, 0);
+
+  ext2_entry_t entry;
+  i64 ret = ext2_readdir(&dir, 0, &entry);
+  assert_int_equal(ret, 1);
+}
+
 /* ext2_mkdir: null vol → -EINVAL */
 static void ext2_mkdir_null_vol_einval(void **state) {
   (void)state;
@@ -1368,6 +1406,7 @@ int main(void) {
       cmocka_unit_test(ext2_rmdir_remove_entry_eio),
       cmocka_unit_test(ext2_unlink_hardlink_writes_inode),
       cmocka_unit_test(ext2_mkdir_seed_kmalloc_fail_enomem),
+      cmocka_unit_test(ext2_readdir_name_len_over_max_clamped),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

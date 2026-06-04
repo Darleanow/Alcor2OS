@@ -568,6 +568,36 @@ static void ramfs_init_idempotent(void **state) {
   assert_non_null(root);
 }
 
+/* ram_open O_CREAT: path has no slash → NULL (line 113) */
+static void ram_open_creat_no_slash_null(void **state) {
+  (void)state;
+  /* kstrrchr("noslash", '/') returns NULL → line 113 */
+  fs_handle_t fh = ram_open(NULL, "noslash", O_CREAT | O_WRONLY);
+  assert_null(fh);
+}
+
+/* ram_open O_CREAT: parent is a file not a dir → NULL (line 126) */
+static void ram_open_creat_parent_not_dir_null(void **state) {
+  (void)state;
+  /* Create a file, then try to create inside it */
+  ram_open(NULL, "/myfile", O_CREAT | O_WRONLY);
+  /* Try /myfile/sub — parent is a file not a dir */
+  fs_handle_t fh = ram_open(NULL, "/myfile/sub", O_CREAT | O_WRONLY);
+  assert_null(fh);
+}
+
+/* ram_write: end wraps around (offset + count overflows) → -EFBIG (line 186) */
+static void ram_write_end_overflow_efbig(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/f", O_CREAT | O_WRONLY);
+  /* offset near UINT64_MAX → end = offset + count wraps → end > UINT64_MAX - 1023 */
+  u64 huge_offset = (u64)-1023ULL - 1ULL; /* end = huge + 1 wraps */
+  char buf[1] = "x";
+  /* end = huge_offset + 1 > (u64)-1 - 1023u → -EFBIG */
+  i64 ret = (i64)ram_write(fh, buf, 1, huge_offset);
+  assert_int_equal(ret, -EFBIG);
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(ram_mkdir_creates_directory, reset_ramfs),
@@ -644,6 +674,9 @@ int main(void) {
       cmocka_unit_test_setup(ramfs_chardev_register_eexist, reset_ramfs),
       cmocka_unit_test_setup(ramfs_chardev_register_oom_enomem, reset_ramfs),
       cmocka_unit_test_setup(ramfs_init_idempotent, reset_ramfs),
+      cmocka_unit_test_setup(ram_open_creat_no_slash_null, reset_ramfs),
+      cmocka_unit_test_setup(ram_open_creat_parent_not_dir_null, reset_ramfs),
+      cmocka_unit_test_setup(ram_write_end_overflow_efbig, reset_ramfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
