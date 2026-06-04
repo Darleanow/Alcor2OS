@@ -11,7 +11,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-void *kmalloc(u64 n) { return malloc(n); }
+static int g_kmalloc_fail_on = -1;
+static int g_kmalloc_call    = 0;
+void *kmalloc(u64 n) {
+    g_kmalloc_call++;
+    if(g_kmalloc_fail_on >= 0 && g_kmalloc_call == g_kmalloc_fail_on) return NULL;
+    return malloc(n);
+}
 void kfree(void *p) { if(p) free(p); }
 
 static bool g_cache_fail = false;
@@ -90,7 +96,9 @@ static int setup_test(void **state) {
         g_files[i].dirty = false;
         g_files[i].vol = NULL;
     }
-    g_cache_fail = false;
+    g_cache_fail     = false;
+    g_kmalloc_fail_on = -1;
+    g_kmalloc_call    = 0;
     return 0;
 }
 
@@ -584,6 +592,12 @@ static void test_open_unmounted(void **state) {
     assert_null(ext2_open(&vol, "/f"));
 }
 
+static void test_open_null_path(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true};
+    assert_null(ext2_open(&vol, NULL));
+}
+
 /* ext2_close: null → no-op, no crash */
 static void test_close_null(void **state) {
     (void)state;
@@ -698,6 +712,18 @@ static void test_create_alloc_inode_fails(void **state) {
 static void test_create_null_vol(void **state) {
     (void)state;
     assert_null(ext2_create(NULL, "/f"));
+}
+
+static void test_create_unmounted(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = false};
+    assert_null(ext2_create(&vol, "/f"));
+}
+
+static void test_create_null_path(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true};
+    assert_null(ext2_create(&vol, NULL));
 }
 
 /* ext2_create: all file slots in use → NULL (claim_free_file_slot fails) */
@@ -855,6 +881,72 @@ static void test_read_max_run_capped(void **state) {
     assert_true(ret > 0);
 }
 
+/* ext2_write: is_dir=true → -EINVAL (covers !file->in_use||file->is_dir branch) */
+static void test_write_is_dir(void **state) {
+    (void)state;
+    g_files[0].in_use = true;
+    g_files[0].is_dir = true;
+    char buf[4] = "abcd";
+    assert_int_equal((i64)ext2_write(&g_files[0], buf, 4, 0), -EINVAL);
+}
+
+/* ext2_write: count == 0 → 0 */
+static void test_write_count_zero(void **state) {
+    (void)state;
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    assert_int_equal(ext2_write(&g_files[0], "x", 0, 0), 0);
+}
+
+/* ext2_truncate: is_dir → -EINVAL (covers middle term of ||) */
+static void test_truncate_is_dir(void **state) {
+    (void)state;
+    g_files[0].in_use = true;
+    g_files[0].is_dir = true;
+    assert_int_equal((i64)ext2_truncate(&g_files[0], 0), -EINVAL);
+}
+
+/* ext2_flush: !in_use → -EINVAL */
+static void test_flush_null_file(void **state) {
+    (void)state;
+    assert_int_equal((i64)ext2_flush(NULL), -EINVAL);
+}
+
+/* ext2_read: run_buf kmalloc fails → run_buf=NULL → single-block path only */
+static void test_read_run_buf_null(void **state) {
+    (void)state;
+    static blockdev_t dev = {.read = mock_dev_read, .ctx = NULL};
+    ext2_volume_t vol = {.mounted = true, .block_size = 1024, .dev = &dev};
+    g_files[0].in_use = true;
+    g_files[0].is_dir = false;
+    g_files[0].vol    = &vol;
+    g_files[0].inode.i_size = 1024;
+    /* Fail kmalloc on call 1 → run_buf=NULL → if(run_buf) false branch */
+    g_kmalloc_fail_on = 1;
+    g_kmalloc_call    = 0;
+    will_return(get_block_num, 5);
+    will_return(vol_read_block, 0);
+    char buf[1024];
+    i64 ret = ext2_read(&g_files[0], buf, sizeof(buf), 0);
+    assert_true(ret >= 0);
+    g_kmalloc_fail_on = -1;
+}
+
+/* ext2_close: g_files[0] in_use with same vol but different inode_num → branch False */
+static void test_close_open_count_different_inode(void **state) {
+    (void)state;
+    ext2_volume_t vol = {.mounted = true};
+    g_files[0].in_use    = true;
+    g_files[0].vol       = &vol;
+    g_files[0].inode_num = 99;
+    g_files[1].in_use          = true;
+    g_files[1].vol             = &vol;
+    g_files[1].inode_num       = 5;
+    g_files[1].dirty           = false;
+    g_files[1].inode.i_links_count = 1;
+    ext2_close(&g_files[1]);
+}
+
 /* validate_parent_for_create: resolve_path fails → returns false (line 553) */
 static void test_validate_parent_resolve_fail(void **state) {
     (void)state;
@@ -912,6 +1004,7 @@ int main(void) {
         /* new coverage */
         cmocka_unit_test_setup(test_open_null_vol, setup_test),
         cmocka_unit_test_setup(test_open_unmounted, setup_test),
+        cmocka_unit_test_setup(test_open_null_path, setup_test),
         cmocka_unit_test_setup(test_close_null, setup_test),
         cmocka_unit_test_setup(test_close_not_in_use, setup_test),
         cmocka_unit_test_setup(test_write_alloc_fails_enospc, setup_test),
@@ -920,6 +1013,8 @@ int main(void) {
         cmocka_unit_test_setup(test_write_partial_then_error, setup_test),
         cmocka_unit_test_setup(test_create_alloc_inode_fails, setup_test),
         cmocka_unit_test_setup(test_create_null_vol, setup_test),
+        cmocka_unit_test_setup(test_create_unmounted, setup_test),
+        cmocka_unit_test_setup(test_create_null_path, setup_test),
         cmocka_unit_test_setup(test_create_all_slots_used, setup_test),
         cmocka_unit_test_setup(test_create_empty_filename, setup_test),
         cmocka_unit_test_setup(test_truncate_write_inode_fail, setup_test),
@@ -930,6 +1025,12 @@ int main(void) {
         cmocka_unit_test_setup(test_read_run_chunk_vol_read_sectors_fail, setup_test),
         cmocka_unit_test_setup(test_read_max_run_capped, setup_test),
         cmocka_unit_test_setup(test_validate_parent_resolve_fail, setup_test),
+        cmocka_unit_test_setup(test_read_run_buf_null, setup_test),
+        cmocka_unit_test_setup(test_close_open_count_different_inode, setup_test),
+        cmocka_unit_test_setup(test_write_is_dir, setup_test),
+        cmocka_unit_test_setup(test_write_count_zero, setup_test),
+        cmocka_unit_test_setup(test_truncate_is_dir, setup_test),
+        cmocka_unit_test_setup(test_flush_null_file, setup_test),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
