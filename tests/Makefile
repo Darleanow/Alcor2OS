@@ -123,7 +123,7 @@ $(OBJ)/src/%.o: $(SRC)/%.c | $(OBJ)
 $(BIN) $(OBJ) $(COV):
 	@mkdir -p $@
 
-test: $(TEST_BINS) | $(COV)
+test: ../build/alcor2.elf $(TEST_BINS) | $(COV)
 	@fail=0; \
 	for t in $(TEST_BINS); do \
 	  echo "--- $$(basename $$t) ---"; \
@@ -141,7 +141,7 @@ KERNEL_SRCS := $(shell find $(SRC) ../include -name '*.c' -o -name '*.h' 2>/dev/
 ../build/alcor2.elf: $(KERNEL_SRCS)
 	$(MAKE) -C .. build/alcor2.elf COV=1 CC=clang
 
-coverage: test ../build/alcor2.elf
+coverage: test
 	$(LLVM_PROFDATA) merge -sparse $(COV)/*.profraw -o $(COV)/merged.profdata
 	@echo ""
 	@echo "==========================================================="
