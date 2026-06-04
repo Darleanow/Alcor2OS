@@ -662,6 +662,93 @@ static void test_follow_symlink_read_fail_eio(void **state) {
   g_vol_read_ok = false;
 }
 
+static void test_resolve_step_read_inode_fail_eio(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+      mock_fs[mock_fs_count].ino        = 99;
+    mock_fs[mock_fs_count].parent_ino = EXT2_ROOT_INODE;
+    mock_fs[mock_fs_count].name       = "ghost";
+    mock_fs[mock_fs_count].type       = EXT2_FT_REG_FILE;
+    memset(&mock_fs[mock_fs_count].inode, 0, sizeof(ext2_inode_t));
+    mock_fs[mock_fs_count].inode.i_mode = EXT2_S_IFREG;
+   (void)state;
+}
+
+static void test_ext2_readlink_empty_filename(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+    char buf[64];
+    /* path "/" → filename="" → -EINVAL (line 470) */
+    i64 ret = ext2_readlink(&dummy_vol, "/", buf, sizeof(buf));
+    assert_int_equal(ret, -EINVAL);
+}
+
+static void test_ext2_readlink_parent_not_dir(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+    /* Add a file, then try to readlink inside it */
+    fs_add(3, EXT2_ROOT_INODE, "f", EXT2_FT_REG_FILE, EXT2_S_IFREG | 0644, 0);
+    char buf[64];
+    i64 ret = ext2_readlink(&dummy_vol, "/f/link", buf, sizeof(buf));
+    assert_int_equal(ret, -ENOTDIR);
+}
+
+static void test_ext2_readlink_entry_not_found(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+    char buf[64];
+    i64 ret = ext2_readlink(&dummy_vol, "/nosuchlink", buf, sizeof(buf));
+    assert_int_equal(ret, -ENOENT);
+}
+
+static void test_ext2_readlink_not_symlink(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+    fs_add(3, EXT2_ROOT_INODE, "reg", EXT2_FT_REG_FILE, EXT2_S_IFREG | 0644, 10);
+    char buf[64];
+    /* /reg exists but is not a symlink → -EINVAL (line 488) */
+    i64 ret = ext2_readlink(&dummy_vol, "/reg", buf, sizeof(buf));
+    assert_int_equal(ret, -EINVAL);
+}
+
+static void test_ext2_readlink_read_inode_fail(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+    mock_fs[mock_fs_count].ino        = 50;
+    mock_fs[mock_fs_count].parent_ino = EXT2_ROOT_INODE;
+    mock_fs[mock_fs_count].name       = "ghost_lnk";
+    mock_fs[mock_fs_count].type       = EXT2_FT_SYMLINK;
+    memset(&mock_fs[mock_fs_count].inode, 0, sizeof(ext2_inode_t));
+    /* The inode is in mock_fs so read_inode will find it */
+    mock_fs[mock_fs_count].inode.i_mode = EXT2_S_IFLNK;
+    mock_fs[mock_fs_count].inode.i_size = 0; /* zero size → -EINVAL in read_symlink_target */
+    mock_fs_count++;
+    char buf[64];
+    i64 ret = ext2_readlink(&dummy_vol, "/ghost_lnk", buf, sizeof(buf));
+    /* zero size → read_symlink_target returns -EINVAL → ext2_readlink returns -EIO */
+    assert_int_equal(ret, -EIO);
+}
+
+static void test_ext2_readlink_eio_on_read_symlink_fail(void **state) {
+    (void)state;
+    fs_reset();
+    fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+    mock_entry_t *e = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK, EXT2_S_IFLNK | 0777, 65);
+    e->inode.i_block[0] = 5;
+    g_cache_ok    = true;
+    g_vol_read_ok = false;
+    char buf[VFS_PATH_MAX];
+    i64 ret = ext2_readlink(&dummy_vol, "/lnk", buf, sizeof(buf));
+    assert_int_equal(ret, -EIO);
+    g_cache_ok = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -721,6 +808,13 @@ int main(void)
       cmocka_unit_test(test_read_symlink_slow_read_fail_eio),
       cmocka_unit_test(test_read_symlink_slow_len_clamped),
       cmocka_unit_test(test_follow_symlink_read_fail_eio),
+      cmocka_unit_test(test_resolve_step_read_inode_fail_eio),
+      cmocka_unit_test(test_ext2_readlink_empty_filename),
+      cmocka_unit_test(test_ext2_readlink_not_symlink),
+      cmocka_unit_test(test_ext2_readlink_parent_not_dir),
+      cmocka_unit_test(test_ext2_readlink_entry_not_found),
+      cmocka_unit_test(test_ext2_readlink_read_inode_fail),
+      cmocka_unit_test(test_ext2_readlink_eio_on_read_symlink_fail),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

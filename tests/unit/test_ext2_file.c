@@ -838,21 +838,20 @@ static void test_read_max_run_capped(void **state) {
     g_files[0].in_use = true;
     g_files[0].is_dir = false;
     g_files[0].vol    = &vol;
-    g_files[0].inode.i_size = 1024 * 20; /* 20 blocks */
+    g_files[0].inode.i_size = 1024 * 20;
 
-    /* Read EXT2_READ_RUN_MAX+1 blocks: max_run gets capped to EXT2_READ_RUN_MAX.
-     * EXT2_READ_RUN_MAX = 8 in the source. Read 9*1024 = 9216 bytes.
-     * max_run = ceil(9216/1024) = 9 > 8 → capped to 8. */
-    will_return(get_block_num, 5); /* block 0 */
-    /* detect_run: 8 checks (EXT2_READ_RUN_MAX=8) */
-    for(int i = 1; i <= 8; i++)
-        will_return(get_block_num, 5 + i); /* all contiguous → run=8 */
-    /* read_run_chunk: vol_read_sectors via mock_dev_read succeeds */
+    /* Read 17 blocks: max_run = 17 > EXT2_READ_RUN_MAX(16) → capped to 16 */
+    /* 1st iter: 1 call for block 0, 15 calls in detect_run (max_run=16, loop 1..15) */
+    will_return(get_block_num, 5);
+    for(int i = 1; i <= 15; i++)
+        will_return(get_block_num, 5 + i);
+    /* 2nd iter: 1 call for block 16 */
+    will_return(get_block_num, 22);
+    /* run=1 → single block path → vol_read_block */
+    will_return(vol_read_block, 0);
 
-    char buf[9 * 1024];
+    char buf[17 * 1024];
     i64 ret = ext2_read(&g_files[0], buf, sizeof(buf), 0);
-    /* 8 blocks read, then loop continues for remaining 1024 bytes */
-    /* Need to provide mocks for the next block too */
     assert_true(ret > 0);
 }
 

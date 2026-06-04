@@ -21,8 +21,11 @@
 
 static u8 g_store[STORE_BLOCKS][BLOCK_SZ];
 
+static int g_kmalloc_fail_next = 0;
+
 void     *kmalloc(u64 n)
 {
+  if(g_kmalloc_fail_next) { g_kmalloc_fail_next = 0; return NULL; }
   return malloc((size_t)n);
 }
 void kfree(void *p)
@@ -496,11 +499,8 @@ static void ensure_indirect_slot_kmalloc_fail(void **state)
   ext2_volume_t v = make_vol();
   ext2_inode_t  inode;
   memset(&inode, 0, sizeof(inode));
-  /* Make kmalloc fail by using a block size > STORE_BLOCKS*BLOCK_SZ so
-     the malloc would be huge. Instead, temporarily override by making
-     the block size very large. */
-  v.block_size = (u32)-1u; /* will cause malloc to fail */
-  u32 result   = ensure_indirect_slot(&v, &inode, 2, 0, 0);
+  g_kmalloc_fail_next = 1;
+  u32 result = ensure_indirect_slot(&v, &inode, 2, 0, 0);
   assert_int_equal(result, 0);
   v.block_size = BLOCK_SZ; /* restore */
 }
@@ -576,10 +576,18 @@ static void get_block_num_single_indirect_read(void **state)
 static void read_indirect_slot_oom(void **state)
 {
   (void)state;
-  /* We can't force kmalloc to fail here (it uses malloc).
-   * Test the vol_read_block fail path instead. */
+  /* vol_read_block fail path → lines 90-92 */
   ext2_volume_t v = make_vol();
   g_read_fail = true;
+  u32 result = read_indirect_slot(&v, 1, 0);
+  assert_int_equal(result, 0);
+}
+
+static void read_indirect_slot_kmalloc_fail(void **state)
+{
+  (void)state;
+  ext2_volume_t v = make_vol();
+  g_kmalloc_fail_next = 1;
   u32 result = read_indirect_slot(&v, 1, 0);
   assert_int_equal(result, 0);
 }
@@ -614,6 +622,22 @@ static void ensure_indirect_slot_read_fail(void **state)
   ext2_inode_t inode;
   memset(&inode, 0, sizeof(inode));
   g_read_fail = true;
+  u32 result = ensure_indirect_slot(&v, &inode, 1, 0, 0);
+  assert_int_equal(result, 0);
+}
+
+static void ensure_indirect_slot_alloc_zeroed_fails(void **state)
+{
+  (void)state;
+  ext2_volume_t     v = make_vol();
+  ext2_group_desc_t gd;
+  memset(&gd, 0, sizeof(gd));
+  v.groups = &gd;
+  ext2_inode_t inode;
+  memset(&inode, 0, sizeof(inode));
+  /* slot 0 in block 1 is 0 (hole); alloc_block returns 0 → alloc_zeroed_block=0 → lines 131-133 */
+  memset(g_store[1], 0, BLOCK_SZ); /* ensure slot is 0 */
+  g_next_block = 0; /* make alloc_block fail */
   u32 result = ensure_indirect_slot(&v, &inode, 1, 0, 0);
   assert_int_equal(result, 0);
 }
@@ -736,9 +760,11 @@ int main(void)
       cmocka_unit_test_setup(get_block_num_single_indirect_read, reset),
       /* new coverage */
       cmocka_unit_test_setup(read_indirect_slot_oom, reset),
+      cmocka_unit_test_setup(read_indirect_slot_kmalloc_fail, reset),
       cmocka_unit_test_setup(read_indirect_slot_hole, reset),
       cmocka_unit_test_setup(read_indirect_slot_success, reset),
       cmocka_unit_test_setup(ensure_indirect_slot_read_fail, reset),
+      cmocka_unit_test_setup(ensure_indirect_slot_alloc_zeroed_fails, reset),
       cmocka_unit_test_setup(free_indirect_subtree_depth0_frees_leaf, reset),
       cmocka_unit_test_setup(free_indirect_subtree_depth1_recurses, reset),
       cmocka_unit_test_setup(alloc_file_block_dind_alloc_fails, reset),

@@ -50,9 +50,14 @@ i64 mock_dev_read(void *ctx, u64 lba, u32 count, void *buf) {
     return count * 512;
 }
 
+static int write_fail_on = -1;
+static int write_call_count = 0;
+
 i64 mock_dev_write(void *ctx, u64 lba, u32 count, const void *buf) {
     (void)ctx;
     mock_dev_write_called = true;
+    write_call_count++;
+    if (write_fail_on >= 0 && write_call_count >= write_fail_on) return -EIO;
     if (lba * 512 >= sizeof(mock_disk)) return -EIO;
     memcpy(mock_disk + lba * 512, buf, count * 512);
     return count * 512;
@@ -264,23 +269,17 @@ static void ext2_mount_gdt_write_block_fail(void **state) {
     fail_lba_end   = -1ULL;
 }
 
-/* flush_superblock write fail → via unmount which calls flush_superblock (line 104) */
 static void flush_superblock_write_fail(void **state) {
   (void)state;
   ext2_init(&mock_dev);
   setup_valid_sb();
   ext2_volume_t *vol = ext2_mount(&mock_dev, 0);
   assert_non_null(vol);
-  /* During unmount, flush_superblock reads then writes the SB.
-   * Fail the read so the write path (line 104) won't be hit that way.
-   * Instead fail the write: block the sb write LBA (2-3) after read succeeds. */
-  /* Both read and write go through mock_dev_read/write which checks fail_lba.
-   * Set fail to cover writes to SB sector (LBA 2-3). */
-  /* The unmount calls flush_superblock which does read then write.
-   * We need only the write to fail. Since both use same check, we rely on
-   * the test ext2_unmount_write_superblock_write_fail already doing this. */
-  /* Just run unmount normally to exercise flush path without crash */
+  write_call_count = 0;
+  write_fail_on = 1;
   ext2_unmount(vol);
+  write_fail_on = -1;
+  write_call_count = 0;
 }
 
 /* write_group_descriptors: kmalloc fails → via unmount (line 126) */
@@ -322,19 +321,17 @@ static void write_gdt_multiblock_clamping(void **state) {
   if(vol) ext2_unmount(vol);
 }
 
-/* write_group_descriptors: write block fails → via unmount (lines 140-141) */
 static void write_gdt_write_block_fail(void **state) {
   (void)state;
   ext2_init(&mock_dev);
   setup_valid_sb();
   ext2_volume_t *vol = ext2_mount(&mock_dev, 0);
   assert_non_null(vol);
-  /* Fail GDT block writes during unmount (GDT block = block 2, LBA 4-5) */
-  fail_lba_start = 4;
-  fail_lba_end   = 6;
+  write_call_count = 0;
+  write_fail_on = 2;
   ext2_unmount(vol);
-  fail_lba_start = -1ULL;
-  fail_lba_end   = -1ULL;
+  write_fail_on = -1;
+  write_call_count = 0;
 }
 
 /* ext2_mount: vol->groups kmalloc fails → NULL (line 271) */

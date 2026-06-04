@@ -46,11 +46,16 @@ static char g_last_rel_path[VFS_PATH_MAX];
 static i64 g_readdir_ret = 0;
 
 static bool g_open_fail = false;
+static int g_open_fail_after = -1;
+static int g_open_call_count = 0;
+
 static fs_handle_t dummy_open(void *fs_data, const char *path, u32 flags) {
   (void)fs_data; (void)flags;
   kstrncpy(g_last_rel_path, path, sizeof(g_last_rel_path));
   if (path[0] != '/') return NULL;
   if (g_open_fail) return NULL;
+  g_open_call_count++;
+  if (g_open_fail_after >= 0 && g_open_call_count > g_open_fail_after) return NULL;
   return (fs_handle_t)1;
 }
 
@@ -215,8 +220,10 @@ static int setup_vfs(void **state) {
   g_readdir_name         = "";
   g_readdir_call_count   = 0;
   g_readdir_fail_after   = -1;
-  g_read_calls  = -1;
-  g_open_fail   = false;
+  g_read_calls      = -1;
+  g_open_fail       = false;
+  g_open_fail_after = -1;
+  g_open_call_count = 0;
   g_fstat_fail  = false;
   memset(g_last_rel_path, 0, sizeof(g_last_rel_path));
   memset(g_readlink_buf, 0, sizeof(g_readlink_buf));
@@ -1106,6 +1113,15 @@ static void *null_mount_cb(const char *s, u32 f) { (void)s; (void)f; return NULL
 static const fs_ops_t null_ops = {0};
 static const fs_type_t null_fstype = {.name = "nullfs", .ops = &null_ops, .mount = null_mount_cb};
 
+static const fs_ops_t noioctl_ops = {
+  .open=dummy_open, .read=dummy_read, .write=dummy_write, .stat=dummy_stat,
+  .fstat=dummy_fstat, .readdir=dummy_readdir, .close=dummy_close,
+  .mkdir=dummy_mkdir, .unlink=dummy_unlink, .rmdir=dummy_rmdir,
+  .truncate=dummy_truncate, .ioctl=NULL, .poll=NULL
+};
+static void *noioctl_mount_cb(const char *s, u32 f) { (void)s; (void)f; return (void*)1; }
+static const fs_type_t noioctl_fstype = {.name="noioctlfs",.ops=&noioctl_ops,.mount=noioctl_mount_cb};
+
 static void *nopoll_mount_cb(const char *s, u32 f) { (void)s; (void)f; return (void*)1; }
 static const fs_ops_t nopoll_ops = {
   .open=dummy_open, .read=dummy_read, .write=dummy_write, .stat=dummy_stat,
@@ -1113,7 +1129,7 @@ static const fs_ops_t nopoll_ops = {
   .ioctl=dummy_ioctl, .mkdir=dummy_mkdir, .unlink=dummy_unlink,
   .rmdir=dummy_rmdir, .truncate=dummy_truncate, .poll=NULL
 };
-static const fs_type_t nopoll_fstype = {.name="nopollfs",.ops=&nopoll_ops,.mount=nopoll_mount_cb};
+__attribute__((unused)) static const fs_type_t nopoll_fstype = {.name="nopollfs",.ops=&nopoll_ops,.mount=nopoll_mount_cb};
 
 
 /* vfs_mount: mount_cb returns NULL → -EINVAL (line 323) */
@@ -1123,15 +1139,14 @@ static void vfs_mount_cb_returns_null_einval(void **state) {
   assert_int_equal((i64)vfs_mount("dev", "/nullmnt", "nullfs"), -EINVAL);
 }
 
-/* vfs_path_starts_with: prefix non-match returns false (line 65) */
 static void vfs_path_starts_with_false_branch(void **state) {
   (void)state;
-  /* vfs_find_mount is exercised via vfs_stat on a path that doesn't match any mount.
-   * After vfs_init with no mounts, any path returns ENOENT via the false branch. */
-  vfs_init(); /* reset — no mounts */
+  vfs_init();
+  vfs_register_fs(&noioctl_fstype);
+  vfs_mount("dev2", "/foomount", "noioctlfs");
+  /* /bar does not start with /foomount → vfs_path_starts_with returns false → ENOENT */
   vfs_stat_t st;
-  assert_int_equal((i64)vfs_stat("/nonexistent", &st), -ENOENT);
-  /* Re-register and re-mount for subsequent tests (setup_vfs handles this per-test) */
+  assert_int_equal((i64)vfs_stat("/bar/baz", &st), -ENOENT);
 }
 
 /* vfs_normalize: null/non-absolute path is a no-op */
@@ -1287,6 +1302,85 @@ static void vfs_seek_end_fstat_fails_einval(void **state) {
   (void)state;
 }
 
+static void vfs_rename_src_open_fails_enoent(void **state) {
+  (void)state;
+  g_stat_type  = VFS_FILE;
+  g_stat_size  = 0;
+  g_open_fail  = true;
+  assert_int_equal((i64)vfs_rename("/src.txt", "/dst.txt"), -ENOENT);
+  g_open_fail  = false;
+  g_stat_type  = VFS_DIRECTORY;
+}
+
+static void vfs_rename_dst_open_second_fails_eio(void **state) {
+  (void)state;
+  g_stat_type       = VFS_FILE;
+  g_stat_size       = 0;
+  g_open_fail_after = 1;
+  assert_int_equal((i64)vfs_rename("/src.txt", "/dst.txt"), -EIO);
+  g_open_fail_after = -1;
+  g_open_call_count = 0;
+  g_stat_type       = VFS_DIRECTORY;
+}
+
+static void vfs_ioctl_no_ioctl_op_enotty(void **state) {
+  (void)state;
+  vfs_register_fs(&noioctl_fstype);
+  vfs_mount("dev2", "/ni", "noioctlfs");
+  i64 fd = vfs_open("/ni/f.txt", O_RDONLY);
+  assert_true(fd >= 0);
+  assert_int_equal((i64)vfs_ioctl(fd, 0x1234, 0), -ENOTTY);
+}
+
+static void vfs_select_read_no_poll_returns_one(void **state) {
+  (void)state;
+  vfs_register_fs(&noioctl_fstype);
+  vfs_mount("dev2", "/ni2", "noioctlfs");
+  i64 fd = vfs_open("/ni2/f.txt", O_RDONLY);
+  assert_true(fd >= 0);
+  assert_int_equal(vfs_select_read_ready(fd), 1);
+}
+
+static void vfs_select_write_no_poll_returns_one(void **state) {
+  (void)state;
+  vfs_register_fs(&noioctl_fstype);
+  vfs_mount("dev2", "/ni3", "noioctlfs");
+  i64 fd = vfs_open("/ni3/f.txt", O_WRONLY);
+  assert_true(fd >= 0);
+  assert_int_equal(vfs_select_write_ready(fd), 1);
+}
+
+static void vfs_oft_alloc_pipe_oft_full(void **state) {
+  (void)state;
+  for(int i = 0; i < VFS_MAX_OFT; i++) oft[i].in_use = true;
+  i32 idx = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, (void*)0x1);
+  assert_true(idx < 0);
+  for(int i = 0; i < VFS_MAX_OFT; i++) oft[i].in_use = false;
+}
+
+static void vfs_open_install_fd_emfile_releases_oft(void **state) {
+  (void)state;
+  for(int i = 0; i < VFS_MAX_FD; i++) g_proc.fds[i] = 0;
+  i64 fd = vfs_open("/f.txt", O_RDONLY);
+  assert_true(fd < 0);
+  for(int i = 0; i < VFS_MAX_FD; i++) g_proc.fds[i] = -1;
+}
+
+static void vfs_getdents_written_nonzero_break(void **state) {
+  (void)state;
+  g_readdir_ret        = 1;
+  g_readdir_name       = "a_very_long_filename_that_exceeds_32_bytes_total";
+  g_readdir_fail_after = 1;
+  i64 fd = vfs_open("/", O_RDONLY);
+  char buf[64];
+  i64 ret = vfs_getdents(fd, buf, sizeof(buf));
+  assert_true(ret >= 0);
+  g_readdir_ret        = 0;
+  g_readdir_name       = "";
+  g_readdir_fail_after = -1;
+  g_readdir_call_count = 0;
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test_setup(vfs_chdir_updates_cwd, setup_vfs),
@@ -1431,6 +1525,14 @@ int main(void) {
       cmocka_unit_test_setup(vfs_select_read_ready_no_poll_returns_one, setup_vfs),
       cmocka_unit_test_setup(vfs_getdents_bad_fd_ebadf, setup_vfs),
       cmocka_unit_test_setup(vfs_seek_end_fstat_fail, setup_vfs),
+      cmocka_unit_test_setup(vfs_ioctl_no_ioctl_op_enotty, setup_vfs),
+      cmocka_unit_test_setup(vfs_select_read_no_poll_returns_one, setup_vfs),
+      cmocka_unit_test_setup(vfs_select_write_no_poll_returns_one, setup_vfs),
+      cmocka_unit_test_setup(vfs_oft_alloc_pipe_oft_full, setup_vfs),
+      cmocka_unit_test_setup(vfs_open_install_fd_emfile_releases_oft, setup_vfs),
+      cmocka_unit_test_setup(vfs_getdents_written_nonzero_break, setup_vfs),
+      cmocka_unit_test_setup(vfs_rename_src_open_fails_enoent, setup_vfs),
+      cmocka_unit_test_setup(vfs_rename_dst_open_second_fails_eio, setup_vfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

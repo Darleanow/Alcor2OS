@@ -343,9 +343,11 @@ static void ram_unlink_non_first_child(void **state) {
   (void)state;
   ram_open(NULL, "/f1", O_CREAT | O_WRONLY);
   ram_open(NULL, "/f2", O_CREAT | O_WRONLY);
-  /* f2 is after f1 in children list */
-  assert_int_equal(ram_unlink(NULL, "/f2"), 0);
-  assert_null(ram__resolve("/f2"));
+  ram_open(NULL, "/f3", O_CREAT | O_WRONLY);
+  /* prepend: f3->f2->f1; delete f1 (third) → prev traverses f3, then f2 */
+  assert_int_equal(ram_unlink(NULL, "/f1"), 0);
+  assert_null(ram__resolve("/f1"));
+  assert_non_null(ram__resolve("/f2"));
 }
 
 /* ram_rmdir: root directory returns -EBUSY */
@@ -461,15 +463,15 @@ static void ram_read_count_clamped_to_avail(void **state) {
   assert_memory_equal(buf, "hi", 2);
 }
 
-/* ram_unlink: removes non-first child from list (prev->next path) */
 static void ram_rmdir_non_first_child(void **state) {
   (void)state;
   ram_mkdir(NULL, "/sub1");
   ram_mkdir(NULL, "/sub2");
-  /* sub2 is after sub1 in root's children */
-  assert_int_equal(ram_rmdir(NULL, "/sub2"), 0);
-  assert_null(ram__resolve("/sub2"));
-  assert_non_null(ram__resolve("/sub1"));
+  ram_mkdir(NULL, "/sub3");
+  /* prepend: sub3->sub2->sub1; delete sub1 (third) → prev traverses sub3, then sub2 */
+  assert_int_equal(ram_rmdir(NULL, "/sub1"), 0);
+  assert_null(ram__resolve("/sub1"));
+  assert_non_null(ram__resolve("/sub2"));
 }
 
 /* ram_mkdir: no last slash → -EINVAL */
@@ -568,10 +570,23 @@ static void ramfs_init_idempotent(void **state) {
   assert_non_null(root);
 }
 
+static void ram_mount_cb_returns_nonnull(void **state) {
+  (void)state;
+  void *result = ram_mount_cb("dev", 0);
+  assert_non_null(result);
+}
+
+static void ram_unlink_frees_data(void **state) {
+  (void)state;
+  fs_handle_t fh = ram_open(NULL, "/withdata", O_CREAT | O_WRONLY);
+  ram_write(fh, "hello", 5, 0);
+  assert_int_equal(ram_unlink(NULL, "/withdata"), 0);
+  assert_null(ram__resolve("/withdata"));
+}
+
 /* ram_open O_CREAT: path has no slash → NULL (line 113) */
 static void ram_open_creat_no_slash_null(void **state) {
   (void)state;
-  /* kstrrchr("noslash", '/') returns NULL → line 113 */
   fs_handle_t fh = ram_open(NULL, "noslash", O_CREAT | O_WRONLY);
   assert_null(fh);
 }
@@ -677,6 +692,8 @@ int main(void) {
       cmocka_unit_test_setup(ram_open_creat_no_slash_null, reset_ramfs),
       cmocka_unit_test_setup(ram_open_creat_parent_not_dir_null, reset_ramfs),
       cmocka_unit_test_setup(ram_write_end_overflow_efbig, reset_ramfs),
+      cmocka_unit_test_setup(ram_mount_cb_returns_nonnull, reset_ramfs),
+      cmocka_unit_test_setup(ram_unlink_frees_data, reset_ramfs),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
