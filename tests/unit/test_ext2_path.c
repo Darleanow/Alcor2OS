@@ -641,6 +641,27 @@ static void test_read_symlink_slow_len_clamped(void **state) {
   g_cache_ok    = false;
 }
 
+/* follow_symlink_step: read_symlink_target fails → -EIO (line 189) */
+static void test_follow_symlink_read_fail_eio(void **state) {
+  (void)state;
+  fs_reset();
+  fs_add(EXT2_ROOT_INODE, 0, "/", EXT2_FT_DIR, EXT2_S_IFDIR | 0755, 0);
+  /* Slow symlink (>60 bytes) in resolve path */
+  mock_entry_t *sym = fs_add(3, EXT2_ROOT_INODE, "lnk", EXT2_FT_SYMLINK, EXT2_S_IFLNK | 0777, 65);
+  sym->inode.i_block[0] = 5;
+  /* vol_read_block fails (g_vol_read_ok=false, g_cache_ok=true) */
+  g_cache_ok    = true;
+  g_vol_read_ok = false; /* vol_read_block returns -EIO */
+
+  u32 ino; ext2_inode_t inode;
+  /* resolve /lnk/file → traverses symlink → read_symlink_target fails → -EIO */
+  i64 ret = resolve_path(&dummy_vol, "/lnk/something", &ino, &inode);
+  assert_int_equal(ret, -EIO);
+
+  g_cache_ok    = false;
+  g_vol_read_ok = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -699,6 +720,7 @@ int main(void)
       cmocka_unit_test(test_read_symlink_slow_success),
       cmocka_unit_test(test_read_symlink_slow_read_fail_eio),
       cmocka_unit_test(test_read_symlink_slow_len_clamped),
+      cmocka_unit_test(test_follow_symlink_read_fail_eio),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

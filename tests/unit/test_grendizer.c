@@ -888,12 +888,16 @@ static void test_gr_dispatch_help_walk_argc_zero(void **state) {
     .command_count = 1,
     .userdata      = NULL
   };
-  /* "help" followed by an unknown command → gr__dispatch_help_walk called
-   * with a command name arg that doesn't exist */
-  char *argv[] = {"prog", "help", "nonexistent_cmd"};
-  int rc = gr_dispatch(&app, 3, argv);
-  /* Returns 2 when command not found in help walk */
-  assert_int_equal(rc, 2);
+  /* "help" alone → general help, returns 0 (already shows help) */
+  char *argv[] = {"prog", "help"};
+  int rc = gr_dispatch(&app, 2, argv);
+  assert_int_equal(rc, 0);
+
+  /* "help sub" where "sub" is a leaf command with no subcommands:
+   * gr__help_walk called → prints help for "sub" → returns 0 */
+  char *argv2[] = {"prog", "help", "sub"};
+  rc = gr_dispatch(&app, 3, argv2);
+  assert_int_equal(rc, 0);
 }
 
 /* gr__apply_flag: null storage → GR_ERR */

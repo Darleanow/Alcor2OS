@@ -95,12 +95,20 @@ static i32  g_oft_rd  = 0;
 static i32  g_oft_wr  = 1;
 static i32  g_oft_seq = 0;
 static i64  g_fd_seq  = 3;
+static int  g_fd_install_count = 0; /* counts vfs_install_fd calls */
+static int  g_fd_fail_on = -1;      /* fail on Nth call (1-based), -1=never */
 i32 vfs_oft_alloc_pipe(i32 kind, void *pipe) {
   (void)kind; (void)pipe;
   return g_oft_seq++;
 }
 void vfs_oft_release(i32 idx) { (void)idx; }
-i64  vfs_install_fd(i32 idx)  { (void)idx; return g_fd_seq++; }
+i64  vfs_install_fd(i32 idx)  {
+  (void)idx;
+  g_fd_install_count++;
+  if(g_fd_fail_on > 0 && g_fd_install_count == g_fd_fail_on)
+    return -ENFILE;
+  return g_fd_seq++;
+}
 
 /* sys_io stubs referenced by sys_fs (pread64/pwrite64 via sys_read/sys_write) */
 u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6) {
@@ -147,10 +155,12 @@ static int setup(void **state)
   g_vfs_getcwd     = "/";
   memset(&g_vfs_stat_out, 0, sizeof(g_vfs_stat_out));
   g_pipe_obj       = (void *)0xCAFE;
-  g_oft_rd         = 0;
-  g_oft_wr         = 1;
-  g_oft_seq        = 0;
-  g_fd_seq         = 3;
+  g_oft_rd             = 0;
+  g_oft_wr             = 1;
+  g_oft_seq            = 0;
+  g_fd_seq             = 3;
+  g_fd_install_count   = 0;
+  g_fd_fail_on         = -1;
   return 0;
 }
 
@@ -839,6 +849,25 @@ static void pipe_oft_alloc_fails_enfile(void **state) {
   assert_int_equal((i64)ret, -ENFILE);
 }
 
+/* sys_pipe: write_fd vfs_install_fd fails → cleanup (lines 676-679) */
+static void pipe_write_fd_fails_enfile(void **state) {
+  (void)state;
+  int fds[2];
+  /* First install (read_fd) succeeds, second (write_fd) fails */
+  g_fd_fail_on = 2; /* fail on 2nd install_fd call */
+  u64 ret = sys_pipe((u64)fds, 0, 0, 0, 0, 0);
+  assert_int_equal((i64)ret, -ENFILE);
+  g_fd_fail_on = -1;
+}
+
+/* sys_openat: efault on bad pathname (line 414) */
+static void sys_openat_efault_path(void **state) {
+  (void)state;
+  g_user_ptr_ok = false;
+  assert_int_equal((i64)sys_openat(SYS_AT_FDCWD, (u64)"/path", 0, 0, 0, 0), -EFAULT);
+  g_user_ptr_ok = true;
+}
+
 /* sys_fstat: fd <= 2 → stdio stat (pipe-like) */
 static void fstat_stdio_fd_returns_chardev(void **state) {
   (void)state;
@@ -1027,6 +1056,8 @@ int main(void)
       cmocka_unit_test_setup(pipe_write_fd_install_fails, setup),
       cmocka_unit_test_setup(readlink_vfs_success, setup),
       cmocka_unit_test_setup(readlink_vfs_result_too_long, setup),
+      cmocka_unit_test_setup(pipe_write_fd_fails_enfile, setup),
+      cmocka_unit_test_setup(sys_openat_efault_path, setup),
       /* new coverage */
       cmocka_unit_test_setup(newfstatat_efault_on_bad_pathname, setup),
       cmocka_unit_test_setup(newfstatat_relative_non_fdcwd_enosys2, setup),
