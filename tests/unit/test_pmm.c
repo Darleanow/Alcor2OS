@@ -201,6 +201,20 @@ static void test_pmm_alloc_bitmap_full_no_free_bit(void **state) {
     assert_null(result);
 }
 
+/* pmm_alloc_pages: not enough consecutive pages → returns 0 (line 168) */
+static void test_pmm_alloc_pages_not_enough_consecutive(void **state) {
+    (void)state;
+    /* 2 pages available but ask for 10 → no 10 consecutive pages → return 0 */
+    struct limine_memmap_entry e1 = { .base = 0x100000, .length = PAGE_SIZE * 2, .type = LIMINE_MEMMAP_USABLE };
+    struct limine_memmap_entry *entries[] = { &e1 };
+    struct limine_memmap_response memmap = { .entry_count = 1, .entries = entries };
+    u64 hhdm_offset = (u64)fake_hhdm - 0x100000;
+    pmm_init(&memmap, hhdm_offset);
+    /* Request 10 consecutive pages when only 2 exist */
+    void *r = pmm_alloc_pages(10);
+    assert_null(r);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(test_pmm_init_success, setup_empty, teardown),
@@ -210,6 +224,7 @@ int main(void) {
         cmocka_unit_test_setup_teardown(test_pmm_get_total, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_pmm_alloc_exhausts_then_fails, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_pmm_alloc_bitmap_full_no_free_bit, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_pmm_alloc_pages_not_enough_consecutive, setup_empty, teardown),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
