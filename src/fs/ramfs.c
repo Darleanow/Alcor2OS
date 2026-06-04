@@ -438,8 +438,6 @@ i64 ramfs_chardev_register(
   char        parent_path[VFS_PATH_MAX];
   char        name[VFS_NAME_MAX];
   const char *last_slash = kstrrchr(path, '/');
-  if(!last_slash)
-    return -EINVAL;
 
   if(last_slash == path) {
     kstrncpy(parent_path, "/", 2);

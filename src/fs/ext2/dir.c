@@ -47,8 +47,6 @@ static void fill_entry_from_dirent(
 )
 {
   u32 name_len = de->name_len;
-  if(name_len > EXT2_NAME_MAX)
-    name_len = EXT2_NAME_MAX;
   kmemcpy(entry->name, de->name, name_len);
   entry->name[name_len] = '\0';
   entry->inode          = de->inode;

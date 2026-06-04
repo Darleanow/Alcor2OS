@@ -67,10 +67,6 @@ static i64 read_symlink_target(
       cache_put_block(blk);
       return -EIO;
     }
-    if(len > vol->block_size)
-      len = (u32)vol->block_size;
-    if(len >= bufsz)
-      len = bufsz - 1;
     kmemcpy(buf, blk, len);
     cache_put_block(blk);
   }
@@ -488,11 +484,10 @@ i64 ext2_readlink(
     return -EINVAL;
 
   char target[VFS_PATH_MAX];
-  i64  tlen = read_symlink_target(vol, &inode, target, sizeof(target));
-  if(tlen < 0)
+  if(read_symlink_target(vol, &inode, target, sizeof(target)) < 0)
     return -EIO;
 
-  u64 n = (u64)tlen;
+  u64 n = (u64)inode.i_size;
   if(n >= cap)
     return -ENAMETOOLONG;
   kmemcpy(buf, target, n);
