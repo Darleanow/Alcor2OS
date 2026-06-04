@@ -289,22 +289,52 @@ static void test_krealloc_zero_size_acts_as_free(void **state) {
 }
 
 /* split_block: block->next != NULL → next->prev updated (line 112) */
+static void test_kmalloc_expand_fails_null(void **state) {
+    (void)state;
+    /* Do NOT expand — heap_start=NULL. kmalloc will call find_free_block (NULL),
+     * then try heap_expand. If pmm_fail=true, expand fails → line 211. */
+    pmm_fail = true;
+    void *r = kmalloc(32);
+    assert_null(r);
+    pmm_fail = false;
+}
+
+static void test_krealloc_kmalloc_fails_null(void **state) {
+    (void)state;
+    heap_expand(1);
+    /* Alloc a block, then try to grow it when expand will fail → line 317 */
+    void *p = kmalloc(32);
+    assert_non_null(p);
+    pmm_fail = true;
+    void *r = krealloc(p, 4096); /* 4096 > current block → needs kmalloc → expand fails */
+    assert_null(r);
+    pmm_fail = false;
+    /* p was freed inside krealloc path? Actually krealloc calls kmalloc which fails,
+     * so p is NOT freed by krealloc. kfree it. */
+    kfree(p);
+}
+
+static void test_krealloc_bad_magic_null(void **state) {
+    (void)state;
+    heap_expand(1);
+    char buf[64];
+    ((heap_block_t *)(buf))->magic = 0xDEAD0000; /* corrupted magic */
+    void *r = krealloc(buf + HEAP_HEADER_SIZE, 128);
+    assert_null(r);
+}
+
 static void test_split_block_next_prev_updated(void **state) {
     (void)state;
     heap_expand(2);
-    /* Allocate three blocks to have a chain */
-    void *p1 = kmalloc(64);
-    void *p2 = kmalloc(64);
-    void *p3 = kmalloc(64);
-    /* Free p1 and p3, keep p2 allocated as a separator */
+    /* block->size=160 bytes, size=16: remaining=144 > 64 → split happens with block->next!=NULL */
+    void *p1 = kmalloc(160);
+    void *p2 = kmalloc(32);
     kfree(p1);
-    kfree(p3);
-    /* Now alloc a small block in p1's space — split triggers with block->next=p2's header */
     void *p4 = kmalloc(16);
     heap_block_t *b4   = (heap_block_t *)((u8 *)p4 - HEAP_HEADER_SIZE);
     heap_block_t *bnxt = b4->next;
-    /* If split happened and block->next != NULL, bnxt->prev should be the new split block */
-    if(bnxt) assert_ptr_equal(bnxt->prev, b4);
+    assert_non_null(bnxt);
+    assert_ptr_equal(bnxt->prev, b4);
     kfree(p2);
     kfree(p4);
 }
@@ -331,6 +361,9 @@ int main(void) {
         cmocka_unit_test_setup_teardown(test_krealloc_null_ptr_acts_as_malloc, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_krealloc_zero_size_acts_as_free, setup_empty, teardown),
         cmocka_unit_test_setup_teardown(test_split_block_next_prev_updated, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_krealloc_bad_magic_null, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_kmalloc_expand_fails_null, setup_empty, teardown),
+        cmocka_unit_test_setup_teardown(test_krealloc_kmalloc_fails_null, setup_empty, teardown),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
