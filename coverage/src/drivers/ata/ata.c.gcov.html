@@ -1,0 +1,913 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Alcor2OS Coverage - src/drivers/ata/ata.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/drivers/ata</a> - ata.c<span style="font-size: 80%;"> (source / <a href="ata.c.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Alcor2OS Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">91.6&nbsp;%</td>
+            <td class="headerCovTableEntry">514</td>
+            <td class="headerCovTableEntry">471</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-04 23:39:52</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntry">33</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+            | Branches:
+            <span class="coverLegendCov">+</span> taken
+            <span class="coverLegendNoCov">-</span> not taken
+            <span class="coverLegendNoCov">#</span> not executed
+</td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">76.4&nbsp;%</td>
+            <td class="headerCovTableEntry">246</td>
+            <td class="headerCovTableEntry">188</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : /**</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             :  * @file src/drivers/ata/ata.c</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             :  * @brief ATA/IDE disk driver (DMA + PIO fallback, LBA28/48).</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             :  *</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             :  * DMA via PCI Bus Master with per-channel bounce buffer.</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             :  * The bounce buffer is 64 KB (16 contiguous pages) per channel, allowing</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             :  * up to 128 sectors (64 KB) per single DMA command instead of 8 (4 KB).</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             :  * Falls back to PIO when no current process (early boot), DMA unavailable,</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             :  * or the transfer is too large for the bounce buffer.</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             :  */</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : </span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;alcor2/arch/cpu.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;alcor2/arch/idt.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;alcor2/arch/io.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;alcor2/arch/pic.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;alcor2/arch/pit.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;alcor2/drivers/ata.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;alcor2/drivers/console.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;alcor2/drivers/pci.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;alcor2/errno.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;alcor2/kstdlib.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;alcor2/mm/pmm.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;alcor2/mm/vmm.h&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #include &lt;alcor2/proc/sched.h&gt;</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : </span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : #include &quot;ata_internal.h&quot;</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : </span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC tlaBgGNC">          20 : #define TIMEOUT_TICKS    500 /* 5 s at 100 Hz */</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">         157 : #define LBA28_LIMIT      0x10000000ULL</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :<span class="tlaGNC">         291 : #define MAX_RETRIES      3</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :<span class="tlaGNC">      500059 : #define POLL_ITERS       500000</span></span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">           3 : #define PRD_EOT          0x8000</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">           9 : #define DMA_BOUNCE_PAGES 16                          /* 64 KB per channel  */</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">           7 : #define DMA_BOUNCE_BYTES (DMA_BOUNCE_PAGES * 0x1000) /* 65536 bytes        */</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">           2 : #define DMA_MAX_SECTORS  (DMA_BOUNCE_BYTES / 512)    /* 128 sectors        */</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : </span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : static ata_channel_t channels[2];</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : static ata_drive_t   drives[4];</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             : static void         *bounce_virt[2]; /* DMA bounce buffer (virtual, 64 KB) */</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : static u64           bounce_phys[2]; /* DMA bounce buffer (physical)        */</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : </span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : static inline u8     reg_read(const ata_channel_t *ch, u8 reg)</span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">         859 : {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">         859 :   return inb(ch-&gt;base + reg);</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">         859 : }</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : static inline void reg_write(const ata_channel_t *ch, u8 reg, u8 v)</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">        1127 : {</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">        1127 :   outb(ch-&gt;base + reg, v);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">        1127 : }</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : static inline u8 alt_status(const ata_channel_t *ch)</span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">      501246 : {</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">      501246 :   return inb(ch-&gt;ctrl);</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">      501246 : }</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :             : /* ~400 ns delay (ATA spec after drive select / command issue). */</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             : static inline void delay_400ns(const ata_channel_t *ch)</span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">         297 : {</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">         297 :   alt_status(ch);</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">         297 :   alt_status(ch);</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">         297 :   alt_status(ch);</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">         297 :   alt_status(ch);</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">         297 : }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :             : </span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : /**</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :  * @brief Poll until BSY clears.</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :  * @param ch    Channel to poll.</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :  * @param iters Maximum iterations.</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  * @return Last status byte.</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  */</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : static u8 poll_bsy(const ata_channel_t *ch, u32 iters)</span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">         106 : {</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">         106 :   u8 s = 0xFF;</span></span>
+<span id="L73"><span class="lineNum">      73</span>         [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         106 :   for(u32 i = 0; i &lt; iters; i++) {</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">         106 :     s = reg_read(ch, ATA_REG_STATUS);</span></span>
+<span id="L75"><span class="lineNum">      75</span>         [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         106 :     if(!(s &amp; ATA_SR_BSY))</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">         106 :       return s;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     cpu_pause();</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaUNC">           0 :   }</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaUNC">           0 :   return s;</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC tlaBgGNC">         106 : }</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : </span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : /**</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :  * @brief Poll until DRQ asserted (BSY clear).</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :  * @param ch    Channel to poll.</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :  * @param iters Maximum iterations.</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :  * @return true if DRQ set, false on error/timeout.</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :  */</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             : static bool poll_drq(const ata_channel_t *ch, u32 iters)</span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">         106 : {</span></span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         106 :   for(u32 i = 0; i &lt; iters; i++) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">         106 :     u8 s = reg_read(ch, ATA_REG_STATUS);</span></span>
+<span id="L92"><span class="lineNum">      92</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">         106 :     if(s &amp; (ATA_SR_ERR | ATA_SR_DF))</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return false;</span></span>
+<span id="L94"><span class="lineNum">      94</span> [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">         106 :     if(!(s &amp; ATA_SR_BSY) &amp;&amp; (s &amp; ATA_SR_DRQ))</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">         106 :       return true;</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     cpu_pause();</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaUNC">           0 :   }</span></span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaUNC">           0 :   return false;</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC tlaBgGNC">         106 : }</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :             : </span>
+<span id="L101"><span class="lineNum">     101</span>                 :             : /**</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :  * @brief Select a drive on its channel (master or slave).</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :  * @param d Drive to select.</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :  */</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : static void select_drive(const ata_drive_t *d)</span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">         106 : {</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">         106 :   reg_write(d-&gt;channel, ATA_REG_HDDEVSEL, 0xA0 | (d-&gt;slave &lt;&lt; 4));</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">         106 :   delay_400ns(d-&gt;channel);</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">         106 : }</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :             : </span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : /**</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  * @brief Right-trim spaces and NULs from an ATA identify string.</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :  * @param s   String buffer (modified in place).</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :  * @param len Maximum length.</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :  */</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : void trim_string(char *s, size_t len)</span>
+<span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">         216 : {</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaGNC">         216 :   char *end = s + len;</span></span>
+<span id="L119"><span class="lineNum">     119</span> [<span class="tlaGBC" title="Branch 0 was taken 6379 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 213 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6368 times"> + </span>]:<span class="tlaGNC">        6592 :   while(end &gt; s &amp;&amp; (end[-1] == ' ' || end[-1] == '\0'))</span></span>
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 6365 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">        6376 :     end--;</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">         216 :   *end = '\0';</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">         216 : }</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span>                 :             : /**</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :  * @brief Check whether a device is present (0xFF = floating bus).</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :  * @param ch Channel to probe.</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :  * @return true if device present.</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :  */</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : static bool channel_exists(const ata_channel_t *ch)</span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">         212 : {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">         212 :   return reg_read(ch, ATA_REG_STATUS) != 0xFF;</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">         212 : }</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :             : /**</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :  * @brief Run IDENTIFY and populate drive descriptor.</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :  * @param d Drive descriptor to fill.</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :  */</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : static void identify(ata_drive_t *d)</span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">         212 : {</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">         212 :   const ata_channel_t *ch = d-&gt;channel;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : </span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">         212 :   d-&gt;present = false;</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">         212 :   d-&gt;atapi   = false;</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">         212 :   d-&gt;lba48   = false;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">         212 :   d-&gt;dma     = false;</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">         212 :   d-&gt;sectors = 0;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">         212 :   if(!channel_exists(ch))</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">         106 :     return;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">         106 :   select_drive(d);</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :             : </span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">         106 :   reg_write(ch, ATA_REG_SECCOUNT, 0);</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :<span class="tlaGNC">         106 :   reg_write(ch, ATA_REG_LBA0, 0);</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">         106 :   reg_write(ch, ATA_REG_LBA1, 0);</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">         106 :   reg_write(ch, ATA_REG_LBA2, 0);</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">         106 :   reg_write(ch, ATA_REG_COMMAND, ATA_CMD_IDENTIFY);</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">         106 :   delay_400ns(ch);</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">         106 :   u8 status = reg_read(ch, ATA_REG_STATUS);</span></span>
+<span id="L161"><span class="lineNum">     161</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">         106 :   if(status == 0)</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return;</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC tlaBgGNC">         106 :   status = poll_bsy(ch, 100000);</span></span>
+<span id="L165"><span class="lineNum">     165</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">         106 :   if(status &amp; ATA_SR_BSY)</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return;</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : </span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :   /* ATAPI signature check */</span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC tlaBgGNC">         106 :   u8 mid = reg_read(ch, ATA_REG_LBA1);</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">         106 :   u8 hi  = reg_read(ch, ATA_REG_LBA2);</span></span>
+<span id="L171"><span class="lineNum">     171</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">         106 :   if((mid == 0x14 &amp;&amp; hi == 0xEB) || (mid == 0x69 &amp;&amp; hi == 0x96)) {</span></span>
+<span class="lineNum">        </span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     d-&gt;present = true;</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaUNC">           0 :     d-&gt;atapi   = true;</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaUNC">           0 :     return;</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaUNC">           0 :   }</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :             : </span>
+<span id="L177"><span class="lineNum">     177</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC tlaBgGNC">         106 :   if(!poll_drq(ch, 100000))</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return;</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC tlaBgGNC">         106 :   u16 id[256];</span></span>
+<span id="L181"><span class="lineNum">     181</span>         [<span class="tlaGBC" title="Branch 0 was taken 27136 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">       27242 :   for(int i = 0; i &lt; 256; i++)</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">       27136 :     id[i] = inw(ch-&gt;base);</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :             : </span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">         106 :   d-&gt;present = true;</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">         106 :   d-&gt;lba48   = !!(id[83] &amp; (1 &lt;&lt; 10));</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">         106 :   d-&gt;dma     = !!(id[49] &amp; (1 &lt;&lt; 8));</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : </span>
+<span id="L188"><span class="lineNum">     188</span>         [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         106 :   if(d-&gt;lba48) {</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">         106 :     d-&gt;sectors = (u64)id[100] | ((u64)id[101] &lt;&lt; 16) | ((u64)id[102] &lt;&lt; 32) |</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaGNC">         106 :                  ((u64)id[103] &lt;&lt; 48);</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">         106 :   }</span></span>
+<span id="L192"><span class="lineNum">     192</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">         106 :   if(d-&gt;sectors == 0)</span></span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     d-&gt;sectors = (u32)id[60] | ((u32)id[61] &lt;&lt; 16);</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :             : </span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :   /* Model (words 27-46) and serial (words 10-19), byte-swapped */</span>
+<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="Branch 0 was taken 2120 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC tlaBgGNC">        2226 :   for(int i = 0; i &lt; 20; i++) {</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">        2120 :     d-&gt;model[(size_t)i * 2]     = (char)(id[27 + i] &gt;&gt; 8);</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">        2120 :     d-&gt;model[(size_t)i * 2 + 1] = (char)(id[27 + i] &amp; 0xFF);</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :<span class="tlaGNC">        2120 :   }</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">         106 :   d-&gt;model[40] = '\0';</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">         106 :   trim_string(d-&gt;model, 40);</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>         [<span class="tlaGBC" title="Branch 0 was taken 1060 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>]:<span class="tlaGNC">        1166 :   for(int i = 0; i &lt; 10; i++) {</span></span>
+<span id="L204"><span class="lineNum">     204</span>                 :<span class="tlaGNC">        1060 :     d-&gt;serial[(size_t)i * 2]     = (char)(id[10 + i] &gt;&gt; 8);</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">        1060 :     d-&gt;serial[(size_t)i * 2 + 1] = (char)(id[10 + i] &amp; 0xFF);</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">        1060 :   }</span></span>
+<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">         106 :   d-&gt;serial[20] = '\0';</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">         106 :   trim_string(d-&gt;serial, 20);</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">         106 : }</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : </span>
+<span id="L211"><span class="lineNum">     211</span>                 :             : /** @brief Acquire exclusive access to a channel (blocks if busy). */</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             : static void channel_acquire(ata_channel_t *ch)</span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">          16 : {</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">          16 :   proc_t *me = proc_current();</span></span>
+<span id="L215"><span class="lineNum">     215</span>         [<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">          16 :   if(!me) {</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">          11 :     ch-&gt;busy = true;</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :<span class="tlaGNC">          11 :     return;</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">          11 :   }</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaGNC">           5 :   cpu_disable_interrupts();</span></span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :   while(ch-&gt;busy) {</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     ch-&gt;lock_waiter = me;</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaUNC">           0 :     proc_block(me);</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaUNC">           0 :     proc_schedule();</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaUNC">           0 :     cpu_disable_interrupts();</span></span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaUNC">           0 :   }</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaGNC tlaBgGNC">           5 :   ch-&gt;busy        = true;</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">           5 :   ch-&gt;lock_waiter = NULL;</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaGNC">           5 :   cpu_enable_interrupts();</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :<span class="tlaGNC">           5 : }</span></span>
+<span id="L230"><span class="lineNum">     230</span>                 :             : </span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : /** @brief Release exclusive access and wake any waiting caller. */</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : static void channel_release(ata_channel_t *ch)</span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">          16 : {</span></span>
+<span id="L234"><span class="lineNum">     234</span>                 :<span class="tlaGNC">          16 :   proc_t *waiter;</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">          16 :   cpu_disable_interrupts();</span></span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">          16 :   ch-&gt;busy        = false;</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">          16 :   waiter          = ch-&gt;lock_waiter;</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">          16 :   ch-&gt;lock_waiter = NULL;</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">          16 :   cpu_enable_interrupts();</span></span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 16 times"> + </span>]:<span class="tlaGNC">          16 :   if(waiter)</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     proc_wake(waiter);</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC tlaBgGNC">          16 : }</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :             : </span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : /**</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :  * @brief Wait for ATA command completion.</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :  *</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :  * With scheduler: block + wake from IRQ. Early boot: busy-poll.</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :  *</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :  * @param ch Channel with a pending command.</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :  * @return 0 on success, -EIO on error, -ETIMEDOUT on timeout.</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             :  */</span>
+<span id="L252"><span class="lineNum">     252</span>                 :             : static i64 wait_irq(ata_channel_t *ch)</span>
+<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaGNC">          79 : {</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">          79 :   proc_t *me = ch-&gt;waiter;</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : </span>
+<span id="L256"><span class="lineNum">     256</span>         [<span class="tlaGBC" title="Branch 0 was taken 59 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 20 times"> + </span>]:<span class="tlaGNC">          79 :   if(!me) {</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">          59 :     cpu_enable_interrupts();</span></span>
+<span id="L258"><span class="lineNum">     258</span>         [<span class="tlaGBC" title="Branch 0 was taken 500058 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">      500059 :     for(int i = 0; i &lt; POLL_ITERS; i++) {</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">      500058 :       u8 s = alt_status(ch);</span></span>
+<span id="L260"><span class="lineNum">     260</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 500057 times"> + </span>]:<span class="tlaGNC">      500058 :       if(s &amp; (ATA_SR_ERR | ATA_SR_DF))</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">           1 :         return -EIO;</span></span>
+<span id="L262"><span class="lineNum">     262</span>         [<span class="tlaGBC" title="Branch 0 was taken 57 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 500000 times"> + </span>]:<span class="tlaGNC">      500057 :       if(!(s &amp; ATA_SR_BSY))</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :<span class="tlaGNC">          57 :         return 0;</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">      500057 :     }</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">           1 :     return -ETIMEDOUT;</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">          59 :   }</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : </span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">          20 :   u64 deadline = pit_get_ticks() + TIMEOUT_TICKS;</span></span>
+<span id="L269"><span class="lineNum">     269</span>         [<span class="tlaGBC" title="Branch 0 was taken 21 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          40 :   while(ch-&gt;state == ATA_STATE_PENDING) {</span></span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 20 times"> + </span>]:<span class="tlaGNC">          21 :     if(pit_get_ticks() &gt;= deadline) {</span></span>
+<span id="L271"><span class="lineNum">     271</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :       if(ch-&gt;dma_ok)</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaUNC tlaBgUNC">           0 :         outb(ch-&gt;bmi + BMI_CMD, 0);</span></span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC tlaBgGNC">           1 :       ch-&gt;state  = ATA_STATE_IDLE;</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">           1 :       ch-&gt;waiter = NULL;</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">           1 :       cpu_enable_interrupts();</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">           1 :       return -ETIMEDOUT;</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :<span class="tlaGNC">          20 :     proc_block(me);</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">          20 :     proc_schedule();</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">          20 :     cpu_disable_interrupts();</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :<span class="tlaGNC">          20 :   }</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :             : </span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">          19 :   ch-&gt;waiter = NULL;</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">          19 :   cpu_enable_interrupts();</span></span>
+<span id="L285"><span class="lineNum">     285</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          19 :   return (ch-&gt;status &amp; (ATA_SR_ERR | ATA_SR_DF)) ? -EIO : 0;</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">          20 : }</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :             : </span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : /**</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :  * @brief Prepare a channel for IRQ-driven command completion.</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :  * @param ch Channel to prepare.</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :  */</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : static void prepare_irq_wait(ata_channel_t *ch)</span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">          75 : {</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaGNC">          75 :   cpu_disable_interrupts();</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :<span class="tlaGNC">          75 :   ch-&gt;state  = ATA_STATE_PENDING;</span></span>
+<span id="L296"><span class="lineNum">     296</span>                 :<span class="tlaGNC">          75 :   ch-&gt;waiter = proc_current();</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">          75 : }</span></span>
+<span id="L298"><span class="lineNum">     298</span>                 :             : </span>
+<span id="L299"><span class="lineNum">     299</span>                 :             : /**</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :  * @brief Program task-file registers for LBA28.</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :  * @param d     Target drive.</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :  * @param lba   Starting LBA.</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :  * @param count Sector count (0 = 256).</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :  */</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             : static void setup_lba28(ata_drive_t *d, u64 lba, u8 count)</span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">          66 : {</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :<span class="tlaGNC">          66 :   const ata_channel_t *ch = d-&gt;channel;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">          66 :   reg_write(</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">          66 :       ch, ATA_REG_HDDEVSEL, 0xE0 | (d-&gt;slave &lt;&lt; 4) | ((lba &gt;&gt; 24) &amp; 0x0F)</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :<span class="tlaGNC">          66 :   );</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaGNC">          66 :   delay_400ns(ch);</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">          66 :   reg_write(ch, ATA_REG_SECCOUNT, count);</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">          66 :   reg_write(ch, ATA_REG_LBA0, (u8)(lba));</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">          66 :   reg_write(ch, ATA_REG_LBA1, (u8)(lba &gt;&gt; 8));</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">          66 :   reg_write(ch, ATA_REG_LBA2, (u8)(lba &gt;&gt; 16));</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">          66 : }</span></span>
+<span id="L317"><span class="lineNum">     317</span>                 :             : </span>
+<span id="L318"><span class="lineNum">     318</span>                 :             : /**</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :  * @brief Program task-file registers for LBA48 (HOB first).</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :  * @param d     Target drive.</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :  * @param lba   Starting LBA.</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :  * @param count Sector count (0 = 65536).</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :  */</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : static void setup_lba48(ata_drive_t *d, u64 lba, u16 count)</span>
+<span id="L325"><span class="lineNum">     325</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L326"><span class="lineNum">     326</span>                 :<span class="tlaGNC">           9 :   const ata_channel_t *ch = d-&gt;channel;</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_HDDEVSEL, 0x40 | (d-&gt;slave &lt;&lt; 4));</span></span>
+<span id="L328"><span class="lineNum">     328</span>                 :<span class="tlaGNC">           9 :   delay_400ns(ch);</span></span>
+<span id="L329"><span class="lineNum">     329</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_SECCOUNT, (u8)(count &gt;&gt; 8));</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_LBA0, (u8)(lba &gt;&gt; 24));</span></span>
+<span id="L331"><span class="lineNum">     331</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_LBA1, (u8)(lba &gt;&gt; 32));</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_LBA2, (u8)(lba &gt;&gt; 40));</span></span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_SECCOUNT, (u8)(count));</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_LBA0, (u8)(lba));</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_LBA1, (u8)(lba &gt;&gt; 8));</span></span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">           9 :   reg_write(ch, ATA_REG_LBA2, (u8)(lba &gt;&gt; 16));</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : /**</span>
+<span id="L340"><span class="lineNum">     340</span>                 :             :  * @brief Load PRDT with a single bounce-buffer entry.</span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :  * @param ch    Channel whose PRDT to program.</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :  * @param phys  Physical address of data buffer.</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :  * @param bytes Transfer size in bytes.</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :  */</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : static void setup_prdt(ata_channel_t *ch, u64 phys, u32 bytes)</span>
+<span id="L346"><span class="lineNum">     346</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">           3 :   ch-&gt;prdt[0].phys_addr  = (u32)phys;</span></span>
+<span id="L348"><span class="lineNum">     348</span>                 :<span class="tlaGNC">           3 :   ch-&gt;prdt[0].byte_count = (u16)(bytes &amp; 0xFFFF);</span></span>
+<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaGNC">           3 :   ch-&gt;prdt[0].flags      = PRD_EOT;</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :<span class="tlaGNC">           3 :   outl(ch-&gt;bmi + BMI_PRDT, (u32)ch-&gt;prdt_phys);</span></span>
+<span id="L351"><span class="lineNum">     351</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :             : </span>
+<span id="L353"><span class="lineNum">     353</span>                 :             : /**</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :  * @brief DMA read/write through bounce buffer with retries.</span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :  * @param d     Target drive.</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :  * @param lba   Starting sector.</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :  * @param count Sector count (must fit in one page).</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :  * @param buf   Caller's buffer.</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :  * @param write true = write, false = read.</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :  * @return 0 on success, negative errno on failure.</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :  */</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             : static i64</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     dma_transfer(ata_drive_t *d, u64 lba, u32 count, void *buf, bool write)</span>
+<span id="L364"><span class="lineNum">     364</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">           5 :   ata_channel_t *ch    = d-&gt;channel;</span></span>
+<span id="L366"><span class="lineNum">     366</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           5 :   int            cidx  = (ch == &amp;channels[0]) ? 0 : 1;</span></span>
+<span id="L367"><span class="lineNum">     367</span> [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :   bool           ext   = d-&gt;lba48 &amp;&amp; (lba + count) &gt;= LBA28_LIMIT;</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">           5 :   u32            bytes = count * ATA_SECTOR_SIZE;</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :             : </span>
+<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(bytes &gt; DMA_BOUNCE_BYTES)</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">           1 :     return -EINVAL;</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">           4 :   void *bounce = bounce_virt[cidx];</span></span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">           4 :   u64   bphys  = bounce_phys[cidx];</span></span>
+<span id="L375"><span class="lineNum">     375</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(!bounce)</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :             : </span>
+<span id="L378"><span class="lineNum">     378</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(write)</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :<span class="tlaGNC">           1 :     kmemcpy(bounce, buf, bytes);</span></span>
+<span id="L380"><span class="lineNum">     380</span>                 :             : </span>
+<span id="L381"><span class="lineNum">     381</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :   for(int retry = 0; retry &lt; MAX_RETRIES; retry++) {</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaGNC">           3 :     outb(ch-&gt;bmi + BMI_CMD, 0);</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaGNC">           3 :     outb(ch-&gt;bmi + BMI_STATUS, BMI_STATUS_IRQ | BMI_STATUS_ERR);</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :             : </span>
+<span id="L385"><span class="lineNum">     385</span>                 :<span class="tlaGNC">           3 :     setup_prdt(ch, bphys, bytes);</span></span>
+<span id="L386"><span class="lineNum">     386</span>                 :<span class="tlaGNC">           3 :     prepare_irq_wait(ch);</span></span>
+<span id="L387"><span class="lineNum">     387</span>                 :             : </span>
+<span id="L388"><span class="lineNum">     388</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           3 :     if(ext) {</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       setup_lba48(d, lba, (u16)count);</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :<span class="tlaUNC">           0 :       reg_write(</span></span>
+<span id="L391"><span class="lineNum">     391</span>                 :<span class="tlaUNC">           0 :           ch, ATA_REG_COMMAND,</span></span>
+<span id="L392"><span class="lineNum">     392</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :           write ? ATA_CMD_WRITE_DMA_EXT : ATA_CMD_READ_DMA_EXT</span></span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaUNC">           0 :       );</span></span>
+<span id="L394"><span class="lineNum">     394</span>                 :<span class="tlaGNC tlaBgGNC">           3 :     } else {</span></span>
+<span id="L395"><span class="lineNum">     395</span>                 :<span class="tlaGNC">           3 :       setup_lba28(d, lba, (u8)count);</span></span>
+<span id="L396"><span class="lineNum">     396</span>                 :<span class="tlaGNC">           3 :       reg_write(</span></span>
+<span id="L397"><span class="lineNum">     397</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :           ch, ATA_REG_COMMAND, write ? ATA_CMD_WRITE_DMA : ATA_CMD_READ_DMA</span></span>
+<span id="L398"><span class="lineNum">     398</span>                 :<span class="tlaGNC">           3 :       );</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :<span class="tlaGNC">           3 :     }</span></span>
+<span id="L400"><span class="lineNum">     400</span>                 :             : </span>
+<span id="L401"><span class="lineNum">     401</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     outb(ch-&gt;bmi + BMI_CMD, BMI_CMD_START | (write ? 0 : BMI_CMD_READ));</span></span>
+<span id="L402"><span class="lineNum">     402</span>                 :<span class="tlaGNC">           3 :     i64 r = wait_irq(ch);</span></span>
+<span id="L403"><span class="lineNum">     403</span>                 :<span class="tlaGNC">           3 :     outb(ch-&gt;bmi + BMI_CMD, 0);</span></span>
+<span id="L404"><span class="lineNum">     404</span>                 :             : </span>
+<span id="L405"><span class="lineNum">     405</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :     if(r == 0 &amp;&amp; !(ch-&gt;bmi_status &amp; BMI_STATUS_ERR)) {</span></span>
+<span id="L406"><span class="lineNum">     406</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :       if(!write)</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :<span class="tlaGNC">           2 :         kmemcpy(buf, bounce, bytes);</span></span>
+<span id="L408"><span class="lineNum">     408</span>                 :<span class="tlaGNC">           3 :       return 0;</span></span>
+<span id="L409"><span class="lineNum">     409</span>                 :<span class="tlaGNC">           3 :     }</span></span>
+<span id="L410"><span class="lineNum">     410</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L411"><span class="lineNum">     411</span>                 :             : </span>
+<span id="L412"><span class="lineNum">     412</span>                 :<span class="tlaUNC tlaBgUNC">           0 :   return -EIO;</span></span>
+<span id="L413"><span class="lineNum">     413</span>                 :<span class="tlaGNC tlaBgGNC">           3 : }</span></span>
+<span id="L414"><span class="lineNum">     414</span>                 :             : </span>
+<span id="L415"><span class="lineNum">     415</span>                 :             : /**</span>
+<span id="L416"><span class="lineNum">     416</span>                 :             :  * @brief Read sectors using PIO.</span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :  * @param d     Target drive.</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             :  * @param lba   Starting sector.</span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :  * @param count Number of sectors.</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :  * @param buf   Output buffer.</span>
+<span id="L421"><span class="lineNum">     421</span>                 :             :  * @return 0 on success, negative errno on failure.</span>
+<span id="L422"><span class="lineNum">     422</span>                 :             :  */</span>
+<span id="L423"><span class="lineNum">     423</span>                 :             : static i64 pio_read(ata_drive_t *d, u64 lba, u32 count, void *buf)</span>
+<span id="L424"><span class="lineNum">     424</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L425"><span class="lineNum">     425</span>                 :<span class="tlaGNC">           9 :   ata_channel_t *ch  = d-&gt;channel;</span></span>
+<span id="L426"><span class="lineNum">     426</span>                 :<span class="tlaGNC">           9 :   u16           *out = (u16 *)buf;</span></span>
+<span id="L427"><span class="lineNum">     427</span>                 :             : </span>
+<span id="L428"><span class="lineNum">     428</span>         [<span class="tlaGBC" title="Branch 0 was taken 67 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          76 :   for(u32 s = 0; s &lt; count; s++) {</span></span>
+<span id="L429"><span class="lineNum">     429</span>                 :<span class="tlaGNC">          67 :     u64  cur = lba + s;</span></span>
+<span id="L430"><span class="lineNum">     430</span> [<span class="tlaGBC" title="Branch 0 was taken 67 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 59 times"> + </span>]:<span class="tlaGNC">          67 :     bool ext = d-&gt;lba48 &amp;&amp; cur &gt;= LBA28_LIMIT;</span></span>
+<span id="L431"><span class="lineNum">     431</span>                 :<span class="tlaGNC">          67 :     i64  r   = -EIO;</span></span>
+<span id="L432"><span class="lineNum">     432</span>                 :             : </span>
+<span id="L433"><span class="lineNum">     433</span> [<span class="tlaGBC" title="Branch 0 was taken 134 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 67 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 67 times"> + </span>]:<span class="tlaGNC">         134 :     for(int retry = 0; retry &lt; MAX_RETRIES &amp;&amp; r &lt; 0; retry++) {</span></span>
+<span id="L434"><span class="lineNum">     434</span>                 :<span class="tlaGNC">          67 :       prepare_irq_wait(ch);</span></span>
+<span id="L435"><span class="lineNum">     435</span>         [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 59 times"> + </span>]:<span class="tlaGNC">          67 :       if(ext) {</span></span>
+<span id="L436"><span class="lineNum">     436</span>                 :<span class="tlaGNC">           8 :         setup_lba48(d, cur, 1);</span></span>
+<span id="L437"><span class="lineNum">     437</span>                 :<span class="tlaGNC">           8 :         reg_write(ch, ATA_REG_COMMAND, ATA_CMD_READ_PIO_EXT);</span></span>
+<span id="L438"><span class="lineNum">     438</span>                 :<span class="tlaGNC">          59 :       } else {</span></span>
+<span id="L439"><span class="lineNum">     439</span>                 :<span class="tlaGNC">          59 :         setup_lba28(d, cur, 1);</span></span>
+<span id="L440"><span class="lineNum">     440</span>                 :<span class="tlaGNC">          59 :         reg_write(ch, ATA_REG_COMMAND, ATA_CMD_READ_PIO);</span></span>
+<span id="L441"><span class="lineNum">     441</span>                 :<span class="tlaGNC">          59 :       }</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :<span class="tlaGNC">          67 :       r = wait_irq(ch);</span></span>
+<span id="L443"><span class="lineNum">     443</span>                 :<span class="tlaGNC">          67 :     }</span></span>
+<span id="L444"><span class="lineNum">     444</span>                 :             : </span>
+<span id="L445"><span class="lineNum">     445</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 67 times"> + </span>]:<span class="tlaGNC">          67 :     if(r &lt; 0)</span></span>
+<span id="L446"><span class="lineNum">     446</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return r;</span></span>
+<span id="L447"><span class="lineNum">     447</span>                 :             : </span>
+<span id="L448"><span class="lineNum">     448</span>         [<span class="tlaGBC" title="Branch 0 was taken 17152 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 67 times"> + </span>]:<span class="tlaGNC tlaBgGNC">       17219 :     for(int i = 0; i &lt; 256; i++)</span></span>
+<span id="L449"><span class="lineNum">     449</span>                 :<span class="tlaGNC">       17152 :       out[s * 256 + i] = inw(ch-&gt;base);</span></span>
+<span id="L450"><span class="lineNum">     450</span>                 :<span class="tlaGNC">          67 :   }</span></span>
+<span id="L451"><span class="lineNum">     451</span>                 :             : </span>
+<span id="L452"><span class="lineNum">     452</span>                 :<span class="tlaGNC">           9 :   return 0;</span></span>
+<span id="L453"><span class="lineNum">     453</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L454"><span class="lineNum">     454</span>                 :             : </span>
+<span id="L455"><span class="lineNum">     455</span>                 :             : /**</span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :  * @brief Write sectors using PIO with cache flush.</span>
+<span id="L457"><span class="lineNum">     457</span>                 :             :  * @param d     Target drive.</span>
+<span id="L458"><span class="lineNum">     458</span>                 :             :  * @param lba   Starting sector.</span>
+<span id="L459"><span class="lineNum">     459</span>                 :             :  * @param count Number of sectors.</span>
+<span id="L460"><span class="lineNum">     460</span>                 :             :  * @param buf   Input buffer.</span>
+<span id="L461"><span class="lineNum">     461</span>                 :             :  * @return 0 on success, negative errno on failure.</span>
+<span id="L462"><span class="lineNum">     462</span>                 :             :  */</span>
+<span id="L463"><span class="lineNum">     463</span>                 :             : static i64 pio_write(ata_drive_t *d, u64 lba, u32 count, const void *buf)</span>
+<span id="L464"><span class="lineNum">     464</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L465"><span class="lineNum">     465</span>                 :<span class="tlaGNC">           5 :   ata_channel_t *ch  = d-&gt;channel;</span></span>
+<span id="L466"><span class="lineNum">     466</span>                 :<span class="tlaGNC">           5 :   const u16     *src = (const u16 *)buf;</span></span>
+<span id="L467"><span class="lineNum">     467</span>                 :             : </span>
+<span id="L468"><span class="lineNum">     468</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">          10 :   for(u32 s = 0; s &lt; count; s++) {</span></span>
+<span id="L469"><span class="lineNum">     469</span>                 :<span class="tlaGNC">           5 :     u64  cur = lba + s;</span></span>
+<span id="L470"><span class="lineNum">     470</span> [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :     bool ext = d-&gt;lba48 &amp;&amp; cur &gt;= LBA28_LIMIT;</span></span>
+<span id="L471"><span class="lineNum">     471</span>                 :<span class="tlaGNC">           5 :     i64  r   = -EIO;</span></span>
+<span id="L472"><span class="lineNum">     472</span>                 :             : </span>
+<span id="L473"><span class="lineNum">     473</span> [<span class="tlaGBC" title="Branch 0 was taken 10 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">          10 :     for(int retry = 0; retry &lt; MAX_RETRIES &amp;&amp; r &lt; 0; retry++) {</span></span>
+<span id="L474"><span class="lineNum">     474</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :       if(ext) {</span></span>
+<span id="L475"><span class="lineNum">     475</span>                 :<span class="tlaGNC">           1 :         setup_lba48(d, cur, 1);</span></span>
+<span id="L476"><span class="lineNum">     476</span>                 :<span class="tlaGNC">           1 :         reg_write(ch, ATA_REG_COMMAND, ATA_CMD_WRITE_PIO_EXT);</span></span>
+<span id="L477"><span class="lineNum">     477</span>                 :<span class="tlaGNC">           4 :       } else {</span></span>
+<span id="L478"><span class="lineNum">     478</span>                 :<span class="tlaGNC">           4 :         setup_lba28(d, cur, 1);</span></span>
+<span id="L479"><span class="lineNum">     479</span>                 :<span class="tlaGNC">           4 :         reg_write(ch, ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);</span></span>
+<span id="L480"><span class="lineNum">     480</span>                 :<span class="tlaGNC">           4 :       }</span></span>
+<span id="L481"><span class="lineNum">     481</span>                 :             : </span>
+<span id="L482"><span class="lineNum">     482</span>                 :<span class="tlaGNC">           5 :       delay_400ns(ch);</span></span>
+<span id="L483"><span class="lineNum">     483</span>                 :<span class="tlaGNC">           5 :       delay_400ns(ch);</span></span>
+<span id="L484"><span class="lineNum">     484</span>                 :             : </span>
+<span id="L485"><span class="lineNum">     485</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :       if(!(reg_read(ch, ATA_REG_STATUS) &amp; ATA_SR_DRQ)) {</span></span>
+<span id="L486"><span class="lineNum">     486</span>                 :<span class="tlaUNC tlaBgUNC">           0 :         r = -EIO;</span></span>
+<span id="L487"><span class="lineNum">     487</span>                 :<span class="tlaUNC">           0 :         continue;</span></span>
+<span id="L488"><span class="lineNum">     488</span>                 :<span class="tlaUNC">           0 :       }</span></span>
+<span id="L489"><span class="lineNum">     489</span>                 :             : </span>
+<span id="L490"><span class="lineNum">     490</span>         [<span class="tlaGBC" title="Branch 0 was taken 1280 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC tlaBgGNC">        1285 :       for(int i = 0; i &lt; 256; i++)</span></span>
+<span id="L491"><span class="lineNum">     491</span>                 :<span class="tlaGNC">        1280 :         outw(ch-&gt;base, src[s * 256 + i]);</span></span>
+<span id="L492"><span class="lineNum">     492</span>                 :             : </span>
+<span id="L493"><span class="lineNum">     493</span>                 :<span class="tlaGNC">           5 :       prepare_irq_wait(ch);</span></span>
+<span id="L494"><span class="lineNum">     494</span>                 :<span class="tlaGNC">           5 :       reg_write(</span></span>
+<span id="L495"><span class="lineNum">     495</span>                 :<span class="tlaGNC">           5 :           ch, ATA_REG_COMMAND,</span></span>
+<span id="L496"><span class="lineNum">     496</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :           ext ? ATA_CMD_CACHE_FLUSH_EXT : ATA_CMD_CACHE_FLUSH</span></span>
+<span id="L497"><span class="lineNum">     497</span>                 :<span class="tlaGNC">           5 :       );</span></span>
+<span id="L498"><span class="lineNum">     498</span>                 :<span class="tlaGNC">           5 :       r = wait_irq(ch);</span></span>
+<span id="L499"><span class="lineNum">     499</span>                 :<span class="tlaGNC">           5 :     }</span></span>
+<span id="L500"><span class="lineNum">     500</span>                 :             : </span>
+<span id="L501"><span class="lineNum">     501</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :     if(r &lt; 0)</span></span>
+<span id="L502"><span class="lineNum">     502</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return r;</span></span>
+<span id="L503"><span class="lineNum">     503</span>                 :<span class="tlaGNC tlaBgGNC">           5 :   }</span></span>
+<span id="L504"><span class="lineNum">     504</span>                 :             : </span>
+<span id="L505"><span class="lineNum">     505</span>                 :<span class="tlaGNC">           5 :   return 0;</span></span>
+<span id="L506"><span class="lineNum">     506</span>                 :<span class="tlaGNC">           5 : }</span></span>
+<span id="L507"><span class="lineNum">     507</span>                 :             : </span>
+<span id="L508"><span class="lineNum">     508</span>                 :             : /*</span>
+<span id="L509"><span class="lineNum">     509</span>                 :             :  * Block cache (read-side, write-through-with-invalidate).</span>
+<span id="L510"><span class="lineNum">     510</span>                 :             :  *</span>
+<span id="L511"><span class="lineNum">     511</span>                 :             :  * 4 KB blocks (8 sectors), 1024 entries = 4 MB total. LRU eviction by</span>
+<span id="L512"><span class="lineNum">     512</span>                 :             :  * monotonic counter. Hits (the common case after warm-up) skip DMA/PIO</span>
+<span id="L513"><span class="lineNum">     513</span>                 :             :  * entirely — clang's repeated ELF page reads now cost a memcpy. Misses</span>
+<span id="L514"><span class="lineNum">     514</span>                 :             :  * fetch a full 4 KB block so adjacent reads land hot.</span>
+<span id="L515"><span class="lineNum">     515</span>                 :             :  */</span>
+<span id="L516"><span class="lineNum">     516</span>                 :             : </span>
+<span id="L517"><span class="lineNum">     517</span>                 :             : ata_cache_entry_t g_ata_cache[CACHE_NUM_ENTRIES];</span>
+<span id="L518"><span class="lineNum">     518</span>                 :             : u64               g_cache_counter = 0;</span>
+<span id="L519"><span class="lineNum">     519</span>                 :             : int               g_cache_inited  = 0;</span>
+<span id="L520"><span class="lineNum">     520</span>                 :             : </span>
+<span id="L521"><span class="lineNum">     521</span>                 :             : void              cache_init_once(void)</span>
+<span id="L522"><span class="lineNum">     522</span>                 :<span class="tlaGNC">          26 : {</span></span>
+<span id="L523"><span class="lineNum">     523</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">          26 :   if(g_cache_inited)</span></span>
+<span id="L524"><span class="lineNum">     524</span>                 :<span class="tlaGNC">           4 :     return;</span></span>
+<span id="L525"><span class="lineNum">     525</span>         [<span class="tlaGBC" title="Branch 0 was taken 22528 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">       22550 :   for(int i = 0; i &lt; CACHE_NUM_ENTRIES; i++)</span></span>
+<span id="L526"><span class="lineNum">     526</span>                 :<span class="tlaGNC">       22528 :     g_ata_cache[i].block_lba = CACHE_INVALID_LBA;</span></span>
+<span id="L527"><span class="lineNum">     527</span>                 :<span class="tlaGNC">          22 :   g_cache_inited = 1;</span></span>
+<span id="L528"><span class="lineNum">     528</span>                 :<span class="tlaGNC">          22 : }</span></span>
+<span id="L529"><span class="lineNum">     529</span>                 :             : </span>
+<span id="L530"><span class="lineNum">     530</span>                 :             : ata_cache_entry_t *cache_lookup(u8 drive, u64 block_lba)</span>
+<span id="L531"><span class="lineNum">     531</span>                 :<span class="tlaGNC">          14 : {</span></span>
+<span id="L532"><span class="lineNum">     532</span>         [<span class="tlaGBC" title="Branch 0 was taken 11267 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">       11278 :   for(int i = 0; i &lt; CACHE_NUM_ENTRIES; i++) {</span></span>
+<span id="L533"><span class="lineNum">     533</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11264 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">       11267 :     if(g_ata_cache[i].block_lba == block_lba &amp;&amp; g_ata_cache[i].drive == drive) {</span></span>
+<span id="L534"><span class="lineNum">     534</span>                 :<span class="tlaGNC">           3 :       g_ata_cache[i].last_used = ++g_cache_counter;</span></span>
+<span id="L535"><span class="lineNum">     535</span>                 :<span class="tlaGNC">           3 :       return &amp;g_ata_cache[i];</span></span>
+<span id="L536"><span class="lineNum">     536</span>                 :<span class="tlaGNC">           3 :     }</span></span>
+<span id="L537"><span class="lineNum">     537</span>                 :<span class="tlaGNC">       11267 :   }</span></span>
+<span id="L538"><span class="lineNum">     538</span>                 :<span class="tlaGNC">          11 :   return NULL;</span></span>
+<span id="L539"><span class="lineNum">     539</span>                 :<span class="tlaGNC">          14 : }</span></span>
+<span id="L540"><span class="lineNum">     540</span>                 :             : </span>
+<span id="L541"><span class="lineNum">     541</span>                 :             : ata_cache_entry_t *cache_alloc(void)</span>
+<span id="L542"><span class="lineNum">     542</span>                 :<span class="tlaGNC">          12 : {</span></span>
+<span id="L543"><span class="lineNum">     543</span>                 :             :   /* Prefer free slot; else evict LRU. */</span>
+<span id="L544"><span class="lineNum">     544</span>                 :<span class="tlaGNC">          12 :   int idx    = 0;</span></span>
+<span id="L545"><span class="lineNum">     545</span>                 :<span class="tlaGNC">          12 :   u64 oldest = (u64)-1;</span></span>
+<span id="L546"><span class="lineNum">     546</span>         [<span class="tlaGBC" title="Branch 0 was taken 1035 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">        1036 :   for(int i = 0; i &lt; CACHE_NUM_ENTRIES; i++) {</span></span>
+<span id="L547"><span class="lineNum">     547</span>         [<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1024 times"> + </span>]:<span class="tlaGNC">        1035 :     if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)</span></span>
+<span id="L548"><span class="lineNum">     548</span>                 :<span class="tlaGNC">          11 :       return &amp;g_ata_cache[i];</span></span>
+<span id="L549"><span class="lineNum">     549</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1023 times"> + </span>]:<span class="tlaGNC">        1024 :     if(g_ata_cache[i].last_used &lt; oldest) {</span></span>
+<span id="L550"><span class="lineNum">     550</span>                 :<span class="tlaGNC">           1 :       oldest = g_ata_cache[i].last_used;</span></span>
+<span id="L551"><span class="lineNum">     551</span>                 :<span class="tlaGNC">           1 :       idx    = i;</span></span>
+<span id="L552"><span class="lineNum">     552</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L553"><span class="lineNum">     553</span>                 :<span class="tlaGNC">        1024 :   }</span></span>
+<span id="L554"><span class="lineNum">     554</span>                 :<span class="tlaGNC">           1 :   return &amp;g_ata_cache[idx];</span></span>
+<span id="L555"><span class="lineNum">     555</span>                 :<span class="tlaGNC">          12 : }</span></span>
+<span id="L556"><span class="lineNum">     556</span>                 :             : </span>
+<span id="L557"><span class="lineNum">     557</span>                 :             : void cache_invalidate_range(u8 drive, u64 lba, u32 count)</span>
+<span id="L558"><span class="lineNum">     558</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L559"><span class="lineNum">     559</span>                 :<span class="tlaGNC">           9 :   u64 end = lba + count;</span></span>
+<span id="L560"><span class="lineNum">     560</span>         [<span class="tlaGBC" title="Branch 0 was taken 9216 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">        9225 :   for(int i = 0; i &lt; CACHE_NUM_ENTRIES; i++) {</span></span>
+<span id="L561"><span class="lineNum">     561</span>         [<span class="tlaGBC" title="Branch 0 was taken 9211 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">        9216 :     if(g_ata_cache[i].block_lba == CACHE_INVALID_LBA)</span></span>
+<span id="L562"><span class="lineNum">     562</span>                 :<span class="tlaGNC">        9211 :       continue;</span></span>
+<span id="L563"><span class="lineNum">     563</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :     if(g_ata_cache[i].drive != drive)</span></span>
+<span id="L564"><span class="lineNum">     564</span>                 :<span class="tlaGNC">           1 :       continue;</span></span>
+<span id="L565"><span class="lineNum">     565</span>                 :<span class="tlaGNC">           4 :     u64 b_start = g_ata_cache[i].block_lba;</span></span>
+<span id="L566"><span class="lineNum">     566</span>                 :<span class="tlaGNC">           4 :     u64 b_end   = b_start + CACHE_BLOCK_SECTORS;</span></span>
+<span id="L567"><span class="lineNum">     567</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :     if(b_start &lt; end &amp;&amp; b_end &gt; lba)</span></span>
+<span id="L568"><span class="lineNum">     568</span>                 :<span class="tlaGNC">           3 :       g_ata_cache[i].block_lba = CACHE_INVALID_LBA;</span></span>
+<span id="L569"><span class="lineNum">     569</span>                 :<span class="tlaGNC">           4 :   }</span></span>
+<span id="L570"><span class="lineNum">     570</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L571"><span class="lineNum">     571</span>                 :             : </span>
+<span id="L572"><span class="lineNum">     572</span>                 :             : static i64 ata_read_raw(ata_drive_t *d, u64 lba, u32 count, void *buf)</span>
+<span id="L573"><span class="lineNum">     573</span>                 :<span class="tlaGNC">          10 : {</span></span>
+<span id="L574"><span class="lineNum">     574</span>                 :<span class="tlaGNC">          10 :   channel_acquire(d-&gt;channel);</span></span>
+<span id="L575"><span class="lineNum">     575</span>                 :<span class="tlaGNC">          10 :   i64 r;</span></span>
+<span id="L576"><span class="lineNum">     576</span> [<span class="tlaGBC" title="Branch 0 was taken 10 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          10 :   if(d-&gt;dma &amp;&amp; d-&gt;channel-&gt;dma_ok &amp;&amp; proc_current() &amp;&amp; count &lt;= DMA_MAX_SECTORS)</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span id="L577"><span class="lineNum">     577</span>                 :<span class="tlaGNC">           1 :     r = dma_transfer(d, lba, count, buf, false);</span></span>
+<span id="L578"><span class="lineNum">     578</span>                 :<span class="tlaGNC">           9 :   else</span></span>
+<span id="L579"><span class="lineNum">     579</span>                 :<span class="tlaGNC">           9 :     r = pio_read(d, lba, count, buf);</span></span>
+<span id="L580"><span class="lineNum">     580</span>                 :<span class="tlaGNC">          10 :   channel_release(d-&gt;channel);</span></span>
+<span id="L581"><span class="lineNum">     581</span>                 :<span class="tlaGNC">          10 :   return r;</span></span>
+<span id="L582"><span class="lineNum">     582</span>                 :<span class="tlaGNC">          10 : }</span></span>
+<span id="L583"><span class="lineNum">     583</span>                 :             : </span>
+<span id="L584"><span class="lineNum">     584</span>                 :             : /**</span>
+<span id="L585"><span class="lineNum">     585</span>                 :             :  * @brief Read sectors from an ATA drive (cache + DMA/PIO fallback).</span>
+<span id="L586"><span class="lineNum">     586</span>                 :             :  * @param drive Drive index (0-3).</span>
+<span id="L587"><span class="lineNum">     587</span>                 :             :  * @param lba   Starting sector.</span>
+<span id="L588"><span class="lineNum">     588</span>                 :             :  * @param count Number of sectors.</span>
+<span id="L589"><span class="lineNum">     589</span>                 :             :  * @param buf   Output buffer.</span>
+<span id="L590"><span class="lineNum">     590</span>                 :             :  * @return 0 on success, negative errno on failure.</span>
+<span id="L591"><span class="lineNum">     591</span>                 :             :  */</span>
+<span id="L592"><span class="lineNum">     592</span>                 :             : i64 ata_read(u8 drive, u64 lba, u32 count, void *buf)</span>
+<span id="L593"><span class="lineNum">     593</span>                 :<span class="tlaGNC">          16 : {</span></span>
+<span id="L594"><span class="lineNum">     594</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 15 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 14 times"> + </span>]:<span class="tlaGNC">          16 :   if(drive &gt;= 4 || !buf || count == 0)</span></span>
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]
+<span id="L595"><span class="lineNum">     595</span>                 :<span class="tlaGNC">           3 :     return -EINVAL;</span></span>
+<span id="L596"><span class="lineNum">     596</span>                 :             : </span>
+<span id="L597"><span class="lineNum">     597</span>                 :<span class="tlaGNC">          13 :   ata_drive_t *d = &amp;drives[drive];</span></span>
+<span id="L598"><span class="lineNum">     598</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          13 :   if(!d-&gt;present || d-&gt;atapi)</span></span>
+<span id="L599"><span class="lineNum">     599</span>                 :<span class="tlaGNC">           1 :     return -ENODEV;</span></span>
+<span id="L600"><span class="lineNum">     600</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          12 :   if(lba + count &gt; d-&gt;sectors)</span></span>
+<span id="L601"><span class="lineNum">     601</span>                 :<span class="tlaGNC">           1 :     return -EINVAL;</span></span>
+<span id="L602"><span class="lineNum">     602</span>                 :             : </span>
+<span id="L603"><span class="lineNum">     603</span>                 :<span class="tlaGNC">          11 :   cache_init_once();</span></span>
+<span id="L604"><span class="lineNum">     604</span>                 :             : </span>
+<span id="L605"><span class="lineNum">     605</span>                 :<span class="tlaGNC">          11 :   u64 cur = lba;</span></span>
+<span id="L606"><span class="lineNum">     606</span>                 :<span class="tlaGNC">          11 :   u64 end = lba + count;</span></span>
+<span id="L607"><span class="lineNum">     607</span>                 :<span class="tlaGNC">          11 :   u8 *out = (u8 *)buf;</span></span>
+<span id="L608"><span class="lineNum">     608</span>                 :             : </span>
+<span id="L609"><span class="lineNum">     609</span>         [<span class="tlaGBC" title="Branch 0 was taken 11 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          22 :   while(cur &lt; end) {</span></span>
+<span id="L610"><span class="lineNum">     610</span>                 :<span class="tlaGNC">          11 :     u64 block_lba     = cur &amp; ~(u64)(CACHE_BLOCK_SECTORS - 1);</span></span>
+<span id="L611"><span class="lineNum">     611</span>                 :<span class="tlaGNC">          11 :     u64 in_block      = cur - block_lba;</span></span>
+<span id="L612"><span class="lineNum">     612</span>                 :<span class="tlaGNC">          11 :     u64 left_in_block = CACHE_BLOCK_SECTORS - in_block;</span></span>
+<span id="L613"><span class="lineNum">     613</span>                 :<span class="tlaGNC">          11 :     u64 left_total    = end - cur;</span></span>
+<span id="L614"><span class="lineNum">     614</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          11 :     u64 take          = left_in_block &lt; left_total ? left_in_block : left_total;</span></span>
+<span id="L615"><span class="lineNum">     615</span>                 :             : </span>
+<span id="L616"><span class="lineNum">     616</span>                 :<span class="tlaGNC">          11 :     ata_cache_entry_t *e = cache_lookup(drive, block_lba);</span></span>
+<span id="L617"><span class="lineNum">     617</span>         [<span class="tlaGBC" title="Branch 0 was taken 10 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          11 :     if(!e) {</span></span>
+<span id="L618"><span class="lineNum">     618</span>                 :<span class="tlaGNC">          10 :       e              = cache_alloc();</span></span>
+<span id="L619"><span class="lineNum">     619</span>                 :<span class="tlaGNC">          10 :       u64 block_size = CACHE_BLOCK_SECTORS;</span></span>
+<span id="L620"><span class="lineNum">     620</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          10 :       if(block_lba + block_size &gt; d-&gt;sectors)</span></span>
+<span id="L621"><span class="lineNum">     621</span>                 :<span class="tlaGNC">           1 :         block_size = d-&gt;sectors - block_lba;</span></span>
+<span id="L622"><span class="lineNum">     622</span>                 :             : </span>
+<span id="L623"><span class="lineNum">     623</span>                 :<span class="tlaGNC">          10 :       i64 r = ata_read_raw(d, block_lba, (u32)block_size, e-&gt;data);</span></span>
+<span id="L624"><span class="lineNum">     624</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          10 :       if(r &lt; 0) {</span></span>
+<span id="L625"><span class="lineNum">     625</span>                 :<span class="tlaUNC tlaBgUNC">           0 :         e-&gt;block_lba = CACHE_INVALID_LBA;</span></span>
+<span id="L626"><span class="lineNum">     626</span>                 :<span class="tlaUNC">           0 :         return r;</span></span>
+<span id="L627"><span class="lineNum">     627</span>                 :<span class="tlaUNC">           0 :       }</span></span>
+<span id="L628"><span class="lineNum">     628</span>                 :             :       /* Zero unread tail (partial block at disk end). */</span>
+<span id="L629"><span class="lineNum">     629</span>         [<span class="tlaGBC" title="Branch 0 was taken 2560 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC tlaBgGNC">        2570 :       for(u64 i = block_size * 512; i &lt; CACHE_BLOCK_BYTES; i++)</span></span>
+<span id="L630"><span class="lineNum">     630</span>                 :<span class="tlaGNC">        2560 :         e-&gt;data[i] = 0;</span></span>
+<span id="L631"><span class="lineNum">     631</span>                 :             : </span>
+<span id="L632"><span class="lineNum">     632</span>                 :<span class="tlaGNC">          10 :       e-&gt;block_lba = block_lba;</span></span>
+<span id="L633"><span class="lineNum">     633</span>                 :<span class="tlaGNC">          10 :       e-&gt;drive     = drive;</span></span>
+<span id="L634"><span class="lineNum">     634</span>                 :<span class="tlaGNC">          10 :       e-&gt;last_used = ++g_cache_counter;</span></span>
+<span id="L635"><span class="lineNum">     635</span>                 :<span class="tlaGNC">          10 :     }</span></span>
+<span id="L636"><span class="lineNum">     636</span>                 :             : </span>
+<span id="L637"><span class="lineNum">     637</span>                 :<span class="tlaGNC">          11 :     kmemcpy(out, &amp;e-&gt;data[in_block * 512], take * 512);</span></span>
+<span id="L638"><span class="lineNum">     638</span>                 :<span class="tlaGNC">          11 :     out += take * 512;</span></span>
+<span id="L639"><span class="lineNum">     639</span>                 :<span class="tlaGNC">          11 :     cur += take;</span></span>
+<span id="L640"><span class="lineNum">     640</span>                 :<span class="tlaGNC">          11 :   }</span></span>
+<span id="L641"><span class="lineNum">     641</span>                 :             : </span>
+<span id="L642"><span class="lineNum">     642</span>                 :<span class="tlaGNC">          11 :   return 0;</span></span>
+<span id="L643"><span class="lineNum">     643</span>                 :<span class="tlaGNC">          11 : }</span></span>
+<span id="L644"><span class="lineNum">     644</span>                 :             : </span>
+<span id="L645"><span class="lineNum">     645</span>                 :             : /**</span>
+<span id="L646"><span class="lineNum">     646</span>                 :             :  * @brief Write sectors to an ATA drive (DMA if available, else PIO).</span>
+<span id="L647"><span class="lineNum">     647</span>                 :             :  * @param drive Drive index (0-3).</span>
+<span id="L648"><span class="lineNum">     648</span>                 :             :  * @param lba   Starting sector.</span>
+<span id="L649"><span class="lineNum">     649</span>                 :             :  * @param count Number of sectors.</span>
+<span id="L650"><span class="lineNum">     650</span>                 :             :  * @param buf   Input buffer.</span>
+<span id="L651"><span class="lineNum">     651</span>                 :             :  * @return 0 on success, negative errno on failure.</span>
+<span id="L652"><span class="lineNum">     652</span>                 :             :  */</span>
+<span id="L653"><span class="lineNum">     653</span>                 :             : i64 ata_write(u8 drive, u64 lba, u32 count, const void *buf)</span>
+<span id="L654"><span class="lineNum">     654</span>                 :<span class="tlaGNC">          11 : {</span></span>
+<span id="L655"><span class="lineNum">     655</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          11 :   if(drive &gt;= 4 || !buf || count == 0)</span></span>
+<span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 8 times"> + </span>]
+<span id="L656"><span class="lineNum">     656</span>                 :<span class="tlaGNC">           3 :     return -EINVAL;</span></span>
+<span id="L657"><span class="lineNum">     657</span>                 :             : </span>
+<span id="L658"><span class="lineNum">     658</span>                 :<span class="tlaGNC">           8 :   ata_drive_t *d = &amp;drives[drive];</span></span>
+<span id="L659"><span class="lineNum">     659</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           8 :   if(!d-&gt;present || d-&gt;atapi)</span></span>
+<span id="L660"><span class="lineNum">     660</span>                 :<span class="tlaGNC">           1 :     return -ENODEV;</span></span>
+<span id="L661"><span class="lineNum">     661</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           7 :   if(lba + count &gt; d-&gt;sectors)</span></span>
+<span id="L662"><span class="lineNum">     662</span>                 :<span class="tlaGNC">           1 :     return -EINVAL;</span></span>
+<span id="L663"><span class="lineNum">     663</span>                 :             : </span>
+<span id="L664"><span class="lineNum">     664</span>                 :             :   /* Write-through: invalidate any cached blocks overlapping this range so</span>
+<span id="L665"><span class="lineNum">     665</span>                 :             :    * the next read sees fresh data. Simpler and safer than mutating cache</span>
+<span id="L666"><span class="lineNum">     666</span>                 :             :    * entries in place (handles unaligned writes too). */</span>
+<span id="L667"><span class="lineNum">     667</span>                 :<span class="tlaGNC">           6 :   cache_init_once();</span></span>
+<span id="L668"><span class="lineNum">     668</span>                 :<span class="tlaGNC">           6 :   cache_invalidate_range(drive, lba, count);</span></span>
+<span id="L669"><span class="lineNum">     669</span>                 :             : </span>
+<span id="L670"><span class="lineNum">     670</span>                 :<span class="tlaGNC">           6 :   channel_acquire(d-&gt;channel);</span></span>
+<span id="L671"><span class="lineNum">     671</span>                 :<span class="tlaGNC">           6 :   i64 r;</span></span>
+<span id="L672"><span class="lineNum">     672</span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           6 :   if(d-&gt;dma &amp;&amp; d-&gt;channel-&gt;dma_ok &amp;&amp; proc_current() &amp;&amp; count &lt;= DMA_MAX_SECTORS)</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span id="L673"><span class="lineNum">     673</span>                 :<span class="tlaGNC">           1 :     r = dma_transfer(d, lba, count, (void *)buf, true);</span></span>
+<span id="L674"><span class="lineNum">     674</span>                 :<span class="tlaGNC">           5 :   else</span></span>
+<span id="L675"><span class="lineNum">     675</span>                 :<span class="tlaGNC">           5 :     r = pio_write(d, lba, count, buf);</span></span>
+<span id="L676"><span class="lineNum">     676</span>                 :<span class="tlaGNC">           6 :   channel_release(d-&gt;channel);</span></span>
+<span id="L677"><span class="lineNum">     677</span>                 :<span class="tlaGNC">           6 :   return r;</span></span>
+<span id="L678"><span class="lineNum">     678</span>                 :<span class="tlaGNC">           7 : }</span></span>
+<span id="L679"><span class="lineNum">     679</span>                 :             : </span>
+<span id="L680"><span class="lineNum">     680</span>                 :             : /**</span>
+<span id="L681"><span class="lineNum">     681</span>                 :             :  * @brief ATA IRQ handler — reading status clears the device's IRQ line.</span>
+<span id="L682"><span class="lineNum">     682</span>                 :             :  * @param channel Channel index (0 = primary, 1 = secondary).</span>
+<span id="L683"><span class="lineNum">     683</span>                 :             :  */</span>
+<span id="L684"><span class="lineNum">     684</span>                 :             : void ata_irq(u8 channel)</span>
+<span id="L685"><span class="lineNum">     685</span>                 :<span class="tlaGNC">           6 : {</span></span>
+<span id="L686"><span class="lineNum">     686</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           6 :   if(channel &gt;= 2)</span></span>
+<span id="L687"><span class="lineNum">     687</span>                 :<span class="tlaGNC">           1 :     return;</span></span>
+<span id="L688"><span class="lineNum">     688</span>                 :             : </span>
+<span id="L689"><span class="lineNum">     689</span>                 :<span class="tlaGNC">           5 :   ata_channel_t *ch = &amp;channels[channel];</span></span>
+<span id="L690"><span class="lineNum">     690</span>                 :             : </span>
+<span id="L691"><span class="lineNum">     691</span>                 :<span class="tlaGNC">           5 :   ch-&gt;status = reg_read(ch, ATA_REG_STATUS);</span></span>
+<span id="L692"><span class="lineNum">     692</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   ch-&gt;error  = (ch-&gt;status &amp; ATA_SR_ERR) ? reg_read(ch, ATA_REG_ERROR) : 0;</span></span>
+<span id="L693"><span class="lineNum">     693</span>                 :             : </span>
+<span id="L694"><span class="lineNum">     694</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(ch-&gt;dma_ok) {</span></span>
+<span id="L695"><span class="lineNum">     695</span>                 :<span class="tlaGNC">           1 :     ch-&gt;bmi_status = inb(ch-&gt;bmi + BMI_STATUS);</span></span>
+<span id="L696"><span class="lineNum">     696</span>                 :<span class="tlaGNC">           1 :     outb(ch-&gt;bmi + BMI_STATUS, BMI_STATUS_IRQ | BMI_STATUS_ERR);</span></span>
+<span id="L697"><span class="lineNum">     697</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L698"><span class="lineNum">     698</span>                 :             : </span>
+<span id="L699"><span class="lineNum">     699</span>                 :<span class="tlaGNC">           5 :   ch-&gt;state = ATA_STATE_IDLE;</span></span>
+<span id="L700"><span class="lineNum">     700</span>                 :             : </span>
+<span id="L701"><span class="lineNum">     701</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(ch-&gt;waiter) {</span></span>
+<span id="L702"><span class="lineNum">     702</span>                 :<span class="tlaGNC">           1 :     proc_wake(ch-&gt;waiter);</span></span>
+<span id="L703"><span class="lineNum">     703</span>                 :<span class="tlaGNC">           1 :     ch-&gt;waiter = NULL;</span></span>
+<span id="L704"><span class="lineNum">     704</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L705"><span class="lineNum">     705</span>                 :<span class="tlaGNC">           5 : }</span></span>
+<span id="L706"><span class="lineNum">     706</span>                 :             : </span>
+<span id="L707"><span class="lineNum">     707</span>                 :             : static void ata_irq_primary(u8 irq)</span>
+<span id="L708"><span class="lineNum">     708</span>                 :<span class="tlaGNC">           1 : {</span></span>
+<span id="L709"><span class="lineNum">     709</span>                 :<span class="tlaGNC">           1 :   (void)irq;</span></span>
+<span id="L710"><span class="lineNum">     710</span>                 :<span class="tlaGNC">           1 :   ata_irq(0);</span></span>
+<span id="L711"><span class="lineNum">     711</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L712"><span class="lineNum">     712</span>                 :             : </span>
+<span id="L713"><span class="lineNum">     713</span>                 :             : static void ata_irq_secondary(u8 irq)</span>
+<span id="L714"><span class="lineNum">     714</span>                 :<span class="tlaGNC">           1 : {</span></span>
+<span id="L715"><span class="lineNum">     715</span>                 :<span class="tlaGNC">           1 :   (void)irq;</span></span>
+<span id="L716"><span class="lineNum">     716</span>                 :<span class="tlaGNC">           1 :   ata_irq(1);</span></span>
+<span id="L717"><span class="lineNum">     717</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L718"><span class="lineNum">     718</span>                 :             : </span>
+<span id="L719"><span class="lineNum">     719</span>                 :             : /** @brief Detect and configure PCI IDE Bus Master for DMA. */</span>
+<span id="L720"><span class="lineNum">     720</span>                 :             : static void init_dma(void)</span>
+<span id="L721"><span class="lineNum">     721</span>                 :<span class="tlaGNC">          53 : {</span></span>
+<span id="L722"><span class="lineNum">     722</span>                 :<span class="tlaGNC">          53 :   pci_device_t ide;</span></span>
+<span id="L723"><span class="lineNum">     723</span>         [<span class="tlaGBC" title="Branch 0 was taken 51 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          53 :   if(!pci_find_device(PCI_CLASS_STORAGE, PCI_SUBCLASS_IDE, &amp;ide)) {</span></span>
+<span id="L724"><span class="lineNum">     724</span>                 :<span class="tlaGNC">          51 :     console_print(&quot;[ATA] No IDE controller found, DMA disabled\n&quot;);</span></span>
+<span id="L725"><span class="lineNum">     725</span>                 :<span class="tlaGNC">          51 :     return;</span></span>
+<span id="L726"><span class="lineNum">     726</span>                 :<span class="tlaGNC">          51 :   }</span></span>
+<span id="L727"><span class="lineNum">     727</span>                 :             : </span>
+<span id="L728"><span class="lineNum">     728</span>                 :<span class="tlaGNC">           2 :   pci_enable_bus_master(&amp;ide);</span></span>
+<span id="L729"><span class="lineNum">     729</span>                 :             : </span>
+<span id="L730"><span class="lineNum">     730</span>                 :<span class="tlaGNC">           2 :   u16 bar4 = ide.bar[4] &amp; 0xFFFC;</span></span>
+<span id="L731"><span class="lineNum">     731</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(bar4 == 0) {</span></span>
+<span id="L732"><span class="lineNum">     732</span>                 :<span class="tlaGNC">           1 :     console_print(&quot;[ATA] BAR4 invalid, DMA disabled\n&quot;);</span></span>
+<span id="L733"><span class="lineNum">     733</span>                 :<span class="tlaGNC">           1 :     return;</span></span>
+<span id="L734"><span class="lineNum">     734</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L735"><span class="lineNum">     735</span>                 :             : </span>
+<span id="L736"><span class="lineNum">     736</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :   for(int i = 0; i &lt; 2; i++) {</span></span>
+<span id="L737"><span class="lineNum">     737</span>                 :<span class="tlaGNC">           2 :     channels[i].bmi = bar4 + (i * 8);</span></span>
+<span id="L738"><span class="lineNum">     738</span>                 :             : </span>
+<span id="L739"><span class="lineNum">     739</span>                 :<span class="tlaGNC">           2 :     void *prdt_page   = pmm_alloc();</span></span>
+<span id="L740"><span class="lineNum">     740</span>                 :<span class="tlaGNC">           2 :     void *bounce_page = pmm_alloc_pages(DMA_BOUNCE_PAGES);</span></span>
+<span id="L741"><span class="lineNum">     741</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :     if(!prdt_page || !bounce_page) {</span></span>
+<span id="L742"><span class="lineNum">     742</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       console_print(&quot;[ATA] Failed to allocate DMA buffers\n&quot;);</span></span>
+<span id="L743"><span class="lineNum">     743</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :       if(prdt_page)</span></span>
+<span id="L744"><span class="lineNum">     744</span>                 :<span class="tlaUNC">           0 :         pmm_free(prdt_page);</span></span>
+<span id="L745"><span class="lineNum">     745</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :       if(bounce_page)</span></span>
+<span id="L746"><span class="lineNum">     746</span>                 :<span class="tlaUNC">           0 :         pmm_free_pages(bounce_page, DMA_BOUNCE_PAGES);</span></span>
+<span id="L747"><span class="lineNum">     747</span>                 :<span class="tlaUNC">           0 :       continue;</span></span>
+<span id="L748"><span class="lineNum">     748</span>                 :<span class="tlaUNC">           0 :     }</span></span>
+<span id="L749"><span class="lineNum">     749</span>                 :             : </span>
+<span id="L750"><span class="lineNum">     750</span>                 :<span class="tlaGNC tlaBgGNC">           2 :     channels[i].prdt_phys = (u64)prdt_page;</span></span>
+<span id="L751"><span class="lineNum">     751</span>                 :<span class="tlaGNC">           2 :     channels[i].prdt      = phys_to_virt((u64)prdt_page);</span></span>
+<span id="L752"><span class="lineNum">     752</span>                 :<span class="tlaGNC">           2 :     channels[i].dma_ok    = true;</span></span>
+<span id="L753"><span class="lineNum">     753</span>                 :             : </span>
+<span id="L754"><span class="lineNum">     754</span>                 :<span class="tlaGNC">           2 :     bounce_phys[i] = (u64)bounce_page;</span></span>
+<span id="L755"><span class="lineNum">     755</span>                 :<span class="tlaGNC">           2 :     bounce_virt[i] = phys_to_virt((u64)bounce_page);</span></span>
+<span id="L756"><span class="lineNum">     756</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L757"><span class="lineNum">     757</span>                 :             : </span>
+<span id="L758"><span class="lineNum">     758</span>                 :<span class="tlaGNC">           1 :   console_print(&quot;[ATA] DMA enabled\n&quot;);</span></span>
+<span id="L759"><span class="lineNum">     759</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L760"><span class="lineNum">     760</span>                 :             : </span>
+<span id="L761"><span class="lineNum">     761</span>                 :             : /** @brief Initialize the ATA subsystem (channels, drives, IRQs, DMA). */</span>
+<span id="L762"><span class="lineNum">     762</span>                 :             : void ata_init(void)</span>
+<span id="L763"><span class="lineNum">     763</span>                 :<span class="tlaGNC">          53 : {</span></span>
+<span id="L764"><span class="lineNum">     764</span>                 :<span class="tlaGNC">          53 :   channels[0] = (ata_channel_t) {.base  = ATA_PRIMARY_DATA,</span></span>
+<span id="L765"><span class="lineNum">     765</span>                 :<span class="tlaGNC">          53 :                                  .ctrl  = ATA_PRIMARY_CTRL,</span></span>
+<span id="L766"><span class="lineNum">     766</span>                 :<span class="tlaGNC">          53 :                                  .irq   = IRQ_ATA_PRIMARY,</span></span>
+<span id="L767"><span class="lineNum">     767</span>                 :<span class="tlaGNC">          53 :                                  .state = ATA_STATE_IDLE};</span></span>
+<span id="L768"><span class="lineNum">     768</span>                 :<span class="tlaGNC">          53 :   channels[1] = (ata_channel_t) {.base  = ATA_SECONDARY_DATA,</span></span>
+<span id="L769"><span class="lineNum">     769</span>                 :<span class="tlaGNC">          53 :                                  .ctrl  = ATA_SECONDARY_CTRL,</span></span>
+<span id="L770"><span class="lineNum">     770</span>                 :<span class="tlaGNC">          53 :                                  .irq   = IRQ_ATA_SECONDARY,</span></span>
+<span id="L771"><span class="lineNum">     771</span>                 :<span class="tlaGNC">          53 :                                  .state = ATA_STATE_IDLE};</span></span>
+<span id="L772"><span class="lineNum">     772</span>                 :             : </span>
+<span id="L773"><span class="lineNum">     773</span>         [<span class="tlaGBC" title="Branch 0 was taken 212 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 53 times"> + </span>]:<span class="tlaGNC">         265 :   for(int i = 0; i &lt; 4; i++) {</span></span>
+<span id="L774"><span class="lineNum">     774</span>                 :<span class="tlaGNC">         212 :     drives[i].channel = &amp;channels[i / 2];</span></span>
+<span id="L775"><span class="lineNum">     775</span>                 :<span class="tlaGNC">         212 :     drives[i].slave   = i % 2;</span></span>
+<span id="L776"><span class="lineNum">     776</span>                 :<span class="tlaGNC">         212 :   }</span></span>
+<span id="L777"><span class="lineNum">     777</span>                 :             : </span>
+<span id="L778"><span class="lineNum">     778</span>         [<span class="tlaGBC" title="Branch 0 was taken 212 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 53 times"> + </span>]:<span class="tlaGNC">         265 :   for(int i = 0; i &lt; 4; i++) {</span></span>
+<span id="L779"><span class="lineNum">     779</span>                 :<span class="tlaGNC">         212 :     identify(&amp;drives[i]);</span></span>
+<span id="L780"><span class="lineNum">     780</span> [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 106 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         212 :     if(drives[i].present &amp;&amp; !drives[i].atapi) {</span></span>
+<span id="L781"><span class="lineNum">     781</span>                 :<span class="tlaGNC">         106 :       u32 mb = (u32)(drives[i].sectors / 2048);</span></span>
+<span id="L782"><span class="lineNum">     782</span>                 :<span class="tlaGNC">         106 :       console_printf(</span></span>
+<span id="L783"><span class="lineNum">     783</span>                 :<span class="tlaGNC">         106 :           &quot;[ATA] Drive %d: %s (%d MB, %s%s)\n&quot;, i, drives[i].model, mb,</span></span>
+<span id="L784"><span class="lineNum">     784</span> [<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 106 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">         106 :           drives[i].lba48 ? &quot;LBA48&quot; : &quot;LBA28&quot;, drives[i].dma ? &quot;, DMA&quot; : &quot;&quot;</span></span>
+<span id="L785"><span class="lineNum">     785</span>                 :<span class="tlaGNC">         106 :       );</span></span>
+<span id="L786"><span class="lineNum">     786</span>                 :<span class="tlaGNC">         106 :     }</span></span>
+<span id="L787"><span class="lineNum">     787</span>                 :<span class="tlaGNC">         212 :   }</span></span>
+<span id="L788"><span class="lineNum">     788</span>                 :             : </span>
+<span id="L789"><span class="lineNum">     789</span>                 :             :   /* Enable device interrupts (nIEN = 0) and drain stale IRQs from IDENTIFY */</span>
+<span id="L790"><span class="lineNum">     790</span>                 :<span class="tlaGNC">          53 :   outb(ATA_PRIMARY_CTRL, 0x00);</span></span>
+<span id="L791"><span class="lineNum">     791</span>                 :<span class="tlaGNC">          53 :   outb(ATA_SECONDARY_CTRL, 0x00);</span></span>
+<span id="L792"><span class="lineNum">     792</span>                 :<span class="tlaGNC">          53 :   (void)reg_read(&amp;channels[0], ATA_REG_STATUS);</span></span>
+<span id="L793"><span class="lineNum">     793</span>                 :<span class="tlaGNC">          53 :   (void)reg_read(&amp;channels[1], ATA_REG_STATUS);</span></span>
+<span id="L794"><span class="lineNum">     794</span>                 :             : </span>
+<span id="L795"><span class="lineNum">     795</span>                 :<span class="tlaGNC">          53 :   pic_unmask(IRQ_ATA_PRIMARY);</span></span>
+<span id="L796"><span class="lineNum">     796</span>                 :<span class="tlaGNC">          53 :   pic_unmask(IRQ_ATA_SECONDARY);</span></span>
+<span id="L797"><span class="lineNum">     797</span>                 :             : </span>
+<span id="L798"><span class="lineNum">     798</span>                 :<span class="tlaGNC">          53 :   irq_register(IRQ_ATA_PRIMARY, ata_irq_primary);</span></span>
+<span id="L799"><span class="lineNum">     799</span>                 :<span class="tlaGNC">          53 :   irq_register(IRQ_ATA_SECONDARY, ata_irq_secondary);</span></span>
+<span id="L800"><span class="lineNum">     800</span>                 :             : </span>
+<span id="L801"><span class="lineNum">     801</span>                 :<span class="tlaGNC">          53 :   init_dma();</span></span>
+<span id="L802"><span class="lineNum">     802</span>                 :<span class="tlaGNC">          53 :   console_print(&quot;[ATA] Ready\n&quot;);</span></span>
+<span id="L803"><span class="lineNum">     803</span>                 :<span class="tlaGNC">          53 : }</span></span>
+<span id="L804"><span class="lineNum">     804</span>                 :             : </span>
+<span id="L805"><span class="lineNum">     805</span>                 :             : /**</span>
+<span id="L806"><span class="lineNum">     806</span>                 :             :  * @brief Get drive descriptor by index.</span>
+<span id="L807"><span class="lineNum">     807</span>                 :             :  * @param idx Drive index (0-3).</span>
+<span id="L808"><span class="lineNum">     808</span>                 :             :  * @return Drive pointer, or NULL if not present.</span>
+<span id="L809"><span class="lineNum">     809</span>                 :             :  */</span>
+<span id="L810"><span class="lineNum">     810</span>                 :             : ata_drive_t *ata_get_drive(u8 idx)</span>
+<span id="L811"><span class="lineNum">     811</span>                 :<span class="tlaGNC">           6 : {</span></span>
+<span id="L812"><span class="lineNum">     812</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           6 :   if(idx &gt;= 4 || !drives[idx].present)</span></span>
+<span id="L813"><span class="lineNum">     813</span>                 :<span class="tlaGNC">           2 :     return NULL;</span></span>
+<span id="L814"><span class="lineNum">     814</span>                 :<span class="tlaGNC">           4 :   return &amp;drives[idx];</span></span>
+<span id="L815"><span class="lineNum">     815</span>                 :<span class="tlaGNC">           6 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

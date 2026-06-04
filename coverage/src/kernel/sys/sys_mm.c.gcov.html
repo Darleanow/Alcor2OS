@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Alcor2OS Coverage - src/kernel/sys/sys_mm.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/kernel/sys</a> - sys_mm.c<span style="font-size: 80%;"> (source / <a href="sys_mm.c.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Alcor2OS Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">98.1&nbsp;%</td>
+            <td class="headerCovTableEntry">154</td>
+            <td class="headerCovTableEntry">151</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-04 23:39:52</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">11</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+            | Branches:
+            <span class="coverLegendCov">+</span> taken
+            <span class="coverLegendNoCov">-</span> not taken
+            <span class="coverLegendNoCov">#</span> not executed
+</td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">92.3&nbsp;%</td>
+            <td class="headerCovTableEntry">78</td>
+            <td class="headerCovTableEntry">72</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : /**</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             :  * @file src/kernel/sys/sys_mm.c</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             :  * @brief Memory syscalls: `mmap`, `mprotect`, `munmap`, `brk`.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             :  *</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             :  * Page alignment, prot → PTE flags, filling file-backed pages through the VFS,</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             :  * and anonymous ranges via `vmm_map_range_alloc` where applicable.</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             :  */</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : #include &lt;alcor2/drivers/fb_user.h&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : #include &lt;alcor2/errno.h&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;alcor2/fs/vfs.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;alcor2/kstdlib.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;alcor2/mm/memory_layout.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;alcor2/mm/pmm.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;alcor2/mm/vmm.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;alcor2/proc/proc.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;alcor2/sys/internal.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #define MAP_SHARED      0x01</span>
+<span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC tlaBgGNC">          14 : #define MAP_PRIVATE     0x02</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">          20 : #define MAP_FIXED       0x10</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">          23 : #define MAP_ANONYMOUS   0x20</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : #define PROT_NONE       0x00</span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">          22 : #define PROT_READ       0x01</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :<span class="tlaGNC">          32 : #define PROT_WRITE      0x02</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : #define PROT_EXEC       0x04</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             : </span>
+<span id="L29"><span class="lineNum">      29</span>                 :<span class="tlaGNC">          87 : #define PAGE_MASK_LOCAL (PAGE_SIZE - 1)</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : </span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : static inline u64 page_align_down(u64 value)</span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">          23 : {</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">          23 :   return value &amp; ~PAGE_MASK_LOCAL;</span></span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC">          23 : }</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : static inline u64 page_align_up(u64 value)</span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">          28 : {</span></span>
+<span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">          28 :   return (value + PAGE_MASK_LOCAL) &amp; ~PAGE_MASK_LOCAL;</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">          28 : }</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : static u64 build_vmm_flags(u64 prot)</span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">          15 : {</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">          15 :   u64 flags = VMM_PRESENT | VMM_USER;</span></span>
+<span id="L44"><span class="lineNum">      44</span>         [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          15 :   if(prot &amp; PROT_WRITE)</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">           8 :     flags |= VMM_WRITE;</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">          15 :   return flags;</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">          15 : }</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : static void unmap_and_free_range(u64 start, u64 length)</span>
+<span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">           6 : {</span></span>
+<span id="L51"><span class="lineNum">      51</span>         [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">          12 :   for(u64 off = 0; off &lt; length; off += PAGE_SIZE) {</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">           6 :     u64 va   = start + off;</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">           6 :     u64 phys = vmm_get_phys(va);</span></span>
+<span id="L54"><span class="lineNum">      54</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :     if(phys) {</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">           3 :       vmm_unmap(va);</span></span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :       if(!fb_user_phys_page_is_framebuffer(phys))</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">           2 :         pmm_free((void *)phys);</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">           3 :     }</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">           6 :   }</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">           6 : }</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : </span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : static i64 map_zeroed_user_range(u64 base, u64 length, u64 map_flags)</span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">          10 : {</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">          10 :   u64 count = length &gt;&gt; 12; /* length is already page-aligned */</span></span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          10 :   if(!vmm_map_range_alloc(base, count, map_flags | VMM_WRITE)) {</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">           1 :     unmap_and_free_range(base, length);</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">           9 :   return 0;</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">          10 : }</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :             : </span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : static void apply_final_prot(u64 base, u64 length, u64 map_flags)</span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L74"><span class="lineNum">      74</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :   for(u64 off = 0; off &lt; length; off += PAGE_SIZE) {</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">           3 :     u64 va   = base + off;</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">           3 :     u64 phys = vmm_get_phys(va);</span></span>
+<span id="L77"><span class="lineNum">      77</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :     if(phys)</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">           3 :       vmm_map(va, phys, map_flags);</span></span>
+<span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :             : </span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : static void fill_file_backed_pages(u64 base, u64 length, i64 fd, u64 offset)</span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">           3 :   i64 saved_pos = vfs_seek(fd, 0, SEEK_CUR);</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">           3 :   vfs_seek(fd, (i64)offset, SEEK_SET);</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : </span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           5 :   for(u64 map_off = 0; map_off &lt; length;) {</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">           3 :     u64 page_virt = base + map_off;</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">           3 :     u64 phys      = vmm_get_phys(page_virt);</span></span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           3 :     if(!phys)</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       break;</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC tlaBgGNC">           3 :     u8 *dst        = (u8 *)(phys + vmm_get_hhdm());</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">           3 :     u64 page_local = map_off &amp; PAGE_MASK_LOCAL;</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">           3 :     u64 chunk      = PAGE_SIZE - page_local;</span></span>
+<span id="L95"><span class="lineNum">      95</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           3 :     if(chunk &gt; length - map_off)</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       chunk = length - map_off;</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :<span class="tlaGNC tlaBgGNC">           3 :     i64 n = vfs_read(fd, dst + page_local, chunk);</span></span>
+<span id="L99"><span class="lineNum">      99</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(n &lt;= 0)</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">           1 :       break;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">           2 :     map_off += (u64)n;</span></span>
+<span id="L102"><span class="lineNum">     102</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :             : </span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">           3 :   vfs_seek(fd, saved_pos, SEEK_SET);</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :             : </span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : u64 sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)</span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">          17 : {</span></span>
+<span id="L109"><span class="lineNum">     109</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 16 times"> + </span>]:<span class="tlaGNC">          17 :   if(length == 0)</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">           1 :     return (u64)-EINVAL;</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :             : </span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaGNC">          16 :   proc_t *p = proc_current();</span></span>
+<span id="L113"><span class="lineNum">     113</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 15 times"> + </span>]:<span class="tlaGNC">          16 :   if(!p)</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">           1 :     return (u64)-ENOMEM;</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>                 :<span class="tlaGNC">          15 :   const bool fixed = (flags &amp; MAP_FIXED) != 0;</span></span>
+<span id="L117"><span class="lineNum">     117</span> [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">          15 :   if(fixed &amp;&amp; addr == 0)</span></span>
+<span id="L118"><span class="lineNum">     118</span>                 :<span class="tlaGNC">           1 :     return (u64)-EINVAL;</span></span>
+<span id="L119"><span class="lineNum">     119</span>                 :             : </span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">          14 :   u64 aligned_len = page_align_up(length);</span></span>
+<span id="L121"><span class="lineNum">     121</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">          14 :   if(aligned_len &lt; length)</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">           1 :     return (u64)-ENOMEM;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span> [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          13 :   u64 base = (fixed &amp;&amp; addr != 0) ? page_align_down(addr)</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">          13 :                                   : page_align_down(p-&gt;mmap_base);</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">          13 :   u64 end  = base + aligned_len;</span></span>
+<span id="L127"><span class="lineNum">     127</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          13 :   if(end &lt; base || end &gt; USER_SPACE_END)</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">           1 :     return (u64)-ENOMEM;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">          12 :   bool is_anon = (flags &amp; MAP_ANONYMOUS) != 0 || fd == (u64)-1;</span></span>
+<span id="L131"><span class="lineNum">     131</span> [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">          12 :   if(!is_anon &amp;&amp; (offset &amp; PAGE_MASK_LOCAL))</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">           2 :     return (u64)-EINVAL;</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :             : </span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">          10 :   u64 map_flags = build_vmm_flags(prot);</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :             : </span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :   /* MAP_FIXED requires &quot;replace any existing mapping at this range with a</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :    * fresh zero-filled mapping&quot; semantics. vmm_map_range_alloc skips pages</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :    * already PRESENT, so the new contents would be stale parent/peer data —</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :    * which is what causes mallocng's a_crash() (heap metadata mismatch).</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :    * Unmap the range first so the subsequent alloc sees only fresh pages. */</span>
+<span id="L141"><span class="lineNum">     141</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          10 :   if(fixed)</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">           3 :     unmap_and_free_range(base, aligned_len);</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :             : </span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">          10 :   i64 map_ret = map_zeroed_user_range(base, aligned_len, map_flags);</span></span>
+<span id="L145"><span class="lineNum">     145</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          10 :   if(map_ret &lt; 0)</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">           1 :     return (u64)map_ret;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : </span>
+<span id="L148"><span class="lineNum">     148</span>         [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           9 :   if(!fixed)</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">           6 :     p-&gt;mmap_base = end;</span></span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : </span>
+<span id="L151"><span class="lineNum">     151</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           9 :   if(!is_anon)</span></span>
+<span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">           3 :     fill_file_backed_pages(base, length, (i64)fd, offset);</span></span>
+<span id="L153"><span class="lineNum">     153</span>                 :             : </span>
+<span id="L154"><span class="lineNum">     154</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           9 :   if(!(prot &amp; PROT_WRITE))</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">           3 :     apply_final_prot(base, aligned_len, map_flags);</span></span>
+<span id="L156"><span class="lineNum">     156</span>                 :             : </span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">           9 :   return base;</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">          10 : }</span></span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : u64 sys_mprotect(u64 addr, u64 len, u64 prot, u64 a4, u64 a5, u64 a6)</span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">           3 :   (void)a4;</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">           3 :   (void)a5;</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">           3 :   (void)a6;</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :             : </span>
+<span id="L166"><span class="lineNum">     166</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(len == 0)</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :             : </span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">           2 :   u64 aligned_start = page_align_down(addr);</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">           2 :   u64 aligned_end   = page_align_up(addr + len);</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">           2 :   u64 map_flags     = build_vmm_flags(prot);</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :             : </span>
+<span id="L173"><span class="lineNum">     173</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           5 :   for(u64 va = aligned_start; va &lt; aligned_end; va += PAGE_SIZE) {</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">           3 :     u64 phys = vmm_get_phys(va);</span></span>
+<span id="L175"><span class="lineNum">     175</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :     if(phys)</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">           2 :       vmm_map(va, phys, map_flags);</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">           2 :   return 0;</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :             : </span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : u64 sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">           3 :   (void)a3;</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">           3 :   (void)a4;</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">           3 :   (void)a5;</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">           3 :   (void)a6;</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : </span>
+<span id="L188"><span class="lineNum">     188</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(len == 0)</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L190"><span class="lineNum">     190</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :   if(!vmm_is_user_range((void *)addr, len))</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return (u64)-EINVAL;</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : </span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC tlaBgGNC">           2 :   u64 aligned_start = page_align_down(addr);</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">           2 :   u64 aligned_end   = page_align_up(addr + len);</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">           2 :   unmap_and_free_range(aligned_start, aligned_end - aligned_start);</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">           2 :   return 0;</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">           2 : }</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :             : </span>
+<span id="L199"><span class="lineNum">     199</span>                 :             : u64 sys_brk(u64 addr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">           5 :   (void)a2;</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :<span class="tlaGNC">           5 :   (void)a3;</span></span>
+<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">           5 :   (void)a4;</span></span>
+<span id="L204"><span class="lineNum">     204</span>                 :<span class="tlaGNC">           5 :   (void)a5;</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">           5 :   (void)a6;</span></span>
+<span id="L206"><span class="lineNum">     206</span>                 :             : </span>
+<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">           5 :   proc_t *p = proc_current();</span></span>
+<span id="L208"><span class="lineNum">     208</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(!p)</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : </span>
+<span id="L211"><span class="lineNum">     211</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(addr == 0)</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">           1 :     return p-&gt;program_break;</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :             : </span>
+<span id="L214"><span class="lineNum">     214</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :   if(addr &gt; p-&gt;program_break) {</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">           2 :     u64 old_end = page_align_up(p-&gt;program_break);</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">           2 :     u64 new_end = page_align_up(addr);</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : </span>
+<span id="L218"><span class="lineNum">     218</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           3 :     for(u64 page_addr = old_end; page_addr &lt; new_end; page_addr += PAGE_SIZE) {</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaGNC">           2 :       u64 phys = (u64)pmm_alloc();</span></span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :       if(!phys)</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">           1 :         return p-&gt;program_break;</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">           1 :       vmm_map(page_addr, phys, VMM_PRESENT | VMM_WRITE | VMM_USER);</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">           1 :       kzero((u8 *)(phys + vmm_get_hhdm()), PAGE_SIZE);</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">           1 :     p-&gt;program_break = addr;</span></span>
+<span id="L226"><span class="lineNum">     226</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">           2 :   return p-&gt;program_break;</span></span>
+<span id="L228"><span class="lineNum">     228</span>                 :<span class="tlaGNC">           3 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

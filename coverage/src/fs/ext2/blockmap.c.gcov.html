@@ -1,0 +1,415 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Alcor2OS Coverage - src/fs/ext2/blockmap.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/fs/ext2</a> - blockmap.c<span style="font-size: 80%;"> (source / <a href="blockmap.c.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Alcor2OS Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">152</td>
+            <td class="headerCovTableEntry">152</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-04 23:39:52</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">9</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+            | Branches:
+            <span class="coverLegendCov">+</span> taken
+            <span class="coverLegendNoCov">-</span> not taken
+            <span class="coverLegendNoCov">#</span> not executed
+</td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">87.1&nbsp;%</td>
+            <td class="headerCovTableEntry">62</td>
+            <td class="headerCovTableEntry">54</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : /**</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             :  * @file src/fs/ext2/blockmap.c</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             :  * @brief Direct + indirect block resolution and reservation for ext2.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             :  *</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             :  * ext2 spreads a file's blocks across three regions: 12 direct entries in the</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             :  * inode, then a single-indirect block, then a double-indirect block, then a</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             :  * triple-indirect block. @ref get_block_num walks them read-only; @ref</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             :  * alloc_file_block grows the indirect tree on demand; @ref free_inode_blocks</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             :  * undoes both passes. Kept in one file because the three operations share</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             :  * the same level/range arithmetic and getting it wrong in one mirrors it in</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             :  * the others.</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             :  *</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             :  * Each level reuses the same primitives so the per-level code stays a thin</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             :  * recipe rather than an inlined copy of the alloc / zero / write-back dance.</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             :  */</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : </span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;alcor2/errno.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : #include &lt;alcor2/fs/ext2.h&gt;</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;alcor2/kstdlib.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;alcor2/mm/heap.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;alcor2/types.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;fs/ext2/internal.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : </span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : /**</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :  * @brief Number of u32 block-pointer slots per indirect block.</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :  *</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :  * Single source of truth for the indirect-tree fan-out; every level math</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :  * (direct→single→double→triple) is derived from this.</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :  *</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :  * @param vol  Volume (block size is per-mount).</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :  * @return Fan-out of one indirect block.</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :  */</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : static inline u32 ptrs_per_block(const ext2_volume_t *vol)</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC tlaBgGNC">          27 : {</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">          27 :   return vol-&gt;block_size / sizeof(u32);</span></span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">          27 : }</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :             : </span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : /**</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :  * @brief Allocate a fresh block, zero it, and bill the inode for it.</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :  *</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :  * Used for both data and metadata (indirect) blocks: in both cases the</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  * caller wants a known-zero block they own, and @c i_blocks must track</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :  * every block charged to the inode regardless of role.</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  *</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :  * @param vol              Target volume.</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :  * @param preferred_group  Locality hint for @ref alloc_block.</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :  * @param inode            Inode whose @c i_blocks gets bumped on success.</span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :  * @return Block number on success, 0 if @ref alloc_block returns 0.</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :  */</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             : static u32 alloc_zeroed_block(</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :     ext2_volume_t *vol, u32 preferred_group, ext2_inode_t *inode</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             : )</span>
+<span id="L53"><span class="lineNum">      53</span>                 :<span class="tlaGNC">          18 : {</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">          18 :   u32 block = alloc_block(vol, preferred_group);</span></span>
+<span id="L55"><span class="lineNum">      55</span>         [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          18 :   if(block == 0)</span></span>
+<span id="L56"><span class="lineNum">      56</span>                 :<span class="tlaGNC">           6 :     return 0;</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">          12 :   u8 *zero = kmalloc(vol-&gt;block_size);</span></span>
+<span id="L58"><span class="lineNum">      58</span>         [<span class="tlaGBC" title="Branch 0 was taken 12 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          12 :   if(zero) {</span></span>
+<span id="L59"><span class="lineNum">      59</span>                 :<span class="tlaGNC">          12 :     kzero(zero, vol-&gt;block_size);</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">          12 :     vol_write_block(vol, block, zero);</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">          12 :     kfree(zero);</span></span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">          12 :   }</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">          12 :   inode-&gt;i_blocks += vol-&gt;block_size / EXT2_SECTOR_SIZE;</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">          12 :   return block;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">          18 : }</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :             : </span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : /**</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :  * @brief Read slot @p slot_idx out of indirect block @p indirect_block.</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  *</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :  * @p indirect_block @c == @c 0 means &quot;this branch of the tree was never</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :  * allocated&quot;; returning 0 there is the read-only counterpart of @ref</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  * get_block_num's &quot;hole&quot; semantics. I/O failure also folds into 0 since</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  * the read-only path has no error channel to bubble up.</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  *</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  * @param vol             Volume.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  * @param indirect_block  Block number of the indirect block, or 0 for hole.</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :  * @param slot_idx        Index inside the indirect block.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  * @return Slot value, or 0 on hole / OOM / I/O failure.</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :  */</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : static u32 read_indirect_slot(</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :     const ext2_volume_t *vol, u32 indirect_block, u32 slot_idx</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : )</span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">          18 : {</span></span>
+<span id="L84"><span class="lineNum">      84</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">          18 :   if(indirect_block == 0)</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">           5 :     return 0;</span></span>
+<span id="L86"><span class="lineNum">      86</span>                 :<span class="tlaGNC">          13 :   u32 *buf = kmalloc(vol-&gt;block_size);</span></span>
+<span id="L87"><span class="lineNum">      87</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          13 :   if(!buf)</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L89"><span class="lineNum">      89</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          12 :   if(vol_read_block(vol, indirect_block, buf) &lt; 0) {</span></span>
+<span id="L90"><span class="lineNum">      90</span>                 :<span class="tlaGNC">           1 :     kfree(buf);</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">          11 :   u32 result = buf[slot_idx];</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">          11 :   kfree(buf);</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">          11 :   return result;</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">          12 : }</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :             : </span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : /**</span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :  * @brief Resolve slot @p slot_idx of @p indirect_block; allocate it if hole.</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :  *</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :  * Read-modify-write of one indirect-block slot. On hole, allocates a fresh</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :  * zeroed child block via @ref alloc_zeroed_block, plugs it into the slot,</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :  * and writes the parent indirect block back. The same primitive serves</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :  * both &quot;leaf data block&quot; and &quot;next-level indirect block&quot; callers because</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :  * the on-disk layout treats them identically.</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :  *</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :  * @param vol              Volume.</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :  * @param inode            Inode being grown (forwarded to @ref</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :  * alloc_zeroed_block).</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :  * @param indirect_block   Parent indirect block (must already exist).</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :  * @param slot_idx         Slot inside the parent.</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  * @param preferred_group  Locality hint.</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :  * @return Slot value (existing or freshly allocated), 0 on OOM / I/O fail.</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :  */</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : static u32 ensure_indirect_slot(</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :     ext2_volume_t *vol, ext2_inode_t *inode, u32 indirect_block, u32 slot_idx,</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :     u32 preferred_group</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : )</span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">          11 : {</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">          11 :   u32 *buf = kmalloc(vol-&gt;block_size);</span></span>
+<span id="L121"><span class="lineNum">     121</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          11 :   if(!buf)</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L123"><span class="lineNum">     123</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          10 :   if(vol_read_block(vol, indirect_block, buf) &lt; 0) {</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">           3 :     kfree(buf);</span></span>
+<span id="L125"><span class="lineNum">     125</span>                 :<span class="tlaGNC">           3 :     return 0;</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :<span class="tlaGNC">           7 :   u32 child = buf[slot_idx];</span></span>
+<span id="L128"><span class="lineNum">     128</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :   if(child == 0) {</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">           7 :     child = alloc_zeroed_block(vol, preferred_group, inode);</span></span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           7 :     if(child == 0) {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">           1 :       kfree(buf);</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">           1 :       return 0;</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">           6 :     buf[slot_idx] = child;</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">           6 :     vol_write_block(vol, indirect_block, buf);</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">           6 :   }</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">           6 :   kfree(buf);</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">           6 :   return child;</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">           7 : }</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :             : </span>
+<span id="L141"><span class="lineNum">     141</span>                 :             : /**</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             :  * @brief Resolve top-level inode slot @p slot_idx; allocate it if hole.</span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :  *</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :  * Analogue of @ref ensure_indirect_slot for the @c i_block[] array, which</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :  * lives inside the inode itself rather than in a separately-stored</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :  * indirect block. No read-modify-write because the inode is the caller's</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :  * own in-memory copy.</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :  *</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :  * @param vol              Volume.</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :  * @param inode            Inode (mutated in place).</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :  * @param slot_idx         Index into @c inode-&gt;i_block[].</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :  * @param preferred_group  Locality hint.</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :  * @return Block number (existing or freshly allocated), 0 on alloc fail.</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :  */</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : static u32 ensure_inode_slot(</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :     ext2_volume_t *vol, ext2_inode_t *inode, u32 slot_idx, u32 preferred_group</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             : )</span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L159"><span class="lineNum">     159</span>         [<span class="tlaGBC" title="Branch 0 was taken 9 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           9 :   if(inode-&gt;i_block[slot_idx] == 0)</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">           9 :     inode-&gt;i_block[slot_idx] = alloc_zeroed_block(vol, preferred_group, inode);</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">           9 :   return inode-&gt;i_block[slot_idx];</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :             : </span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : /**</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :  * @brief Resolve a file-relative block index to an on-disk block number.</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :  *</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :  * Four ranges, mapped left-to-right: 12 direct slots → single → double →</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :  * triple. The @c file_block subtraction at each boundary lets the same</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :  * range check (@c file_block @c &lt; @c ppb) repeat at each level instead of</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :  * accumulating offsets.</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :  *</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :  * @param vol         Source volume.</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :  * @param inode       Inode owning the file.</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :  * @param file_block  File-relative block index (0 = first block).</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :  * @return On-disk block number, or 0 when the block is a hole.</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             :  */</span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : u32 get_block_num(</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     const ext2_volume_t *vol, const ext2_inode_t *inode, u32 file_block</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             : )</span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">          10 : {</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaGNC">          10 :   const u32 ppb = ptrs_per_block(vol);</span></span>
+<span id="L182"><span class="lineNum">     182</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          10 :   if(file_block &lt; EXT2_NDIR_BLOCKS)</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">           1 :     return inode-&gt;i_block[file_block];</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">           9 :   file_block -= EXT2_NDIR_BLOCKS;</span></span>
+<span id="L185"><span class="lineNum">     185</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           9 :   if(file_block &lt; ppb)</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">           5 :     return read_indirect_slot(vol, inode-&gt;i_block[EXT2_IND_BLOCK], file_block);</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :<span class="tlaGNC">           4 :   file_block -= ppb;</span></span>
+<span id="L188"><span class="lineNum">     188</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           4 :   if(file_block &lt; ppb * ppb) {</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">           3 :     u32 ind = read_indirect_slot(</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaGNC">           3 :         vol, inode-&gt;i_block[EXT2_DIND_BLOCK], file_block / ppb</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">           3 :     );</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :<span class="tlaGNC">           3 :     return read_indirect_slot(vol, ind, file_block % ppb);</span></span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">           1 :   file_block -= ppb * ppb;</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">           1 :   u32 dind = read_indirect_slot(</span></span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">           1 :       vol, inode-&gt;i_block[EXT2_TIND_BLOCK], file_block / (ppb * ppb)</span></span>
+<span id="L197"><span class="lineNum">     197</span>                 :<span class="tlaGNC">           1 :   );</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">           1 :   u32 rem = file_block % (ppb * ppb);</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :<span class="tlaGNC">           1 :   u32 ind = read_indirect_slot(vol, dind, rem / ppb);</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">           1 :   return read_indirect_slot(vol, ind, rem % ppb);</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :             : </span>
+<span id="L203"><span class="lineNum">     203</span>                 :             : /**</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :  * @brief Reserve the block at file-relative index @p file_block.</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :  *</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :  * Mirrors @ref get_block_num's level structure but each step uses the</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :  * @c ensure_* helpers so a hole at any level along the path becomes a</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :  * freshly allocated zeroed block. Early-out on every alloc failure so a</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :  * partial alloc doesn't strand metadata blocks the inode now thinks it</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :  * owns but can't reach.</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :  *</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :  * @param vol              Target volume.</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :  * @param inode            Inode being grown.</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :  * @param file_block       File-relative block index.</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             :  * @param preferred_group  Locality hint for new blocks.</span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :  * @return Block number on success, 0 if any underlying alloc failed.</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :  */</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             : u32 alloc_file_block(</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :     ext2_volume_t *vol, ext2_inode_t *inode, u32 file_block, u32 preferred_group</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : )</span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">           9 :   const u32 ppb = ptrs_per_block(vol);</span></span>
+<span id="L223"><span class="lineNum">     223</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           9 :   if(file_block &lt; EXT2_NDIR_BLOCKS)</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :<span class="tlaGNC">           2 :     return ensure_inode_slot(vol, inode, file_block, preferred_group);</span></span>
+<span id="L225"><span class="lineNum">     225</span>                 :<span class="tlaGNC">           7 :   file_block -= EXT2_NDIR_BLOCKS;</span></span>
+<span id="L226"><span class="lineNum">     226</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           7 :   if(file_block &lt; ppb) {</span></span>
+<span id="L227"><span class="lineNum">     227</span>                 :<span class="tlaGNC">           2 :     u32 ind = ensure_inode_slot(vol, inode, EXT2_IND_BLOCK, preferred_group);</span></span>
+<span id="L228"><span class="lineNum">     228</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     return ind ? ensure_indirect_slot(</span></span>
+<span id="L229"><span class="lineNum">     229</span>                 :<span class="tlaGNC">           1 :                      vol, inode, ind, file_block, preferred_group</span></span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">           1 :                  )</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :<span class="tlaGNC">           2 :                : 0;</span></span>
+<span id="L232"><span class="lineNum">     232</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">           5 :   file_block -= ppb;</span></span>
+<span id="L234"><span class="lineNum">     234</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           5 :   if(file_block &lt; ppb * ppb) {</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">           2 :     u32 dind = ensure_inode_slot(vol, inode, EXT2_DIND_BLOCK, preferred_group);</span></span>
+<span id="L236"><span class="lineNum">     236</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(!dind)</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">           1 :       return 0;</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">           1 :     u32 ind = ensure_indirect_slot(</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">           1 :         vol, inode, dind, file_block / ppb, preferred_group</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaGNC">           1 :     );</span></span>
+<span id="L241"><span class="lineNum">     241</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     return ind ? ensure_indirect_slot(</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">           1 :                      vol, inode, ind, file_block % ppb, preferred_group</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">           1 :                  )</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">           1 :                : 0;</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">           3 :   file_block -= ppb * ppb;</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaGNC">           3 :   u32 tind = ensure_inode_slot(vol, inode, EXT2_TIND_BLOCK, preferred_group);</span></span>
+<span id="L248"><span class="lineNum">     248</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(!tind)</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">           2 :   u32 dind = ensure_indirect_slot(</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaGNC">           2 :       vol, inode, tind, file_block / (ppb * ppb), preferred_group</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">           2 :   );</span></span>
+<span id="L253"><span class="lineNum">     253</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(!dind)</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaGNC">           1 :   u32 rem = file_block % (ppb * ppb);</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">           1 :   u32 ind = ensure_indirect_slot(vol, inode, dind, rem / ppb, preferred_group);</span></span>
+<span id="L257"><span class="lineNum">     257</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :   return ind ? ensure_indirect_slot(vol, inode, ind, rem % ppb, preferred_group)</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">           1 :              : 0;</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">           2 : }</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :             : </span>
+<span id="L261"><span class="lineNum">     261</span>                 :             : /**</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :  * @brief Recursively free an indirect-block subtree.</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :  *</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :  * @p depth selects how many indirection levels remain under @p block_num:</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :  * 0 = the children are leaf data blocks, 1 = single-indirect children,</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :  * 2 = double-indirect children. Folding the three &quot;free the indirect</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             :  * tree&quot; variants into one recursive walk drops the linear repetition that</span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :  * dominated the original @ref free_inode_blocks.</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :  *</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :  * @param vol        Volume.</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :  * @param block_num  Block to free (skipped if 0).</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :  * @param depth      Levels of indirection remaining (0..2).</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :  */</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             : static void free_indirect_subtree(ext2_volume_t *vol, u32 block_num, u32 depth)</span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">          12 : {</span></span>
+<span id="L276"><span class="lineNum">     276</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          12 :   if(block_num == 0)</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">           5 :     return;</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :<span class="tlaGNC">           7 :   u32 *buf = kmalloc(vol-&gt;block_size);</span></span>
+<span id="L279"><span class="lineNum">     279</span> [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :   if(buf &amp;&amp; vol_read_block(vol, block_num, buf) == 0) {</span></span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">           7 :     u32 ppb = ptrs_per_block(vol);</span></span>
+<span id="L281"><span class="lineNum">     281</span>         [<span class="tlaGBC" title="Branch 0 was taken 1792 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">        1799 :     for(u32 i = 0; i &lt; ppb; i++) {</span></span>
+<span id="L282"><span class="lineNum">     282</span>         [<span class="tlaGBC" title="Branch 0 was taken 1786 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">        1792 :       if(buf[i] == 0)</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">        1786 :         continue;</span></span>
+<span id="L284"><span class="lineNum">     284</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           6 :       if(depth == 0)</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">           4 :         free_block(vol, buf[i]);</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">           2 :       else</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">           2 :         free_indirect_subtree(vol, buf[i], depth - 1);</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">           6 :     }</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">           7 :   }</span></span>
+<span id="L290"><span class="lineNum">     290</span>         [<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           7 :   if(buf)</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">           7 :     kfree(buf);</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">           7 :   free_block(vol, block_num);</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">           7 : }</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : /**</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :  * @brief Free every block referenced by @p inode and reset its counters.</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :  *</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :  * Walks the three indirect roots via @ref free_indirect_subtree and the</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :  * 12 direct entries inline. Clears @c i_block[] entries as it goes so</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :  * a partial failure (mid-free crash) leaves the inode pointing at fewer</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :  * stale blocks rather than dangling references.</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :  *</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :  * @param vol    Volume.</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :  * @param inode  Inode (mutated in place).</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :  * @return Always 0; preserved for callers that fold this into an errno chain.</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :  */</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             : i64 free_inode_blocks(ext2_volume_t *vol, ext2_inode_t *inode)</span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">           2 : {</span></span>
+<span id="L309"><span class="lineNum">     309</span>         [<span class="tlaGBC" title="Branch 0 was taken 24 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          26 :   for(u32 i = 0; i &lt; EXT2_NDIR_BLOCKS; i++) {</span></span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          24 :     if(inode-&gt;i_block[i]) {</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaGNC">          13 :       free_block(vol, inode-&gt;i_block[i]);</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">          13 :       inode-&gt;i_block[i] = 0;</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">          13 :     }</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">          24 :   }</span></span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">           2 :   free_indirect_subtree(vol, inode-&gt;i_block[EXT2_IND_BLOCK], 0);</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">           2 :   inode-&gt;i_block[EXT2_IND_BLOCK] = 0;</span></span>
+<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">           2 :   free_indirect_subtree(vol, inode-&gt;i_block[EXT2_DIND_BLOCK], 1);</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaGNC">           2 :   inode-&gt;i_block[EXT2_DIND_BLOCK] = 0;</span></span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">           2 :   free_indirect_subtree(vol, inode-&gt;i_block[EXT2_TIND_BLOCK], 2);</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">           2 :   inode-&gt;i_block[EXT2_TIND_BLOCK] = 0;</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :<span class="tlaGNC">           2 :   inode-&gt;i_blocks                 = 0;</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :<span class="tlaGNC">           2 :   return 0;</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaGNC">           2 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

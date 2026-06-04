@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Alcor2OS Coverage - src/kernel/drivers/fb_console/sgr.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">src/kernel/drivers/fb_console</a> - sgr.c<span style="font-size: 80%;"> (source / <a href="sgr.c.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Alcor2OS Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">95.7&nbsp;%</td>
+            <td class="headerCovTableEntry">115</td>
+            <td class="headerCovTableEntry">110</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-04 23:39:52</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+            | Branches:
+            <span class="coverLegendCov">+</span> taken
+            <span class="coverLegendNoCov">-</span> not taken
+            <span class="coverLegendNoCov">#</span> not executed
+</td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">90.9&nbsp;%</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntry">60</td>
+          </tr>
+                  <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : /**</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             :  * @file src/kernel/drivers/fb_console/sgr.c</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             :  * @brief Select Graphic Rendition (SGR) handling — @c CSI @c m parsing.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             :  *</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             :  * SGR is the largest @c CSI subset by parameter count: bold/italic/underline</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             :  * attrs, 8/16/256/truecolour fg+bg, and their resets. Lives in its own file</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             :  * because @ref csi_sgr fans out to four kinds of param consumer (reset, attr,</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             :  * basic colour, extended colour) and each is non-trivial on its own.</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             :  */</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;alcor2/types.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;kernel/drivers/fb_console/internal.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : </span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : /**</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             :  * @brief Reset @c cur_fg / @c cur_bg / @c cur_attr to the boot defaults.</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             :  *</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :  * Used by both the @c CSI @c 0 @c m code and the empty-param shortcut in</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :  * @ref csi_sgr (xterm treats an empty list as a full reset).</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :  */</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : static void sgr_reset(void)</span>
+<span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC tlaBgGNC">           3 : {</span></span>
+<span id="L22"><span class="lineNum">      22</span>                 :<span class="tlaGNC">           3 :   fb_ctx.cur_fg   = fb_ctx.default_fg;</span></span>
+<span id="L23"><span class="lineNum">      23</span>                 :<span class="tlaGNC">           3 :   fb_ctx.cur_bg   = fb_ctx.default_bg;</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :<span class="tlaGNC">           3 :   fb_ctx.cur_attr = 0;</span></span>
+<span id="L25"><span class="lineNum">      25</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : /**</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :  * @brief Update @c cur_attr from a single-param attribute code (bold,</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :  *        italic, …, or the corresponding @c 21/22/23/… reset).</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :  *</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :  * @param p  SGR code already known to be in the attribute range.</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :  * @return @c true if @p p matched an attribute code; @c false if the caller</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :  *         should fall through to colour handling.</span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :  */</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : static bool sgr_apply_attr(int p)</span>
+<span id="L36"><span class="lineNum">      36</span>                 :<span class="tlaGNC">          14 : {</span></span>
+<span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">          14 :   switch(p) {</span></span>
+<span id="L38"><span class="lineNum">      38</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">           2 :   case SGR_BOLD:</span></span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_attr |= (u8)FB_ATTR_BOLD;</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L41"><span class="lineNum">      41</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_ITALIC:</span></span>
+<span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr |= (u8)FB_ATTR_ITALIC;</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L44"><span class="lineNum">      44</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_UNDERLINE:</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr |= (u8)FB_ATTR_UNDERLINE;</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L47"><span class="lineNum">      47</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">           2 :   case SGR_BLINK:</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_attr |= (u8)FB_ATTR_BLINK;</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L50"><span class="lineNum">      50</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">           2 :   case SGR_REVERSE:</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_attr |= (u8)FB_ATTR_REVERSE;</span></span>
+<span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L53"><span class="lineNum">      53</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_NO_BOLD:</span></span>
+<span id="L54"><span class="lineNum">      54</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr &amp;= (u8) ~(u8)FB_ATTR_BOLD;</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L56"><span class="lineNum">      56</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_NO_ITALIC:</span></span>
+<span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr &amp;= (u8) ~(u8)FB_ATTR_ITALIC;</span></span>
+<span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L59"><span class="lineNum">      59</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_NO_UNDERLINE:</span></span>
+<span id="L60"><span class="lineNum">      60</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr &amp;= (u8) ~(u8)FB_ATTR_UNDERLINE;</span></span>
+<span id="L61"><span class="lineNum">      61</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L62"><span class="lineNum">      62</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_NO_BLINK:</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr &amp;= (u8) ~(u8)FB_ATTR_BLINK;</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L65"><span class="lineNum">      65</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   case SGR_NO_REVERSE:</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_attr &amp;= (u8) ~(u8)FB_ATTR_REVERSE;</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L68"><span class="lineNum">      68</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">           1 :   default:</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :<span class="tlaGNC">           1 :     return false;</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">          14 :   }</span></span>
+<span id="L71"><span class="lineNum">      71</span>                 :<span class="tlaGNC">          14 : }</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :             : </span>
+<span id="L73"><span class="lineNum">      73</span>                 :             : /**</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  * @brief Update @c cur_fg / @c cur_bg from a single-param colour code</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  *        (default, 30..37, 40..47, 90..97, 100..107).</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  *</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :  * @param p  SGR code.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  * @return @c true if @p p matched a basic colour code; @c false otherwise.</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :  */</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             : static bool sgr_apply_basic_color(int p)</span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">          11 : {</span></span>
+<span id="L82"><span class="lineNum">      82</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          11 :   if(p == SGR_FG_DEFAULT) {</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_fg = fb_ctx.default_fg;</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L86"><span class="lineNum">      86</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          10 :   if(p == SGR_BG_DEFAULT) {</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :<span class="tlaGNC">           1 :     fb_ctx.cur_bg = fb_ctx.default_bg;</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :<span class="tlaGNC">           1 :     return true;</span></span>
+<span id="L89"><span class="lineNum">      89</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L90"><span class="lineNum">      90</span> [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           9 :   if(p &gt;= SGR_FG_BASE &amp;&amp; p &lt;= SGR_FG_END) {</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_fg = ansi16_fg[p - SGR_FG_BASE];</span></span>
+<span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L94"><span class="lineNum">      94</span> [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           7 :   if(p &gt;= SGR_FG_BRIGHT_BASE &amp;&amp; p &lt;= SGR_FG_BRIGHT_END) {</span></span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_fg = ansi16_fg_bright[p - SGR_FG_BRIGHT_BASE];</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L98"><span class="lineNum">      98</span> [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           5 :   if(p &gt;= SGR_BG_BASE &amp;&amp; p &lt;= SGR_BG_END) {</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BASE];</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L102"><span class="lineNum">     102</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :   if(p &gt;= SGR_BG_BRIGHT_BASE &amp;&amp; p &lt;= SGR_BG_BRIGHT_END) {</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">           2 :     fb_ctx.cur_bg = ansi16_bg[p - SGR_BG_BRIGHT_BASE];</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">           2 :     return true;</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">           1 :   return false;</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : </span>
+<span id="L109"><span class="lineNum">     109</span>                 :             : /**</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :  * @brief Handle the multi-param extended colour forms @c 38;5;N, @c 38;2;R;G;B,</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :  *        @c 48;5;N, @c 48;2;R;G;B.</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  *</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :  * Advances the parameter cursor past the consumed subform so the caller can</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :  * resume its loop without double-counting.</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :  *</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :  * @param pv  Parameter vector.</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :  * @param np  Number of valid entries in @p pv.</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :  * @param pi  Pointer to the cursor; updated to the last consumed index.</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :  * @return @c true if an extended form was consumed; @c false if the params</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :  *         at @p pi don't form a complete subform (caller drops the code).</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :  */</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             : static bool sgr_apply_extended_color(const int *pv, int np, int *pi)</span>
+<span id="L123"><span class="lineNum">     123</span>                 :<span class="tlaGNC">           8 : {</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">           8 :   int p = pv[*pi];</span></span>
+<span id="L125"><span class="lineNum">     125</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           8 :   if(p != SGR_FG_EXTENDED &amp;&amp; p != SGR_BG_EXTENDED)</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return false;</span></span>
+<span id="L127"><span class="lineNum">     127</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC tlaBgGNC">           8 :   if(*pi + 2 &gt;= np)</span></span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">           1 :     return false;</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">           7 :   int form = pv[*pi + 1];</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">           7 :   u32 colour;</span></span>
+<span id="L131"><span class="lineNum">     131</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           7 :   if(form == SGR_EXT_FORM_256) {</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">           4 :     colour = ansi256_to_rgb((unsigned)pv[*pi + 2]);</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">           4 :     *pi += 2;</span></span>
+<span id="L134"><span class="lineNum">     134</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           4 :   } else if(form == SGR_EXT_FORM_TRUECOLOR &amp;&amp; *pi + 4 &lt; np) {</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">           2 :     u32 r  = (u32)pv[*pi + 2] &amp; BYTE_MASK;</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :<span class="tlaGNC">           2 :     u32 g  = (u32)pv[*pi + 3] &amp; BYTE_MASK;</span></span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">           2 :     u32 b  = (u32)pv[*pi + 4] &amp; BYTE_MASK;</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :<span class="tlaGNC">           2 :     colour = (r &lt;&lt; BGRA_RED_SHIFT) | (g &lt;&lt; BGRA_GREEN_SHIFT) | b;</span></span>
+<span id="L139"><span class="lineNum">     139</span>                 :<span class="tlaGNC">           2 :     *pi += 4;</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">           2 :   } else {</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">           1 :     return false;</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L143"><span class="lineNum">     143</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :   if(p == SGR_FG_EXTENDED)</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">           3 :     fb_ctx.cur_fg = colour;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">           3 :   else</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">           3 :     fb_ctx.cur_bg = colour;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">           6 :   return true;</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :<span class="tlaGNC">           7 : }</span></span>
+<span id="L149"><span class="lineNum">     149</span>                 :             : </span>
+<span id="L150"><span class="lineNum">     150</span>                 :             : /** @brief Maximum SGR params consumed in one @c CSI @c m sequence. xterm caps</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :  * at 16; 32 gives headroom for pathological RGB stacks without growing the</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :  * kernel stack noticeably. */</span>
+<span id="L153"><span class="lineNum">     153</span>                 :<span class="tlaGNC">           4 : #define SGR_MAX_PARAMS 32</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : </span>
+<span id="L155"><span class="lineNum">     155</span>                 :             : void csi_sgr(void)</span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">           4 : {</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">           4 :   int pv[SGR_MAX_PARAMS];</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">           4 :   int np = csi_params(pv, SGR_MAX_PARAMS);</span></span>
+<span id="L159"><span class="lineNum">     159</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(np == 0) {</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">           1 :     sgr_reset();</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">           1 :     return;</span></span>
+<span id="L162"><span class="lineNum">     162</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L163"><span class="lineNum">     163</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           8 :   for(int pi = 0; pi &lt; np; pi++) {</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">           5 :     int p = pv[pi];</span></span>
+<span id="L165"><span class="lineNum">     165</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           5 :     if(p == SGR_RESET) {</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">           2 :       sgr_reset();</span></span>
+<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">           2 :       continue;</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">           2 :     }</span></span>
+<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :     if(sgr_apply_attr(p))</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">           3 :       continue;</span></span>
+<span id="L171"><span class="lineNum">     171</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC tlaBgUNC">           0 :     if(sgr_apply_basic_color(p))</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaUNC">           0 :       continue;</span></span>
+<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaUNC">           0 :     (void)sgr_apply_extended_color(pv, np, &amp;pi);</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaUNC">           0 :   }</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC tlaBgGNC">           3 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

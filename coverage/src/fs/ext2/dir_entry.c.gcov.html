@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Alcor2OS Coverage - src/fs/ext2/dir_entry.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/fs/ext2</a> - dir_entry.c<span style="font-size: 80%;"> (source / <a href="dir_entry.c.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Alcor2OS Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">208</td>
+            <td class="headerCovTableEntry">208</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-04 23:39:52</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">90.0&nbsp;%</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">18</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+            | Branches:
+            <span class="coverLegendCov">+</span> taken
+            <span class="coverLegendNoCov">-</span> not taken
+            <span class="coverLegendNoCov">#</span> not executed
+</td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryMed">81.1&nbsp;%</td>
+            <td class="headerCovTableEntry">164</td>
+            <td class="headerCovTableEntry">133</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : /**</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             :  * @file src/fs/ext2/dir_entry.c</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             :  * @brief On-disk directory entry primitives — lookup, insert, remove,</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             :  *        emptiness check.</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             :  *</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             :  * The on-disk directory format is a sequence of variable-length records</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             :  * inside the directory's data blocks; every helper here walks that</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             :  * structure with the same offset / @c rec_len arithmetic. Kept in one file</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             :  * so the dirent layout knowledge stays in a single place and the higher-</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             :  * level ops in @c dir.c only depend on the typed interface (find / add /</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             :  * remove / is_empty), never on @c rec_len byte math.</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             :  *</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             :  * The per-block scanners (@ref dir_block_find_name, @ref</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             :  * dir_block_remove_name, @ref dir_block_count_entries, @ref</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             :  * dir_block_try_insert) own the inner dirent walk; the public functions</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             :  * just iterate the directory's data blocks and delegate.</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             :  */</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : #include &lt;alcor2/errno.h&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             : #include &lt;alcor2/kstdlib.h&gt;</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : #include &lt;alcor2/mm/heap.h&gt;</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : #include &lt;alcor2/types.h&gt;</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : #include &lt;fs/ext2/internal.h&gt;</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             : </span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : /**</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :  * @brief Byte alignment for an on-disk @c ext2_dirent_t record.</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :  *</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :  * ext2 stores dirents at 4-byte boundaries; @c rec_len is rounded up to</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :  * the next multiple. Named so the rounding math reads as alignment, not</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :  * as the literal @c 4 it derives from.</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :  */</span>
+<span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC tlaBgGNC">         147 : #define EXT2_DIRENT_ALIGN 4u</span></span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             : /**</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :  * @brief Aligned on-disk size of a dirent with @p name_len bytes of name.</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :  *</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :  * @param name_len  Name length in bytes (excluding NUL — dirents are not</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  *                  NUL-terminated).</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :  * @return Bytes the dirent occupies on disk, rounded up to</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :  *         @ref EXT2_DIRENT_ALIGN.</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :  */</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             : static inline u32 dirent_aligned_len(u32 name_len)</span>
+<span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">          70 : {</span></span>
+<span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">          70 :   return ((u32)sizeof(ext2_dirent_t) + name_len + EXT2_DIRENT_ALIGN - 1u) &amp;</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">          70 :          ~(EXT2_DIRENT_ALIGN - 1u);</span></span>
+<span id="L46"><span class="lineNum">      46</span>                 :<span class="tlaGNC">          70 : }</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :             : </span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : /**</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :  * @brief Locate the dirent named @p name inside a single block buffer.</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :  *</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :  * Returns a mutable pointer so the remove path can splice without a</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :  * second scan; the find path treats it as read-only. Stops at the first</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :  * zero @c rec_len because that's how ext2 marks &quot;no more dirents in this</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :  * block&quot;.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  *</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  * @param block_buf  Loaded block contents.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  * @param block_size Block size in bytes.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  * @param name       Name to match (not NUL-terminated within the dirent).</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  * @param name_len   Length of @p name.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :  * @return Dirent pointer on hit, NULL if not in this block.</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :  */</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             : static ext2_dirent_t *dir_block_find_name(</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :     u8 *block_buf, u32 block_size, const char *name, u32 name_len</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             : )</span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">          19 : {</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">          19 :   u32 off = 0;</span></span>
+<span id="L67"><span class="lineNum">      67</span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 27 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          37 :   while(off &lt; block_size) {</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">          33 :     ext2_dirent_t *de = (ext2_dirent_t *)(block_buf + off);</span></span>
+<span id="L69"><span class="lineNum">      69</span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">          33 :     if(de-&gt;rec_len == 0)</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">           7 :       return NULL;</span></span>
+<span id="L71"><span class="lineNum">      71</span> [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 19 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          26 :     if(de-&gt;inode != 0 &amp;&amp; de-&gt;name_len == name_len &amp;&amp;</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 12 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]
+<span id="L72"><span class="lineNum">      72</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">          26 :        kstrncmp(de-&gt;name, name, name_len) == 0)</span></span>
+<span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">           8 :       return de;</span></span>
+<span id="L74"><span class="lineNum">      74</span>                 :<span class="tlaGNC">          18 :     off += de-&gt;rec_len;</span></span>
+<span id="L75"><span class="lineNum">      75</span>                 :<span class="tlaGNC">          18 :   }</span></span>
+<span id="L76"><span class="lineNum">      76</span>                 :<span class="tlaGNC">           4 :   return NULL;</span></span>
+<span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">          19 : }</span></span>
+<span id="L78"><span class="lineNum">      78</span>                 :             : </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : /**</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :  * @brief Remove the dirent named @p name from a single block buffer.</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :  *</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             :  * Two cases: first-in-block hits get @c inode @c = @c 0 (tombstone); any</span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :  * later hit gets folded into the previous dirent's @c rec_len so the</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :  * dirent becomes unreachable via the walk but the block stays compact.</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :  *</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :  * @param block_buf  Loaded block contents (mutated on hit).</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :  * @param block_size Block size in bytes.</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :  * @param name       Name to remove.</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :  * @param name_len   Length of @p name.</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :  * @return @c true if the block was modified, @c false if @p name wasn't found.</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :  */</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             : static bool dir_block_remove_name(</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :     u8 *block_buf, u32 block_size, const char *name, u32 name_len</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             : )</span>
+<span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">           9 :   u32            off  = 0;</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaGNC">           9 :   ext2_dirent_t *prev = NULL;</span></span>
+<span id="L98"><span class="lineNum">      98</span> [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 7 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          15 :   while(off &lt; block_size) {</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">          12 :     ext2_dirent_t *de = (ext2_dirent_t *)(block_buf + off);</span></span>
+<span id="L100"><span class="lineNum">     100</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">          12 :     if(de-&gt;rec_len == 0)</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">           1 :       return false;</span></span>
+<span id="L102"><span class="lineNum">     102</span> [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">          11 :     if(de-&gt;inode != 0 &amp;&amp; de-&gt;name_len == name_len &amp;&amp;</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]
+<span id="L103"><span class="lineNum">     103</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          11 :        kstrncmp(de-&gt;name, name, name_len) == 0) {</span></span>
+<span id="L104"><span class="lineNum">     104</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           5 :       if(prev)</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">           2 :         prev-&gt;rec_len += de-&gt;rec_len;</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">           3 :       else</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">           3 :         de-&gt;inode = 0;</span></span>
+<span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">           5 :       return true;</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :<span class="tlaGNC">           5 :     }</span></span>
+<span id="L110"><span class="lineNum">     110</span>                 :<span class="tlaGNC">           6 :     prev = de;</span></span>
+<span id="L111"><span class="lineNum">     111</span>                 :<span class="tlaGNC">           6 :     off += de-&gt;rec_len;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :<span class="tlaGNC">           6 :   }</span></span>
+<span id="L113"><span class="lineNum">     113</span>                 :<span class="tlaGNC">           3 :   return false;</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :             : </span>
+<span id="L116"><span class="lineNum">     116</span>                 :             : /**</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :  * @brief Count non-./.. dirents in a single block buffer.</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :  *</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :  * @c . and @c .. are the structural entries every directory carries; the</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :  * emptiness check is interested only in user-visible children, so they</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :  * are filtered out here rather than at the caller.</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :  *</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :  * @param block_buf  Loaded block contents.</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :  * @param block_size Block size in bytes.</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :  * @return Number of in-use, non-./.. dirents.</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :  */</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : static u32 dir_block_count_entries(const u8 *block_buf, u32 block_size)</span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :<span class="tlaGNC">           9 :   u32 count = 0;</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :<span class="tlaGNC">           9 :   u32 off   = 0;</span></span>
+<span id="L131"><span class="lineNum">     131</span> [<span class="tlaGBC" title="Branch 0 was taken 15 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">          23 :   while(off &lt; block_size) {</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">          20 :     const ext2_dirent_t *de = (const ext2_dirent_t *)(block_buf + off);</span></span>
+<span id="L133"><span class="lineNum">     133</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          20 :     if(de-&gt;rec_len == 0)</span></span>
+<span id="L134"><span class="lineNum">     134</span>                 :<span class="tlaGNC">           6 :       break;</span></span>
+<span id="L135"><span class="lineNum">     135</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 9 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          14 :     if(de-&gt;inode != 0) {</span></span>
+<span id="L136"><span class="lineNum">     136</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">          12 :       bool is_dot = (de-&gt;name_len == 1 &amp;&amp; de-&gt;name[0] == '.');</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">          12 :       bool is_dotdot =</span></span>
+<span id="L138"><span class="lineNum">     138</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">          12 :           (de-&gt;name_len == 2 &amp;&amp; de-&gt;name[0] == '.' &amp;&amp; de-&gt;name[1] == '.');</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]
+<span id="L139"><span class="lineNum">     139</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">          12 :       if(!is_dot &amp;&amp; !is_dotdot)</span></span>
+<span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">           4 :         count++;</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">          12 :     }</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">          14 :     off += de-&gt;rec_len;</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">          14 :   }</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :<span class="tlaGNC">           9 :   return count;</span></span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :             : </span>
+<span id="L147"><span class="lineNum">     147</span>                 :             : /**</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             :  * @brief Try to insert a new dirent into a single block by splicing slack.</span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :  *</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :  * ext2 packs dirents back-to-back with each carrying @c rec_len = &quot;bytes</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :  * until next dirent (or end of block)&quot;. Slack at the end of an existing</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :  * dirent is reusable: shrink the predecessor's @c rec_len to its actual</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :  * size and lay the new dirent in the recovered space.</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :  *</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :  * @param block_buf  Loaded block contents (mutated on success).</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :  * @param block_size Block size in bytes.</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :  * @param name       Entry name.</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :  * @param name_len   Length of @p name.</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :  * @param inode_num  Target inode number.</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :  * @param file_type  EXT2_FT_* file type.</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :  * @return @c true if the block now contains the new entry, @c false if no</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :  *         slack big enough was found.</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :  */</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : static bool dir_block_try_insert(</span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :     u8 *block_buf, u32 block_size, const char *name, u32 name_len,</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :     u32 inode_num, u8 file_type</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : )</span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :<span class="tlaGNC">           9 :   u32 needed = dirent_aligned_len(name_len);</span></span>
+<span id="L170"><span class="lineNum">     170</span>                 :<span class="tlaGNC">           9 :   u32 off    = 0;</span></span>
+<span id="L171"><span class="lineNum">     171</span> [<span class="tlaGBC" title="Branch 0 was taken 6 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          17 :   while(off &lt; block_size) {</span></span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">          14 :     ext2_dirent_t *de = (ext2_dirent_t *)(block_buf + off);</span></span>
+<span id="L173"><span class="lineNum">     173</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">          14 :     if(de-&gt;rec_len == 0)</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">           1 :       return false;</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">          13 :     u32 actual     = dirent_aligned_len(de-&gt;name_len);</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">          13 :     u32 free_space = de-&gt;rec_len - actual;</span></span>
+<span id="L177"><span class="lineNum">     177</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">          13 :     if(free_space &gt;= needed) {</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">           5 :       u32 new_rec_len       = de-&gt;rec_len - actual;</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">           5 :       de-&gt;rec_len           = (u16)actual;</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">           5 :       ext2_dirent_t *new_de = (ext2_dirent_t *)(block_buf + off + actual);</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaGNC">           5 :       new_de-&gt;inode         = inode_num;</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">           5 :       new_de-&gt;rec_len       = (u16)new_rec_len;</span></span>
+<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">           5 :       new_de-&gt;name_len      = (u8)name_len;</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">           5 :       new_de-&gt;file_type     = file_type;</span></span>
+<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">           5 :       kmemcpy(new_de-&gt;name, name, name_len);</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">           5 :       return true;</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :<span class="tlaGNC">           5 :     }</span></span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">           8 :     off += de-&gt;rec_len;</span></span>
+<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaGNC">           8 :   }</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaGNC">           3 :   return false;</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">           9 : }</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :             : </span>
+<span id="L193"><span class="lineNum">     193</span>                 :             : /**</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :  * @brief Lay a single dirent in a freshly allocated, zeroed block.</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :  *</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :  * Used when @ref dir_block_try_insert can't find slack and the caller</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :  * grows the directory by one block. The new dirent's @c rec_len covers</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :  * the whole block so subsequent inserts have the full block as slack.</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :  *</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :  * @param block_buf  Block buffer (zeroed then populated).</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :  * @param block_size Block size in bytes.</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :  * @param name       Entry name.</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :  * @param name_len   Length of @p name.</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :  * @param inode_num  Target inode number.</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :  * @param file_type  EXT2_FT_* file type.</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :  */</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : static void dir_init_first_entry(</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :     u8 *block_buf, u32 block_size, const char *name, u32 name_len,</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :     u32 inode_num, u8 file_type</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : )</span>
+<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">           4 : {</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">           4 :   kzero(block_buf, block_size);</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">           4 :   ext2_dirent_t *de = (ext2_dirent_t *)block_buf;</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">           4 :   de-&gt;inode         = inode_num;</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">           4 :   de-&gt;rec_len       = (u16)block_size;</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">           4 :   de-&gt;name_len      = (u8)name_len;</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :<span class="tlaGNC">           4 :   de-&gt;file_type     = file_type;</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">           4 :   kmemcpy(de-&gt;name, name, name_len);</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : </span>
+<span id="L221"><span class="lineNum">     221</span>                 :             : /**</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :  * @brief Find a directory entry by name.</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :  *</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :  * Walks the directory's data blocks; the per-block scan is done by</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :  * @ref dir_block_find_name so the dirent layout stays in one place.</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :  * Holes (sparse blocks) are skipped silently — a hole means &quot;no entries</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :  * in this slot&quot;.</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :  *</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :  * @param vol        Volume.</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :  * @param dir_inode  Directory inode.</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :  * @param name       Entry name to find.</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :  * @param out_ino    Output inode number if found.</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :  * @param out_type   Output file type if found.</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :  * @return 0 on success, -ENOENT if not found, -ENOMEM / -EIO on failure.</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :  */</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             : i64 dir_find_entry(</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :     const ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name,</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     u32 *out_ino, u8 *out_type</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : )</span>
+<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaGNC">           9 : {</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">           9 :   u32 name_len   = kstrlen(name);</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">           9 :   u32 dir_size   = dir_inode-&gt;i_size;</span></span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">           9 :   u32 block_size = vol-&gt;block_size;</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :             : </span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">           9 :   u8 *block_buf = kmalloc(block_size);</span></span>
+<span id="L246"><span class="lineNum">     246</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 8 times"> + </span>]:<span class="tlaGNC">           9 :   if(!block_buf)</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :             : </span>
+<span id="L249"><span class="lineNum">     249</span>         [<span class="tlaGBC" title="Branch 0 was taken 9 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">          13 :   for(u32 off = 0; off &lt; dir_size; off += block_size) {</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">           9 :     u32 block_num = get_block_num(vol, dir_inode, off / block_size);</span></span>
+<span id="L251"><span class="lineNum">     251</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 8 times"> + </span>]:<span class="tlaGNC">           9 :     if(block_num == 0)</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">           1 :       continue;</span></span>
+<span id="L253"><span class="lineNum">     253</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           8 :     if(vol_read_block(vol, block_num, block_buf) &lt; 0) {</span></span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">           1 :       kfree(block_buf);</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaGNC">           1 :       return -EIO;</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">           7 :     ext2_dirent_t *de =</span></span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">           7 :         dir_block_find_name(block_buf, block_size, name, name_len);</span></span>
+<span id="L259"><span class="lineNum">     259</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           7 :     if(de) {</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">           3 :       *out_ino  = de-&gt;inode;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">           3 :       *out_type = de-&gt;file_type;</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">           3 :       kfree(block_buf);</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :<span class="tlaGNC">           3 :       return 0;</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">           3 :     }</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">           7 :   }</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :             : </span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">           4 :   kfree(block_buf);</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">           4 :   return -ENOENT;</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">           8 : }</span></span>
+<span id="L270"><span class="lineNum">     270</span>                 :             : </span>
+<span id="L271"><span class="lineNum">     271</span>                 :             : /**</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             :  * @brief Try to splice the new entry into any existing block's slack.</span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :  *</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :  * Sweep over every allocated block in the directory; on the first block</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :  * with enough slack, @ref dir_block_try_insert mutates it in place and</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :  * we persist with @ref vol_write_block. -ENOENT is the &quot;nowhere to put</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :  * it&quot; sentinel that tells @ref dir_add_entry to fall through to growth.</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             :  *</span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :  * @param vol        Volume.</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :  * @param dir_inode  Directory inode.</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :  * @param name       Entry name.</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :  * @param name_len   Length of @p name.</span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :  * @param inode_num  Target inode number.</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :  * @param file_type  EXT2_FT_* file type.</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :  * @param block_buf  Caller-owned scratch buffer of @c vol-&gt;block_size bytes.</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :  * @return 0 on insert, -ENOENT if no block had enough slack, -EIO on write</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :  *         failure.</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :  */</span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : static i64 dir_try_insert_into_existing(</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     const ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name,</span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :     u32 name_len, u32 inode_num, u8 file_type, u8 *block_buf</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : )</span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">           4 : {</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :<span class="tlaGNC">           4 :   u32 block_size = vol-&gt;block_size;</span></span>
+<span id="L295"><span class="lineNum">     295</span>                 :<span class="tlaGNC">           4 :   u32 dir_blocks = (dir_inode-&gt;i_size + block_size - 1) / block_size;</span></span>
+<span id="L296"><span class="lineNum">     296</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           7 :   for(u32 b = 0; b &lt; dir_blocks; b++) {</span></span>
+<span id="L297"><span class="lineNum">     297</span>                 :<span class="tlaGNC">           4 :     u32 block_num = get_block_num(vol, dir_inode, b);</span></span>
+<span id="L298"><span class="lineNum">     298</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :     if(block_num == 0)</span></span>
+<span id="L299"><span class="lineNum">     299</span>                 :<span class="tlaGNC">           1 :       continue;</span></span>
+<span id="L300"><span class="lineNum">     300</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(vol_read_block(vol, block_num, block_buf) &lt; 0)</span></span>
+<span id="L301"><span class="lineNum">     301</span>                 :<span class="tlaGNC">           1 :       continue;</span></span>
+<span id="L302"><span class="lineNum">     302</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">           2 :     if(dir_block_try_insert(</span></span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">           2 :            block_buf, block_size, name, name_len, inode_num, file_type</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">           2 :        ))</span></span>
+<span id="L305"><span class="lineNum">     305</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaGNC">           1 :       return (vol_write_block(vol, block_num, block_buf) &lt; 0) ? -EIO : 0;</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :<span class="tlaGNC">           3 :   return -ENOENT;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : </span>
+<span id="L310"><span class="lineNum">     310</span>                 :             : /**</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :  * @brief Grow the directory by one block, seeded with the new entry.</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :  *</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :  * Allocates a fresh data block via @ref alloc_file_block, lays down the</span>
+<span id="L314"><span class="lineNum">     314</span>                 :             :  * single dirent via @ref dir_init_first_entry, persists the block, and</span>
+<span id="L315"><span class="lineNum">     315</span>                 :             :  * publishes the larger @c i_size by rewriting the inode.</span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :  *</span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :  * @param vol        Volume.</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :  * @param dir_ino    Directory inode number.</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :  * @param dir_inode  Directory inode (mutated: @c i_size grows by one block).</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             :  * @param name       Entry name.</span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :  * @param name_len   Length of @p name.</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :  * @param inode_num  Target inode number.</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :  * @param file_type  EXT2_FT_* file type.</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :  * @param block_buf  Caller-owned scratch buffer of @c vol-&gt;block_size bytes.</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :  * @return 0 on success, -ENOSPC / -EIO on failure.</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :  */</span>
+<span id="L327"><span class="lineNum">     327</span>                 :             : static i64 dir_grow_with_entry(</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             :     ext2_volume_t *vol, u32 dir_ino, ext2_inode_t *dir_inode, const char *name,</span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :     u32 name_len, u32 inode_num, u8 file_type, u8 *block_buf</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             : )</span>
+<span id="L331"><span class="lineNum">     331</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">           3 :   u32 block_size    = vol-&gt;block_size;</span></span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaGNC">           3 :   u32 dir_blocks    = (dir_inode-&gt;i_size + block_size - 1) / block_size;</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">           3 :   u32 preferred_grp = (dir_ino - 1) / vol-&gt;inodes_per_group;</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :<span class="tlaGNC">           3 :   u32 new_block = alloc_file_block(vol, dir_inode, dir_blocks, preferred_grp);</span></span>
+<span id="L336"><span class="lineNum">     336</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(new_block == 0)</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">           1 :     return -ENOSPC;</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :<span class="tlaGNC">           2 :   dir_init_first_entry(</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :<span class="tlaGNC">           2 :       block_buf, block_size, name, name_len, inode_num, file_type</span></span>
+<span id="L340"><span class="lineNum">     340</span>                 :<span class="tlaGNC">           2 :   );</span></span>
+<span id="L341"><span class="lineNum">     341</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(vol_write_block(vol, new_block, block_buf) &lt; 0)</span></span>
+<span id="L342"><span class="lineNum">     342</span>                 :<span class="tlaGNC">           1 :     return -EIO;</span></span>
+<span id="L343"><span class="lineNum">     343</span>                 :<span class="tlaGNC">           1 :   dir_inode-&gt;i_size += block_size;</span></span>
+<span id="L344"><span class="lineNum">     344</span> [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :   return (write_inode(vol, dir_ino, dir_inode) &lt; 0) ? -EIO : 0;</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaGNC">           2 : }</span></span>
+<span id="L346"><span class="lineNum">     346</span>                 :             : </span>
+<span id="L347"><span class="lineNum">     347</span>                 :             : /**</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :  * @brief Add a directory entry.</span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :  *</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :  * Two-phase: try @ref dir_try_insert_into_existing first; on -ENOENT,</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :  * fall through to @ref dir_grow_with_entry. The scratch buffer is owned</span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :  * here so both helpers reuse the same allocation.</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :  *</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :  * @param vol        Volume.</span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :  * @param dir_ino    Directory inode number.</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :  * @param dir_inode  Directory inode (mutated if the directory grows).</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :  * @param name       Entry name.</span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :  * @param inode_num  Inode number for new entry.</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :  * @param file_type  File type (EXT2_FT_*).</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :  * @return 0 on success, -ENOMEM / -ENOSPC / -EIO on failure.</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :  */</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             : i64 dir_add_entry(</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     ext2_volume_t *vol, u32 dir_ino, ext2_inode_t *dir_inode, const char *name,</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :     u32 inode_num, u8 file_type</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             : )</span>
+<span id="L366"><span class="lineNum">     366</span>                 :<span class="tlaGNC">           3 : {</span></span>
+<span id="L367"><span class="lineNum">     367</span>                 :<span class="tlaGNC">           3 :   u32 name_len  = kstrlen(name);</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">           3 :   u8 *block_buf = kmalloc(vol-&gt;block_size);</span></span>
+<span id="L369"><span class="lineNum">     369</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(!block_buf)</span></span>
+<span id="L370"><span class="lineNum">     370</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">           2 :   i64 ret = dir_try_insert_into_existing(</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :<span class="tlaGNC">           2 :       vol, dir_inode, name, name_len, inode_num, file_type, block_buf</span></span>
+<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">           2 :   );</span></span>
+<span id="L374"><span class="lineNum">     374</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(ret == -ENOENT)</span></span>
+<span id="L375"><span class="lineNum">     375</span>                 :<span class="tlaGNC">           1 :     ret = dir_grow_with_entry(</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">           1 :         vol, dir_ino, dir_inode, name, name_len, inode_num, file_type, block_buf</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :<span class="tlaGNC">           1 :     );</span></span>
+<span id="L378"><span class="lineNum">     378</span>                 :<span class="tlaGNC">           2 :   kfree(block_buf);</span></span>
+<span id="L379"><span class="lineNum">     379</span>                 :<span class="tlaGNC">           2 :   return ret;</span></span>
+<span id="L380"><span class="lineNum">     380</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L381"><span class="lineNum">     381</span>                 :             : </span>
+<span id="L382"><span class="lineNum">     382</span>                 :             : /**</span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :  * @brief Remove a directory entry.</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :  *</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :  * Per-block scan via @ref dir_block_remove_name; on hit, the block is</span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :  * written back since the scanner mutated it in place (either tombstoned</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             :  * the head dirent or merged into the previous one).</span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :  *</span>
+<span id="L389"><span class="lineNum">     389</span>                 :             :  * @param vol        Volume.</span>
+<span id="L390"><span class="lineNum">     390</span>                 :             :  * @param dir_inode  Directory inode.</span>
+<span id="L391"><span class="lineNum">     391</span>                 :             :  * @param name       Entry name to remove.</span>
+<span id="L392"><span class="lineNum">     392</span>                 :             :  * @return 0 on success, -ENOENT if absent, -ENOMEM / -EIO on failure.</span>
+<span id="L393"><span class="lineNum">     393</span>                 :             :  */</span>
+<span id="L394"><span class="lineNum">     394</span>                 :             : i64 dir_remove_entry(</span>
+<span id="L395"><span class="lineNum">     395</span>                 :             :     const ext2_volume_t *vol, const ext2_inode_t *dir_inode, const char *name</span>
+<span id="L396"><span class="lineNum">     396</span>                 :             : )</span>
+<span id="L397"><span class="lineNum">     397</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L398"><span class="lineNum">     398</span>                 :<span class="tlaGNC">           5 :   u32 name_len   = kstrlen(name);</span></span>
+<span id="L399"><span class="lineNum">     399</span>                 :<span class="tlaGNC">           5 :   u32 dir_size   = dir_inode-&gt;i_size;</span></span>
+<span id="L400"><span class="lineNum">     400</span>                 :<span class="tlaGNC">           5 :   u32 block_size = vol-&gt;block_size;</span></span>
+<span id="L401"><span class="lineNum">     401</span>                 :             : </span>
+<span id="L402"><span class="lineNum">     402</span>                 :<span class="tlaGNC">           5 :   u8 *block_buf = kmalloc(block_size);</span></span>
+<span id="L403"><span class="lineNum">     403</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(!block_buf)</span></span>
+<span id="L404"><span class="lineNum">     404</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L405"><span class="lineNum">     405</span>                 :             : </span>
+<span id="L406"><span class="lineNum">     406</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           6 :   for(u32 off = 0; off &lt; dir_size; off += block_size) {</span></span>
+<span id="L407"><span class="lineNum">     407</span>                 :<span class="tlaGNC">           4 :     u32 block_num = get_block_num(vol, dir_inode, off / block_size);</span></span>
+<span id="L408"><span class="lineNum">     408</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :     if(block_num == 0)</span></span>
+<span id="L409"><span class="lineNum">     409</span>                 :<span class="tlaGNC">           1 :       continue;</span></span>
+<span id="L410"><span class="lineNum">     410</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(vol_read_block(vol, block_num, block_buf) &lt; 0) {</span></span>
+<span id="L411"><span class="lineNum">     411</span>                 :<span class="tlaGNC">           1 :       kfree(block_buf);</span></span>
+<span id="L412"><span class="lineNum">     412</span>                 :<span class="tlaGNC">           1 :       return -EIO;</span></span>
+<span id="L413"><span class="lineNum">     413</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L414"><span class="lineNum">     414</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(dir_block_remove_name(block_buf, block_size, name, name_len)) {</span></span>
+<span id="L415"><span class="lineNum">     415</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :       i64 ret = (vol_write_block(vol, block_num, block_buf) &lt; 0) ? -EIO : 0;</span></span>
+<span id="L416"><span class="lineNum">     416</span>                 :<span class="tlaGNC">           1 :       kfree(block_buf);</span></span>
+<span id="L417"><span class="lineNum">     417</span>                 :<span class="tlaGNC">           1 :       return ret;</span></span>
+<span id="L418"><span class="lineNum">     418</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L419"><span class="lineNum">     419</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L420"><span class="lineNum">     420</span>                 :             : </span>
+<span id="L421"><span class="lineNum">     421</span>                 :<span class="tlaGNC">           2 :   kfree(block_buf);</span></span>
+<span id="L422"><span class="lineNum">     422</span>                 :<span class="tlaGNC">           2 :   return -ENOENT;</span></span>
+<span id="L423"><span class="lineNum">     423</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L424"><span class="lineNum">     424</span>                 :             : </span>
+<span id="L425"><span class="lineNum">     425</span>                 :             : /**</span>
+<span id="L426"><span class="lineNum">     426</span>                 :             :  * @brief Check if a directory is empty.</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             :  *</span>
+<span id="L428"><span class="lineNum">     428</span>                 :             :  * Sums non-./.. counts across blocks via @ref dir_block_count_entries.</span>
+<span id="L429"><span class="lineNum">     429</span>                 :             :  * Short-circuits once any block produces a non-zero count so a large</span>
+<span id="L430"><span class="lineNum">     430</span>                 :             :  * directory with one user entry near the start exits early.</span>
+<span id="L431"><span class="lineNum">     431</span>                 :             :  *</span>
+<span id="L432"><span class="lineNum">     432</span>                 :             :  * @param vol        Volume.</span>
+<span id="L433"><span class="lineNum">     433</span>                 :             :  * @param dir_inode  Directory inode.</span>
+<span id="L434"><span class="lineNum">     434</span>                 :             :  * @return true if only . and .. are present, false otherwise (including</span>
+<span id="L435"><span class="lineNum">     435</span>                 :             :  *         on allocation / I/O failure — safer to refuse rmdir than to</span>
+<span id="L436"><span class="lineNum">     436</span>                 :             :  *         delete a directory we couldn't fully inspect).</span>
+<span id="L437"><span class="lineNum">     437</span>                 :             :  */</span>
+<span id="L438"><span class="lineNum">     438</span>                 :             : bool dir_is_empty(const ext2_volume_t *vol, const ext2_inode_t *dir_inode)</span>
+<span id="L439"><span class="lineNum">     439</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L440"><span class="lineNum">     440</span>                 :<span class="tlaGNC">           5 :   u32 dir_size   = dir_inode-&gt;i_size;</span></span>
+<span id="L441"><span class="lineNum">     441</span>                 :<span class="tlaGNC">           5 :   u32 block_size = vol-&gt;block_size;</span></span>
+<span id="L442"><span class="lineNum">     442</span>                 :             : </span>
+<span id="L443"><span class="lineNum">     443</span>                 :<span class="tlaGNC">           5 :   u8 *block_buf = kmalloc(block_size);</span></span>
+<span id="L444"><span class="lineNum">     444</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(!block_buf)</span></span>
+<span id="L445"><span class="lineNum">     445</span>                 :<span class="tlaGNC">           1 :     return false;</span></span>
+<span id="L446"><span class="lineNum">     446</span>                 :             : </span>
+<span id="L447"><span class="lineNum">     447</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           6 :   for(u32 off = 0; off &lt; dir_size; off += block_size) {</span></span>
+<span id="L448"><span class="lineNum">     448</span>                 :<span class="tlaGNC">           4 :     u32 block_num = get_block_num(vol, dir_inode, off / block_size);</span></span>
+<span id="L449"><span class="lineNum">     449</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :     if(block_num == 0)</span></span>
+<span id="L450"><span class="lineNum">     450</span>                 :<span class="tlaGNC">           1 :       continue;</span></span>
+<span id="L451"><span class="lineNum">     451</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(vol_read_block(vol, block_num, block_buf) &lt; 0) {</span></span>
+<span id="L452"><span class="lineNum">     452</span>                 :<span class="tlaGNC">           1 :       kfree(block_buf);</span></span>
+<span id="L453"><span class="lineNum">     453</span>                 :<span class="tlaGNC">           1 :       return false;</span></span>
+<span id="L454"><span class="lineNum">     454</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L455"><span class="lineNum">     455</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(dir_block_count_entries(block_buf, block_size) &gt; 0) {</span></span>
+<span id="L456"><span class="lineNum">     456</span>                 :<span class="tlaGNC">           1 :       kfree(block_buf);</span></span>
+<span id="L457"><span class="lineNum">     457</span>                 :<span class="tlaGNC">           1 :       return false;</span></span>
+<span id="L458"><span class="lineNum">     458</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L459"><span class="lineNum">     459</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L460"><span class="lineNum">     460</span>                 :             : </span>
+<span id="L461"><span class="lineNum">     461</span>                 :<span class="tlaGNC">           2 :   kfree(block_buf);</span></span>
+<span id="L462"><span class="lineNum">     462</span>                 :<span class="tlaGNC">           2 :   return true;</span></span>
+<span id="L463"><span class="lineNum">     463</span>                 :<span class="tlaGNC">           4 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

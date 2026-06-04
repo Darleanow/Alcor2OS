@@ -1,0 +1,451 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Alcor2OS Coverage - src/fs/ext2/super.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/fs/ext2</a> - super.c<span style="font-size: 80%;"> (source / <a href="super.c.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Alcor2OS Coverage</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">155</td>
+            <td class="headerCovTableEntry">155</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-06-04 23:39:52</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">12</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+            | Branches:
+            <span class="coverLegendCov">+</span> taken
+            <span class="coverLegendNoCov">-</span> not taken
+            <span class="coverLegendNoCov">#</span> not executed
+</td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryHi">97.8&nbsp;%</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">45</td>
+          </tr>
+                  <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : /**</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             :  * @file src/fs/ext2/super.c</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             :  * @brief Block-level I/O, superblock + GDT writeback, volume bring-up.</span>
+<span id="L4"><span class="lineNum">       4</span>                 :             :  *</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             :  * Owns the per-volume state (@ref g_volumes) and the default device pointer</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             :  * (@ref g_default_dev), plus the low-level block read/write primitives every</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             :  * other ext2 module routes through. Mount and init also live here because</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             :  * they are the only callers that touch the raw superblock layout.</span>
+<span id="L9"><span class="lineNum">       9</span>                 :             :  */</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : </span>
+<span id="L11"><span class="lineNum">      11</span>                 :             : #include &lt;alcor2/drivers/console.h&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             : #include &lt;alcor2/errno.h&gt;</span>
+<span id="L13"><span class="lineNum">      13</span>                 :             : #include &lt;alcor2/fs/ext2.h&gt;</span>
+<span id="L14"><span class="lineNum">      14</span>                 :             : #include &lt;alcor2/kstdlib.h&gt;</span>
+<span id="L15"><span class="lineNum">      15</span>                 :             : #include &lt;alcor2/mm/heap.h&gt;</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             : #include &lt;alcor2/types.h&gt;</span>
+<span id="L17"><span class="lineNum">      17</span>                 :             : #include &lt;fs/ext2/internal.h&gt;</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : </span>
+<span id="L19"><span class="lineNum">      19</span>                 :             : /** @brief Mounted-volume pool. Sized at @ref EXT2_MAX_VOLUMES to cap the</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :  * static superblock + GDT footprint. */</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             : ext2_volume_t g_volumes[EXT2_MAX_VOLUMES];</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             : </span>
+<span id="L23"><span class="lineNum">      23</span>                 :             : /** @brief First-registered block device; used by @c mount(&quot;ext2&quot;) when no</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :  * source path is supplied. */</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             : const blockdev_t *g_default_dev;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             : </span>
+<span id="L27"><span class="lineNum">      27</span>                 :             : /**</span>
+<span id="L28"><span class="lineNum">      28</span>                 :             :  * @brief Sector offset (from the partition start) where the superblock</span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :  *        begins.</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             :  *</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             :  * ext2 places the superblock at byte 1024 of the volume; with 512-byte</span>
+<span id="L32"><span class="lineNum">      32</span>                 :             :  * sectors that's sector 2.</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             :  */</span>
+<span id="L34"><span class="lineNum">      34</span>                 :<span class="tlaGNC tlaBgGNC">          30 : #define EXT2_SB_SECTOR_OFFSET 2u</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :             : </span>
+<span id="L36"><span class="lineNum">      36</span>                 :             : /**</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :  * @brief Sectors spanned by the on-disk superblock (1024 bytes / 512).</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :  */</span>
+<span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">          30 : #define EXT2_SB_SECTOR_COUNT 2u</span></span>
+<span id="L40"><span class="lineNum">      40</span>                 :             : </span>
+<span id="L41"><span class="lineNum">      41</span>                 :             : /**</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :  * @brief Default on-disk inode size for revision-0 ext2 volumes.</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :  *</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             :  * Revision 0 has no @c s_inode_size field; the size is fixed at 128.</span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :  * Revision ≥ 1 reads it from the superblock instead.</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :  */</span>
+<span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">          27 : #define EXT2_REV0_INODE_SIZE 128u</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :             : </span>
+<span id="L49"><span class="lineNum">      49</span>                 :             : /**</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :  * @brief Read one ext2 block worth of bytes into @p buf.</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             :  *</span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :  * Translates the ext2-level block number to the underlying device's sector</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :  * range. Every metadata + data read in the driver goes through this so the</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :  * block-to-sector ratio lives in exactly one place.</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :  *</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :  * @param vol    Source volume.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :  * @param block  Ext2 block number.</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :  * @param buf    Destination buffer (≥ @c vol-&gt;block_size bytes).</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :  * @return Bytes transferred on success, negative errno on I/O failure.</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :  */</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : i64 vol_read_block(const ext2_volume_t *vol, u32 block, void *buf)</span>
+<span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">          33 : {</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">          33 :   const u32 sectors_per_block = vol-&gt;block_size / EXT2_SECTOR_SIZE;</span></span>
+<span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">          33 :   const u32 sector            = block * sectors_per_block;</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">          33 :   return vol_read_sectors(vol, sector, sectors_per_block, buf);</span></span>
+<span id="L66"><span class="lineNum">      66</span>                 :<span class="tlaGNC">          33 : }</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :             : </span>
+<span id="L68"><span class="lineNum">      68</span>                 :             : /**</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :  * @brief Write one ext2 block worth of bytes from @p buf.</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :  *</span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :  * Counterpart of @ref vol_read_block; same single-source-of-truth rationale</span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :  * for the block-to-sector translation.</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :  *</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             :  * @param vol    Target volume.</span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :  * @param block  Ext2 block number.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :  * @param buf    Source buffer (≥ @c vol-&gt;block_size bytes).</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :  * @return Bytes transferred on success, negative errno on I/O failure.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :  */</span>
+<span id="L79"><span class="lineNum">      79</span>                 :             : i64 vol_write_block(const ext2_volume_t *vol, u32 block, const void *buf)</span>
+<span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">          14 : {</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">          14 :   const u32 sectors_per_block = vol-&gt;block_size / EXT2_SECTOR_SIZE;</span></span>
+<span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">          14 :   const u32 sector            = block * sectors_per_block;</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :<span class="tlaGNC">          14 :   return vol_write_sectors(vol, sector, sectors_per_block, buf);</span></span>
+<span id="L84"><span class="lineNum">      84</span>                 :<span class="tlaGNC">          14 : }</span></span>
+<span id="L85"><span class="lineNum">      85</span>                 :             : </span>
+<span id="L86"><span class="lineNum">      86</span>                 :             : /**</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :  * @brief Persist the in-memory superblock back to disk.</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :  *</span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :  * Read-modify-write because the superblock lives inside a 1 KiB block that</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :  * may have other bytes we don't model; reading first preserves those.</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :  *</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :  * @param vol  Volume with the mutated @c vol-&gt;sb.</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             :  * @return 0 on success, negative errno on I/O failure.</span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :  */</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             : static i64 write_superblock(ext2_volume_t *vol)</span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">           8 : {</span></span>
+<span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaGNC">           8 :   u8 buf[EXT2_MIN_BLOCK_SIZE];</span></span>
+<span id="L98"><span class="lineNum">      98</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           8 :   if(vol_read_sectors(vol, EXT2_SB_SECTOR_OFFSET, EXT2_SB_SECTOR_COUNT, buf) &lt;</span></span>
+<span id="L99"><span class="lineNum">      99</span>                 :<span class="tlaGNC">           8 :      0)</span></span>
+<span id="L100"><span class="lineNum">     100</span>                 :<span class="tlaGNC">           2 :     return -EIO;</span></span>
+<span id="L101"><span class="lineNum">     101</span>                 :<span class="tlaGNC">           6 :   kmemcpy(buf, &amp;vol-&gt;sb, sizeof(ext2_superblock_t));</span></span>
+<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           6 :   if(vol_write_sectors(vol, EXT2_SB_SECTOR_OFFSET, EXT2_SB_SECTOR_COUNT, buf) &lt;</span></span>
+<span id="L103"><span class="lineNum">     103</span>                 :<span class="tlaGNC">           6 :      0)</span></span>
+<span id="L104"><span class="lineNum">     104</span>                 :<span class="tlaGNC">           1 :     return -EIO;</span></span>
+<span id="L105"><span class="lineNum">     105</span>                 :<span class="tlaGNC">           5 :   return 0;</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">           6 : }</span></span>
+<span id="L107"><span class="lineNum">     107</span>                 :             : </span>
+<span id="L108"><span class="lineNum">     108</span>                 :             : /**</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :  * @brief Persist the group descriptor table back to disk.</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :  *</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :  * Walks block-by-block so a single huge GDT split across many blocks doesn't</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :  * need a contiguous kmalloc the size of the whole table — only one block's</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :  * worth of scratch.</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :  *</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :  * @param vol  Volume with the mutated @c vol-&gt;groups.</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :  * @return 0 on success, negative errno on I/O failure or OOM.</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :  */</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             : static i64 write_group_descriptors(ext2_volume_t *vol)</span>
+<span id="L119"><span class="lineNum">     119</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">           5 :   u32 gdt_block     = vol-&gt;first_data_block + 1;</span></span>
+<span id="L121"><span class="lineNum">     121</span>                 :<span class="tlaGNC">           5 :   u32 gdt_size      = vol-&gt;groups_count * sizeof(ext2_group_desc_t);</span></span>
+<span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">           5 :   u32 blocks_needed = (gdt_size + vol-&gt;block_size - 1) / vol-&gt;block_size;</span></span>
+<span id="L123"><span class="lineNum">     123</span>                 :             : </span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">           5 :   u8 *buf = kmalloc(vol-&gt;block_size);</span></span>
+<span id="L125"><span class="lineNum">     125</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(!buf)</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L127"><span class="lineNum">     127</span>                 :             : </span>
+<span id="L128"><span class="lineNum">     128</span>                 :<span class="tlaGNC">           4 :   u32 groups_per_block = vol-&gt;block_size / sizeof(ext2_group_desc_t);</span></span>
+<span id="L129"><span class="lineNum">     129</span>                 :             : </span>
+<span id="L130"><span class="lineNum">     130</span>         [<span class="tlaGBC" title="Branch 0 was taken 5 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           8 :   for(u32 b = 0; b &lt; blocks_needed; b++) {</span></span>
+<span id="L131"><span class="lineNum">     131</span>                 :<span class="tlaGNC">           5 :     kzero(buf, vol-&gt;block_size);</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :<span class="tlaGNC">           5 :     u32 start_group = b * groups_per_block;</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :<span class="tlaGNC">           5 :     u32 count       = vol-&gt;groups_count - start_group;</span></span>
+<span id="L134"><span class="lineNum">     134</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :     if(count &gt; groups_per_block)</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :<span class="tlaGNC">           1 :       count = groups_per_block;</span></span>
+<span id="L136"><span class="lineNum">     136</span>                 :             : </span>
+<span id="L137"><span class="lineNum">     137</span>                 :<span class="tlaGNC">           5 :     kmemcpy(buf, &amp;vol-&gt;groups[start_group], count * sizeof(ext2_group_desc_t));</span></span>
+<span id="L138"><span class="lineNum">     138</span>                 :             : </span>
+<span id="L139"><span class="lineNum">     139</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :     if(vol_write_block(vol, gdt_block + b, buf) &lt; 0) {</span></span>
+<span id="L140"><span class="lineNum">     140</span>                 :<span class="tlaGNC">           1 :       kfree(buf);</span></span>
+<span id="L141"><span class="lineNum">     141</span>                 :<span class="tlaGNC">           1 :       return -EIO;</span></span>
+<span id="L142"><span class="lineNum">     142</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L143"><span class="lineNum">     143</span>                 :<span class="tlaGNC">           5 :   }</span></span>
+<span id="L144"><span class="lineNum">     144</span>                 :             : </span>
+<span id="L145"><span class="lineNum">     145</span>                 :<span class="tlaGNC">           3 :   kfree(buf);</span></span>
+<span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">           3 :   return 0;</span></span>
+<span id="L147"><span class="lineNum">     147</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             : /**</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :  * @brief Persist superblock + GDT in a single call.</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :  *</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :  * Called by every mutating op (mkdir, unlink, write…) so a crash between</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :  * the in-memory mutation and the next flush only loses content, never the</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :  * structural metadata that points at it.</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :  *</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :  * @param vol  Volume whose in-memory metadata is dirty.</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :  * @return 0 on success, the first negative errno encountered otherwise.</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             :  */</span>
+<span id="L159"><span class="lineNum">     159</span>                 :             : i64 flush_metadata(ext2_volume_t *vol)</span>
+<span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">           8 : {</span></span>
+<span id="L161"><span class="lineNum">     161</span>                 :<span class="tlaGNC">           8 :   i64 ret = write_superblock(vol);</span></span>
+<span id="L162"><span class="lineNum">     162</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           8 :   if(ret &lt; 0)</span></span>
+<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">           3 :     return ret;</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">           5 :   return write_group_descriptors(vol);</span></span>
+<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">           8 : }</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :             : </span>
+<span id="L167"><span class="lineNum">     167</span>                 :             : /**</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :  * @brief Initialise the ext2 driver: clear the volume + file pools and</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :  * register the fs type with the VFS.</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :  *</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :  * @param dev  Default block device that subsequent @c mount(&quot;ext2&quot;) calls</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :  *             will pick up when no @c source is supplied.</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :  */</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             : void ext2_init(const blockdev_t *dev)</span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">          18 : {</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">          18 :   g_default_dev = dev;</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :<span class="tlaGNC">          18 :   kzero(g_volumes, sizeof(g_volumes));</span></span>
+<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">          18 :   kzero(g_files, sizeof(g_files));</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">          18 :   vfs_register_fs(&amp;g_ext2_fstype);</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :<span class="tlaGNC">          18 : }</span></span>
+<span id="L181"><span class="lineNum">     181</span>                 :             : </span>
+<span id="L182"><span class="lineNum">     182</span>                 :             : /**</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :  * @brief Claim the first free slot in @ref g_volumes.</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :  *</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :  * @return Slot pointer, or NULL when the pool is full.</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :  */</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : static ext2_volume_t *claim_free_volume_slot(void)</span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">          17 : {</span></span>
+<span id="L189"><span class="lineNum">     189</span>         [<span class="tlaGBC" title="Branch 0 was taken 20 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          21 :   for(int i = 0; i &lt; EXT2_MAX_VOLUMES; i++) {</span></span>
+<span id="L190"><span class="lineNum">     190</span>         [<span class="tlaGBC" title="Branch 0 was taken 16 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">          20 :     if(!g_volumes[i].mounted)</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC">          16 :       return &amp;g_volumes[i];</span></span>
+<span id="L192"><span class="lineNum">     192</span>                 :<span class="tlaGNC">          20 :   }</span></span>
+<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC">           1 :   return NULL;</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">          17 : }</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : </span>
+<span id="L196"><span class="lineNum">     196</span>                 :             : /**</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :  * @brief Read the on-disk superblock and validate its magic.</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :  *</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :  * Goes via the raw @c dev-&gt;read because the volume isn't bootstrapped yet</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :  * — @ref vol_read_sectors needs a populated @c vol.</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :  *</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :  * @param dev            Block device.</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             :  * @param partition_lba  Sector offset of the partition start.</span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :  * @param sb_buf         Output buffer (@c EXT2_MIN_BLOCK_SIZE bytes).</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :  * @return 0 on success, -EIO on read failure, -EINVAL on bad magic.</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :  */</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             : static i64 read_partition_superblock(</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :     const blockdev_t *dev, u32 partition_lba, u8 *sb_buf</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             : )</span>
+<span id="L210"><span class="lineNum">     210</span>                 :<span class="tlaGNC">          16 : {</span></span>
+<span id="L211"><span class="lineNum">     211</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 15 times"> + </span>]:<span class="tlaGNC">          16 :   if(dev-&gt;read(</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">          16 :          dev-&gt;ctx, partition_lba + EXT2_SB_SECTOR_OFFSET, EXT2_SB_SECTOR_COUNT,</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">          16 :          sb_buf</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">          16 :      ) &lt; 0)</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">           1 :     return -EIO;</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">          15 :   const ext2_superblock_t *sb = (const ext2_superblock_t *)sb_buf;</span></span>
+<span id="L217"><span class="lineNum">     217</span>         [<span class="tlaGBC" title="Branch 0 was taken 14 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          15 :   return (sb-&gt;s_magic == EXT2_MAGIC) ? 0 : -EINVAL;</span></span>
+<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">          16 : }</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :             : </span>
+<span id="L220"><span class="lineNum">     220</span>                 :             : /**</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :  * @brief Populate @p vol's cached fields from the on-disk superblock.</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :  *</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :  * Caches the derived counts (block size, inode size, group count) so the</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :  * rest of the driver doesn't recompute them per call. Revision 0 has no</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :  * @c s_inode_size, so the default @ref EXT2_REV0_INODE_SIZE is used.</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :  *</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :  * @param vol            Volume to populate.</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :  * @param dev            Underlying block device.</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :  * @param partition_lba  Partition start.</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :  * @param sb             Source superblock.</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :  */</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             : static void populate_volume_from_sb(</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :     ext2_volume_t *vol, const blockdev_t *dev, u32 partition_lba,</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :     const ext2_superblock_t *sb</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             : )</span>
+<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">          14 : {</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">          14 :   vol-&gt;dev              = dev;</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">          14 :   vol-&gt;partition_lba    = partition_lba;</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :<span class="tlaGNC">          14 :   vol-&gt;block_size       = EXT2_MIN_BLOCK_SIZE &lt;&lt; sb-&gt;s_log_block_size;</span></span>
+<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaGNC">          14 :   vol-&gt;blocks_per_group = sb-&gt;s_blocks_per_group;</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">          14 :   vol-&gt;inodes_per_group = sb-&gt;s_inodes_per_group;</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">          14 :   vol-&gt;inode_size =</span></span>
+<span id="L243"><span class="lineNum">     243</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">          14 :       (sb-&gt;s_rev_level &gt;= 1) ? sb-&gt;s_inode_size : EXT2_REV0_INODE_SIZE;</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">          14 :   vol-&gt;inodes_count     = sb-&gt;s_inodes_count;</span></span>
+<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">          14 :   vol-&gt;blocks_count     = sb-&gt;s_blocks_count;</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">          14 :   vol-&gt;first_data_block = sb-&gt;s_first_data_block;</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaGNC">          14 :   vol-&gt;groups_count     = (sb-&gt;s_blocks_count + sb-&gt;s_blocks_per_group - 1) /</span></span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">          14 :                       sb-&gt;s_blocks_per_group;</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaGNC">          14 :   kmemcpy(&amp;vol-&gt;sb, sb, sizeof(*sb));</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">          14 : }</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             : /**</span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :  * @brief Allocate @p vol-&gt;groups and fill it from disk.</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             :  *</span>
+<span id="L255"><span class="lineNum">     255</span>                 :             :  * Uses a temporary contiguous buffer to absorb the multi-block read, then</span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :  * copies into the typed @c groups array. Two allocations are required —</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             :  * @c groups must outlive the function but @c gdt_buf doesn't.</span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :  *</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :  * @param vol  Volume (already populated by @ref populate_volume_from_sb).</span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :  * @return 0 on success, -ENOMEM / -EIO otherwise; on failure @c vol-&gt;groups</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :  *         is freed and left NULL.</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             :  */</span>
+<span id="L263"><span class="lineNum">     263</span>                 :             : static i64 load_group_descriptors(ext2_volume_t *vol)</span>
+<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">          14 : {</span></span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">          14 :   u32 gdt_block  = vol-&gt;first_data_block + 1;</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">          14 :   u32 gdt_size   = vol-&gt;groups_count * sizeof(ext2_group_desc_t);</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">          14 :   u32 gdt_blocks = (gdt_size + vol-&gt;block_size - 1) / vol-&gt;block_size;</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :             : </span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">          14 :   vol-&gt;groups = kmalloc((u64)vol-&gt;groups_count * sizeof(ext2_group_desc_t));</span></span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 13 times"> + </span>]:<span class="tlaGNC">          14 :   if(!vol-&gt;groups)</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">          13 :   u8 *gdt_buf = kmalloc((u64)gdt_blocks * vol-&gt;block_size);</span></span>
+<span id="L274"><span class="lineNum">     274</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          13 :   if(!gdt_buf) {</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">           1 :     kfree(vol-&gt;groups);</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">           1 :     vol-&gt;groups = NULL;</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">           1 :     return -ENOMEM;</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L279"><span class="lineNum">     279</span>                 :             : </span>
+<span id="L280"><span class="lineNum">     280</span>         [<span class="tlaGBC" title="Branch 0 was taken 13 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          24 :   for(u32 b = 0; b &lt; gdt_blocks; b++) {</span></span>
+<span id="L281"><span class="lineNum">     281</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 12 times"> + </span>]:<span class="tlaGNC">          13 :     if(vol_read_block(vol, gdt_block + b, gdt_buf + (u64)b * vol-&gt;block_size) &lt;</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">          13 :        0) {</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">           1 :       kfree(gdt_buf);</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">           1 :       kfree(vol-&gt;groups);</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">           1 :       vol-&gt;groups = NULL;</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">           1 :       return -EIO;</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :<span class="tlaGNC">           1 :     }</span></span>
+<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">          13 :   }</span></span>
+<span id="L289"><span class="lineNum">     289</span>                 :             : </span>
+<span id="L290"><span class="lineNum">     290</span>                 :<span class="tlaGNC">          11 :   kmemcpy(vol-&gt;groups, gdt_buf, vol-&gt;groups_count * sizeof(ext2_group_desc_t));</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">          11 :   kfree(gdt_buf);</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :<span class="tlaGNC">          11 :   return 0;</span></span>
+<span id="L293"><span class="lineNum">     293</span>                 :<span class="tlaGNC">          12 : }</span></span>
+<span id="L294"><span class="lineNum">     294</span>                 :             : </span>
+<span id="L295"><span class="lineNum">     295</span>                 :             : /**</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :  * @brief Mount an ext2 partition: read the superblock, validate the magic,</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :  * load the group descriptor table into RAM, mark the slot live.</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :  *</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :  * Linear bring-up: each helper either succeeds or rolls back what it</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :  * allocated. Errors funnel to a single NULL return with a console message,</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :  * so the caller doesn't need an errno channel.</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :  *</span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :  * @param dev            Block device backing the volume.</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :  * @param partition_lba  Partition start, in sectors.</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             :  * @return Volume handle on success, NULL on slot exhaustion / bad magic / OOM.</span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :  */</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             : ext2_volume_t *ext2_mount(const blockdev_t *dev, u32 partition_lba)</span>
+<span id="L308"><span class="lineNum">     308</span>                 :<span class="tlaGNC">          17 : {</span></span>
+<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">          17 :   ext2_volume_t *vol = claim_free_volume_slot();</span></span>
+<span id="L310"><span class="lineNum">     310</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 16 times"> + </span>]:<span class="tlaGNC">          17 :   if(!vol) {</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :<span class="tlaGNC">           1 :     console_print(&quot;[EXT2] No free volume slots\n&quot;);</span></span>
+<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">           1 :     return NULL;</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">           1 :   }</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : </span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">          16 :   u8  sb_buf[EXT2_MIN_BLOCK_SIZE];</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">          16 :   i64 ret = read_partition_superblock(dev, partition_lba, sb_buf);</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 14 times"> + </span>]:<span class="tlaGNC">          16 :   if(ret &lt; 0) {</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaGNC">           2 :     console_print(</span></span>
+<span id="L319"><span class="lineNum">     319</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :         ret == -EIO ? &quot;[EXT2] Failed to read superblock\n&quot;</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">           2 :                     : &quot;[EXT2] Invalid magic number\n&quot;</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :<span class="tlaGNC">           2 :     );</span></span>
+<span id="L322"><span class="lineNum">     322</span>                 :<span class="tlaGNC">           2 :     return NULL;</span></span>
+<span id="L323"><span class="lineNum">     323</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : </span>
+<span id="L325"><span class="lineNum">     325</span>                 :<span class="tlaGNC">          14 :   populate_volume_from_sb(</span></span>
+<span id="L326"><span class="lineNum">     326</span>                 :<span class="tlaGNC">          14 :       vol, dev, partition_lba, (const ext2_superblock_t *)sb_buf</span></span>
+<span id="L327"><span class="lineNum">     327</span>                 :<span class="tlaGNC">          14 :   );</span></span>
+<span id="L328"><span class="lineNum">     328</span>                 :             : </span>
+<span id="L329"><span class="lineNum">     329</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>]:<span class="tlaGNC">          14 :   if(load_group_descriptors(vol) &lt; 0) {</span></span>
+<span id="L330"><span class="lineNum">     330</span>                 :<span class="tlaGNC">           3 :     console_print(&quot;[EXT2] Failed to load group descriptors\n&quot;);</span></span>
+<span id="L331"><span class="lineNum">     331</span>                 :<span class="tlaGNC">           3 :     return NULL;</span></span>
+<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L333"><span class="lineNum">     333</span>                 :             : </span>
+<span id="L334"><span class="lineNum">     334</span>                 :<span class="tlaGNC">          11 :   vol-&gt;mounted = true;</span></span>
+<span id="L335"><span class="lineNum">     335</span>                 :<span class="tlaGNC">          11 :   console_printf(</span></span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">          11 :       &quot;[EXT2] Mounted: %u blocks, %u inodes, %u block size\n&quot;,</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">          11 :       vol-&gt;blocks_count, vol-&gt;inodes_count, vol-&gt;block_size</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :<span class="tlaGNC">          11 :   );</span></span>
+<span id="L339"><span class="lineNum">     339</span>                 :<span class="tlaGNC">          11 :   return vol;</span></span>
+<span id="L340"><span class="lineNum">     340</span>                 :<span class="tlaGNC">          14 : }</span></span>
+<span id="L341"><span class="lineNum">     341</span>                 :             : </span>
+<span id="L342"><span class="lineNum">     342</span>                 :             : /**</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :  * @brief Unmount an ext2 partition.</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :  *</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             :  * Flushes metadata and frees the volume descriptor slot.</span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :  *</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :  * @param vol Volume to unmount.</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :  */</span>
+<span id="L349"><span class="lineNum">     349</span>                 :             : void ext2_unmount(ext2_volume_t *vol)</span>
+<span id="L350"><span class="lineNum">     350</span>                 :<span class="tlaGNC">          10 : {</span></span>
+<span id="L351"><span class="lineNum">     351</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 8 times"> + </span>]:<span class="tlaGNC">          10 :   if(!vol || !vol-&gt;mounted)</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaGNC">           2 :     return;</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :<span class="tlaGNC">           8 :   flush_metadata(vol);</span></span>
+<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           8 :   if(vol-&gt;groups) {</span></span>
+<span id="L355"><span class="lineNum">     355</span>                 :<span class="tlaGNC">           8 :     kfree(vol-&gt;groups);</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">           8 :     vol-&gt;groups = NULL;</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">           8 :   }</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :<span class="tlaGNC">           8 :   vol-&gt;mounted = false;</span></span>
+<span id="L359"><span class="lineNum">     359</span>                 :<span class="tlaGNC">           8 : }</span></span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

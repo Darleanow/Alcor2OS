@@ -1,0 +1,1 @@
+genhtml build/coverage/lcov.info --output-directory build/coverage/html --title 'Alcor2OS Coverage' --legend --highlight --branch-coverage --ignore-errors source --quiet
