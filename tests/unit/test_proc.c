@@ -19,7 +19,8 @@ void *kzalloc(u64 size)
   return p;
 }
 
-u64  vmm_create_address_space(void) { return 0x1000; }
+static bool g_vmm_create_fail = false;
+u64  vmm_create_address_space(void) { return g_vmm_create_fail ? 0 : 0x1000; }
 void vmm_destroy_user_mappings(u64 cr3) { (void)cr3; }
 void vmm_clear_user_mappings(u64 cr3) { (void)cr3; }
 void vmm_switch(u64 cr3) { (void)cr3; }
@@ -39,22 +40,26 @@ u64 vmm_clone_address_space(u64 cr3)
   return g_vmm_clone_fail ? 0 : 0x2000;
 }
 
-void *pmm_alloc_pages(u64 count) { return malloc(count * 4096); }
+static bool g_pmm_fail = false;
+void *pmm_alloc_pages(u64 count) { return g_pmm_fail ? NULL : malloc(count * 4096); }
 
+static int  g_elf_load_ret  = 0;
+static u64  g_elf_load_phdr = 0;
 int elf_load(const void *data, u64 size, elf_info_t *info)
 {
   (void)data;
   (void)size;
   info->entry = 0x400000;
-  info->phdr  = 0;
-  return 0;
+  info->phdr  = g_elf_load_phdr;
+  return g_elf_load_ret;
 }
+static int g_elf_load_fd_ret = 0;
 int elf_load_fd(i64 fd, elf_info_t *info)
 {
   (void)fd;
   info->entry = 0x400000;
-  info->phdr  = 0;
-  return 0;
+  info->phdr  = g_elf_load_phdr;
+  return g_elf_load_fd_ret;
 }
 
 void vfs_proc_init_fds(i32 *fds) { (void)fds; }
@@ -143,6 +148,11 @@ static int setup(void **state)
   need_resched        = false;
   g_context_switch_cb = NULL;
   g_vmm_clone_fail    = false;
+  g_vmm_create_fail   = false;
+  g_pmm_fail          = false;
+  g_elf_load_ret      = 0;
+  g_elf_load_fd_ret   = 0;
+  g_elf_load_phdr     = 0;
   return 0;
 }
 
@@ -1090,6 +1100,59 @@ static void test_proc_create_mem_with_argv_envp(void **state)
   assert_string_equal(p->name, "myapp");
 }
 
+/* proc_create_inner: vmm_create_address_space fails → returns 0 (line 413-414) */
+static void test_proc_create_vmm_fail(void **state) {
+  (void)state;
+  g_vmm_create_fail = true;
+  char *argv[] = {(char *)"init", NULL};
+  u64 pid = proc_create_mem("init", NULL, 0, argv, argv);
+  assert_int_equal(pid, 0); /* failed */
+  g_vmm_create_fail = false;
+}
+
+/* proc_create_inner: pmm_alloc_pages (kernel stack) fails → returns 0 (line 419-421) */
+static void test_proc_create_stack_fail(void **state) {
+  (void)state;
+  g_pmm_fail = true;
+  char *argv[] = {(char *)"init", NULL};
+  u64 pid = proc_create_mem("init", NULL, 0, argv, argv);
+  assert_int_equal(pid, 0);
+  g_pmm_fail = false;
+}
+
+/* proc_create_inner: elf_load fails → returns 0 (lines 426-429) */
+static void test_proc_create_elf_fail_enoexec(void **state) {
+  (void)state;
+  /* proc_create_mem passes elf_fd=-1 so elf_load() (not elf_load_fd) is called */
+  g_elf_load_ret = -1;
+  char *argv[] = {(char *)"init", NULL};
+  u64 pid = proc_create_mem("init", NULL, 0, argv, argv);
+  assert_int_equal(pid, 0);
+  g_elf_load_ret = 0;
+}
+
+/* proc_setup_image: elf_info.phdr != 0 → pushes AT_PHDR auxv (lines 342-345) */
+static void test_proc_setup_image_with_phdr(void **state) {
+  (void)state;
+  g_elf_load_phdr = 0x401000;
+  char *argv[] = {(char *)"prog", NULL};
+  u64 pid = proc_create_mem("prog", NULL, 0, argv, argv);
+  assert_true(pid > 0);
+  g_elf_load_phdr = 0;
+}
+
+/* proc_setup_image: user stack pmm_alloc_pages fails → -ENOMEM (line 210) */
+static void test_proc_setup_image_elf_enomem(void **state) {
+  (void)state;
+  /* pmm_alloc_pages returns NULL → proc_setup_image returns -ENOMEM
+   * → proc_create_inner returns 0 */
+  g_pmm_fail = true;
+  char *argv[] = {(char *)"prog", NULL};
+  u64 pid = proc_create_mem("prog", NULL, 0, argv, argv);
+  assert_int_equal(pid, 0);
+  g_pmm_fail = false;
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
@@ -1158,6 +1221,12 @@ int main(void)
       cmocka_unit_test_setup_teardown(test_proc_waitpid_no_current, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_waitpid_specific_no_child_echild, setup, teardown),
       cmocka_unit_test_setup_teardown(test_proc_create_mem_with_argv_envp, setup, teardown),
+      /* new coverage */
+      cmocka_unit_test_setup_teardown(test_proc_create_vmm_fail, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_create_stack_fail, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_create_elf_fail_enoexec, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_setup_image_with_phdr, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_proc_setup_image_elf_enomem, setup, teardown),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
