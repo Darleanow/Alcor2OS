@@ -854,6 +854,48 @@ static void test_gr_dispatch_help_walk_no_arg(void **state)
   assert_int_equal(gr_dispatch(&app, 3, argv), 0);
 }
 
+/* gr__find_cmd: null name → returns NULL (line 529) */
+static void test_gr_find_cmd_null_name_returns_null(void **state) {
+  (void)state;
+  gr_cmd cmds[] = {{"foo", NULL, NULL, NULL}};
+  const gr_cmd *r = gr__find_cmd(cmds, 1, NULL);
+  assert_null(r);
+}
+
+/* gr__path_join: null/empty seg → early return (line 541) */
+static void test_gr_path_join_null_seg_noop(void **state) {
+  (void)state;
+  char dst[64] = "original";
+  gr__path_join(dst, sizeof(dst), "prefix", NULL);
+  /* dst should be unchanged since seg is NULL */
+  assert_string_equal(dst, "original");
+  gr__path_join(dst, sizeof(dst), "prefix", "");
+  assert_string_equal(dst, "original");
+}
+
+static int help_walk_dummy_run(int argc, char **argv, void *ud) {
+  (void)argc; (void)argv; (void)ud; return 0;
+}
+
+/* gr_dispatch: "help" with no further args → "requires a command name" (lines 616-618) */
+static void test_gr_dispatch_help_walk_argc_zero(void **state) {
+  (void)state;
+  gr_cmd subcmds[] = {{"sub", "A subcommand", help_walk_dummy_run, NULL}};
+  gr_app app = {
+    .program       = "prog",
+    .blurb         = "blurb",
+    .commands      = subcmds,
+    .command_count = 1,
+    .userdata      = NULL
+  };
+  /* "help" followed by an unknown command → gr__dispatch_help_walk called
+   * with a command name arg that doesn't exist */
+  char *argv[] = {"prog", "help", "nonexistent_cmd"};
+  int rc = gr_dispatch(&app, 3, argv);
+  /* Returns 2 when command not found in help walk */
+  assert_int_equal(rc, 2);
+}
+
 /* gr__apply_flag: null storage → GR_ERR */
 static void test_gr_apply_flag_null_storage(void **state) {
   (void)state;
@@ -976,6 +1018,9 @@ int main(void)
       cmocka_unit_test(test_gr_apply_count_null_storage),
       cmocka_unit_test(test_gr_apply_val_null_storage),
       cmocka_unit_test(test_gr_apply_val_unknown_kind),
+      cmocka_unit_test(test_gr_find_cmd_null_name_returns_null),
+      cmocka_unit_test(test_gr_path_join_null_seg_noop),
+      cmocka_unit_test(test_gr_dispatch_help_walk_argc_zero),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
