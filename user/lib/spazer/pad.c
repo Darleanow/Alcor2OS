@@ -93,12 +93,12 @@ spz_pad_t *spz_pad_new(
   p->title       = spz_strdup(title);
   p->frame_dirty = true;
 
-  p->inner.y     = has_border ? outer.y + 1 : outer.y;
-  p->inner.x     = has_border ? outer.x + 1 : outer.x;
-  p->inner.rows  = has_border ? outer.rows - 2 : outer.rows;
-  p->inner.cols  = has_border ? outer.cols - 2 : outer.cols;
+  p->inner.y    = has_border ? outer.y + 1 : outer.y;
+  p->inner.x    = has_border ? outer.x + 1 : outer.x;
+  p->inner.rows = has_border ? outer.rows - 2 : outer.rows;
+  p->inner.cols = has_border ? outer.cols - 2 : outer.cols;
 
-  p->frame       = newwin(outer.rows, outer.cols, outer.y, outer.x);
+  p->frame = newwin(outer.rows, outer.cols, outer.y, outer.x);
   if(!p->frame) {
     free(p->title);
     free(p);
@@ -164,7 +164,9 @@ void spz_pad_refresh(spz_pad_t *p)
 
   if(p->frame_dirty) {
     werase(p->frame);
-    spz_border_draw(p->frame, p->outer.rows, p->outer.cols, p->title, p->border);
+    spz_border_draw(
+        p->frame, p->outer.rows, p->outer.cols, p->title, p->border
+    );
     p->frame_dirty = false;
   }
   /* Transient newwins (status bar) can run doupdate against a stale curscr,

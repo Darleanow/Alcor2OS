@@ -44,7 +44,7 @@ spz_panel_t *spz_panel_new(spz_rect_t r, const char *title, spz_border_t b)
   p->title       = spz_strdup(title);
   p->frame_dirty = true;
 
-  p->frame       = newwin(r.rows, r.cols, r.y, r.x);
+  p->frame = newwin(r.rows, r.cols, r.y, r.x);
   if(!p->frame) {
     free(p->title);
     free(p);
@@ -108,7 +108,8 @@ void spz_panel_refresh(spz_panel_t *p)
     p->frame_dirty = false;
   }
   wnoutrefresh(p->frame);
-  /* derwin shares cells with the frame; touch so the body overlay re-renders. */
+  /* derwin shares cells with the frame; touch so the body overlay re-renders.
+   */
   touchwin(p->body);
   wnoutrefresh(p->body);
   doupdate();

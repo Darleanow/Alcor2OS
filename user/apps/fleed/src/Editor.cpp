@@ -60,13 +60,27 @@ int Editor::run()
       m_ui.redraw(m_buffer);
       continue;
 
-    case Command::Save:        handleSave();                   break;
-    case Command::ArrowUp:     m_buffer.cursorMoveUp();        break;
-    case Command::ArrowDown:   m_buffer.cursorMoveDown();      break;
-    case Command::ArrowLeft:   m_buffer.cursorMoveLeft();      break;
-    case Command::ArrowRight:  m_buffer.cursorMoveRight();     break;
-    case Command::Home:        m_buffer.cursorMoveLineStart(); break;
-    case Command::End:         m_buffer.cursorMoveLineEnd();   break;
+    case Command::Save:
+      handleSave();
+      break;
+    case Command::ArrowUp:
+      m_buffer.cursorMoveUp();
+      break;
+    case Command::ArrowDown:
+      m_buffer.cursorMoveDown();
+      break;
+    case Command::ArrowLeft:
+      m_buffer.cursorMoveLeft();
+      break;
+    case Command::ArrowRight:
+      m_buffer.cursorMoveRight();
+      break;
+    case Command::Home:
+      m_buffer.cursorMoveLineStart();
+      break;
+    case Command::End:
+      m_buffer.cursorMoveLineEnd();
+      break;
     }
 
     m_ui.refreshCursor(m_buffer);

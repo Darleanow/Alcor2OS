@@ -52,9 +52,7 @@ void Buffer::newLine()
 {
   std::string &curr = m_text.at(m_cursor.y);
   std::string  tail = curr.substr(m_cursor.x);
-  curr.erase(
-      curr.begin() + static_cast<int>(m_cursor.x), curr.end()
-  );
+  curr.erase(curr.begin() + static_cast<int>(m_cursor.x), curr.end());
   m_text.insert(m_text.begin() + static_cast<int>(m_cursor.y) + 1, tail);
   setCursorPos(0, m_cursor.y + 1);
 }
