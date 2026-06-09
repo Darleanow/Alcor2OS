@@ -1,5 +1,5 @@
 <map id="proc_fork" name="proc_fork">
 <area shape="rect" id="Node000001" title="Fork the current process." alt="" coords="131,5,213,31"/>
-<area shape="rect" id="Node000002" href="$sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" title="Duplicate the calling process (fork)." alt="" coords="5,5,83,31"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca" title="Duplicate the calling process (fork)." alt="" coords="5,5,83,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,21,83,21,83,15,117,15"/>
 </map>

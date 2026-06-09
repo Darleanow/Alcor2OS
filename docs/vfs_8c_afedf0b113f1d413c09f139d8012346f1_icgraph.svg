@@ -336,7 +336,7 @@ var sectionId = 'dynsection-2';
 <!-- Node3 -->
 <g id="Node000003" class="node">
 <title>Node3</title>
-<g id="a_Node000003"><a xlink:href="sys__fs_8c.html#a3da7d8c19db4de1b35b610bbe9b7cdd4" target="_top" xlink:title="Duplicate oldfd to the lowest free fd ≥ 3.">
+<g id="a_Node000003"><a xlink:href="sys__fs_8c.html#ae62f411f7a86b6cd6e4b2dc0b82d7c10" target="_top" xlink:title="Duplicate oldfd to the lowest free fd ≥ 3.">
 <polygon fill="white" stroke="#666666" points="231.5,-725 175.5,-725 175.5,-706 231.5,-706 231.5,-725"/>
 <text text-anchor="middle" x="203.5" y="-713" font-family="Helvetica,sans-Serif" font-size="10.00">sys_dup</text>
 </a>
@@ -354,7 +354,7 @@ var sectionId = 'dynsection-2';
 <!-- Node4 -->
 <g id="Node000004" class="node">
 <title>Node4</title>
-<g id="a_Node000004"><a xlink:href="sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e" target="_top" xlink:title="Perform a file&#45;control operation on fd.">
+<g id="a_Node000004"><a xlink:href="sys__fs_8c.html#a6223f2ac2734bd07fbc86a18d95bb9bf" target="_top" xlink:title="Perform a file&#45;control operation on fd.">
 <polygon fill="white" stroke="#666666" points="233.5,-688 173.5,-688 173.5,-669 233.5,-669 233.5,-688"/>
 <text text-anchor="middle" x="203.5" y="-676" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fcntl</text>
 </a>
@@ -390,7 +390,7 @@ var sectionId = 'dynsection-2';
 <!-- Node9 -->
 <g id="Node000009" class="node">
 <title>Node9</title>
-<g id="a_Node000009"><a xlink:href="sys__fs_8c.html#a6fa7c567e06bd525be10ca4058ba6557" target="_top" xlink:title="Duplicate oldfd into the specific slot newfd.">
+<g id="a_Node000009"><a xlink:href="sys__fs_8c.html#aa0c6360eda6cab7b049de354b1c64b3e" target="_top" xlink:title="Duplicate oldfd into the specific slot newfd.">
 <polygon fill="white" stroke="#666666" points="234.5,-632 172.5,-632 172.5,-613 234.5,-613 234.5,-632"/>
 <text text-anchor="middle" x="203.5" y="-620" font-family="Helvetica,sans-Serif" font-size="10.00">sys_dup2</text>
 </a>
@@ -462,7 +462,7 @@ var sectionId = 'dynsection-2';
 <!-- Node16 -->
 <g id="Node000016" class="node">
 <title>Node16</title>
-<g id="a_Node000016"><a xlink:href="sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21" target="_top" xlink:title="Stat the open file descriptor fd into a POSIX stat buffer.">
+<g id="a_Node000016"><a xlink:href="sys__fs_8c.html#a55c19a120c8db8174f736c5925e4e682" target="_top" xlink:title="Stat the open file descriptor fd into a POSIX stat buffer.">
 <polygon fill="white" stroke="#666666" points="234,-429 173,-429 173,-410 234,-410 234,-429"/>
 <text text-anchor="middle" x="203.5" y="-417" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fstat</text>
 </a>
@@ -480,7 +480,7 @@ var sectionId = 'dynsection-2';
 <!-- Node18 -->
 <g id="Node000018" class="node">
 <title>Node18</title>
-<g id="a_Node000018"><a xlink:href="sys__fs_8c.html#a1c7b290c87a6fc7f5dc164a9e944f00d" target="_top" xlink:title="Truncate the file open as fd to exactly length bytes.">
+<g id="a_Node000018"><a xlink:href="sys__fs_8c.html#a21ca8e448559278ca1affa80b962f7a0" target="_top" xlink:title="Truncate the file open as fd to exactly length bytes.">
 <polygon fill="white" stroke="#666666" points="244.5,-392 162.5,-392 162.5,-373 244.5,-373 244.5,-392"/>
 <text text-anchor="middle" x="203.5" y="-380" font-family="Helvetica,sans-Serif" font-size="10.00">sys_ftruncate</text>
 </a>
@@ -507,7 +507,7 @@ var sectionId = 'dynsection-2';
 <!-- Node21 -->
 <g id="Node000021" class="node">
 <title>Node21</title>
-<g id="a_Node000021"><a xlink:href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" target="_top" xlink:title="Fill dirp with dirent64 entries from the open directory fd.">
+<g id="a_Node000021"><a xlink:href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6" target="_top" xlink:title="Fill dirp with dirent64 entries from the open directory fd.">
 <polygon fill="white" stroke="#666666" points="244,-355 163,-355 163,-336 244,-336 244,-355"/>
 <text text-anchor="middle" x="203.5" y="-343" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getdents</text>
 </a>
@@ -525,7 +525,7 @@ var sectionId = 'dynsection-2';
 <!-- Node22 -->
 <g id="Node000022" class="node">
 <title>Node22</title>
-<g id="a_Node000022"><a xlink:href="sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395" target="_top" xlink:title="getdents64 — identical to sys_getdents on this platform.">
+<g id="a_Node000022"><a xlink:href="sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab" target="_top" xlink:title="getdents64 &#45; identical to sys_getdents on this platform.">
 <polygon fill="white" stroke="#666666" points="99.5,-355 6.5,-355 6.5,-336 99.5,-336 99.5,-355"/>
 <text text-anchor="middle" x="53" y="-343" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getdents64</text>
 </a>
@@ -543,7 +543,7 @@ var sectionId = 'dynsection-2';
 <!-- Node24 -->
 <g id="Node000024" class="node">
 <title>Node24</title>
-<g id="a_Node000024"><a xlink:href="sys__io_8c.html#a3c39ef7f15c9019f7298af3310a3a7b1" target="_top" xlink:title="Perform a device control operation on fd.">
+<g id="a_Node000024"><a xlink:href="sys__io_8c.html#a6a5e5a5ee5e647ddb4116735cc0f16b6" target="_top" xlink:title="Perform a device control operation on fd.">
 <polygon fill="white" stroke="#666666" points="233,-318 174,-318 174,-299 233,-299 233,-318"/>
 <text text-anchor="middle" x="203.5" y="-306" font-family="Helvetica,sans-Serif" font-size="10.00">sys_ioctl</text>
 </a>
@@ -597,7 +597,7 @@ var sectionId = 'dynsection-2';
 <!-- Node34 -->
 <g id="Node000034" class="node">
 <title>Node34</title>
-<g id="a_Node000034"><a xlink:href="sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635" target="_top" xlink:title="Read count bytes from fd at absolute offset without moving the seek position.">
+<g id="a_Node000034"><a xlink:href="sys__fs_8c.html#ac897a1cc4c3feace952df07d7cc30a63" target="_top" xlink:title="Read count bytes from fd at absolute offset without moving the seek position.">
 <polygon fill="white" stroke="#666666" points="242.5,-207 164.5,-207 164.5,-188 242.5,-188 242.5,-207"/>
 <text text-anchor="middle" x="203.5" y="-195" font-family="Helvetica,sans-Serif" font-size="10.00">sys_pread64</text>
 </a>
@@ -615,7 +615,7 @@ var sectionId = 'dynsection-2';
 <!-- Node35 -->
 <g id="Node000035" class="node">
 <title>Node35</title>
-<g id="a_Node000035"><a xlink:href="sys__io_8c.html#a9e0ba6a136c04452cb4759138652bb88" target="_top" xlink:title="Read up to count bytes from fd into buf.">
+<g id="a_Node000035"><a xlink:href="sys__io_8c.html#a1f6826ad0dba19ec47987621a296de79" target="_top" xlink:title="Read up to count bytes from fd into buf.">
 <polygon fill="white" stroke="#666666" points="233.5,-281 173.5,-281 173.5,-262 233.5,-262 233.5,-281"/>
 <text text-anchor="middle" x="203.5" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">sys_read</text>
 </a>
@@ -651,7 +651,7 @@ var sectionId = 'dynsection-2';
 <!-- Node33 -->
 <g id="Node000033" class="node">
 <title>Node33</title>
-<g id="a_Node000033"><a xlink:href="sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9" target="_top" xlink:title=" ">
+<g id="a_Node000033"><a xlink:href="sys__mm_8c.html#acad864e33862a96e5affd8f9f1003117" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="88,-170 18,-170 18,-151 88,-151 88,-170"/>
 <text text-anchor="middle" x="53" y="-158" font-family="Helvetica,sans-Serif" font-size="10.00">sys_mmap</text>
 </a>
@@ -669,7 +669,7 @@ var sectionId = 'dynsection-2';
 <!-- Node36 -->
 <g id="Node000036" class="node">
 <title>Node36</title>
-<g id="a_Node000036"><a xlink:href="sys__io_8c.html#a20b06db6011d3c71ba1ce6b1de28c1f5" target="_top" xlink:title=" ">
+<g id="a_Node000036"><a xlink:href="sys__io_8c.html#a49f67f2278c6d9a40498ca66aa099919" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="86,-281 20,-281 20,-262 86,-262 86,-281"/>
 <text text-anchor="middle" x="53" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">sys_readv</text>
 </a>
@@ -714,7 +714,7 @@ var sectionId = 'dynsection-2';
 <!-- Node38 -->
 <g id="Node000038" class="node">
 <title>Node38</title>
-<g id="a_Node000038"><a xlink:href="sys__io_8c.html#aaf0072fb1689f96d7565297e99d45c8a" target="_top" xlink:title="Reposition the file offset of fd (lseek).">
+<g id="a_Node000038"><a xlink:href="sys__io_8c.html#ada1f7c45065087a202187a787dd84cd4" target="_top" xlink:title="Reposition the file offset of fd (lseek).">
 <polygon fill="white" stroke="#666666" points="236,-133 171,-133 171,-114 236,-114 236,-133"/>
 <text text-anchor="middle" x="203.5" y="-121" font-family="Helvetica,sans-Serif" font-size="10.00">sys_lseek</text>
 </a>
@@ -732,7 +732,7 @@ var sectionId = 'dynsection-2';
 <!-- Node39 -->
 <g id="Node000039" class="node">
 <title>Node39</title>
-<g id="a_Node000039"><a xlink:href="sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237" target="_top" xlink:title="Write count bytes to fd at absolute offset without moving the seek position.">
+<g id="a_Node000039"><a xlink:href="sys__fs_8c.html#a430c96a16cfcfe001404dc60153f7414" target="_top" xlink:title="Write count bytes to fd at absolute offset without moving the seek position.">
 <polygon fill="white" stroke="#666666" points="93.5,-57 12.5,-57 12.5,-38 93.5,-38 93.5,-57"/>
 <text text-anchor="middle" x="53" y="-45" font-family="Helvetica,sans-Serif" font-size="10.00">sys_pwrite64</text>
 </a>
@@ -849,7 +849,7 @@ var sectionId = 'dynsection-2';
 <!-- Node48 -->
 <g id="Node000048" class="node">
 <title>Node48</title>
-<g id="a_Node000048"><a xlink:href="sys__io_8c.html#aaf2c4002d448ac156bcf915154c831bb" target="_top" xlink:title="Write count bytes from buf to fd.">
+<g id="a_Node000048"><a xlink:href="sys__io_8c.html#a636c903c7fd56e8c6ecee603c8d03d6c" target="_top" xlink:title="Write count bytes from buf to fd.">
 <polygon fill="white" stroke="#666666" points="235,-19 172,-19 172,0 235,0 235,-19"/>
 <text text-anchor="middle" x="203.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_write</text>
 </a>
@@ -876,7 +876,7 @@ var sectionId = 'dynsection-2';
 <!-- Node49 -->
 <g id="Node000049" class="node">
 <title>Node49</title>
-<g id="a_Node000049"><a xlink:href="sys__io_8c.html#a9f5a42925c399f61f3791fb61ba295b9" target="_top" xlink:title="Gathered&#45;write across iovcnt iovecs into fd.">
+<g id="a_Node000049"><a xlink:href="sys__io_8c.html#a19b4c03b7511baf0e45259e1814916e3" target="_top" xlink:title="Gathered&#45;write across iovcnt iovecs into fd.">
 <polygon fill="white" stroke="#666666" points="87.5,-19 18.5,-19 18.5,0 87.5,0 87.5,-19"/>
 <text text-anchor="middle" x="53" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_writev</text>
 </a>

@@ -1,5 +1,5 @@
 <map id="vfs_set_flags" name="vfs_set_flags">
 <area shape="rect" id="Node000001" title="Overwrite the open flags for fd (used by fcntl F_SETFL)." alt="" coords="133,5,240,31"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e" title="Perform a file&#45;control operation on fd." alt="" coords="5,5,85,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a6223f2ac2734bd07fbc86a18d95bb9bf" title="Perform a file&#45;control operation on fd." alt="" coords="5,5,85,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,21,86,21,86,15,120,15"/>
 </map>

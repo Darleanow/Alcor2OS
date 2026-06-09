@@ -6,7 +6,7 @@
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="684,105,650,108,649,103,683,99"/>
 <area shape="rect" id="Node000003" href="$proc_8c.html#a9e54e9500784e83d9e222135c963b730" title="POSIX&#45;style exec: replace p&#39;s user image with the ELF read from elf_fd. Tears down the current user m..." alt="" coords="192,5,383,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="425,35,383,30,383,25,426,29"/>
-<area shape="rect" id="Node000004" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="26,5,123,31"/>
+<area shape="rect" id="Node000004" href="$sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" title="Replace the calling process image with a new ELF at pathname." alt="" coords="26,5,123,31"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="178,21,124,21,124,15,178,15"/>
 <area shape="rect" id="Node000006" href="$proc_8c.html#afec7a3067e9c51948cc32acb1f590b54" title="Common path: allocate slot, load ELF from memory buffer or open fd." alt="" coords="218,55,357,80"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="460,104,353,83,354,77,461,99"/>
@@ -22,6 +22,6 @@
 <area shape="poly" id="edge8_Node000011_Node000012" title=" " alt="" coords="214,119,121,119,121,114,214,114"/>
 <area shape="rect" id="Node000014" href="$proc_8c.html#a343bbb181246db8a2491f82d14f9d26e" title="Fork the current process." alt="" coords="33,153,116,179"/>
 <area shape="poly" id="edge9_Node000011_Node000014" title=" " alt="" coords="219,135,117,159,116,154,218,130"/>
-<area shape="rect" id="Node000018" href="$sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" title="Wait for a child process to change state (wait4)." alt="" coords="31,203,118,228"/>
+<area shape="rect" id="Node000018" href="$sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2" title="Wait for a child process to change state (wait4)." alt="" coords="31,203,118,228"/>
 <area shape="poly" id="edge12_Node000017_Node000018" title=" " alt="" coords="221,218,118,218,118,213,221,213"/>
 </map>

@@ -53,16 +53,16 @@
 <area shape="rect" id="Node000029" href="$ramfs_8c.html#af637621c8cf4b54bce326f48174772ff" title="Initialise ramfs (idempotent)." alt="" coords="224,803,312,828"/>
 <area shape="poly" id="edge28_Node000024_Node000029" title=" " alt="" coords="434,752,357,792,313,807,311,802,355,788,432,748"/>
 <area shape="poly" id="edge26_Node000025_Node000019" title=" " alt="" coords="214,713,118,700,118,695,215,707"/>
-<area shape="rect" id="Node000031" href="$sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" title="Check that path exists and is accessible; always grants access." alt="" coords="419,839,513,864"/>
+<area shape="rect" id="Node000031" href="$sys__fs_8c.html#ac00f75dace7b43d7bc9d163cc7c4324e" title="Check that path exists and is accessible; always grants access." alt="" coords="419,839,513,864"/>
 <area shape="poly" id="edge30_Node000030_Node000031" title=" " alt="" coords="562,866,513,860,514,855,562,861"/>
-<area shape="rect" id="Node000033" href="$sys__fs_8c.html#a3c7030445954bf053945683539a885b4" title="Read the target of a symbolic link at path into buf." alt="" coords="414,888,518,913"/>
+<area shape="rect" id="Node000033" href="$sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05" title="Read the target of a symbolic link at path into buf." alt="" coords="414,888,518,913"/>
 <area shape="poly" id="edge32_Node000030_Node000033" title=" " alt="" coords="563,891,519,897,518,891,562,885"/>
-<area shape="rect" id="Node000034" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="428,937,504,963"/>
+<area shape="rect" id="Node000034" href="$sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" title="Stat the node at path into a POSIX stat buffer." alt="" coords="428,937,504,963"/>
 <area shape="poly" id="edge33_Node000030_Node000034" title=" " alt="" coords="613,896,501,940,499,935,611,891"/>
-<area shape="rect" id="Node000032" href="$sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972" title="faccessat — only AT_FDCWD and absolute paths are supported." alt="" coords="211,852,325,877"/>
+<area shape="rect" id="Node000032" href="$sys__fs_8c.html#a843f0a3368fbde4eda4f696b3ee1dba4" title="faccessat &#45; only AT_FDCWD and absolute paths are supported." alt="" coords="211,852,325,877"/>
 <area shape="poly" id="edge31_Node000031_Node000032" title=" " alt="" coords="405,858,325,864,324,858,405,853"/>
-<area shape="rect" id="Node000035" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="228,925,308,951"/>
+<area shape="rect" id="Node000035" href="$sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" title="lstat &#45; no symlink resolution in VFS yet; identical to stat." alt="" coords="228,925,308,951"/>
 <area shape="poly" id="edge34_Node000034_Node000035" title=" " alt="" coords="414,950,308,943,308,938,415,944"/>
-<area shape="rect" id="Node000036" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="207,975,329,1000"/>
+<area shape="rect" id="Node000036" href="$sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" title="newfstatat &#45; supports AT_FDCWD and absolute paths only." alt="" coords="207,975,329,1000"/>
 <area shape="poly" id="edge35_Node000034_Node000036" title=" " alt="" coords="415,962,329,979,328,973,414,957"/>
 </map>

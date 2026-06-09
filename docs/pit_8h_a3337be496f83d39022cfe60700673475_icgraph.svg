@@ -84,7 +84,7 @@
 <!-- Node6 -->
 <g id="Node000006" class="node">
 <title>Node6</title>
-<g id="a_Node000006"><a xlink:href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
+<g id="a_Node000006"><a xlink:href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
 <polygon fill="white" stroke="#666666" points="239,-56 166,-56 166,-37 239,-37 239,-56"/>
 <text text-anchor="middle" x="202.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_execve</text>
 </a>
@@ -102,7 +102,7 @@
 <!-- Node7 -->
 <g id="Node000007" class="node">
 <title>Node7</title>
-<g id="a_Node000007"><a xlink:href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" target="_top" xlink:title="Terminate the calling process with status.">
+<g id="a_Node000007"><a xlink:href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" target="_top" xlink:title="Terminate the calling process with status.">
 <polygon fill="white" stroke="#666666" points="231,-19 174,-19 174,0 231,0 231,-19"/>
 <text text-anchor="middle" x="202.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_exit</text>
 </a>
@@ -138,7 +138,7 @@
 <!-- Node8 -->
 <g id="Node000008" class="node">
 <title>Node8</title>
-<g id="a_Node000008"><a xlink:href="sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" target="_top" xlink:title="Terminate all threads in the group — equivalent to sys_exit here.">
+<g id="a_Node000008"><a xlink:href="sys__proc_8c.html#afee2a1f1efdfdcf0b0d4490e832c19d8" target="_top" xlink:title="Terminate all threads in the group &#45; equivalent to sys_exit here.">
 <polygon fill="white" stroke="#666666" points="100.5,-19 10.5,-19 10.5,0 100.5,0 100.5,-19"/>
 <text text-anchor="middle" x="55.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_exit_group</text>
 </a>

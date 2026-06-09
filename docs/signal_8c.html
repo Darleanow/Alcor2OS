@@ -99,24 +99,24 @@ Functions</h2></td></tr>
 <tr class="memitem:a80bd148d76d33aa31ecd31741f13b776" id="r_a80bd148d76d33aa31ecd31741f13b776"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a80bd148d76d33aa31ecd31741f13b776">sig_default_ignore</a> (int signum)</td></tr>
 <tr class="memdesc:a80bd148d76d33aa31ecd31741f13b776"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the default action for a signal is to ignore it.  <br /></td></tr>
 <tr class="separator:a80bd148d76d33aa31ecd31741f13b776"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d9e10561f9a6244a4ff1a370e6c58e0" id="r_a0d9e10561f9a6244a4ff1a370e6c58e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a0d9e10561f9a6244a4ff1a370e6c58e0">sys_rt_sigaction</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> signum, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> act, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldact, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sigsetsize, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a0d9e10561f9a6244a4ff1a370e6c58e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register or query a signal action.  <br /></td></tr>
-<tr class="separator:a0d9e10561f9a6244a4ff1a370e6c58e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acec5c387232178f47bb983308649f1f3" id="r_acec5c387232178f47bb983308649f1f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#acec5c387232178f47bb983308649f1f3">sys_rt_sigprocmask</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> how, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> set, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldset, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sigsetsize, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:acec5c387232178f47bb983308649f1f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Examine and change the blocked signal mask.  <br /></td></tr>
-<tr class="separator:acec5c387232178f47bb983308649f1f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac280ec41dc24bc5323e752f9499814b7" id="r_ac280ec41dc24bc5323e752f9499814b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#ac280ec41dc24bc5323e752f9499814b7">sys_rt_sigreturn</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:ac280ec41dc24bc5323e752f9499814b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return from a signal handler by restoring saved register context.  <br /></td></tr>
-<tr class="separator:ac280ec41dc24bc5323e752f9499814b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf33b94444c34b265669722766ce7351" id="r_aaf33b94444c34b265669722766ce7351"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#aaf33b94444c34b265669722766ce7351">sys_kill</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sig, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:aaf33b94444c34b265669722766ce7351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a signal to a process.  <br /></td></tr>
-<tr class="separator:aaf33b94444c34b265669722766ce7351"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5f7c2b99e462d63a376becc8d503470" id="r_ab5f7c2b99e462d63a376becc8d503470"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#ab5f7c2b99e462d63a376becc8d503470">sys_tkill</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sig, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="separator:ab5f7c2b99e462d63a376becc8d503470"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb4d7329079c42e646f8770eab5568cb" id="r_abb4d7329079c42e646f8770eab5568cb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#abb4d7329079c42e646f8770eab5568cb">sys_tgkill</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tgid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sig, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="separator:abb4d7329079c42e646f8770eab5568cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42a05e0f24f0badb8057ea6a34d55e73" id="r_a42a05e0f24f0badb8057ea6a34d55e73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a42a05e0f24f0badb8057ea6a34d55e73">sys_sigaltstack</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> ss, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> old_ss, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="separator:a42a05e0f24f0badb8057ea6a34d55e73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a629480847a7353fe30161c30a58c3cb2" id="r_a629480847a7353fe30161c30a58c3cb2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a629480847a7353fe30161c30a58c3cb2">sys_rt_sigaction</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> signum, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> act, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldact, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sigsetsize, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a629480847a7353fe30161c30a58c3cb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register or query a signal action.  <br /></td></tr>
+<tr class="separator:a629480847a7353fe30161c30a58c3cb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d5a6d868001aafb8916dffaed836aaa" id="r_a4d5a6d868001aafb8916dffaed836aaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a4d5a6d868001aafb8916dffaed836aaa">sys_rt_sigprocmask</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> how, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> set, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldset, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sigsetsize, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a4d5a6d868001aafb8916dffaed836aaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Examine and change the blocked signal mask.  <br /></td></tr>
+<tr class="separator:a4d5a6d868001aafb8916dffaed836aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a372a073fc367e2608f716c50176d628c" id="r_a372a073fc367e2608f716c50176d628c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a372a073fc367e2608f716c50176d628c">sys_rt_sigreturn</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a372a073fc367e2608f716c50176d628c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return from a signal handler by restoring saved register context.  <br /></td></tr>
+<tr class="separator:a372a073fc367e2608f716c50176d628c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab603823f7de6c07aa5558dbcfe5558aa" id="r_ab603823f7de6c07aa5558dbcfe5558aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#ab603823f7de6c07aa5558dbcfe5558aa">sys_kill</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sig, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ab603823f7de6c07aa5558dbcfe5558aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a signal to a process.  <br /></td></tr>
+<tr class="separator:ab603823f7de6c07aa5558dbcfe5558aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76b1fde36f3f9d96f102483de8a8050d" id="r_a76b1fde36f3f9d96f102483de8a8050d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a76b1fde36f3f9d96f102483de8a8050d">sys_tkill</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sig, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="separator:a76b1fde36f3f9d96f102483de8a8050d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56fe11d2c32798c7aa960d92d62999a7" id="r_a56fe11d2c32798c7aa960d92d62999a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a56fe11d2c32798c7aa960d92d62999a7">sys_tgkill</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tgid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sig, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="separator:a56fe11d2c32798c7aa960d92d62999a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad059f88517ba4d1877ba3d98fd78919e" id="r_ad059f88517ba4d1877ba3d98fd78919e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#ad059f88517ba4d1877ba3d98fd78919e">sys_sigaltstack</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> ss, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> old_ss, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="separator:ad059f88517ba4d1877ba3d98fd78919e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7074927000ae63eff0dbe4b580f4036e" id="r_a7074927000ae63eff0dbe4b580f4036e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="signal_8c.html#a7074927000ae63eff0dbe4b580f4036e">proc_signal</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pid, int signum)</td></tr>
 <tr class="memdesc:a7074927000ae63eff0dbe4b580f4036e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark a signal as pending for a process and wake it if blocked.  <br /></td></tr>
 <tr class="separator:a7074927000ae63eff0dbe4b580f4036e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -252,14 +252,14 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="aaf33b94444c34b265669722766ce7351" name="aaf33b94444c34b265669722766ce7351"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf33b94444c34b265669722766ce7351">&#9670;&#160;</a></span>sys_kill()</h2>
+<a id="ab603823f7de6c07aa5558dbcfe5558aa" name="ab603823f7de6c07aa5558dbcfe5558aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab603823f7de6c07aa5558dbcfe5558aa">&#9670;&#160;</a></span>sys_kill()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_kill </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_kill </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pid</em>, </td>
@@ -315,24 +315,24 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_aaf33b94444c34b265669722766ce7351_cgraph.svg" width="352" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_ab603823f7de6c07aa5558dbcfe5558aa_cgraph.svg" width="352" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_aaf33b94444c34b265669722766ce7351_icgraph.svg" width="214" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_ab603823f7de6c07aa5558dbcfe5558aa_icgraph.svg" width="214" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a0d9e10561f9a6244a4ff1a370e6c58e0" name="a0d9e10561f9a6244a4ff1a370e6c58e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d9e10561f9a6244a4ff1a370e6c58e0">&#9670;&#160;</a></span>sys_rt_sigaction()</h2>
+<a id="a629480847a7353fe30161c30a58c3cb2" name="a629480847a7353fe30161c30a58c3cb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a629480847a7353fe30161c30a58c3cb2">&#9670;&#160;</a></span>sys_rt_sigaction()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_rt_sigaction </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_rt_sigaction </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>signum</em>, </td>
@@ -390,19 +390,19 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_a0d9e10561f9a6244a4ff1a370e6c58e0_cgraph.svg" width="339" height="135"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_a629480847a7353fe30161c30a58c3cb2_cgraph.svg" width="339" height="135"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="acec5c387232178f47bb983308649f1f3" name="acec5c387232178f47bb983308649f1f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acec5c387232178f47bb983308649f1f3">&#9670;&#160;</a></span>sys_rt_sigprocmask()</h2>
+<a id="a4d5a6d868001aafb8916dffaed836aaa" name="a4d5a6d868001aafb8916dffaed836aaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d5a6d868001aafb8916dffaed836aaa">&#9670;&#160;</a></span>sys_rt_sigprocmask()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_rt_sigprocmask </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_rt_sigprocmask </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>how</em>, </td>
@@ -460,19 +460,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_acec5c387232178f47bb983308649f1f3_cgraph.svg" width="363" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_a4d5a6d868001aafb8916dffaed836aaa_cgraph.svg" width="363" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="ac280ec41dc24bc5323e752f9499814b7" name="ac280ec41dc24bc5323e752f9499814b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac280ec41dc24bc5323e752f9499814b7">&#9670;&#160;</a></span>sys_rt_sigreturn()</h2>
+<a id="a372a073fc367e2608f716c50176d628c" name="a372a073fc367e2608f716c50176d628c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a372a073fc367e2608f716c50176d628c">&#9670;&#160;</a></span>sys_rt_sigreturn()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_rt_sigreturn </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_rt_sigreturn </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -522,19 +522,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_ac280ec41dc24bc5323e752f9499814b7_cgraph.svg" width="490" height="122"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_a372a073fc367e2608f716c50176d628c_cgraph.svg" width="490" height="122"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a42a05e0f24f0badb8057ea6a34d55e73" name="a42a05e0f24f0badb8057ea6a34d55e73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a42a05e0f24f0badb8057ea6a34d55e73">&#9670;&#160;</a></span>sys_sigaltstack()</h2>
+<a id="ad059f88517ba4d1877ba3d98fd78919e" name="ad059f88517ba4d1877ba3d98fd78919e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad059f88517ba4d1877ba3d98fd78919e">&#9670;&#160;</a></span>sys_sigaltstack()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_sigaltstack </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_sigaltstack </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>ss</em>, </td>
@@ -579,14 +579,14 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="abb4d7329079c42e646f8770eab5568cb" name="abb4d7329079c42e646f8770eab5568cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb4d7329079c42e646f8770eab5568cb">&#9670;&#160;</a></span>sys_tgkill()</h2>
+<a id="a56fe11d2c32798c7aa960d92d62999a7" name="a56fe11d2c32798c7aa960d92d62999a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56fe11d2c32798c7aa960d92d62999a7">&#9670;&#160;</a></span>sys_tgkill()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_tgkill </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_tgkill </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>tgid</em>, </td>
@@ -631,19 +631,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_abb4d7329079c42e646f8770eab5568cb_cgraph.svg" width="484" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_a56fe11d2c32798c7aa960d92d62999a7_cgraph.svg" width="484" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="ab5f7c2b99e462d63a376becc8d503470" name="ab5f7c2b99e462d63a376becc8d503470"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5f7c2b99e462d63a376becc8d503470">&#9670;&#160;</a></span>sys_tkill()</h2>
+<a id="a76b1fde36f3f9d96f102483de8a8050d" name="a76b1fde36f3f9d96f102483de8a8050d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76b1fde36f3f9d96f102483de8a8050d">&#9670;&#160;</a></span>sys_tkill()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_tkill </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_tkill </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>tid</em>, </td>
@@ -688,7 +688,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_ab5f7c2b99e462d63a376becc8d503470_cgraph.svg" width="476" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="signal_8c_a76b1fde36f3f9d96f102483de8a8050d_cgraph.svg" width="476" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

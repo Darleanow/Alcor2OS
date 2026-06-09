@@ -1,5 +1,5 @@
 <map id="vfs_ioctl" name="vfs_ioctl">
 <area shape="rect" id="Node000001" title="Dispatch ioctl through the filesystem driver behind fd." alt="" coords="132,5,209,31"/>
-<area shape="rect" id="Node000002" href="$sys__io_8c.html#a3c39ef7f15c9019f7298af3310a3a7b1" title="Perform a device control operation on fd." alt="" coords="5,5,84,31"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#a6a5e5a5ee5e647ddb4116735cc0f16b6" title="Perform a device control operation on fd." alt="" coords="5,5,84,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,21,84,21,84,15,118,15"/>
 </map>

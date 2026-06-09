@@ -1,7 +1,7 @@
 <map id="proc_schedule" name="proc_schedule">
 <area shape="rect" id="Node000001" title="Schedule the next ready process to run." alt="" coords="181,31,296,56"/>
-<area shape="rect" id="Node000002" href="$sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" title=" " alt="" coords="27,5,112,31"/>
+<area shape="rect" id="Node000002" href="$sys__misc_8c.html#a12083668cc3022ede84483a1b6193c79" title=" " alt="" coords="27,5,112,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,35,112,27,113,22,168,30"/>
-<area shape="rect" id="Node000003" href="$sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536" title=" " alt="" coords="5,55,133,80"/>
+<area shape="rect" id="Node000003" href="$sys__misc_8c.html#aea67d7e16c735675c01b94b37f573e35" title=" " alt="" coords="5,55,133,80"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,56,134,61,133,56,167,51"/>
 </map>

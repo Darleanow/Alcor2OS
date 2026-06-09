@@ -82,7 +82,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Kernel-only declarations for the syscall implementation layer.  
+<p>Kernel-only syscall layer declarations, not a public API.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="fs_2pipe_8h_source.html">alcor2/fs/pipe.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="syscall_8h_source.html">alcor2/sys/syscall.h</a>&gt;</code><br />
@@ -102,174 +102,171 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsys__def__t.html">sys_def_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Descriptor for a single syscall mapping.  <a href="structsys__def__t.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps a syscall number to its name and handler.  <a href="structsys__def__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:aa3c350d6225eeada9bb8fe4e6cc6a0d8" id="r_aa3c350d6225eeada9bb8fe4e6cc6a0d8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa3c350d6225eeada9bb8fe4e6cc6a0d8">SYSCALL_DECL</a>(name)&#160;&#160;&#160;<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> name(<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td></tr>
+<tr class="memitem:aa3c350d6225eeada9bb8fe4e6cc6a0d8" id="r_aa3c350d6225eeada9bb8fe4e6cc6a0d8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa3c350d6225eeada9bb8fe4e6cc6a0d8">SYSCALL_DECL</a>(name)&#160;&#160;&#160;<a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> name(<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td></tr>
 <tr class="separator:aa3c350d6225eeada9bb8fe4e6cc6a0d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ad1c308acabf108485576aa43c99a0082" id="r_ad1c308acabf108485576aa43c99a0082"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad1c308acabf108485576aa43c99a0082">syscall_fn_t</a>) (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td></tr>
-<tr class="separator:ad1c308acabf108485576aa43c99a0082"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2244d218354999b246e1d3c45a1c74d3" id="r_a2244d218354999b246e1d3c45a1c74d3"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2244d218354999b246e1d3c45a1c74d3">syscall_fn_t</a>) (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td></tr>
+<tr class="separator:a2244d218354999b246e1d3c45a1c74d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a72b8b20ac7646aa4f944f21911bc3cfc" id="r_a72b8b20ac7646aa4f944f21911bc3cfc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a72b8b20ac7646aa4f944f21911bc3cfc">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a9e0ba6a136c04452cb4759138652bb88">sys_read</a>)</td></tr>
+<tr class="memitem:a72b8b20ac7646aa4f944f21911bc3cfc" id="r_a72b8b20ac7646aa4f944f21911bc3cfc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a72b8b20ac7646aa4f944f21911bc3cfc">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a1f6826ad0dba19ec47987621a296de79">sys_read</a>)</td></tr>
 <tr class="separator:a72b8b20ac7646aa4f944f21911bc3cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae208c01310da2dd472573647ece1d16c" id="r_ae208c01310da2dd472573647ece1d16c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ae208c01310da2dd472573647ece1d16c">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#aaf2c4002d448ac156bcf915154c831bb">sys_write</a>)</td></tr>
+<tr class="memitem:ae208c01310da2dd472573647ece1d16c" id="r_ae208c01310da2dd472573647ece1d16c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ae208c01310da2dd472573647ece1d16c">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a636c903c7fd56e8c6ecee603c8d03d6c">sys_write</a>)</td></tr>
 <tr class="separator:ae208c01310da2dd472573647ece1d16c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e2e6dddbeafb52c3f3bca09ae9891e3" id="r_a1e2e6dddbeafb52c3f3bca09ae9891e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a1e2e6dddbeafb52c3f3bca09ae9891e3">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#aaf0072fb1689f96d7565297e99d45c8a">sys_lseek</a>)</td></tr>
+<tr class="memitem:a1e2e6dddbeafb52c3f3bca09ae9891e3" id="r_a1e2e6dddbeafb52c3f3bca09ae9891e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a1e2e6dddbeafb52c3f3bca09ae9891e3">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#ada1f7c45065087a202187a787dd84cd4">sys_lseek</a>)</td></tr>
 <tr class="separator:a1e2e6dddbeafb52c3f3bca09ae9891e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0f96426aec659b8d8d1cfdac675644e" id="r_aa0f96426aec659b8d8d1cfdac675644e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa0f96426aec659b8d8d1cfdac675644e">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a3c39ef7f15c9019f7298af3310a3a7b1">sys_ioctl</a>)</td></tr>
+<tr class="memitem:aa0f96426aec659b8d8d1cfdac675644e" id="r_aa0f96426aec659b8d8d1cfdac675644e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa0f96426aec659b8d8d1cfdac675644e">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a6a5e5a5ee5e647ddb4116735cc0f16b6">sys_ioctl</a>)</td></tr>
 <tr class="separator:aa0f96426aec659b8d8d1cfdac675644e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9bde62dd0186f394a54692b85a723b4" id="r_af9bde62dd0186f394a54692b85a723b4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af9bde62dd0186f394a54692b85a723b4">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#ae8980a971f13f29c4b0d6c555f502b00">sys_nanosleep</a>)</td></tr>
+<tr class="memitem:af9bde62dd0186f394a54692b85a723b4" id="r_af9bde62dd0186f394a54692b85a723b4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af9bde62dd0186f394a54692b85a723b4">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a0ffe6bb6499c3d1943debea0f7ee78a7">sys_nanosleep</a>)</td></tr>
 <tr class="separator:af9bde62dd0186f394a54692b85a723b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83a97424dd655278917c0c4b168b3824" id="r_a83a97424dd655278917c0c4b168b3824"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a83a97424dd655278917c0c4b168b3824">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a20b06db6011d3c71ba1ce6b1de28c1f5">sys_readv</a>)</td></tr>
+<tr class="memitem:a83a97424dd655278917c0c4b168b3824" id="r_a83a97424dd655278917c0c4b168b3824"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a83a97424dd655278917c0c4b168b3824">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a49f67f2278c6d9a40498ca66aa099919">sys_readv</a>)</td></tr>
 <tr class="separator:a83a97424dd655278917c0c4b168b3824"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cdc4541c05e88ee6025049cfef0144e" id="r_a8cdc4541c05e88ee6025049cfef0144e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a8cdc4541c05e88ee6025049cfef0144e">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a9f5a42925c399f61f3791fb61ba295b9">sys_writev</a>)</td></tr>
+<tr class="memitem:a8cdc4541c05e88ee6025049cfef0144e" id="r_a8cdc4541c05e88ee6025049cfef0144e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a8cdc4541c05e88ee6025049cfef0144e">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a19b4c03b7511baf0e45259e1814916e3">sys_writev</a>)</td></tr>
 <tr class="separator:a8cdc4541c05e88ee6025049cfef0144e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26f3f4417bf3a998d54e0d176e677280" id="r_a26f3f4417bf3a998d54e0d176e677280"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a26f3f4417bf3a998d54e0d176e677280">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#aa9e778b7b4070bb665442953438b91f7">sys_select</a>)</td></tr>
+<tr class="memitem:a26f3f4417bf3a998d54e0d176e677280" id="r_a26f3f4417bf3a998d54e0d176e677280"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a26f3f4417bf3a998d54e0d176e677280">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a8e70cdd2f9ab30cb2ccdf4c0002eb0a4">sys_select</a>)</td></tr>
 <tr class="separator:a26f3f4417bf3a998d54e0d176e677280"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7acf205241d62a76bccbff7e2494e4b6" id="r_a7acf205241d62a76bccbff7e2494e4b6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7acf205241d62a76bccbff7e2494e4b6">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#ac1f83a4054cef5b877820ce1a87cd67f">sys_poll</a>)</td></tr>
+<tr class="memitem:a7acf205241d62a76bccbff7e2494e4b6" id="r_a7acf205241d62a76bccbff7e2494e4b6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7acf205241d62a76bccbff7e2494e4b6">SYSCALL_DECL</a> (<a class="el" href="sys__io_8c.html#a9f8fa2af9558b271aa627430deaf804a">sys_poll</a>)</td></tr>
 <tr class="separator:a7acf205241d62a76bccbff7e2494e4b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acaf7c57775cc72c2a3810651c45f2a60" id="r_acaf7c57775cc72c2a3810651c45f2a60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#acaf7c57775cc72c2a3810651c45f2a60">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9">sys_mmap</a>)</td></tr>
+<tr class="memitem:acaf7c57775cc72c2a3810651c45f2a60" id="r_acaf7c57775cc72c2a3810651c45f2a60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#acaf7c57775cc72c2a3810651c45f2a60">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#acad864e33862a96e5affd8f9f1003117">sys_mmap</a>)</td></tr>
 <tr class="separator:acaf7c57775cc72c2a3810651c45f2a60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add114ce43c53916e5bc70aa803cc86a9" id="r_add114ce43c53916e5bc70aa803cc86a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#add114ce43c53916e5bc70aa803cc86a9">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#a5d85ae596caf7c76319a5ae5690f0d33">sys_mprotect</a>)</td></tr>
+<tr class="memitem:add114ce43c53916e5bc70aa803cc86a9" id="r_add114ce43c53916e5bc70aa803cc86a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#add114ce43c53916e5bc70aa803cc86a9">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#a4f2de5317a7c9ae2d00c06fb97664e30">sys_mprotect</a>)</td></tr>
 <tr class="separator:add114ce43c53916e5bc70aa803cc86a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a375082d332e2eba28e18fd81ad37392c" id="r_a375082d332e2eba28e18fd81ad37392c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a375082d332e2eba28e18fd81ad37392c">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#a95d35a82f8059990e8f0598e18299f19">sys_munmap</a>)</td></tr>
+<tr class="memitem:a375082d332e2eba28e18fd81ad37392c" id="r_a375082d332e2eba28e18fd81ad37392c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a375082d332e2eba28e18fd81ad37392c">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#a02c0e569b4291ae0b76ce7e51f2afd9f">sys_munmap</a>)</td></tr>
 <tr class="separator:a375082d332e2eba28e18fd81ad37392c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02ab72566ca72f0166b2a80a0e5fbf03" id="r_a02ab72566ca72f0166b2a80a0e5fbf03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a02ab72566ca72f0166b2a80a0e5fbf03">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#a2d1d07fe317612d6d37d18174c73b63b">sys_brk</a>)</td></tr>
+<tr class="memitem:a02ab72566ca72f0166b2a80a0e5fbf03" id="r_a02ab72566ca72f0166b2a80a0e5fbf03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a02ab72566ca72f0166b2a80a0e5fbf03">SYSCALL_DECL</a> (<a class="el" href="sys__mm_8c.html#acc8203bee043d8868e52505da29de6c0">sys_brk</a>)</td></tr>
 <tr class="separator:a02ab72566ca72f0166b2a80a0e5fbf03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0cb9df4c588442025ce695505c68a76" id="r_ab0cb9df4c588442025ce695505c68a76"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab0cb9df4c588442025ce695505c68a76">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a520ffff94cc2df8d87a6080ffaa9707f">sys_open</a>)</td></tr>
+<tr class="memitem:ab0cb9df4c588442025ce695505c68a76" id="r_ab0cb9df4c588442025ce695505c68a76"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab0cb9df4c588442025ce695505c68a76">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#adcd3dedc92d59bac3e8a22803f6d7b8e">sys_open</a>)</td></tr>
 <tr class="separator:ab0cb9df4c588442025ce695505c68a76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aced80e837567b353e15cabe2720c0be9" id="r_aced80e837567b353e15cabe2720c0be9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aced80e837567b353e15cabe2720c0be9">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#abaf0d0b41a478d216409de789942f3c1">sys_close</a>)</td></tr>
+<tr class="memitem:aced80e837567b353e15cabe2720c0be9" id="r_aced80e837567b353e15cabe2720c0be9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aced80e837567b353e15cabe2720c0be9">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a729440766bc54111935da682ec73c007">sys_close</a>)</td></tr>
 <tr class="separator:aced80e837567b353e15cabe2720c0be9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbe873bad8735b1adc09616335321555" id="r_abbe873bad8735b1adc09616335321555"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#abbe873bad8735b1adc09616335321555">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be">sys_stat</a>)</td></tr>
+<tr class="memitem:abbe873bad8735b1adc09616335321555" id="r_abbe873bad8735b1adc09616335321555"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#abbe873bad8735b1adc09616335321555">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b">sys_stat</a>)</td></tr>
 <tr class="separator:abbe873bad8735b1adc09616335321555"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a6d4d545e45ede30abae53353160e9e" id="r_a7a6d4d545e45ede30abae53353160e9e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7a6d4d545e45ede30abae53353160e9e">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21">sys_fstat</a>)</td></tr>
+<tr class="memitem:a7a6d4d545e45ede30abae53353160e9e" id="r_a7a6d4d545e45ede30abae53353160e9e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7a6d4d545e45ede30abae53353160e9e">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a55c19a120c8db8174f736c5925e4e682">sys_fstat</a>)</td></tr>
 <tr class="separator:a7a6d4d545e45ede30abae53353160e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0312e53dcdea8eb01ac262aaa93b2a9e" id="r_a0312e53dcdea8eb01ac262aaa93b2a9e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a0312e53dcdea8eb01ac262aaa93b2a9e">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c">sys_lstat</a>)</td></tr>
+<tr class="memitem:a0312e53dcdea8eb01ac262aaa93b2a9e" id="r_a0312e53dcdea8eb01ac262aaa93b2a9e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a0312e53dcdea8eb01ac262aaa93b2a9e">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03">sys_lstat</a>)</td></tr>
 <tr class="separator:a0312e53dcdea8eb01ac262aaa93b2a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af45539b6a1cbe1743643351da9b1ddea" id="r_af45539b6a1cbe1743643351da9b1ddea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af45539b6a1cbe1743643351da9b1ddea">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d">sys_access</a>)</td></tr>
+<tr class="memitem:af45539b6a1cbe1743643351da9b1ddea" id="r_af45539b6a1cbe1743643351da9b1ddea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af45539b6a1cbe1743643351da9b1ddea">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ac00f75dace7b43d7bc9d163cc7c4324e">sys_access</a>)</td></tr>
 <tr class="separator:af45539b6a1cbe1743643351da9b1ddea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11a4780044f5f880aeefad353495869f" id="r_a11a4780044f5f880aeefad353495869f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a11a4780044f5f880aeefad353495869f">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972">sys_faccessat</a>)</td></tr>
+<tr class="memitem:a11a4780044f5f880aeefad353495869f" id="r_a11a4780044f5f880aeefad353495869f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a11a4780044f5f880aeefad353495869f">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a843f0a3368fbde4eda4f696b3ee1dba4">sys_faccessat</a>)</td></tr>
 <tr class="separator:a11a4780044f5f880aeefad353495869f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b8878f657cbecfe0b89a4dd2d4e3a54" id="r_a6b8878f657cbecfe0b89a4dd2d4e3a54"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a6b8878f657cbecfe0b89a4dd2d4e3a54">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d">sys_newfstatat</a>)</td></tr>
+<tr class="memitem:a6b8878f657cbecfe0b89a4dd2d4e3a54" id="r_a6b8878f657cbecfe0b89a4dd2d4e3a54"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a6b8878f657cbecfe0b89a4dd2d4e3a54">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4">sys_newfstatat</a>)</td></tr>
 <tr class="separator:a6b8878f657cbecfe0b89a4dd2d4e3a54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd459bf55ae9c113ff3e0b81d16fec15" id="r_abd459bf55ae9c113ff3e0b81d16fec15"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#abd459bf55ae9c113ff3e0b81d16fec15">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a3da7d8c19db4de1b35b610bbe9b7cdd4">sys_dup</a>)</td></tr>
+<tr class="memitem:abd459bf55ae9c113ff3e0b81d16fec15" id="r_abd459bf55ae9c113ff3e0b81d16fec15"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#abd459bf55ae9c113ff3e0b81d16fec15">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ae62f411f7a86b6cd6e4b2dc0b82d7c10">sys_dup</a>)</td></tr>
 <tr class="separator:abd459bf55ae9c113ff3e0b81d16fec15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46fece6da7bf468ded0bf1d77a503802" id="r_a46fece6da7bf468ded0bf1d77a503802"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a46fece6da7bf468ded0bf1d77a503802">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a6fa7c567e06bd525be10ca4058ba6557">sys_dup2</a>)</td></tr>
+<tr class="memitem:a46fece6da7bf468ded0bf1d77a503802" id="r_a46fece6da7bf468ded0bf1d77a503802"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a46fece6da7bf468ded0bf1d77a503802">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#aa0c6360eda6cab7b049de354b1c64b3e">sys_dup2</a>)</td></tr>
 <tr class="separator:a46fece6da7bf468ded0bf1d77a503802"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8c662a0156e670c8bbd9df595d33794" id="r_ae8c662a0156e670c8bbd9df595d33794"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ae8c662a0156e670c8bbd9df595d33794">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e">sys_fcntl</a>)</td></tr>
+<tr class="memitem:ae8c662a0156e670c8bbd9df595d33794" id="r_ae8c662a0156e670c8bbd9df595d33794"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ae8c662a0156e670c8bbd9df595d33794">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a6223f2ac2734bd07fbc86a18d95bb9bf">sys_fcntl</a>)</td></tr>
 <tr class="separator:ae8c662a0156e670c8bbd9df595d33794"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a308da76900447caab4583b75ee301093" id="r_a308da76900447caab4583b75ee301093"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a308da76900447caab4583b75ee301093">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6">sys_getdents</a>)</td></tr>
+<tr class="memitem:a308da76900447caab4583b75ee301093" id="r_a308da76900447caab4583b75ee301093"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a308da76900447caab4583b75ee301093">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6">sys_getdents</a>)</td></tr>
 <tr class="separator:a308da76900447caab4583b75ee301093"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c30686c3cb7b6360ce4d6c42877af3f" id="r_a2c30686c3cb7b6360ce4d6c42877af3f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2c30686c3cb7b6360ce4d6c42877af3f">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395">sys_getdents64</a>)</td></tr>
+<tr class="memitem:a2c30686c3cb7b6360ce4d6c42877af3f" id="r_a2c30686c3cb7b6360ce4d6c42877af3f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2c30686c3cb7b6360ce4d6c42877af3f">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab">sys_getdents64</a>)</td></tr>
 <tr class="separator:a2c30686c3cb7b6360ce4d6c42877af3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2914eb7bb442a719e34f201b99952a19" id="r_a2914eb7bb442a719e34f201b99952a19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2914eb7bb442a719e34f201b99952a19">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a66f6c5b7f67e1321644f27a4f71daf77">sys_getcwd</a>)</td></tr>
+<tr class="memitem:a2914eb7bb442a719e34f201b99952a19" id="r_a2914eb7bb442a719e34f201b99952a19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2914eb7bb442a719e34f201b99952a19">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ac3355ebc949d101587bb3088939d1354">sys_getcwd</a>)</td></tr>
 <tr class="separator:a2914eb7bb442a719e34f201b99952a19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91a94920513bb2fdc94c64dc176339a5" id="r_a91a94920513bb2fdc94c64dc176339a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a91a94920513bb2fdc94c64dc176339a5">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a5ffaa19d9650c07f19e99856e7465210">sys_chdir</a>)</td></tr>
+<tr class="memitem:a91a94920513bb2fdc94c64dc176339a5" id="r_a91a94920513bb2fdc94c64dc176339a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a91a94920513bb2fdc94c64dc176339a5">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a1ea573c06e1dcfab3525cc896f1209e5">sys_chdir</a>)</td></tr>
 <tr class="separator:a91a94920513bb2fdc94c64dc176339a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabd001fecaba32fad4346eb732563060" id="r_aabd001fecaba32fad4346eb732563060"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aabd001fecaba32fad4346eb732563060">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#afdc1e627b591695459f391aebfdaef92">sys_mkdir</a>)</td></tr>
+<tr class="memitem:aabd001fecaba32fad4346eb732563060" id="r_aabd001fecaba32fad4346eb732563060"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aabd001fecaba32fad4346eb732563060">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ab0692f7c0eb184a9c883778b8ee656cc">sys_mkdir</a>)</td></tr>
 <tr class="separator:aabd001fecaba32fad4346eb732563060"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af376084e18df31eb77d395858333b769" id="r_af376084e18df31eb77d395858333b769"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af376084e18df31eb77d395858333b769">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a5a0e70030b084d0a0fe76e4f0e18ce00">sys_rmdir</a>)</td></tr>
+<tr class="memitem:af376084e18df31eb77d395858333b769" id="r_af376084e18df31eb77d395858333b769"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af376084e18df31eb77d395858333b769">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#afd8c8e519c3b13da94fe0224b3cf8a32">sys_rmdir</a>)</td></tr>
 <tr class="separator:af376084e18df31eb77d395858333b769"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab15c9c1800151864f236b2cf8febcb5a" id="r_ab15c9c1800151864f236b2cf8febcb5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab15c9c1800151864f236b2cf8febcb5a">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#abb5ff8d1a9032c4f32ad1f65a4a5133e">sys_creat</a>)</td></tr>
+<tr class="memitem:ab15c9c1800151864f236b2cf8febcb5a" id="r_ab15c9c1800151864f236b2cf8febcb5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab15c9c1800151864f236b2cf8febcb5a">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a67491e3dcf3e348a1a1ea5caf62d69ed">sys_creat</a>)</td></tr>
 <tr class="separator:ab15c9c1800151864f236b2cf8febcb5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a761bdb33bfcd5b738c46f99bc89a223d" id="r_a761bdb33bfcd5b738c46f99bc89a223d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a761bdb33bfcd5b738c46f99bc89a223d">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a9b635f43a86efa68bdf828ae9fb1c76c">sys_unlink</a>)</td></tr>
+<tr class="memitem:a761bdb33bfcd5b738c46f99bc89a223d" id="r_a761bdb33bfcd5b738c46f99bc89a223d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a761bdb33bfcd5b738c46f99bc89a223d">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#adad566d662cfea8d303bb495215855e3">sys_unlink</a>)</td></tr>
 <tr class="separator:a761bdb33bfcd5b738c46f99bc89a223d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1822b423b0d7b7154fd6f4b87df58dab" id="r_a1822b423b0d7b7154fd6f4b87df58dab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a1822b423b0d7b7154fd6f4b87df58dab">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#aa6dfd2d967f7393f9df4852259140393">sys_rename</a>)</td></tr>
+<tr class="memitem:a1822b423b0d7b7154fd6f4b87df58dab" id="r_a1822b423b0d7b7154fd6f4b87df58dab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a1822b423b0d7b7154fd6f4b87df58dab">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a72c1d42f6a448e08ff4ec4ddf6b1a4e3">sys_rename</a>)</td></tr>
 <tr class="separator:a1822b423b0d7b7154fd6f4b87df58dab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a631ae0b010b7c5e7f2e989ce53364522" id="r_a631ae0b010b7c5e7f2e989ce53364522"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a631ae0b010b7c5e7f2e989ce53364522">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a1c7b290c87a6fc7f5dc164a9e944f00d">sys_ftruncate</a>)</td></tr>
+<tr class="memitem:a631ae0b010b7c5e7f2e989ce53364522" id="r_a631ae0b010b7c5e7f2e989ce53364522"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a631ae0b010b7c5e7f2e989ce53364522">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a21ca8e448559278ca1affa80b962f7a0">sys_ftruncate</a>)</td></tr>
 <tr class="separator:a631ae0b010b7c5e7f2e989ce53364522"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae67b42850ad564f147dcbd8e856308a" id="r_aae67b42850ad564f147dcbd8e856308a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aae67b42850ad564f147dcbd8e856308a">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635">sys_pread64</a>)</td></tr>
+<tr class="memitem:aae67b42850ad564f147dcbd8e856308a" id="r_aae67b42850ad564f147dcbd8e856308a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aae67b42850ad564f147dcbd8e856308a">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ac897a1cc4c3feace952df07d7cc30a63">sys_pread64</a>)</td></tr>
 <tr class="separator:aae67b42850ad564f147dcbd8e856308a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e0961dec4ab098471c2aa219443c341" id="r_a4e0961dec4ab098471c2aa219443c341"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a4e0961dec4ab098471c2aa219443c341">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237">sys_pwrite64</a>)</td></tr>
+<tr class="memitem:a4e0961dec4ab098471c2aa219443c341" id="r_a4e0961dec4ab098471c2aa219443c341"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a4e0961dec4ab098471c2aa219443c341">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a430c96a16cfcfe001404dc60153f7414">sys_pwrite64</a>)</td></tr>
 <tr class="separator:a4e0961dec4ab098471c2aa219443c341"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f9cdcec58cca5b4890aeec5c3728a6f" id="r_a9f9cdcec58cca5b4890aeec5c3728a6f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a9f9cdcec58cca5b4890aeec5c3728a6f">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a9d175f2f2749eea869fbafc3a6306d23">sys_symlink</a>)</td></tr>
+<tr class="memitem:a9f9cdcec58cca5b4890aeec5c3728a6f" id="r_a9f9cdcec58cca5b4890aeec5c3728a6f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a9f9cdcec58cca5b4890aeec5c3728a6f">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a6e41fc79c7f4a5106d2927d1bf5e1548">sys_symlink</a>)</td></tr>
 <tr class="separator:a9f9cdcec58cca5b4890aeec5c3728a6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3ba0fe8bba54d3f52d61a2e6d80b9e9" id="r_aa3ba0fe8bba54d3f52d61a2e6d80b9e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa3ba0fe8bba54d3f52d61a2e6d80b9e9">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a22b2ac6b30d04a46bf880d289a4aea46">sys_openat</a>)</td></tr>
+<tr class="memitem:aa3ba0fe8bba54d3f52d61a2e6d80b9e9" id="r_aa3ba0fe8bba54d3f52d61a2e6d80b9e9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa3ba0fe8bba54d3f52d61a2e6d80b9e9">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#aeff2bd471d7083f3d78c590694c15fe6">sys_openat</a>)</td></tr>
 <tr class="separator:aa3ba0fe8bba54d3f52d61a2e6d80b9e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64c7edcda7282a656fc766e467f00d75" id="r_a64c7edcda7282a656fc766e467f00d75"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a64c7edcda7282a656fc766e467f00d75">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4">sys_readlink</a>)</td></tr>
+<tr class="memitem:a64c7edcda7282a656fc766e467f00d75" id="r_a64c7edcda7282a656fc766e467f00d75"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a64c7edcda7282a656fc766e467f00d75">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05">sys_readlink</a>)</td></tr>
 <tr class="separator:a64c7edcda7282a656fc766e467f00d75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3272ac22c1a8156098faab13764d451" id="r_ab3272ac22c1a8156098faab13764d451"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab3272ac22c1a8156098faab13764d451">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a081835edaec6846f64003072244af565">sys_getpid</a>)</td></tr>
+<tr class="memitem:ab3272ac22c1a8156098faab13764d451" id="r_ab3272ac22c1a8156098faab13764d451"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab3272ac22c1a8156098faab13764d451">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#aa882939f7e066b9a38d413c4c6d6e581">sys_getpid</a>)</td></tr>
 <tr class="separator:ab3272ac22c1a8156098faab13764d451"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc871475b61fbd91884b3e3dc7f49026" id="r_acc871475b61fbd91884b3e3dc7f49026"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#acc871475b61fbd91884b3e3dc7f49026">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a5aabf0a59cd47d6e0a95b8dd74ee8413">sys_gettid</a>)</td></tr>
+<tr class="memitem:acc871475b61fbd91884b3e3dc7f49026" id="r_acc871475b61fbd91884b3e3dc7f49026"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#acc871475b61fbd91884b3e3dc7f49026">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#af35689fb812a5e6f2ab800a93d822583">sys_gettid</a>)</td></tr>
 <tr class="separator:acc871475b61fbd91884b3e3dc7f49026"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae54b65efd7c80a22c803dad73adbee98" id="r_ae54b65efd7c80a22c803dad73adbee98"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ae54b65efd7c80a22c803dad73adbee98">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a351915ba1475da0bcf53ea7c5d9c18b4">sys_getppid</a>)</td></tr>
+<tr class="memitem:ae54b65efd7c80a22c803dad73adbee98" id="r_ae54b65efd7c80a22c803dad73adbee98"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ae54b65efd7c80a22c803dad73adbee98">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a356a344759c51450fd80a1f96d790b6d">sys_getppid</a>)</td></tr>
 <tr class="separator:ae54b65efd7c80a22c803dad73adbee98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15e964395462cb65205645bfd2cfa893" id="r_a15e964395462cb65205645bfd2cfa893"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a15e964395462cb65205645bfd2cfa893">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e">sys_clone</a>)</td></tr>
+<tr class="memitem:a15e964395462cb65205645bfd2cfa893" id="r_a15e964395462cb65205645bfd2cfa893"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a15e964395462cb65205645bfd2cfa893">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#abb73ea77ef1d8ed5f068ab9d52210cb6">sys_clone</a>)</td></tr>
 <tr class="separator:a15e964395462cb65205645bfd2cfa893"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2120fdab1af668077f5703bb4bc52e7" id="r_ac2120fdab1af668077f5703bb4bc52e7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ac2120fdab1af668077f5703bb4bc52e7">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36">sys_fork</a>)</td></tr>
+<tr class="memitem:ac2120fdab1af668077f5703bb4bc52e7" id="r_ac2120fdab1af668077f5703bb4bc52e7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ac2120fdab1af668077f5703bb4bc52e7">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca">sys_fork</a>)</td></tr>
 <tr class="separator:ac2120fdab1af668077f5703bb4bc52e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8be27b419152978c28e82971736e6c20" id="r_a8be27b419152978c28e82971736e6c20"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a8be27b419152978c28e82971736e6c20">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce">sys_execve</a>)</td></tr>
+<tr class="memitem:a8be27b419152978c28e82971736e6c20" id="r_a8be27b419152978c28e82971736e6c20"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a8be27b419152978c28e82971736e6c20">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d">sys_execve</a>)</td></tr>
 <tr class="separator:a8be27b419152978c28e82971736e6c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4c6477cebce22ed0d2c5a22829df64d" id="r_ad4c6477cebce22ed0d2c5a22829df64d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad4c6477cebce22ed0d2c5a22829df64d">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5">sys_exit</a>)</td></tr>
+<tr class="memitem:ad4c6477cebce22ed0d2c5a22829df64d" id="r_ad4c6477cebce22ed0d2c5a22829df64d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad4c6477cebce22ed0d2c5a22829df64d">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f">sys_exit</a>)</td></tr>
 <tr class="separator:ad4c6477cebce22ed0d2c5a22829df64d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e43781b15391c52938ea01d84a5f3b8" id="r_a7e43781b15391c52938ea01d84a5f3b8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7e43781b15391c52938ea01d84a5f3b8">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398">sys_wait4</a>)</td></tr>
+<tr class="memitem:a7e43781b15391c52938ea01d84a5f3b8" id="r_a7e43781b15391c52938ea01d84a5f3b8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7e43781b15391c52938ea01d84a5f3b8">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2">sys_wait4</a>)</td></tr>
 <tr class="separator:a7e43781b15391c52938ea01d84a5f3b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9be71d6aab46793360201bfff70086b" id="r_ab9be71d6aab46793360201bfff70086b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab9be71d6aab46793360201bfff70086b">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a35e8b5da30840d9d7ee6501b3080cb6f">sys_uname</a>)</td></tr>
+<tr class="memitem:ab9be71d6aab46793360201bfff70086b" id="r_ab9be71d6aab46793360201bfff70086b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ab9be71d6aab46793360201bfff70086b">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#aa2f921041e469fa4a18d9a8ce5b1af1c">sys_uname</a>)</td></tr>
 <tr class="separator:ab9be71d6aab46793360201bfff70086b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a043d4c8180bbef380b2777cd97afc764" id="r_a043d4c8180bbef380b2777cd97afc764"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a043d4c8180bbef380b2777cd97afc764">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a52090911e9c6b7a812b026687670ac54">sys_getuid</a>)</td></tr>
+<tr class="memitem:a043d4c8180bbef380b2777cd97afc764" id="r_a043d4c8180bbef380b2777cd97afc764"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a043d4c8180bbef380b2777cd97afc764">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#acb177b13a00911c1f808c92d6c13d914">sys_getuid</a>)</td></tr>
 <tr class="separator:a043d4c8180bbef380b2777cd97afc764"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad52a9a3895d4a3924ee90305d2f7569a" id="r_ad52a9a3895d4a3924ee90305d2f7569a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad52a9a3895d4a3924ee90305d2f7569a">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a667c0af9ce7fe4012b884a86217834a0">sys_getgid</a>)</td></tr>
+<tr class="memitem:ad52a9a3895d4a3924ee90305d2f7569a" id="r_ad52a9a3895d4a3924ee90305d2f7569a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad52a9a3895d4a3924ee90305d2f7569a">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a2a2682d7b1b12e8212be8c792c316371">sys_getgid</a>)</td></tr>
 <tr class="separator:ad52a9a3895d4a3924ee90305d2f7569a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12a65908b5cbd17161885adcad50012a" id="r_a12a65908b5cbd17161885adcad50012a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a12a65908b5cbd17161885adcad50012a">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#ab0b6f027b667afd096484d66a94b3afe">sys_geteuid</a>)</td></tr>
+<tr class="memitem:a12a65908b5cbd17161885adcad50012a" id="r_a12a65908b5cbd17161885adcad50012a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a12a65908b5cbd17161885adcad50012a">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a3600bf8790d7f9c1be26dc18999a237d">sys_geteuid</a>)</td></tr>
 <tr class="separator:a12a65908b5cbd17161885adcad50012a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea6cf1955574c2c8e41a09d18f86ed25" id="r_aea6cf1955574c2c8e41a09d18f86ed25"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aea6cf1955574c2c8e41a09d18f86ed25">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a0eb960f2aef304b6aedbf1b5ba1318a3">sys_getegid</a>)</td></tr>
+<tr class="memitem:aea6cf1955574c2c8e41a09d18f86ed25" id="r_aea6cf1955574c2c8e41a09d18f86ed25"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aea6cf1955574c2c8e41a09d18f86ed25">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a096f9c169f93983403009f54d2795749">sys_getegid</a>)</td></tr>
 <tr class="separator:aea6cf1955574c2c8e41a09d18f86ed25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb6cb582b03a5a22f902f847430c06e7" id="r_aeb6cb582b03a5a22f902f847430c06e7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aeb6cb582b03a5a22f902f847430c06e7">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a3b1b5ea932b7bfeca8baa769a7dd512c">sys_set_tid_address</a>)</td></tr>
+<tr class="memitem:aeb6cb582b03a5a22f902f847430c06e7" id="r_aeb6cb582b03a5a22f902f847430c06e7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aeb6cb582b03a5a22f902f847430c06e7">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#af5622de49344cae03a88a645f4f56693">sys_set_tid_address</a>)</td></tr>
 <tr class="separator:aeb6cb582b03a5a22f902f847430c06e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c59d74833e1490208748ba3b908eb27" id="r_a1c59d74833e1490208748ba3b908eb27"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a1c59d74833e1490208748ba3b908eb27">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a3eabb43b1bbaf3a80c8c51781df1b461">sys_gettimeofday</a>)</td></tr>
+<tr class="memitem:a1c59d74833e1490208748ba3b908eb27" id="r_a1c59d74833e1490208748ba3b908eb27"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a1c59d74833e1490208748ba3b908eb27">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a1645983f24eed2956accb6972898ebc9">sys_gettimeofday</a>)</td></tr>
 <tr class="separator:a1c59d74833e1490208748ba3b908eb27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4e9e8facb0dc4940810707e429c2bc6" id="r_ac4e9e8facb0dc4940810707e429c2bc6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ac4e9e8facb0dc4940810707e429c2bc6">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b">sys_futex</a>)</td></tr>
+<tr class="memitem:ac4e9e8facb0dc4940810707e429c2bc6" id="r_ac4e9e8facb0dc4940810707e429c2bc6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ac4e9e8facb0dc4940810707e429c2bc6">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a12083668cc3022ede84483a1b6193c79">sys_futex</a>)</td></tr>
 <tr class="separator:ac4e9e8facb0dc4940810707e429c2bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af086ea3804e09d04c57dc7884555f8a7" id="r_af086ea3804e09d04c57dc7884555f8a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af086ea3804e09d04c57dc7884555f8a7">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a813e11c5074e2203adfcc8bc41cc41e2">sys_clock_gettime</a>)</td></tr>
+<tr class="memitem:af086ea3804e09d04c57dc7884555f8a7" id="r_af086ea3804e09d04c57dc7884555f8a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af086ea3804e09d04c57dc7884555f8a7">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a1365123dcbfffc7d2348f4a649e9c6a6">sys_clock_gettime</a>)</td></tr>
 <tr class="separator:af086ea3804e09d04c57dc7884555f8a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68a3d2b39516d07a28ae06daaabae940" id="r_a68a3d2b39516d07a28ae06daaabae940"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a68a3d2b39516d07a28ae06daaabae940">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536">sys_sched_yield</a>)</td></tr>
+<tr class="memitem:a68a3d2b39516d07a28ae06daaabae940" id="r_a68a3d2b39516d07a28ae06daaabae940"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a68a3d2b39516d07a28ae06daaabae940">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#aea67d7e16c735675c01b94b37f573e35">sys_sched_yield</a>)</td></tr>
 <tr class="separator:a68a3d2b39516d07a28ae06daaabae940"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a507a88edcd1310a4cd17507e34b67236" id="r_a507a88edcd1310a4cd17507e34b67236"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a507a88edcd1310a4cd17507e34b67236">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a376e4253e540cd78b90ab598fef7e736">sys_sched_getaffinity</a>)</td></tr>
+<tr class="memitem:a507a88edcd1310a4cd17507e34b67236" id="r_a507a88edcd1310a4cd17507e34b67236"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a507a88edcd1310a4cd17507e34b67236">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a3bac77b7646ebaaf4080623640a94e89">sys_sched_getaffinity</a>)</td></tr>
 <tr class="separator:a507a88edcd1310a4cd17507e34b67236"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c138874b8c4bd8db7ddbf680f0e213c" id="r_a3c138874b8c4bd8db7ddbf680f0e213c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a3c138874b8c4bd8db7ddbf680f0e213c">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#aa5a4a37a49b2d755c95b14cc06f51fb0">sys_getrlimit</a>)</td></tr>
+<tr class="memitem:a3c138874b8c4bd8db7ddbf680f0e213c" id="r_a3c138874b8c4bd8db7ddbf680f0e213c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a3c138874b8c4bd8db7ddbf680f0e213c">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a547ba45d48137f35de99e2cca00216a8">sys_getrlimit</a>)</td></tr>
 <tr class="separator:a3c138874b8c4bd8db7ddbf680f0e213c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45056d1cee06c4126509c927c6bbc8ef" id="r_a45056d1cee06c4126509c927c6bbc8ef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a45056d1cee06c4126509c927c6bbc8ef">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#adef0661ef2be5395508e70477c8834c7">sys_prlimit64</a>)</td></tr>
+<tr class="memitem:a45056d1cee06c4126509c927c6bbc8ef" id="r_a45056d1cee06c4126509c927c6bbc8ef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a45056d1cee06c4126509c927c6bbc8ef">SYSCALL_DECL</a> (<a class="el" href="sys__misc_8c.html#a3d3f729d707cb26c19173e81773e7ddc">sys_prlimit64</a>)</td></tr>
 <tr class="separator:a45056d1cee06c4126509c927c6bbc8ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e49f572bfebf532c9fc68d20fcdb648" id="r_a6e49f572bfebf532c9fc68d20fcdb648"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a6e49f572bfebf532c9fc68d20fcdb648">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a0d9e10561f9a6244a4ff1a370e6c58e0">sys_rt_sigaction</a>)</td></tr>
+<tr class="memitem:a6e49f572bfebf532c9fc68d20fcdb648" id="r_a6e49f572bfebf532c9fc68d20fcdb648"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a6e49f572bfebf532c9fc68d20fcdb648">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a629480847a7353fe30161c30a58c3cb2">sys_rt_sigaction</a>)</td></tr>
 <tr class="separator:a6e49f572bfebf532c9fc68d20fcdb648"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a9908c5be0997cb6ddca0b161d1ed5f" id="r_a5a9908c5be0997cb6ddca0b161d1ed5f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a5a9908c5be0997cb6ddca0b161d1ed5f">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#acec5c387232178f47bb983308649f1f3">sys_rt_sigprocmask</a>)</td></tr>
+<tr class="memitem:a5a9908c5be0997cb6ddca0b161d1ed5f" id="r_a5a9908c5be0997cb6ddca0b161d1ed5f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a5a9908c5be0997cb6ddca0b161d1ed5f">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a4d5a6d868001aafb8916dffaed836aaa">sys_rt_sigprocmask</a>)</td></tr>
 <tr class="separator:a5a9908c5be0997cb6ddca0b161d1ed5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15b43dbd1e86dd13cbd76dbd115a3ce7" id="r_a15b43dbd1e86dd13cbd76dbd115a3ce7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a15b43dbd1e86dd13cbd76dbd115a3ce7">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#ac280ec41dc24bc5323e752f9499814b7">sys_rt_sigreturn</a>)</td></tr>
+<tr class="memitem:a15b43dbd1e86dd13cbd76dbd115a3ce7" id="r_a15b43dbd1e86dd13cbd76dbd115a3ce7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a15b43dbd1e86dd13cbd76dbd115a3ce7">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a372a073fc367e2608f716c50176d628c">sys_rt_sigreturn</a>)</td></tr>
 <tr class="separator:a15b43dbd1e86dd13cbd76dbd115a3ce7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc843b6601e2d426bce6c13c816c913f" id="r_adc843b6601e2d426bce6c13c816c913f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#adc843b6601e2d426bce6c13c816c913f">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a42a05e0f24f0badb8057ea6a34d55e73">sys_sigaltstack</a>)</td></tr>
+<tr class="memitem:adc843b6601e2d426bce6c13c816c913f" id="r_adc843b6601e2d426bce6c13c816c913f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#adc843b6601e2d426bce6c13c816c913f">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#ad059f88517ba4d1877ba3d98fd78919e">sys_sigaltstack</a>)</td></tr>
 <tr class="separator:adc843b6601e2d426bce6c13c816c913f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace21a79e61407ff9f90554ead7105afb" id="r_ace21a79e61407ff9f90554ead7105afb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ace21a79e61407ff9f90554ead7105afb">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#aaf33b94444c34b265669722766ce7351">sys_kill</a>)</td></tr>
+<tr class="memitem:ace21a79e61407ff9f90554ead7105afb" id="r_ace21a79e61407ff9f90554ead7105afb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ace21a79e61407ff9f90554ead7105afb">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#ab603823f7de6c07aa5558dbcfe5558aa">sys_kill</a>)</td></tr>
 <tr class="separator:ace21a79e61407ff9f90554ead7105afb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f2af364c2a1c4ef97ff56a16728b56d" id="r_a7f2af364c2a1c4ef97ff56a16728b56d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7f2af364c2a1c4ef97ff56a16728b56d">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#ab5f7c2b99e462d63a376becc8d503470">sys_tkill</a>)</td></tr>
+<tr class="memitem:a7f2af364c2a1c4ef97ff56a16728b56d" id="r_a7f2af364c2a1c4ef97ff56a16728b56d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7f2af364c2a1c4ef97ff56a16728b56d">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a76b1fde36f3f9d96f102483de8a8050d">sys_tkill</a>)</td></tr>
 <tr class="separator:a7f2af364c2a1c4ef97ff56a16728b56d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af92d08b5c8126474c23985446b548f1d" id="r_af92d08b5c8126474c23985446b548f1d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af92d08b5c8126474c23985446b548f1d">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#abb4d7329079c42e646f8770eab5568cb">sys_tgkill</a>)</td></tr>
+<tr class="memitem:af92d08b5c8126474c23985446b548f1d" id="r_af92d08b5c8126474c23985446b548f1d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#af92d08b5c8126474c23985446b548f1d">SYSCALL_DECL</a> (<a class="el" href="signal_8c.html#a56fe11d2c32798c7aa960d92d62999a7">sys_tgkill</a>)</td></tr>
 <tr class="separator:af92d08b5c8126474c23985446b548f1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02633417da2b2c7d8c38d50cfedc205a" id="r_a02633417da2b2c7d8c38d50cfedc205a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a02633417da2b2c7d8c38d50cfedc205a">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#affab6f1b0ea45def80ad50ccbeb86401">sys_arch_prctl</a>)</td></tr>
+<tr class="memitem:a02633417da2b2c7d8c38d50cfedc205a" id="r_a02633417da2b2c7d8c38d50cfedc205a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a02633417da2b2c7d8c38d50cfedc205a">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#ad6acc981d690211ae470bf4a31a66a2c">sys_arch_prctl</a>)</td></tr>
 <tr class="separator:a02633417da2b2c7d8c38d50cfedc205a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ca573922679d91624fab211ae9a0c46" id="r_a7ca573922679d91624fab211ae9a0c46"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7ca573922679d91624fab211ae9a0c46">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d">sys_pipe</a>)</td></tr>
+<tr class="memitem:a7ca573922679d91624fab211ae9a0c46" id="r_a7ca573922679d91624fab211ae9a0c46"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7ca573922679d91624fab211ae9a0c46">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a1361807f14bd5e1589c54913d1a5cda5">sys_pipe</a>)</td></tr>
 <tr class="separator:a7ca573922679d91624fab211ae9a0c46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a979698644f5b27dd4aaec7a50be786b3" id="r_a979698644f5b27dd4aaec7a50be786b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a979698644f5b27dd4aaec7a50be786b3">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#abcbdbff193493e997cd9f83c1d102823">sys_pipe2</a>)</td></tr>
+<tr class="memitem:a979698644f5b27dd4aaec7a50be786b3" id="r_a979698644f5b27dd4aaec7a50be786b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a979698644f5b27dd4aaec7a50be786b3">SYSCALL_DECL</a> (<a class="el" href="sys__fs_8c.html#a934218d9a754bf91e6e04a9224aaf79f">sys_pipe2</a>)</td></tr>
 <tr class="separator:a979698644f5b27dd4aaec7a50be786b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82aa6d23c90febea7b49f466dc04b96b" id="r_a82aa6d23c90febea7b49f466dc04b96b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a82aa6d23c90febea7b49f466dc04b96b">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2">sys_exit_group</a>)</td></tr>
+<tr class="memitem:a82aa6d23c90febea7b49f466dc04b96b" id="r_a82aa6d23c90febea7b49f466dc04b96b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a82aa6d23c90febea7b49f466dc04b96b">SYSCALL_DECL</a> (<a class="el" href="sys__proc_8c.html#afee2a1f1efdfdcf0b0d4490e832c19d8">sys_exit_group</a>)</td></tr>
 <tr class="separator:a82aa6d23c90febea7b49f466dc04b96b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaac3b4ca3e75790f0700aaa0b9525502" id="r_aaac3b4ca3e75790f0700aaa0b9525502"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aaac3b4ca3e75790f0700aaa0b9525502">SYSCALL_DECL</a> (<a class="el" href="sys__fb_8c.html#a5207565acdb63299c9b1f71adfcafa5a">sys_alcor_fb_info</a>)</td></tr>
+<tr class="memitem:aaac3b4ca3e75790f0700aaa0b9525502" id="r_aaac3b4ca3e75790f0700aaa0b9525502"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aaac3b4ca3e75790f0700aaa0b9525502">SYSCALL_DECL</a> (<a class="el" href="sys__fb_8c.html#ad89da097fd0c24449ca1c1286b2184f1">sys_alcor_fb_info</a>)</td></tr>
 <tr class="separator:aaac3b4ca3e75790f0700aaa0b9525502"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d5d268da1fb480ba08710d2c5e4b0ab" id="r_a7d5d268da1fb480ba08710d2c5e4b0ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7d5d268da1fb480ba08710d2c5e4b0ab">SYSCALL_DECL</a> (<a class="el" href="sys__fb_8c.html#a574a5d0e75777f10f4f2acfaacf165fb">sys_alcor_fb_mmap</a>)</td></tr>
+<tr class="memitem:a7d5d268da1fb480ba08710d2c5e4b0ab" id="r_a7d5d268da1fb480ba08710d2c5e4b0ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a7d5d268da1fb480ba08710d2c5e4b0ab">SYSCALL_DECL</a> (<a class="el" href="sys__fb_8c.html#a41553db98c294d92155a064cf8b6d4b9">sys_alcor_fb_mmap</a>)</td></tr>
 <tr class="separator:a7d5d268da1fb480ba08710d2c5e4b0ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Kernel-only declarations for the syscall implementation layer. </p>
-<p>Not a user-facing API. Centralizes prototypes expected by <code>syscall_dispatch</code> and the <code>sys_*.c</code>, <code><a class="el" href="pipe_8c.html" title="Anonymous pipes backed by a fixed-size ring buffer.">pipe.c</a></code>, and <code><a class="el" href="signal_8c.html" title="POSIX signal system calls and delivery mechanism.">signal.c</a></code> modules.</p>
-<dl class="section user"><dt>Handler contract</dt><dd>Each <code>sys_*</code> takes six <code>u64</code> arguments in Linux x86_64 order: RDI, RSI, RDX, R10, R8, R9 (the dispatcher reads the syscall frame and passes them through unchanged). Return value is <code>u64</code>; on error use <code>(u64)-errno</code> with codes from <code><a class="el" href="errno_8h.html" title="Standard error number definitions (Linux-compatible).">errno.h</a></code> (e.g. <code>(u64)-EINVAL</code>).</dd></dl>
-<p>The <code><a class="el" href="include_2alcor2_2sys_2internal_8h.html#aa3c350d6225eeada9bb8fe4e6cc6a0d8">SYSCALL_DECL(name)</a></code> macro pins this signature so it cannot drift.</p>
-<dl class="section user"><dt>Unimplemented numbers</dt><dd>Numbers not present in the table in <code><a class="el" href="sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch.">sys_dispatch.c</a></code> yield <code>-ENOSYS</code> (see implementation). </dd></dl>
+<div class="textblock"><p>Kernel-only syscall layer declarations, not a public API. </p>
+<p>Centralises prototypes used by syscall_dispatch and all sys_*.c modules. Each handler takes six u64 args (Linux x86-64 ABI: RDI, RSI, RDX, R10, R8, R9) and returns kern_err_t. syscall_dispatch is the only place that casts it to u64 for sysret. Unknown syscall numbers return -ENOSYS. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="aa3c350d6225eeada9bb8fe4e6cc6a0d8" name="aa3c350d6225eeada9bb8fe4e6cc6a0d8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa3c350d6225eeada9bb8fe4e6cc6a0d8">&#9670;&#160;</a></span>SYSCALL_DECL</h2>
@@ -282,7 +279,7 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">name</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> name(<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> name(<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -290,14 +287,14 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="ad1c308acabf108485576aa43c99a0082" name="ad1c308acabf108485576aa43c99a0082"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1c308acabf108485576aa43c99a0082">&#9670;&#160;</a></span>syscall_fn_t</h2>
+<a id="a2244d218354999b246e1d3c45a1c74d3" name="a2244d218354999b246e1d3c45a1c74d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2244d218354999b246e1d3c45a1c74d3">&#9670;&#160;</a></span>syscall_fn_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>(* syscall_fn_t) (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td>
+          <td class="memname">typedef <a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>(* syscall_fn_t) (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -314,7 +311,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d">sys_access</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ac00f75dace7b43d7bc9d163cc7c4324e">sys_access</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -332,7 +329,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fb_8c.html#a5207565acdb63299c9b1f71adfcafa5a">sys_alcor_fb_info</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fb_8c.html#ad89da097fd0c24449ca1c1286b2184f1">sys_alcor_fb_info</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -350,7 +347,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fb_8c.html#a574a5d0e75777f10f4f2acfaacf165fb">sys_alcor_fb_mmap</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fb_8c.html#a41553db98c294d92155a064cf8b6d4b9">sys_alcor_fb_mmap</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -368,7 +365,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#affab6f1b0ea45def80ad50ccbeb86401">sys_arch_prctl</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#ad6acc981d690211ae470bf4a31a66a2c">sys_arch_prctl</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -386,7 +383,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__mm_8c.html#a2d1d07fe317612d6d37d18174c73b63b">sys_brk</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__mm_8c.html#acc8203bee043d8868e52505da29de6c0">sys_brk</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -404,7 +401,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a5ffaa19d9650c07f19e99856e7465210">sys_chdir</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a1ea573c06e1dcfab3525cc896f1209e5">sys_chdir</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -422,7 +419,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a813e11c5074e2203adfcc8bc41cc41e2">sys_clock_gettime</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a1365123dcbfffc7d2348f4a649e9c6a6">sys_clock_gettime</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -440,7 +437,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e">sys_clone</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#abb73ea77ef1d8ed5f068ab9d52210cb6">sys_clone</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -458,7 +455,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#abaf0d0b41a478d216409de789942f3c1">sys_close</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a729440766bc54111935da682ec73c007">sys_close</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -476,7 +473,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#abb5ff8d1a9032c4f32ad1f65a4a5133e">sys_creat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a67491e3dcf3e348a1a1ea5caf62d69ed">sys_creat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -494,7 +491,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a3da7d8c19db4de1b35b610bbe9b7cdd4">sys_dup</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ae62f411f7a86b6cd6e4b2dc0b82d7c10">sys_dup</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -512,7 +509,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a6fa7c567e06bd525be10ca4058ba6557">sys_dup2</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#aa0c6360eda6cab7b049de354b1c64b3e">sys_dup2</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -530,7 +527,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce">sys_execve</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d">sys_execve</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -548,7 +545,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5">sys_exit</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f">sys_exit</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -566,7 +563,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2">sys_exit_group</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#afee2a1f1efdfdcf0b0d4490e832c19d8">sys_exit_group</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -584,7 +581,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972">sys_faccessat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a843f0a3368fbde4eda4f696b3ee1dba4">sys_faccessat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -602,7 +599,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e">sys_fcntl</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a6223f2ac2734bd07fbc86a18d95bb9bf">sys_fcntl</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -620,7 +617,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36">sys_fork</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca">sys_fork</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -638,7 +635,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21">sys_fstat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a55c19a120c8db8174f736c5925e4e682">sys_fstat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -656,7 +653,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a1c7b290c87a6fc7f5dc164a9e944f00d">sys_ftruncate</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a21ca8e448559278ca1affa80b962f7a0">sys_ftruncate</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -674,7 +671,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b">sys_futex</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a12083668cc3022ede84483a1b6193c79">sys_futex</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -692,7 +689,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a66f6c5b7f67e1321644f27a4f71daf77">sys_getcwd</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ac3355ebc949d101587bb3088939d1354">sys_getcwd</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -710,7 +707,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6">sys_getdents</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6">sys_getdents</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -728,7 +725,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395">sys_getdents64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab">sys_getdents64</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -746,7 +743,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a0eb960f2aef304b6aedbf1b5ba1318a3">sys_getegid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a096f9c169f93983403009f54d2795749">sys_getegid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -764,7 +761,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#ab0b6f027b667afd096484d66a94b3afe">sys_geteuid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a3600bf8790d7f9c1be26dc18999a237d">sys_geteuid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -782,7 +779,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a667c0af9ce7fe4012b884a86217834a0">sys_getgid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a2a2682d7b1b12e8212be8c792c316371">sys_getgid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -800,7 +797,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a081835edaec6846f64003072244af565">sys_getpid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#aa882939f7e066b9a38d413c4c6d6e581">sys_getpid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -818,7 +815,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a351915ba1475da0bcf53ea7c5d9c18b4">sys_getppid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a356a344759c51450fd80a1f96d790b6d">sys_getppid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -836,7 +833,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#aa5a4a37a49b2d755c95b14cc06f51fb0">sys_getrlimit</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a547ba45d48137f35de99e2cca00216a8">sys_getrlimit</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -854,7 +851,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a5aabf0a59cd47d6e0a95b8dd74ee8413">sys_gettid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#af35689fb812a5e6f2ab800a93d822583">sys_gettid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -872,7 +869,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a3eabb43b1bbaf3a80c8c51781df1b461">sys_gettimeofday</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a1645983f24eed2956accb6972898ebc9">sys_gettimeofday</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -890,7 +887,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a52090911e9c6b7a812b026687670ac54">sys_getuid</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#acb177b13a00911c1f808c92d6c13d914">sys_getuid</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -908,7 +905,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#a3c39ef7f15c9019f7298af3310a3a7b1">sys_ioctl</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a6a5e5a5ee5e647ddb4116735cc0f16b6">sys_ioctl</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -926,7 +923,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#aaf33b94444c34b265669722766ce7351">sys_kill</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#ab603823f7de6c07aa5558dbcfe5558aa">sys_kill</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -944,7 +941,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#aaf0072fb1689f96d7565297e99d45c8a">sys_lseek</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#ada1f7c45065087a202187a787dd84cd4">sys_lseek</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -962,7 +959,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c">sys_lstat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03">sys_lstat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -980,7 +977,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#afdc1e627b591695459f391aebfdaef92">sys_mkdir</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ab0692f7c0eb184a9c883778b8ee656cc">sys_mkdir</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -998,7 +995,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__mm_8c.html#a9208a6dc01fb9ccbb5210b4dda4fcda9">sys_mmap</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__mm_8c.html#acad864e33862a96e5affd8f9f1003117">sys_mmap</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1016,7 +1013,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__mm_8c.html#a5d85ae596caf7c76319a5ae5690f0d33">sys_mprotect</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__mm_8c.html#a4f2de5317a7c9ae2d00c06fb97664e30">sys_mprotect</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1034,7 +1031,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__mm_8c.html#a95d35a82f8059990e8f0598e18299f19">sys_munmap</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__mm_8c.html#a02c0e569b4291ae0b76ce7e51f2afd9f">sys_munmap</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1052,7 +1049,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#ae8980a971f13f29c4b0d6c555f502b00">sys_nanosleep</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a0ffe6bb6499c3d1943debea0f7ee78a7">sys_nanosleep</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1070,7 +1067,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d">sys_newfstatat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4">sys_newfstatat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1088,7 +1085,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a520ffff94cc2df8d87a6080ffaa9707f">sys_open</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#adcd3dedc92d59bac3e8a22803f6d7b8e">sys_open</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1106,7 +1103,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a22b2ac6b30d04a46bf880d289a4aea46">sys_openat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#aeff2bd471d7083f3d78c590694c15fe6">sys_openat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1124,7 +1121,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d">sys_pipe</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a1361807f14bd5e1589c54913d1a5cda5">sys_pipe</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1142,7 +1139,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#abcbdbff193493e997cd9f83c1d102823">sys_pipe2</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a934218d9a754bf91e6e04a9224aaf79f">sys_pipe2</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1160,7 +1157,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#ac1f83a4054cef5b877820ce1a87cd67f">sys_poll</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a9f8fa2af9558b271aa627430deaf804a">sys_poll</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1178,7 +1175,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635">sys_pread64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ac897a1cc4c3feace952df07d7cc30a63">sys_pread64</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1196,7 +1193,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#adef0661ef2be5395508e70477c8834c7">sys_prlimit64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a3d3f729d707cb26c19173e81773e7ddc">sys_prlimit64</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1214,7 +1211,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237">sys_pwrite64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a430c96a16cfcfe001404dc60153f7414">sys_pwrite64</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1232,7 +1229,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#a9e0ba6a136c04452cb4759138652bb88">sys_read</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a1f6826ad0dba19ec47987621a296de79">sys_read</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1250,7 +1247,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4">sys_readlink</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05">sys_readlink</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1268,7 +1265,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#a20b06db6011d3c71ba1ce6b1de28c1f5">sys_readv</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a49f67f2278c6d9a40498ca66aa099919">sys_readv</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1286,7 +1283,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#aa6dfd2d967f7393f9df4852259140393">sys_rename</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a72c1d42f6a448e08ff4ec4ddf6b1a4e3">sys_rename</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1304,7 +1301,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a5a0e70030b084d0a0fe76e4f0e18ce00">sys_rmdir</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#afd8c8e519c3b13da94fe0224b3cf8a32">sys_rmdir</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1322,7 +1319,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#a0d9e10561f9a6244a4ff1a370e6c58e0">sys_rt_sigaction</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#a629480847a7353fe30161c30a58c3cb2">sys_rt_sigaction</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1340,7 +1337,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#acec5c387232178f47bb983308649f1f3">sys_rt_sigprocmask</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#a4d5a6d868001aafb8916dffaed836aaa">sys_rt_sigprocmask</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1358,7 +1355,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#ac280ec41dc24bc5323e752f9499814b7">sys_rt_sigreturn</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#a372a073fc367e2608f716c50176d628c">sys_rt_sigreturn</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1376,7 +1373,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a376e4253e540cd78b90ab598fef7e736">sys_sched_getaffinity</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a3bac77b7646ebaaf4080623640a94e89">sys_sched_getaffinity</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1394,7 +1391,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536">sys_sched_yield</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#aea67d7e16c735675c01b94b37f573e35">sys_sched_yield</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1412,7 +1409,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#aa9e778b7b4070bb665442953438b91f7">sys_select</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a8e70cdd2f9ab30cb2ccdf4c0002eb0a4">sys_select</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1430,7 +1427,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a3b1b5ea932b7bfeca8baa769a7dd512c">sys_set_tid_address</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#af5622de49344cae03a88a645f4f56693">sys_set_tid_address</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1448,7 +1445,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#a42a05e0f24f0badb8057ea6a34d55e73">sys_sigaltstack</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#ad059f88517ba4d1877ba3d98fd78919e">sys_sigaltstack</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1466,7 +1463,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be">sys_stat</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b">sys_stat</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1484,7 +1481,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a9d175f2f2749eea869fbafc3a6306d23">sys_symlink</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a6e41fc79c7f4a5106d2927d1bf5e1548">sys_symlink</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1502,7 +1499,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#abb4d7329079c42e646f8770eab5568cb">sys_tgkill</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#a56fe11d2c32798c7aa960d92d62999a7">sys_tgkill</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1520,7 +1517,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="signal_8c.html#ab5f7c2b99e462d63a376becc8d503470">sys_tkill</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="signal_8c.html#a76b1fde36f3f9d96f102483de8a8050d">sys_tkill</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1538,7 +1535,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__misc_8c.html#a35e8b5da30840d9d7ee6501b3080cb6f">sys_uname</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__misc_8c.html#aa2f921041e469fa4a18d9a8ce5b1af1c">sys_uname</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1556,7 +1553,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__fs_8c.html#a9b635f43a86efa68bdf828ae9fb1c76c">sys_unlink</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__fs_8c.html#adad566d662cfea8d303bb495215855e3">sys_unlink</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1574,7 +1571,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398">sys_wait4</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2">sys_wait4</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1592,7 +1589,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#aaf2c4002d448ac156bcf915154c831bb">sys_write</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a636c903c7fd56e8c6ecee603c8d03d6c">sys_write</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1610,7 +1607,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">SYSCALL_DECL </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="sys__io_8c.html#a9f5a42925c399f61f3791fb61ba295b9">sys_writev</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="sys__io_8c.html#a19b4c03b7511baf0e45259e1814916e3">sys_writev</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>

@@ -30,7 +30,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a5a0e70030b084d0a0fe76e4f0e18ce00" target="_top" xlink:title="Remove the empty directory at pathname.">
+<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#afd8c8e519c3b13da94fe0224b3cf8a32" target="_top" xlink:title="Remove the empty directory at pathname.">
 <polygon fill="white" stroke="#666666" points="65,-19 0,-19 0,0 65,0 65,-19"/>
 <text text-anchor="middle" x="32.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_rmdir</text>
 </a>

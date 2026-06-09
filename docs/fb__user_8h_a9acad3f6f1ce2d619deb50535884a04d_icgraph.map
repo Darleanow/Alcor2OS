@@ -2,6 +2,6 @@
 <area shape="rect" id="Node000001" title="Fill out for SYS_ALCOR_FB_INFO." alt="" coords="188,31,313,56"/>
 <area shape="rect" id="Node000002" href="$dev__nodes_8c.html#afa55f4a72c3518c6614505f5075d1b62" title="Read from /dev/fb — returns an alcor_fb_info_t with the framebuffer geometry." alt="" coords="37,5,108,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,35,108,26,109,20,175,30"/>
-<area shape="rect" id="Node000003" href="$sys__fb_8c.html#a5207565acdb63299c9b1f71adfcafa5a" title=" " alt="" coords="5,55,140,80"/>
+<area shape="rect" id="Node000003" href="$sys__fb_8c.html#ad89da097fd0c24449ca1c1286b2184f1" title=" " alt="" coords="5,55,140,80"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,56,140,61,140,56,174,51"/>
 </map>

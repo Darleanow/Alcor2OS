@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="include_2alcor2_2sys_2internal_8h.html" target="_top" xlink:title="Kernel&#45;only declarations for the syscall implementation layer.">
+<g id="a_Node000002"><a xlink:href="include_2alcor2_2sys_2internal_8h.html" target="_top" xlink:title="Kernel&#45;only syscall layer declarations, not a public API.">
 <polygon fill="white" stroke="#666666" points="451.5,-96 347.5,-96 347.5,-66 451.5,-66 451.5,-96"/>
 <text text-anchor="start" x="355.5" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00">include/alcor2/sys</text>
 <text text-anchor="middle" x="399.5" y="-73" font-family="Helvetica,sans-Serif" font-size="10.00">/internal.h</text>

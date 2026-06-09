@@ -30,7 +30,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__proc_8c.html#affab6f1b0ea45def80ad50ccbeb86401" target="_top" xlink:title=" ">
+<g id="a_Node000002"><a xlink:href="sys__proc_8c.html#ad6acc981d690211ae470bf4a31a66a2c" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="86,-19 0,-19 0,0 86,0 86,-19"/>
 <text text-anchor="middle" x="43" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_arch_prctl</text>
 </a>

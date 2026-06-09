@@ -1,5 +1,5 @@
 <map id="include/alcor2/sys/internal.h" name="include/alcor2/sys/internal.h">
-<area shape="rect" id="Node000001" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="565,5,703,45"/>
+<area shape="rect" id="Node000001" title="Kernel&#45;only syscall layer declarations, not a public API." alt="" coords="565,5,703,45"/>
 <area shape="rect" id="Node000002" href="$sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch." alt="" coords="5,93,143,133"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="551,39,369,62,156,96,143,98,142,93,155,91,368,57,550,33"/>
 <area shape="rect" id="Node000003" href="$sys__fb_8c.html" title="Syscalls: framebuffer info + mmap (userspace drawing / font stacks)." alt="" coords="167,101,335,126"/>

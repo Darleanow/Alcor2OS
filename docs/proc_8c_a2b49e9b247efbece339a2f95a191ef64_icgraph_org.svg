@@ -254,7 +254,7 @@
 <!-- Node56 -->
 <g id="Node000056" class="node">
 <title>Node56</title>
-<g id="a_Node000056"><a xlink:href="sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" target="_top" xlink:title=" ">
+<g id="a_Node000056"><a xlink:href="sys__misc_8c.html#a12083668cc3022ede84483a1b6193c79" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="89.5,-93 25.5,-93 25.5,-74 89.5,-74 89.5,-93"/>
 <text text-anchor="middle" x="57.5" y="-81" font-family="Helvetica,sans-Serif" font-size="10.00">sys_futex</text>
 </a>
@@ -272,7 +272,7 @@
 <!-- Node57 -->
 <g id="Node000057" class="node">
 <title>Node57</title>
-<g id="a_Node000057"><a xlink:href="sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536" target="_top" xlink:title=" ">
+<g id="a_Node000057"><a xlink:href="sys__misc_8c.html#aea67d7e16c735675c01b94b37f573e35" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="105.5,-56 9.5,-56 9.5,-37 105.5,-37 105.5,-56"/>
 <text text-anchor="middle" x="57.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_sched_yield</text>
 </a>

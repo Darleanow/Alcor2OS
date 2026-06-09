@@ -116,6 +116,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a5148c9c1252e19e12def2814f71690e3" id="r_a5148c9c1252e19e12def2814f71690e3"><td class="memItemLeft" align="right" valign="top">typedef size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a></td></tr>
 <tr class="memdesc:a5148c9c1252e19e12def2814f71690e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size type.  <br /></td></tr>
 <tr class="separator:a5148c9c1252e19e12def2814f71690e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60161a130eae0ecc7257b79ac7418c41" id="r_a60161a130eae0ecc7257b79ac7418c41"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="types_8h.html#a85cb35fbe5bf2961d7ad5f26814a91a2">i64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a></td></tr>
+<tr class="memdesc:a60161a130eae0ecc7257b79ac7418c41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return type for fallible kernel operations: 0 on success, positive for values (fd, byte count…), negative -errno on error. The only cast to u64 happens in syscall_dispatch at the sysret boundary.  <br /></td></tr>
+<tr class="separator:a60161a130eae0ecc7257b79ac7418c41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Fixed-width unsigned integer types</div></td></tr>
 <tr class="memitem:a92c50087ca0e64fa93fc59402c55f8ca" id="r_a92c50087ca0e64fa93fc59402c55f8ca"><td class="memItemLeft" align="right" valign="top">typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></td></tr>
 <tr class="separator:a92c50087ca0e64fa93fc59402c55f8ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -281,6 +284,22 @@ Typedefs</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a60161a130eae0ecc7257b79ac7418c41" name="a60161a130eae0ecc7257b79ac7418c41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60161a130eae0ecc7257b79ac7418c41">&#9670;&#160;</a></span>kern_err_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="types_8h.html#a85cb35fbe5bf2961d7ad5f26814a91a2">i64</a> <a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return type for fallible kernel operations: 0 on success, positive for values (fd, byte count…), negative -errno on error. The only cast to u64 happens in syscall_dispatch at the sysret boundary. </p>
 
 </div>
 </div>

@@ -543,7 +543,7 @@ var sectionId = 'dynsection-3';
 <!-- Node31 -->
 <g id="Node000031" class="node">
 <title>Node31</title>
-<g id="a_Node000031"><a xlink:href="sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" target="_top" xlink:title="Check that path exists and is accessible; always grants access.">
+<g id="a_Node000031"><a xlink:href="sys__fs_8c.html#ac00f75dace7b43d7bc9d163cc7c4324e" target="_top" xlink:title="Check that path exists and is accessible; always grants access.">
 <polygon fill="white" stroke="#666666" points="381,-121 310,-121 310,-102 381,-102 381,-121"/>
 <text text-anchor="middle" x="345.5" y="-109" font-family="Helvetica,sans-Serif" font-size="10.00">sys_access</text>
 </a>
@@ -561,7 +561,7 @@ var sectionId = 'dynsection-3';
 <!-- Node33 -->
 <g id="Node000033" class="node">
 <title>Node33</title>
-<g id="a_Node000033"><a xlink:href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
+<g id="a_Node000033"><a xlink:href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
 <polygon fill="white" stroke="#666666" points="384.5,-84 306.5,-84 306.5,-65 384.5,-65 384.5,-84"/>
 <text text-anchor="middle" x="345.5" y="-72" font-family="Helvetica,sans-Serif" font-size="10.00">sys_readlink</text>
 </a>
@@ -579,7 +579,7 @@ var sectionId = 'dynsection-3';
 <!-- Node34 -->
 <g id="Node000034" class="node">
 <title>Node34</title>
-<g id="a_Node000034"><a xlink:href="sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" target="_top" xlink:title="Stat the node at path into a POSIX stat buffer.">
+<g id="a_Node000034"><a xlink:href="sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" target="_top" xlink:title="Stat the node at path into a POSIX stat buffer.">
 <polygon fill="white" stroke="#666666" points="374,-47 317,-47 317,-28 374,-28 374,-47"/>
 <text text-anchor="middle" x="345.5" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">sys_stat</text>
 </a>
@@ -597,7 +597,7 @@ var sectionId = 'dynsection-3';
 <!-- Node32 -->
 <g id="Node000032" class="node">
 <title>Node32</title>
-<g id="a_Node000032"><a xlink:href="sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972" target="_top" xlink:title="faccessat — only AT_FDCWD and absolute paths are supported.">
+<g id="a_Node000032"><a xlink:href="sys__fs_8c.html#a843f0a3368fbde4eda4f696b3ee1dba4" target="_top" xlink:title="faccessat &#45; only AT_FDCWD and absolute paths are supported.">
 <polygon fill="white" stroke="#666666" points="239.5,-111 154.5,-111 154.5,-92 239.5,-92 239.5,-111"/>
 <text text-anchor="middle" x="197" y="-99" font-family="Helvetica,sans-Serif" font-size="10.00">sys_faccessat</text>
 </a>
@@ -615,7 +615,7 @@ var sectionId = 'dynsection-3';
 <!-- Node35 -->
 <g id="Node000035" class="node">
 <title>Node35</title>
-<g id="a_Node000035"><a xlink:href="sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" target="_top" xlink:title="lstat — no symlink resolution in VFS yet; identical to stat.">
+<g id="a_Node000035"><a xlink:href="sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" target="_top" xlink:title="lstat &#45; no symlink resolution in VFS yet; identical to stat.">
 <polygon fill="white" stroke="#666666" points="227,-56 167,-56 167,-37 227,-37 227,-56"/>
 <text text-anchor="middle" x="197" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_lstat</text>
 </a>
@@ -633,7 +633,7 @@ var sectionId = 'dynsection-3';
 <!-- Node36 -->
 <g id="Node000036" class="node">
 <title>Node36</title>
-<g id="a_Node000036"><a xlink:href="sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" target="_top" xlink:title="newfstatat — supports AT_FDCWD and absolute paths only.">
+<g id="a_Node000036"><a xlink:href="sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" target="_top" xlink:title="newfstatat &#45; supports AT_FDCWD and absolute paths only.">
 <polygon fill="white" stroke="#666666" points="242.5,-19 151.5,-19 151.5,0 242.5,0 242.5,-19"/>
 <text text-anchor="middle" x="197" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_newfstatat</text>
 </a>

@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" target="_top" xlink:title="Duplicate the calling process (fork).">
+<g id="a_Node000002"><a xlink:href="sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca" target="_top" xlink:title="Duplicate the calling process (fork).">
 <polygon fill="white" stroke="#666666" points="58,-19 0,-19 0,0 58,0 58,-19"/>
 <text text-anchor="middle" x="29" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fork</text>
 </a>

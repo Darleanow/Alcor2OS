@@ -102,7 +102,7 @@ var sectionId = 'dynsection-13';
 <!-- Node16 -->
 <g id="Node000016" class="node">
 <title>Node16</title>
-<g id="a_Node000016"><a xlink:href="signal_8c.html#aaf33b94444c34b265669722766ce7351" target="_top" xlink:title="Send a signal to a process.">
+<g id="a_Node000016"><a xlink:href="signal_8c.html#ab603823f7de6c07aa5558dbcfe5558aa" target="_top" xlink:title="Send a signal to a process.">
 <polygon fill="white" stroke="#666666" points="383,-128 330,-128 330,-109 383,-109 383,-128"/>
 <text text-anchor="middle" x="356.5" y="-116" font-family="Helvetica,sans-Serif" font-size="10.00">sys_kill</text>
 </a>
@@ -228,7 +228,7 @@ var sectionId = 'dynsection-13';
 <!-- Node6 -->
 <g id="Node000006" class="node">
 <title>Node6</title>
-<g id="a_Node000006"><a xlink:href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
+<g id="a_Node000006"><a xlink:href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
 <polygon fill="white" stroke="#666666" points="239,-212 166,-212 166,-193 239,-193 239,-212"/>
 <text text-anchor="middle" x="202.5" y="-200" font-family="Helvetica,sans-Serif" font-size="10.00">sys_execve</text>
 </a>
@@ -246,7 +246,7 @@ var sectionId = 'dynsection-13';
 <!-- Node7 -->
 <g id="Node000007" class="node">
 <title>Node7</title>
-<g id="a_Node000007"><a xlink:href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" target="_top" xlink:title="Terminate the calling process with status.">
+<g id="a_Node000007"><a xlink:href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" target="_top" xlink:title="Terminate the calling process with status.">
 <polygon fill="white" stroke="#666666" points="231,-249 174,-249 174,-230 231,-230 231,-249"/>
 <text text-anchor="middle" x="202.5" y="-237" font-family="Helvetica,sans-Serif" font-size="10.00">sys_exit</text>
 </a>
@@ -282,7 +282,7 @@ var sectionId = 'dynsection-13';
 <!-- Node8 -->
 <g id="Node000008" class="node">
 <title>Node8</title>
-<g id="a_Node000008"><a xlink:href="sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" target="_top" xlink:title="Terminate all threads in the group — equivalent to sys_exit here.">
+<g id="a_Node000008"><a xlink:href="sys__proc_8c.html#afee2a1f1efdfdcf0b0d4490e832c19d8" target="_top" xlink:title="Terminate all threads in the group &#45; equivalent to sys_exit here.">
 <polygon fill="white" stroke="#666666" points="100.5,-249 10.5,-249 10.5,-230 100.5,-230 100.5,-249"/>
 <text text-anchor="middle" x="55.5" y="-237" font-family="Helvetica,sans-Serif" font-size="10.00">sys_exit_group</text>
 </a>
@@ -355,7 +355,7 @@ var sectionId = 'dynsection-13';
 <!-- Node17 -->
 <g id="Node000017" class="node">
 <title>Node17</title>
-<g id="a_Node000017"><a xlink:href="signal_8c.html#abb4d7329079c42e646f8770eab5568cb" target="_top" xlink:title=" ">
+<g id="a_Node000017"><a xlink:href="signal_8c.html#a56fe11d2c32798c7aa960d92d62999a7" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="234,-126 171,-126 171,-107 234,-107 234,-126"/>
 <text text-anchor="middle" x="202.5" y="-114" font-family="Helvetica,sans-Serif" font-size="10.00">sys_tgkill</text>
 </a>
@@ -373,7 +373,7 @@ var sectionId = 'dynsection-13';
 <!-- Node18 -->
 <g id="Node000018" class="node">
 <title>Node18</title>
-<g id="a_Node000018"><a xlink:href="signal_8c.html#ab5f7c2b99e462d63a376becc8d503470" target="_top" xlink:title=" ">
+<g id="a_Node000018"><a xlink:href="signal_8c.html#a76b1fde36f3f9d96f102483de8a8050d" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="231,-89 174,-89 174,-70 231,-70 231,-89"/>
 <text text-anchor="middle" x="202.5" y="-77" font-family="Helvetica,sans-Serif" font-size="10.00">sys_tkill</text>
 </a>
@@ -463,7 +463,7 @@ var sectionId = 'dynsection-13';
 <!-- Node26 -->
 <g id="Node000026" class="node">
 <title>Node26</title>
-<g id="a_Node000026"><a xlink:href="sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" target="_top" xlink:title="Wait for a child process to change state (wait4).">
+<g id="a_Node000026"><a xlink:href="sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2" target="_top" xlink:title="Wait for a child process to change state (wait4).">
 <polygon fill="white" stroke="#666666" points="389,-19 324,-19 324,0 389,0 389,-19"/>
 <text text-anchor="middle" x="356.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_wait4</text>
 </a>

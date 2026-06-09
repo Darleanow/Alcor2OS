@@ -1,0 +1,16 @@
+<map id="sys_readv" name="sys_readv">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,93,55"/>
+<area shape="rect" id="Node000002" href="$sys__io_8c.html#a1f6826ad0dba19ec47987621a296de79" title="Read up to count bytes from fd into buf." alt="" coords="141,55,221,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,48,129,55,128,60,93,53"/>
+<area shape="rect" id="Node000003" href="$sys__io_8c.html#aa22ffdd5fbef3893cc52ebbe6e176d6b" title="Return true if ptr..ptr+size is a valid user read/write range." alt="" coords="269,5,365,31"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="94,35,256,21,256,26,94,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="216,52,268,33,270,38,218,57"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#aa43ccf694fc49a889902be97e38e32db" title="Read up to count bytes from fd into buf." alt="" coords="278,55,357,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="222,65,264,65,264,70,222,70"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#a4f6a03fb7bcaf9d0f016d7d16297ec39" title="Check if a memory range is entirely in user space." alt="" coords="413,5,567,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="366,15,400,15,400,21,366,21"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#afedf0b113f1d413c09f139d8012346f1" title="Translate a process fd number to its OFT index." alt="" coords="451,55,529,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="357,65,437,65,437,70,357,70"/>
+<area shape="rect" id="Node000008" href="$pipe_8c.html#ac067fb884c8b5856f687b5777b88f5c1" title="Read up to count bytes from the pipe&#39;s read end." alt="" coords="433,104,547,129"/>
+<area shape="poly" id="edge6_Node000005_Node000008" title=" " alt="" coords="358,76,432,98,431,103,356,81"/>
+</map>

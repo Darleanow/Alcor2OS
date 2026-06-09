@@ -210,7 +210,7 @@ var sectionId = 'dynsection-0';
 <!-- Node17 -->
 <g id="Node000017" class="node">
 <title>Node17</title>
-<g id="a_Node000017"><a xlink:href="include_2alcor2_2sys_2internal_8h.html" target="_top" xlink:title="Kernel&#45;only declarations for the syscall implementation layer.">
+<g id="a_Node000017"><a xlink:href="include_2alcor2_2sys_2internal_8h.html" target="_top" xlink:title="Kernel&#45;only syscall layer declarations, not a public API.">
 <polygon fill="white" stroke="#666666" points="302.5,-239 186.5,-239 186.5,-220 302.5,-220 302.5,-239"/>
 <text text-anchor="middle" x="244.5" y="-227" font-family="Helvetica,sans-Serif" font-size="10.00">alcor2/sys/internal.h</text>
 </a>

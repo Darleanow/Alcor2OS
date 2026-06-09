@@ -2,7 +2,7 @@
 <area shape="rect" id="Node000001" title="x86_64 syscall interface and definitions." alt="" coords="561,5,700,45"/>
 <area shape="rect" id="Node000002" href="$alcor__fb__user_8h.html" title="Userland helpers for the Alcor2 custom framebuffer syscalls." alt="" coords="93,93,243,133"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="548,45,243,101,242,96,547,39"/>
-<area shape="rect" id="Node000004" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="561,93,700,133"/>
+<area shape="rect" id="Node000004" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only syscall layer declarations, not a public API." alt="" coords="561,93,700,133"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="633,59,633,93,628,93,628,59"/>
 <area shape="rect" id="Node000005" href="$sys__dispatch_8c.html" title="Numbered syscall lookup and dispatch." alt="" coords="193,181,330,221"/>
 <area shape="poly" id="edge13_Node000001_Node000005" title=" " alt="" coords="580,54,303,184,300,179,577,49"/>

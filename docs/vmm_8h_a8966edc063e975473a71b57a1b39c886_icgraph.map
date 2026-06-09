@@ -16,10 +16,10 @@
 <area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="355,70,288,70,288,65,355,65"/>
 <area shape="rect" id="Node000010" href="$proc_8c.html#a343bbb181246db8a2491f82d14f9d26e" title="Fork the current process." alt="" coords="200,104,283,129"/>
 <area shape="poly" id="edge7_Node000007_Node000010" title=" " alt="" coords="367,86,284,108,282,103,366,81"/>
-<area shape="rect" id="Node000009" href="$sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e" title="Duplicate the calling process (clone)." alt="" coords="21,55,108,80"/>
+<area shape="rect" id="Node000009" href="$sys__proc_8c.html#abb73ea77ef1d8ed5f068ab9d52210cb6" title="Duplicate the calling process (clone)." alt="" coords="21,55,108,80"/>
 <area shape="poly" id="edge6_Node000008_Node000009" title=" " alt="" coords="182,70,108,70,108,65,182,65"/>
-<area shape="rect" id="Node000011" href="$sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" title="Duplicate the calling process (fork)." alt="" coords="26,104,103,129"/>
+<area shape="rect" id="Node000011" href="$sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca" title="Duplicate the calling process (fork)." alt="" coords="26,104,103,129"/>
 <area shape="poly" id="edge8_Node000010_Node000011" title=" " alt="" coords="186,119,104,119,104,114,186,114"/>
-<area shape="rect" id="Node000014" href="$sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" title="Wait for a child process to change state (wait4)." alt="" coords="198,153,285,179"/>
+<area shape="rect" id="Node000014" href="$sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2" title="Wait for a child process to change state (wait4)." alt="" coords="198,153,285,179"/>
 <area shape="poly" id="edge11_Node000013_Node000014" title=" " alt="" coords="362,169,285,169,285,163,362,163"/>
 </map>

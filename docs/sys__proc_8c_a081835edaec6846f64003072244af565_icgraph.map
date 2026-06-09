@@ -1,5 +1,0 @@
-<map id="sys_getpid" name="sys_getpid">
-<area shape="rect" id="Node000001" title="Return the calling process&#39;s PID (or 1 if no process is running)." alt="" coords="143,5,235,31"/>
-<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a5aabf0a59cd47d6e0a95b8dd74ee8413" title="Return the calling thread&#39;s TID — same as PID (no thread support)." alt="" coords="5,5,95,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,21,95,21,95,15,129,15"/>
-</map>

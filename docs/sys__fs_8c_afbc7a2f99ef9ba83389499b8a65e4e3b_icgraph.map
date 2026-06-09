@@ -1,0 +1,7 @@
+<map id="sys_stat" name="sys_stat">
+<area shape="rect" id="Node000001" title="Stat the node at path into a POSIX stat buffer." alt="" coords="175,31,251,56"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" title="lstat &#45; no symlink resolution in VFS yet; identical to stat." alt="" coords="26,5,106,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,37,106,28,107,22,162,32"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" title="newfstatat &#45; supports AT_FDCWD and absolute paths only." alt="" coords="5,55,127,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="162,54,127,60,126,55,161,49"/>
+</map>

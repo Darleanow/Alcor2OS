@@ -38,7 +38,7 @@
 <!-- Node10 -->
 <g id="Node000010" class="node">
 <title>Node10</title>
-<g id="a_Node000010"><a xlink:href="sys__fb_8c.html#a574a5d0e75777f10f4f2acfaacf165fb" target="_top" xlink:title=" ">
+<g id="a_Node000010"><a xlink:href="sys__fb_8c.html#a41553db98c294d92155a064cf8b6d4b9" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="451.5,-84 337.5,-84 337.5,-65 451.5,-65 451.5,-84"/>
 <text text-anchor="middle" x="394.5" y="-72" font-family="Helvetica,sans-Serif" font-size="10.00">sys_alcor_fb_mmap</text>
 </a>
@@ -128,7 +128,7 @@
 <!-- Node9 -->
 <g id="Node000009" class="node">
 <title>Node9</title>
-<g id="a_Node000009"><a xlink:href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
+<g id="a_Node000009"><a xlink:href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
 <polygon fill="white" stroke="#666666" points="88.5,-102 15.5,-102 15.5,-83 88.5,-83 88.5,-102"/>
 <text text-anchor="middle" x="52" y="-90" font-family="Helvetica,sans-Serif" font-size="10.00">sys_execve</text>
 </a>

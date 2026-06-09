@@ -1,0 +1,10 @@
+<map id="sys_tkill" name="sys_tkill">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,81,31"/>
+<area shape="rect" id="Node000002" href="$signal_8c.html#ab603823f7de6c07aa5558dbcfe5558aa" title="Send a signal to a process." alt="" coords="129,5,200,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,15,116,15,116,21,82,21"/>
+<area shape="rect" id="Node000003" href="$proc_8c.html#a83048efe1b9806dbf8041cf77680cae6" title="Get process by PID." alt="" coords="392,5,471,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="201,15,378,15,378,21,201,21"/>
+<area shape="rect" id="Node000004" href="$signal_8c.html#a7074927000ae63eff0dbe4b580f4036e" title="Mark a signal as pending for a process and wake it if blocked." alt="" coords="248,31,344,56"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="201,22,235,29,234,34,200,27"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="344,32,378,25,379,30,345,37"/>
+</map>

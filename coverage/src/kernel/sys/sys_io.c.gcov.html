@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-06-04 23:45:49</td>
+            <td class="headerValue">2026-06-09 01:20:19</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">95.5&nbsp;%</td>
@@ -113,18 +113,18 @@
 <span id="L35"><span class="lineNum">      35</span>                 :             :  * @return Bytes read on success (0 on EOF), negative @c -errno on failure</span>
 <span id="L36"><span class="lineNum">      36</span>                 :             :  *         (@c -EFAULT, @c -EBADF, etc.).</span>
 <span id="L37"><span class="lineNum">      37</span>                 :             :  */</span>
-<span id="L38"><span class="lineNum">      38</span>                 :             : u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             : kern_err_t sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)</span>
 <span id="L39"><span class="lineNum">      39</span>                 :<span class="tlaGNC">           8 : {</span></span>
 <span id="L40"><span class="lineNum">      40</span>                 :<span class="tlaGNC">           8 :   (void)a4;</span></span>
 <span id="L41"><span class="lineNum">      41</span>                 :<span class="tlaGNC">           8 :   (void)a5;</span></span>
 <span id="L42"><span class="lineNum">      42</span>                 :<span class="tlaGNC">           8 :   (void)a6;</span></span>
 <span id="L43"><span class="lineNum">      43</span>                 :             : </span>
 <span id="L44"><span class="lineNum">      44</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           8 :   if(!user_rw_ok(buf, count))</span></span>
-<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L46"><span class="lineNum">      46</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           7 :   if(count == 0)</span></span>
 <span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
 <span id="L48"><span class="lineNum">      48</span>                 :             : </span>
-<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">           6 :   return (u64)vfs_read((i64)fd, (void *)buf, count);</span></span>
+<span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">           6 :   return vfs_read((i64)fd, (void *)buf, count);</span></span>
 <span id="L50"><span class="lineNum">      50</span>                 :<span class="tlaGNC">           7 : }</span></span>
 <span id="L51"><span class="lineNum">      51</span>                 :             : </span>
 <span id="L52"><span class="lineNum">      52</span>                 :             : /**</span>
@@ -136,27 +136,27 @@
 <span id="L58"><span class="lineNum">      58</span>                 :             :  * @param count  Bytes to write.</span>
 <span id="L59"><span class="lineNum">      59</span>                 :             :  * @return Bytes written on success, negative @c -errno on failure.</span>
 <span id="L60"><span class="lineNum">      60</span>                 :             :  */</span>
-<span id="L61"><span class="lineNum">      61</span>                 :             : u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             : kern_err_t sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)</span>
 <span id="L62"><span class="lineNum">      62</span>                 :<span class="tlaGNC">           5 : {</span></span>
 <span id="L63"><span class="lineNum">      63</span>                 :<span class="tlaGNC">           5 :   (void)a4;</span></span>
 <span id="L64"><span class="lineNum">      64</span>                 :<span class="tlaGNC">           5 :   (void)a5;</span></span>
 <span id="L65"><span class="lineNum">      65</span>                 :<span class="tlaGNC">           5 :   (void)a6;</span></span>
 <span id="L66"><span class="lineNum">      66</span>                 :             : </span>
 <span id="L67"><span class="lineNum">      67</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(!user_rw_ok(buf, count))</span></span>
-<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L68"><span class="lineNum">      68</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L69"><span class="lineNum">      69</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(count == 0)</span></span>
 <span id="L70"><span class="lineNum">      70</span>                 :<span class="tlaGNC">           1 :     return 0;</span></span>
 <span id="L71"><span class="lineNum">      71</span>                 :             : </span>
-<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">           3 :   return (u64)vfs_write((i64)fd, (void *)buf, count);</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">           3 :   return vfs_write((i64)fd, (void *)buf, count);</span></span>
 <span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">           4 : }</span></span>
 <span id="L74"><span class="lineNum">      74</span>                 :             : </span>
 <span id="L75"><span class="lineNum">      75</span>                 :             : /** @brief Reposition the file offset of @p fd (@c lseek). */</span>
-<span id="L76"><span class="lineNum">      76</span>                 :             : u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             : kern_err_t sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)</span>
 <span id="L77"><span class="lineNum">      77</span>                 :<span class="tlaGNC">           1 : {</span></span>
 <span id="L78"><span class="lineNum">      78</span>                 :<span class="tlaGNC">           1 :   (void)a4;</span></span>
 <span id="L79"><span class="lineNum">      79</span>                 :<span class="tlaGNC">           1 :   (void)a5;</span></span>
 <span id="L80"><span class="lineNum">      80</span>                 :<span class="tlaGNC">           1 :   (void)a6;</span></span>
-<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">           1 :   return (u64)vfs_seek((i64)fd, (i64)offset, (i32)whence);</span></span>
+<span id="L81"><span class="lineNum">      81</span>                 :<span class="tlaGNC">           1 :   return vfs_seek((i64)fd, (i64)offset, (i32)whence);</span></span>
 <span id="L82"><span class="lineNum">      82</span>                 :<span class="tlaGNC">           1 : }</span></span>
 <span id="L83"><span class="lineNum">      83</span>                 :             : </span>
 <span id="L84"><span class="lineNum">      84</span>                 :             : /**</span>
@@ -166,12 +166,12 @@
 <span id="L88"><span class="lineNum">      88</span>                 :             :  * the stdio termios + ALCOR2/FB_CONSOLE ioctls, mouse_ops handles</span>
 <span id="L89"><span class="lineNum">      89</span>                 :             :  * @c /dev/mouse, and pipes / regular files return @c -ENOTTY.</span>
 <span id="L90"><span class="lineNum">      90</span>                 :             :  */</span>
-<span id="L91"><span class="lineNum">      91</span>                 :             : u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             : kern_err_t sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)</span>
 <span id="L92"><span class="lineNum">      92</span>                 :<span class="tlaGNC">           1 : {</span></span>
 <span id="L93"><span class="lineNum">      93</span>                 :<span class="tlaGNC">           1 :   (void)a4;</span></span>
 <span id="L94"><span class="lineNum">      94</span>                 :<span class="tlaGNC">           1 :   (void)a5;</span></span>
 <span id="L95"><span class="lineNum">      95</span>                 :<span class="tlaGNC">           1 :   (void)a6;</span></span>
-<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">           1 :   return (u64)vfs_ioctl((i64)fd, request, arg);</span></span>
+<span id="L96"><span class="lineNum">      96</span>                 :<span class="tlaGNC">           1 :   return vfs_ioctl((i64)fd, request, arg);</span></span>
 <span id="L97"><span class="lineNum">      97</span>                 :<span class="tlaGNC">           1 : }</span></span>
 <span id="L98"><span class="lineNum">      98</span>                 :             : </span>
 <span id="L99"><span class="lineNum">      99</span>                 :             : /**</span>
@@ -180,7 +180,7 @@
 <span id="L102"><span class="lineNum">     102</span>                 :             :  * Implemented as a sequence of STI/HLT pairs, each ~10 ms.  @p rem is not</span>
 <span id="L103"><span class="lineNum">     103</span>                 :             :  * filled because preemption is cooperative and we don't track elapsed time.</span>
 <span id="L104"><span class="lineNum">     104</span>                 :             :  */</span>
-<span id="L105"><span class="lineNum">     105</span>                 :             : u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             : kern_err_t sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)</span>
 <span id="L106"><span class="lineNum">     106</span>                 :<span class="tlaGNC">           4 : {</span></span>
 <span id="L107"><span class="lineNum">     107</span>                 :<span class="tlaGNC">           4 :   (void)rem;</span></span>
 <span id="L108"><span class="lineNum">     108</span>                 :<span class="tlaGNC">           4 :   (void)a3;</span></span>
@@ -195,12 +195,12 @@
 <span id="L117"><span class="lineNum">     117</span>                 :<span class="tlaGNC">           4 :   };</span></span>
 <span id="L118"><span class="lineNum">     118</span>                 :             : </span>
 <span id="L119"><span class="lineNum">     119</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(!user_rw_ok(req, sizeof(struct timespec)))</span></span>
-<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L120"><span class="lineNum">     120</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L121"><span class="lineNum">     121</span>                 :             : </span>
 <span id="L122"><span class="lineNum">     122</span>                 :<span class="tlaGNC">           3 :   const struct timespec *ts = (const struct timespec *)req;</span></span>
 <span id="L123"><span class="lineNum">     123</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(ts-&gt;sec &lt; 0 || ts-&gt;nsec &lt; 0 || ts-&gt;nsec &gt;= 1000000000)</span></span>
 <span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]
-<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">           2 :     return (u64)-EINVAL;</span></span>
+<span id="L124"><span class="lineNum">     124</span>                 :<span class="tlaGNC">           2 :     return -EINVAL;</span></span>
 <span id="L125"><span class="lineNum">     125</span>                 :             : </span>
 <span id="L126"><span class="lineNum">     126</span>                 :             :   /* Sleep against the monotonic ns clock so the duration holds regardless of</span>
 <span id="L127"><span class="lineNum">     127</span>                 :             :    * the PIT rate. HLT wakes on each tick; the loop re-checks until the deadline</span>
@@ -224,16 +224,16 @@
 <span id="L145"><span class="lineNum">     145</span>                 :             : </span>
 <span id="L146"><span class="lineNum">     146</span>                 :<span class="tlaGNC">           7 : #define SYS_READV_IOV_MAX 1024</span></span>
 <span id="L147"><span class="lineNum">     147</span>                 :             : </span>
-<span id="L148"><span class="lineNum">     148</span>                 :             : u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : kern_err_t sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)</span>
 <span id="L149"><span class="lineNum">     149</span>                 :<span class="tlaGNC">           8 : {</span></span>
 <span id="L150"><span class="lineNum">     150</span>                 :<span class="tlaGNC">           8 :   (void)a4;</span></span>
 <span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">           8 :   (void)a5;</span></span>
 <span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">           8 :   (void)a6;</span></span>
 <span id="L153"><span class="lineNum">     153</span>                 :             : </span>
 <span id="L154"><span class="lineNum">     154</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           8 :   if(iovcnt == 0 || iovcnt &gt; SYS_READV_IOV_MAX)</span></span>
-<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">           1 :     return (u64)-EINVAL;</span></span>
+<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">           1 :     return -EINVAL;</span></span>
 <span id="L156"><span class="lineNum">     156</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           7 :   if(!iov_ptr || !user_rw_ok(iov_ptr, iovcnt * sizeof(struct iovec)))</span></span>
-<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L158"><span class="lineNum">     158</span>                 :             : </span>
 <span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">           6 :   const struct iovec *vec   = (const struct iovec *)iov_ptr;</span></span>
 <span id="L160"><span class="lineNum">     160</span>                 :<span class="tlaGNC">           6 :   u64                 total = 0;</span></span>
@@ -242,7 +242,7 @@
 <span id="L163"><span class="lineNum">     163</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           8 :     if(!vec[i].iov_base || vec[i].iov_len == 0)</span></span>
 <span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">           3 :       continue;</span></span>
 <span id="L165"><span class="lineNum">     165</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:<span class="tlaGNC">           5 :     if(!user_rw_ok((u64)vec[i].iov_base, vec[i].iov_len))</span></span>
-<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return (u64)-EFAULT;</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return -EFAULT;</span></span>
 <span id="L167"><span class="lineNum">     167</span>                 :             : </span>
 <span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC tlaBgGNC">           5 :     u64 chunk = sys_read(fd, (u64)vec[i].iov_base, vec[i].iov_len, 0, 0, 0);</span></span>
 <span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :     if((i64)chunk &lt; 0)</span></span>
@@ -258,7 +258,7 @@
 <span id="L179"><span class="lineNum">     179</span>                 :             : /**</span>
 <span id="L180"><span class="lineNum">     180</span>                 :             :  * @brief Gathered-write across @p iovcnt iovecs into @p fd.</span>
 <span id="L181"><span class="lineNum">     181</span>                 :             :  *</span>
-<span id="L182"><span class="lineNum">     182</span>                 :             :  * Each iov is dispatched as a separate ::sys_write — the VFS driver decides</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :  * Each iov is dispatched as a separate ::sys_write - the VFS driver decides</span>
 <span id="L183"><span class="lineNum">     183</span>                 :             :  * how to coalesce. @c tty_write goes through @c fb_console_write whose</span>
 <span id="L184"><span class="lineNum">     184</span>                 :             :  * begin/end pair is idempotent enough that a multi-iov refresh stays cheap.</span>
 <span id="L185"><span class="lineNum">     185</span>                 :             :  *</span>
@@ -267,14 +267,14 @@
 <span id="L188"><span class="lineNum">     188</span>                 :             :  * @param iovcnt  Number of iovecs in the array.</span>
 <span id="L189"><span class="lineNum">     189</span>                 :             :  * @return Total bytes written on success, negative @c -errno on failure.</span>
 <span id="L190"><span class="lineNum">     190</span>                 :             :  */</span>
-<span id="L191"><span class="lineNum">     191</span>                 :             : u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : kern_err_t sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)</span>
 <span id="L192"><span class="lineNum">     192</span>                 :<span class="tlaGNC">           4 : {</span></span>
 <span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC">           4 :   (void)a4;</span></span>
 <span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">           4 :   (void)a5;</span></span>
 <span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">           4 :   (void)a6;</span></span>
 <span id="L196"><span class="lineNum">     196</span>                 :             : </span>
 <span id="L197"><span class="lineNum">     197</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(!iov)</span></span>
-<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L199"><span class="lineNum">     199</span>                 :             : </span>
 <span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">           3 :   const struct iovec *vec   = (const struct iovec *)iov;</span></span>
 <span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">           3 :   u64                 total = 0;</span></span>
@@ -527,14 +527,14 @@
 <span id="L447"><span class="lineNum">     447</span>                 :             :  * loop sleeping one HLT tick per iteration until at least one fd is ready or</span>
 <span id="L448"><span class="lineNum">     448</span>                 :             :  * the timeout expires.  The output sets are zeroed on timeout.</span>
 <span id="L449"><span class="lineNum">     449</span>                 :             :  */</span>
-<span id="L450"><span class="lineNum">     450</span>                 :             : u64 sys_select(</span>
+<span id="L450"><span class="lineNum">     450</span>                 :             : kern_err_t sys_select(</span>
 <span id="L451"><span class="lineNum">     451</span>                 :             :     u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout, u64 a6</span>
 <span id="L452"><span class="lineNum">     452</span>                 :             : )</span>
 <span id="L453"><span class="lineNum">     453</span>                 :<span class="tlaGNC tlaBgGNC">          11 : {</span></span>
 <span id="L454"><span class="lineNum">     454</span>                 :<span class="tlaGNC">          11 :   (void)a6;</span></span>
 <span id="L455"><span class="lineNum">     455</span>                 :             : </span>
 <span id="L456"><span class="lineNum">     456</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 9 times"> + </span>]:<span class="tlaGNC">          11 :   if(nfds_u &gt; 1024)</span></span>
-<span id="L457"><span class="lineNum">     457</span>                 :<span class="tlaGNC">           2 :     return (u64)-EINVAL;</span></span>
+<span id="L457"><span class="lineNum">     457</span>                 :<span class="tlaGNC">           2 :     return -EINVAL;</span></span>
 <span id="L458"><span class="lineNum">     458</span>                 :             : </span>
 <span id="L459"><span class="lineNum">     459</span>                 :<span class="tlaGNC">           9 :   u32  nfds      = (u32)nfds_u;</span></span>
 <span id="L460"><span class="lineNum">     460</span>         [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           9 :   u32  nlongs    = nfds ? (nfds + (SEL_NFDBITS - 1)) / SEL_NFDBITS : 0;</span></span>
@@ -544,14 +544,14 @@
 <span id="L464"><span class="lineNum">     464</span>                 :             : </span>
 <span id="L465"><span class="lineNum">     465</span> [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           9 :   if(nfds &amp;&amp; !readfds &amp;&amp; !writefds &amp;&amp; !exceptfds)</span></span>
 <span class="lineNum">        </span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]
-<span id="L466"><span class="lineNum">     466</span>                 :<span class="tlaGNC">           1 :     return (u64)-EINVAL;</span></span>
+<span id="L466"><span class="lineNum">     466</span>                 :<span class="tlaGNC">           1 :     return -EINVAL;</span></span>
 <span id="L467"><span class="lineNum">     467</span>                 :             : </span>
 <span id="L468"><span class="lineNum">     468</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           8 :   if(nfds == 0) {</span></span>
 <span id="L469"><span class="lineNum">     469</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     if(timeout) {</span></span>
 <span id="L470"><span class="lineNum">     470</span>                 :<span class="tlaGNC">           1 :       bool immediate = false;</span></span>
 <span id="L471"><span class="lineNum">     471</span>                 :<span class="tlaGNC">           1 :       i32  prc       = parse_timeval(timeout, &amp;immediate, &amp;ticks_rem);</span></span>
 <span id="L472"><span class="lineNum">     472</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :       if(prc)</span></span>
-<span id="L473"><span class="lineNum">     473</span>                 :<span class="tlaUNC tlaBgUNC">           0 :         return (u64)prc;</span></span>
+<span id="L473"><span class="lineNum">     473</span>                 :<span class="tlaUNC tlaBgUNC">           0 :         return prc;</span></span>
 <span id="L474"><span class="lineNum">     474</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">           1 :       if(immediate)</span></span>
 <span id="L475"><span class="lineNum">     475</span>                 :<span class="tlaGNC">           1 :         return 0;</span></span>
 <span id="L476"><span class="lineNum">     476</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC tlaBgUNC">           0 :       for(u64 t = 0; t &lt; ticks_rem; t++)</span></span>
@@ -563,7 +563,7 @@
 <span id="L482"><span class="lineNum">     482</span>                 :<span class="tlaUNC">           0 :   }</span></span>
 <span id="L483"><span class="lineNum">     483</span>                 :             : </span>
 <span id="L484"><span class="lineNum">     484</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC tlaBgGNC">           7 :   if(nlongs &gt; SEL_FDSET_LONG)</span></span>
-<span id="L485"><span class="lineNum">     485</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return (u64)-EINVAL;</span></span>
+<span id="L485"><span class="lineNum">     485</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     return -EINVAL;</span></span>
 <span id="L486"><span class="lineNum">     486</span>                 :             : </span>
 <span id="L487"><span class="lineNum">     487</span>                 :<span class="tlaGNC tlaBgGNC">           7 :   unsigned long rin[SEL_FDSET_LONG], win[SEL_FDSET_LONG], ein[SEL_FDSET_LONG];</span></span>
 <span id="L488"><span class="lineNum">     488</span>                 :<span class="tlaGNC">           7 :   unsigned long rout[SEL_FDSET_LONG], wout[SEL_FDSET_LONG],</span></span>
@@ -575,17 +575,17 @@
 <span id="L494"><span class="lineNum">     494</span>                 :             : </span>
 <span id="L495"><span class="lineNum">     495</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           7 :   if(readfds) {</span></span>
 <span id="L496"><span class="lineNum">     496</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :     if(!user_rw_ok(readfds, (u64)nlongs * sizeof(unsigned long)))</span></span>
-<span id="L497"><span class="lineNum">     497</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
+<span id="L497"><span class="lineNum">     497</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
 <span id="L498"><span class="lineNum">     498</span>                 :<span class="tlaGNC">           3 :     kmemcpy(rin, (void *)readfds, (u64)nlongs * sizeof(unsigned long));</span></span>
 <span id="L499"><span class="lineNum">     499</span>                 :<span class="tlaGNC">           3 :   }</span></span>
 <span id="L500"><span class="lineNum">     500</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           6 :   if(writefds) {</span></span>
 <span id="L501"><span class="lineNum">     501</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(!user_rw_ok(writefds, (u64)nlongs * sizeof(unsigned long)))</span></span>
-<span id="L502"><span class="lineNum">     502</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
+<span id="L502"><span class="lineNum">     502</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
 <span id="L503"><span class="lineNum">     503</span>                 :<span class="tlaGNC">           1 :     kmemcpy(win, (void *)writefds, (u64)nlongs * sizeof(unsigned long));</span></span>
 <span id="L504"><span class="lineNum">     504</span>                 :<span class="tlaGNC">           1 :   }</span></span>
 <span id="L505"><span class="lineNum">     505</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           5 :   if(exceptfds) {</span></span>
 <span id="L506"><span class="lineNum">     506</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           1 :     if(!user_rw_ok(exceptfds, (u64)nlongs * sizeof(unsigned long)))</span></span>
-<span id="L507"><span class="lineNum">     507</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
+<span id="L507"><span class="lineNum">     507</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
 <span id="L508"><span class="lineNum">     508</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     kmemcpy(ein, (void *)exceptfds, (u64)nlongs * sizeof(unsigned long));</span></span>
 <span id="L509"><span class="lineNum">     509</span>                 :<span class="tlaUNC">           0 :   }</span></span>
 <span id="L510"><span class="lineNum">     510</span>                 :             : </span>
@@ -595,7 +595,7 @@
 <span id="L514"><span class="lineNum">     514</span>                 :<span class="tlaGNC">           4 :     bool immediate = false;</span></span>
 <span id="L515"><span class="lineNum">     515</span>                 :<span class="tlaGNC">           4 :     i32  prc       = parse_timeval(timeout, &amp;immediate, &amp;ticks_rem);</span></span>
 <span id="L516"><span class="lineNum">     516</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :     if(prc)</span></span>
-<span id="L517"><span class="lineNum">     517</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return (u64)prc;</span></span>
+<span id="L517"><span class="lineNum">     517</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return prc;</span></span>
 <span id="L518"><span class="lineNum">     518</span>                 :<span class="tlaGNC tlaBgGNC">           4 :     poll_mode = immediate;</span></span>
 <span id="L519"><span class="lineNum">     519</span>                 :<span class="tlaGNC">           4 :   } else</span></span>
 <span id="L520"><span class="lineNum">     520</span>                 :<span class="tlaUNC tlaBgUNC">           0 :     infinite = true;</span></span>
@@ -604,7 +604,7 @@
 <span id="L523"><span class="lineNum">     523</span>                 :<span class="tlaGNC">           4 :     int total = 0;</span></span>
 <span id="L524"><span class="lineNum">     524</span>                 :<span class="tlaGNC">           4 :     i32 err   = select_scan(nfds, rin, win, rout, wout, eout, &amp;total);</span></span>
 <span id="L525"><span class="lineNum">     525</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :     if(err)</span></span>
-<span id="L526"><span class="lineNum">     526</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return (u64)err;</span></span>
+<span id="L526"><span class="lineNum">     526</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return err;</span></span>
 <span id="L527"><span class="lineNum">     527</span>                 :             : </span>
 <span id="L528"><span class="lineNum">     528</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC tlaBgGNC">           4 :     if(total &gt; 0 || poll_mode) {</span></span>
 <span id="L529"><span class="lineNum">     529</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           4 :       if(readfds)</span></span>
@@ -613,7 +613,7 @@
 <span id="L532"><span class="lineNum">     532</span>                 :<span class="tlaGNC">           1 :         kmemcpy((void *)writefds, wout, (u64)nlongs * sizeof(unsigned long));</span></span>
 <span id="L533"><span class="lineNum">     533</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :       if(exceptfds)</span></span>
 <span id="L534"><span class="lineNum">     534</span>                 :<span class="tlaUNC tlaBgUNC">           0 :         kmemcpy((void *)exceptfds, eout, (u64)nlongs * sizeof(unsigned long));</span></span>
-<span id="L535"><span class="lineNum">     535</span>                 :<span class="tlaGNC tlaBgGNC">           4 :       return (u64)total;</span></span>
+<span id="L535"><span class="lineNum">     535</span>                 :<span class="tlaGNC tlaBgGNC">           4 :       return total;</span></span>
 <span id="L536"><span class="lineNum">     536</span>                 :<span class="tlaGNC">           4 :     }</span></span>
 <span id="L537"><span class="lineNum">     537</span>                 :             : </span>
 <span id="L538"><span class="lineNum">     538</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC tlaBgUNC">           0 :     if(!infinite) {</span></span>
@@ -644,19 +644,19 @@
 <span id="L563"><span class="lineNum">     563</span>                 :             :  * loop sleeping one HLT tick per iteration, and copies results back on exit.</span>
 <span id="L564"><span class="lineNum">     564</span>                 :             :  * Returns 0 on timeout, the number of ready fds otherwise.</span>
 <span id="L565"><span class="lineNum">     565</span>                 :             :  */</span>
-<span id="L566"><span class="lineNum">     566</span>                 :             : u64 sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)</span>
+<span id="L566"><span class="lineNum">     566</span>                 :             : kern_err_t sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)</span>
 <span id="L567"><span class="lineNum">     567</span>                 :<span class="tlaGNC">           7 : {</span></span>
 <span id="L568"><span class="lineNum">     568</span>                 :<span class="tlaGNC">           7 :   (void)a4;</span></span>
 <span id="L569"><span class="lineNum">     569</span>                 :<span class="tlaGNC">           7 :   (void)a5;</span></span>
 <span id="L570"><span class="lineNum">     570</span>                 :<span class="tlaGNC">           7 :   (void)a6;</span></span>
 <span id="L571"><span class="lineNum">     571</span>                 :             : </span>
 <span id="L572"><span class="lineNum">     572</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           7 :   if(nfds_u &gt; (u64)POLL__MAX_NFDS)</span></span>
-<span id="L573"><span class="lineNum">     573</span>                 :<span class="tlaGNC">           1 :     return (u64)-EINVAL;</span></span>
+<span id="L573"><span class="lineNum">     573</span>                 :<span class="tlaGNC">           1 :     return -EINVAL;</span></span>
 <span id="L574"><span class="lineNum">     574</span>                 :             : </span>
 <span id="L575"><span class="lineNum">     575</span>                 :<span class="tlaGNC">           6 :   u32 nfds = (u32)nfds_u;</span></span>
 <span id="L576"><span class="lineNum">     576</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           6 :   if(nfds != 0 &amp;&amp;</span></span>
 <span id="L577"><span class="lineNum">     577</span> [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :      (!fds || !user_rw_ok(fds, (u64)nfds * sizeof(poll__fd_abi_t))))</span></span>
-<span id="L578"><span class="lineNum">     578</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L578"><span class="lineNum">     578</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L579"><span class="lineNum">     579</span>                 :             : </span>
 <span id="L580"><span class="lineNum">     580</span>                 :<span class="tlaGNC">           5 :   i32            timeout_ms = (i32)timeout_u;</span></span>
 <span id="L581"><span class="lineNum">     581</span>                 :<span class="tlaGNC">           5 :   bool           immediate, infinite;</span></span>
@@ -688,7 +688,7 @@
 <span id="L607"><span class="lineNum">     607</span>                 :             : </span>
 <span id="L608"><span class="lineNum">     608</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           3 :     if(nready &gt; 0 || immediate) {</span></span>
 <span id="L609"><span class="lineNum">     609</span>                 :<span class="tlaGNC">           3 :       kmemcpy((void *)fds, local, (u64)nfds * sizeof(poll__fd_abi_t));</span></span>
-<span id="L610"><span class="lineNum">     610</span>                 :<span class="tlaGNC">           3 :       return (u64)nready;</span></span>
+<span id="L610"><span class="lineNum">     610</span>                 :<span class="tlaGNC">           3 :       return nready;</span></span>
 <span id="L611"><span class="lineNum">     611</span>                 :<span class="tlaGNC">           3 :     }</span></span>
 <span id="L612"><span class="lineNum">     612</span>                 :             : </span>
 <span id="L613"><span class="lineNum">     613</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC tlaBgUNC">           0 :     if(!infinite) {</span></span>

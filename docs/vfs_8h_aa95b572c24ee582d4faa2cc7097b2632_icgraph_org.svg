@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a3da7d8c19db4de1b35b610bbe9b7cdd4" target="_top" xlink:title="Duplicate oldfd to the lowest free fd ≥ 3.">
+<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#ae62f411f7a86b6cd6e4b2dc0b82d7c10" target="_top" xlink:title="Duplicate oldfd to the lowest free fd ≥ 3.">
 <polygon fill="white" stroke="#666666" points="58,-56 2,-56 2,-37 58,-37 58,-56"/>
 <text text-anchor="middle" x="30" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_dup</text>
 </a>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="Node000003" class="node">
 <title>Node3</title>
-<g id="a_Node000003"><a xlink:href="sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e" target="_top" xlink:title="Perform a file&#45;control operation on fd.">
+<g id="a_Node000003"><a xlink:href="sys__fs_8c.html#a6223f2ac2734bd07fbc86a18d95bb9bf" target="_top" xlink:title="Perform a file&#45;control operation on fd.">
 <polygon fill="white" stroke="#666666" points="60,-19 0,-19 0,0 60,0 60,-19"/>
 <text text-anchor="middle" x="30" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fcntl</text>
 </a>

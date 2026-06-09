@@ -164,7 +164,7 @@
 <!-- Node19 -->
 <g id="Node000019" class="node">
 <title>Node19</title>
-<g id="a_Node000019"><a xlink:href="include_2alcor2_2sys_2internal_8h.html" target="_top" xlink:title="Kernel&#45;only declarations for the syscall implementation layer.">
+<g id="a_Node000019"><a xlink:href="include_2alcor2_2sys_2internal_8h.html" target="_top" xlink:title="Kernel&#45;only syscall layer declarations, not a public API.">
 <polygon fill="white" stroke="#666666" points="787.5,-184 671.5,-184 671.5,-165 787.5,-165 787.5,-184"/>
 <text text-anchor="middle" x="729.5" y="-172" font-family="Helvetica,sans-Serif" font-size="10.00">alcor2/sys/internal.h</text>
 </a>

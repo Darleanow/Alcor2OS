@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2026-06-04 23:45:49</td>
+            <td class="headerValue">2026-06-09 01:20:19</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
@@ -93,7 +93,7 @@
 <span id="L15"><span class="lineNum">      15</span> [<span class="tlaGBC" title="Branch 0 was taken 24 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 23 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">          30 :   return ptr &amp;&amp; vmm_is_user_range((void *)ptr, size);</span></span>
 <span id="L16"><span class="lineNum">      16</span>                 :<span class="tlaGNC">          30 : }</span></span>
 <span id="L17"><span class="lineNum">      17</span>                 :             : </span>
-<span id="L18"><span class="lineNum">      18</span>                 :             : u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L18"><span class="lineNum">      18</span>                 :             : kern_err_t sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)</span>
 <span id="L19"><span class="lineNum">      19</span>                 :<span class="tlaGNC">           2 : {</span></span>
 <span id="L20"><span class="lineNum">      20</span>                 :<span class="tlaGNC">           2 :   (void)a2;</span></span>
 <span id="L21"><span class="lineNum">      21</span>                 :<span class="tlaGNC">           2 :   (void)a3;</span></span>
@@ -110,7 +110,7 @@
 <span id="L32"><span class="lineNum">      32</span>                 :<span class="tlaGNC">           2 :     char machine[65];</span></span>
 <span id="L33"><span class="lineNum">      33</span>                 :<span class="tlaGNC">           2 :   } *u = (void *)buf;</span></span>
 <span id="L34"><span class="lineNum">      34</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(!user_buf_ok(buf, sizeof(*u)))</span></span>
-<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L35"><span class="lineNum">      35</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L36"><span class="lineNum">      36</span>                 :             : </span>
 <span id="L37"><span class="lineNum">      37</span>                 :<span class="tlaGNC">           1 :   kzero(u, sizeof(*u));</span></span>
 <span id="L38"><span class="lineNum">      38</span>                 :<span class="tlaGNC">           1 :   kstrncpy(u-&gt;sysname, &quot;Alcor2&quot;, 65);</span></span>
@@ -121,7 +121,7 @@
 <span id="L43"><span class="lineNum">      43</span>                 :<span class="tlaGNC">           1 :   return 0;</span></span>
 <span id="L44"><span class="lineNum">      44</span>                 :<span class="tlaGNC">           2 : }</span></span>
 <span id="L45"><span class="lineNum">      45</span>                 :             : </span>
-<span id="L46"><span class="lineNum">      46</span>                 :             : u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             : kern_err_t sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)</span>
 <span id="L47"><span class="lineNum">      47</span>                 :<span class="tlaGNC">           3 : {</span></span>
 <span id="L48"><span class="lineNum">      48</span>                 :<span class="tlaGNC">           3 :   (void)tz;</span></span>
 <span id="L49"><span class="lineNum">      49</span>                 :<span class="tlaGNC">           3 :   (void)a3;</span></span>
@@ -130,7 +130,7 @@
 <span id="L52"><span class="lineNum">      52</span>                 :<span class="tlaGNC">           3 :   (void)a6;</span></span>
 <span id="L53"><span class="lineNum">      53</span>                 :             : </span>
 <span id="L54"><span class="lineNum">      54</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(!user_buf_ok(tv, 16))</span></span>
-<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
+<span id="L55"><span class="lineNum">      55</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
 <span id="L56"><span class="lineNum">      56</span>                 :             : </span>
 <span id="L57"><span class="lineNum">      57</span>                 :<span class="tlaGNC">           2 :   struct</span></span>
 <span id="L58"><span class="lineNum">      58</span>                 :<span class="tlaGNC">           2 :   {</span></span>
@@ -145,7 +145,7 @@
 <span id="L67"><span class="lineNum">      67</span>                 :<span class="tlaGNC">           3 : }</span></span>
 <span id="L68"><span class="lineNum">      68</span>                 :             : </span>
 <span id="L69"><span class="lineNum">      69</span>                 :             : /* Blocking futex. Keys map to the CPU physical backing of each 4-byte futex</span>
-<span id="L70"><span class="lineNum">      70</span>                 :             :  * word — safe with CLONE_THREAD (shared PTEs) unlike raw user VAs alone. */</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             :  * word - safe with CLONE_THREAD (shared PTEs) unlike raw user VAs alone. */</span>
 <span id="L71"><span class="lineNum">      71</span>                 :             : </span>
 <span id="L72"><span class="lineNum">      72</span>                 :<span class="tlaGNC">          46 : #define FUTEX_WAIT            0</span></span>
 <span id="L73"><span class="lineNum">      73</span>                 :<span class="tlaGNC">          22 : #define FUTEX_WAKE            1</span></span>
@@ -230,246 +230,247 @@
 <span id="L151"><span class="lineNum">     151</span>                 :<span class="tlaGNC">           2 :   return mv;</span></span>
 <span id="L152"><span class="lineNum">     152</span>                 :<span class="tlaGNC">           4 : }</span></span>
 <span id="L153"><span class="lineNum">     153</span>                 :             : </span>
-<span id="L154"><span class="lineNum">     154</span>                 :             : u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)</span>
-<span id="L155"><span class="lineNum">     155</span>                 :<span class="tlaGNC">          26 : {</span></span>
-<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">          26 :   (void)timeout;</span></span>
-<span id="L157"><span class="lineNum">     157</span>                 :             : </span>
-<span id="L158"><span class="lineNum">     158</span>                 :<span class="tlaGNC">          26 :   u32 cmd = (u32)op &amp; ~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME);</span></span>
-<span id="L159"><span class="lineNum">     159</span>                 :             : </span>
-<span id="L160"><span class="lineNum">     160</span>                 :             :   /* Priority-inheritance / lock-pi: not implemented in full; treat as the</span>
-<span id="L161"><span class="lineNum">     161</span>                 :             :    * closest non-PI primitive so libstdc++/musl does not spin into abort. */</span>
-<span id="L162"><span class="lineNum">     162</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 25 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 24 times"> + </span>]:<span class="tlaGNC">          26 :   if(cmd == FUTEX_LOCK_PI || cmd == FUTEX_TRYLOCK_PI || cmd == FUTEX_UNLOCK_PI)</span></span>
+<span id="L154"><span class="lineNum">     154</span>                 :             : kern_err_t</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :     sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)</span>
+<span id="L156"><span class="lineNum">     156</span>                 :<span class="tlaGNC">          26 : {</span></span>
+<span id="L157"><span class="lineNum">     157</span>                 :<span class="tlaGNC">          26 :   (void)timeout;</span></span>
+<span id="L158"><span class="lineNum">     158</span>                 :             : </span>
+<span id="L159"><span class="lineNum">     159</span>                 :<span class="tlaGNC">          26 :   u32 cmd = (u32)op &amp; ~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME);</span></span>
+<span id="L160"><span class="lineNum">     160</span>                 :             : </span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :   /* Priority-inheritance / lock-pi: not implemented in full; treat as the</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :    * closest non-PI primitive so libstdc++/musl does not spin into abort. */</span>
+<span id="L163"><span class="lineNum">     163</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 25 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 24 times"> + </span>]:<span class="tlaGNC">          26 :   if(cmd == FUTEX_LOCK_PI || cmd == FUTEX_TRYLOCK_PI || cmd == FUTEX_UNLOCK_PI)</span></span>
 <span class="lineNum">        </span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 23 times"> + </span>]
-<span id="L163"><span class="lineNum">     163</span>                 :<span class="tlaGNC">           3 :     return 0;</span></span>
-<span id="L164"><span class="lineNum">     164</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">          23 :   if(cmd == FUTEX_WAIT_REQUEUE_PI)</span></span>
-<span id="L165"><span class="lineNum">     165</span>                 :<span class="tlaGNC">           1 :     cmd = FUTEX_WAIT;</span></span>
-<span id="L166"><span class="lineNum">     166</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">          23 :   if(cmd == FUTEX_CMP_REQUEUE_PI)</span></span>
-<span id="L167"><span class="lineNum">     167</span>                 :<span class="tlaGNC">           1 :     cmd = FUTEX_CMP_REQUEUE;</span></span>
-<span id="L168"><span class="lineNum">     168</span>                 :             : </span>
-<span id="L169"><span class="lineNum">     169</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">          23 :   if(cmd == FUTEX_WAKE_OP) {</span></span>
-<span id="L170"><span class="lineNum">     170</span>                 :             :     /* Full WAKE_OP decode is huge; lld/musl only need forward progress. */</span>
-<span id="L171"><span class="lineNum">     171</span>                 :<span class="tlaGNC">           2 :     u64 k = futex_key_pa(uaddr);</span></span>
-<span id="L172"><span class="lineNum">     172</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(!k)</span></span>
-<span id="L173"><span class="lineNum">     173</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
-<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">           1 :     return futex_wake_pa(k, 256);</span></span>
-<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">           2 :   }</span></span>
-<span id="L176"><span class="lineNum">     176</span>                 :             : </span>
-<span id="L177"><span class="lineNum">     177</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          21 :   if(cmd == FUTEX_FD)</span></span>
-<span id="L178"><span class="lineNum">     178</span>                 :<span class="tlaGNC">           2 :     return (u64)-ENOSYS;</span></span>
-<span id="L179"><span class="lineNum">     179</span>                 :             : </span>
-<span id="L180"><span class="lineNum">     180</span> [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          19 :   if(cmd == FUTEX_WAIT || cmd == FUTEX_WAIT_BITSET) {</span></span>
-<span id="L181"><span class="lineNum">     181</span>                 :<span class="tlaGNC">           9 :     u32 curv;</span></span>
-<span id="L182"><span class="lineNum">     182</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           9 :     if(!futex_read_u32(uaddr, &amp;curv))</span></span>
-<span id="L183"><span class="lineNum">     183</span>                 :<span class="tlaGNC">           2 :       return (u64)-EFAULT;</span></span>
-<span id="L184"><span class="lineNum">     184</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           7 :     if(curv != (u32)val)</span></span>
-<span id="L185"><span class="lineNum">     185</span>                 :<span class="tlaGNC">           3 :       return (u64)-EAGAIN;</span></span>
-<span id="L186"><span class="lineNum">     186</span>                 :             : </span>
-<span id="L187"><span class="lineNum">     187</span>                 :<span class="tlaGNC">           4 :     u64 key = futex_key_pa(uaddr);</span></span>
-<span id="L188"><span class="lineNum">     188</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :     if(!key)</span></span>
-<span id="L189"><span class="lineNum">     189</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return (u64)-EFAULT;</span></span>
-<span id="L190"><span class="lineNum">     190</span>                 :             : </span>
-<span id="L191"><span class="lineNum">     191</span>                 :<span class="tlaGNC tlaBgGNC">           4 :     proc_t *cur = proc_current();</span></span>
-<span id="L192"><span class="lineNum">     192</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :     if(!cur)</span></span>
-<span id="L193"><span class="lineNum">     193</span>                 :<span class="tlaGNC">           1 :       return (u64)-ESRCH;</span></span>
-<span id="L194"><span class="lineNum">     194</span>                 :             : </span>
-<span id="L195"><span class="lineNum">     195</span>                 :<span class="tlaGNC">           3 :     int slot = -1;</span></span>
-<span id="L196"><span class="lineNum">     196</span>         [<span class="tlaGBC" title="Branch 0 was taken 258 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">         259 :     for(int i = 0; i &lt; FUTEX_QUEUE_LEN; i++) {</span></span>
-<span id="L197"><span class="lineNum">     197</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 256 times"> + </span>]:<span class="tlaGNC">         258 :       if(g_futex_q[i].key_pa == 0) {</span></span>
-<span id="L198"><span class="lineNum">     198</span>                 :<span class="tlaGNC">           2 :         slot = i;</span></span>
-<span id="L199"><span class="lineNum">     199</span>                 :<span class="tlaGNC">           2 :         break;</span></span>
-<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">           2 :       }</span></span>
-<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">         258 :     }</span></span>
-<span id="L202"><span class="lineNum">     202</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(slot &lt; 0)</span></span>
-<span id="L203"><span class="lineNum">     203</span>                 :<span class="tlaGNC">           1 :       return (u64)-ENOMEM;</span></span>
-<span id="L204"><span class="lineNum">     204</span>                 :             : </span>
-<span id="L205"><span class="lineNum">     205</span>                 :<span class="tlaGNC">           2 :     g_futex_q[slot].key_pa = key;</span></span>
-<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">           2 :     g_futex_q[slot].waiter = cur;</span></span>
-<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">           2 :     cur-&gt;state             = PROC_STATE_BLOCKED;</span></span>
-<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">           2 :     proc_schedule();</span></span>
-<span id="L209"><span class="lineNum">     209</span>                 :             : </span>
-<span id="L210"><span class="lineNum">     210</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :     if(g_futex_q[slot].waiter == cur) {</span></span>
-<span id="L211"><span class="lineNum">     211</span>                 :<span class="tlaGNC">           2 :       g_futex_q[slot].key_pa = 0;</span></span>
-<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">           2 :       g_futex_q[slot].waiter = NULL;</span></span>
-<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">           2 :     }</span></span>
-<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">           2 :     return 0;</span></span>
-<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">           3 :   }</span></span>
-<span id="L216"><span class="lineNum">     216</span>                 :             : </span>
-<span id="L217"><span class="lineNum">     217</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          10 :   if(cmd == FUTEX_WAKE || cmd == FUTEX_WAKE_BITSET) {</span></span>
-<span id="L218"><span class="lineNum">     218</span>                 :<span class="tlaGNC">           3 :     u64 k = futex_key_pa(uaddr);</span></span>
-<span id="L219"><span class="lineNum">     219</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(!k)</span></span>
-<span id="L220"><span class="lineNum">     220</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
-<span id="L221"><span class="lineNum">     221</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     return futex_wake_pa(k, val ? val : ~(u64)0);</span></span>
-<span id="L222"><span class="lineNum">     222</span>                 :<span class="tlaGNC">           3 :   }</span></span>
-<span id="L223"><span class="lineNum">     223</span>                 :             : </span>
-<span id="L224"><span class="lineNum">     224</span>                 :             :   /* REQUEUE variants (musl pthread_cond). Keep semantics loose: wake every</span>
-<span id="L225"><span class="lineNum">     225</span>                 :             :    * waiter on @p uaddr, then requeue every remaining waiter onto @p uaddr2.</span>
-<span id="L226"><span class="lineNum">     226</span>                 :             :    * (Linux passes wake/requeue counts in r10/r9 — we ignore them so we never</span>
-<span id="L227"><span class="lineNum">     227</span>                 :             :    * leave waiters stuck if those args are mis-parsed.) */</span>
-<span id="L228"><span class="lineNum">     228</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           7 :   if(cmd == FUTEX_REQUEUE || cmd == FUTEX_CMP_REQUEUE) {</span></span>
-<span id="L229"><span class="lineNum">     229</span>                 :<span class="tlaGNC">           6 :     (void)val3;</span></span>
-<span id="L230"><span class="lineNum">     230</span>                 :             : </span>
-<span id="L231"><span class="lineNum">     231</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :     if(cmd == FUTEX_CMP_REQUEUE) {</span></span>
-<span id="L232"><span class="lineNum">     232</span>                 :<span class="tlaGNC">           3 :       u32 curv;</span></span>
-<span id="L233"><span class="lineNum">     233</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :       if(!futex_read_u32(uaddr, &amp;curv))</span></span>
-<span id="L234"><span class="lineNum">     234</span>                 :<span class="tlaGNC">           1 :         return (u64)-EFAULT;</span></span>
-<span id="L235"><span class="lineNum">     235</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :       if(curv != (u32)val)</span></span>
-<span id="L236"><span class="lineNum">     236</span>                 :<span class="tlaGNC">           2 :         return (u64)-EAGAIN;</span></span>
-<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">           2 :     }</span></span>
-<span id="L238"><span class="lineNum">     238</span>                 :             : </span>
-<span id="L239"><span class="lineNum">     239</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(!user_buf_ok(uaddr2, sizeof(u32)))</span></span>
-<span id="L240"><span class="lineNum">     240</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
-<span id="L241"><span class="lineNum">     241</span>                 :             : </span>
-<span id="L242"><span class="lineNum">     242</span>                 :<span class="tlaGNC">           2 :     u64 k1 = futex_key_pa(uaddr);</span></span>
-<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">           2 :     u64 k2 = futex_key_pa(uaddr2);</span></span>
-<span id="L244"><span class="lineNum">     244</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(!k1 || !k2)</span></span>
-<span id="L245"><span class="lineNum">     245</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
-<span id="L246"><span class="lineNum">     246</span>                 :             : </span>
-<span id="L247"><span class="lineNum">     247</span>                 :<span class="tlaGNC">           1 :     u64 wk = futex_wake_pa(k1, ~(u64)0);</span></span>
-<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">           1 :     u64 rq = futex_requeue_pa(k1, k2, ~(u64)0);</span></span>
-<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaGNC">           1 :     (void)timeout;</span></span>
-<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">           1 :     return wk + rq;</span></span>
-<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaGNC">           2 :   }</span></span>
-<span id="L252"><span class="lineNum">     252</span>                 :             : </span>
-<span id="L253"><span class="lineNum">     253</span>                 :<span class="tlaGNC">           1 :   return (u64)-ENOSYS;</span></span>
-<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">           7 : }</span></span>
-<span id="L255"><span class="lineNum">     255</span>                 :             : </span>
-<span id="L256"><span class="lineNum">     256</span>                 :             : u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)</span>
-<span id="L257"><span class="lineNum">     257</span>                 :<span class="tlaGNC">           2 : {</span></span>
-<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">           2 :   (void)clk;</span></span>
-<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">           2 :   (void)a3;</span></span>
-<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">           2 :   (void)a4;</span></span>
-<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">           2 :   (void)a5;</span></span>
-<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">           2 :   (void)a6;</span></span>
-<span id="L263"><span class="lineNum">     263</span>                 :             : </span>
-<span id="L264"><span class="lineNum">     264</span>                 :<span class="tlaGNC">           2 :   struct</span></span>
-<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">           2 :   {</span></span>
-<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">           2 :     i64 s;</span></span>
-<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">           2 :     i64 ns;</span></span>
-<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">           2 :   } *ts = (void *)tp;</span></span>
-<span id="L269"><span class="lineNum">     269</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(!user_buf_ok(tp, sizeof(*ts)))</span></span>
-<span id="L270"><span class="lineNum">     270</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
-<span id="L271"><span class="lineNum">     271</span>                 :             : </span>
-<span id="L272"><span class="lineNum">     272</span>                 :<span class="tlaGNC">           1 :   u64 ns = pit_get_ns();</span></span>
-<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">           1 :   ts-&gt;s  = (i64)(ns / 1000000000ULL);</span></span>
-<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">           1 :   ts-&gt;ns = (i64)(ns % 1000000000ULL);</span></span>
-<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">           1 :   return 0;</span></span>
-<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">           2 : }</span></span>
-<span id="L277"><span class="lineNum">     277</span>                 :             : </span>
-<span id="L278"><span class="lineNum">     278</span>                 :             : u64 sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)</span>
-<span id="L279"><span class="lineNum">     279</span>                 :<span class="tlaGNC">           1 : {</span></span>
-<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">           1 :   (void)a1;</span></span>
-<span id="L281"><span class="lineNum">     281</span>                 :<span class="tlaGNC">           1 :   (void)a2;</span></span>
-<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">           1 :   (void)a3;</span></span>
-<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">           1 :   (void)a4;</span></span>
-<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">           1 :   (void)a5;</span></span>
-<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">           1 :   (void)a6;</span></span>
-<span id="L286"><span class="lineNum">     286</span>                 :             : </span>
-<span id="L287"><span class="lineNum">     287</span>                 :             :   /* User scheduling is proc_t-based; yield through proc scheduler. */</span>
-<span id="L288"><span class="lineNum">     288</span>                 :<span class="tlaGNC">           1 :   proc_schedule();</span></span>
-<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">           1 :   return 0;</span></span>
-<span id="L290"><span class="lineNum">     290</span>                 :<span class="tlaGNC">           1 : }</span></span>
-<span id="L291"><span class="lineNum">     291</span>                 :             : </span>
-<span id="L292"><span class="lineNum">     292</span>                 :             : /**</span>
-<span id="L293"><span class="lineNum">     293</span>                 :             :  * @brief Stub for sched_getaffinity(pid, cpusetsize, mask).</span>
-<span id="L294"><span class="lineNum">     294</span>                 :             :  *</span>
-<span id="L295"><span class="lineNum">     295</span>                 :             :  * We have a single-CPU kernel so the affinity mask is always {0}. Writes</span>
-<span id="L296"><span class="lineNum">     296</span>                 :             :  * one byte (bit 0 set) into the user-supplied @p mask buffer and returns</span>
-<span id="L297"><span class="lineNum">     297</span>                 :             :  * the size of the populated mask in bytes (Linux convention).</span>
-<span id="L298"><span class="lineNum">     298</span>                 :             :  */</span>
-<span id="L299"><span class="lineNum">     299</span>                 :             : u64 sys_sched_getaffinity(</span>
-<span id="L300"><span class="lineNum">     300</span>                 :             :     u64 pid, u64 cpusetsize, u64 mask, u64 a4, u64 a5, u64 a6</span>
-<span id="L301"><span class="lineNum">     301</span>                 :             : )</span>
-<span id="L302"><span class="lineNum">     302</span>                 :<span class="tlaGNC">           6 : {</span></span>
-<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">           6 :   (void)pid;</span></span>
-<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">           6 :   (void)a4;</span></span>
-<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">           6 :   (void)a5;</span></span>
-<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">           6 :   (void)a6;</span></span>
-<span id="L307"><span class="lineNum">     307</span>                 :             : </span>
-<span id="L308"><span class="lineNum">     308</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :   if(cpusetsize == 0 || !mask)</span></span>
-<span id="L309"><span class="lineNum">     309</span>                 :<span class="tlaGNC">           3 :     return (u64)-EINVAL;</span></span>
-<span id="L310"><span class="lineNum">     310</span>                 :             : </span>
-<span id="L311"><span class="lineNum">     311</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(!vmm_is_user_range((void *)mask, cpusetsize))</span></span>
-<span id="L312"><span class="lineNum">     312</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
-<span id="L313"><span class="lineNum">     313</span>                 :             : </span>
-<span id="L314"><span class="lineNum">     314</span>                 :<span class="tlaGNC">           2 :   u8 *m = (u8 *)mask;</span></span>
-<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">           2 :   m[0]  = 0x01; /* CPU 0 only */</span></span>
-<span id="L316"><span class="lineNum">     316</span>         [<span class="tlaGBC" title="Branch 0 was taken 14 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          16 :   for(u64 i = 1; i &lt; cpusetsize; i++)</span></span>
-<span id="L317"><span class="lineNum">     317</span>                 :<span class="tlaGNC">          14 :     m[i] = 0;</span></span>
-<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaGNC">           2 :   return cpusetsize;</span></span>
-<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">           3 : }</span></span>
-<span id="L320"><span class="lineNum">     320</span>                 :             : </span>
-<span id="L321"><span class="lineNum">     321</span>                 :             : /** Linux rlimit struct: each value is rlim_t (u64 on x86_64). */</span>
-<span id="L322"><span class="lineNum">     322</span>                 :             : struct k_rlimit</span>
-<span id="L323"><span class="lineNum">     323</span>                 :             : {</span>
-<span id="L324"><span class="lineNum">     324</span>                 :             :   u64 rlim_cur;</span>
-<span id="L325"><span class="lineNum">     325</span>                 :             :   u64 rlim_max;</span>
-<span id="L326"><span class="lineNum">     326</span>                 :             : };</span>
-<span id="L327"><span class="lineNum">     327</span>                 :             : </span>
-<span id="L328"><span class="lineNum">     328</span>                 :             : /* RLIMIT_* indices we care about. */</span>
-<span id="L329"><span class="lineNum">     329</span>                 :             : #define RLIMIT_CPU    0</span>
-<span id="L330"><span class="lineNum">     330</span>                 :             : #define RLIMIT_FSIZE  1</span>
-<span id="L331"><span class="lineNum">     331</span>                 :             : #define RLIMIT_DATA   2</span>
-<span id="L332"><span class="lineNum">     332</span>                 :<span class="tlaGNC">           1 : #define RLIMIT_STACK  3</span></span>
-<span id="L333"><span class="lineNum">     333</span>                 :             : #define RLIMIT_CORE   4</span>
-<span id="L334"><span class="lineNum">     334</span>                 :             : #define RLIMIT_RSS    5</span>
-<span id="L335"><span class="lineNum">     335</span>                 :<span class="tlaGNC">           1 : #define RLIMIT_NPROC  6</span></span>
-<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">           1 : #define RLIMIT_NOFILE 7</span></span>
-<span id="L337"><span class="lineNum">     337</span>                 :             : #define RLIMIT_AS     9</span>
-<span id="L338"><span class="lineNum">     338</span>                 :             : </span>
-<span id="L339"><span class="lineNum">     339</span>                 :             : /** Fill in a generous default rlimit so userland (clang/musl) doesn't bail. */</span>
-<span id="L340"><span class="lineNum">     340</span>                 :             : static void fill_default_rlimit(u64 resource, struct k_rlimit *out)</span>
-<span id="L341"><span class="lineNum">     341</span>                 :<span class="tlaGNC">           5 : {</span></span>
-<span id="L342"><span class="lineNum">     342</span>                 :<span class="tlaGNC">           5 :   out-&gt;rlim_cur = (u64)-1; /* RLIM_INFINITY */</span></span>
-<span id="L343"><span class="lineNum">     343</span>                 :<span class="tlaGNC">           5 :   out-&gt;rlim_max = (u64)-1;</span></span>
-<span id="L344"><span class="lineNum">     344</span>                 :             : </span>
-<span id="L345"><span class="lineNum">     345</span>                 :<span class="tlaGNC">           5 :   switch(resource) {</span></span>
-<span id="L346"><span class="lineNum">     346</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           1 :   case RLIMIT_STACK:</span></span>
-<span id="L347"><span class="lineNum">     347</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_cur = 8ULL * 1024 * 1024;  /* 8 MiB */</span></span>
-<span id="L348"><span class="lineNum">     348</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_max = 64ULL * 1024 * 1024; /* 64 MiB */</span></span>
-<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaGNC">           1 :     break;</span></span>
-<span id="L350"><span class="lineNum">     350</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           1 :   case RLIMIT_NOFILE:</span></span>
-<span id="L351"><span class="lineNum">     351</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_cur = 1024;</span></span>
-<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_max = 4096;</span></span>
-<span id="L353"><span class="lineNum">     353</span>                 :<span class="tlaGNC">           1 :     break;</span></span>
-<span id="L354"><span class="lineNum">     354</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           1 :   case RLIMIT_NPROC:</span></span>
-<span id="L355"><span class="lineNum">     355</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_cur = 256;</span></span>
-<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_max = 256;</span></span>
-<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">           1 :     break;</span></span>
-<span id="L358"><span class="lineNum">     358</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           2 :   default:</span></span>
-<span id="L359"><span class="lineNum">     359</span>                 :<span class="tlaGNC">           2 :     break;</span></span>
-<span id="L360"><span class="lineNum">     360</span>                 :<span class="tlaGNC">           5 :   }</span></span>
-<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">           5 : }</span></span>
-<span id="L362"><span class="lineNum">     362</span>                 :             : </span>
-<span id="L363"><span class="lineNum">     363</span>                 :             : u64 sys_getrlimit(u64 resource, u64 rlim, u64 a3, u64 a4, u64 a5, u64 a6)</span>
-<span id="L364"><span class="lineNum">     364</span>                 :<span class="tlaGNC">           4 : {</span></span>
-<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">           4 :   (void)a3;</span></span>
-<span id="L366"><span class="lineNum">     366</span>                 :<span class="tlaGNC">           4 :   (void)a4;</span></span>
-<span id="L367"><span class="lineNum">     367</span>                 :<span class="tlaGNC">           4 :   (void)a5;</span></span>
-<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">           4 :   (void)a6;</span></span>
-<span id="L369"><span class="lineNum">     369</span>                 :             : </span>
-<span id="L370"><span class="lineNum">     370</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(!user_buf_ok(rlim, sizeof(struct k_rlimit)))</span></span>
-<span id="L371"><span class="lineNum">     371</span>                 :<span class="tlaGNC">           1 :     return (u64)-EFAULT;</span></span>
-<span id="L372"><span class="lineNum">     372</span>                 :             : </span>
-<span id="L373"><span class="lineNum">     373</span>                 :<span class="tlaGNC">           3 :   fill_default_rlimit(resource, (struct k_rlimit *)rlim);</span></span>
-<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">           3 :   return 0;</span></span>
-<span id="L375"><span class="lineNum">     375</span>                 :<span class="tlaGNC">           4 : }</span></span>
-<span id="L376"><span class="lineNum">     376</span>                 :             : </span>
-<span id="L377"><span class="lineNum">     377</span>                 :             : u64 sys_prlimit64(</span>
-<span id="L378"><span class="lineNum">     378</span>                 :             :     u64 pid, u64 resource, u64 new_limit, u64 old_limit, u64 a5, u64 a6</span>
-<span id="L379"><span class="lineNum">     379</span>                 :             : )</span>
-<span id="L380"><span class="lineNum">     380</span>                 :<span class="tlaGNC">           5 : {</span></span>
-<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaGNC">           5 :   (void)pid;</span></span>
-<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaGNC">           5 :   (void)new_limit; /* setting limits is a no-op */</span></span>
-<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaGNC">           5 :   (void)a5;</span></span>
-<span id="L384"><span class="lineNum">     384</span>                 :<span class="tlaGNC">           5 :   (void)a6;</span></span>
-<span id="L385"><span class="lineNum">     385</span>                 :             : </span>
-<span id="L386"><span class="lineNum">     386</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           5 :   if(old_limit) {</span></span>
-<span id="L387"><span class="lineNum">     387</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(!user_buf_ok(old_limit, sizeof(struct k_rlimit)))</span></span>
-<span id="L388"><span class="lineNum">     388</span>                 :<span class="tlaGNC">           1 :       return (u64)-EFAULT;</span></span>
-<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">           2 :     fill_default_rlimit(resource, (struct k_rlimit *)old_limit);</span></span>
-<span id="L390"><span class="lineNum">     390</span>                 :<span class="tlaGNC">           2 :   }</span></span>
-<span id="L391"><span class="lineNum">     391</span>                 :<span class="tlaGNC">           4 :   return 0;</span></span>
-<span id="L392"><span class="lineNum">     392</span>                 :<span class="tlaGNC">           5 : }</span></span>
+<span id="L164"><span class="lineNum">     164</span>                 :<span class="tlaGNC">           3 :     return 0;</span></span>
+<span id="L165"><span class="lineNum">     165</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">          23 :   if(cmd == FUTEX_WAIT_REQUEUE_PI)</span></span>
+<span id="L166"><span class="lineNum">     166</span>                 :<span class="tlaGNC">           1 :     cmd = FUTEX_WAIT;</span></span>
+<span id="L167"><span class="lineNum">     167</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 22 times"> + </span>]:<span class="tlaGNC">          23 :   if(cmd == FUTEX_CMP_REQUEUE_PI)</span></span>
+<span id="L168"><span class="lineNum">     168</span>                 :<span class="tlaGNC">           1 :     cmd = FUTEX_CMP_REQUEUE;</span></span>
+<span id="L169"><span class="lineNum">     169</span>                 :             : </span>
+<span id="L170"><span class="lineNum">     170</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 21 times"> + </span>]:<span class="tlaGNC">          23 :   if(cmd == FUTEX_WAKE_OP) {</span></span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :     /* Full WAKE_OP decode is huge; lld/musl only need forward progress. */</span>
+<span id="L172"><span class="lineNum">     172</span>                 :<span class="tlaGNC">           2 :     u64 k = futex_key_pa(uaddr);</span></span>
+<span id="L173"><span class="lineNum">     173</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(!k)</span></span>
+<span id="L174"><span class="lineNum">     174</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
+<span id="L175"><span class="lineNum">     175</span>                 :<span class="tlaGNC">           1 :     return futex_wake_pa(k, 256);</span></span>
+<span id="L176"><span class="lineNum">     176</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L177"><span class="lineNum">     177</span>                 :             : </span>
+<span id="L178"><span class="lineNum">     178</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 19 times"> + </span>]:<span class="tlaGNC">          21 :   if(cmd == FUTEX_FD)</span></span>
+<span id="L179"><span class="lineNum">     179</span>                 :<span class="tlaGNC">           2 :     return -ENOSYS;</span></span>
+<span id="L180"><span class="lineNum">     180</span>                 :             : </span>
+<span id="L181"><span class="lineNum">     181</span> [<span class="tlaGBC" title="Branch 0 was taken 8 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 11 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:<span class="tlaGNC">          19 :   if(cmd == FUTEX_WAIT || cmd == FUTEX_WAIT_BITSET) {</span></span>
+<span id="L182"><span class="lineNum">     182</span>                 :<span class="tlaGNC">           9 :     u32 curv;</span></span>
+<span id="L183"><span class="lineNum">     183</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">           9 :     if(!futex_read_u32(uaddr, &amp;curv))</span></span>
+<span id="L184"><span class="lineNum">     184</span>                 :<span class="tlaGNC">           2 :       return -EFAULT;</span></span>
+<span id="L185"><span class="lineNum">     185</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           7 :     if(curv != (u32)val)</span></span>
+<span id="L186"><span class="lineNum">     186</span>                 :<span class="tlaGNC">           3 :       return -EAGAIN;</span></span>
+<span id="L187"><span class="lineNum">     187</span>                 :             : </span>
+<span id="L188"><span class="lineNum">     188</span>                 :<span class="tlaGNC">           4 :     u64 key = futex_key_pa(uaddr);</span></span>
+<span id="L189"><span class="lineNum">     189</span>         [<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           4 :     if(!key)</span></span>
+<span id="L190"><span class="lineNum">     190</span>                 :<span class="tlaUNC tlaBgUNC">           0 :       return -EFAULT;</span></span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : </span>
+<span id="L192"><span class="lineNum">     192</span>                 :<span class="tlaGNC tlaBgGNC">           4 :     proc_t *cur = proc_current();</span></span>
+<span id="L193"><span class="lineNum">     193</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :     if(!cur)</span></span>
+<span id="L194"><span class="lineNum">     194</span>                 :<span class="tlaGNC">           1 :       return -ESRCH;</span></span>
+<span id="L195"><span class="lineNum">     195</span>                 :             : </span>
+<span id="L196"><span class="lineNum">     196</span>                 :<span class="tlaGNC">           3 :     int slot = -1;</span></span>
+<span id="L197"><span class="lineNum">     197</span>         [<span class="tlaGBC" title="Branch 0 was taken 258 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">         259 :     for(int i = 0; i &lt; FUTEX_QUEUE_LEN; i++) {</span></span>
+<span id="L198"><span class="lineNum">     198</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 256 times"> + </span>]:<span class="tlaGNC">         258 :       if(g_futex_q[i].key_pa == 0) {</span></span>
+<span id="L199"><span class="lineNum">     199</span>                 :<span class="tlaGNC">           2 :         slot = i;</span></span>
+<span id="L200"><span class="lineNum">     200</span>                 :<span class="tlaGNC">           2 :         break;</span></span>
+<span id="L201"><span class="lineNum">     201</span>                 :<span class="tlaGNC">           2 :       }</span></span>
+<span id="L202"><span class="lineNum">     202</span>                 :<span class="tlaGNC">         258 :     }</span></span>
+<span id="L203"><span class="lineNum">     203</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(slot &lt; 0)</span></span>
+<span id="L204"><span class="lineNum">     204</span>                 :<span class="tlaGNC">           1 :       return -ENOMEM;</span></span>
+<span id="L205"><span class="lineNum">     205</span>                 :             : </span>
+<span id="L206"><span class="lineNum">     206</span>                 :<span class="tlaGNC">           2 :     g_futex_q[slot].key_pa = key;</span></span>
+<span id="L207"><span class="lineNum">     207</span>                 :<span class="tlaGNC">           2 :     g_futex_q[slot].waiter = cur;</span></span>
+<span id="L208"><span class="lineNum">     208</span>                 :<span class="tlaGNC">           2 :     cur-&gt;state             = PROC_STATE_BLOCKED;</span></span>
+<span id="L209"><span class="lineNum">     209</span>                 :<span class="tlaGNC">           2 :     proc_schedule();</span></span>
+<span id="L210"><span class="lineNum">     210</span>                 :             : </span>
+<span id="L211"><span class="lineNum">     211</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :     if(g_futex_q[slot].waiter == cur) {</span></span>
+<span id="L212"><span class="lineNum">     212</span>                 :<span class="tlaGNC">           2 :       g_futex_q[slot].key_pa = 0;</span></span>
+<span id="L213"><span class="lineNum">     213</span>                 :<span class="tlaGNC">           2 :       g_futex_q[slot].waiter = NULL;</span></span>
+<span id="L214"><span class="lineNum">     214</span>                 :<span class="tlaGNC">           2 :     }</span></span>
+<span id="L215"><span class="lineNum">     215</span>                 :<span class="tlaGNC">           2 :     return 0;</span></span>
+<span id="L216"><span class="lineNum">     216</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L217"><span class="lineNum">     217</span>                 :             : </span>
+<span id="L218"><span class="lineNum">     218</span> [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 8 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:<span class="tlaGNC">          10 :   if(cmd == FUTEX_WAKE || cmd == FUTEX_WAKE_BITSET) {</span></span>
+<span id="L219"><span class="lineNum">     219</span>                 :<span class="tlaGNC">           3 :     u64 k = futex_key_pa(uaddr);</span></span>
+<span id="L220"><span class="lineNum">     220</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(!k)</span></span>
+<span id="L221"><span class="lineNum">     221</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
+<span id="L222"><span class="lineNum">     222</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     return futex_wake_pa(k, val ? val : ~(u64)0);</span></span>
+<span id="L223"><span class="lineNum">     223</span>                 :<span class="tlaGNC">           3 :   }</span></span>
+<span id="L224"><span class="lineNum">     224</span>                 :             : </span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :   /* REQUEUE variants (musl pthread_cond). Keep semantics loose: wake every</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :    * waiter on @p uaddr, then requeue every remaining waiter onto @p uaddr2.</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             :    * (Linux passes wake/requeue counts in r10/r9 - we ignore them so we never</span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :    * leave waiters stuck if those args are mis-parsed.) */</span>
+<span id="L229"><span class="lineNum">     229</span> [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           7 :   if(cmd == FUTEX_REQUEUE || cmd == FUTEX_CMP_REQUEUE) {</span></span>
+<span id="L230"><span class="lineNum">     230</span>                 :<span class="tlaGNC">           6 :     (void)val3;</span></span>
+<span id="L231"><span class="lineNum">     231</span>                 :             : </span>
+<span id="L232"><span class="lineNum">     232</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :     if(cmd == FUTEX_CMP_REQUEUE) {</span></span>
+<span id="L233"><span class="lineNum">     233</span>                 :<span class="tlaGNC">           3 :       u32 curv;</span></span>
+<span id="L234"><span class="lineNum">     234</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :       if(!futex_read_u32(uaddr, &amp;curv))</span></span>
+<span id="L235"><span class="lineNum">     235</span>                 :<span class="tlaGNC">           1 :         return -EFAULT;</span></span>
+<span id="L236"><span class="lineNum">     236</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:<span class="tlaGNC">           2 :       if(curv != (u32)val)</span></span>
+<span id="L237"><span class="lineNum">     237</span>                 :<span class="tlaGNC">           2 :         return -EAGAIN;</span></span>
+<span id="L238"><span class="lineNum">     238</span>                 :<span class="tlaGNC">           2 :     }</span></span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : </span>
+<span id="L240"><span class="lineNum">     240</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(!user_buf_ok(uaddr2, sizeof(u32)))</span></span>
+<span id="L241"><span class="lineNum">     241</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
+<span id="L242"><span class="lineNum">     242</span>                 :             : </span>
+<span id="L243"><span class="lineNum">     243</span>                 :<span class="tlaGNC">           2 :     u64 k1 = futex_key_pa(uaddr);</span></span>
+<span id="L244"><span class="lineNum">     244</span>                 :<span class="tlaGNC">           2 :     u64 k2 = futex_key_pa(uaddr2);</span></span>
+<span id="L245"><span class="lineNum">     245</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>][<span class="tlaUNC" title="Branch 0 was not taken"> - </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :     if(!k1 || !k2)</span></span>
+<span id="L246"><span class="lineNum">     246</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
+<span id="L247"><span class="lineNum">     247</span>                 :             : </span>
+<span id="L248"><span class="lineNum">     248</span>                 :<span class="tlaGNC">           1 :     u64 wk = futex_wake_pa(k1, ~(u64)0);</span></span>
+<span id="L249"><span class="lineNum">     249</span>                 :<span class="tlaGNC">           1 :     u64 rq = futex_requeue_pa(k1, k2, ~(u64)0);</span></span>
+<span id="L250"><span class="lineNum">     250</span>                 :<span class="tlaGNC">           1 :     (void)timeout;</span></span>
+<span id="L251"><span class="lineNum">     251</span>                 :<span class="tlaGNC">           1 :     return wk + rq;</span></span>
+<span id="L252"><span class="lineNum">     252</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L253"><span class="lineNum">     253</span>                 :             : </span>
+<span id="L254"><span class="lineNum">     254</span>                 :<span class="tlaGNC">           1 :   return -ENOSYS;</span></span>
+<span id="L255"><span class="lineNum">     255</span>                 :<span class="tlaGNC">           7 : }</span></span>
+<span id="L256"><span class="lineNum">     256</span>                 :             : </span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : kern_err_t sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L258"><span class="lineNum">     258</span>                 :<span class="tlaGNC">           2 : {</span></span>
+<span id="L259"><span class="lineNum">     259</span>                 :<span class="tlaGNC">           2 :   (void)clk;</span></span>
+<span id="L260"><span class="lineNum">     260</span>                 :<span class="tlaGNC">           2 :   (void)a3;</span></span>
+<span id="L261"><span class="lineNum">     261</span>                 :<span class="tlaGNC">           2 :   (void)a4;</span></span>
+<span id="L262"><span class="lineNum">     262</span>                 :<span class="tlaGNC">           2 :   (void)a5;</span></span>
+<span id="L263"><span class="lineNum">     263</span>                 :<span class="tlaGNC">           2 :   (void)a6;</span></span>
+<span id="L264"><span class="lineNum">     264</span>                 :             : </span>
+<span id="L265"><span class="lineNum">     265</span>                 :<span class="tlaGNC">           2 :   struct</span></span>
+<span id="L266"><span class="lineNum">     266</span>                 :<span class="tlaGNC">           2 :   {</span></span>
+<span id="L267"><span class="lineNum">     267</span>                 :<span class="tlaGNC">           2 :     i64 s;</span></span>
+<span id="L268"><span class="lineNum">     268</span>                 :<span class="tlaGNC">           2 :     i64 ns;</span></span>
+<span id="L269"><span class="lineNum">     269</span>                 :<span class="tlaGNC">           2 :   } *ts = (void *)tp;</span></span>
+<span id="L270"><span class="lineNum">     270</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           2 :   if(!user_buf_ok(tp, sizeof(*ts)))</span></span>
+<span id="L271"><span class="lineNum">     271</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>                 :<span class="tlaGNC">           1 :   u64 ns = pit_get_ns();</span></span>
+<span id="L274"><span class="lineNum">     274</span>                 :<span class="tlaGNC">           1 :   ts-&gt;s  = (i64)(ns / 1000000000ULL);</span></span>
+<span id="L275"><span class="lineNum">     275</span>                 :<span class="tlaGNC">           1 :   ts-&gt;ns = (i64)(ns % 1000000000ULL);</span></span>
+<span id="L276"><span class="lineNum">     276</span>                 :<span class="tlaGNC">           1 :   return 0;</span></span>
+<span id="L277"><span class="lineNum">     277</span>                 :<span class="tlaGNC">           2 : }</span></span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :             : kern_err_t sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L280"><span class="lineNum">     280</span>                 :<span class="tlaGNC">           1 : {</span></span>
+<span id="L281"><span class="lineNum">     281</span>                 :<span class="tlaGNC">           1 :   (void)a1;</span></span>
+<span id="L282"><span class="lineNum">     282</span>                 :<span class="tlaGNC">           1 :   (void)a2;</span></span>
+<span id="L283"><span class="lineNum">     283</span>                 :<span class="tlaGNC">           1 :   (void)a3;</span></span>
+<span id="L284"><span class="lineNum">     284</span>                 :<span class="tlaGNC">           1 :   (void)a4;</span></span>
+<span id="L285"><span class="lineNum">     285</span>                 :<span class="tlaGNC">           1 :   (void)a5;</span></span>
+<span id="L286"><span class="lineNum">     286</span>                 :<span class="tlaGNC">           1 :   (void)a6;</span></span>
+<span id="L287"><span class="lineNum">     287</span>                 :             : </span>
+<span id="L288"><span class="lineNum">     288</span>                 :             :   /* User scheduling is proc_t-based; yield through proc scheduler. */</span>
+<span id="L289"><span class="lineNum">     289</span>                 :<span class="tlaGNC">           1 :   proc_schedule();</span></span>
+<span id="L290"><span class="lineNum">     290</span>                 :<span class="tlaGNC">           1 :   return 0;</span></span>
+<span id="L291"><span class="lineNum">     291</span>                 :<span class="tlaGNC">           1 : }</span></span>
+<span id="L292"><span class="lineNum">     292</span>                 :             : </span>
+<span id="L293"><span class="lineNum">     293</span>                 :             : /**</span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :  * @brief Stub for sched_getaffinity(pid, cpusetsize, mask).</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :  *</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :  * We have a single-CPU kernel so the affinity mask is always {0}. Writes</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             :  * one byte (bit 0 set) into the user-supplied @p mask buffer and returns</span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :  * the size of the populated mask in bytes (Linux convention).</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :  */</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             : kern_err_t sys_sched_getaffinity(</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :     u64 pid, u64 cpusetsize, u64 mask, u64 a4, u64 a5, u64 a6</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             : )</span>
+<span id="L303"><span class="lineNum">     303</span>                 :<span class="tlaGNC">           6 : {</span></span>
+<span id="L304"><span class="lineNum">     304</span>                 :<span class="tlaGNC">           6 :   (void)pid;</span></span>
+<span id="L305"><span class="lineNum">     305</span>                 :<span class="tlaGNC">           6 :   (void)a4;</span></span>
+<span id="L306"><span class="lineNum">     306</span>                 :<span class="tlaGNC">           6 :   (void)a5;</span></span>
+<span id="L307"><span class="lineNum">     307</span>                 :<span class="tlaGNC">           6 :   (void)a6;</span></span>
+<span id="L308"><span class="lineNum">     308</span>                 :             : </span>
+<span id="L309"><span class="lineNum">     309</span> [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>][<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           6 :   if(cpusetsize == 0 || !mask)</span></span>
+<span id="L310"><span class="lineNum">     310</span>                 :<span class="tlaGNC">           3 :     return -EINVAL;</span></span>
+<span id="L311"><span class="lineNum">     311</span>                 :             : </span>
+<span id="L312"><span class="lineNum">     312</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :   if(!vmm_is_user_range((void *)mask, cpusetsize))</span></span>
+<span id="L313"><span class="lineNum">     313</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : </span>
+<span id="L315"><span class="lineNum">     315</span>                 :<span class="tlaGNC">           2 :   u8 *m = (u8 *)mask;</span></span>
+<span id="L316"><span class="lineNum">     316</span>                 :<span class="tlaGNC">           2 :   m[0]  = 0x01; /* CPU 0 only */</span></span>
+<span id="L317"><span class="lineNum">     317</span>         [<span class="tlaGBC" title="Branch 0 was taken 14 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">          16 :   for(u64 i = 1; i &lt; cpusetsize; i++)</span></span>
+<span id="L318"><span class="lineNum">     318</span>                 :<span class="tlaGNC">          14 :     m[i] = 0;</span></span>
+<span id="L319"><span class="lineNum">     319</span>                 :<span class="tlaGNC">           2 :   return cpusetsize;</span></span>
+<span id="L320"><span class="lineNum">     320</span>                 :<span class="tlaGNC">           3 : }</span></span>
+<span id="L321"><span class="lineNum">     321</span>                 :             : </span>
+<span id="L322"><span class="lineNum">     322</span>                 :             : /** Linux rlimit struct: each value is rlim_t (u64 on x86_64). */</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             : struct k_rlimit</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             : {</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :   u64 rlim_cur;</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :   u64 rlim_max;</span>
+<span id="L327"><span class="lineNum">     327</span>                 :             : };</span>
+<span id="L328"><span class="lineNum">     328</span>                 :             : </span>
+<span id="L329"><span class="lineNum">     329</span>                 :             : /* RLIMIT_* indices we care about. */</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             : #define RLIMIT_CPU    0</span>
+<span id="L331"><span class="lineNum">     331</span>                 :             : #define RLIMIT_FSIZE  1</span>
+<span id="L332"><span class="lineNum">     332</span>                 :             : #define RLIMIT_DATA   2</span>
+<span id="L333"><span class="lineNum">     333</span>                 :<span class="tlaGNC">           1 : #define RLIMIT_STACK  3</span></span>
+<span id="L334"><span class="lineNum">     334</span>                 :             : #define RLIMIT_CORE   4</span>
+<span id="L335"><span class="lineNum">     335</span>                 :             : #define RLIMIT_RSS    5</span>
+<span id="L336"><span class="lineNum">     336</span>                 :<span class="tlaGNC">           1 : #define RLIMIT_NPROC  6</span></span>
+<span id="L337"><span class="lineNum">     337</span>                 :<span class="tlaGNC">           1 : #define RLIMIT_NOFILE 7</span></span>
+<span id="L338"><span class="lineNum">     338</span>                 :             : #define RLIMIT_AS     9</span>
+<span id="L339"><span class="lineNum">     339</span>                 :             : </span>
+<span id="L340"><span class="lineNum">     340</span>                 :             : /** Fill in a generous default rlimit so userland (clang/musl) doesn't bail. */</span>
+<span id="L341"><span class="lineNum">     341</span>                 :             : static void fill_default_rlimit(u64 resource, struct k_rlimit *out)</span>
+<span id="L342"><span class="lineNum">     342</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L343"><span class="lineNum">     343</span>                 :<span class="tlaGNC">           5 :   out-&gt;rlim_cur = (u64)-1; /* RLIM_INFINITY */</span></span>
+<span id="L344"><span class="lineNum">     344</span>                 :<span class="tlaGNC">           5 :   out-&gt;rlim_max = (u64)-1;</span></span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : </span>
+<span id="L346"><span class="lineNum">     346</span>                 :<span class="tlaGNC">           5 :   switch(resource) {</span></span>
+<span id="L347"><span class="lineNum">     347</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           1 :   case RLIMIT_STACK:</span></span>
+<span id="L348"><span class="lineNum">     348</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_cur = 8ULL * 1024 * 1024;  /* 8 MiB */</span></span>
+<span id="L349"><span class="lineNum">     349</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_max = 64ULL * 1024 * 1024; /* 64 MiB */</span></span>
+<span id="L350"><span class="lineNum">     350</span>                 :<span class="tlaGNC">           1 :     break;</span></span>
+<span id="L351"><span class="lineNum">     351</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           1 :   case RLIMIT_NOFILE:</span></span>
+<span id="L352"><span class="lineNum">     352</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_cur = 1024;</span></span>
+<span id="L353"><span class="lineNum">     353</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_max = 4096;</span></span>
+<span id="L354"><span class="lineNum">     354</span>                 :<span class="tlaGNC">           1 :     break;</span></span>
+<span id="L355"><span class="lineNum">     355</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 4 times"> + </span>]:<span class="tlaGNC">           1 :   case RLIMIT_NPROC:</span></span>
+<span id="L356"><span class="lineNum">     356</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_cur = 256;</span></span>
+<span id="L357"><span class="lineNum">     357</span>                 :<span class="tlaGNC">           1 :     out-&gt;rlim_max = 256;</span></span>
+<span id="L358"><span class="lineNum">     358</span>                 :<span class="tlaGNC">           1 :     break;</span></span>
+<span id="L359"><span class="lineNum">     359</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           2 :   default:</span></span>
+<span id="L360"><span class="lineNum">     360</span>                 :<span class="tlaGNC">           2 :     break;</span></span>
+<span id="L361"><span class="lineNum">     361</span>                 :<span class="tlaGNC">           5 :   }</span></span>
+<span id="L362"><span class="lineNum">     362</span>                 :<span class="tlaGNC">           5 : }</span></span>
+<span id="L363"><span class="lineNum">     363</span>                 :             : </span>
+<span id="L364"><span class="lineNum">     364</span>                 :             : kern_err_t sys_getrlimit(u64 resource, u64 rlim, u64 a3, u64 a4, u64 a5, u64 a6)</span>
+<span id="L365"><span class="lineNum">     365</span>                 :<span class="tlaGNC">           4 : {</span></span>
+<span id="L366"><span class="lineNum">     366</span>                 :<span class="tlaGNC">           4 :   (void)a3;</span></span>
+<span id="L367"><span class="lineNum">     367</span>                 :<span class="tlaGNC">           4 :   (void)a4;</span></span>
+<span id="L368"><span class="lineNum">     368</span>                 :<span class="tlaGNC">           4 :   (void)a5;</span></span>
+<span id="L369"><span class="lineNum">     369</span>                 :<span class="tlaGNC">           4 :   (void)a6;</span></span>
+<span id="L370"><span class="lineNum">     370</span>                 :             : </span>
+<span id="L371"><span class="lineNum">     371</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :   if(!user_buf_ok(rlim, sizeof(struct k_rlimit)))</span></span>
+<span id="L372"><span class="lineNum">     372</span>                 :<span class="tlaGNC">           1 :     return -EFAULT;</span></span>
+<span id="L373"><span class="lineNum">     373</span>                 :             : </span>
+<span id="L374"><span class="lineNum">     374</span>                 :<span class="tlaGNC">           3 :   fill_default_rlimit(resource, (struct k_rlimit *)rlim);</span></span>
+<span id="L375"><span class="lineNum">     375</span>                 :<span class="tlaGNC">           3 :   return 0;</span></span>
+<span id="L376"><span class="lineNum">     376</span>                 :<span class="tlaGNC">           4 : }</span></span>
+<span id="L377"><span class="lineNum">     377</span>                 :             : </span>
+<span id="L378"><span class="lineNum">     378</span>                 :             : kern_err_t sys_prlimit64(</span>
+<span id="L379"><span class="lineNum">     379</span>                 :             :     u64 pid, u64 resource, u64 new_limit, u64 old_limit, u64 a5, u64 a6</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             : )</span>
+<span id="L381"><span class="lineNum">     381</span>                 :<span class="tlaGNC">           5 : {</span></span>
+<span id="L382"><span class="lineNum">     382</span>                 :<span class="tlaGNC">           5 :   (void)pid;</span></span>
+<span id="L383"><span class="lineNum">     383</span>                 :<span class="tlaGNC">           5 :   (void)new_limit; /* setting limits is a no-op */</span></span>
+<span id="L384"><span class="lineNum">     384</span>                 :<span class="tlaGNC">           5 :   (void)a5;</span></span>
+<span id="L385"><span class="lineNum">     385</span>                 :<span class="tlaGNC">           5 :   (void)a6;</span></span>
+<span id="L386"><span class="lineNum">     386</span>                 :             : </span>
+<span id="L387"><span class="lineNum">     387</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           5 :   if(old_limit) {</span></span>
+<span id="L388"><span class="lineNum">     388</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           3 :     if(!user_buf_ok(old_limit, sizeof(struct k_rlimit)))</span></span>
+<span id="L389"><span class="lineNum">     389</span>                 :<span class="tlaGNC">           1 :       return -EFAULT;</span></span>
+<span id="L390"><span class="lineNum">     390</span>                 :<span class="tlaGNC">           2 :     fill_default_rlimit(resource, (struct k_rlimit *)old_limit);</span></span>
+<span id="L391"><span class="lineNum">     391</span>                 :<span class="tlaGNC">           2 :   }</span></span>
+<span id="L392"><span class="lineNum">     392</span>                 :<span class="tlaGNC">           4 :   return 0;</span></span>
+<span id="L393"><span class="lineNum">     393</span>                 :<span class="tlaGNC">           5 : }</span></span>
         </pre>
               </td>
             </tr>

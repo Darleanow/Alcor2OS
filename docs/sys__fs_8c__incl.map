@@ -12,7 +12,7 @@
 <area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="445,28,606,72,605,78,443,33"/>
 <area shape="rect" id="Node000012" href="$proc_8h.html" title="Process management and scheduling." alt="" coords="704,152,843,177"/>
 <area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="487,22,559,28,635,39,701,55,727,65,746,77,757,90,765,106,774,137,769,138,760,107,753,93,742,81,724,70,699,60,634,45,558,34,486,27"/>
-<area shape="rect" id="Node000015" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="192,79,347,104"/>
+<area shape="rect" id="Node000015" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only syscall layer declarations, not a public API." alt="" coords="192,79,347,104"/>
 <area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="382,33,304,74,302,70,380,28"/>
 <area shape="rect" id="Node000004" href="$types_8h.html" title="Common type definitions and macros." alt="" coords="399,299,513,324"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,176,129,212,150,232,173,248,226,272,281,288,336,298,385,304,384,309,335,304,280,293,224,277,171,253,147,236,125,216,96,179"/>

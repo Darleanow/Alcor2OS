@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21" target="_top" xlink:title="Stat the open file descriptor fd into a POSIX stat buffer.">
+<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a55c19a120c8db8174f736c5925e4e682" target="_top" xlink:title="Stat the open file descriptor fd into a POSIX stat buffer.">
 <polygon fill="white" stroke="#666666" points="200,-280 139,-280 139,-261 200,-261 200,-280"/>
 <text text-anchor="middle" x="169.5" y="-268" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fstat</text>
 </a>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="Node000003" class="node">
 <title>Node3</title>
-<g id="a_Node000003"><a xlink:href="sys__fs_8c.html#a66f6c5b7f67e1321644f27a4f71daf77" target="_top" xlink:title="Copy the calling process&#39;s CWD string into the user buffer buf.">
+<g id="a_Node000003"><a xlink:href="sys__fs_8c.html#ac3355ebc949d101587bb3088939d1354" target="_top" xlink:title="Copy the calling process&#39;s CWD string into the user buffer buf.">
 <polygon fill="white" stroke="#666666" points="206.5,-243 132.5,-243 132.5,-224 206.5,-224 206.5,-243"/>
 <text text-anchor="middle" x="169.5" y="-231" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getcwd</text>
 </a>
@@ -56,7 +56,7 @@
 <!-- Node4 -->
 <g id="Node000004" class="node">
 <title>Node4</title>
-<g id="a_Node000004"><a xlink:href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" target="_top" xlink:title="Fill dirp with dirent64 entries from the open directory fd.">
+<g id="a_Node000004"><a xlink:href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6" target="_top" xlink:title="Fill dirp with dirent64 entries from the open directory fd.">
 <polygon fill="white" stroke="#666666" points="210,-206 129,-206 129,-187 210,-187 210,-206"/>
 <text text-anchor="middle" x="169.5" y="-194" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getdents</text>
 </a>
@@ -74,7 +74,7 @@
 <!-- Node6 -->
 <g id="Node000006" class="node">
 <title>Node6</title>
-<g id="a_Node000006"><a xlink:href="sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" target="_top" xlink:title="newfstatat — supports AT_FDCWD and absolute paths only.">
+<g id="a_Node000006"><a xlink:href="sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" target="_top" xlink:title="newfstatat &#45; supports AT_FDCWD and absolute paths only.">
 <polygon fill="white" stroke="#666666" points="92,-112 1,-112 1,-93 92,-93 92,-112"/>
 <text text-anchor="middle" x="46.5" y="-100" font-family="Helvetica,sans-Serif" font-size="10.00">sys_newfstatat</text>
 </a>
@@ -92,7 +92,7 @@
 <!-- Node7 -->
 <g id="Node000007" class="node">
 <title>Node7</title>
-<g id="a_Node000007"><a xlink:href="sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635" target="_top" xlink:title="Read count bytes from fd at absolute offset without moving the seek position.">
+<g id="a_Node000007"><a xlink:href="sys__fs_8c.html#ac897a1cc4c3feace952df07d7cc30a63" target="_top" xlink:title="Read count bytes from fd at absolute offset without moving the seek position.">
 <polygon fill="white" stroke="#666666" points="208.5,-130 130.5,-130 130.5,-111 208.5,-111 208.5,-130"/>
 <text text-anchor="middle" x="169.5" y="-118" font-family="Helvetica,sans-Serif" font-size="10.00">sys_pread64</text>
 </a>
@@ -110,7 +110,7 @@
 <!-- Node8 -->
 <g id="Node000008" class="node">
 <title>Node8</title>
-<g id="a_Node000008"><a xlink:href="sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237" target="_top" xlink:title="Write count bytes to fd at absolute offset without moving the seek position.">
+<g id="a_Node000008"><a xlink:href="sys__fs_8c.html#a430c96a16cfcfe001404dc60153f7414" target="_top" xlink:title="Write count bytes to fd at absolute offset without moving the seek position.">
 <polygon fill="white" stroke="#666666" points="210,-93 129,-93 129,-74 210,-74 210,-93"/>
 <text text-anchor="middle" x="169.5" y="-81" font-family="Helvetica,sans-Serif" font-size="10.00">sys_pwrite64</text>
 </a>
@@ -128,7 +128,7 @@
 <!-- Node9 -->
 <g id="Node000009" class="node">
 <title>Node9</title>
-<g id="a_Node000009"><a xlink:href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
+<g id="a_Node000009"><a xlink:href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
 <polygon fill="white" stroke="#666666" points="208.5,-56 130.5,-56 130.5,-37 208.5,-37 208.5,-56"/>
 <text text-anchor="middle" x="169.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_readlink</text>
 </a>
@@ -146,7 +146,7 @@
 <!-- Node10 -->
 <g id="Node000010" class="node">
 <title>Node10</title>
-<g id="a_Node000010"><a xlink:href="sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" target="_top" xlink:title="Stat the node at path into a POSIX stat buffer.">
+<g id="a_Node000010"><a xlink:href="sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" target="_top" xlink:title="Stat the node at path into a POSIX stat buffer.">
 <polygon fill="white" stroke="#666666" points="198,-19 141,-19 141,0 198,0 198,-19"/>
 <text text-anchor="middle" x="169.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_stat</text>
 </a>
@@ -164,7 +164,7 @@
 <!-- Node5 -->
 <g id="Node000005" class="node">
 <title>Node5</title>
-<g id="a_Node000005"><a xlink:href="sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395" target="_top" xlink:title="getdents64 — identical to sys_getdents on this platform.">
+<g id="a_Node000005"><a xlink:href="sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab" target="_top" xlink:title="getdents64 &#45; identical to sys_getdents on this platform.">
 <polygon fill="white" stroke="#666666" points="93,-206 0,-206 0,-187 93,-187 93,-206"/>
 <text text-anchor="middle" x="46.5" y="-194" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getdents64</text>
 </a>
@@ -191,7 +191,7 @@
 <!-- Node11 -->
 <g id="Node000011" class="node">
 <title>Node11</title>
-<g id="a_Node000011"><a xlink:href="sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" target="_top" xlink:title="lstat — no symlink resolution in VFS yet; identical to stat.">
+<g id="a_Node000011"><a xlink:href="sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" target="_top" xlink:title="lstat &#45; no symlink resolution in VFS yet; identical to stat.">
 <polygon fill="white" stroke="#666666" points="76.5,-19 16.5,-19 16.5,0 76.5,0 76.5,-19"/>
 <text text-anchor="middle" x="46.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_lstat</text>
 </a>

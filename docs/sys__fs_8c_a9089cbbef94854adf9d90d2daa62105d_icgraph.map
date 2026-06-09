@@ -1,5 +1,0 @@
-<map id="sys_access" name="sys_access">
-<area shape="rect" id="Node000001" title="Check that path exists and is accessible; always grants access." alt="" coords="167,5,261,31"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972" title="faccessat — only AT_FDCWD and absolute paths are supported." alt="" coords="5,5,119,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,21,119,21,119,15,153,15"/>
-</map>

@@ -1,5 +1,5 @@
 <map id="vfs_unlink" name="vfs_unlink">
 <area shape="rect" id="Node000001" title="Delete the file at path (must not be a directory)." alt="" coords="144,5,233,31"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a9b635f43a86efa68bdf828ae9fb1c76c" title="Delete the file at pathname." alt="" coords="5,5,96,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#adad566d662cfea8d303bb495215855e3" title="Delete the file at pathname." alt="" coords="5,5,96,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,21,96,21,96,15,130,15"/>
 </map>

@@ -1,0 +1,25 @@
+<map id="sys_openat" name="sys_openat">
+<area shape="rect" id="Node000001" title="openat &#45; only AT_FDCWD is supported; delegates to sys_open." alt="" coords="5,132,101,157"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#adcd3dedc92d59bac3e8a22803f6d7b8e" title="Open or create a file and return a file descriptor." alt="" coords="149,132,232,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,142,136,142,136,147,101,147"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a2b62b386a750a6392a02d67953da3095" title="Return true if ptr is a valid, non&#45;NULL user&#45;space pointer." alt="" coords="280,56,384,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="214,129,294,86,297,90,217,134"/>
+<area shape="rect" id="Node000005" href="$vfs_8c.html#ab5bd80a9a513b26f0163e722c9def638" title="Open or create a file and install a file descriptor." alt="" coords="291,156,373,181"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="233,149,278,157,277,162,232,154"/>
+<area shape="rect" id="Node000004" href="$vmm_8c.html#ae8c1a22dcc48b0b427c8272d84b88ca0" title="Check if a pointer is in user space." alt="" coords="439,5,573,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="376,53,447,32,449,37,377,58"/>
+<area shape="rect" id="Node000006" href="$vfs_8c.html#a7a6905322835d34f51e6b34bd87075da" title="Allocate and zero a free OFT slot; refcount is initialised to 1." alt="" coords="467,55,545,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="348,154,385,126,431,97,459,83,461,88,433,102,388,131,351,158"/>
+<area shape="rect" id="Node000008" href="$proc_8c.html#ad849c5156bdc5fb8229a60a9fc0157ac" title="Get the currently running process." alt="" coords="628,205,731,231"/>
+<area shape="poly" id="edge6_Node000005_Node000008" title=" " alt="" coords="368,153,412,141,465,132,524,130,553,134,581,141,624,164,658,193,655,197,621,168,579,146,552,139,523,136,466,137,413,147,369,159"/>
+<area shape="rect" id="Node000009" href="$vfs_8c.html#aa3642862a395542eb9bd7c999dcf795f" title="Find the mount whose target is the longest prefix of path." alt="" coords="445,156,567,181"/>
+<area shape="poly" id="edge7_Node000005_Node000009" title=" " alt="" coords="373,166,431,166,431,171,373,171"/>
+<area shape="rect" id="Node000013" href="$vfs_8c.html#af1e90ca12131ca668303e7b23f903842" title="Install a new fd in the calling process pointing at OFT slot oft_idx." alt="" coords="451,205,561,231"/>
+<area shape="poly" id="edge8_Node000005_Node000013" title=" " alt="" coords="374,178,448,199,446,204,372,183"/>
+<area shape="rect" id="Node000014" href="$vfs_8c.html#a51d7bce96d1618609b4420f3aa8146b7" title="Build an absolute, normalised path in out." alt="" coords="432,255,580,280"/>
+<area shape="poly" id="edge10_Node000005_Node000014" title=" " alt="" coords="349,180,386,209,433,240,450,247,447,252,431,244,383,214,346,184"/>
+<area shape="rect" id="Node000019" href="$vfs_8c.html#a717a1fb6f59873ee3957f52bbb945bc7" title="Decrement the OFT refcount for slot idx." alt="" coords="445,304,567,329"/>
+<area shape="poly" id="edge12_Node000005_Node000019" title=" " alt="" coords="342,180,377,233,403,263,434,289,445,296,442,301,430,293,399,267,373,236,338,183"/>
+<area shape="poly" id="edge9_Node000013_Node000008" title=" " alt="" coords="561,215,614,215,614,221,561,221"/>
+<area shape="poly" id="edge11_Node000014_Node000008" title=" " alt="" coords="551,252,620,232,621,237,552,257"/>
+</map>

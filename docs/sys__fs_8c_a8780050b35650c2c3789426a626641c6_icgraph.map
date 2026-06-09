@@ -1,0 +1,5 @@
+<map id="sys_getdents" name="sys_getdents">
+<area shape="rect" id="Node000001" title="Fill dirp with dirent64 entries from the open directory fd." alt="" coords="177,5,285,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab" title="getdents64 &#45; identical to sys_getdents on this platform." alt="" coords="5,5,129,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,21,129,21,129,15,164,15"/>
+</map>

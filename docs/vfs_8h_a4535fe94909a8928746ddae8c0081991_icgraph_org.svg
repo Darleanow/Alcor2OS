@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a1c7b290c87a6fc7f5dc164a9e944f00d" target="_top" xlink:title="Truncate the file open as fd to exactly length bytes.">
+<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a21ca8e448559278ca1affa80b962f7a0" target="_top" xlink:title="Truncate the file open as fd to exactly length bytes.">
 <polygon fill="white" stroke="#666666" points="82,-19 0,-19 0,0 82,0 82,-19"/>
 <text text-anchor="middle" x="41" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_ftruncate</text>
 </a>

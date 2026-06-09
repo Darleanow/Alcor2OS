@@ -236,7 +236,7 @@
 <!-- Node55 -->
 <g id="Node000055" class="node">
 <title>Node55</title>
-<g id="a_Node000055"><a xlink:href="sys__misc_8c.html#a439ddc81d402bd6c2b7ef91bd8ba334b" target="_top" xlink:title=" ">
+<g id="a_Node000055"><a xlink:href="sys__misc_8c.html#a12083668cc3022ede84483a1b6193c79" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="367.5,-93 303.5,-93 303.5,-74 367.5,-74 367.5,-93"/>
 <text text-anchor="middle" x="335.5" y="-81" font-family="Helvetica,sans-Serif" font-size="10.00">sys_futex</text>
 </a>
@@ -254,7 +254,7 @@
 <!-- Node56 -->
 <g id="Node000056" class="node">
 <title>Node56</title>
-<g id="a_Node000056"><a xlink:href="sys__misc_8c.html#acacf20558cd95ceaa18a6f8b837c5536" target="_top" xlink:title=" ">
+<g id="a_Node000056"><a xlink:href="sys__misc_8c.html#aea67d7e16c735675c01b94b37f573e35" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="383.5,-56 287.5,-56 287.5,-37 383.5,-37 383.5,-56"/>
 <text text-anchor="middle" x="335.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_sched_yield</text>
 </a>
@@ -434,7 +434,7 @@
 <!-- Node25 -->
 <g id="Node000025" class="node">
 <title>Node25</title>
-<g id="a_Node000025"><a xlink:href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
+<g id="a_Node000025"><a xlink:href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
 <polygon fill="white" stroke="#666666" points="217,-278 144,-278 144,-259 217,-259 217,-278"/>
 <text text-anchor="middle" x="180.5" y="-266" font-family="Helvetica,sans-Serif" font-size="10.00">sys_execve</text>
 </a>
@@ -452,7 +452,7 @@
 <!-- Node42 -->
 <g id="Node000042" class="node">
 <title>Node42</title>
-<g id="a_Node000042"><a xlink:href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" target="_top" xlink:title="Terminate the calling process with status.">
+<g id="a_Node000042"><a xlink:href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" target="_top" xlink:title="Terminate the calling process with status.">
 <polygon fill="#fff0f0" stroke="red" points="209,-241 152,-241 152,-222 209,-222 209,-241"/>
 <text text-anchor="middle" x="180.5" y="-229" font-family="Helvetica,sans-Serif" font-size="10.00">sys_exit</text>
 </a>
@@ -506,7 +506,7 @@
 <!-- Node51 -->
 <g id="Node000051" class="node">
 <title>Node51</title>
-<g id="a_Node000051"><a xlink:href="sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" target="_top" xlink:title="Wait for a child process to change state (wait4).">
+<g id="a_Node000051"><a xlink:href="sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2" target="_top" xlink:title="Wait for a child process to change state (wait4).">
 <polygon fill="white" stroke="#666666" points="213,-93 148,-93 148,-74 213,-74 213,-93"/>
 <text text-anchor="middle" x="180.5" y="-81" font-family="Helvetica,sans-Serif" font-size="10.00">sys_wait4</text>
 </a>
@@ -524,7 +524,7 @@
 <!-- Node53 -->
 <g id="Node000053" class="node">
 <title>Node53</title>
-<g id="a_Node000053"><a xlink:href="sys__io_8c.html#ac1f83a4054cef5b877820ce1a87cd67f" target="_top" xlink:title="Wait for events on an array of nfds_u file descriptors (poll).">
+<g id="a_Node000053"><a xlink:href="sys__io_8c.html#a9f8fa2af9558b271aa627430deaf804a" target="_top" xlink:title="Wait for events on an array of nfds_u file descriptors (poll).">
 <polygon fill="white" stroke="#666666" points="208.5,-19 152.5,-19 152.5,0 208.5,0 208.5,-19"/>
 <text text-anchor="middle" x="180.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_poll</text>
 </a>
@@ -542,7 +542,7 @@
 <!-- Node54 -->
 <g id="Node000054" class="node">
 <title>Node54</title>
-<g id="a_Node000054"><a xlink:href="sys__io_8c.html#aa9e778b7b4070bb665442953438b91f7" target="_top" xlink:title="Monitor up to nfds_u descriptors for I/O readiness (select).">
+<g id="a_Node000054"><a xlink:href="sys__io_8c.html#a8e70cdd2f9ab30cb2ccdf4c0002eb0a4" target="_top" xlink:title="Monitor up to nfds_u descriptors for I/O readiness (select).">
 <polygon fill="white" stroke="#666666" points="214.5,-56 146.5,-56 146.5,-37 214.5,-37 214.5,-56"/>
 <text text-anchor="middle" x="180.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_select</text>
 </a>

@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="Node000002" class="node">
 <title>Node2</title>
-<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
+<g id="a_Node000002"><a xlink:href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
 <polygon fill="white" stroke="#666666" points="78,-19 0,-19 0,0 78,0 78,-19"/>
 <text text-anchor="middle" x="39" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_readlink</text>
 </a>

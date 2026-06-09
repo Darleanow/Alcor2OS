@@ -1,5 +1,5 @@
 <map id="proc_waitpid" name="proc_waitpid">
 <area shape="rect" id="Node000001" title="Wait for any child or specific child process." alt="" coords="140,5,245,31"/>
-<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" title="Wait for a child process to change state (wait4)." alt="" coords="5,5,92,31"/>
+<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2" title="Wait for a child process to change state (wait4)." alt="" coords="5,5,92,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
 </map>

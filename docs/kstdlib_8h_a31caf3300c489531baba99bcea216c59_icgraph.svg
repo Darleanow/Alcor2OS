@@ -210,7 +210,7 @@ var sectionId = 'dynsection-8';
 <!-- Node46 -->
 <g id="Node000046" class="node">
 <title>Node46</title>
-<g id="a_Node000046"><a xlink:href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
+<g id="a_Node000046"><a xlink:href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05" target="_top" xlink:title="Read the target of a symbolic link at path into buf.">
 <polygon fill="white" stroke="#666666" points="224.5,-133 146.5,-133 146.5,-114 224.5,-114 224.5,-133"/>
 <text text-anchor="middle" x="185.5" y="-121" font-family="Helvetica,sans-Serif" font-size="10.00">sys_readlink</text>
 </a>
@@ -282,7 +282,7 @@ var sectionId = 'dynsection-8';
 <!-- Node60 -->
 <g id="Node000060" class="node">
 <title>Node60</title>
-<g id="a_Node000060"><a xlink:href="sys__fs_8c.html#a66f6c5b7f67e1321644f27a4f71daf77" target="_top" xlink:title="Copy the calling process&#39;s CWD string into the user buffer buf.">
+<g id="a_Node000060"><a xlink:href="sys__fs_8c.html#ac3355ebc949d101587bb3088939d1354" target="_top" xlink:title="Copy the calling process&#39;s CWD string into the user buffer buf.">
 <polygon fill="white" stroke="#666666" points="719,-132 645,-132 645,-113 719,-113 719,-132"/>
 <text text-anchor="middle" x="682" y="-120" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getcwd</text>
 </a>
@@ -570,7 +570,7 @@ var sectionId = 'dynsection-8';
 <!-- Node28 -->
 <g id="Node000028" class="node">
 <title>Node28</title>
-<g id="a_Node000028"><a xlink:href="sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" target="_top" xlink:title="Stat the node at path into a POSIX stat buffer.">
+<g id="a_Node000028"><a xlink:href="sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" target="_top" xlink:title="Stat the node at path into a POSIX stat buffer.">
 <polygon fill="white" stroke="#666666" points="214,-415 157,-415 157,-396 214,-396 214,-415"/>
 <text text-anchor="middle" x="185.5" y="-403" font-family="Helvetica,sans-Serif" font-size="10.00">sys_stat</text>
 </a>
@@ -588,7 +588,7 @@ var sectionId = 'dynsection-8';
 <!-- Node29 -->
 <g id="Node000029" class="node">
 <title>Node29</title>
-<g id="a_Node000029"><a xlink:href="sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" target="_top" xlink:title="lstat — no symlink resolution in VFS yet; identical to stat.">
+<g id="a_Node000029"><a xlink:href="sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" target="_top" xlink:title="lstat &#45; no symlink resolution in VFS yet; identical to stat.">
 <polygon fill="white" stroke="#666666" points="75.5,-433 15.5,-433 15.5,-414 75.5,-414 75.5,-433"/>
 <text text-anchor="middle" x="45.5" y="-421" font-family="Helvetica,sans-Serif" font-size="10.00">sys_lstat</text>
 </a>
@@ -606,7 +606,7 @@ var sectionId = 'dynsection-8';
 <!-- Node30 -->
 <g id="Node000030" class="node">
 <title>Node30</title>
-<g id="a_Node000030"><a xlink:href="sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" target="_top" xlink:title="newfstatat — supports AT_FDCWD and absolute paths only.">
+<g id="a_Node000030"><a xlink:href="sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" target="_top" xlink:title="newfstatat &#45; supports AT_FDCWD and absolute paths only.">
 <polygon fill="white" stroke="#666666" points="91,-396 0,-396 0,-377 91,-377 91,-396"/>
 <text text-anchor="middle" x="45.5" y="-384" font-family="Helvetica,sans-Serif" font-size="10.00">sys_newfstatat</text>
 </a>
@@ -966,7 +966,7 @@ var sectionId = 'dynsection-8';
 <!-- Node63 -->
 <g id="Node000063" class="node">
 <title>Node63</title>
-<g id="a_Node000063"><a xlink:href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" target="_top" xlink:title="Fill dirp with dirent64 entries from the open directory fd.">
+<g id="a_Node000063"><a xlink:href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6" target="_top" xlink:title="Fill dirp with dirent64 entries from the open directory fd.">
 <polygon fill="white" stroke="#666666" points="554.5,-19 473.5,-19 473.5,0 554.5,0 554.5,-19"/>
 <text text-anchor="middle" x="514" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getdents</text>
 </a>
@@ -984,7 +984,7 @@ var sectionId = 'dynsection-8';
 <!-- Node64 -->
 <g id="Node000064" class="node">
 <title>Node64</title>
-<g id="a_Node000064"><a xlink:href="sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395" target="_top" xlink:title="getdents64 — identical to sys_getdents on this platform.">
+<g id="a_Node000064"><a xlink:href="sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab" target="_top" xlink:title="getdents64 &#45; identical to sys_getdents on this platform.">
 <polygon fill="white" stroke="#666666" points="389,-19 296,-19 296,0 389,0 389,-19"/>
 <text text-anchor="middle" x="342.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_getdents64</text>
 </a>

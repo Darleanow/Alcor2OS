@@ -130,50 +130,50 @@ Functions</h2></td></tr>
 <tr class="memitem:acf40044c5e098f736e0e2f32a76717ed" id="r_acf40044c5e098f736e0e2f32a76717ed"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="types_8h.html#a85cb35fbe5bf2961d7ad5f26814a91a2">i64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#acf40044c5e098f736e0e2f32a76717ed">copy_user_strvec</a> (char **user_vec, char store[][<a class="el" href="sys__proc_8c.html#adcb675d62d3d40872dcbc03dc948c6af">MAX_ARG_LEN</a>], char *ptrs[], int *out_count)</td></tr>
 <tr class="memdesc:acf40044c5e098f736e0e2f32a76717ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy a null-terminated user-space string vector into kernel storage.  <br /></td></tr>
 <tr class="separator:acf40044c5e098f736e0e2f32a76717ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a081835edaec6846f64003072244af565" id="r_a081835edaec6846f64003072244af565"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a081835edaec6846f64003072244af565">sys_getpid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a081835edaec6846f64003072244af565"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's PID (or 1 if no process is running).  <br /></td></tr>
-<tr class="separator:a081835edaec6846f64003072244af565"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5aabf0a59cd47d6e0a95b8dd74ee8413" id="r_a5aabf0a59cd47d6e0a95b8dd74ee8413"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a5aabf0a59cd47d6e0a95b8dd74ee8413">sys_gettid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a5aabf0a59cd47d6e0a95b8dd74ee8413"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling thread's TID — same as PID (no thread support).  <br /></td></tr>
-<tr class="separator:a5aabf0a59cd47d6e0a95b8dd74ee8413"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a351915ba1475da0bcf53ea7c5d9c18b4" id="r_a351915ba1475da0bcf53ea7c5d9c18b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a351915ba1475da0bcf53ea7c5d9c18b4">sys_getppid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a351915ba1475da0bcf53ea7c5d9c18b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's parent PID.  <br /></td></tr>
-<tr class="separator:a351915ba1475da0bcf53ea7c5d9c18b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a479ed177adb4ba4e7cc96063f917c31e" id="r_a479ed177adb4ba4e7cc96063f917c31e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e">sys_clone</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> child_stack, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> ptid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> ctid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tls, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a479ed177adb4ba4e7cc96063f917c31e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate the calling process (<code>clone</code>).  <br /></td></tr>
-<tr class="separator:a479ed177adb4ba4e7cc96063f917c31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba8579e09bd5de65736d9b19dc356a36" id="r_aba8579e09bd5de65736d9b19dc356a36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36">sys_fork</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:aba8579e09bd5de65736d9b19dc356a36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate the calling process (<code>fork</code>).  <br /></td></tr>
-<tr class="separator:aba8579e09bd5de65736d9b19dc356a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac94fd40d902c2bb4efd34532439a30ce" id="r_ac94fd40d902c2bb4efd34532439a30ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce">sys_execve</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> argv, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> envp, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:ac94fd40d902c2bb4efd34532439a30ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace the calling process image with a new ELF at <code>pathname</code>.  <br /></td></tr>
-<tr class="separator:ac94fd40d902c2bb4efd34532439a30ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adaaff2c02bdbb9c04402a8ff043d32a5" id="r_adaaff2c02bdbb9c04402a8ff043d32a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5">sys_exit</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> status, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:adaaff2c02bdbb9c04402a8ff043d32a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terminate the calling process with <code>status</code>.  <br /></td></tr>
-<tr class="separator:adaaff2c02bdbb9c04402a8ff043d32a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e8aa1e2259e05a3fffab177867626b2" id="r_a6e8aa1e2259e05a3fffab177867626b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2">sys_exit_group</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> status, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a6e8aa1e2259e05a3fffab177867626b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terminate all threads in the group — equivalent to <a class="el" href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status.">sys_exit</a> here.  <br /></td></tr>
-<tr class="separator:a6e8aa1e2259e05a3fffab177867626b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54f03e8b54e409ff39140d6476222398" id="r_a54f03e8b54e409ff39140d6476222398"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398">sys_wait4</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> wstatus, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> options, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> rusage, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a54f03e8b54e409ff39140d6476222398"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for a child process to change state (<code>wait4</code>).  <br /></td></tr>
-<tr class="separator:a54f03e8b54e409ff39140d6476222398"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52090911e9c6b7a812b026687670ac54" id="r_a52090911e9c6b7a812b026687670ac54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a52090911e9c6b7a812b026687670ac54">sys_getuid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a52090911e9c6b7a812b026687670ac54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's real user ID (always 0 — root).  <br /></td></tr>
-<tr class="separator:a52090911e9c6b7a812b026687670ac54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a667c0af9ce7fe4012b884a86217834a0" id="r_a667c0af9ce7fe4012b884a86217834a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a667c0af9ce7fe4012b884a86217834a0">sys_getgid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a667c0af9ce7fe4012b884a86217834a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's real group ID (always 0 — root).  <br /></td></tr>
-<tr class="separator:a667c0af9ce7fe4012b884a86217834a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0b6f027b667afd096484d66a94b3afe" id="r_ab0b6f027b667afd096484d66a94b3afe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#ab0b6f027b667afd096484d66a94b3afe">sys_geteuid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:ab0b6f027b667afd096484d66a94b3afe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's effective user ID (always 0 — root).  <br /></td></tr>
-<tr class="separator:ab0b6f027b667afd096484d66a94b3afe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0eb960f2aef304b6aedbf1b5ba1318a3" id="r_a0eb960f2aef304b6aedbf1b5ba1318a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a0eb960f2aef304b6aedbf1b5ba1318a3">sys_getegid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a0eb960f2aef304b6aedbf1b5ba1318a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's effective group ID (always 0 — root).  <br /></td></tr>
-<tr class="separator:a0eb960f2aef304b6aedbf1b5ba1318a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1b5ea932b7bfeca8baa769a7dd512c" id="r_a3b1b5ea932b7bfeca8baa769a7dd512c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a3b1b5ea932b7bfeca8baa769a7dd512c">sys_set_tid_address</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tidptr, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a3b1b5ea932b7bfeca8baa769a7dd512c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the clear-child-tid address (no-op); returns the current TID.  <br /></td></tr>
-<tr class="separator:a3b1b5ea932b7bfeca8baa769a7dd512c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affab6f1b0ea45def80ad50ccbeb86401" id="r_affab6f1b0ea45def80ad50ccbeb86401"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#affab6f1b0ea45def80ad50ccbeb86401">sys_arch_prctl</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> code, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> addr, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="separator:affab6f1b0ea45def80ad50ccbeb86401"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa882939f7e066b9a38d413c4c6d6e581" id="r_aa882939f7e066b9a38d413c4c6d6e581"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#aa882939f7e066b9a38d413c4c6d6e581">sys_getpid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:aa882939f7e066b9a38d413c4c6d6e581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's PID (or 1 if no process is running).  <br /></td></tr>
+<tr class="separator:aa882939f7e066b9a38d413c4c6d6e581"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af35689fb812a5e6f2ab800a93d822583" id="r_af35689fb812a5e6f2ab800a93d822583"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#af35689fb812a5e6f2ab800a93d822583">sys_gettid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:af35689fb812a5e6f2ab800a93d822583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling thread's TID - same as PID (no thread support).  <br /></td></tr>
+<tr class="separator:af35689fb812a5e6f2ab800a93d822583"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a356a344759c51450fd80a1f96d790b6d" id="r_a356a344759c51450fd80a1f96d790b6d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a356a344759c51450fd80a1f96d790b6d">sys_getppid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a356a344759c51450fd80a1f96d790b6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's parent PID.  <br /></td></tr>
+<tr class="separator:a356a344759c51450fd80a1f96d790b6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb73ea77ef1d8ed5f068ab9d52210cb6" id="r_abb73ea77ef1d8ed5f068ab9d52210cb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#abb73ea77ef1d8ed5f068ab9d52210cb6">sys_clone</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> child_stack, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> ptid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> ctid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tls, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:abb73ea77ef1d8ed5f068ab9d52210cb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate the calling process (<code>clone</code>).  <br /></td></tr>
+<tr class="separator:abb73ea77ef1d8ed5f068ab9d52210cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94d8af8fc8ae857d5816d6ca7ab73bca" id="r_a94d8af8fc8ae857d5816d6ca7ab73bca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca">sys_fork</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a94d8af8fc8ae857d5816d6ca7ab73bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate the calling process (<code>fork</code>).  <br /></td></tr>
+<tr class="separator:a94d8af8fc8ae857d5816d6ca7ab73bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a827b355acd43667b34b4d1db5377be4d" id="r_a827b355acd43667b34b4d1db5377be4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d">sys_execve</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> argv, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> envp, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a827b355acd43667b34b4d1db5377be4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace the calling process image with a new ELF at <code>pathname</code>.  <br /></td></tr>
+<tr class="separator:a827b355acd43667b34b4d1db5377be4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b72e7bd7c7689eb96c83b2ecad335f" id="r_af0b72e7bd7c7689eb96c83b2ecad335f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f">sys_exit</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> status, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:af0b72e7bd7c7689eb96c83b2ecad335f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terminate the calling process with <code>status</code>.  <br /></td></tr>
+<tr class="separator:af0b72e7bd7c7689eb96c83b2ecad335f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afee2a1f1efdfdcf0b0d4490e832c19d8" id="r_afee2a1f1efdfdcf0b0d4490e832c19d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#afee2a1f1efdfdcf0b0d4490e832c19d8">sys_exit_group</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> status, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:afee2a1f1efdfdcf0b0d4490e832c19d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terminate all threads in the group - equivalent to <a class="el" href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" title="Terminate the calling process with status.">sys_exit</a> here.  <br /></td></tr>
+<tr class="separator:afee2a1f1efdfdcf0b0d4490e832c19d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a804304a7ce50ad8730e039286e05d7e2" id="r_a804304a7ce50ad8730e039286e05d7e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2">sys_wait4</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pid, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> wstatus, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> options, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> rusage, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a804304a7ce50ad8730e039286e05d7e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for a child process to change state (<code>wait4</code>).  <br /></td></tr>
+<tr class="separator:a804304a7ce50ad8730e039286e05d7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb177b13a00911c1f808c92d6c13d914" id="r_acb177b13a00911c1f808c92d6c13d914"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#acb177b13a00911c1f808c92d6c13d914">sys_getuid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:acb177b13a00911c1f808c92d6c13d914"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's real user ID (always 0 - root).  <br /></td></tr>
+<tr class="separator:acb177b13a00911c1f808c92d6c13d914"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a2682d7b1b12e8212be8c792c316371" id="r_a2a2682d7b1b12e8212be8c792c316371"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a2a2682d7b1b12e8212be8c792c316371">sys_getgid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a2a2682d7b1b12e8212be8c792c316371"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's real group ID (always 0 - root).  <br /></td></tr>
+<tr class="separator:a2a2682d7b1b12e8212be8c792c316371"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3600bf8790d7f9c1be26dc18999a237d" id="r_a3600bf8790d7f9c1be26dc18999a237d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a3600bf8790d7f9c1be26dc18999a237d">sys_geteuid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a3600bf8790d7f9c1be26dc18999a237d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's effective user ID (always 0 - root).  <br /></td></tr>
+<tr class="separator:a3600bf8790d7f9c1be26dc18999a237d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a096f9c169f93983403009f54d2795749" id="r_a096f9c169f93983403009f54d2795749"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#a096f9c169f93983403009f54d2795749">sys_getegid</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a1, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a096f9c169f93983403009f54d2795749"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the calling process's effective group ID (always 0 - root).  <br /></td></tr>
+<tr class="separator:a096f9c169f93983403009f54d2795749"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5622de49344cae03a88a645f4f56693" id="r_af5622de49344cae03a88a645f4f56693"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#af5622de49344cae03a88a645f4f56693">sys_set_tid_address</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> tidptr, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:af5622de49344cae03a88a645f4f56693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the clear-child-tid address (no-op); returns the current TID.  <br /></td></tr>
+<tr class="separator:af5622de49344cae03a88a645f4f56693"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6acc981d690211ae470bf4a31a66a2c" id="r_ad6acc981d690211ae470bf4a31a66a2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__proc_8c.html#ad6acc981d690211ae470bf4a31a66a2c">sys_arch_prctl</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> code, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> addr, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="separator:ad6acc981d690211ae470bf4a31a66a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Process syscalls: PID queries, fork, exec, wait, clone, identity. </p>
@@ -382,14 +382,14 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="affab6f1b0ea45def80ad50ccbeb86401" name="affab6f1b0ea45def80ad50ccbeb86401"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#affab6f1b0ea45def80ad50ccbeb86401">&#9670;&#160;</a></span>sys_arch_prctl()</h2>
+<a id="ad6acc981d690211ae470bf4a31a66a2c" name="ad6acc981d690211ae470bf4a31a66a2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6acc981d690211ae470bf4a31a66a2c">&#9670;&#160;</a></span>sys_arch_prctl()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_arch_prctl </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_arch_prctl </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>code</em>, </td>
@@ -434,19 +434,19 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_affab6f1b0ea45def80ad50ccbeb86401_cgraph.svg" width="307" height="234"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_ad6acc981d690211ae470bf4a31a66a2c_cgraph.svg" width="307" height="234"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a479ed177adb4ba4e7cc96063f917c31e" name="a479ed177adb4ba4e7cc96063f917c31e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a479ed177adb4ba4e7cc96063f917c31e">&#9670;&#160;</a></span>sys_clone()</h2>
+<a id="abb73ea77ef1d8ed5f068ab9d52210cb6" name="abb73ea77ef1d8ed5f068ab9d52210cb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb73ea77ef1d8ed5f068ab9d52210cb6">&#9670;&#160;</a></span>sys_clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_clone </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_clone </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>flags</em>, </td>
@@ -494,19 +494,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a479ed177adb4ba4e7cc96063f917c31e_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_abb73ea77ef1d8ed5f068ab9d52210cb6_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="ac94fd40d902c2bb4efd34532439a30ce" name="ac94fd40d902c2bb4efd34532439a30ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac94fd40d902c2bb4efd34532439a30ce">&#9670;&#160;</a></span>sys_execve()</h2>
+<a id="a827b355acd43667b34b4d1db5377be4d" name="a827b355acd43667b34b4d1db5377be4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a827b355acd43667b34b4d1db5377be4d">&#9670;&#160;</a></span>sys_execve()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_execve </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_execve </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pathname</em>, </td>
@@ -554,19 +554,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_ac94fd40d902c2bb4efd34532439a30ce_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a827b355acd43667b34b4d1db5377be4d_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="adaaff2c02bdbb9c04402a8ff043d32a5" name="adaaff2c02bdbb9c04402a8ff043d32a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adaaff2c02bdbb9c04402a8ff043d32a5">&#9670;&#160;</a></span>sys_exit()</h2>
+<a id="af0b72e7bd7c7689eb96c83b2ecad335f" name="af0b72e7bd7c7689eb96c83b2ecad335f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0b72e7bd7c7689eb96c83b2ecad335f">&#9670;&#160;</a></span>sys_exit()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_exit </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_exit </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>status</em>, </td>
@@ -613,24 +613,24 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_adaaff2c02bdbb9c04402a8ff043d32a5_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_af0b72e7bd7c7689eb96c83b2ecad335f_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_adaaff2c02bdbb9c04402a8ff043d32a5_icgraph.svg" width="255" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_af0b72e7bd7c7689eb96c83b2ecad335f_icgraph.svg" width="255" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a6e8aa1e2259e05a3fffab177867626b2" name="a6e8aa1e2259e05a3fffab177867626b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e8aa1e2259e05a3fffab177867626b2">&#9670;&#160;</a></span>sys_exit_group()</h2>
+<a id="afee2a1f1efdfdcf0b0d4490e832c19d8" name="afee2a1f1efdfdcf0b0d4490e832c19d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afee2a1f1efdfdcf0b0d4490e832c19d8">&#9670;&#160;</a></span>sys_exit_group()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_exit_group </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_exit_group </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>status</em>, </td>
@@ -673,23 +673,23 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Terminate all threads in the group — equivalent to <a class="el" href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status.">sys_exit</a> here. </p>
+<p>Terminate all threads in the group - equivalent to <a class="el" href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" title="Terminate the calling process with status.">sys_exit</a> here. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a6e8aa1e2259e05a3fffab177867626b2_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_afee2a1f1efdfdcf0b0d4490e832c19d8_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="aba8579e09bd5de65736d9b19dc356a36" name="aba8579e09bd5de65736d9b19dc356a36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba8579e09bd5de65736d9b19dc356a36">&#9670;&#160;</a></span>sys_fork()</h2>
+<a id="a94d8af8fc8ae857d5816d6ca7ab73bca" name="a94d8af8fc8ae857d5816d6ca7ab73bca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94d8af8fc8ae857d5816d6ca7ab73bca">&#9670;&#160;</a></span>sys_fork()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_fork </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_fork </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -736,19 +736,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_aba8579e09bd5de65736d9b19dc356a36_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a94d8af8fc8ae857d5816d6ca7ab73bca_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a0eb960f2aef304b6aedbf1b5ba1318a3" name="a0eb960f2aef304b6aedbf1b5ba1318a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0eb960f2aef304b6aedbf1b5ba1318a3">&#9670;&#160;</a></span>sys_getegid()</h2>
+<a id="a096f9c169f93983403009f54d2795749" name="a096f9c169f93983403009f54d2795749"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a096f9c169f93983403009f54d2795749">&#9670;&#160;</a></span>sys_getegid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getegid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getegid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -791,18 +791,18 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the calling process's effective group ID (always 0 — root). </p>
+<p>Return the calling process's effective group ID (always 0 - root). </p>
 
 </div>
 </div>
-<a id="ab0b6f027b667afd096484d66a94b3afe" name="ab0b6f027b667afd096484d66a94b3afe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0b6f027b667afd096484d66a94b3afe">&#9670;&#160;</a></span>sys_geteuid()</h2>
+<a id="a3600bf8790d7f9c1be26dc18999a237d" name="a3600bf8790d7f9c1be26dc18999a237d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3600bf8790d7f9c1be26dc18999a237d">&#9670;&#160;</a></span>sys_geteuid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_geteuid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_geteuid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -845,18 +845,18 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the calling process's effective user ID (always 0 — root). </p>
+<p>Return the calling process's effective user ID (always 0 - root). </p>
 
 </div>
 </div>
-<a id="a667c0af9ce7fe4012b884a86217834a0" name="a667c0af9ce7fe4012b884a86217834a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a667c0af9ce7fe4012b884a86217834a0">&#9670;&#160;</a></span>sys_getgid()</h2>
+<a id="a2a2682d7b1b12e8212be8c792c316371" name="a2a2682d7b1b12e8212be8c792c316371"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a2682d7b1b12e8212be8c792c316371">&#9670;&#160;</a></span>sys_getgid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getgid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getgid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -899,18 +899,18 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the calling process's real group ID (always 0 — root). </p>
+<p>Return the calling process's real group ID (always 0 - root). </p>
 
 </div>
 </div>
-<a id="a081835edaec6846f64003072244af565" name="a081835edaec6846f64003072244af565"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a081835edaec6846f64003072244af565">&#9670;&#160;</a></span>sys_getpid()</h2>
+<a id="aa882939f7e066b9a38d413c4c6d6e581" name="aa882939f7e066b9a38d413c4c6d6e581"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa882939f7e066b9a38d413c4c6d6e581">&#9670;&#160;</a></span>sys_getpid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getpid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getpid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -957,24 +957,24 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a081835edaec6846f64003072244af565_cgraph.svg" width="254" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_aa882939f7e066b9a38d413c4c6d6e581_cgraph.svg" width="254" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a081835edaec6846f64003072244af565_icgraph.svg" width="240" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_aa882939f7e066b9a38d413c4c6d6e581_icgraph.svg" width="240" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a351915ba1475da0bcf53ea7c5d9c18b4" name="a351915ba1475da0bcf53ea7c5d9c18b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a351915ba1475da0bcf53ea7c5d9c18b4">&#9670;&#160;</a></span>sys_getppid()</h2>
+<a id="a356a344759c51450fd80a1f96d790b6d" name="a356a344759c51450fd80a1f96d790b6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a356a344759c51450fd80a1f96d790b6d">&#9670;&#160;</a></span>sys_getppid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getppid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getppid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -1021,19 +1021,19 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a351915ba1475da0bcf53ea7c5d9c18b4_cgraph.svg" width="262" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a356a344759c51450fd80a1f96d790b6d_cgraph.svg" width="262" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a5aabf0a59cd47d6e0a95b8dd74ee8413" name="a5aabf0a59cd47d6e0a95b8dd74ee8413"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5aabf0a59cd47d6e0a95b8dd74ee8413">&#9670;&#160;</a></span>sys_gettid()</h2>
+<a id="af35689fb812a5e6f2ab800a93d822583" name="af35689fb812a5e6f2ab800a93d822583"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af35689fb812a5e6f2ab800a93d822583">&#9670;&#160;</a></span>sys_gettid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_gettid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_gettid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -1076,23 +1076,23 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the calling thread's TID — same as PID (no thread support). </p>
+<p>Return the calling thread's TID - same as PID (no thread support). </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a5aabf0a59cd47d6e0a95b8dd74ee8413_cgraph.svg" width="391" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_af35689fb812a5e6f2ab800a93d822583_cgraph.svg" width="391" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a52090911e9c6b7a812b026687670ac54" name="a52090911e9c6b7a812b026687670ac54"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52090911e9c6b7a812b026687670ac54">&#9670;&#160;</a></span>sys_getuid()</h2>
+<a id="acb177b13a00911c1f808c92d6c13d914" name="acb177b13a00911c1f808c92d6c13d914"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb177b13a00911c1f808c92d6c13d914">&#9670;&#160;</a></span>sys_getuid()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getuid </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getuid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>a1</em>, </td>
@@ -1135,18 +1135,18 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Return the calling process's real user ID (always 0 — root). </p>
+<p>Return the calling process's real user ID (always 0 - root). </p>
 
 </div>
 </div>
-<a id="a3b1b5ea932b7bfeca8baa769a7dd512c" name="a3b1b5ea932b7bfeca8baa769a7dd512c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b1b5ea932b7bfeca8baa769a7dd512c">&#9670;&#160;</a></span>sys_set_tid_address()</h2>
+<a id="af5622de49344cae03a88a645f4f56693" name="af5622de49344cae03a88a645f4f56693"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5622de49344cae03a88a645f4f56693">&#9670;&#160;</a></span>sys_set_tid_address()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_set_tid_address </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_set_tid_address </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>tidptr</em>, </td>
@@ -1193,19 +1193,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a3b1b5ea932b7bfeca8baa769a7dd512c_cgraph.svg" width="315" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_af5622de49344cae03a88a645f4f56693_cgraph.svg" width="315" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a54f03e8b54e409ff39140d6476222398" name="a54f03e8b54e409ff39140d6476222398"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54f03e8b54e409ff39140d6476222398">&#9670;&#160;</a></span>sys_wait4()</h2>
+<a id="a804304a7ce50ad8730e039286e05d7e2" name="a804304a7ce50ad8730e039286e05d7e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a804304a7ce50ad8730e039286e05d7e2">&#9670;&#160;</a></span>sys_wait4()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_wait4 </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_wait4 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pid</em>, </td>
@@ -1253,7 +1253,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a54f03e8b54e409ff39140d6476222398_cgraph.svg" width="100%" height="564"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__proc_8c_a804304a7ce50ad8730e039286e05d7e2_cgraph.svg" width="100%" height="564"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

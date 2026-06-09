@@ -1,5 +1,0 @@
-<map id="sys_exit" name="sys_exit">
-<area shape="rect" id="Node000001" title="Terminate the calling process with status." alt="" coords="173,5,249,31"/>
-<area shape="rect" id="Node000002" href="$sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" title="Terminate all threads in the group — equivalent to sys_exit here." alt="" coords="5,5,125,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,21,126,21,126,15,160,15"/>
-</map>

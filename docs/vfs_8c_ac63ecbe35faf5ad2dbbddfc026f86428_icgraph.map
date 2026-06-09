@@ -1,23 +1,23 @@
 <map id="vfs_stat" name="vfs_stat">
 <area shape="rect" id="Node000001" title="Stat the node at path via the responsible driver." alt="" coords="321,104,396,129"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d" title="Check that path exists and is accessible; always grants access." alt="" coords="177,5,271,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#ac00f75dace7b43d7bc9d163cc7c4324e" title="Check that path exists and is accessible; always grants access." alt="" coords="177,5,271,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="334,96,305,70,272,44,253,33,255,28,275,40,309,66,337,92"/>
-<area shape="rect" id="Node000004" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="175,55,273,80"/>
+<area shape="rect" id="Node000004" href="$sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" title="Replace the calling process image with a new ELF at pathname." alt="" coords="175,55,273,80"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="309,102,259,83,261,78,311,97"/>
-<area shape="rect" id="Node000005" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="186,104,262,129"/>
+<area shape="rect" id="Node000005" href="$sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" title="Stat the node at path into a POSIX stat buffer." alt="" coords="186,104,262,129"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="308,119,262,119,262,114,308,114"/>
 <area shape="rect" id="Node000008" href="$vfs_8c.html#a67bb6451b3cc29b98fdbdba7d9dd1594" title="Change the calling process&#39;s working directory to path." alt="" coords="183,153,265,179"/>
 <area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="311,137,261,156,259,151,309,132"/>
 <area shape="rect" id="Node000010" href="$vfs_8c.html#a9381581b42a850046ecb0593a98bd3af" title="Rename (move) a file, copying across mount points if necessary." alt="" coords="175,203,273,228"/>
 <area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="336,141,275,192,254,205,251,200,272,188,333,137"/>
-<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972" title="faccessat — only AT_FDCWD and absolute paths are supported." alt="" coords="9,5,123,31"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a843f0a3368fbde4eda4f696b3ee1dba4" title="faccessat &#45; only AT_FDCWD and absolute paths are supported." alt="" coords="9,5,123,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="163,21,123,21,123,15,163,15"/>
-<area shape="rect" id="Node000006" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="26,55,106,80"/>
+<area shape="rect" id="Node000006" href="$sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" title="lstat &#45; no symlink resolution in VFS yet; identical to stat." alt="" coords="26,55,106,80"/>
 <area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="172,103,105,82,107,77,174,98"/>
-<area shape="rect" id="Node000007" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="5,104,127,129"/>
+<area shape="rect" id="Node000007" href="$sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" title="newfstatat &#45; supports AT_FDCWD and absolute paths only." alt="" coords="5,104,127,129"/>
 <area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="172,119,127,119,127,114,172,114"/>
-<area shape="rect" id="Node000009" href="$sys__fs_8c.html#a5ffaa19d9650c07f19e99856e7465210" title="Change the calling process&#39;s working directory to path." alt="" coords="25,153,107,179"/>
+<area shape="rect" id="Node000009" href="$sys__fs_8c.html#a1ea573c06e1dcfab3525cc896f1209e5" title="Change the calling process&#39;s working directory to path." alt="" coords="25,153,107,179"/>
 <area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="169,169,107,169,107,163,169,163"/>
-<area shape="rect" id="Node000011" href="$sys__fs_8c.html#aa6dfd2d967f7393f9df4852259140393" title="Rename oldpath to newpath, copying across mount points if necessary." alt="" coords="15,203,117,228"/>
+<area shape="rect" id="Node000011" href="$sys__fs_8c.html#a72c1d42f6a448e08ff4ec4ddf6b1a4e3" title="Rename oldpath to newpath, copying across mount points if necessary." alt="" coords="15,203,117,228"/>
 <area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="161,218,117,218,117,213,161,213"/>
 </map>

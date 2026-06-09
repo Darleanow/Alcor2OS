@@ -8,6 +8,6 @@
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,21,311,21,311,15,371,15"/>
 <area shape="rect" id="Node000004" href="$proc_8c.html#a05d8256bb38d6c73fef205ea13c91871" title="Start the first user process from kernel initialization." alt="" coords="5,5,124,31"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="158,21,124,21,124,15,158,15"/>
-<area shape="rect" id="Node000008" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="193,55,290,80"/>
+<area shape="rect" id="Node000008" href="$sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" title="Replace the calling process image with a new ELF at pathname." alt="" coords="193,55,290,80"/>
 <area shape="poly" id="edge5_Node000007_Node000008" title=" " alt="" coords="344,70,290,70,290,65,344,65"/>
 </map>

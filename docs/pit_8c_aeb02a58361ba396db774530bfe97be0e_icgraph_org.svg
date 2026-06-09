@@ -209,7 +209,7 @@
 <!-- Node12 -->
 <g id="Node000012" class="node">
 <title>Node12</title>
-<g id="a_Node000012"><a xlink:href="sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
+<g id="a_Node000012"><a xlink:href="sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" target="_top" xlink:title="Replace the calling process image with a new ELF at pathname.">
 <polygon fill="white" stroke="#666666" points="92,-56 19,-56 19,-37 92,-37 92,-56"/>
 <text text-anchor="middle" x="55.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_execve</text>
 </a>
@@ -227,7 +227,7 @@
 <!-- Node13 -->
 <g id="Node000013" class="node">
 <title>Node13</title>
-<g id="a_Node000013"><a xlink:href="sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" target="_top" xlink:title="Terminate the calling process with status.">
+<g id="a_Node000013"><a xlink:href="sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" target="_top" xlink:title="Terminate the calling process with status.">
 <polygon fill="#fff0f0" stroke="red" points="84,-19 27,-19 27,0 84,0 84,-19"/>
 <text text-anchor="middle" x="55.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_exit</text>
 </a>

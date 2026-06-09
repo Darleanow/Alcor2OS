@@ -74,7 +74,7 @@
 <!-- Node4 -->
 <g id="Node000004" class="node">
 <title>Node4</title>
-<g id="a_Node000004"><a xlink:href="sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e" target="_top" xlink:title="Duplicate the calling process (clone).">
+<g id="a_Node000004"><a xlink:href="sys__proc_8c.html#abb73ea77ef1d8ed5f068ab9d52210cb6" target="_top" xlink:title="Duplicate the calling process (clone).">
 <polygon fill="white" stroke="#666666" points="65,-56 0,-56 0,-37 65,-37 65,-56"/>
 <text text-anchor="middle" x="32.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_clone</text>
 </a>
@@ -92,7 +92,7 @@
 <!-- Node6 -->
 <g id="Node000006" class="node">
 <title>Node6</title>
-<g id="a_Node000006"><a xlink:href="sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" target="_top" xlink:title="Duplicate the calling process (fork).">
+<g id="a_Node000006"><a xlink:href="sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca" target="_top" xlink:title="Duplicate the calling process (fork).">
 <polygon fill="white" stroke="#666666" points="61.5,-19 3.5,-19 3.5,0 61.5,0 61.5,-19"/>
 <text text-anchor="middle" x="32.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fork</text>
 </a>

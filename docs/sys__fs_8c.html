@@ -142,88 +142,88 @@ Functions</h2></td></tr>
 <tr class="memitem:abf135f96082ac0697aa765c3fbdfd02d" id="r_abf135f96082ac0697aa765c3fbdfd02d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#abf135f96082ac0697aa765c3fbdfd02d">fill_stat_buf</a> (struct <a class="el" href="structstat__buf.html">stat_buf</a> *st, const <a class="el" href="structvfs__stat__t.html">vfs_stat_t</a> *vst)</td></tr>
 <tr class="memdesc:abf135f96082ac0697aa765c3fbdfd02d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translate an internal <a class="el" href="structvfs__stat__t.html" title="Metadata returned by stat operations.">vfs_stat_t</a> into the POSIX <code>stat</code> layout.  <br /></td></tr>
 <tr class="separator:abf135f96082ac0697aa765c3fbdfd02d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a520ffff94cc2df8d87a6080ffaa9707f" id="r_a520ffff94cc2df8d87a6080ffaa9707f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a520ffff94cc2df8d87a6080ffaa9707f">sys_open</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a520ffff94cc2df8d87a6080ffaa9707f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open or create a file and return a file descriptor.  <br /></td></tr>
-<tr class="separator:a520ffff94cc2df8d87a6080ffaa9707f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abaf0d0b41a478d216409de789942f3c1" id="r_abaf0d0b41a478d216409de789942f3c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#abaf0d0b41a478d216409de789942f3c1">sys_close</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:abaf0d0b41a478d216409de789942f3c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release <code>fd</code> and decrement its OFT refcount.  <br /></td></tr>
-<tr class="separator:abaf0d0b41a478d216409de789942f3c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22b0dcc6380583c59252fa2ed22396be" id="r_a22b0dcc6380583c59252fa2ed22396be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be">sys_stat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a22b0dcc6380583c59252fa2ed22396be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stat the node at <code>path</code> into a POSIX <code>stat</code> buffer.  <br /></td></tr>
-<tr class="separator:a22b0dcc6380583c59252fa2ed22396be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a085eef8d1b7497d0e8ce862699ddda21" id="r_a085eef8d1b7497d0e8ce862699ddda21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21">sys_fstat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a085eef8d1b7497d0e8ce862699ddda21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stat the open file descriptor <code>fd</code> into a POSIX <code>stat</code> buffer.  <br /></td></tr>
-<tr class="separator:a085eef8d1b7497d0e8ce862699ddda21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac22ce1113852c1c17215004ca932368c" id="r_ac22ce1113852c1c17215004ca932368c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c">sys_lstat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:ac22ce1113852c1c17215004ca932368c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>lstat</code> — no symlink resolution in VFS yet; identical to <code>stat</code>.  <br /></td></tr>
-<tr class="separator:ac22ce1113852c1c17215004ca932368c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9089cbbef94854adf9d90d2daa62105d" id="r_a9089cbbef94854adf9d90d2daa62105d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a9089cbbef94854adf9d90d2daa62105d">sys_access</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a9089cbbef94854adf9d90d2daa62105d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that <code>path</code> exists and is accessible; always grants access.  <br /></td></tr>
-<tr class="separator:a9089cbbef94854adf9d90d2daa62105d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f92b0a4eb34f692e65bd3bf737f3972" id="r_a9f92b0a4eb34f692e65bd3bf737f3972"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a9f92b0a4eb34f692e65bd3bf737f3972">sys_faccessat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a9f92b0a4eb34f692e65bd3bf737f3972"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>faccessat</code> — only <code>AT_FDCWD</code> and absolute paths are supported.  <br /></td></tr>
-<tr class="separator:a9f92b0a4eb34f692e65bd3bf737f3972"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa02dc7e1c637fb1892f68f97fdc6d44d" id="r_aa02dc7e1c637fb1892f68f97fdc6d44d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d">sys_newfstatat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:aa02dc7e1c637fb1892f68f97fdc6d44d"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>newfstatat</code> — supports <code>AT_FDCWD</code> and absolute paths only.  <br /></td></tr>
-<tr class="separator:aa02dc7e1c637fb1892f68f97fdc6d44d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3da7d8c19db4de1b35b610bbe9b7cdd4" id="r_a3da7d8c19db4de1b35b610bbe9b7cdd4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a3da7d8c19db4de1b35b610bbe9b7cdd4">sys_dup</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a3da7d8c19db4de1b35b610bbe9b7cdd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate <code>oldfd</code> to the lowest free fd ≥ 3.  <br /></td></tr>
-<tr class="separator:a3da7d8c19db4de1b35b610bbe9b7cdd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fa7c567e06bd525be10ca4058ba6557" id="r_a6fa7c567e06bd525be10ca4058ba6557"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a6fa7c567e06bd525be10ca4058ba6557">sys_dup2</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> newfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a6fa7c567e06bd525be10ca4058ba6557"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate <code>oldfd</code> into the specific slot <code>newfd</code>.  <br /></td></tr>
-<tr class="separator:a6fa7c567e06bd525be10ca4058ba6557"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dd257b30e1a85479bea08c0c341490e" id="r_a0dd257b30e1a85479bea08c0c341490e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a0dd257b30e1a85479bea08c0c341490e">sys_fcntl</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> cmd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> arg, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a0dd257b30e1a85479bea08c0c341490e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a file-control operation on <code>fd</code>.  <br /></td></tr>
-<tr class="separator:a0dd257b30e1a85479bea08c0c341490e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44bf07790c50aadc67f2b582652962b6" id="r_a44bf07790c50aadc67f2b582652962b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6">sys_getdents</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirp, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a44bf07790c50aadc67f2b582652962b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill <code>dirp</code> with <code>dirent64</code> entries from the open directory <code>fd</code>.  <br /></td></tr>
-<tr class="separator:a44bf07790c50aadc67f2b582652962b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28fc6c6bd6a6228f07f9f04f6a55c395" id="r_a28fc6c6bd6a6228f07f9f04f6a55c395"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a28fc6c6bd6a6228f07f9f04f6a55c395">sys_getdents64</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirp, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a28fc6c6bd6a6228f07f9f04f6a55c395"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>getdents64</code> — identical to <a class="el" href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" title="Fill dirp with dirent64 entries from the open directory fd.">sys_getdents</a> on this platform.  <br /></td></tr>
-<tr class="separator:a28fc6c6bd6a6228f07f9f04f6a55c395"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66f6c5b7f67e1321644f27a4f71daf77" id="r_a66f6c5b7f67e1321644f27a4f71daf77"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a66f6c5b7f67e1321644f27a4f71daf77">sys_getcwd</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> size, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a66f6c5b7f67e1321644f27a4f71daf77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the calling process's CWD string into the user buffer <code>buf</code>.  <br /></td></tr>
-<tr class="separator:a66f6c5b7f67e1321644f27a4f71daf77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ffaa19d9650c07f19e99856e7465210" id="r_a5ffaa19d9650c07f19e99856e7465210"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a5ffaa19d9650c07f19e99856e7465210">sys_chdir</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a5ffaa19d9650c07f19e99856e7465210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the calling process's working directory to <code>path</code>.  <br /></td></tr>
-<tr class="separator:a5ffaa19d9650c07f19e99856e7465210"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdc1e627b591695459f391aebfdaef92" id="r_afdc1e627b591695459f391aebfdaef92"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#afdc1e627b591695459f391aebfdaef92">sys_mkdir</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:afdc1e627b591695459f391aebfdaef92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a directory at <code>pathname</code>.  <br /></td></tr>
-<tr class="separator:afdc1e627b591695459f391aebfdaef92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a0e70030b084d0a0fe76e4f0e18ce00" id="r_a5a0e70030b084d0a0fe76e4f0e18ce00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a5a0e70030b084d0a0fe76e4f0e18ce00">sys_rmdir</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a5a0e70030b084d0a0fe76e4f0e18ce00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the empty directory at <code>pathname</code>.  <br /></td></tr>
-<tr class="separator:a5a0e70030b084d0a0fe76e4f0e18ce00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb5ff8d1a9032c4f32ad1f65a4a5133e" id="r_abb5ff8d1a9032c4f32ad1f65a4a5133e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#abb5ff8d1a9032c4f32ad1f65a4a5133e">sys_creat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:abb5ff8d1a9032c4f32ad1f65a4a5133e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create or truncate a file at <code>pathname</code> (<code>open</code> with <code>O_WRONLY|O_CREAT|O_TRUNC</code>).  <br /></td></tr>
-<tr class="separator:abb5ff8d1a9032c4f32ad1f65a4a5133e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b635f43a86efa68bdf828ae9fb1c76c" id="r_a9b635f43a86efa68bdf828ae9fb1c76c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a9b635f43a86efa68bdf828ae9fb1c76c">sys_unlink</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a9b635f43a86efa68bdf828ae9fb1c76c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the file at <code>pathname</code>.  <br /></td></tr>
-<tr class="separator:a9b635f43a86efa68bdf828ae9fb1c76c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6dfd2d967f7393f9df4852259140393" id="r_aa6dfd2d967f7393f9df4852259140393"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#aa6dfd2d967f7393f9df4852259140393">sys_rename</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldpath, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> newpath, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:aa6dfd2d967f7393f9df4852259140393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rename <code>oldpath</code> to <code>newpath</code>, copying across mount points if necessary.  <br /></td></tr>
-<tr class="separator:aa6dfd2d967f7393f9df4852259140393"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c7b290c87a6fc7f5dc164a9e944f00d" id="r_a1c7b290c87a6fc7f5dc164a9e944f00d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a1c7b290c87a6fc7f5dc164a9e944f00d">sys_ftruncate</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> length, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a1c7b290c87a6fc7f5dc164a9e944f00d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncate the file open as <code>fd</code> to exactly <code>length</code> bytes.  <br /></td></tr>
-<tr class="separator:a1c7b290c87a6fc7f5dc164a9e944f00d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61b09a8f68c22deb040563c3591ec635" id="r_a61b09a8f68c22deb040563c3591ec635"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a61b09a8f68c22deb040563c3591ec635">sys_pread64</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> offset, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a61b09a8f68c22deb040563c3591ec635"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read <code>count</code> bytes from <code>fd</code> at absolute <code>offset</code> without moving the seek position.  <br /></td></tr>
-<tr class="separator:a61b09a8f68c22deb040563c3591ec635"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31616d53ffa4f00fbfe3f2dfc16e4237" id="r_a31616d53ffa4f00fbfe3f2dfc16e4237"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a31616d53ffa4f00fbfe3f2dfc16e4237">sys_pwrite64</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> offset, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a31616d53ffa4f00fbfe3f2dfc16e4237"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write <code>count</code> bytes to <code>fd</code> at absolute <code>offset</code> without moving the seek position.  <br /></td></tr>
-<tr class="separator:a31616d53ffa4f00fbfe3f2dfc16e4237"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d175f2f2749eea869fbafc3a6306d23" id="r_a9d175f2f2749eea869fbafc3a6306d23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a9d175f2f2749eea869fbafc3a6306d23">sys_symlink</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> target, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> linkpath, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a9d175f2f2749eea869fbafc3a6306d23"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>symlink</code> — not implemented; returns <code>-ENOSYS</code>.  <br /></td></tr>
-<tr class="separator:a9d175f2f2749eea869fbafc3a6306d23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22b2ac6b30d04a46bf880d289a4aea46" id="r_a22b2ac6b30d04a46bf880d289a4aea46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a22b2ac6b30d04a46bf880d289a4aea46">sys_openat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a22b2ac6b30d04a46bf880d289a4aea46"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>openat</code> — only <code>AT_FDCWD</code> is supported; delegates to <a class="el" href="sys__fs_8c.html#a520ffff94cc2df8d87a6080ffaa9707f" title="Open or create a file and return a file descriptor.">sys_open</a>.  <br /></td></tr>
-<tr class="separator:a22b2ac6b30d04a46bf880d289a4aea46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c7030445954bf053945683539a885b4" id="r_a3c7030445954bf053945683539a885b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a3c7030445954bf053945683539a885b4">sys_readlink</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> bufsiz, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="memdesc:a3c7030445954bf053945683539a885b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the target of a symbolic link at <code>path</code> into <code>buf</code>.  <br /></td></tr>
-<tr class="separator:a3c7030445954bf053945683539a885b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6794bf08828f6a427d54937607d2ab7d" id="r_a6794bf08828f6a427d54937607d2ab7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d">sys_pipe</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pipefd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="separator:a6794bf08828f6a427d54937607d2ab7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abcbdbff193493e997cd9f83c1d102823" id="r_abcbdbff193493e997cd9f83c1d102823"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#abcbdbff193493e997cd9f83c1d102823">sys_pipe2</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pipefd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
-<tr class="separator:abcbdbff193493e997cd9f83c1d102823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcd3dedc92d59bac3e8a22803f6d7b8e" id="r_adcd3dedc92d59bac3e8a22803f6d7b8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#adcd3dedc92d59bac3e8a22803f6d7b8e">sys_open</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:adcd3dedc92d59bac3e8a22803f6d7b8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open or create a file and return a file descriptor.  <br /></td></tr>
+<tr class="separator:adcd3dedc92d59bac3e8a22803f6d7b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a729440766bc54111935da682ec73c007" id="r_a729440766bc54111935da682ec73c007"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a729440766bc54111935da682ec73c007">sys_close</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a729440766bc54111935da682ec73c007"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release <code>fd</code> and decrement its OFT refcount.  <br /></td></tr>
+<tr class="separator:a729440766bc54111935da682ec73c007"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbc7a2f99ef9ba83389499b8a65e4e3b" id="r_afbc7a2f99ef9ba83389499b8a65e4e3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b">sys_stat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:afbc7a2f99ef9ba83389499b8a65e4e3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stat the node at <code>path</code> into a POSIX <code>stat</code> buffer.  <br /></td></tr>
+<tr class="separator:afbc7a2f99ef9ba83389499b8a65e4e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55c19a120c8db8174f736c5925e4e682" id="r_a55c19a120c8db8174f736c5925e4e682"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a55c19a120c8db8174f736c5925e4e682">sys_fstat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a55c19a120c8db8174f736c5925e4e682"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stat the open file descriptor <code>fd</code> into a POSIX <code>stat</code> buffer.  <br /></td></tr>
+<tr class="separator:a55c19a120c8db8174f736c5925e4e682"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6762c1aef55f2a7cb052e3cb2e758f03" id="r_a6762c1aef55f2a7cb052e3cb2e758f03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03">sys_lstat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a6762c1aef55f2a7cb052e3cb2e758f03"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>lstat</code> - no symlink resolution in VFS yet; identical to <code>stat</code>.  <br /></td></tr>
+<tr class="separator:a6762c1aef55f2a7cb052e3cb2e758f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac00f75dace7b43d7bc9d163cc7c4324e" id="r_ac00f75dace7b43d7bc9d163cc7c4324e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ac00f75dace7b43d7bc9d163cc7c4324e">sys_access</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ac00f75dace7b43d7bc9d163cc7c4324e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that <code>path</code> exists and is accessible; always grants access.  <br /></td></tr>
+<tr class="separator:ac00f75dace7b43d7bc9d163cc7c4324e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a843f0a3368fbde4eda4f696b3ee1dba4" id="r_a843f0a3368fbde4eda4f696b3ee1dba4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a843f0a3368fbde4eda4f696b3ee1dba4">sys_faccessat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a843f0a3368fbde4eda4f696b3ee1dba4"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>faccessat</code> - only <code>AT_FDCWD</code> and absolute paths are supported.  <br /></td></tr>
+<tr class="separator:a843f0a3368fbde4eda4f696b3ee1dba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a909349d198ccea749d6af7dff2d464e4" id="r_a909349d198ccea749d6af7dff2d464e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4">sys_newfstatat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> statbuf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a909349d198ccea749d6af7dff2d464e4"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>newfstatat</code> - supports <code>AT_FDCWD</code> and absolute paths only.  <br /></td></tr>
+<tr class="separator:a909349d198ccea749d6af7dff2d464e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae62f411f7a86b6cd6e4b2dc0b82d7c10" id="r_ae62f411f7a86b6cd6e4b2dc0b82d7c10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ae62f411f7a86b6cd6e4b2dc0b82d7c10">sys_dup</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ae62f411f7a86b6cd6e4b2dc0b82d7c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate <code>oldfd</code> to the lowest free fd ≥ 3.  <br /></td></tr>
+<tr class="separator:ae62f411f7a86b6cd6e4b2dc0b82d7c10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0c6360eda6cab7b049de354b1c64b3e" id="r_aa0c6360eda6cab7b049de354b1c64b3e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#aa0c6360eda6cab7b049de354b1c64b3e">sys_dup2</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> newfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:aa0c6360eda6cab7b049de354b1c64b3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate <code>oldfd</code> into the specific slot <code>newfd</code>.  <br /></td></tr>
+<tr class="separator:aa0c6360eda6cab7b049de354b1c64b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6223f2ac2734bd07fbc86a18d95bb9bf" id="r_a6223f2ac2734bd07fbc86a18d95bb9bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a6223f2ac2734bd07fbc86a18d95bb9bf">sys_fcntl</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> cmd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> arg, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a6223f2ac2734bd07fbc86a18d95bb9bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a file-control operation on <code>fd</code>.  <br /></td></tr>
+<tr class="separator:a6223f2ac2734bd07fbc86a18d95bb9bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8780050b35650c2c3789426a626641c6" id="r_a8780050b35650c2c3789426a626641c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6">sys_getdents</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirp, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a8780050b35650c2c3789426a626641c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill <code>dirp</code> with <code>dirent64</code> entries from the open directory <code>fd</code>.  <br /></td></tr>
+<tr class="separator:a8780050b35650c2c3789426a626641c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af32ea2e80ab9ed4d67b1a6902045abab" id="r_af32ea2e80ab9ed4d67b1a6902045abab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#af32ea2e80ab9ed4d67b1a6902045abab">sys_getdents64</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirp, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:af32ea2e80ab9ed4d67b1a6902045abab"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>getdents64</code> - identical to <a class="el" href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6" title="Fill dirp with dirent64 entries from the open directory fd.">sys_getdents</a> on this platform.  <br /></td></tr>
+<tr class="separator:af32ea2e80ab9ed4d67b1a6902045abab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3355ebc949d101587bb3088939d1354" id="r_ac3355ebc949d101587bb3088939d1354"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ac3355ebc949d101587bb3088939d1354">sys_getcwd</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> size, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ac3355ebc949d101587bb3088939d1354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the calling process's CWD string into the user buffer <code>buf</code>.  <br /></td></tr>
+<tr class="separator:ac3355ebc949d101587bb3088939d1354"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ea573c06e1dcfab3525cc896f1209e5" id="r_a1ea573c06e1dcfab3525cc896f1209e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a1ea573c06e1dcfab3525cc896f1209e5">sys_chdir</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a1ea573c06e1dcfab3525cc896f1209e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the calling process's working directory to <code>path</code>.  <br /></td></tr>
+<tr class="separator:a1ea573c06e1dcfab3525cc896f1209e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0692f7c0eb184a9c883778b8ee656cc" id="r_ab0692f7c0eb184a9c883778b8ee656cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ab0692f7c0eb184a9c883778b8ee656cc">sys_mkdir</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ab0692f7c0eb184a9c883778b8ee656cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a directory at <code>pathname</code>.  <br /></td></tr>
+<tr class="separator:ab0692f7c0eb184a9c883778b8ee656cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd8c8e519c3b13da94fe0224b3cf8a32" id="r_afd8c8e519c3b13da94fe0224b3cf8a32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#afd8c8e519c3b13da94fe0224b3cf8a32">sys_rmdir</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:afd8c8e519c3b13da94fe0224b3cf8a32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the empty directory at <code>pathname</code>.  <br /></td></tr>
+<tr class="separator:afd8c8e519c3b13da94fe0224b3cf8a32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67491e3dcf3e348a1a1ea5caf62d69ed" id="r_a67491e3dcf3e348a1a1ea5caf62d69ed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a67491e3dcf3e348a1a1ea5caf62d69ed">sys_creat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a67491e3dcf3e348a1a1ea5caf62d69ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create or truncate a file at <code>pathname</code> (<code>open</code> with <code>O_WRONLY|O_CREAT|O_TRUNC</code>).  <br /></td></tr>
+<tr class="separator:a67491e3dcf3e348a1a1ea5caf62d69ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adad566d662cfea8d303bb495215855e3" id="r_adad566d662cfea8d303bb495215855e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#adad566d662cfea8d303bb495215855e3">sys_unlink</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pathname, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:adad566d662cfea8d303bb495215855e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the file at <code>pathname</code>.  <br /></td></tr>
+<tr class="separator:adad566d662cfea8d303bb495215855e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72c1d42f6a448e08ff4ec4ddf6b1a4e3" id="r_a72c1d42f6a448e08ff4ec4ddf6b1a4e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a72c1d42f6a448e08ff4ec4ddf6b1a4e3">sys_rename</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> oldpath, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> newpath, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a72c1d42f6a448e08ff4ec4ddf6b1a4e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rename <code>oldpath</code> to <code>newpath</code>, copying across mount points if necessary.  <br /></td></tr>
+<tr class="separator:a72c1d42f6a448e08ff4ec4ddf6b1a4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21ca8e448559278ca1affa80b962f7a0" id="r_a21ca8e448559278ca1affa80b962f7a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a21ca8e448559278ca1affa80b962f7a0">sys_ftruncate</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> length, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a21ca8e448559278ca1affa80b962f7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Truncate the file open as <code>fd</code> to exactly <code>length</code> bytes.  <br /></td></tr>
+<tr class="separator:a21ca8e448559278ca1affa80b962f7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac897a1cc4c3feace952df07d7cc30a63" id="r_ac897a1cc4c3feace952df07d7cc30a63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ac897a1cc4c3feace952df07d7cc30a63">sys_pread64</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> offset, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ac897a1cc4c3feace952df07d7cc30a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read <code>count</code> bytes from <code>fd</code> at absolute <code>offset</code> without moving the seek position.  <br /></td></tr>
+<tr class="separator:ac897a1cc4c3feace952df07d7cc30a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a430c96a16cfcfe001404dc60153f7414" id="r_a430c96a16cfcfe001404dc60153f7414"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a430c96a16cfcfe001404dc60153f7414">sys_pwrite64</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> fd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> count, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> offset, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a430c96a16cfcfe001404dc60153f7414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write <code>count</code> bytes to <code>fd</code> at absolute <code>offset</code> without moving the seek position.  <br /></td></tr>
+<tr class="separator:a430c96a16cfcfe001404dc60153f7414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e41fc79c7f4a5106d2927d1bf5e1548" id="r_a6e41fc79c7f4a5106d2927d1bf5e1548"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a6e41fc79c7f4a5106d2927d1bf5e1548">sys_symlink</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> target, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> linkpath, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:a6e41fc79c7f4a5106d2927d1bf5e1548"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>symlink</code> - not implemented; returns <code>-ENOSYS</code>.  <br /></td></tr>
+<tr class="separator:a6e41fc79c7f4a5106d2927d1bf5e1548"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeff2bd471d7083f3d78c590694c15fe6" id="r_aeff2bd471d7083f3d78c590694c15fe6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#aeff2bd471d7083f3d78c590694c15fe6">sys_openat</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> dirfd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> mode, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:aeff2bd471d7083f3d78c590694c15fe6"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>openat</code> - only <code>AT_FDCWD</code> is supported; delegates to <a class="el" href="sys__fs_8c.html#adcd3dedc92d59bac3e8a22803f6d7b8e" title="Open or create a file and return a file descriptor.">sys_open</a>.  <br /></td></tr>
+<tr class="separator:aeff2bd471d7083f3d78c590694c15fe6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1729b5f524e554c1ba82a19a6aeae05" id="r_ac1729b5f524e554c1ba82a19a6aeae05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#ac1729b5f524e554c1ba82a19a6aeae05">sys_readlink</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> path, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> buf, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> bufsiz, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="memdesc:ac1729b5f524e554c1ba82a19a6aeae05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the target of a symbolic link at <code>path</code> into <code>buf</code>.  <br /></td></tr>
+<tr class="separator:ac1729b5f524e554c1ba82a19a6aeae05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1361807f14bd5e1589c54913d1a5cda5" id="r_a1361807f14bd5e1589c54913d1a5cda5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a1361807f14bd5e1589c54913d1a5cda5">sys_pipe</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pipefd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a2, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="separator:a1361807f14bd5e1589c54913d1a5cda5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a934218d9a754bf91e6e04a9224aaf79f" id="r_a934218d9a754bf91e6e04a9224aaf79f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sys__fs_8c.html#a934218d9a754bf91e6e04a9224aaf79f">sys_pipe2</a> (<a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> pipefd, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> flags, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a3, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a4, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a5, <a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> a6)</td></tr>
+<tr class="separator:a934218d9a754bf91e6e04a9224aaf79f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Filesystem syscalls: open, close, stat, seek, rename, chdir, … </p>
@@ -453,7 +453,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Translate an internal <a class="el" href="structvfs__stat__t.html" title="Metadata returned by stat operations.">vfs_stat_t</a> into the POSIX <code>stat</code> layout. </p>
-<p>Files are reported as user-executable (<code>0755</code>) even without real mode bits — toolchain binaries rely on this for <code>posix_spawn</code> permission checks. </p>
+<p>Files are reported as user-executable (<code>0755</code>) even without real mode bits - toolchain binaries rely on this for <code>posix_spawn</code> permission checks. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -505,14 +505,14 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="a9089cbbef94854adf9d90d2daa62105d" name="a9089cbbef94854adf9d90d2daa62105d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9089cbbef94854adf9d90d2daa62105d">&#9670;&#160;</a></span>sys_access()</h2>
+<a id="ac00f75dace7b43d7bc9d163cc7c4324e" name="ac00f75dace7b43d7bc9d163cc7c4324e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac00f75dace7b43d7bc9d163cc7c4324e">&#9670;&#160;</a></span>sys_access()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_access </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_access </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
@@ -559,24 +559,24 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a9089cbbef94854adf9d90d2daa62105d_cgraph.svg" width="100%" height="570"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ac00f75dace7b43d7bc9d163cc7c4324e_cgraph.svg" width="100%" height="570"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a9089cbbef94854adf9d90d2daa62105d_icgraph.svg" width="267" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ac00f75dace7b43d7bc9d163cc7c4324e_icgraph.svg" width="267" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a5ffaa19d9650c07f19e99856e7465210" name="a5ffaa19d9650c07f19e99856e7465210"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ffaa19d9650c07f19e99856e7465210">&#9670;&#160;</a></span>sys_chdir()</h2>
+<a id="a1ea573c06e1dcfab3525cc896f1209e5" name="a1ea573c06e1dcfab3525cc896f1209e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ea573c06e1dcfab3525cc896f1209e5">&#9670;&#160;</a></span>sys_chdir()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_chdir </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_chdir </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
@@ -623,19 +623,19 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a5ffaa19d9650c07f19e99856e7465210_cgraph.svg" width="100%" height="561"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a1ea573c06e1dcfab3525cc896f1209e5_cgraph.svg" width="100%" height="561"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="abaf0d0b41a478d216409de789942f3c1" name="abaf0d0b41a478d216409de789942f3c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abaf0d0b41a478d216409de789942f3c1">&#9670;&#160;</a></span>sys_close()</h2>
+<a id="a729440766bc54111935da682ec73c007" name="a729440766bc54111935da682ec73c007"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a729440766bc54111935da682ec73c007">&#9670;&#160;</a></span>sys_close()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_close </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_close </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -682,19 +682,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_abaf0d0b41a478d216409de789942f3c1_cgraph.svg" width="572" height="110"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a729440766bc54111935da682ec73c007_cgraph.svg" width="572" height="110"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="abb5ff8d1a9032c4f32ad1f65a4a5133e" name="abb5ff8d1a9032c4f32ad1f65a4a5133e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb5ff8d1a9032c4f32ad1f65a4a5133e">&#9670;&#160;</a></span>sys_creat()</h2>
+<a id="a67491e3dcf3e348a1a1ea5caf62d69ed" name="a67491e3dcf3e348a1a1ea5caf62d69ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67491e3dcf3e348a1a1ea5caf62d69ed">&#9670;&#160;</a></span>sys_creat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_creat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_creat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pathname</em>, </td>
@@ -741,19 +741,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_abb5ff8d1a9032c4f32ad1f65a4a5133e_cgraph.svg" width="100%" height="551"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a67491e3dcf3e348a1a1ea5caf62d69ed_cgraph.svg" width="100%" height="551"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a3da7d8c19db4de1b35b610bbe9b7cdd4" name="a3da7d8c19db4de1b35b610bbe9b7cdd4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3da7d8c19db4de1b35b610bbe9b7cdd4">&#9670;&#160;</a></span>sys_dup()</h2>
+<a id="ae62f411f7a86b6cd6e4b2dc0b82d7c10" name="ae62f411f7a86b6cd6e4b2dc0b82d7c10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae62f411f7a86b6cd6e4b2dc0b82d7c10">&#9670;&#160;</a></span>sys_dup()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_dup </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_dup </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>oldfd</em>, </td>
@@ -800,19 +800,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a3da7d8c19db4de1b35b610bbe9b7cdd4_cgraph.svg" width="516" height="135"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ae62f411f7a86b6cd6e4b2dc0b82d7c10_cgraph.svg" width="516" height="135"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a6fa7c567e06bd525be10ca4058ba6557" name="a6fa7c567e06bd525be10ca4058ba6557"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6fa7c567e06bd525be10ca4058ba6557">&#9670;&#160;</a></span>sys_dup2()</h2>
+<a id="aa0c6360eda6cab7b049de354b1c64b3e" name="aa0c6360eda6cab7b049de354b1c64b3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0c6360eda6cab7b049de354b1c64b3e">&#9670;&#160;</a></span>sys_dup2()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_dup2 </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_dup2 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>oldfd</em>, </td>
@@ -859,19 +859,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a6fa7c567e06bd525be10ca4058ba6557_cgraph.svg" width="551" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_aa0c6360eda6cab7b049de354b1c64b3e_cgraph.svg" width="551" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a9f92b0a4eb34f692e65bd3bf737f3972" name="a9f92b0a4eb34f692e65bd3bf737f3972"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f92b0a4eb34f692e65bd3bf737f3972">&#9670;&#160;</a></span>sys_faccessat()</h2>
+<a id="a843f0a3368fbde4eda4f696b3ee1dba4" name="a843f0a3368fbde4eda4f696b3ee1dba4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a843f0a3368fbde4eda4f696b3ee1dba4">&#9670;&#160;</a></span>sys_faccessat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_faccessat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_faccessat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>dirfd</em>, </td>
@@ -914,24 +914,24 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p><code>faccessat</code> — only <code>AT_FDCWD</code> and absolute paths are supported. </p>
+<p><code>faccessat</code> - only <code>AT_FDCWD</code> and absolute paths are supported. </p>
 <p>Relative paths with a real <code>dirfd</code> return <code>-ENOSYS</code>; all supported flags are accepted and silently ignored (no fine-grained mode checking in VFS). </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a9f92b0a4eb34f692e65bd3bf737f3972_cgraph.svg" width="100%" height="477"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a843f0a3368fbde4eda4f696b3ee1dba4_cgraph.svg" width="100%" height="477"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a0dd257b30e1a85479bea08c0c341490e" name="a0dd257b30e1a85479bea08c0c341490e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0dd257b30e1a85479bea08c0c341490e">&#9670;&#160;</a></span>sys_fcntl()</h2>
+<a id="a6223f2ac2734bd07fbc86a18d95bb9bf" name="a6223f2ac2734bd07fbc86a18d95bb9bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6223f2ac2734bd07fbc86a18d95bb9bf">&#9670;&#160;</a></span>sys_fcntl()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_fcntl </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_fcntl </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -979,19 +979,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a0dd257b30e1a85479bea08c0c341490e_cgraph.svg" width="556" height="183"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a6223f2ac2734bd07fbc86a18d95bb9bf_cgraph.svg" width="556" height="183"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a085eef8d1b7497d0e8ce862699ddda21" name="a085eef8d1b7497d0e8ce862699ddda21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a085eef8d1b7497d0e8ce862699ddda21">&#9670;&#160;</a></span>sys_fstat()</h2>
+<a id="a55c19a120c8db8174f736c5925e4e682" name="a55c19a120c8db8174f736c5925e4e682"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55c19a120c8db8174f736c5925e4e682">&#9670;&#160;</a></span>sys_fstat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_fstat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_fstat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -1039,19 +1039,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a085eef8d1b7497d0e8ce862699ddda21_cgraph.svg" width="594" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a55c19a120c8db8174f736c5925e4e682_cgraph.svg" width="594" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a1c7b290c87a6fc7f5dc164a9e944f00d" name="a1c7b290c87a6fc7f5dc164a9e944f00d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c7b290c87a6fc7f5dc164a9e944f00d">&#9670;&#160;</a></span>sys_ftruncate()</h2>
+<a id="a21ca8e448559278ca1affa80b962f7a0" name="a21ca8e448559278ca1affa80b962f7a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21ca8e448559278ca1affa80b962f7a0">&#9670;&#160;</a></span>sys_ftruncate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_ftruncate </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_ftruncate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -1098,19 +1098,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a1c7b290c87a6fc7f5dc164a9e944f00d_cgraph.svg" width="552" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a21ca8e448559278ca1affa80b962f7a0_cgraph.svg" width="552" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a66f6c5b7f67e1321644f27a4f71daf77" name="a66f6c5b7f67e1321644f27a4f71daf77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66f6c5b7f67e1321644f27a4f71daf77">&#9670;&#160;</a></span>sys_getcwd()</h2>
+<a id="ac3355ebc949d101587bb3088939d1354" name="ac3355ebc949d101587bb3088939d1354"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3355ebc949d101587bb3088939d1354">&#9670;&#160;</a></span>sys_getcwd()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getcwd </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getcwd </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
@@ -1157,19 +1157,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a66f6c5b7f67e1321644f27a4f71daf77_cgraph.svg" width="460" height="184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ac3355ebc949d101587bb3088939d1354_cgraph.svg" width="460" height="184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a44bf07790c50aadc67f2b582652962b6" name="a44bf07790c50aadc67f2b582652962b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44bf07790c50aadc67f2b582652962b6">&#9670;&#160;</a></span>sys_getdents()</h2>
+<a id="a8780050b35650c2c3789426a626641c6" name="a8780050b35650c2c3789426a626641c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8780050b35650c2c3789426a626641c6">&#9670;&#160;</a></span>sys_getdents()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getdents </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getdents </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -1216,24 +1216,24 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a44bf07790c50aadc67f2b582652962b6_cgraph.svg" width="626" height="184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a8780050b35650c2c3789426a626641c6_cgraph.svg" width="626" height="184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a44bf07790c50aadc67f2b582652962b6_icgraph.svg" width="291" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a8780050b35650c2c3789426a626641c6_icgraph.svg" width="291" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a28fc6c6bd6a6228f07f9f04f6a55c395" name="a28fc6c6bd6a6228f07f9f04f6a55c395"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a28fc6c6bd6a6228f07f9f04f6a55c395">&#9670;&#160;</a></span>sys_getdents64()</h2>
+<a id="af32ea2e80ab9ed4d67b1a6902045abab" name="af32ea2e80ab9ed4d67b1a6902045abab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af32ea2e80ab9ed4d67b1a6902045abab">&#9670;&#160;</a></span>sys_getdents64()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_getdents64 </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_getdents64 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -1276,23 +1276,23 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p><code>getdents64</code> — identical to <a class="el" href="sys__fs_8c.html#a44bf07790c50aadc67f2b582652962b6" title="Fill dirp with dirent64 entries from the open directory fd.">sys_getdents</a> on this platform. </p>
+<p><code>getdents64</code> - identical to <a class="el" href="sys__fs_8c.html#a8780050b35650c2c3789426a626641c6" title="Fill dirp with dirent64 entries from the open directory fd.">sys_getdents</a> on this platform. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a28fc6c6bd6a6228f07f9f04f6a55c395_cgraph.svg" width="647" height="184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_af32ea2e80ab9ed4d67b1a6902045abab_cgraph.svg" width="647" height="184"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="ac22ce1113852c1c17215004ca932368c" name="ac22ce1113852c1c17215004ca932368c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac22ce1113852c1c17215004ca932368c">&#9670;&#160;</a></span>sys_lstat()</h2>
+<a id="a6762c1aef55f2a7cb052e3cb2e758f03" name="a6762c1aef55f2a7cb052e3cb2e758f03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6762c1aef55f2a7cb052e3cb2e758f03">&#9670;&#160;</a></span>sys_lstat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_lstat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_lstat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
@@ -1335,23 +1335,23 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p><code>lstat</code> — no symlink resolution in VFS yet; identical to <code>stat</code>. </p>
+<p><code>lstat</code> - no symlink resolution in VFS yet; identical to <code>stat</code>. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ac22ce1113852c1c17215004ca932368c_cgraph.svg" width="100%" height="590"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a6762c1aef55f2a7cb052e3cb2e758f03_cgraph.svg" width="100%" height="590"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="afdc1e627b591695459f391aebfdaef92" name="afdc1e627b591695459f391aebfdaef92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdc1e627b591695459f391aebfdaef92">&#9670;&#160;</a></span>sys_mkdir()</h2>
+<a id="ab0692f7c0eb184a9c883778b8ee656cc" name="ab0692f7c0eb184a9c883778b8ee656cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0692f7c0eb184a9c883778b8ee656cc">&#9670;&#160;</a></span>sys_mkdir()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_mkdir </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_mkdir </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pathname</em>, </td>
@@ -1398,19 +1398,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_afdc1e627b591695459f391aebfdaef92_cgraph.svg" width="100%" height="553"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ab0692f7c0eb184a9c883778b8ee656cc_cgraph.svg" width="100%" height="553"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="aa02dc7e1c637fb1892f68f97fdc6d44d" name="aa02dc7e1c637fb1892f68f97fdc6d44d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa02dc7e1c637fb1892f68f97fdc6d44d">&#9670;&#160;</a></span>sys_newfstatat()</h2>
+<a id="a909349d198ccea749d6af7dff2d464e4" name="a909349d198ccea749d6af7dff2d464e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a909349d198ccea749d6af7dff2d464e4">&#9670;&#160;</a></span>sys_newfstatat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_newfstatat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_newfstatat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>dirfd</em>, </td>
@@ -1453,24 +1453,24 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p><code>newfstatat</code> — supports <code>AT_FDCWD</code> and absolute paths only. </p>
+<p><code>newfstatat</code> - supports <code>AT_FDCWD</code> and absolute paths only. </p>
 <p><code>AT_SYMLINK_NOFOLLOW</code> is accepted but not enforced (VFS has no <code>lstat</code>). <code>AT_EMPTY_PATH</code> returns <code>-ENOSYS</code>. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_aa02dc7e1c637fb1892f68f97fdc6d44d_cgraph.svg" width="100%" height="582"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a909349d198ccea749d6af7dff2d464e4_cgraph.svg" width="100%" height="582"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a520ffff94cc2df8d87a6080ffaa9707f" name="a520ffff94cc2df8d87a6080ffaa9707f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a520ffff94cc2df8d87a6080ffaa9707f">&#9670;&#160;</a></span>sys_open()</h2>
+<a id="adcd3dedc92d59bac3e8a22803f6d7b8e" name="adcd3dedc92d59bac3e8a22803f6d7b8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcd3dedc92d59bac3e8a22803f6d7b8e">&#9670;&#160;</a></span>sys_open()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_open </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_open </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
@@ -1517,24 +1517,24 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a520ffff94cc2df8d87a6080ffaa9707f_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_adcd3dedc92d59bac3e8a22803f6d7b8e_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a520ffff94cc2df8d87a6080ffaa9707f_icgraph.svg" width="238" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_adcd3dedc92d59bac3e8a22803f6d7b8e_icgraph.svg" width="238" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a22b2ac6b30d04a46bf880d289a4aea46" name="a22b2ac6b30d04a46bf880d289a4aea46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22b2ac6b30d04a46bf880d289a4aea46">&#9670;&#160;</a></span>sys_openat()</h2>
+<a id="aeff2bd471d7083f3d78c590694c15fe6" name="aeff2bd471d7083f3d78c590694c15fe6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeff2bd471d7083f3d78c590694c15fe6">&#9670;&#160;</a></span>sys_openat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_openat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_openat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>dirfd</em>, </td>
@@ -1577,23 +1577,23 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p><code>openat</code> — only <code>AT_FDCWD</code> is supported; delegates to <a class="el" href="sys__fs_8c.html#a520ffff94cc2df8d87a6080ffaa9707f" title="Open or create a file and return a file descriptor.">sys_open</a>. </p>
+<p><code>openat</code> - only <code>AT_FDCWD</code> is supported; delegates to <a class="el" href="sys__fs_8c.html#adcd3dedc92d59bac3e8a22803f6d7b8e" title="Open or create a file and return a file descriptor.">sys_open</a>. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a22b2ac6b30d04a46bf880d289a4aea46_cgraph.svg" width="100%" height="551"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_aeff2bd471d7083f3d78c590694c15fe6_cgraph.svg" width="100%" height="551"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a6794bf08828f6a427d54937607d2ab7d" name="a6794bf08828f6a427d54937607d2ab7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6794bf08828f6a427d54937607d2ab7d">&#9670;&#160;</a></span>sys_pipe()</h2>
+<a id="a1361807f14bd5e1589c54913d1a5cda5" name="a1361807f14bd5e1589c54913d1a5cda5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1361807f14bd5e1589c54913d1a5cda5">&#9670;&#160;</a></span>sys_pipe()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_pipe </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_pipe </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pipefd</em>, </td>
@@ -1638,24 +1638,24 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a6794bf08828f6a427d54937607d2ab7d_cgraph.svg" width="606" height="376"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a1361807f14bd5e1589c54913d1a5cda5_cgraph.svg" width="606" height="376"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a6794bf08828f6a427d54937607d2ab7d_icgraph.svg" width="224" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a1361807f14bd5e1589c54913d1a5cda5_icgraph.svg" width="224" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="abcbdbff193493e997cd9f83c1d102823" name="abcbdbff193493e997cd9f83c1d102823"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abcbdbff193493e997cd9f83c1d102823">&#9670;&#160;</a></span>sys_pipe2()</h2>
+<a id="a934218d9a754bf91e6e04a9224aaf79f" name="a934218d9a754bf91e6e04a9224aaf79f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a934218d9a754bf91e6e04a9224aaf79f">&#9670;&#160;</a></span>sys_pipe2()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_pipe2 </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_pipe2 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pipefd</em>, </td>
@@ -1700,19 +1700,19 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_abcbdbff193493e997cd9f83c1d102823_cgraph.svg" width="100%" height="594"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a934218d9a754bf91e6e04a9224aaf79f_cgraph.svg" width="100%" height="594"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a61b09a8f68c22deb040563c3591ec635" name="a61b09a8f68c22deb040563c3591ec635"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61b09a8f68c22deb040563c3591ec635">&#9670;&#160;</a></span>sys_pread64()</h2>
+<a id="ac897a1cc4c3feace952df07d7cc30a63" name="ac897a1cc4c3feace952df07d7cc30a63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac897a1cc4c3feace952df07d7cc30a63">&#9670;&#160;</a></span>sys_pread64()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_pread64 </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_pread64 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -1760,19 +1760,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a61b09a8f68c22deb040563c3591ec635_cgraph.svg" width="628" height="234"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ac897a1cc4c3feace952df07d7cc30a63_cgraph.svg" width="628" height="234"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a31616d53ffa4f00fbfe3f2dfc16e4237" name="a31616d53ffa4f00fbfe3f2dfc16e4237"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31616d53ffa4f00fbfe3f2dfc16e4237">&#9670;&#160;</a></span>sys_pwrite64()</h2>
+<a id="a430c96a16cfcfe001404dc60153f7414" name="a430c96a16cfcfe001404dc60153f7414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a430c96a16cfcfe001404dc60153f7414">&#9670;&#160;</a></span>sys_pwrite64()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_pwrite64 </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_pwrite64 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>fd</em>, </td>
@@ -1816,23 +1816,23 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Write <code>count</code> bytes to <code>fd</code> at absolute <code>offset</code> without moving the seek position. </p>
-<p>Stdio fds (0–2) delegate to <a class="el" href="sys__io_8c.html#aaf2c4002d448ac156bcf915154c831bb" title="Write count bytes from buf to fd.">sys_write</a> since they have no seekable OFT entry. For regular files, the OFT offset is saved and restored. </p>
+<p>Stdio fds (0–2) delegate to <a class="el" href="sys__io_8c.html#a636c903c7fd56e8c6ecee603c8d03d6c" title="Write count bytes from buf to fd.">sys_write</a> since they have no seekable OFT entry. For regular files, the OFT offset is saved and restored. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a31616d53ffa4f00fbfe3f2dfc16e4237_cgraph.svg" width="602" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a430c96a16cfcfe001404dc60153f7414_cgraph.svg" width="602" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a3c7030445954bf053945683539a885b4" name="a3c7030445954bf053945683539a885b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c7030445954bf053945683539a885b4">&#9670;&#160;</a></span>sys_readlink()</h2>
+<a id="ac1729b5f524e554c1ba82a19a6aeae05" name="ac1729b5f524e554c1ba82a19a6aeae05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1729b5f524e554c1ba82a19a6aeae05">&#9670;&#160;</a></span>sys_readlink()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_readlink </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_readlink </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
@@ -1880,19 +1880,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a3c7030445954bf053945683539a885b4_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_ac1729b5f524e554c1ba82a19a6aeae05_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="aa6dfd2d967f7393f9df4852259140393" name="aa6dfd2d967f7393f9df4852259140393"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6dfd2d967f7393f9df4852259140393">&#9670;&#160;</a></span>sys_rename()</h2>
+<a id="a72c1d42f6a448e08ff4ec4ddf6b1a4e3" name="a72c1d42f6a448e08ff4ec4ddf6b1a4e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72c1d42f6a448e08ff4ec4ddf6b1a4e3">&#9670;&#160;</a></span>sys_rename()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_rename </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_rename </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>oldpath</em>, </td>
@@ -1939,19 +1939,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_aa6dfd2d967f7393f9df4852259140393_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a72c1d42f6a448e08ff4ec4ddf6b1a4e3_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a5a0e70030b084d0a0fe76e4f0e18ce00" name="a5a0e70030b084d0a0fe76e4f0e18ce00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a0e70030b084d0a0fe76e4f0e18ce00">&#9670;&#160;</a></span>sys_rmdir()</h2>
+<a id="afd8c8e519c3b13da94fe0224b3cf8a32" name="afd8c8e519c3b13da94fe0224b3cf8a32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd8c8e519c3b13da94fe0224b3cf8a32">&#9670;&#160;</a></span>sys_rmdir()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_rmdir </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_rmdir </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pathname</em>, </td>
@@ -1998,19 +1998,19 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a5a0e70030b084d0a0fe76e4f0e18ce00_cgraph.svg" width="100%" height="553"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_afd8c8e519c3b13da94fe0224b3cf8a32_cgraph.svg" width="100%" height="553"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
 </div>
-<a id="a22b0dcc6380583c59252fa2ed22396be" name="a22b0dcc6380583c59252fa2ed22396be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22b0dcc6380583c59252fa2ed22396be">&#9670;&#160;</a></span>sys_stat()</h2>
+<a id="afbc7a2f99ef9ba83389499b8a65e4e3b" name="afbc7a2f99ef9ba83389499b8a65e4e3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbc7a2f99ef9ba83389499b8a65e4e3b">&#9670;&#160;</a></span>sys_stat()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_stat </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_stat </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
@@ -2057,24 +2057,24 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a22b0dcc6380583c59252fa2ed22396be_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_afbc7a2f99ef9ba83389499b8a65e4e3b_cgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a22b0dcc6380583c59252fa2ed22396be_icgraph.svg" width="256" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_afbc7a2f99ef9ba83389499b8a65e4e3b_icgraph.svg" width="256" height="86"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a9d175f2f2749eea869fbafc3a6306d23" name="a9d175f2f2749eea869fbafc3a6306d23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d175f2f2749eea869fbafc3a6306d23">&#9670;&#160;</a></span>sys_symlink()</h2>
+<a id="a6e41fc79c7f4a5106d2927d1bf5e1548" name="a6e41fc79c7f4a5106d2927d1bf5e1548"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e41fc79c7f4a5106d2927d1bf5e1548">&#9670;&#160;</a></span>sys_symlink()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_symlink </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_symlink </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>target</em>, </td>
@@ -2117,18 +2117,18 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p><code>symlink</code> — not implemented; returns <code>-ENOSYS</code>. </p>
+<p><code>symlink</code> - not implemented; returns <code>-ENOSYS</code>. </p>
 
 </div>
 </div>
-<a id="a9b635f43a86efa68bdf828ae9fb1c76c" name="a9b635f43a86efa68bdf828ae9fb1c76c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b635f43a86efa68bdf828ae9fb1c76c">&#9670;&#160;</a></span>sys_unlink()</h2>
+<a id="adad566d662cfea8d303bb495215855e3" name="adad566d662cfea8d303bb495215855e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adad566d662cfea8d303bb495215855e3">&#9670;&#160;</a></span>sys_unlink()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> sys_unlink </td>
+          <td class="memname"><a class="el" href="types_8h.html#a60161a130eae0ecc7257b79ac7418c41">kern_err_t</a> sys_unlink </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="types_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
           <td class="paramname"><em>pathname</em>, </td>
@@ -2175,7 +2175,7 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_a9b635f43a86efa68bdf828ae9fb1c76c_cgraph.svg" width="100%" height="553"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="sys__fs_8c_adad566d662cfea8d303bb495215855e3_cgraph.svg" width="100%" height="553"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

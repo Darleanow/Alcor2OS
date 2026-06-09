@@ -1,9 +1,9 @@
 <map id="fill_proc_self_exe_stat" name="fill_proc_self_exe_stat">
 <area shape="rect" id="Node000001" title="Fill st with synthetic stat data for the /proc/self/exe virtual symlink." alt="" coords="299,31,465,56"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="175,31,251,56"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" title="Stat the node at path into a POSIX stat buffer." alt="" coords="175,31,251,56"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="285,46,251,46,251,41,285,41"/>
-<area shape="rect" id="Node000003" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="26,5,106,31"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" title="lstat &#45; no symlink resolution in VFS yet; identical to stat." alt="" coords="26,5,106,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="161,37,106,28,107,22,162,32"/>
-<area shape="rect" id="Node000004" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="5,55,127,80"/>
+<area shape="rect" id="Node000004" href="$sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" title="newfstatat &#45; supports AT_FDCWD and absolute paths only." alt="" coords="5,55,127,80"/>
 <area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="162,54,127,60,126,55,161,49"/>
 </map>

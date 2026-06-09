@@ -1,11 +1,11 @@
 <map id="fill_stat_buf" name="fill_stat_buf">
 <area shape="rect" id="Node000001" title="Translate an internal vfs_stat_t into the POSIX stat layout." alt="" coords="304,31,403,56"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a085eef8d1b7497d0e8ce862699ddda21" title="Stat the open file descriptor fd into a POSIX stat buffer." alt="" coords="175,5,256,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a55c19a120c8db8174f736c5925e4e682" title="Stat the open file descriptor fd into a POSIX stat buffer." alt="" coords="175,5,256,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="290,34,256,28,257,23,291,29"/>
-<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a22b0dcc6380583c59252fa2ed22396be" title="Stat the node at path into a POSIX stat buffer." alt="" coords="177,55,253,80"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#afbc7a2f99ef9ba83389499b8a65e4e3b" title="Stat the node at path into a POSIX stat buffer." alt="" coords="177,55,253,80"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="291,57,254,63,253,58,290,52"/>
-<area shape="rect" id="Node000004" href="$sys__fs_8c.html#ac22ce1113852c1c17215004ca932368c" title="lstat — no symlink resolution in VFS yet; identical to stat." alt="" coords="26,29,106,55"/>
+<area shape="rect" id="Node000004" href="$sys__fs_8c.html#a6762c1aef55f2a7cb052e3cb2e758f03" title="lstat &#45; no symlink resolution in VFS yet; identical to stat." alt="" coords="26,29,106,55"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="163,61,106,51,107,46,164,56"/>
-<area shape="rect" id="Node000005" href="$sys__fs_8c.html#aa02dc7e1c637fb1892f68f97fdc6d44d" title="newfstatat — supports AT_FDCWD and absolute paths only." alt="" coords="5,79,127,104"/>
+<area shape="rect" id="Node000005" href="$sys__fs_8c.html#a909349d198ccea749d6af7dff2d464e4" title="newfstatat &#45; supports AT_FDCWD and absolute paths only." alt="" coords="5,79,127,104"/>
 <area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="164,78,128,84,127,79,163,73"/>
 </map>

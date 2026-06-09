@@ -1,6 +1,6 @@
 <map id="include/alcor2/fs/pipe.h" name="include/alcor2/fs/pipe.h">
 <area shape="rect" id="Node000001" title="Kernel pipe object interface shared by the VFS and syscall layers." alt="" coords="533,5,706,31"/>
-<area shape="rect" id="Node000002" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="469,79,607,119"/>
+<area shape="rect" id="Node000002" href="$include_2alcor2_2sys_2internal_8h.html" title="Kernel&#45;only syscall layer declarations, not a public API." alt="" coords="469,79,607,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="599,42,559,80,556,77,596,38"/>
 <area shape="rect" id="Node000005" href="$sys__fs_8c.html" title="Filesystem syscalls: open, close, stat, seek, rename, chdir, …" alt="" coords="5,174,172,199"/>
 <area shape="poly" id="edge11_Node000001_Node000005" title=" " alt="" coords="571,37,126,176,124,171,569,32"/>

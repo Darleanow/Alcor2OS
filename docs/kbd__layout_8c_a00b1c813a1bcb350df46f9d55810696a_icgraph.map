@@ -8,12 +8,12 @@
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="405,75,348,44,319,33,321,28,350,40,407,70"/>
 <area shape="rect" id="Node000005" href="$signal_8c.html#a34cacd8b8ee76d1c5a9b89e80bb30087" title="Check for deliverable signals and set up a signal frame if needed." alt="" coords="201,55,349,80"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="383,87,349,81,350,76,384,82"/>
-<area shape="rect" id="Node000006" href="$sys__proc_8c.html#ac94fd40d902c2bb4efd34532439a30ce" title="Replace the calling process image with a new ELF at pathname." alt="" coords="227,104,324,129"/>
+<area shape="rect" id="Node000006" href="$sys__proc_8c.html#a827b355acd43667b34b4d1db5377be4d" title="Replace the calling process image with a new ELF at pathname." alt="" coords="227,104,324,129"/>
 <area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="384,103,325,112,324,107,383,98"/>
-<area shape="rect" id="Node000007" href="$sys__proc_8c.html#adaaff2c02bdbb9c04402a8ff043d32a5" title="Terminate the calling process with status." alt="" coords="237,153,313,179"/>
+<area shape="rect" id="Node000007" href="$sys__proc_8c.html#af0b72e7bd7c7689eb96c83b2ecad335f" title="Terminate the calling process with status." alt="" coords="237,153,313,179"/>
 <area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="406,115,350,143,314,157,312,152,348,138,403,110"/>
 <area shape="rect" id="Node000004" href="$src_2kernel_2main_8c.html#af2a6510459a9078c19de386e065e36dd" title=" " alt="" coords="5,5,153,31"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="189,21,154,21,154,15,189,15"/>
-<area shape="rect" id="Node000008" href="$sys__proc_8c.html#a6e8aa1e2259e05a3fffab177867626b2" title="Terminate all threads in the group — equivalent to sys_exit here." alt="" coords="19,153,139,179"/>
+<area shape="rect" id="Node000008" href="$sys__proc_8c.html#afee2a1f1efdfdcf0b0d4490e832c19d8" title="Terminate all threads in the group &#45; equivalent to sys_exit here." alt="" coords="19,153,139,179"/>
 <area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="224,169,139,169,139,163,224,163"/>
 </map>

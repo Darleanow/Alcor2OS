@@ -210,7 +210,7 @@ var sectionId = 'dynsection-12';
 <!-- Node9 -->
 <g id="Node000009" class="node">
 <title>Node9</title>
-<g id="a_Node000009"><a xlink:href="sys__proc_8c.html#a479ed177adb4ba4e7cc96063f917c31e" target="_top" xlink:title="Duplicate the calling process (clone).">
+<g id="a_Node000009"><a xlink:href="sys__proc_8c.html#abb73ea77ef1d8ed5f068ab9d52210cb6" target="_top" xlink:title="Duplicate the calling process (clone).">
 <polygon fill="white" stroke="#666666" points="77,-93 12,-93 12,-74 77,-74 77,-93"/>
 <text text-anchor="middle" x="44.5" y="-81" font-family="Helvetica,sans-Serif" font-size="10.00">sys_clone</text>
 </a>
@@ -228,7 +228,7 @@ var sectionId = 'dynsection-12';
 <!-- Node11 -->
 <g id="Node000011" class="node">
 <title>Node11</title>
-<g id="a_Node000011"><a xlink:href="sys__proc_8c.html#aba8579e09bd5de65736d9b19dc356a36" target="_top" xlink:title="Duplicate the calling process (fork).">
+<g id="a_Node000011"><a xlink:href="sys__proc_8c.html#a94d8af8fc8ae857d5816d6ca7ab73bca" target="_top" xlink:title="Duplicate the calling process (fork).">
 <polygon fill="white" stroke="#666666" points="73.5,-56 15.5,-56 15.5,-37 73.5,-37 73.5,-56"/>
 <text text-anchor="middle" x="44.5" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">sys_fork</text>
 </a>
@@ -246,7 +246,7 @@ var sectionId = 'dynsection-12';
 <!-- Node14 -->
 <g id="Node000014" class="node">
 <title>Node14</title>
-<g id="a_Node000014"><a xlink:href="sys__proc_8c.html#a54f03e8b54e409ff39140d6476222398" target="_top" xlink:title="Wait for a child process to change state (wait4).">
+<g id="a_Node000014"><a xlink:href="sys__proc_8c.html#a804304a7ce50ad8730e039286e05d7e2" target="_top" xlink:title="Wait for a child process to change state (wait4).">
 <polygon fill="white" stroke="#666666" points="209.5,-19 144.5,-19 144.5,0 209.5,0 209.5,-19"/>
 <text text-anchor="middle" x="177" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">sys_wait4</text>
 </a>

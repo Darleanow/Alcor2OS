@@ -1,5 +1,5 @@
 <map id="include/alcor2/sys/internal.h" name="include/alcor2/sys/internal.h">
-<area shape="rect" id="Node000001" title="Kernel&#45;only declarations for the syscall implementation layer." alt="" coords="53,5,192,45"/>
+<area shape="rect" id="Node000001" title="Kernel&#45;only syscall layer declarations, not a public API." alt="" coords="53,5,192,45"/>
 <area shape="rect" id="Node000002" href="$fs_2pipe_8h.html" title="Kernel pipe object interface shared by the VFS and syscall layers." alt="" coords="5,167,128,192"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,47,94,94,76,154,71,152,90,92,111,45"/>
 <area shape="rect" id="Node000007" href="$syscall_8h.html" title="x86_64 syscall interface and definitions." alt="" coords="104,93,253,119"/>

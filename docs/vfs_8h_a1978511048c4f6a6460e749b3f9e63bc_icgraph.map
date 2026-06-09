@@ -1,7 +1,7 @@
 <map id="vfs_oft_alloc_pipe" name="vfs_oft_alloc_pipe">
 <area shape="rect" id="Node000001" title="Allocate an OFT entry for one end of a pipe." alt="" coords="267,5,405,31"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a6794bf08828f6a427d54937607d2ab7d" title=" " alt="" coords="140,5,219,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#a1361807f14bd5e1589c54913d1a5cda5" title=" " alt="" coords="140,5,219,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,21,219,21,219,15,253,15"/>
-<area shape="rect" id="Node000003" href="$sys__fs_8c.html#abcbdbff193493e997cd9f83c1d102823" title=" " alt="" coords="5,5,92,31"/>
+<area shape="rect" id="Node000003" href="$sys__fs_8c.html#a934218d9a754bf91e6e04a9224aaf79f" title=" " alt="" coords="5,5,92,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="126,21,92,21,92,15,126,15"/>
 </map>

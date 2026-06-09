@@ -1,5 +1,5 @@
 <map id="vfs_mkdir" name="vfs_mkdir">
 <area shape="rect" id="Node000001" title="Create a directory at path." alt="" coords="143,5,229,31"/>
-<area shape="rect" id="Node000002" href="$sys__fs_8c.html#afdc1e627b591695459f391aebfdaef92" title="Create a directory at pathname." alt="" coords="5,5,95,31"/>
+<area shape="rect" id="Node000002" href="$sys__fs_8c.html#ab0692f7c0eb184a9c883778b8ee656cc" title="Create a directory at pathname." alt="" coords="5,5,95,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,21,95,21,95,15,129,15"/>
 </map>

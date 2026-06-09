@@ -76,7 +76,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Descriptor for a single syscall mapping.  
+<p>Maps a syscall number to its name and handler.  
  <a href="structsys__def__t.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="include_2alcor2_2sys_2internal_8h_source.html">internal.h</a>&gt;</code></p>
@@ -87,12 +87,11 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a32e940515cfd73fdd7d341cb670b7765"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8ecbdf8a9461393112d1365fc5d878a" id="r_ad8ecbdf8a9461393112d1365fc5d878a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsys__def__t.html#ad8ecbdf8a9461393112d1365fc5d878a">name</a></td></tr>
 <tr class="separator:ad8ecbdf8a9461393112d1365fc5d878a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60ad3b4fc9397eac249e89b27aefff1f" id="r_a60ad3b4fc9397eac249e89b27aefff1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad1c308acabf108485576aa43c99a0082">syscall_fn_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsys__def__t.html#a60ad3b4fc9397eac249e89b27aefff1f">handler</a></td></tr>
+<tr class="memitem:a60ad3b4fc9397eac249e89b27aefff1f" id="r_a60ad3b4fc9397eac249e89b27aefff1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2244d218354999b246e1d3c45a1c74d3">syscall_fn_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsys__def__t.html#a60ad3b4fc9397eac249e89b27aefff1f">handler</a></td></tr>
 <tr class="separator:a60ad3b4fc9397eac249e89b27aefff1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Descriptor for a single syscall mapping. </p>
-<p>Handler signature is invariant six u64-in / u64-out (System V order: RDI, RSI, RDX, R10, R8, R9). No nargs field — every entry accepts the full register window and ignores unused slots via (void)aN. </p>
+<div class="textblock"><p>Maps a syscall number to its name and handler. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a60ad3b4fc9397eac249e89b27aefff1f" name="a60ad3b4fc9397eac249e89b27aefff1f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a60ad3b4fc9397eac249e89b27aefff1f">&#9670;&#160;</a></span>handler</h2>
@@ -101,7 +100,7 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#ad1c308acabf108485576aa43c99a0082">syscall_fn_t</a> sys_def_t::handler</td>
+          <td class="memname"><a class="el" href="include_2alcor2_2sys_2internal_8h.html#a2244d218354999b246e1d3c45a1c74d3">syscall_fn_t</a> sys_def_t::handler</td>
         </tr>
       </table>
 </div><div class="memdoc">
