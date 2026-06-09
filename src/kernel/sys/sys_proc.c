@@ -111,7 +111,8 @@ kern_err_t sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * and the bare @c __clone (faccessat helper).  Full thread creation
  * (@c CLONE_THREAD) returns @c -ENOSYS.
  */
-kern_err_t sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
+kern_err_t
+    sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
 {
   (void)ptid;
   (void)ctid;
@@ -284,7 +285,8 @@ kern_err_t sys_exit_group(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * Delegates to ::proc_waitpid.  @p wstatus is written only when non-NULL and
  * the call returns a valid child PID.  @p rusage is ignored.
  */
-kern_err_t sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
+kern_err_t
+    sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
 {
   (void)rusage;
   (void)a5;
@@ -353,7 +355,8 @@ kern_err_t sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
 /** @brief Store the clear-child-tid address (no-op); returns the current TID.
  */
-kern_err_t sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t
+    sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)tidptr;
   (void)a2;

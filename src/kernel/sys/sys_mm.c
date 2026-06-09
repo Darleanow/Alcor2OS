@@ -104,7 +104,8 @@ static void fill_file_backed_pages(u64 base, u64 length, i64 fd, u64 offset)
   vfs_seek(fd, saved_pos, SEEK_SET);
 }
 
-kern_err_t sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
+kern_err_t
+    sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
 {
   if(length == 0)
     return -EINVAL;

@@ -145,7 +145,7 @@ kern_err_t sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
     return 0;
   }
 
-  vfs_stat_t    vst;
+  vfs_stat_t vst;
   kern_err_t rc = vfs_stat((const char *)path, &vst);
   if(rc < 0)
     return rc;
@@ -225,7 +225,8 @@ kern_err_t sys_access(u64 path, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
  * Relative paths with a real @p dirfd return @c -ENOSYS; all supported flags
  * are accepted and silently ignored (no fine-grained mode checking in VFS).
  */
-kern_err_t sys_faccessat(u64 dirfd, u64 pathname, u64 mode, u64 flags, u64 a5, u64 a6)
+kern_err_t
+    sys_faccessat(u64 dirfd, u64 pathname, u64 mode, u64 flags, u64 a5, u64 a6)
 {
   const i64 AT_FDCWD = -100;
 

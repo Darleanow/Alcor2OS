@@ -18,7 +18,8 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
   return ptr && vmm_is_user_range((void *)ptr, size);
 }
 
-kern_err_t sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t
+    sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -37,7 +38,8 @@ kern_err_t sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 
   return 0;
 }
 
-kern_err_t sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t
+    sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;

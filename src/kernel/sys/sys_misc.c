@@ -151,7 +151,8 @@ static u64 futex_requeue_pa(u64 from_pa, u64 to_pa, u64 max_mv)
   return mv;
 }
 
-kern_err_t sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
+kern_err_t
+    sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
 {
   (void)timeout;
 
