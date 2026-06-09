@@ -131,7 +131,7 @@ kern_err_t sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u6
   if(child_stack != 0 && !vmm_is_user_ptr((void *)child_stack))
     return -EFAULT;
 
-  return (u64)proc_clone(frame, child_stack, (u32)flags);
+  return proc_clone(frame, child_stack, (u32)flags);
 }
 
 /** @brief Duplicate the calling process (@c fork). */
@@ -147,7 +147,7 @@ kern_err_t sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   const syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
     return -EINVAL;
-  return (u64)proc_fork(frame);
+  return proc_fork(frame);
 }
 
 /**

@@ -532,7 +532,7 @@ kern_err_t sys_pread64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
     return -EFAULT;
   i64 saved = vfs_seek((i64)fd, 0, SEEK_CUR);
   if(saved < 0)
-    return (u64)saved;
+    return saved;
   vfs_seek((i64)fd, (i64)offset, SEEK_SET);
   i64 result = vfs_read((i64)fd, (void *)buf, count);
   vfs_seek((i64)fd, saved, SEEK_SET);
@@ -558,7 +558,7 @@ kern_err_t sys_pwrite64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
 
   i64 saved = vfs_seek((i64)fd, 0, SEEK_CUR);
   if(saved < 0)
-    return (u64)saved;
+    return saved;
   vfs_seek((i64)fd, (i64)offset, SEEK_SET);
   i64 result = vfs_write((i64)fd, (const void *)buf, count);
   vfs_seek((i64)fd, saved, SEEK_SET);

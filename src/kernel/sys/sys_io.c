@@ -46,7 +46,7 @@ kern_err_t sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   if(count == 0)
     return 0;
 
-  return (u64)vfs_read((i64)fd, (void *)buf, count);
+  return vfs_read((i64)fd, (void *)buf, count);
 }
 
 /**
@@ -69,7 +69,7 @@ kern_err_t sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
   if(count == 0)
     return 0;
 
-  return (u64)vfs_write((i64)fd, (void *)buf, count);
+  return vfs_write((i64)fd, (void *)buf, count);
 }
 
 /** @brief Reposition the file offset of @p fd (@c lseek). */
@@ -78,7 +78,7 @@ kern_err_t sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
   (void)a4;
   (void)a5;
   (void)a6;
-  return (u64)vfs_seek((i64)fd, (i64)offset, (i32)whence);
+  return vfs_seek((i64)fd, (i64)offset, (i32)whence);
 }
 
 /**
@@ -93,7 +93,7 @@ kern_err_t sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
   (void)a4;
   (void)a5;
   (void)a6;
-  return (u64)vfs_ioctl((i64)fd, request, arg);
+  return vfs_ioctl((i64)fd, request, arg);
 }
 
 /**
@@ -470,7 +470,7 @@ kern_err_t sys_select(
       bool immediate = false;
       i32  prc       = parse_timeval(timeout, &immediate, &ticks_rem);
       if(prc)
-        return (u64)prc;
+        return prc;
       if(immediate)
         return 0;
       for(u64 t = 0; t < ticks_rem; t++)
@@ -514,7 +514,7 @@ kern_err_t sys_select(
     bool immediate = false;
     i32  prc       = parse_timeval(timeout, &immediate, &ticks_rem);
     if(prc)
-      return (u64)prc;
+      return prc;
     poll_mode = immediate;
   } else
     infinite = true;
@@ -523,7 +523,7 @@ kern_err_t sys_select(
     int total = 0;
     i32 err   = select_scan(nfds, rin, win, rout, wout, eout, &total);
     if(err)
-      return (u64)err;
+      return err;
 
     if(total > 0 || poll_mode) {
       if(readfds)
@@ -607,7 +607,7 @@ kern_err_t sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
 
     if(nready > 0 || immediate) {
       kmemcpy((void *)fds, local, (u64)nfds * sizeof(poll__fd_abi_t));
-      return (u64)nready;
+      return nready;
     }
 
     if(!infinite) {
