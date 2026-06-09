@@ -73,7 +73,7 @@ static i64 copy_user_strvec(
 }
 
 /** @brief Return the calling process's PID (or 1 if no process is running). */
-u64 sys_getpid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_getpid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -85,14 +85,14 @@ u64 sys_getpid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return p ? p->pid : 1;
 }
 
-/** @brief Return the calling thread's TID — same as PID (no thread support). */
-u64 sys_gettid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief Return the calling thread's TID - same as PID (no thread support). */
+kern_err_t sys_gettid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_getpid(a1, a2, a3, a4, a5, a6);
 }
 
 /** @brief Return the calling process's parent PID. */
-u64 sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -111,7 +111,8 @@ u64 sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * and the bare @c __clone (faccessat helper).  Full thread creation
  * (@c CLONE_THREAD) returns @c -ENOSYS.
  */
-u64 sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
+kern_err_t
+    sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
 {
   (void)ptid;
   (void)ctid;
@@ -119,23 +120,23 @@ u64 sys_clone(u64 flags, u64 child_stack, u64 ptid, u64 ctid, u64 tls, u64 a6)
   (void)a6;
 
   if(flags & ALCOR_CLONE_THREAD)
-    return (u64)-ENOSYS;
+    return -ENOSYS;
 
   if(flags & ~(ALCOR_CLONE_VM | ALCOR_CLONE_VFORK | ALCOR_CSIGNAL))
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   const syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   if(child_stack != 0 && !vmm_is_user_ptr((void *)child_stack))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
-  return (u64)proc_clone(frame, child_stack, (u32)flags);
+  return proc_clone(frame, child_stack, (u32)flags);
 }
 
 /** @brief Duplicate the calling process (@c fork). */
-u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -146,8 +147,8 @@ u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
   const syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
-    return (u64)-EINVAL;
-  return (u64)proc_fork(frame);
+    return -EINVAL;
+  return proc_fork(frame);
 }
 
 /**
@@ -158,26 +159,26 @@ u64 sys_fork(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * any vfork-blocked parent, and redirects the in-flight syscall return frame
  * to the new entry point.
  */
-u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(!user_cstr_ok(pathname))
-    return (u64)-EFAULT;
+    return -EFAULT;
   const char *path = (const char *)pathname;
 
   if(argv && !user_buf_ok(argv, sizeof(char *)))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(envp && !user_buf_ok(envp, sizeof(char *)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   vfs_stat_t st;
   if(vfs_stat(path, &st) < 0)
-    return (u64)-ENOENT;
+    return -ENOENT;
   if(st.type != VFS_FILE)
-    return (u64)-EACCES;
+    return -EACCES;
 
   /* All five scratch buffers are freed at the single @c out: label so the
    * function has one cleanup path instead of five copies of five kfrees. */
@@ -191,7 +192,7 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
   i64    fd   = -1;
 
   if(!arg_storage || !new_argv || !env_storage || !new_envp || !name_storage) {
-    rc_u = (u64)-ENOMEM;
+    rc_u = -ENOMEM;
     goto out;
   }
 
@@ -221,13 +222,13 @@ u64 sys_execve(u64 pathname, u64 argv, u64 envp, u64 a4, u64 a5, u64 a6)
 
   fd = vfs_open(path, 0);
   if(fd < 0) {
-    rc_u = (u64)-ENOENT;
+    rc_u = -ENOENT;
     goto out;
   }
 
   proc_t *p = proc_current();
   if(!p) {
-    rc_u = (u64)-EINVAL;
+    rc_u = -EINVAL;
     goto out;
   }
 
@@ -261,7 +262,7 @@ out:
 }
 
 /** @brief Terminate the calling process with @p status. */
-u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -271,9 +272,9 @@ u64 sys_exit(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   proc_exit((i64)status);
 }
 
-/** @brief Terminate all threads in the group — equivalent to ::sys_exit here.
+/** @brief Terminate all threads in the group - equivalent to ::sys_exit here.
  */
-u64 sys_exit_group(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_exit_group(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_exit(status, a2, a3, a4, a5, a6);
 }
@@ -284,7 +285,8 @@ u64 sys_exit_group(u64 status, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * Delegates to ::proc_waitpid.  @p wstatus is written only when non-NULL and
  * the call returns a valid child PID.  @p rusage is ignored.
  */
-u64 sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
+kern_err_t
+    sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
 {
   (void)rusage;
   (void)a5;
@@ -296,15 +298,15 @@ u64 sys_wait4(u64 pid, u64 wstatus, u64 options, u64 rusage, u64 a5, u64 a6)
   i64  ret = proc_waitpid((i64)pid, kstatus_ptr, (i32)options);
   if(ret > 0 && wstatus) {
     if(!user_buf_ok(wstatus, sizeof(i32)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     *(i32 *)wstatus = kstatus;
   }
 
-  return (u64)ret;
+  return ret;
 }
 
-/** @brief Return the calling process's real user ID (always 0 — root). */
-u64 sys_getuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief Return the calling process's real user ID (always 0 - root). */
+kern_err_t sys_getuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -315,8 +317,8 @@ u64 sys_getuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-/** @brief Return the calling process's real group ID (always 0 — root). */
-u64 sys_getgid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief Return the calling process's real group ID (always 0 - root). */
+kern_err_t sys_getgid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -327,8 +329,8 @@ u64 sys_getgid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-/** @brief Return the calling process's effective user ID (always 0 — root). */
-u64 sys_geteuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief Return the calling process's effective user ID (always 0 - root). */
+kern_err_t sys_geteuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -339,8 +341,8 @@ u64 sys_geteuid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-/** @brief Return the calling process's effective group ID (always 0 — root). */
-u64 sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief Return the calling process's effective group ID (always 0 - root). */
+kern_err_t sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -353,7 +355,8 @@ u64 sys_getegid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
 /** @brief Store the clear-child-tid address (no-op); returns the current TID.
  */
-u64 sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t
+    sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)tidptr;
   (void)a2;
@@ -370,7 +373,7 @@ u64 sys_set_tid_address(u64 tidptr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 #define ARCH_GET_FS 0x1003
 #define ARCH_GET_GS 0x1004
 
-u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -390,15 +393,15 @@ u64 sys_arch_prctl(u64 code, u64 addr, u64 a3, u64 a4, u64 a5, u64 a6)
     return 0;
   case ARCH_GET_FS:
     if(!addr)
-      return (u64)-EFAULT;
+      return -EFAULT;
     *(u64 *)addr = cpu_get_fs_base();
     return 0;
   case ARCH_GET_GS:
     if(!addr)
-      return (u64)-EFAULT;
+      return -EFAULT;
     *(u64 *)addr = cpu_get_gs_base();
     return 0;
   default:
-    return (u64)-EINVAL;
+    return -EINVAL;
   }
 }

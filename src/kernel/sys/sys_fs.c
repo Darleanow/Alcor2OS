@@ -87,7 +87,7 @@ static inline bool user_buf_ok(u64 ptr, u64 size)
  * @brief Translate an internal ::vfs_stat_t into the POSIX @c stat layout.
  *
  * Files are reported as user-executable (@c 0755) even without real mode
- * bits — toolchain binaries rely on this for @c posix_spawn permission checks.
+ * bits - toolchain binaries rely on this for @c posix_spawn permission checks.
  */
 static void fill_stat_buf(struct stat_buf *st, const vfs_stat_t *vst)
 {
@@ -104,7 +104,7 @@ static void fill_stat_buf(struct stat_buf *st, const vfs_stat_t *vst)
 }
 
 /** @brief Open or create a file and return a file descriptor. */
-u64 sys_open(u64 path, u64 flags, u64 mode, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_open(u64 path, u64 flags, u64 mode, u64 a4, u64 a5, u64 a6)
 {
   (void)mode;
   (void)a4;
@@ -112,14 +112,13 @@ u64 sys_open(u64 path, u64 flags, u64 mode, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(path))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
-  i64 fd = vfs_open((const char *)path, (u32)flags);
-  return (u64)fd;
+  return vfs_open((const char *)path, (u32)flags);
 }
 
 /** @brief Release @p fd and decrement its OFT refcount. */
-u64 sys_close(u64 fd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_close(u64 fd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -127,12 +126,11 @@ u64 sys_close(u64 fd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  i64 result = vfs_close((i64)fd);
-  return (result < 0) ? (u64)result : 0;
+  return vfs_close((i64)fd);
 }
 
 /** @brief Stat the node at @p path into a POSIX @c stat buffer. */
-u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -140,7 +138,7 @@ u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(path) || !user_buf_ok(statbuf, sizeof(struct stat_buf)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   if(path_is_proc_self_exe((const char *)path)) {
     fill_proc_self_exe_stat((struct stat_buf *)statbuf, proc_current());
@@ -148,8 +146,9 @@ u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   }
 
   vfs_stat_t vst;
-  if(vfs_stat((const char *)path, &vst) < 0)
-    return (u64)-ENOENT;
+  kern_err_t rc = vfs_stat((const char *)path, &vst);
+  if(rc < 0)
+    return rc;
 
   fill_stat_buf((struct stat_buf *)statbuf, &vst);
   return 0;
@@ -161,7 +160,7 @@ u64 sys_stat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
  * FDs 0–2 (stdio) return synthetic character-device metadata since they have
  * no OFT entry in the default configuration.
  */
-u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -169,7 +168,7 @@ u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_buf_ok(statbuf, sizeof(struct stat_buf)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   struct stat_buf *st = (struct stat_buf *)statbuf;
   if(fd <= 2) {
@@ -183,21 +182,22 @@ u64 sys_fstat(u64 fd, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
   }
 
   vfs_stat_t vst;
-  if(vfs_fstat((i64)fd, &vst) < 0)
-    return (u64)-EBADF;
+  kern_err_t rc = vfs_fstat((i64)fd, &vst);
+  if(rc < 0)
+    return rc;
 
   fill_stat_buf(st, &vst);
   return 0;
 }
 
-/** @brief @c lstat — no symlink resolution in VFS yet; identical to @c stat. */
-u64 sys_lstat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief @c lstat - no symlink resolution in VFS yet; identical to @c stat. */
+kern_err_t sys_lstat(u64 path, u64 statbuf, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_stat(path, statbuf, a3, a4, a5, a6);
 }
 
 /** @brief Check that @p path exists and is accessible; always grants access. */
-u64 sys_access(u64 path, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_access(u64 path, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)mode;
   (void)a3;
@@ -206,28 +206,27 @@ u64 sys_access(u64 path, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(path))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   if(path_is_proc_self_exe((const char *)path)) {
     const proc_t *p = proc_current();
     if(!p || !p->exe_path[0])
-      return (u64)-ENOENT;
+      return -ENOENT;
     return 0;
   }
 
   vfs_stat_t st;
-  if(vfs_stat((const char *)path, &st) < 0)
-    return (u64)-ENOENT;
-  return 0;
+  return vfs_stat((const char *)path, &st);
 }
 
 /**
- * @brief @c faccessat — only @c AT_FDCWD and absolute paths are supported.
+ * @brief @c faccessat - only @c AT_FDCWD and absolute paths are supported.
  *
  * Relative paths with a real @p dirfd return @c -ENOSYS; all supported flags
  * are accepted and silently ignored (no fine-grained mode checking in VFS).
  */
-u64 sys_faccessat(u64 dirfd, u64 pathname, u64 mode, u64 flags, u64 a5, u64 a6)
+kern_err_t
+    sys_faccessat(u64 dirfd, u64 pathname, u64 mode, u64 flags, u64 a5, u64 a6)
 {
   const i64 AT_FDCWD = -100;
 
@@ -236,22 +235,22 @@ u64 sys_faccessat(u64 dirfd, u64 pathname, u64 mode, u64 flags, u64 a5, u64 a6)
   (void)flags;
 
   if(!user_cstr_ok(pathname))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   const char *p = (const char *)pathname;
   if(p[0] != '/' && (i64)dirfd != AT_FDCWD)
-    return (u64)-ENOSYS;
+    return -ENOSYS;
 
   return sys_access(pathname, mode, 0, 0, 0, 0);
 }
 
 /**
- * @brief @c newfstatat — supports @c AT_FDCWD and absolute paths only.
+ * @brief @c newfstatat - supports @c AT_FDCWD and absolute paths only.
  *
  * @c AT_SYMLINK_NOFOLLOW is accepted but not enforced (VFS has no @c lstat).
  * @c AT_EMPTY_PATH returns @c -ENOSYS.
  */
-u64 sys_newfstatat(
+kern_err_t sys_newfstatat(
     u64 dirfd, u64 pathname, u64 statbuf, u64 flags, u64 a5, u64 a6
 )
 {
@@ -265,20 +264,20 @@ u64 sys_newfstatat(
   (void)a6;
 
   if(flags & AT_EMPTY_PATH)
-    return (u64)-ENOSYS;
+    return -ENOSYS;
 
   {
     u32 allowed = AT_SYMLINK_NOFOLLOW | AT_NO_AUTOMOUNT | AT_STATX_MASK;
     if((u32)flags & ~allowed)
-      return (u64)-EINVAL;
+      return -EINVAL;
   }
 
   if(!user_cstr_ok(pathname) || !user_buf_ok(statbuf, sizeof(struct stat_buf)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   const char *p = (const char *)pathname;
   if(p[0] != '/' && (i64)dirfd != AT_FDCWD)
-    return (u64)-ENOSYS;
+    return -ENOSYS;
 
   (void)dirfd;
   (void)flags;
@@ -286,7 +285,7 @@ u64 sys_newfstatat(
 }
 
 /** @brief Duplicate @p oldfd to the lowest free fd ≥ 3. */
-u64 sys_dup(u64 oldfd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_dup(u64 oldfd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -294,12 +293,11 @@ u64 sys_dup(u64 oldfd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a5;
   (void)a6;
 
-  i64 result = vfs_dup((i64)oldfd);
-  return (result < 0) ? (u64)-EBADF : (u64)result;
+  return vfs_dup((i64)oldfd);
 }
 
 /** @brief Duplicate @p oldfd into the specific slot @p newfd. */
-u64 sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -309,8 +307,7 @@ u64 sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
   if(oldfd == newfd)
     return newfd;
 
-  i64 result = vfs_dup2((i64)oldfd, (i64)newfd);
-  return (result < 0) ? (u64)-EBADF : (u64)result;
+  return vfs_dup2((i64)oldfd, (i64)newfd);
 }
 
 #define F_DUPFD    0
@@ -326,7 +323,7 @@ u64 sys_dup2(u64 oldfd, u64 newfd, u64 a3, u64 a4, u64 a5, u64 a6)
  * Supported commands: @c F_DUPFD, @c F_GETFD, @c F_SETFD, @c F_GETFL,
  * @c F_SETFL.  Unknown commands return 0 to avoid breaking musl probes.
  */
-u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
@@ -338,24 +335,24 @@ u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
       return fd;
     {
       i64 result = vfs_dup((i64)fd);
-      return (result < 0) ? (u64)-EBADF : (u64)result;
+      return (result < 0) ? -EBADF : result;
     }
   case F_GETFD: {
     if((i64)fd < 0 || (i64)fd >= VFS_MAX_FD)
-      return (u64)-EBADF;
+      return -EBADF;
     proc_t *p = proc_current();
     if(!p)
-      return (u64)-EINVAL;
+      return -EINVAL;
     return p->fd_cloexec[fd] ? FD_CLOEXEC : 0;
   }
   case F_SETFD: {
     if((i64)fd < 0 || (i64)fd >= VFS_MAX_FD)
-      return (u64)-EBADF;
+      return -EBADF;
     proc_t *p = proc_current();
     if(!p)
-      return (u64)-EINVAL;
+      return -EINVAL;
     if(fd > 2 && fd < 256 && p->fds[fd] < 0)
-      return (u64)-EBADF;
+      return -EBADF;
     p->fd_cloexec[fd] = (arg & FD_CLOEXEC) ? 1 : 0;
     return 0;
   }
@@ -364,12 +361,12 @@ u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
       return O_RDWR;
     {
       i64 flags = vfs_get_flags((i64)fd);
-      return (flags < 0) ? (u64)-EBADF : (u64)flags;
+      return (flags < 0) ? -EBADF : flags;
     }
   case F_SETFL:
     if(fd <= 2)
       return 0;
-    return vfs_set_flags((i64)fd, (u32)arg) < 0 ? (u64)-EBADF : 0;
+    return vfs_set_flags((i64)fd, (u32)arg) < 0 ? -EBADF : 0;
   default:
     return 0;
   }
@@ -377,29 +374,29 @@ u64 sys_fcntl(u64 fd, u64 cmd, u64 arg, u64 a4, u64 a5, u64 a6)
 
 /** @brief Fill @p dirp with @c dirent64 entries from the open directory @p fd.
  */
-u64 sys_getdents(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_getdents(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(!user_buf_ok(dirp, count))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(count < 32)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   i64 result = vfs_getdents((i64)fd, (void *)dirp, count);
-  return (u64)result;
+  return result;
 }
 
-/** @brief @c getdents64 — identical to ::sys_getdents on this platform. */
-u64 sys_getdents64(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
+/** @brief @c getdents64 - identical to ::sys_getdents on this platform. */
+kern_err_t sys_getdents64(u64 fd, u64 dirp, u64 count, u64 a4, u64 a5, u64 a6)
 {
   return sys_getdents(fd, dirp, count, a4, a5, a6);
 }
 
 /** @brief Copy the calling process's CWD string into the user buffer @p buf. */
-u64 sys_getcwd(u64 buf, u64 size, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_getcwd(u64 buf, u64 size, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -407,22 +404,22 @@ u64 sys_getcwd(u64 buf, u64 size, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!buf)
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(size == 0)
-    return (u64)-EINVAL;
+    return -EINVAL;
   if(!user_buf_ok(buf, size))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   const char *cwd = vfs_getcwd();
   u64         len = kstrlen(cwd);
   if(len + 1 > size)
-    return (u64)-ERANGE;
+    return -ERANGE;
   kstrncpy((char *)buf, cwd, size);
   return len + 1;
 }
 
 /** @brief Change the calling process's working directory to @p path. */
-u64 sys_chdir(u64 path, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_chdir(u64 path, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -431,13 +428,12 @@ u64 sys_chdir(u64 path, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(path))
-    return (u64)-EFAULT;
-  i64 result = vfs_chdir((const char *)path);
-  return (result < 0) ? (u64)-ENOENT : 0;
+    return -EFAULT;
+  return vfs_chdir((const char *)path);
 }
 
 /** @brief Create a directory at @p pathname. */
-u64 sys_mkdir(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_mkdir(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)mode;
   (void)a3;
@@ -446,13 +442,12 @@ u64 sys_mkdir(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(pathname))
-    return (u64)-EFAULT;
-  i64 result = vfs_mkdir((const char *)pathname);
-  return (result < 0) ? (u64)-ENOENT : 0;
+    return -EFAULT;
+  return vfs_mkdir((const char *)pathname);
 }
 
 /** @brief Remove the empty directory at @p pathname. */
-u64 sys_rmdir(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_rmdir(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -461,14 +456,14 @@ u64 sys_rmdir(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(pathname))
-    return (u64)-EFAULT;
+    return -EFAULT;
   i64 result = vfs_rmdir((const char *)pathname);
-  return (result < 0) ? (u64)result : 0;
+  return (result < 0) ? result : 0;
 }
 
 /** @brief Create or truncate a file at @p pathname (@c open with @c
  * O_WRONLY|O_CREAT|O_TRUNC). */
-u64 sys_creat(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_creat(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -478,7 +473,7 @@ u64 sys_creat(u64 pathname, u64 mode, u64 a3, u64 a4, u64 a5, u64 a6)
 }
 
 /** @brief Delete the file at @p pathname. */
-u64 sys_unlink(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_unlink(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -487,14 +482,13 @@ u64 sys_unlink(u64 pathname, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(pathname))
-    return (u64)-EFAULT;
-  i64 result = vfs_unlink((const char *)pathname);
-  return (result < 0) ? (u64)-ENOENT : 0;
+    return -EFAULT;
+  return vfs_unlink((const char *)pathname);
 }
 
 /** @brief Rename @p oldpath to @p newpath, copying across mount points if
  * necessary. */
-u64 sys_rename(u64 oldpath, u64 newpath, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_rename(u64 oldpath, u64 newpath, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -502,14 +496,14 @@ u64 sys_rename(u64 oldpath, u64 newpath, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_cstr_ok(oldpath) || !user_cstr_ok(newpath))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   i64 result = vfs_rename((const char *)oldpath, (const char *)newpath);
-  return (result < 0) ? (u64)result : 0;
+  return (result < 0) ? result : 0;
 }
 
 /** @brief Truncate the file open as @p fd to exactly @p length bytes. */
-u64 sys_ftruncate(u64 fd, u64 length, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_ftruncate(u64 fd, u64 length, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -517,10 +511,10 @@ u64 sys_ftruncate(u64 fd, u64 length, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(fd <= 2)
-    return (u64)-EBADF;
+    return -EBADF;
 
   i64 result = vfs_ftruncate((i64)fd, (i64)length);
-  return (result < 0) ? (u64)result : 0;
+  return (result < 0) ? result : 0;
 }
 
 /**
@@ -530,20 +524,20 @@ u64 sys_ftruncate(u64 fd, u64 length, u64 a3, u64 a4, u64 a5, u64 a6)
  * Saves and restores the OFT offset around the read; returns @c -ESPIPE if
  * the offset cannot be saved (e.g. pipe).
  */
-u64 sys_pread64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
+kern_err_t sys_pread64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
 {
   (void)a5;
   (void)a6;
 
   if(!user_buf_ok(buf, count))
-    return (u64)-EFAULT;
+    return -EFAULT;
   i64 saved = vfs_seek((i64)fd, 0, SEEK_CUR);
   if(saved < 0)
-    return (u64)saved;
+    return saved;
   vfs_seek((i64)fd, (i64)offset, SEEK_SET);
   i64 result = vfs_read((i64)fd, (void *)buf, count);
   vfs_seek((i64)fd, saved, SEEK_SET);
-  return (u64)result;
+  return result;
 }
 
 /**
@@ -553,27 +547,27 @@ u64 sys_pread64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
  * Stdio fds (0–2) delegate to ::sys_write since they have no seekable OFT
  * entry.  For regular files, the OFT offset is saved and restored.
  */
-u64 sys_pwrite64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
+kern_err_t sys_pwrite64(u64 fd, u64 buf, u64 count, u64 offset, u64 a5, u64 a6)
 {
   (void)a5;
   (void)a6;
 
   if(!user_buf_ok(buf, count))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(fd <= 2)
     return sys_write(fd, buf, count, 0, 0, 0);
 
   i64 saved = vfs_seek((i64)fd, 0, SEEK_CUR);
   if(saved < 0)
-    return (u64)saved;
+    return saved;
   vfs_seek((i64)fd, (i64)offset, SEEK_SET);
   i64 result = vfs_write((i64)fd, (const void *)buf, count);
   vfs_seek((i64)fd, saved, SEEK_SET);
-  return (u64)result;
+  return result;
 }
 
-/** @brief @c symlink — not implemented; returns @c -ENOSYS. */
-u64 sys_symlink(u64 target, u64 linkpath, u64 a3, u64 a4, u64 a5, u64 a6)
+/** @brief @c symlink - not implemented; returns @c -ENOSYS. */
+kern_err_t sys_symlink(u64 target, u64 linkpath, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)target;
   (void)linkpath;
@@ -581,16 +575,16 @@ u64 sys_symlink(u64 target, u64 linkpath, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a4;
   (void)a5;
   (void)a6;
-  return (u64)-ENOSYS;
+  return -ENOSYS;
 }
 
-/** @brief @c openat — only @c AT_FDCWD is supported; delegates to ::sys_open.
+/** @brief @c openat - only @c AT_FDCWD is supported; delegates to ::sys_open.
  */
-u64 sys_openat(u64 dirfd, u64 path, u64 flags, u64 mode, u64 a5, u64 a6)
+kern_err_t sys_openat(u64 dirfd, u64 path, u64 flags, u64 mode, u64 a5, u64 a6)
 {
   const i64 AT_FDCWD = -100;
   if((i64)dirfd != AT_FDCWD)
-    return (u64)-ENOSYS;
+    return -ENOSYS;
   return sys_open(path, flags, mode, 0, a5, a6);
 }
 
@@ -600,41 +594,41 @@ u64 sys_openat(u64 dirfd, u64 path, u64 flags, u64 mode, u64 a5, u64 a6)
  * @c /proc/self/exe is handled as a virtual symlink pointing to
  * @c proc_t::exe_path.  Other paths are forwarded to the VFS driver.
  */
-u64 sys_readlink(u64 path, u64 buf, u64 bufsiz, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_readlink(u64 path, u64 buf, u64 bufsiz, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(!user_cstr_ok(path) || !user_buf_ok(buf, bufsiz))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(bufsiz == 0)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   const char *pstr = (const char *)path;
 
   if(path_is_proc_self_exe(pstr)) {
     const proc_t *p = proc_current();
     if(!p || !p->exe_path[0])
-      return (u64)-ENOENT;
+      return -ENOENT;
     u64 len = kstrlen(p->exe_path);
     if(len >= bufsiz)
-      return (u64)-ERANGE;
+      return -ERANGE;
     kmemcpy((void *)buf, p->exe_path, len);
-    return (u64)len;
+    return len;
   }
 
   char ktarget[VFS_PATH_MAX];
   i64  tlen = vfs_readlink(pstr, ktarget, sizeof(ktarget));
   if(tlen < 0)
-    return (u64)tlen;
+    return tlen;
   if((u64)tlen >= bufsiz)
-    return (u64)-ERANGE;
+    return -ERANGE;
   kmemcpy((void *)buf, ktarget, (u64)tlen);
-  return (u64)tlen;
+  return tlen;
 }
 
-u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -643,40 +637,40 @@ u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!pipefd)
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(!vmm_is_user_range((void *)pipefd, sizeof(int) * 2))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(!proc_current())
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   void *pipe = pipe_alloc_obj();
   if(!pipe)
-    return (u64)-ENOMEM;
+    return -ENOMEM;
 
   i32 read_oft = vfs_oft_alloc_pipe(VFS_KIND_PIPE_RD, pipe);
   if(read_oft < 0) {
     pipe_rd_release(pipe);
     pipe_wr_release(pipe);
-    return (u64)-ENFILE;
+    return -ENFILE;
   }
   i32 write_oft = vfs_oft_alloc_pipe(VFS_KIND_PIPE_WR, pipe);
   if(write_oft < 0) {
     vfs_oft_release(read_oft);
-    return (u64)-ENFILE;
+    return -ENFILE;
   }
 
   i64 read_fd = vfs_install_fd(read_oft);
   if(read_fd < 0) {
     vfs_oft_release(read_oft);
     vfs_oft_release(write_oft);
-    return (u64)read_fd;
+    return read_fd;
   }
   i64 write_fd = vfs_install_fd(write_oft);
   if(write_fd < 0) {
     vfs_oft_release(write_oft);
     proc_current()->fds[read_fd] = -1;
     vfs_oft_release(read_oft);
-    return (u64)write_fd;
+    return write_fd;
   }
 
   int *fds = (int *)pipefd;
@@ -685,7 +679,7 @@ u64 sys_pipe(u64 pipefd, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_pipe2(u64 pipefd, u64 flags, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_pipe2(u64 pipefd, u64 flags, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -698,7 +692,7 @@ u64 sys_pipe2(u64 pipefd, u64 flags, u64 a3, u64 a4, u64 a5, u64 a6)
 
   /* Apply O_CLOEXEC per-fd so exec auto-closes these ends (musl posix_spawn
    * relies on this for its error-reporting pipe).  FD_CLOEXEC is a per-fd
-   * attribute — it must NOT be stored in the shared OFT entry. */
+   * attribute - it must NOT be stored in the shared OFT entry. */
   if((u32)flags & O_CLOEXEC) {
     const int *fds = (const int *)pipefd;
     proc_t    *p   = proc_current();

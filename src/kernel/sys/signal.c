@@ -58,7 +58,7 @@ static int sig_default_ignore(int signum)
  * @param sigsetsize Size of signal set (must be 8).
  * @return 0 on success, negative errno on error.
  */
-u64 sys_rt_sigaction(
+kern_err_t sys_rt_sigaction(
     u64 signum, u64 act, u64 oldact, u64 sigsetsize, u64 a5, u64 a6
 )
 {
@@ -66,25 +66,25 @@ u64 sys_rt_sigaction(
   (void)a6;
 
   if(sigsetsize != 8)
-    return (u64)-EINVAL;
+    return -EINVAL;
   if(signum == 0 || signum >= NSIG)
-    return (u64)-EINVAL;
+    return -EINVAL;
   if(signum == SIGKILL || signum == SIGSTOP)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   proc_t *p = proc_current();
   if(!p)
-    return (u64)-ESRCH;
+    return -ESRCH;
 
   if(oldact) {
     if(!vmm_is_user_range((void *)oldact, sizeof(k_sigaction_t)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     kmemcpy((void *)oldact, &p->sig_actions[signum], sizeof(k_sigaction_t));
   }
 
   if(act) {
     if(!vmm_is_user_range((void *)act, sizeof(k_sigaction_t)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     kmemcpy(&p->sig_actions[signum], (const void *)act, sizeof(k_sigaction_t));
   }
 
@@ -102,7 +102,7 @@ u64 sys_rt_sigaction(
  * @param sigsetsize Size of signal set (must be 8).
  * @return 0 on success, negative errno on error.
  */
-u64 sys_rt_sigprocmask(
+kern_err_t sys_rt_sigprocmask(
     u64 how, u64 set, u64 oldset, u64 sigsetsize, u64 a5, u64 a6
 )
 {
@@ -110,21 +110,21 @@ u64 sys_rt_sigprocmask(
   (void)a6;
 
   if(sigsetsize != 8)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   proc_t *p = proc_current();
   if(!p)
-    return (u64)-ESRCH;
+    return -ESRCH;
 
   if(oldset) {
     if(!vmm_is_user_range((void *)oldset, sizeof(u64)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     *(u64 *)oldset = p->sig_mask;
   }
 
   if(set) {
     if(!vmm_is_user_range((void *)set, sizeof(u64)))
-      return (u64)-EFAULT;
+      return -EFAULT;
 
     u64 new_mask = *(u64 *)set;
     /* SIGKILL and SIGSTOP cannot be blocked */
@@ -141,7 +141,7 @@ u64 sys_rt_sigprocmask(
       p->sig_mask = new_mask;
       break;
     default:
-      return (u64)-EINVAL;
+      return -EINVAL;
     }
   }
 
@@ -159,7 +159,7 @@ u64 sys_rt_sigprocmask(
  *
  * @return Original rax (syscall return value interrupted by signal).
  */
-u64 sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -170,12 +170,12 @@ u64 sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 
   syscall_frame_t *frame = syscall_get_current_frame();
   if(!frame)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   /* frame->rsp is user RSP at sigreturn call time = &sig_ucontext_t */
   const sig_ucontext_t *ctx = (const sig_ucontext_t *)frame->rsp;
   if(!vmm_is_user_range(ctx, sizeof(sig_ucontext_t)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   /* Restore all general-purpose registers */
   frame->r15    = ctx->r15;
@@ -215,7 +215,7 @@ u64 sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * @param sig Signal number (0 = existence check only).
  * @return 0 on success, negative errno on error.
  */
-u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -223,7 +223,7 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(sig >= NSIG)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   if((i64)pid == -1) {
     /* Broadcast: not fully implemented; succeed silently */
@@ -232,7 +232,7 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
 
   const proc_t *target = proc_get((u64)pid);
   if(!target)
-    return (u64)-ESRCH;
+    return -ESRCH;
 
   if(sig == 0)
     return 0; /* Existence check */
@@ -242,13 +242,13 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
 }
 
 /* tkill(tid, sig) — single-threaded kernel: tid maps to pid. */
-u64 sys_tkill(u64 tid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_tkill(u64 tid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_kill(tid, sig, a3, a4, a5, a6);
 }
 
 /* tgkill(tgid, tid, sig) — same: route to sys_kill on the tgid. */
-u64 sys_tgkill(u64 tgid, u64 tid, u64 sig, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_tgkill(u64 tgid, u64 tid, u64 sig, u64 a4, u64 a5, u64 a6)
 {
   (void)tid;
   return sys_kill(tgid, sig, 0, a4, a5, a6);
@@ -256,7 +256,7 @@ u64 sys_tgkill(u64 tgid, u64 tid, u64 sig, u64 a4, u64 a5, u64 a6)
 
 /* sigaltstack(const stack_t *ss, stack_t *old_ss) — alternate signal stack.
  * No real altstack support: zero out old_ss if requested, ignore ss. */
-u64 sys_sigaltstack(u64 ss, u64 old_ss, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_sigaltstack(u64 ss, u64 old_ss, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)ss;
   (void)a3;
