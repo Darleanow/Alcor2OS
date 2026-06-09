@@ -32,6 +32,11 @@ typedef int64_t i64;
 /** @brief Size type. */
 typedef size_t usize;
 
+/** @brief Return type for fallible kernel operations: 0 on success, positive
+ *  for values (fd, byte count…), negative -errno on error.
+ *  The only cast to u64 happens in syscall_dispatch at the sysret boundary. */
+typedef i64 kern_err_t;
+
 /** @brief Pack structure (no padding). */
 #define PACKED __attribute__((packed))
 

@@ -18,7 +18,7 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
   return ptr && vmm_is_user_range((void *)ptr, size);
 }
 
-u64 sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -27,9 +27,9 @@ u64 sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_rw_ok(user_info, sizeof(alcor_fb_info_t)))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(!fb_user_ready())
-    return (u64)-ENODEV;
+    return -ENODEV;
 
   alcor_fb_info_t st;
   fb_user_fill_info(&st);
@@ -37,7 +37,7 @@ u64 sys_alcor_fb_info(u64 user_info, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -45,11 +45,11 @@ u64 sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!fb_user_ready())
-    return (u64)-ENODEV;
+    return -ENODEV;
 
   proc_t *p = proc_current();
   if(!p)
-    return (u64)-ENOMEM;
+    return -ENOMEM;
 
   u64 map_sz  = fb_user_map_size();
   u64 px_off  = fb_user_mmap_pixel_offset();
@@ -57,13 +57,13 @@ u64 sys_alcor_fb_mmap(u64 hint, u64 size_req, u64 a3, u64 a4, u64 a5, u64 a6)
   u64 n_pages = map_sz / PAGE_SIZE;
 
   if(size_req != 0 && size_req != map_sz)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   u64 base = (hint != 0) ? (hint & ~(u64)(PAGE_SIZE - 1))
                          : (p->mmap_base & ~(u64)(PAGE_SIZE - 1));
   u64 end  = base + map_sz;
   if(end < base || end > USER_SPACE_END)
-    return (u64)-ENOMEM;
+    return -ENOMEM;
 
   if(hint == 0)
     p->mmap_base = end;

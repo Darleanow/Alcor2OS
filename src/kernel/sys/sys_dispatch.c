@@ -144,7 +144,7 @@ u64 syscall_dispatch(syscall_frame_t *frame)
 #endif
     if(p)
       p->current_frame = old_frame;
-    return (u64)-ENOSYS;
+    return (u64)(kern_err_t)-ENOSYS;
   }
 
 #if SYS_TRACE
@@ -154,12 +154,12 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   );
 #endif
 
-  u64 ret = d->handler(
+  kern_err_t kret = d->handler(
       frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
   );
 
 #if SYS_TRACE
-  klogf(" = %lx\n", ret);
+  klogf(" = %lx\n", (u64)kret);
 #endif
 
   if(p)
@@ -168,5 +168,5 @@ u64 syscall_dispatch(syscall_frame_t *frame)
   /* Check if we need to switch tasks before returning to user mode. */
   proc_check_resched();
 
-  return ret;
+  return (u64)kret;
 }

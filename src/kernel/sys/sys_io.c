@@ -35,14 +35,14 @@ static inline bool user_rw_ok(u64 ptr, u64 size)
  * @return Bytes read on success (0 on EOF), negative @c -errno on failure
  *         (@c -EFAULT, @c -EBADF, etc.).
  */
-u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(!user_rw_ok(buf, count))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(count == 0)
     return 0;
 
@@ -58,14 +58,14 @@ u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
  * @param count  Bytes to write.
  * @return Bytes written on success, negative @c -errno on failure.
  */
-u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(!user_rw_ok(buf, count))
-    return (u64)-EFAULT;
+    return -EFAULT;
   if(count == 0)
     return 0;
 
@@ -73,7 +73,7 @@ u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6)
 }
 
 /** @brief Reposition the file offset of @p fd (@c lseek). */
-u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
@@ -88,7 +88,7 @@ u64 sys_lseek(u64 fd, u64 offset, u64 whence, u64 a4, u64 a5, u64 a6)
  * the stdio termios + ALCOR2/FB_CONSOLE ioctls, mouse_ops handles
  * @c /dev/mouse, and pipes / regular files return @c -ENOTTY.
  */
-u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
@@ -102,7 +102,7 @@ u64 sys_ioctl(u64 fd, u64 request, u64 arg, u64 a4, u64 a5, u64 a6)
  * Implemented as a sequence of STI/HLT pairs, each ~10 ms.  @p rem is not
  * filled because preemption is cooperative and we don't track elapsed time.
  */
-u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)rem;
   (void)a3;
@@ -117,11 +117,11 @@ u64 sys_nanosleep(u64 req, u64 rem, u64 a3, u64 a4, u64 a5, u64 a6)
   };
 
   if(!user_rw_ok(req, sizeof(struct timespec)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   const struct timespec *ts = (const struct timespec *)req;
   if(ts->sec < 0 || ts->nsec < 0 || ts->nsec >= 1000000000)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   /* Sleep against the monotonic ns clock so the duration holds regardless of
    * the PIT rate. HLT wakes on each tick; the loop re-checks until the deadline
@@ -145,16 +145,16 @@ struct iovec
 
 #define SYS_READV_IOV_MAX 1024
 
-u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(iovcnt == 0 || iovcnt > SYS_READV_IOV_MAX)
-    return (u64)-EINVAL;
+    return -EINVAL;
   if(!iov_ptr || !user_rw_ok(iov_ptr, iovcnt * sizeof(struct iovec)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   const struct iovec *vec   = (const struct iovec *)iov_ptr;
   u64                 total = 0;
@@ -163,7 +163,7 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
     if(!vec[i].iov_base || vec[i].iov_len == 0)
       continue;
     if(!user_rw_ok((u64)vec[i].iov_base, vec[i].iov_len))
-      return (u64)-EFAULT;
+      return -EFAULT;
 
     u64 chunk = sys_read(fd, (u64)vec[i].iov_base, vec[i].iov_len, 0, 0, 0);
     if((i64)chunk < 0)
@@ -179,7 +179,7 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 /**
  * @brief Gathered-write across @p iovcnt iovecs into @p fd.
  *
- * Each iov is dispatched as a separate ::sys_write — the VFS driver decides
+ * Each iov is dispatched as a separate ::sys_write - the VFS driver decides
  * how to coalesce. @c tty_write goes through @c fb_console_write whose
  * begin/end pair is idempotent enough that a multi-iov refresh stays cheap.
  *
@@ -188,14 +188,14 @@ u64 sys_readv(u64 fd, u64 iov_ptr, u64 iovcnt, u64 a4, u64 a5, u64 a6)
  * @param iovcnt  Number of iovecs in the array.
  * @return Total bytes written on success, negative @c -errno on failure.
  */
-u64 sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_writev(u64 fd, u64 iov, u64 iovcnt, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(!iov)
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   const struct iovec *vec   = (const struct iovec *)iov;
   u64                 total = 0;
@@ -447,14 +447,14 @@ static void sel_hlt_slice(void)
  * loop sleeping one HLT tick per iteration until at least one fd is ready or
  * the timeout expires.  The output sets are zeroed on timeout.
  */
-u64 sys_select(
+kern_err_t sys_select(
     u64 nfds_u, u64 readfds, u64 writefds, u64 exceptfds, u64 timeout, u64 a6
 )
 {
   (void)a6;
 
   if(nfds_u > 1024)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   u32  nfds      = (u32)nfds_u;
   u32  nlongs    = nfds ? (nfds + (SEL_NFDBITS - 1)) / SEL_NFDBITS : 0;
@@ -463,7 +463,7 @@ u64 sys_select(
   bool infinite  = false;
 
   if(nfds && !readfds && !writefds && !exceptfds)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   if(nfds == 0) {
     if(timeout) {
@@ -482,7 +482,7 @@ u64 sys_select(
   }
 
   if(nlongs > SEL_FDSET_LONG)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   unsigned long rin[SEL_FDSET_LONG], win[SEL_FDSET_LONG], ein[SEL_FDSET_LONG];
   unsigned long rout[SEL_FDSET_LONG], wout[SEL_FDSET_LONG],
@@ -494,17 +494,17 @@ u64 sys_select(
 
   if(readfds) {
     if(!user_rw_ok(readfds, (u64)nlongs * sizeof(unsigned long)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     kmemcpy(rin, (void *)readfds, (u64)nlongs * sizeof(unsigned long));
   }
   if(writefds) {
     if(!user_rw_ok(writefds, (u64)nlongs * sizeof(unsigned long)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     kmemcpy(win, (void *)writefds, (u64)nlongs * sizeof(unsigned long));
   }
   if(exceptfds) {
     if(!user_rw_ok(exceptfds, (u64)nlongs * sizeof(unsigned long)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     kmemcpy(ein, (void *)exceptfds, (u64)nlongs * sizeof(unsigned long));
   }
 
@@ -532,7 +532,7 @@ u64 sys_select(
         kmemcpy((void *)writefds, wout, (u64)nlongs * sizeof(unsigned long));
       if(exceptfds)
         kmemcpy((void *)exceptfds, eout, (u64)nlongs * sizeof(unsigned long));
-      return (u64)total;
+      return total;
     }
 
     if(!infinite) {
@@ -563,19 +563,19 @@ u64 sys_select(
  * loop sleeping one HLT tick per iteration, and copies results back on exit.
  * Returns 0 on timeout, the number of ready fds otherwise.
  */
-u64 sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_poll(u64 fds, u64 nfds_u, u64 timeout_u, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
   (void)a6;
 
   if(nfds_u > (u64)POLL__MAX_NFDS)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   u32 nfds = (u32)nfds_u;
   if(nfds != 0 &&
      (!fds || !user_rw_ok(fds, (u64)nfds * sizeof(poll__fd_abi_t))))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   i32            timeout_ms = (i32)timeout_u;
   bool           immediate, infinite;

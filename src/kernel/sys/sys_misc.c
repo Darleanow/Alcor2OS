@@ -15,7 +15,7 @@ static inline bool user_buf_ok(u64 ptr, u64 size)
   return ptr && vmm_is_user_range((void *)ptr, size);
 }
 
-u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
@@ -32,7 +32,7 @@ u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
     char machine[65];
   } *u = (void *)buf;
   if(!user_buf_ok(buf, sizeof(*u)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   kzero(u, sizeof(*u));
   kstrncpy(u->sysname, "Alcor2", 65);
@@ -43,7 +43,7 @@ u64 sys_uname(u64 buf, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)tz;
   (void)a3;
@@ -52,7 +52,7 @@ u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_buf_ok(tv, 16))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   struct
   {
@@ -67,7 +67,7 @@ u64 sys_gettimeofday(u64 tv, u64 tz, u64 a3, u64 a4, u64 a5, u64 a6)
 }
 
 /* Blocking futex. Keys map to the CPU physical backing of each 4-byte futex
- * word — safe with CLONE_THREAD (shared PTEs) unlike raw user VAs alone. */
+ * word - safe with CLONE_THREAD (shared PTEs) unlike raw user VAs alone. */
 
 #define FUTEX_WAIT            0
 #define FUTEX_WAKE            1
@@ -151,7 +151,7 @@ static u64 futex_requeue_pa(u64 from_pa, u64 to_pa, u64 max_mv)
   return mv;
 }
 
-u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
+kern_err_t sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
 {
   (void)timeout;
 
@@ -170,27 +170,27 @@ u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
     /* Full WAKE_OP decode is huge; lld/musl only need forward progress. */
     u64 k = futex_key_pa(uaddr);
     if(!k)
-      return (u64)-EFAULT;
+      return -EFAULT;
     return futex_wake_pa(k, 256);
   }
 
   if(cmd == FUTEX_FD)
-    return (u64)-ENOSYS;
+    return -ENOSYS;
 
   if(cmd == FUTEX_WAIT || cmd == FUTEX_WAIT_BITSET) {
     u32 curv;
     if(!futex_read_u32(uaddr, &curv))
-      return (u64)-EFAULT;
+      return -EFAULT;
     if(curv != (u32)val)
-      return (u64)-EAGAIN;
+      return -EAGAIN;
 
     u64 key = futex_key_pa(uaddr);
     if(!key)
-      return (u64)-EFAULT;
+      return -EFAULT;
 
     proc_t *cur = proc_current();
     if(!cur)
-      return (u64)-ESRCH;
+      return -ESRCH;
 
     int slot = -1;
     for(int i = 0; i < FUTEX_QUEUE_LEN; i++) {
@@ -200,7 +200,7 @@ u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
       }
     }
     if(slot < 0)
-      return (u64)-ENOMEM;
+      return -ENOMEM;
 
     g_futex_q[slot].key_pa = key;
     g_futex_q[slot].waiter = cur;
@@ -217,13 +217,13 @@ u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
   if(cmd == FUTEX_WAKE || cmd == FUTEX_WAKE_BITSET) {
     u64 k = futex_key_pa(uaddr);
     if(!k)
-      return (u64)-EFAULT;
+      return -EFAULT;
     return futex_wake_pa(k, val ? val : ~(u64)0);
   }
 
   /* REQUEUE variants (musl pthread_cond). Keep semantics loose: wake every
    * waiter on @p uaddr, then requeue every remaining waiter onto @p uaddr2.
-   * (Linux passes wake/requeue counts in r10/r9 — we ignore them so we never
+   * (Linux passes wake/requeue counts in r10/r9 - we ignore them so we never
    * leave waiters stuck if those args are mis-parsed.) */
   if(cmd == FUTEX_REQUEUE || cmd == FUTEX_CMP_REQUEUE) {
     (void)val3;
@@ -231,18 +231,18 @@ u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
     if(cmd == FUTEX_CMP_REQUEUE) {
       u32 curv;
       if(!futex_read_u32(uaddr, &curv))
-        return (u64)-EFAULT;
+        return -EFAULT;
       if(curv != (u32)val)
-        return (u64)-EAGAIN;
+        return -EAGAIN;
     }
 
     if(!user_buf_ok(uaddr2, sizeof(u32)))
-      return (u64)-EFAULT;
+      return -EFAULT;
 
     u64 k1 = futex_key_pa(uaddr);
     u64 k2 = futex_key_pa(uaddr2);
     if(!k1 || !k2)
-      return (u64)-EFAULT;
+      return -EFAULT;
 
     u64 wk = futex_wake_pa(k1, ~(u64)0);
     u64 rq = futex_requeue_pa(k1, k2, ~(u64)0);
@@ -250,10 +250,10 @@ u64 sys_futex(u64 uaddr, u64 op, u64 val, u64 timeout, u64 uaddr2, u64 val3)
     return wk + rq;
   }
 
-  return (u64)-ENOSYS;
+  return -ENOSYS;
 }
 
-u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)clk;
   (void)a3;
@@ -267,7 +267,7 @@ u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
     i64 ns;
   } *ts = (void *)tp;
   if(!user_buf_ok(tp, sizeof(*ts)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   u64 ns = pit_get_ns();
   ts->s  = (i64)(ns / 1000000000ULL);
@@ -275,7 +275,7 @@ u64 sys_clock_gettime(u64 clk, u64 tp, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a1;
   (void)a2;
@@ -296,7 +296,7 @@ u64 sys_sched_yield(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
  * one byte (bit 0 set) into the user-supplied @p mask buffer and returns
  * the size of the populated mask in bytes (Linux convention).
  */
-u64 sys_sched_getaffinity(
+kern_err_t sys_sched_getaffinity(
     u64 pid, u64 cpusetsize, u64 mask, u64 a4, u64 a5, u64 a6
 )
 {
@@ -306,10 +306,10 @@ u64 sys_sched_getaffinity(
   (void)a6;
 
   if(cpusetsize == 0 || !mask)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   if(!vmm_is_user_range((void *)mask, cpusetsize))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   u8 *m = (u8 *)mask;
   m[0]  = 0x01; /* CPU 0 only */
@@ -360,7 +360,7 @@ static void fill_default_rlimit(u64 resource, struct k_rlimit *out)
   }
 }
 
-u64 sys_getrlimit(u64 resource, u64 rlim, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_getrlimit(u64 resource, u64 rlim, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -368,13 +368,13 @@ u64 sys_getrlimit(u64 resource, u64 rlim, u64 a3, u64 a4, u64 a5, u64 a6)
   (void)a6;
 
   if(!user_buf_ok(rlim, sizeof(struct k_rlimit)))
-    return (u64)-EFAULT;
+    return -EFAULT;
 
   fill_default_rlimit(resource, (struct k_rlimit *)rlim);
   return 0;
 }
 
-u64 sys_prlimit64(
+kern_err_t sys_prlimit64(
     u64 pid, u64 resource, u64 new_limit, u64 old_limit, u64 a5, u64 a6
 )
 {
@@ -385,7 +385,7 @@ u64 sys_prlimit64(
 
   if(old_limit) {
     if(!user_buf_ok(old_limit, sizeof(struct k_rlimit)))
-      return (u64)-EFAULT;
+      return -EFAULT;
     fill_default_rlimit(resource, (struct k_rlimit *)old_limit);
   }
   return 0;

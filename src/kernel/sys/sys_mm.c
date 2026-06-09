@@ -104,38 +104,38 @@ static void fill_file_backed_pages(u64 base, u64 length, i64 fd, u64 offset)
   vfs_seek(fd, saved_pos, SEEK_SET);
 }
 
-u64 sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
+kern_err_t sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
 {
   if(length == 0)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   proc_t *p = proc_current();
   if(!p)
-    return (u64)-ENOMEM;
+    return -ENOMEM;
 
   const bool fixed = (flags & MAP_FIXED) != 0;
   if(fixed && addr == 0)
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   u64 aligned_len = page_align_up(length);
   if(aligned_len < length)
-    return (u64)-ENOMEM;
+    return -ENOMEM;
 
   u64 base = (fixed && addr != 0) ? page_align_down(addr)
                                   : page_align_down(p->mmap_base);
   u64 end  = base + aligned_len;
   if(end < base || end > USER_SPACE_END)
-    return (u64)-ENOMEM;
+    return -ENOMEM;
 
   bool is_anon = (flags & MAP_ANONYMOUS) != 0 || fd == (u64)-1;
   if(!is_anon && (offset & PAGE_MASK_LOCAL))
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   u64 map_flags = build_vmm_flags(prot);
 
   /* MAP_FIXED requires "replace any existing mapping at this range with a
    * fresh zero-filled mapping" semantics. vmm_map_range_alloc skips pages
-   * already PRESENT, so the new contents would be stale parent/peer data —
+   * already PRESENT, so the new contents would be stale parent/peer data -
    * which is what causes mallocng's a_crash() (heap metadata mismatch).
    * Unmap the range first so the subsequent alloc sees only fresh pages. */
   if(fixed)
@@ -143,7 +143,7 @@ u64 sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
 
   i64 map_ret = map_zeroed_user_range(base, aligned_len, map_flags);
   if(map_ret < 0)
-    return (u64)map_ret;
+    return map_ret;
 
   if(!fixed)
     p->mmap_base = end;
@@ -157,7 +157,7 @@ u64 sys_mmap(u64 addr, u64 length, u64 prot, u64 flags, u64 fd, u64 offset)
   return base;
 }
 
-u64 sys_mprotect(u64 addr, u64 len, u64 prot, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_mprotect(u64 addr, u64 len, u64 prot, u64 a4, u64 a5, u64 a6)
 {
   (void)a4;
   (void)a5;
@@ -178,7 +178,7 @@ u64 sys_mprotect(u64 addr, u64 len, u64 prot, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a3;
   (void)a4;
@@ -188,7 +188,7 @@ u64 sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)
   if(len == 0)
     return 0;
   if(!vmm_is_user_range((void *)addr, len))
-    return (u64)-EINVAL;
+    return -EINVAL;
 
   u64 aligned_start = page_align_down(addr);
   u64 aligned_end   = page_align_up(addr + len);
@@ -196,7 +196,7 @@ u64 sys_munmap(u64 addr, u64 len, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-u64 sys_brk(u64 addr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+kern_err_t sys_brk(u64 addr, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   (void)a2;
   (void)a3;
