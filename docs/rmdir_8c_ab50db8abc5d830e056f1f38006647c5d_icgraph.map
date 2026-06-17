@@ -1,0 +1,8 @@
+<map id="remove_recursive" name="remove_recursive">
+<area shape="rect" id="Node000001" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="319,29,457,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="423,19,413,11,388,8,367,10,356,15,354,20,360,28,355,31,349,21,352,11,366,5,388,3,415,6,426,15"/>
+<area shape="rect" id="Node000002" href="$rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" title="Remove a directory and optionally its content and ancestor components." alt="" coords="108,29,271,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="305,45,271,45,271,39,305,39"/>
+<area shape="rect" id="Node000003" href="$rmdir_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="Entry point for the rmdir utility." alt="" coords="5,29,60,55"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="94,45,60,45,60,39,94,39"/>
+</map>

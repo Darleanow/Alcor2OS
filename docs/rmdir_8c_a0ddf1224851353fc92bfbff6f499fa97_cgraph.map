@@ -1,0 +1,49 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title="Entry point for the rmdir utility." alt="" coords="5,381,60,407"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#a856ce27279fc9ff59cc800cb6b638444" title="Parse command&#45;line arguments according to spec." alt="" coords="150,231,229,256"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="45,379,163,264,167,267,49,383"/>
+<area shape="rect" id="Node000018" href="$rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" title="Remove a directory and optionally its content and ancestor components." alt="" coords="108,481,271,507"/>
+<area shape="poly" id="edge23_Node000001_Node000018" title=" " alt="" coords="56,405,158,472,156,476,53,409"/>
+<area shape="rect" id="Node000003" href="$grendizer_8c.html#aa797faea2bca5a766903925a39cb8257" title="Increment the accumulating counter storage." alt="" coords="507,5,635,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="192,229,207,192,233,142,269,90,292,67,317,48,359,28,405,16,451,10,493,9,493,14,451,16,406,21,361,33,320,52,295,71,273,93,237,145,212,194,197,231"/>
+<area shape="rect" id="Node000004" href="$grendizer_8c.html#a567dd32fb181a8127afb574abb37fb6b" title="Write a formatted diagnostic to buf or fallback stream. Truncates with &quot;...&quot; when buf is too small; f..." alt="" coords="684,183,756,208"/>
+<area shape="poly" id="edge17_Node000002_Node000004" title=" " alt="" coords="194,229,211,199,238,160,273,121,294,105,318,92,363,74,404,64,442,62,478,67,514,77,551,92,637,132,669,150,697,171,693,176,666,155,635,136,549,97,512,82,477,72,442,68,405,70,365,79,320,96,297,109,277,125,242,163,216,202,199,232"/>
+<area shape="rect" id="Node000007" href="$grendizer_8c.html#ad77dd2a004746af8d162015d09c07540" title="Set the boolean flag storage to 1." alt="" coords="330,107,446,132"/>
+<area shape="poly" id="edge5_Node000002_Node000007" title=" " alt="" coords="202,229,251,187,317,141,330,135,332,140,320,146,254,191,206,233"/>
+<area shape="rect" id="Node000008" href="$grendizer_8c.html#a7cd7ff450550ead6f6dea5d440874db8" title="Dispatch value parsing to the correct typed handler for o." alt="" coords="324,156,452,181"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="221,228,318,190,336,183,338,188,320,195,223,233"/>
+<area shape="rect" id="Node000012" href="$grendizer_8c.html#a8c5930904c98c02e2c149425638d7a85" title="Find an option descriptor by long name, length&#45;bounded (no NUL required)." alt="" coords="338,205,438,231"/>
+<area shape="poly" id="edge15_Node000002_Node000012" title=" " alt="" coords="229,236,324,223,325,229,229,241"/>
+<area shape="rect" id="Node000013" href="$grendizer_8c.html#a5a02919a2bacd3e11e6c11c25f421f81" title="Find an option descriptor by its short character key." alt="" coords="335,255,441,280"/>
+<area shape="poly" id="edge16_Node000002_Node000013" title=" " alt="" coords="229,245,322,257,322,262,229,251"/>
+<area shape="rect" id="Node000014" href="$grendizer_8c.html#a5ad67079ff756c8f59550116192284db" title="Return non&#45;zero if the option kind requires a value token." alt="" coords="505,356,636,381"/>
+<area shape="poly" id="edge18_Node000002_Node000014" title=" " alt="" coords="224,254,320,289,513,350,511,355,318,294,222,259"/>
+<area shape="rect" id="Node000015" href="$grendizer_8c.html#a8dc5a5bb6f608ade07c04cc6d3028ac5" title="Resolve the display program name from spec and argv0." alt="" coords="331,405,445,431"/>
+<area shape="poly" id="edge19_Node000002_Node000015" title=" " alt="" coords="200,255,246,320,280,358,320,392,329,397,327,402,317,396,277,362,242,323,196,258"/>
+<area shape="rect" id="Node000017" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="347,356,429,381"/>
+<area shape="poly" id="edge21_Node000002_Node000017" title=" " alt="" coords="208,254,257,292,320,334,346,348,343,353,317,339,254,296,205,258"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="608,29,638,48,663,77,684,109,712,168,707,171,679,112,659,80,634,52,605,33"/>
+<area shape="rect" id="Node000005" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="804,332,883,357"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="734,206,825,320,821,323,730,210"/>
+<area shape="poly" id="edge6_Node000007_Node000004" title=" " alt="" coords="447,125,536,141,637,163,675,175,673,181,635,169,535,146,446,130"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="452,171,670,189,670,194,452,176"/>
+<area shape="rect" id="Node000009" href="$grendizer_8c.html#a0eae8d348350684f2fa1b77435cd0c0e" title="Parse a floating&#45;point value from text into out. Hand&#45;rolled to avoid a strtod dependency in freestan..." alt="" coords="510,208,631,233"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="434,179,513,202,511,207,433,184"/>
+<area shape="rect" id="Node000010" href="$grendizer_8c.html#a91c2a6ae03cea75ee7262316b3c395f2" title="Parse a signed decimal integer from text into out." alt="" coords="516,257,625,283"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="436,179,459,190,474,204,484,217,493,230,507,243,518,249,515,254,504,247,489,233,479,220,470,207,456,195,434,184"/>
+<area shape="rect" id="Node000011" href="$grendizer_8c.html#a8e70c9e2b4b39959c3a210f3aae769ce" title="Parse an unsigned decimal integer from text into out." alt="" coords="512,307,629,332"/>
+<area shape="poly" id="edge13_Node000008_Node000011" title=" " alt="" coords="442,179,459,191,478,217,484,242,490,267,507,292,514,298,511,302,503,296,485,270,479,244,473,219,455,195,439,184"/>
+<area shape="poly" id="edge10_Node000009_Node000004" title=" " alt="" coords="631,208,670,201,671,206,632,213"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="606,255,635,242,687,213,689,218,637,247,608,260"/>
+<area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="612,304,634,292,672,256,701,219,705,222,676,260,638,296,614,309"/>
+<area shape="rect" id="Node000016" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="512,405,629,431"/>
+<area shape="poly" id="edge20_Node000015_Node000016" title=" " alt="" coords="446,415,498,415,498,421,446,421"/>
+<area shape="poly" id="edge22_Node000017_Node000014" title=" " alt="" coords="429,366,492,366,492,371,429,371"/>
+<area shape="poly" id="edge24_Node000018_Node000005" title=" " alt="" coords="271,490,349,486,441,478,539,463,635,441,684,424,731,403,808,362,811,367,733,408,686,429,637,446,540,468,441,483,349,491,271,496"/>
+<area shape="rect" id="Node000019" href="$rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" title="Remove a single empty directory, printing a diagnostic on failure." alt="" coords="523,544,619,569"/>
+<area shape="poly" id="edge25_Node000018_Node000019" title=" " alt="" coords="268,504,510,544,509,549,267,509"/>
+<area shape="rect" id="Node000020" href="$rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="319,581,457,607"/>
+<area shape="poly" id="edge26_Node000018_Node000020" title=" " alt="" coords="217,504,351,573,348,577,215,509"/>
+<area shape="poly" id="edge27_Node000020_Node000019" title=" " alt="" coords="450,579,509,567,510,572,451,584"/>
+<area shape="poly" id="edge28_Node000020_Node000020" title=" " alt="" coords="358,583,352,573,355,563,367,557,388,555,413,558,423,567,420,571,411,563,388,560,369,562,359,567,357,572,362,580"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="remove_with_parents" name="remove_with_parents">
+<area shape="rect" id="Node000001" title="Remove a directory and optionally its content and ancestor components." alt="" coords="5,56,168,81"/>
+<area shape="rect" id="Node000002" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="246,5,325,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,53,232,29,233,34,138,58"/>
+<area shape="rect" id="Node000004" href="$rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" title="Remove a single empty directory, printing a diagnostic on failure." alt="" coords="403,93,499,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="169,73,355,91,390,95,389,101,354,97,168,78"/>
+<area shape="rect" id="Node000005" href="$rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="216,131,355,156"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="123,79,239,123,237,128,121,84"/>
+<area shape="rect" id="Node000003" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="407,5,494,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="325,15,393,15,393,21,325,21"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="342,128,388,117,390,122,343,133"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="258,132,252,122,255,113,266,106,285,104,308,107,318,116,314,120,306,112,285,109,268,111,259,116,257,122,262,129"/>
+</map>

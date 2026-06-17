@@ -115,7 +115,7 @@ var searchData=
   ['inodes_5fper_5fgroup_112',['inodes_per_group',['../structext2__volume__t.html#a0fd893192fb3547c835f3c3329def647',1,'ext2_volume_t']]],
   ['input_5fring_113',['INPUT_RING',['../src_2kernel_2drivers_2fb__console_2internal_8h.html#a7348d45d81972fdf7b35a1d1ea90df79',1,'internal.h']]],
   ['install_5fatlas_5fpayload_114',['install_atlas_payload',['../atlas__install_8c.html#a54262a79f9deda2b5141bea67af7ce4f',1,'atlas_install.c']]],
-  ['internal_2eh_115',['internal.h',['../src_2fs_2ext2_2internal_8h.html',1,'(Global Namespace)'],['../include_2alcor2_2sys_2internal_8h.html',1,'(Global Namespace)'],['../src_2kernel_2drivers_2fb__console_2internal_8h.html',1,'(Global Namespace)']]],
+  ['internal_2eh_115',['internal.h',['../include_2alcor2_2sys_2internal_8h.html',1,'(Global Namespace)'],['../src_2fs_2ext2_2internal_8h.html',1,'(Global Namespace)'],['../src_2kernel_2drivers_2fb__console_2internal_8h.html',1,'(Global Namespace)']]],
   ['internal_5fmodule_5fcount_116',['internal_module_count',['../structlimine__module__request.html#a488645c8767ccb0d45a1c719a394ed8f',1,'limine_module_request']]],
   ['internal_5fmodules_117',['internal_modules',['../structlimine__module__request.html#a67eba0f1df1a3812b3727506ecad9758',1,'limine_module_request']]],
   ['interrupt_5fframe_5ft_118',['interrupt_frame_t',['../idt_8h.html#a86c80e5f4b0726aabf195f6f3bd3389b',1,'idt.h']]],

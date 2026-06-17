@@ -12,8 +12,8 @@
 <g id="Node000001" class="node">
 <title>Node1</title>
 <g id="a_Node000001"><a xlink:title="VFS size limits shared between the filesystem layer and proc.h.">
-<polygon fill="#999999" stroke="#666666" points="1631.5,-261 1494.5,-261 1494.5,-242 1631.5,-242 1631.5,-261"/>
-<text text-anchor="middle" x="1563" y="-249" font-family="Helvetica,sans-Serif" font-size="10.00">include/alcor2/fs/limits.h</text>
+<polygon fill="#999999" stroke="#666666" points="1690.5,-261 1553.5,-261 1553.5,-242 1690.5,-242 1690.5,-261"/>
+<text text-anchor="middle" x="1622" y="-249" font-family="Helvetica,sans-Serif" font-size="10.00">include/alcor2/fs/limits.h</text>
 </a>
 </g>
 </g>
@@ -30,8 +30,8 @@
 <g id="edge1_Node000001_Node000002" class="edge">
 <title>Node1&#45;&gt;Node2</title>
 <g id="a_edge1_Node000001_Node000002"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M1483.83,-244.84C1321.34,-233.24 953.12,-206.94 806.22,-196.44"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="1484.01,-248.37 1494.23,-245.59 1484.5,-241.38 1484.01,-248.37"/>
+<path fill="none" stroke="#63b8ff" d="M1543.45,-245.27C1371.01,-233.78 962.28,-206.54 806.12,-196.14"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="1543.26,-248.76 1553.47,-245.93 1543.73,-241.78 1543.26,-248.76"/>
 </a>
 </g>
 </g>
@@ -49,17 +49,17 @@
 <g id="edge33_Node000001_Node000027" class="edge">
 <title>Node1&#45;&gt;Node27</title>
 <g id="a_edge33_Node000001_Node000027"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M1563,-231.65C1563,-223.36 1563,-213.78 1563,-206.11"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="1559.5,-231.87 1563,-241.87 1566.5,-231.87 1559.5,-231.87"/>
+<path fill="none" stroke="#63b8ff" d="M1606.06,-234.7C1597.07,-225.78 1585.93,-214.74 1577.24,-206.11"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="1603.73,-237.31 1613.29,-241.87 1608.66,-232.34 1603.73,-237.31"/>
 </a>
 </g>
 </g>
 <!-- Node33 -->
 <g id="Node000033" class="node">
 <title>Node33</title>
-<g id="a_Node000033"><a xlink:href="grendizer_8c.html" target="_top" xlink:title="Grendizer argument&#45;parsing library — flags, options, subcommands, and help generation.">
-<polygon fill="white" stroke="#666666" points="1744.5,-200.5 1635.5,-200.5 1635.5,-181.5 1744.5,-181.5 1744.5,-200.5"/>
-<text text-anchor="middle" x="1690" y="-188.5" font-family="Helvetica,sans-Serif" font-size="10.00">user/lib/grendizer.c</text>
+<g id="a_Node000033"><a xlink:href="rmdir_8c.html" target="_top" xlink:title="Remove empty directories.">
+<polygon fill="white" stroke="#666666" points="1728,-200.5 1636,-200.5 1636,-181.5 1728,-181.5 1728,-200.5"/>
+<text text-anchor="middle" x="1682" y="-188.5" font-family="Helvetica,sans-Serif" font-size="10.00">user/bin/rmdir.c</text>
 </a>
 </g>
 </g>
@@ -67,8 +67,26 @@
 <g id="edge47_Node000001_Node000033" class="edge">
 <title>Node1&#45;&gt;Node33</title>
 <g id="a_edge47_Node000001_Node000033"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M1590.61,-237.78C1615.12,-226.49 1650.24,-210.31 1671.51,-200.52"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="1589.09,-234.63 1581.47,-241.99 1592.01,-240.99 1589.09,-234.63"/>
+<path fill="none" stroke="#63b8ff" d="M1638.32,-234.59C1649.52,-223.67 1663.97,-209.58 1673.11,-200.67"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="1635.57,-232.38 1630.85,-241.87 1640.46,-237.39 1635.57,-232.38"/>
+</a>
+</g>
+</g>
+<!-- Node34 -->
+<g id="Node000034" class="node">
+<title>Node34</title>
+<g id="a_Node000034"><a xlink:href="grendizer_8c.html" target="_top" xlink:title="Grendizer argument&#45;parsing library — flags, options, subcommands, and help generation.">
+<polygon fill="white" stroke="#666666" points="1855.5,-200.5 1746.5,-200.5 1746.5,-181.5 1855.5,-181.5 1855.5,-200.5"/>
+<text text-anchor="middle" x="1801" y="-188.5" font-family="Helvetica,sans-Serif" font-size="10.00">user/lib/grendizer.c</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node34 -->
+<g id="edge48_Node000001_Node000034" class="edge">
+<title>Node1&#45;&gt;Node34</title>
+<g id="a_edge48_Node000001_Node000034"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M1657.75,-238.82C1692.37,-227.5 1744.04,-210.62 1774.94,-200.52"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="1656.45,-235.56 1648.03,-241.99 1658.62,-242.21 1656.45,-235.56"/>
 </a>
 </g>
 </g>

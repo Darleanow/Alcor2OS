@@ -1,0 +1,20 @@
+<map id="user/bin/rmdir.c" name="user/bin/rmdir.c">
+<area shape="rect" id="Node000001" title="Remove empty directories." alt="" coords="265,5,388,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,77,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="281,33,91,80,90,75,280,28"/>
+<area shape="rect" id="Node000003" href="$errno_8h.html" title="Standard error number definitions (Linux&#45;compatible)." alt="" coords="102,79,170,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="297,33,181,76,179,71,295,28"/>
+<area shape="rect" id="Node000004" href="$grendizer_8h.html" title="Single&#45;header CLI parsing library for Alcor2 userland." alt="" coords="194,79,289,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="315,33,267,72,264,68,311,29"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="293,152,360,177"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="329,31,329,138,324,138,324,31"/>
+<area shape="rect" id="Node000007" href="$limits_8h.html" title="VFS size limits shared between the filesystem layer and proc.h." alt="" coords="365,79,435,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="341,29,380,67,376,71,337,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="459,79,530,104"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="355,28,456,71,454,76,353,33"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="555,79,629,104"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="370,28,542,74,541,79,369,33"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="195,152,269,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="242,105,238,139,233,138,237,104"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="257,102,304,141,301,145,253,106"/>
+</map>

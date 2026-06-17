@@ -1,0 +1,6 @@
+<map id="remove_recursive" name="remove_recursive">
+<area shape="rect" id="Node000001" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="5,29,144,55"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="47,31,41,21,44,11,56,5,75,3,97,6,107,15,104,19,95,11,75,8,57,10,48,15,46,20,51,28"/>
+<area shape="rect" id="Node000002" href="$rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" title="Remove a single empty directory, printing a diagnostic on failure." alt="" coords="192,29,288,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,39,178,39,178,45,144,45"/>
+</map>

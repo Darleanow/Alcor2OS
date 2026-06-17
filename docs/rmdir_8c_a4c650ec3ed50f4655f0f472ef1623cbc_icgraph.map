@@ -1,0 +1,11 @@
+<map id="remove_dir" name="remove_dir">
+<area shape="rect" id="Node000001" title="Remove a single empty directory, printing a diagnostic on failure." alt="" coords="505,55,601,80"/>
+<area shape="rect" id="Node000002" href="$rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="319,29,457,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="491,61,457,55,458,50,492,55"/>
+<area shape="rect" id="Node000003" href="$rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" title="Remove a directory and optionally its content and ancestor components." alt="" coords="108,55,271,80"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="492,70,271,70,271,65,492,65"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="417,19,408,11,388,8,371,10,362,15,360,20,365,28,360,31,354,21,358,11,369,5,388,3,411,6,420,15"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="306,55,271,60,270,54,305,50"/>
+<area shape="rect" id="Node000004" href="$rmdir_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="Entry point for the rmdir utility." alt="" coords="5,55,60,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="94,70,60,70,60,65,94,65"/>
+</map>
