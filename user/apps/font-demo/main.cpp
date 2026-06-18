@@ -5,7 +5,7 @@
  * Default font on guest: /bin/FiraCode-Regular.ttf (SIL OFL). Any TTF/OTF
  * works.
  */
-#include <alcor2/fb_user.h>
+#include <alcor2/fb.h>
 
 #include <fcntl.h>
 #include <stdint.h>
@@ -47,7 +47,7 @@ static int load_file(const char *path, uint8_t **out, size_t *osz)
 }
 
 static void put_px(
-    uint8_t *fb, const alcor_fb_info_t *inf, int x, int y, uint32_t rgb, int a
+    uint8_t *fb, const alcor_fb_t *inf, int x, int y, uint32_t rgb, int a
 )
 {
   if(x < 0 || y < 0 || (uint32_t)x >= inf->width || (uint32_t)y >= inf->height)
@@ -74,7 +74,7 @@ static void put_px(
   p[3] = 0xff;
 }
 
-static void fill_bg(uint8_t *fb, const alcor_fb_info_t *inf, uint32_t rgb)
+static void fill_bg(uint8_t *fb, const alcor_fb_t *inf, uint32_t rgb)
 {
   for(uint32_t y = 0; y < inf->height; y++)
     for(uint32_t x = 0; x < inf->width; x++)
@@ -82,8 +82,8 @@ static void fill_bg(uint8_t *fb, const alcor_fb_info_t *inf, uint32_t rgb)
 }
 
 static void blit_gray(
-    uint8_t *fb, const alcor_fb_info_t *inf, int x0, int y0,
-    const FT_Bitmap *bm, uint32_t fg
+    uint8_t *fb, const alcor_fb_t *inf, int x0, int y0, const FT_Bitmap *bm,
+    uint32_t fg
 )
 {
   for(unsigned yy = 0; yy < bm->rows; yy++) {
@@ -96,7 +96,7 @@ static void blit_gray(
 }
 
 static void shape_draw_line(
-    uint8_t *fb, const alcor_fb_info_t *inf, FT_Face face, hb_font_t *hbfont,
+    uint8_t *fb, const alcor_fb_t *inf, FT_Face face, hb_font_t *hbfont,
     unsigned pixel_h, int pen_x, int baseline_y, const char *utf8, uint32_t fg
 )
 {
@@ -142,19 +142,14 @@ static void shape_draw_line(
 
 int main(int argc, char **argv)
 {
-  alcor_fb_info_t inf;
-  if(alcor_fb_info(&inf) != 0) {
-    const char msg[] = "font-demo: fb_info failed\n";
+  alcor_fb_t inf;
+  if(alcor_fb_open(&inf) != 0) {
+    const char msg[] = "font-demo: framebuffer open failed\n";
     write(2, msg, sizeof(msg) - 1);
     return 1;
   }
 
-  uint8_t *fb = static_cast<uint8_t *>(alcor_fb_mmap());
-  if(!fb || fb == (uint8_t *)-1) {
-    const char msg[] = "font-demo: fb_mmap syscall failed\n";
-    write(2, msg, sizeof(msg) - 1);
-    return 1;
-  }
+  uint8_t *fb = static_cast<uint8_t *>(inf.pixels);
   if(inf.bpp != 32) {
     const char msg[] = "font-demo: need 32bpp framebuffer\n";
     write(2, msg, sizeof(msg) - 1);

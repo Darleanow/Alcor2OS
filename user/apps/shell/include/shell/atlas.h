@@ -1,7 +1,7 @@
 /**
  * @file shell/atlas.h
  * @brief Rasterize a TTF (Fira Code) into a glyph atlas and submit it to the
- * kernel framebuffer console via @c ioctl(FB_CONSOLE_SET_ATLAS).
+ * kernel framebuffer console via @c alcor_console_set_atlas().
  */
 
 #ifndef SHELL_ATLAS_H

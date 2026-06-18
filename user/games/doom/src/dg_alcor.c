@@ -12,9 +12,9 @@
 #include "doomgeneric.h"
 #include "doomkeys.h"
 
-#include <alcor2/fb_console_ioctl.h>
-#include <alcor2/fb_user.h>
-#include <alcor2/mouse.h>
+#include <alcor2/console.h>
+#include <alcor2/fb.h>
+#include <alcor2/input.h>
 #include <alcor2/timer.h>
 
 #include <fcntl.h>
@@ -43,25 +43,6 @@
  * resizing that buffer.
  */
 #define MAX_SCALE 5u
-
-/*
- * Keyboard layout ioctl — mirrors include/alcor2/kbd.h values so this file
- * does not depend on kernel headers.
- */
-
-#define ALCOR2_IOC_KBD_SET_LAYOUT                                              \
-  ((1u << 30) | (0x4bu << 8) | 1u | (sizeof(uint32_t) << 16))
-
-/* Enable \x00<ch> release events from the keyboard driver.  When active, each
- * key RELEASE emits this two-byte sentinel so we can drop keys from the held
- * table immediately rather than waiting for a repeat timeout.  This fixes
- * diagonal movement (Z+D) where PS/2 stops repeating the first key once a
- * second key is pressed. */
-#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                          \
-  ((1u << 30) | (0x4bu << 8) | 2u | (sizeof(uint32_t) << 16))
-
-#define KBD_LAYOUT_US 0u
-#define KBD_LAYOUT_FR 1u
 
 /*
  * Key-binding globals (defined in doomgeneric/m_controls.c).
@@ -117,12 +98,12 @@ static void apply_alcor_key_bindings(void)
 
 /* Framebuffer state */
 
-static uint32_t       *s_fb32; /* mapped framebuffer (u32 pixels)   */
-static alcor_fb_info_t s_fbinfo;
-static uint32_t        s_pitch32; /* framebuffer pitch in u32 units    */
-static uint32_t        s_scale;   /* Doom pixels → native pixels       */
-static uint32_t        s_off_x;   /* left margin to centre the image   */
-static uint32_t        s_off_y;   /* top margin to centre the image    */
+static uint32_t  *s_fb32;    /* mapped framebuffer (u32 pixels)   */
+static alcor_fb_t s_fb;      /* geometry + mapping                */
+static uint32_t   s_pitch32; /* framebuffer pitch in u32 units  */
+static uint32_t   s_scale;   /* Doom pixels → native pixels       */
+static uint32_t   s_off_x;   /* left margin to centre the image   */
+static uint32_t   s_off_y;   /* top margin to centre the image    */
 
 /* Keyboard state */
 
@@ -172,7 +153,7 @@ static int evq_pop(unsigned char *dk, int *pressed)
 }
 
 /* Held-key tracking. The kernel emits a precise \x00<ch> break code on every
- * key-up (ALCOR2_IOC_KBD_RELEASE_EVENTS), so a key is held from its make code
+ * key-up (alcor_kbd_set_release_events), so a key is held from its make code
  * until its break code — no repeat-timeout heuristic, which would otherwise
  * kill a held key once PS/2 stops repeating it (it only repeats the last key,
  * breaking Z then D). */
@@ -241,7 +222,7 @@ static void parse_input(const uint8_t *buf, int n)
     unsigned char dk;
 
     /* \x00<ch> — key-release sentinel emitted by the kernel when
-     * ALCOR2_IOC_KBD_RELEASE_EVENTS is enabled.  Process immediately without
+     * alcor_kbd_set_release_events is enabled.  Process immediately without
      * going through hold_press. */
     if(buf[i] == 0x00u) {
       if(i + 1 < n) {
@@ -361,27 +342,22 @@ static void restore_terminal(void)
 {
   /* Hand the framebuffer back; fb_console repaints the whole screen (margins
    * included) with the console theme, clearing the game image. */
-  ioctl(STDOUT_FILENO, FB_CONSOLE_RECLAIM, 0);
+  alcor_console_reclaim();
 
   /* Drop the elevated timer rate. */
-  uint32_t fast_off = 0u;
-  ioctl(STDIN_FILENO, ALCOR2_IOC_TIMER_FAST, &fast_off);
+  alcor_timer_fast(0);
 
   /* Disable release events before restoring layout so canonical programs don't
    * see spurious \x00<ch> sequences. */
-  uint32_t rel = 0u;
-  ioctl(STDIN_FILENO, ALCOR2_IOC_KBD_RELEASE_EVENTS, &rel);
+  alcor_kbd_set_release_events(0);
 
-  if(s_layout_changed) {
-    uint32_t us = KBD_LAYOUT_US;
-    ioctl(STDIN_FILENO, ALCOR2_IOC_KBD_SET_LAYOUT, &us);
-  }
+  if(s_layout_changed)
+    alcor_kbd_set_layout(ALCOR_KBD_US);
   if(s_raw_mode_active)
     tcsetattr(STDIN_FILENO, TCSANOW, &s_saved_tio);
   if(s_mouse_fd >= 0) {
-    uint32_t rel_off = 0u;
-    ioctl(s_mouse_fd, ALCOR2_IOC_MOUSE_SET_RELATIVE, &rel_off);
-    close(s_mouse_fd);
+    alcor_mouse_set_relative(s_mouse_fd, 0);
+    alcor_mouse_close(s_mouse_fd);
     s_mouse_fd = -1;
   }
 }
@@ -416,13 +392,13 @@ static void feed_mouse_events(void)
   if(s_mouse_fd < 0)
     return;
 
-  alcor2_mouse_event_t pkt;
-  int                  accum_dx = 0;
-  int                  got      = 0;
+  int accum_dx = 0;
+  int got      = 0;
+  int dx, btn;
 
-  while((int)read(s_mouse_fd, &pkt, sizeof(pkt)) == (int)sizeof(pkt)) {
-    accum_dx += (int)pkt.dx;
-    s_mouse_buttons = (int)pkt.buttons;
+  while(alcor_mouse_poll(s_mouse_fd, &dx, NULL, NULL, &btn) == 1) {
+    accum_dx += dx;
+    s_mouse_buttons = btn;
     got             = 1;
   }
 
@@ -461,23 +437,18 @@ static void sig_handler(int sig)
 
 void DG_Init(void)
 {
-  if(alcor_fb_info(&s_fbinfo) < 0) {
-    const char msg[] = "doom: SYS_ALCOR_FB_INFO failed\n";
+  if(alcor_fb_open(&s_fb) < 0) {
+    const char msg[] = "doom: framebuffer open failed\n";
     (void)write(STDERR_FILENO, msg, sizeof(msg) - 1);
     _exit(1);
   }
-  s_fb32 = alcor_fb_mmap();
-  if(s_fb32 == (void *)-1) {
-    const char msg[] = "doom: SYS_ALCOR_FB_MMAP failed\n";
-    (void)write(STDERR_FILENO, msg, sizeof(msg) - 1);
-    _exit(1);
-  }
-  s_pitch32 = s_fbinfo.pitch / 4u;
+  s_fb32    = (uint32_t *)s_fb.pixels;
+  s_pitch32 = s_fb.pitch / 4u;
 
   /* Largest uniform scale that fits both axes, so the image fills as much of
    * the screen as possible without distorting Doom's 320×200 aspect ratio. */
-  uint32_t sx = s_fbinfo.width / DOOMGENERIC_RESX;
-  uint32_t sy = s_fbinfo.height / DOOMGENERIC_RESY;
+  uint32_t sx = s_fb.width / DOOMGENERIC_RESX;
+  uint32_t sy = s_fb.height / DOOMGENERIC_RESY;
   s_scale     = (sx < sy) ? sx : sy;
   if(s_scale < 1u)
     s_scale = 1u;
@@ -487,16 +458,15 @@ void DG_Init(void)
   /* Centre the scaled image in the framebuffer. */
   uint32_t out_w = DOOMGENERIC_RESX * s_scale;
   uint32_t out_h = DOOMGENERIC_RESY * s_scale;
-  s_off_x = (s_fbinfo.width > out_w) ? (s_fbinfo.width - out_w) / 2u : 0u;
-  s_off_y = (s_fbinfo.height > out_h) ? (s_fbinfo.height - out_h) / 2u : 0u;
+  s_off_x        = (s_fb.width > out_w) ? (s_fb.width - out_w) / 2u : 0u;
+  s_off_y        = (s_fb.height > out_h) ? (s_fb.height - out_h) / 2u : 0u;
 
   /* Stop the fb_console from painting its cursor and text over our pixels. */
-  ioctl(STDOUT_FILENO, FB_CONSOLE_YIELD, 0);
+  alcor_console_yield();
 
   /* Raise the timer rate so DG_SleepMs(1) in the game loop has 1 ms (not 4 ms)
    * resolution. Released in restore_terminal / on exit. */
-  uint32_t fast_on = 1u;
-  ioctl(STDIN_FILENO, ALCOR2_IOC_TIMER_FAST, &fast_on);
+  alcor_timer_fast(1);
 
   /* Switch stdin to raw, non-blocking mode. */
   struct termios raw;
@@ -509,23 +479,20 @@ void DG_Init(void)
   s_raw_mode_active = 1;
 
   /* Switch to FR (AZERTY) layout: physical ZQSD → z/q/s/d. */
-  uint32_t fr = KBD_LAYOUT_FR;
-  if(ioctl(STDIN_FILENO, ALCOR2_IOC_KBD_SET_LAYOUT, &fr) == 0)
+  if(alcor_kbd_set_layout(ALCOR_KBD_FR) == 0)
     s_layout_changed = 1;
 
   /* Enable key-release events: kernel emits \x00<ch> on break codes so
    * simultaneous keys (e.g. Z+D diagonal) are released precisely instead
    * of waiting for the repeat timeout. */
-  uint32_t rel = 1u;
-  ioctl(STDIN_FILENO, ALCOR2_IOC_KBD_RELEASE_EVENTS, &rel);
+  alcor_kbd_set_release_events(1);
 
   /* Open the mouse device in non-blocking mode.  Failure is silently
    * tolerated — the game runs keyboard-only if the mouse is unavailable. */
-  s_mouse_fd = open("/dev/mouse", O_RDONLY | O_NONBLOCK);
+  s_mouse_fd = alcor_mouse_open();
   if(s_mouse_fd >= 0) {
     /* Pin the cursor to the screen centre and let deltas flow freely. */
-    uint32_t rel_on = 1u;
-    ioctl(s_mouse_fd, ALCOR2_IOC_MOUSE_SET_RELATIVE, &rel_on);
+    alcor_mouse_set_relative(s_mouse_fd, 1);
   }
 
   (void)atexit(restore_terminal);

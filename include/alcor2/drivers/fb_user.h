@@ -8,7 +8,23 @@
 
 #include <alcor2/limine.h>
 #include <alcor2/types.h>
-#include <uapi/alcor2/fb.h>
+
+/** @brief Linear framebuffer description (fixed layout for the syscall ABI).
+ *
+ * Filled by @ref SYS_ALCOR_FB_INFO. The userland mirror is the private record
+ * inside the musl fork's @c <alcor2/fb.h> @c alcor_fb_open() — keep in sync. */
+typedef struct __attribute__((packed))
+{
+  u32 width;
+  u32 height;
+  u32 pitch;
+  u16 bpp;
+  u16 _pad;
+  /** @brief Active bytes: @c pitch * height (may be less than @a map_size). */
+  u64 byte_len;
+  /** @brief Mappable span in bytes (page-aligned, includes leading padding). */
+  u64 map_size;
+} alcor_fb_info_t;
 
 /**
  * @brief Capture framebuffer geometry and physical span from Limine.

@@ -9,7 +9,18 @@
 #define ALCOR2_PIT_H
 
 #include <alcor2/types.h>
-#include <uapi/alcor2/timer.h> /* UAPI: PIT_TICK_HZ, PIT_TICK_HZ_FAST, ioctl code */
+
+/** @brief Default tick rate in Hz (idle/system rate). */
+#define PIT_TICK_HZ 250u
+
+/** @brief Elevated tick rate for latency-sensitive apps. */
+#define PIT_TICK_HZ_FAST 1000u
+
+/** @brief ioctl(0, ALCOR2_IOC_TIMER_FAST, &uint32_t on); _IOW('T', 1, u32).
+ *
+ * Refcounted vote for ::PIT_TICK_HZ_FAST, auto-released on process exit.
+ * Userland half lives in the musl fork's @c <alcor2/timer.h>. */
+#define ALCOR2_IOC_TIMER_FAST ((1U << 30) | (0x54U << 8) | 1U | (4U << 16))
 
 /**
  * @brief Program the PIT and install the timer IRQ handler.

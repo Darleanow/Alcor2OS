@@ -55,16 +55,27 @@ thirdparty/limine/limine:
 	  $(MAKE) -C thirdparty/limine >/dev/null; \
 	fi
 
-thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a:
-	@echo "musl $(MUSL_VER) — download & build"
+# Ensure the forked-musl submodule is checked out before building.
+thirdparty/musl-src/Makefile:
+	@echo "musl fork — checking out submodule thirdparty/musl-src"
+	git submodule update --init thirdparty/musl-src
+
+# Build the Alcor2 musl fork (carries the userland ABI: SYS_ALCOR_* and the
+# <alcor2/*.h> verb headers). Built out of a copy in the gitignored build dir
+# so the tracked submodule stays pristine (no -dirty gitlink).
+thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile
+	@echo "musl $(MUSL_VER) (Alcor2 fork) — build from submodule"
+	@rm -rf thirdparty/musl
 	@mkdir -p thirdparty
-	@curl -sL $(MUSL_URL) | tar xz -C thirdparty
-	@mv thirdparty/musl-$(MUSL_VER) thirdparty/musl
+	@cp -a thirdparty/musl-src thirdparty/musl
 	@cd thirdparty/musl && ./configure --prefix=$$(pwd)/$(MUSL_PREFIX) \
 		--disable-shared $(MUSL_CONFIGURE_EXTRA) \
 		CFLAGS='-Os -fno-stack-protector' >/dev/null
 	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
+	@grep -qE 'SYS_ALCOR_FB_MMAP[[:space:]]+499' \
+		thirdparty/musl/$(MUSL_PREFIX)/include/bits/syscall.h || \
+		{ echo >&2 "musl fork: Alcor SYS_* numbers missing from sysroot"; exit 1; }
 
 
 

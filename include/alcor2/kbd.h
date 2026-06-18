@@ -10,7 +10,33 @@
 
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/types.h>
-#include <uapi/alcor2/kbd.h> /* UAPI: ioctl codes and kbd_layout_t enum */
+
+/*
+ * Keyboard ioctl ABI (kernel side). Linux _IOW encoding, group 'K'.
+ * Userland half lives in the musl fork's <alcor2/input.h>.
+ *   bits 31:30 — direction (01 = write, user → kernel)
+ *   bits 23:16 — argument size in bytes
+ *   bits 15:8  — type character ('K' = keyboard)
+ *   bits  7:0  — command ordinal
+ */
+
+/** ioctl(0, ALCOR2_IOC_KBD_SET_LAYOUT, &uint32_t id); id is a ::kbd_layout_t.
+ */
+#define ALCOR2_IOC_KBD_SET_LAYOUT                                              \
+  ((1U << 30) | (0x4BU << 8) | 1U | (sizeof(uint32_t) << 16))
+
+/** ioctl(0, ALCOR2_IOC_KBD_RELEASE_EVENTS, &uint32_t on); \x00<char> on key-up.
+ */
+#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                          \
+  ((1U << 30) | (0x4BU << 8) | 2U | (sizeof(uint32_t) << 16))
+
+/** @brief Selectable keyboard layouts (argument for the SET_LAYOUT ioctl). */
+typedef enum
+{
+  KBD_LAYOUT_US = 0, /**< US QWERTY. */
+  KBD_LAYOUT_FR = 1, /**< AZERTY lettering on a US scan map; US-ASCII digits. */
+  KBD_LAYOUT_COUNT
+} kbd_layout_t;
 
 struct proc;
 

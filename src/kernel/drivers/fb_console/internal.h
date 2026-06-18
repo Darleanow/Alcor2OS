@@ -14,10 +14,10 @@
 #define ALCOR2_KERNEL_DRIVERS_FB_CONSOLE_INTERNAL_H
 
 #include <alcor2/arch/pit.h>
+#include <alcor2/drivers/fb_console.h>
 #include <alcor2/types.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <uapi/alcor2/fb_console_ioctl.h>
 
 /** @brief Cursor blink half-period in PIT ticks (~2 Hz). Derived from
  * @c PIT_TICK_HZ so the visible rate is independent of the chosen PIT

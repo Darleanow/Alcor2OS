@@ -22,8 +22,6 @@
 #include <alcor2/mm/vmm.h>
 #include <alcor2/proc/proc.h>
 #include <alcor2/types.h>
-#include <uapi/alcor2/fb.h>
-#include <uapi/alcor2/fb_console_ioctl.h>
 
 /**
  * @brief Read from /dev/null — always returns 0 (EOF).

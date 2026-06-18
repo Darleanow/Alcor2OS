@@ -5,7 +5,6 @@ ISO    := alcor2.iso
 BUILD   := build
 SRC     := src
 INCLUDE := include
-UAPI    := include/uapi
 
 DISK      := disk.img
 DISK_SIZE := 1024M

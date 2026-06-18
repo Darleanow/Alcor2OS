@@ -5,12 +5,10 @@
 
 #include <grendizer.h>
 
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/ioctl.h>
 
-#include <alcor2/kbd.h>
+#include <alcor2/input.h>
 
 int main(int argc, char *argv[])
 {
@@ -26,11 +24,11 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  uint32_t layout;
+  alcor_kbd_layout_t layout;
   if(strcmp(rest.argv[0], "us") == 0)
-    layout = KBD_LAYOUT_US;
+    layout = ALCOR_KBD_US;
   else if(strcmp(rest.argv[0], "fr") == 0)
-    layout = KBD_LAYOUT_FR;
+    layout = ALCOR_KBD_FR;
   else {
     (void)fprintf(
         stderr, "kbd: unknown layout '%s' (expected us|fr)\n", rest.argv[0]
@@ -38,8 +36,8 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  if(ioctl(0, ALCOR2_IOC_KBD_SET_LAYOUT, &layout) < 0) {
-    perror("kbd: ioctl");
+  if(alcor_kbd_set_layout(layout) < 0) {
+    perror("kbd: set layout");
     return 1;
   }
   (void)printf("keyboard: layout %s\n", rest.argv[0]);
