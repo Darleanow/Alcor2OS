@@ -80,10 +80,10 @@ public:
   const std::string &line(size_t row) const;
 
   /** @brief Total line count. */
-  size_t        lineCount() const;
+  size_t lineCount() const;
 
   /** @brief @c true if the buffer holds no lines. */
-  bool          empty() const noexcept;
+  bool empty() const noexcept;
 
   /** @brief Current cursor position. */
   const Cursor &cursor() const noexcept;
@@ -94,20 +94,23 @@ public:
    * @param x  Byte offset inside the target line.
    * @param y  Line index.
    */
-  void          setCursorPos(size_t x, size_t y);
+  void setCursorPos(size_t x, size_t y);
 
   /** @brief Move the cursor one line up, clamping the column if needed. */
-  void          cursorMoveUp();
+  void cursorMoveUp();
   /** @brief Move the cursor one line down, clamping the column if needed. */
-  void          cursorMoveDown();
+  void cursorMoveDown();
   /** @brief Move the cursor one byte left, wrapping to the previous line. */
-  void          cursorMoveLeft();
+  void cursorMoveLeft();
   /** @brief Move the cursor one byte right, wrapping to the next line. */
-  void          cursorMoveRight();
+  void cursorMoveRight();
   /** @brief Move the cursor to the first byte of the current line. */
-  void          cursorMoveLineStart();
+  void cursorMoveLineStart();
   /** @brief Move the cursor past the last byte of the current line. */
-  void          cursorMoveLineEnd();
+  void cursorMoveLineEnd();
+
+  /** @brief Tabulates from the cursor 4 spaces */
+  void tabulate();
 
 private:
   std::vector<std::string> m_text;

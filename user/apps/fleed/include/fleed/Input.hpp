@@ -15,6 +15,7 @@ enum class Command : std::uint8_t
   None,       /**< Unhandled event; the caller should ignore it. */
   Quit,       /**< Leave the editor without saving. */
   Save,       /**< Persist the buffer to its file. */
+  Tab,        /**< Tabulates 4 spaces. */
   Backspace,  /**< Delete the byte before the cursor or fuse two lines. */
   Insert,     /**< Insert @c KeyAction::data into the buffer at the cursor. */
   ArrowUp,    /**< Move the cursor one row up. */

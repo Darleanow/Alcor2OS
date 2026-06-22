@@ -63,6 +63,10 @@ int Editor::run()
     case Command::Save:
       handleSave();
       break;
+    case Command::Tab:
+      m_buffer.tabulate();
+      m_ui.redraw(m_buffer);
+      continue;
     case Command::ArrowUp:
       m_buffer.cursorMoveUp();
       break;

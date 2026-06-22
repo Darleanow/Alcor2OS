@@ -6,6 +6,7 @@
  * @c Command::None so the event loop can ignore it cleanly.
  */
 
+#include "spazer/spazer.h"
 #include <fleed/Input.hpp>
 
 #include <cwctype>
@@ -24,6 +25,8 @@ KeyAction classify(const spz_event_t &ev)
     return {Command::Save, 0};
   case SPZ_KEY_BACKSPACE:
     return {Command::Backspace, 0};
+  case SPZ_KEY_TAB:
+    return {Command::Tab, 0};
   case SPZ_KEY_UP:
     return {Command::ArrowUp, 0};
   case SPZ_KEY_DOWN:

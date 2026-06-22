@@ -159,4 +159,9 @@ void Buffer::cursorMoveLineEnd()
   m_cursor.x = m_text.at(m_cursor.y).size();
 }
 
+void Buffer::tabulate()
+{
+  append("    ", 4);
+}
+
 } /* namespace fleed */
