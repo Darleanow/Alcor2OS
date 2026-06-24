@@ -26,12 +26,7 @@ constexpr int kPadWidthPad = 16;
 constexpr int kPadMinRows = 32;
 constexpr int kPadMinCols = 80;
 
-/**
- * @brief Push the current bottom status bar with a centre slot.
- *
- * @param center  Centre text, NULL for empty.
- */
-void paintStatus(const char *center)
+void          paintStatus(const char *center)
 {
   spz_bar_t bar = {"fleed", center, kHints, SPZ_STYLE_STATUS};
   spz_statusbar(&bar);
@@ -113,8 +108,11 @@ void Ui::ensurePadSize(const Buffer &buffer)
     if(w > max_w)
       max_w = w;
   }
+  size_t digits  = std::to_string(buffer.lineCount()).size() + 1;
+  m_gutter_width = (digits > kGutterMin) ? digits : kGutterMin;
+
   int need_rows = static_cast<int>(buffer.lineCount()) + 1;
-  int need_cols = static_cast<int>(max_w) + kPadWidthPad;
+  int need_cols = static_cast<int>(max_w + m_gutter_width) + kPadWidthPad;
   (void)spz_pad_resize(m_pad, need_rows, need_cols);
 }
 
@@ -124,7 +122,9 @@ void Ui::redraw(const Buffer &buffer)
   WINDOW *body = spz_pad_buffer(m_pad);
   werase(body);
   for(size_t i = 0; i < buffer.lineCount(); ++i)
-    mvwaddstr(body, static_cast<int>(i), 0, buffer.line(i).c_str());
+    mvwaddstr(
+        body, static_cast<int>(i), 0, (gutterCell(i) + buffer.line(i)).c_str()
+    );
   refreshCursor(buffer);
 }
 
@@ -134,14 +134,17 @@ void Ui::redrawLine(const Buffer &buffer, size_t line_idx)
   WINDOW *body = spz_pad_buffer(m_pad);
   wmove(body, static_cast<int>(line_idx), 0);
   wclrtoeol(body);
-  mvwaddstr(body, static_cast<int>(line_idx), 0, buffer.line(line_idx).c_str());
+  mvwaddstr(
+      body, static_cast<int>(line_idx), 0,
+      (gutterCell(line_idx) + buffer.line(line_idx)).c_str()
+  );
 }
 
 void Ui::refreshCursor(const Buffer &buffer)
 {
   spz_pad_set_cursor(
       m_pad, static_cast<int>(buffer.cursor().y),
-      static_cast<int>(buffer.cursor().x)
+      static_cast<int>(buffer.cursor().x + m_gutter_width)
   );
   refreshStatusBar(buffer);
   spz_pad_refresh(m_pad);
@@ -151,6 +154,15 @@ void Ui::setStatus(const char *text)
 {
   m_status_msg = text ? text : "";
   paintStatus(m_status_msg.empty() ? nullptr : m_status_msg.c_str());
+}
+
+std::string Ui::gutterCell(size_t line_idx) const
+{
+  std::string num = std::to_string(line_idx + 1);
+  std::string cell(m_gutter_width, ' ');
+  if(num.size() + 1 <= m_gutter_width)
+    cell.replace(m_gutter_width - 1 - num.size(), num.size(), num);
+  return cell;
 }
 
 void Ui::refreshStatusBar(const Buffer &buffer)
