@@ -31,6 +31,10 @@ struct spz_pad
   spz_border_t border;      /**< Border style. */
   char        *title;       /**< Heap-owned copy, NULL for none. */
   bool         frame_dirty; /**< Border needs to be re-drawn on next refresh. */
+  bool         body_dirty;  /**< Pad body needs a full re-projection on next
+                             *   refresh (content repainted or viewport moved).
+                             *   A cursor-only move that does not scroll leaves
+                             *   this clear so the refresh does not flash. */
 };
 
 /** @brief Upper bound for @c off_row so the viewport stays inside the pad. */
@@ -51,11 +55,15 @@ static int max_off_col(const spz_pad_t *p)
  * @brief Slide the viewport so the cursor is visible, then clamp to bounds.
  *
  * @param p  Pad.
+ * @return @c true if the viewport offset changed and the body must be
+ *         re-projected, @c false if the cursor moved within the visible slice.
  */
-static void follow_cursor(spz_pad_t *p)
+static bool follow_cursor(spz_pad_t *p)
 {
-  const int view_h = p->inner.rows;
-  const int view_w = p->inner.cols;
+  const int view_h  = p->inner.rows;
+  const int view_w  = p->inner.cols;
+  const int old_row = p->off_row;
+  const int old_col = p->off_col;
 
   if(p->cur_row < p->off_row)
     p->off_row = p->cur_row;
@@ -69,6 +77,8 @@ static void follow_cursor(spz_pad_t *p)
 
   p->off_row = spz_clamp(p->off_row, max_off_row(p));
   p->off_col = spz_clamp(p->off_col, max_off_col(p));
+
+  return p->off_row != old_row || p->off_col != old_col;
 }
 
 spz_pad_t *spz_pad_new(
@@ -92,6 +102,7 @@ spz_pad_t *spz_pad_new(
   p->border      = b;
   p->title       = spz_strdup(title);
   p->frame_dirty = true;
+  p->body_dirty  = true;
 
   p->inner.y    = has_border ? outer.y + 1 : outer.y;
   p->inner.x    = has_border ? outer.x + 1 : outer.x;
@@ -144,8 +155,12 @@ void spz_pad_scroll_to(spz_pad_t *p, int row, int col)
 {
   if(!p)
     return;
-  p->off_row = spz_clamp(row, max_off_row(p));
-  p->off_col = spz_clamp(col, max_off_col(p));
+  int old_row = p->off_row;
+  int old_col = p->off_col;
+  p->off_row  = spz_clamp(row, max_off_row(p));
+  p->off_col  = spz_clamp(col, max_off_col(p));
+  if(p->off_row != old_row || p->off_col != old_col)
+    p->body_dirty = true;
 }
 
 void spz_pad_set_cursor(spz_pad_t *p, int row, int col)
@@ -154,7 +169,8 @@ void spz_pad_set_cursor(spz_pad_t *p, int row, int col)
     return;
   p->cur_row = spz_clamp(row, p->virt_rows - 1);
   p->cur_col = spz_clamp(col, p->virt_cols - 1);
-  follow_cursor(p);
+  if(follow_cursor(p))
+    p->body_dirty = true;
 }
 
 void spz_pad_refresh(spz_pad_t *p)
@@ -176,10 +192,14 @@ void spz_pad_refresh(spz_pad_t *p)
 
   /* pnoutrefresh propagates the pad cursor as the hardware cursor. */
   wmove(p->body, p->cur_row, p->cur_col);
-  /* werase + paint inside a pad can be dropped when the viewport offset has
-   * not moved; redrawwin marks every line dirty so the projection is
-   * complete. */
-  redrawwin(p->body);
+  /* A full re-projection is only needed when content was repainted or the
+   * viewport scrolled; redrawwin marks every line dirty so pnoutrefresh emits
+   * the whole slice. A cursor-only move skips it, otherwise the unchanged
+   * slice would be re-sent every keystroke and flash. */
+  if(p->body_dirty) {
+    redrawwin(p->body);
+    p->body_dirty = false;
+  }
 
   int dst_y1 = p->inner.y + p->inner.rows - 1;
   int dst_x1 = p->inner.x + p->inner.cols - 1;
@@ -204,7 +224,8 @@ int spz_pad_resize(spz_pad_t *p, int virt_rows, int virt_cols)
 
   if(wresize(p->body, new_rows, new_cols) != OK)
     return -1;
-  p->virt_rows = new_rows;
-  p->virt_cols = new_cols;
+  p->virt_rows  = new_rows;
+  p->virt_cols  = new_cols;
+  p->body_dirty = true;
   return 0;
 }
