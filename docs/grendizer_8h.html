@@ -199,6 +199,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a7f04d2a8ddb69baa1d282de4c9d8ff0e" id="r_a7f04d2a8ddb69baa1d282de4c9d8ff0e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grendizer_8h.html#a7f04d2a8ddb69baa1d282de4c9d8ff0e">gr_dispatch</a> (const <a class="el" href="structgr__app.html">gr_app</a> *app, int argc, char **argv)</td></tr>
 <tr class="memdesc:a7f04d2a8ddb69baa1d282de4c9d8ff0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dispatch <code>main</code> arguments through the subcommand tree.  <br /></td></tr>
 <tr class="separator:a7f04d2a8ddb69baa1d282de4c9d8ff0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad247c28ce169443517be658bf2fb06d" id="r_aad247c28ce169443517be658bf2fb06d"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grendizer_8h.html#aad247c28ce169443517be658bf2fb06d">gr_basename</a> (const char *path)</td></tr>
+<tr class="memdesc:aad247c28ce169443517be658bf2fb06d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the filename component of <code>path</code> (the part after the last <code>'/'</code> ).  <br /></td></tr>
+<tr class="separator:aad247c28ce169443517be658bf2fb06d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Single-header CLI parsing library for Alcor2 userland. </p>
@@ -235,7 +238,7 @@ Functions</h2></td></tr>
 <div class="line">    <span class="comment">// rest.argv[0..rest.argc-1] = positional args</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agrendizer_8h_html"><div class="ttname"><a href="grendizer_8h.html">grendizer.h</a></div><div class="ttdoc">Single-header CLI parsing library for Alcor2 userland.</div></div>
-<div class="ttc" id="agrendizer_8h_html_a856ce27279fc9ff59cc800cb6b638444"><div class="ttname"><a href="grendizer_8h.html#a856ce27279fc9ff59cc800cb6b638444">gr_parse</a></div><div class="ttdeci">int gr_parse(const gr_spec *spec, int argc, char **argv, gr_rest *rest, char *errbuf, size_t errcap)</div><div class="ttdoc">Parse command-line arguments according to spec.</div><div class="ttdef"><b>Definition</b> grendizer.c:355</div></div>
+<div class="ttc" id="agrendizer_8h_html_a856ce27279fc9ff59cc800cb6b638444"><div class="ttname"><a href="grendizer_8h.html#a856ce27279fc9ff59cc800cb6b638444">gr_parse</a></div><div class="ttdeci">int gr_parse(const gr_spec *spec, int argc, char **argv, gr_rest *rest, char *errbuf, size_t errcap)</div><div class="ttdoc">Parse command-line arguments according to spec.</div><div class="ttdef"><b>Definition</b> grendizer.c:364</div></div>
 <div class="ttc" id="agroup__gr__macros_html_ga0d11684e807d19f33ad38d5568ff99b9"><div class="ttname"><a href="group__gr__macros.html#ga0d11684e807d19f33ad38d5568ff99b9">GR_END</a></div><div class="ttdeci">#define GR_END</div><div class="ttdoc">Sentinel that terminates a gr_opt array.</div><div class="ttdef"><b>Definition</b> grendizer.h:213</div></div>
 <div class="ttc" id="agroup__gr__macros_html_gae35a579bbc9ba375544a4035c105939f"><div class="ttname"><a href="group__gr__macros.html#gae35a579bbc9ba375544a4035c105939f">GR_FLAG</a></div><div class="ttdeci">#define GR_FLAG(short, long, storage, help)</div><div class="ttdoc">Declare a GR_KIND_FLAG option.</div><div class="ttdef"><b>Definition</b> grendizer.h:189</div></div>
 <div class="ttc" id="agroup__gr__macros_html_gaf672b9539626ae8159aa4a2e9e1e30c6"><div class="ttname"><a href="group__gr__macros.html#gaf672b9539626ae8159aa4a2e9e1e30c6">GR_STR</a></div><div class="ttdeci">#define GR_STR(short, long, storage, hint, help)</div><div class="ttdoc">Declare a GR_KIND_STR option.</div><div class="ttdef"><b>Definition</b> grendizer.h:197</div></div>
@@ -419,6 +422,39 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="aad247c28ce169443517be658bf2fb06d" name="aad247c28ce169443517be658bf2fb06d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad247c28ce169443517be658bf2fb06d">&#9670;&#160;</a></span>gr_basename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char * gr_basename </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the filename component of <code>path</code> (the part after the last <code>'/'</code> ). </p>
+<p>The returned pointer points into the original <code>path</code> string; no memory is allocated. When <code>path</code> is <code>NULL</code>, empty, or ends with <code>'/'</code> the function returns <code>"."</code> .</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Source path string (may be <code>NULL</code>). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the basename within <code>path</code>. </dd></dl>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8h_aad247c28ce169443517be658bf2fb06d_icgraph.svg" width="603" height="135"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
+</div>
+</div>
 <a id="a7f04d2a8ddb69baa1d282de4c9d8ff0e" name="a7f04d2a8ddb69baa1d282de4c9d8ff0e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7f04d2a8ddb69baa1d282de4c9d8ff0e">&#9670;&#160;</a></span>gr_dispatch()</h2>
 
@@ -465,7 +501,7 @@ Functions</h2></td></tr>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="grendizer_8h_a7f04d2a8ddb69baa1d282de4c9d8ff0e_cgraph.svg" width="100%" height="521"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="grendizer_8h_a7f04d2a8ddb69baa1d282de4c9d8ff0e_cgraph.svg" width="100%" height="519"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

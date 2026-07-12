@@ -16,8 +16,9 @@ var searchData=
   ['box_5fedges_5ffor_13',['box_edges_for',['../user_2apps_2shell_2platform_2atlas_8c.html#a98ddd251fc55ef0e1725cfa026038462',1,'atlas.c']]],
   ['buf_5fadd_14',['buf_add',['../ls_8c.html#afa7f1f48b7333fc91fc8796d6a1fd7d7',1,'ls.c']]],
   ['buf_5fappend_15',['buf_append',['../expand_8c.html#ac4648bb165875a636b911892835620fc',1,'expand.c']]],
-  ['build_5fexpanded_5fargv_16',['build_expanded_argv',['../exec_8c.html#acbb7ff6148e8d1243a60bc1bc22f440e',1,'exec.c']]],
-  ['build_5fsymlink_5fpath_17',['build_symlink_path',['../path_8c.html#a3eec62bdfc7a172243ba75dcf1c6a205',1,'path.c']]],
-  ['build_5fvmm_5fflags_18',['build_vmm_flags',['../sys__mm_8c.html#aabf8fe59bb5b9155cd27c3dc43612a4e',1,'sys_mm.c']]],
-  ['bytes_5fpp_5ffrom_5fbpp_19',['bytes_pp_from_bpp',['../console_8c.html#a4a9b6ef5ee0db021ca9b257eb0a006a0',1,'bytes_pp_from_bpp(u16 bpp):&#160;console.c'],['../src_2kernel_2drivers_2fb__console_2internal_8h.html#a391b96d7a5bd8dde174eec55c5169832',1,'bytes_pp_from_bpp(u16 bpp):&#160;pixel.c'],['../pixel_8c.html#a391b96d7a5bd8dde174eec55c5169832',1,'bytes_pp_from_bpp(u16 bpp):&#160;pixel.c']]]
+  ['build_5fdest_5fpath_16',['build_dest_path',['../cp_8c.html#a5fd48d42e3b22c9f70d02d733250c4e0',1,'cp.c']]],
+  ['build_5fexpanded_5fargv_17',['build_expanded_argv',['../exec_8c.html#acbb7ff6148e8d1243a60bc1bc22f440e',1,'exec.c']]],
+  ['build_5fsymlink_5fpath_18',['build_symlink_path',['../path_8c.html#a3eec62bdfc7a172243ba75dcf1c6a205',1,'path.c']]],
+  ['build_5fvmm_5fflags_19',['build_vmm_flags',['../sys__mm_8c.html#aabf8fe59bb5b9155cd27c3dc43612a4e',1,'sys_mm.c']]],
+  ['bytes_5fpp_5ffrom_5fbpp_20',['bytes_pp_from_bpp',['../console_8c.html#a4a9b6ef5ee0db021ca9b257eb0a006a0',1,'bytes_pp_from_bpp(u16 bpp):&#160;console.c'],['../src_2kernel_2drivers_2fb__console_2internal_8h.html#a391b96d7a5bd8dde174eec55c5169832',1,'bytes_pp_from_bpp(u16 bpp):&#160;pixel.c'],['../pixel_8c.html#a391b96d7a5bd8dde174eec55c5169832',1,'bytes_pp_from_bpp(u16 bpp):&#160;pixel.c']]]
 ];

@@ -1,0 +1,17 @@
+<map id="gr_basename" name="gr_basename">
+<area shape="rect" id="Node000001" title="Return the filename component of path (the part after the last &#39;/&#39; )." alt="" coords="487,31,597,56"/>
+<area shape="rect" id="Node000002" href="$cp_8c.html#a5fd48d42e3b22c9f70d02d733250c4e0" title="Build &quot;dir/basename(src)&quot; into out (capacity cap)." alt="" coords="313,5,439,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,35,438,30,439,25,473,30"/>
+<area shape="rect" id="Node000004" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="317,55,435,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="473,56,435,62,434,56,472,51"/>
+<area shape="rect" id="Node000003" href="$cp_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="181,5,235,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="300,21,235,21,235,15,300,15"/>
+<area shape="rect" id="Node000005" href="$grendizer_8c.html#a7d6ef8a050fe5a3a15a0b94a05ea96b8" title="Resolve the display program name for a gr_app." alt="" coords="153,55,263,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="304,70,263,70,263,65,304,65"/>
+<area shape="rect" id="Node000007" href="$grendizer_8c.html#a8dc5a5bb6f608ade07c04cc6d3028ac5" title="Resolve the display program name from spec and argv0." alt="" coords="151,104,265,129"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="320,87,253,106,252,101,318,81"/>
+<area shape="rect" id="Node000006" href="$grendizer_8c.html#a7f04d2a8ddb69baa1d282de4c9d8ff0e" title="Dispatch main arguments through the subcommand tree." alt="" coords="5,55,103,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="140,70,103,70,103,65,140,65"/>
+<area shape="rect" id="Node000008" href="$grendizer_8c.html#a856ce27279fc9ff59cc800cb6b638444" title="Parse command&#45;line arguments according to spec." alt="" coords="15,104,93,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="137,119,93,119,93,114,137,114"/>
+</map>

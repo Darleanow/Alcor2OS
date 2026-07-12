@@ -10,7 +10,8 @@ var searchData=
   ['complete_2ec_7',['complete.c',['../complete_8c.html',1,'']]],
   ['console_2ec_8',['console.c',['../console_8c.html',1,'']]],
   ['console_2eh_9',['console.h',['../console_8h.html',1,'']]],
-  ['cpu_2ec_10',['cpu.c',['../cpu_8c.html',1,'']]],
-  ['cpu_2eh_11',['cpu.h',['../cpu_8h.html',1,'']]],
-  ['csi_2ec_12',['csi.c',['../csi_8c.html',1,'']]]
+  ['cp_2ec_10',['cp.c',['../cp_8c.html',1,'']]],
+  ['cpu_2ec_11',['cpu.c',['../cpu_8c.html',1,'']]],
+  ['cpu_2eh_12',['cpu.h',['../cpu_8h.html',1,'']]],
+  ['csi_2ec_13',['csi.c',['../csi_8c.html',1,'']]]
 ];

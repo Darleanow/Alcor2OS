@@ -18,8 +18,8 @@
 <area shape="poly" id="edge17_Node000002_Node000014" title=" " alt="" coords="163,231,194,261,236,290,276,310,318,326,399,350,397,355,316,331,274,315,233,295,191,265,159,234"/>
 <area shape="rect" id="Node000015" href="$grendizer_8c.html#a8dc5a5bb6f608ade07c04cc6d3028ac5" title="Resolve the display program name from spec and argv0." alt="" coords="241,407,356,432"/>
 <area shape="poly" id="edge18_Node000002_Node000015" title=" " alt="" coords="154,232,163,264,179,307,203,353,237,393,242,398,238,402,233,397,199,356,174,309,158,266,149,233"/>
-<area shape="rect" id="Node000017" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="258,357,339,383"/>
-<area shape="poly" id="edge20_Node000002_Node000017" title=" " alt="" coords="158,231,188,281,210,310,236,336,254,348,251,353,233,340,206,313,184,284,153,234"/>
+<area shape="rect" id="Node000018" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="258,357,339,383"/>
+<area shape="poly" id="edge20_Node000002_Node000018" title=" " alt="" coords="158,231,188,281,210,310,236,336,254,348,251,353,233,340,206,313,184,284,153,234"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="512,28,543,48,566,71,585,96,614,144,610,147,581,99,562,74,540,52,509,33"/>
 <area shape="poly" id="edge5_Node000007_Node000004" title=" " alt="" coords="357,123,542,149,576,156,575,161,541,154,356,128"/>
 <area shape="poly" id="edge7_Node000008_Node000004" title=" " alt="" coords="363,167,576,167,576,173,363,173"/>
@@ -34,5 +34,5 @@
 <area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="519,304,540,292,563,269,582,243,611,194,615,197,587,246,567,273,543,296,522,309"/>
 <area shape="rect" id="Node000016" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="417,407,535,432"/>
 <area shape="poly" id="edge19_Node000015_Node000016" title=" " alt="" coords="356,417,403,417,403,422,356,422"/>
-<area shape="poly" id="edge21_Node000017_Node000014" title=" " alt="" coords="340,367,397,367,397,372,340,372"/>
+<area shape="poly" id="edge21_Node000018_Node000014" title=" " alt="" coords="340,367,397,367,397,372,340,372"/>
 </map>

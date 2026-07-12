@@ -2,8 +2,8 @@
 <area shape="rect" id="Node000001" title="Entry point for the rmdir utility." alt="" coords="5,381,60,407"/>
 <area shape="rect" id="Node000002" href="$grendizer_8c.html#a856ce27279fc9ff59cc800cb6b638444" title="Parse command&#45;line arguments according to spec." alt="" coords="150,231,229,256"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="45,379,163,264,167,267,49,383"/>
-<area shape="rect" id="Node000018" href="$rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" title="Remove a directory and optionally its content and ancestor components." alt="" coords="108,481,271,507"/>
-<area shape="poly" id="edge23_Node000001_Node000018" title=" " alt="" coords="56,405,158,472,156,476,53,409"/>
+<area shape="rect" id="Node000019" href="$rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" title="Remove a directory and optionally its content and ancestor components." alt="" coords="108,481,271,507"/>
+<area shape="poly" id="edge23_Node000001_Node000019" title=" " alt="" coords="56,405,158,472,156,476,53,409"/>
 <area shape="rect" id="Node000003" href="$grendizer_8c.html#aa797faea2bca5a766903925a39cb8257" title="Increment the accumulating counter storage." alt="" coords="507,5,635,31"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="192,229,207,192,233,142,269,90,292,67,317,48,359,28,405,16,451,10,493,9,493,14,451,16,406,21,361,33,320,52,295,71,273,93,237,145,212,194,197,231"/>
 <area shape="rect" id="Node000004" href="$grendizer_8c.html#a567dd32fb181a8127afb574abb37fb6b" title="Write a formatted diagnostic to buf or fallback stream. Truncates with &quot;...&quot; when buf is too small; f..." alt="" coords="684,183,756,208"/>
@@ -20,8 +20,8 @@
 <area shape="poly" id="edge18_Node000002_Node000014" title=" " alt="" coords="224,254,320,289,513,350,511,355,318,294,222,259"/>
 <area shape="rect" id="Node000015" href="$grendizer_8c.html#a8dc5a5bb6f608ade07c04cc6d3028ac5" title="Resolve the display program name from spec and argv0." alt="" coords="331,405,445,431"/>
 <area shape="poly" id="edge19_Node000002_Node000015" title=" " alt="" coords="200,255,246,320,280,358,320,392,329,397,327,402,317,396,277,362,242,323,196,258"/>
-<area shape="rect" id="Node000017" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="347,356,429,381"/>
-<area shape="poly" id="edge21_Node000002_Node000017" title=" " alt="" coords="208,254,257,292,320,334,346,348,343,353,317,339,254,296,205,258"/>
+<area shape="rect" id="Node000018" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="347,356,429,381"/>
+<area shape="poly" id="edge21_Node000002_Node000018" title=" " alt="" coords="208,254,257,292,320,334,346,348,343,353,317,339,254,296,205,258"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="608,29,638,48,663,77,684,109,712,168,707,171,679,112,659,80,634,52,605,33"/>
 <area shape="rect" id="Node000005" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="804,332,883,357"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="734,206,825,320,821,323,730,210"/>
@@ -38,12 +38,12 @@
 <area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="612,304,634,292,672,256,701,219,705,222,676,260,638,296,614,309"/>
 <area shape="rect" id="Node000016" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="512,405,629,431"/>
 <area shape="poly" id="edge20_Node000015_Node000016" title=" " alt="" coords="446,415,498,415,498,421,446,421"/>
-<area shape="poly" id="edge22_Node000017_Node000014" title=" " alt="" coords="429,366,492,366,492,371,429,371"/>
-<area shape="poly" id="edge24_Node000018_Node000005" title=" " alt="" coords="271,490,349,486,441,478,539,463,635,441,684,424,731,403,808,362,811,367,733,408,686,429,637,446,540,468,441,483,349,491,271,496"/>
-<area shape="rect" id="Node000019" href="$rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" title="Remove a single empty directory, printing a diagnostic on failure." alt="" coords="523,544,619,569"/>
-<area shape="poly" id="edge25_Node000018_Node000019" title=" " alt="" coords="268,504,510,544,509,549,267,509"/>
-<area shape="rect" id="Node000020" href="$rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="319,581,457,607"/>
-<area shape="poly" id="edge26_Node000018_Node000020" title=" " alt="" coords="217,504,351,573,348,577,215,509"/>
-<area shape="poly" id="edge27_Node000020_Node000019" title=" " alt="" coords="450,579,509,567,510,572,451,584"/>
-<area shape="poly" id="edge28_Node000020_Node000020" title=" " alt="" coords="358,583,352,573,355,563,367,557,388,555,413,558,423,567,420,571,411,563,388,560,369,562,359,567,357,572,362,580"/>
+<area shape="poly" id="edge22_Node000018_Node000014" title=" " alt="" coords="429,366,492,366,492,371,429,371"/>
+<area shape="poly" id="edge24_Node000019_Node000005" title=" " alt="" coords="271,490,349,486,441,478,539,463,635,441,684,424,731,403,808,362,811,367,733,408,686,429,637,446,540,468,441,483,349,491,271,496"/>
+<area shape="rect" id="Node000020" href="$rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" title="Remove a single empty directory, printing a diagnostic on failure." alt="" coords="523,544,619,569"/>
+<area shape="poly" id="edge25_Node000019_Node000020" title=" " alt="" coords="268,504,510,544,509,549,267,509"/>
+<area shape="rect" id="Node000021" href="$rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" title="Recursively remove all content of a directory, then the directory itself." alt="" coords="319,581,457,607"/>
+<area shape="poly" id="edge26_Node000019_Node000021" title=" " alt="" coords="217,504,351,573,348,577,215,509"/>
+<area shape="poly" id="edge27_Node000021_Node000020" title=" " alt="" coords="450,579,509,567,510,572,451,584"/>
+<area shape="poly" id="edge28_Node000021_Node000021" title=" " alt="" coords="358,583,352,573,355,563,367,557,388,555,413,558,423,567,420,571,411,563,388,560,369,562,359,567,357,572,362,580"/>
 </map>

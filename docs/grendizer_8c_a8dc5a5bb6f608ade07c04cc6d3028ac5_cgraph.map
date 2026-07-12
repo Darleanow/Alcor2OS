@@ -2,4 +2,6 @@
 <area shape="rect" id="Node000001" title="Resolve the display program name from spec and argv0." alt="" coords="5,5,120,31"/>
 <area shape="rect" id="Node000002" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="168,5,285,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,15,154,15,154,21,120,21"/>
+<area shape="rect" id="Node000003" href="$grendizer_8c.html#aad247c28ce169443517be658bf2fb06d" title="Return the filename component of path (the part after the last &#39;/&#39; )." alt="" coords="333,5,444,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="286,15,320,15,320,21,286,21"/>
 </map>

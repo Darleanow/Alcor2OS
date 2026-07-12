@@ -35,19 +35,19 @@
 </a>
 </g>
 </g>
-<!-- Node18 -->
-<g id="Node000018" class="node">
-<title>Node18</title>
-<g id="a_Node000018"><a xlink:href="rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" target="_top" xlink:title="Remove a directory and optionally its content and ancestor components.">
+<!-- Node19 -->
+<g id="Node000019" class="node">
+<title>Node19</title>
+<g id="a_Node000019"><a xlink:href="rmdir_8c.html#a0bb729a5841d9b68c065e316c29f68a3" target="_top" xlink:title="Remove a directory and optionally its content and ancestor components.">
 <polygon fill="white" stroke="#666666" points="199,-94 77,-94 77,-75 199,-75 199,-94"/>
 <text text-anchor="middle" x="138" y="-82" font-family="Helvetica,sans-Serif" font-size="10.00">remove_with_parents</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node18 -->
-<g id="edge23_Node000001_Node000018" class="edge">
-<title>Node1&#45;&gt;Node18</title>
-<g id="a_edge23_Node000001_Node000018"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node19 -->
+<g id="edge23_Node000001_Node000019" class="edge">
+<title>Node1&#45;&gt;Node19</title>
+<g id="a_edge23_Node000001_Node000019"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M36.6,-149.7C56.25,-136.94 90.78,-114.51 113.78,-99.58"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="115.78,-102.45 122.26,-94.07 111.97,-96.58 115.78,-102.45"/>
 </a>
@@ -197,19 +197,19 @@
 </a>
 </g>
 </g>
-<!-- Node17 -->
-<g id="Node000017" class="node">
-<title>Node17</title>
-<g id="a_Node000017"><a xlink:href="grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" target="_top" xlink:title="Emit formatted usage text for spec to stream.">
+<!-- Node18 -->
+<g id="Node000018" class="node">
+<title>Node18</title>
+<g id="a_Node000018"><a xlink:href="grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" target="_top" xlink:title="Emit formatted usage text for spec to stream.">
 <polygon fill="white" stroke="#666666" points="317.5,-188 256.5,-188 256.5,-169 317.5,-169 317.5,-188"/>
 <text text-anchor="middle" x="287" y="-176" font-family="Helvetica,sans-Serif" font-size="10.00">gr_usage</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node17 -->
-<g id="edge21_Node000002_Node000017" class="edge">
-<title>Node2&#45;&gt;Node17</title>
-<g id="a_edge21_Node000002_Node000017"><a xlink:title=" ">
+<!-- Node2&#45;&gt;Node18 -->
+<g id="edge21_Node000002_Node000018" class="edge">
+<title>Node2&#45;&gt;Node18</title>
+<g id="a_edge21_Node000002_Node000018"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M150.62,-262.9C168.19,-248.64 202.88,-221.53 235,-202.5 241.05,-198.91 247.73,-195.45 254.2,-192.32"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="255.86,-195.41 263.44,-188 252.89,-189.07 255.86,-195.41"/>
 </a>
@@ -345,7 +345,7 @@
 <g id="Node000016" class="node">
 <title>Node16</title>
 <g id="a_Node000016"><a xlink:href="grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" target="_top" xlink:title="Return the filename component of path (after the last &#39;/&#39;).">
-<polygon fill="white" stroke="#666666" points="468,-151 380,-151 380,-132 468,-132 468,-151"/>
+<polygon fill="#fff0f0" stroke="red" points="468,-151 380,-151 380,-132 468,-132 468,-151"/>
 <text text-anchor="middle" x="424" y="-139" font-family="Helvetica,sans-Serif" font-size="10.00">gr__basename</text>
 </a>
 </g>
@@ -359,73 +359,73 @@
 </a>
 </g>
 </g>
-<!-- Node17&#45;&gt;Node14 -->
-<g id="edge22_Node000017_Node000014" class="edge">
-<title>Node17&#45;&gt;Node14</title>
-<g id="a_edge22_Node000017_Node000014"><a xlink:title=" ">
+<!-- Node18&#45;&gt;Node14 -->
+<g id="edge22_Node000018_Node000014" class="edge">
+<title>Node18&#45;&gt;Node14</title>
+<g id="a_edge22_Node000018_Node000014"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M317.63,-178.5C331.51,-178.5 348.55,-178.5 364.86,-178.5"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="364.88,-182 374.88,-178.5 364.88,-175 364.88,-182"/>
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node5 -->
-<g id="edge24_Node000018_Node000005" class="edge">
-<title>Node18&#45;&gt;Node5</title>
-<g id="a_edge24_Node000018_Node000005"><a xlink:title=" ">
+<!-- Node19&#45;&gt;Node5 -->
+<g id="edge24_Node000019_Node000005" class="edge">
+<title>Node19&#45;&gt;Node5</title>
+<g id="a_edge24_Node000019_Node000005"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M199.3,-85.36C267.1,-87.7 379.89,-95.73 473,-122.5 521.49,-136.44 573.56,-164.4 603.17,-181.68"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="601.57,-184.8 611.96,-186.88 605.14,-178.78 601.57,-184.8"/>
-</a>
-</g>
-</g>
-<!-- Node19 -->
-<g id="Node000019" class="node">
-<title>Node19</title>
-<g id="a_Node000019"><a xlink:href="rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" target="_top" xlink:title="Remove a single empty directory, printing a diagnostic on failure.">
-<polygon fill="white" stroke="#666666" points="460,-47 388,-47 388,-28 460,-28 460,-47"/>
-<text text-anchor="middle" x="424" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">remove_dir</text>
-</a>
-</g>
-</g>
-<!-- Node18&#45;&gt;Node19 -->
-<g id="edge25_Node000018_Node000019" class="edge">
-<title>Node18&#45;&gt;Node19</title>
-<g id="a_edge25_Node000018_Node000019"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M196.47,-74.99C250.04,-66.12 328.84,-53.08 377.97,-44.95"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="378.69,-48.38 387.99,-43.29 377.55,-41.47 378.69,-48.38"/>
 </a>
 </g>
 </g>
 <!-- Node20 -->
 <g id="Node000020" class="node">
 <title>Node20</title>
-<g id="a_Node000020"><a xlink:href="rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" target="_top" xlink:title="Recursively remove all content of a directory, then the directory itself.">
+<g id="a_Node000020"><a xlink:href="rmdir_8c.html#a4c650ec3ed50f4655f0f472ef1623cbc" target="_top" xlink:title="Remove a single empty directory, printing a diagnostic on failure.">
+<polygon fill="white" stroke="#666666" points="460,-47 388,-47 388,-28 460,-28 460,-47"/>
+<text text-anchor="middle" x="424" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">remove_dir</text>
+</a>
+</g>
+</g>
+<!-- Node19&#45;&gt;Node20 -->
+<g id="edge25_Node000019_Node000020" class="edge">
+<title>Node19&#45;&gt;Node20</title>
+<g id="a_edge25_Node000019_Node000020"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M196.47,-74.99C250.04,-66.12 328.84,-53.08 377.97,-44.95"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="378.69,-48.38 387.99,-43.29 377.55,-41.47 378.69,-48.38"/>
+</a>
+</g>
+</g>
+<!-- Node21 -->
+<g id="Node000021" class="node">
+<title>Node21</title>
+<g id="a_Node000021"><a xlink:href="rmdir_8c.html#ab50db8abc5d830e056f1f38006647c5d" target="_top" xlink:title="Recursively remove all content of a directory, then the directory itself.">
 <polygon fill="white" stroke="#666666" points="339,-19 235,-19 235,0 339,0 339,-19"/>
 <text text-anchor="middle" x="287" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">remove_recursive</text>
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node20 -->
-<g id="edge26_Node000018_Node000020" class="edge">
-<title>Node18&#45;&gt;Node20</title>
-<g id="a_edge26_Node000018_Node000020"><a xlink:title=" ">
+<!-- Node19&#45;&gt;Node21 -->
+<g id="edge26_Node000019_Node000021" class="edge">
+<title>Node19&#45;&gt;Node21</title>
+<g id="a_edge26_Node000019_Node000021"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M157.92,-74.85C183.39,-61.85 228.89,-38.64 258.24,-23.66"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="259.84,-26.78 267.16,-19.11 256.66,-20.54 259.84,-26.78"/>
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node19 -->
-<g id="edge27_Node000020_Node000019" class="edge">
-<title>Node20&#45;&gt;Node19</title>
-<g id="a_edge27_Node000020_Node000019"><a xlink:title=" ">
+<!-- Node21&#45;&gt;Node20 -->
+<g id="edge27_Node000021_Node000020" class="edge">
+<title>Node21&#45;&gt;Node20</title>
+<g id="a_edge27_Node000021_Node000020"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M334.08,-19.06C348.22,-21.99 363.75,-25.21 377.83,-28.13"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="377.28,-31.59 387.78,-30.2 378.7,-24.74 377.28,-31.59"/>
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node20 -->
-<g id="edge28_Node000020_Node000020" class="edge">
-<title>Node20&#45;&gt;Node20</title>
-<g id="a_edge28_Node000020_Node000020"><a xlink:title=" ">
+<!-- Node21&#45;&gt;Node21 -->
+<g id="edge28_Node000021_Node000021" class="edge">
+<title>Node21&#45;&gt;Node21</title>
+<g id="a_edge28_Node000021_Node000021"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M266.04,-19.08C255.84,-27.73 262.83,-37 287,-37 302.49,-37 310.92,-33.2 312.3,-28.19"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="315.42,-26.61 307.96,-19.08 309.1,-29.62 315.42,-26.61"/>
 </a>

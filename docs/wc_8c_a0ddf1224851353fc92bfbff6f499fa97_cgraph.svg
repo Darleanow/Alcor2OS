@@ -99,19 +99,19 @@ var sectionId = 'dynsection-2';
 </a>
 </g>
 </g>
-<!-- Node19 -->
-<g id="Node000019" class="node">
-<title>Node19</title>
-<g id="a_Node000019"><a xlink:href="wc_8c.html#ad21b5ee3a936ddbef3d88ed1a1a003dc" target="_top" xlink:title="Print the requested subset of counters followed by an optional filename.">
+<!-- Node20 -->
+<g id="Node000020" class="node">
+<title>Node20</title>
+<g id="a_Node000020"><a xlink:href="wc_8c.html#ad21b5ee3a936ddbef3d88ed1a1a003dc" target="_top" xlink:title="Print the requested subset of counters followed by an optional filename.">
 <polygon fill="white" stroke="#666666" points="154,-132 77,-132 77,-113 154,-113 154,-132"/>
 <text text-anchor="middle" x="115.5" y="-120" font-family="Helvetica,sans-Serif" font-size="10.00">print_counts</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node19 -->
-<g id="edge23_Node000001_Node000019" class="edge">
-<title>Node1&#45;&gt;Node19</title>
-<g id="a_edge23_Node000001_Node000019"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node20 -->
+<g id="edge23_Node000001_Node000020" class="edge">
+<title>Node1&#45;&gt;Node20</title>
+<g id="a_edge23_Node000001_Node000020"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M41.22,-151.65C52.81,-147.04 67.76,-141.1 81.13,-135.78"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="82.51,-138.99 90.51,-132.04 79.93,-132.49 82.51,-138.99"/>
 </a>
@@ -261,19 +261,19 @@ var sectionId = 'dynsection-2';
 </a>
 </g>
 </g>
-<!-- Node18 -->
-<g id="Node000018" class="node">
-<title>Node18</title>
-<g id="a_Node000018"><a xlink:href="grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" target="_top" xlink:title="Emit formatted usage text for spec to stream.">
+<!-- Node19 -->
+<g id="Node000019" class="node">
+<title>Node19</title>
+<g id="a_Node000019"><a xlink:href="grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" target="_top" xlink:title="Emit formatted usage text for spec to stream.">
 <polygon fill="white" stroke="#666666" points="268.5,-56 207.5,-56 207.5,-37 268.5,-37 268.5,-56"/>
 <text text-anchor="middle" x="238" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">gr_usage</text>
 </a>
 </g>
 </g>
-<!-- Node3&#45;&gt;Node18 -->
-<g id="edge21_Node000003_Node000018" class="edge">
-<title>Node3&#45;&gt;Node18</title>
-<g id="a_edge21_Node000003_Node000018"><a xlink:title=" ">
+<!-- Node3&#45;&gt;Node19 -->
+<g id="edge21_Node000003_Node000019" class="edge">
+<title>Node3&#45;&gt;Node19</title>
+<g id="a_edge21_Node000003_Node000019"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M142.18,-149.98C146.45,-147.64 150.59,-144.83 154,-141.5 179.29,-116.76 165.02,-95.55 190,-70.5 193.53,-66.96 197.7,-63.83 202.07,-61.11"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="204.11,-63.98 211.18,-56.08 200.73,-57.85 204.11,-63.98"/>
 </a>
@@ -391,7 +391,7 @@ var sectionId = 'dynsection-2';
 <g id="Node000017" class="node">
 <title>Node17</title>
 <g id="a_Node000017"><a xlink:href="grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" target="_top" xlink:title="Return the filename component of path (after the last &#39;/&#39;).">
-<polygon fill="white" stroke="#666666" points="415,-19 327,-19 327,0 415,0 415,-19"/>
+<polygon fill="#fff0f0" stroke="red" points="415,-19 327,-19 327,0 415,0 415,-19"/>
 <text text-anchor="middle" x="371" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">gr__basename</text>
 </a>
 </g>
@@ -405,10 +405,10 @@ var sectionId = 'dynsection-2';
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node15 -->
-<g id="edge22_Node000018_Node000015" class="edge">
-<title>Node18&#45;&gt;Node15</title>
-<g id="a_edge22_Node000018_Node000015"><a xlink:title=" ">
+<!-- Node19&#45;&gt;Node15 -->
+<g id="edge22_Node000019_Node000015" class="edge">
+<title>Node19&#45;&gt;Node15</title>
+<g id="a_edge22_Node000019_Node000015"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M268.73,-46.73C281.48,-46.82 296.85,-46.94 311.72,-47.06"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="311.87,-50.56 321.89,-47.13 311.92,-43.56 311.87,-50.56"/>
 </a>

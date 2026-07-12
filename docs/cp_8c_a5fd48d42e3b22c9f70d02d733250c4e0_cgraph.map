@@ -1,0 +1,9 @@
+<map id="build_dest_path" name="build_dest_path">
+<area shape="rect" id="Node000001" title="Build &quot;dir/basename(src)&quot; into out (capacity cap)." alt="" coords="5,31,131,56"/>
+<area shape="rect" id="Node000002" href="$grendizer_8c.html#aad247c28ce169443517be658bf2fb06d" title="Return the filename component of path (the part after the last &#39;/&#39; )." alt="" coords="179,5,289,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,31,164,26,165,31,131,36"/>
+<area shape="rect" id="Node000003" href="$compiler__abi_8c.html#a2a109329562dd58501331877767b1188" title=" " alt="" coords="195,55,273,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="131,50,181,57,181,62,131,55"/>
+<area shape="rect" id="Node000004" href="$kstdlib_8c.html#a54804dde5f7917f0dffa2b2d15229fa4" title="Copy memory from src to dst." alt="" coords="337,55,424,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="274,65,323,65,323,70,274,70"/>
+</map>

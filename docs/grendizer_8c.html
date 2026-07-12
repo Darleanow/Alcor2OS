@@ -105,6 +105,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a567dd32fb181a8127afb574abb37fb6b" id="r_a567dd32fb181a8127afb574abb37fb6b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grendizer_8c.html#a567dd32fb181a8127afb574abb37fb6b">gr__errf</a> (char *buf, size_t cap, FILE *fallback, const char *fmt,...)</td></tr>
 <tr class="memdesc:a567dd32fb181a8127afb574abb37fb6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a formatted diagnostic to <code>buf</code> or <code>fallback</code> stream. Truncates with "..." when <code>buf</code> is too small; falls back to <code>fallback</code> (which may be NULL to suppress output entirely).  <br /></td></tr>
 <tr class="separator:a567dd32fb181a8127afb574abb37fb6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad247c28ce169443517be658bf2fb06d" id="r_aad247c28ce169443517be658bf2fb06d"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grendizer_8c.html#aad247c28ce169443517be658bf2fb06d">gr_basename</a> (const char *path)</td></tr>
+<tr class="memdesc:aad247c28ce169443517be658bf2fb06d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the filename component of <code>path</code> (the part after the last <code>'/'</code> ).  <br /></td></tr>
+<tr class="separator:aad247c28ce169443517be658bf2fb06d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d249c789c4f5a7161db904ba8844fe5" id="r_a4d249c789c4f5a7161db904ba8844fe5"><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5">gr__basename</a> (const char *path)</td></tr>
 <tr class="memdesc:a4d249c789c4f5a7161db904ba8844fe5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the filename component of <code>path</code> (after the last '/').  <br /></td></tr>
 <tr class="separator:a4d249c789c4f5a7161db904ba8844fe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -226,7 +229,7 @@ Functions</h2></td></tr>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a7d6ef8a050fe5a3a15a0b94a05ea96b8_cgraph.svg" width="286" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a7d6ef8a050fe5a3a15a0b94a05ea96b8_cgraph.svg" width="444" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -435,6 +438,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Return the filename component of <code>path</code> (after the last '/'). </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a4d249c789c4f5a7161db904ba8844fe5_cgraph.svg" width="287" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -1257,12 +1265,45 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a8dc5a5bb6f608ade07c04cc6d3028ac5_cgraph.svg" width="291" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a8dc5a5bb6f608ade07c04cc6d3028ac5_cgraph.svg" width="450" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a8dc5a5bb6f608ade07c04cc6d3028ac5_icgraph.svg" width="355" height="36"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
+</div>
+</div>
+<a id="aad247c28ce169443517be658bf2fb06d" name="aad247c28ce169443517be658bf2fb06d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad247c28ce169443517be658bf2fb06d">&#9670;&#160;</a></span>gr_basename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char * gr_basename </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the filename component of <code>path</code> (the part after the last <code>'/'</code> ). </p>
+<p>The returned pointer points into the original <code>path</code> string; no memory is allocated. When <code>path</code> is <code>NULL</code>, empty, or ends with <code>'/'</code> the function returns <code>"."</code> .</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>Source path string (may be <code>NULL</code>). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the basename within <code>path</code>. </dd></dl>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="grendizer_8c_aad247c28ce169443517be658bf2fb06d_icgraph.svg" width="603" height="135"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1313,7 +1354,7 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a7f04d2a8ddb69baa1d282de4c9d8ff0e_cgraph.svg" width="100%" height="521"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="grendizer_8c_a7f04d2a8ddb69baa1d282de4c9d8ff0e_cgraph.svg" width="100%" height="519"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

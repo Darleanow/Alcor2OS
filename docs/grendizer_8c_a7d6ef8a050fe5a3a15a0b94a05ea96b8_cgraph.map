@@ -2,4 +2,6 @@
 <area shape="rect" id="Node000001" title="Resolve the display program name for a gr_app." alt="" coords="5,5,115,31"/>
 <area shape="rect" id="Node000002" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="163,5,280,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,15,149,15,149,21,115,21"/>
+<area shape="rect" id="Node000003" href="$grendizer_8c.html#aad247c28ce169443517be658bf2fb06d" title="Return the filename component of path (the part after the last &#39;/&#39; )." alt="" coords="328,5,439,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="280,15,314,15,314,21,280,21"/>
 </map>

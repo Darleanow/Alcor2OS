@@ -179,19 +179,19 @@
 </a>
 </g>
 </g>
-<!-- Node17 -->
-<g id="Node000017" class="node">
-<title>Node17</title>
-<g id="a_Node000017"><a xlink:href="grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" target="_top" xlink:title="Emit formatted usage text for spec to stream.">
+<!-- Node18 -->
+<g id="Node000018" class="node">
+<title>Node18</title>
+<g id="a_Node000018"><a xlink:href="grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" target="_top" xlink:title="Emit formatted usage text for spec to stream.">
 <polygon fill="white" stroke="#666666" points="250.5,-56 189.5,-56 189.5,-37 250.5,-37 250.5,-56"/>
 <text text-anchor="middle" x="220" y="-44" font-family="Helvetica,sans-Serif" font-size="10.00">gr_usage</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node17 -->
-<g id="edge20_Node000002_Node000017" class="edge">
-<title>Node2&#45;&gt;Node17</title>
-<g id="a_edge20_Node000002_Node000017"><a xlink:title=" ">
+<!-- Node2&#45;&gt;Node18 -->
+<g id="edge20_Node000002_Node000018" class="edge">
+<title>Node2&#45;&gt;Node18</title>
+<g id="a_edge20_Node000002_Node000018"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M112.51,-149.78C122.03,-132.08 144.31,-94.2 172,-70.5 176.07,-67.01 180.74,-63.87 185.51,-61.09"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="187.52,-63.99 194.7,-56.2 184.23,-57.81 187.52,-63.99"/>
 </a>
@@ -309,7 +309,7 @@
 <g id="Node000016" class="node">
 <title>Node16</title>
 <g id="a_Node000016"><a xlink:href="grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" target="_top" xlink:title="Return the filename component of path (after the last &#39;/&#39;).">
-<polygon fill="white" stroke="#666666" points="397,-19 309,-19 309,0 397,0 397,-19"/>
+<polygon fill="#fff0f0" stroke="red" points="397,-19 309,-19 309,0 397,0 397,-19"/>
 <text text-anchor="middle" x="353" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">gr__basename</text>
 </a>
 </g>
@@ -323,10 +323,10 @@
 </a>
 </g>
 </g>
-<!-- Node17&#45;&gt;Node14 -->
-<g id="edge21_Node000017_Node000014" class="edge">
-<title>Node17&#45;&gt;Node14</title>
-<g id="a_edge21_Node000017_Node000014"><a xlink:title=" ">
+<!-- Node18&#45;&gt;Node14 -->
+<g id="edge21_Node000018_Node000014" class="edge">
+<title>Node18&#45;&gt;Node14</title>
+<g id="a_edge21_Node000018_Node000014"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M250.73,-46.73C263.48,-46.82 278.85,-46.94 293.72,-47.06"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="293.87,-50.56 303.89,-47.13 293.92,-43.56 293.87,-50.56"/>
 </a>

@@ -4,8 +4,8 @@
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="59,206,113,185,114,190,61,211"/>
 <area shape="rect" id="Node000003" href="$grendizer_8c.html#a856ce27279fc9ff59cc800cb6b638444" title="Parse command&#45;line arguments according to spec." alt="" coords="120,207,199,232"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="60,217,106,217,106,222,60,222"/>
-<area shape="rect" id="Node000019" href="$wc_8c.html#ad21b5ee3a936ddbef3d88ed1a1a003dc" title="Print the requested subset of counters followed by an optional filename." alt="" coords="108,256,211,281"/>
-<area shape="poly" id="edge23_Node000001_Node000019" title=" " alt="" coords="61,227,114,248,113,253,59,232"/>
+<area shape="rect" id="Node000020" href="$wc_8c.html#ad21b5ee3a936ddbef3d88ed1a1a003dc" title="Print the requested subset of counters followed by an optional filename." alt="" coords="108,256,211,281"/>
+<area shape="poly" id="edge23_Node000001_Node000020" title=" " alt="" coords="61,227,114,248,113,253,59,232"/>
 <area shape="rect" id="Node000004" href="$grendizer_8c.html#aa797faea2bca5a766903925a39cb8257" title="Increment the accumulating counter storage." alt="" coords="436,5,564,31"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="193,204,209,192,221,174,227,155,229,119,233,83,241,65,257,48,295,25,337,12,381,6,422,6,422,11,382,12,339,17,297,30,260,52,246,68,238,84,234,119,232,156,226,176,213,196,197,209"/>
 <area shape="rect" id="Node000005" href="$grendizer_8c.html#a567dd32fb181a8127afb574abb37fb6b" title="Write a formatted diagnostic to buf or fallback stream. Truncates with &quot;...&quot; when buf is too small; f..." alt="" coords="613,157,685,183"/>
@@ -22,8 +22,8 @@
 <area shape="poly" id="edge18_Node000003_Node000015" title=" " alt="" coords="193,230,212,241,227,255,236,267,246,279,260,290,291,305,336,321,436,350,434,355,335,326,289,310,257,295,242,283,232,270,223,258,209,245,190,234"/>
 <area shape="rect" id="Node000016" href="$grendizer_8c.html#a8dc5a5bb6f608ade07c04cc6d3028ac5" title="Resolve the display program name from spec and argv0." alt="" coords="265,407,380,432"/>
 <area shape="poly" id="edge19_Node000003_Node000016" title=" " alt="" coords="198,230,213,242,226,262,234,282,237,320,240,357,247,375,261,394,264,397,261,401,257,397,242,377,235,358,231,320,228,283,222,264,209,245,195,234"/>
-<area shape="rect" id="Node000018" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="282,357,363,383"/>
-<area shape="poly" id="edge21_Node000003_Node000018" title=" " alt="" coords="196,230,213,241,230,266,237,290,244,313,261,336,276,348,273,353,257,340,239,315,232,291,225,269,209,245,193,234"/>
+<area shape="rect" id="Node000019" href="$grendizer_8c.html#ae8d1395c4aff81c99dce0b92a2f27f79" title="Emit formatted usage text for spec to stream." alt="" coords="282,357,363,383"/>
+<area shape="poly" id="edge21_Node000003_Node000019" title=" " alt="" coords="196,230,213,241,230,266,237,290,244,313,261,336,276,348,273,353,257,340,239,315,232,291,225,269,209,245,193,234"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="536,28,567,48,590,71,609,96,638,144,634,147,605,99,586,74,564,52,533,33"/>
 <area shape="poly" id="edge6_Node000008_Node000005" title=" " alt="" coords="381,123,566,149,600,156,599,161,565,154,380,128"/>
 <area shape="poly" id="edge8_Node000009_Node000005" title=" " alt="" coords="387,167,600,167,600,173,387,173"/>
@@ -38,5 +38,5 @@
 <area shape="poly" id="edge14_Node000012_Node000005" title=" " alt="" coords="543,304,564,292,587,269,606,243,635,194,639,197,611,246,591,273,567,296,546,309"/>
 <area shape="rect" id="Node000017" href="$grendizer_8c.html#a4d249c789c4f5a7161db904ba8844fe5" title="Return the filename component of path (after the last &#39;/&#39;)." alt="" coords="441,407,559,432"/>
 <area shape="poly" id="edge20_Node000016_Node000017" title=" " alt="" coords="380,417,427,417,427,422,380,422"/>
-<area shape="poly" id="edge22_Node000018_Node000015" title=" " alt="" coords="364,367,421,367,421,372,364,372"/>
+<area shape="poly" id="edge22_Node000019_Node000015" title=" " alt="" coords="364,367,421,367,421,372,364,372"/>
 </map>
