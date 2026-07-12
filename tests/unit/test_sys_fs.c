@@ -111,12 +111,12 @@ i64  vfs_install_fd(i32 idx)  {
 }
 
 /* sys_io stubs referenced by sys_fs (pread64/pwrite64 via sys_read/sys_write) */
-u64 sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6) {
+kern_err_t sys_read(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6) {
   (void)fd; (void)buf; (void)a4; (void)a5; (void)a6;
   if(!count) return 0;
   return (u64)g_vfs_read_ret;
 }
-u64 sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6) {
+kern_err_t sys_write(u64 fd, u64 buf, u64 count, u64 a4, u64 a5, u64 a6) {
   (void)fd; (void)buf; (void)a4; (void)a5; (void)a6;
   if(!count) return 0;
   return (u64)g_vfs_write_ret;

@@ -1,21 +1,11 @@
 /**
  * @file include/alcor2/sys/internal.h
- * @brief Kernel-only declarations for the syscall implementation layer.
+ * @brief Kernel-only syscall layer declarations, not a public API.
  *
- * Not a user-facing API. Centralizes prototypes expected by `syscall_dispatch`
- * and the `sys_*.c`, `pipe.c`, and `signal.c` modules.
- *
- * @par Handler contract
- * Each `sys_*` takes six `u64` arguments in Linux x86_64 order: RDI, RSI, RDX,
- * R10, R8, R9 (the dispatcher reads the syscall frame and passes them through
- * unchanged). Return value is `u64`; on error use `(u64)-errno` with codes from
- * `errno.h` (e.g. `(u64)-EINVAL`).
- *
- * The `SYSCALL_DECL(name)` macro pins this signature so it cannot drift.
- *
- * @par Unimplemented numbers
- * Numbers not present in the table in `sys_dispatch.c` yield `-ENOSYS` (see
- * implementation).
+ * Centralises prototypes used by syscall_dispatch and all sys_*.c modules.
+ * Each handler takes six u64 args (Linux x86-64 ABI: RDI, RSI, RDX, R10,
+ * R8, R9) and returns kern_err_t. syscall_dispatch is the only place that
+ * casts it to u64 for sysret. Unknown syscall numbers return -ENOSYS.
  */
 
 #ifndef ALCOR2_SYS_INTERNAL_H
@@ -24,14 +14,9 @@
 #include <alcor2/fs/pipe.h>
 #include <alcor2/sys/syscall.h>
 
-typedef u64 (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
+typedef kern_err_t (*syscall_fn_t)(u64, u64, u64, u64, u64, u64);
 
-/** @brief Descriptor for a single syscall mapping.
- *
- * Handler signature is invariant six u64-in / u64-out (System V order:
- * RDI, RSI, RDX, R10, R8, R9). No nargs field — every entry accepts
- * the full register window and ignores unused slots via (void)aN.
- */
+/** @brief Maps a syscall number to its name and handler. */
 typedef struct
 {
   u64          num;     /**< Syscall number (RAX) */
@@ -39,7 +24,7 @@ typedef struct
   syscall_fn_t handler; /**< Implementation function */
 } sys_def_t;
 
-#define SYSCALL_DECL(name) u64 name(u64, u64, u64, u64, u64, u64)
+#define SYSCALL_DECL(name) kern_err_t name(u64, u64, u64, u64, u64, u64)
 
 /* I/O */
 SYSCALL_DECL(sys_read);

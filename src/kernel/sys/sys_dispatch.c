@@ -138,35 +138,32 @@ u64 syscall_dispatch(syscall_frame_t *frame)
     p->current_frame = frame;
   }
 
+  kern_err_t kret;
+
   if(!d || !d->handler) {
 #if SYS_TRACE
     klogf("[sys] unknown syscall %d\n", (int)num);
 #endif
-    if(p)
-      p->current_frame = old_frame;
-    return (u64)-ENOSYS;
+    kret = -ENOSYS;
+  } else {
+#if SYS_TRACE
+    klogf(
+        "[sys] %s(%lx, %lx, %lx, %lx, %lx, %lx)", d->name, frame->rdi,
+        frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
+    );
+#endif
+    kret = d->handler(
+        frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
+    );
+#if SYS_TRACE
+    klogf(" = %lx\n", (u64)kret);
+#endif
   }
-
-#if SYS_TRACE
-  klogf(
-      "[sys] %s(%lx, %lx, %lx, %lx, %lx, %lx)", d->name, frame->rdi, frame->rsi,
-      frame->rdx, frame->r10, frame->r8, frame->r9
-  );
-#endif
-
-  u64 ret = d->handler(
-      frame->rdi, frame->rsi, frame->rdx, frame->r10, frame->r8, frame->r9
-  );
-
-#if SYS_TRACE
-  klogf(" = %lx\n", ret);
-#endif
 
   if(p)
     p->current_frame = old_frame;
 
-  /* Check if we need to switch tasks before returning to user mode. */
   proc_check_resched();
 
-  return ret;
+  return (u64)kret;
 }
