@@ -46,6 +46,25 @@ fi
 unset _cand _plain
 LLD_BIN=$CLANG_INSTALL/usr/bin/lld
 
+# Pick a strip that understands x86_64-linux ELF; fall back to host strip.
+STRIP_BIN=
+for _cand in "$MUSL_CROSS/bin/x86_64-linux-musl-strip" "$(command -v strip 2>/dev/null)"; do
+  if [ -n "$_cand" ] && [ -x "$_cand" ]; then STRIP_BIN=$_cand; break; fi
+done
+unset _cand
+
+# Copy a static library to /usr/lib and strip its debug sections. libstdc++.a
+# ships with ELFCOMPRESS_ZLIB-compressed .debug_* sections; the in-OS lld is
+# built without zlib and refuses to link them.
+install_static_lib()
+{
+  src=$1
+  dst=$2
+  [ -f "$src" ] || return 0
+  $S cp "$src" "$dst"
+  [ -n "$STRIP_BIN" ] && $S "$STRIP_BIN" --strip-debug "$dst" 2>/dev/null || true
+}
+
 # ----- 1. Skeleton -----------------------------------------------------------
 $S mkdir -p \
   "$MNT/bin" "$MNT/etc" "$MNT/tmp" "$MNT/home" \
@@ -87,11 +106,11 @@ fd_fira="$USER_BUILD/apps/font-demo/FiraCode-Regular.ttf"
 # ----- 3a. User-space OS library headers -------------------------------------
 $S mkdir -p "$MNT/usr/include"
 $S cp "$ROOT/user/include/grendizer.h" "$MNT/usr/include/grendizer.h"
-[ -f "$USER_BUILD/lib/libgrendizer.a" ] && $S cp "$USER_BUILD/lib/libgrendizer.a" "$MNT/usr/lib/libgrendizer.a" || true
+install_static_lib "$USER_BUILD/lib/libgrendizer.a" "$MNT/usr/lib/libgrendizer.a"
 
 # ----- 3. musl runtime ---------------------------------------------------------
 $S cp -r "$MUSL/include/."          "$MNT/usr/include/"
-$S cp    "$MUSL/lib/libc.a"         "$MNT/usr/lib/libc.a"
+install_static_lib "$MUSL/lib/libc.a" "$MNT/usr/lib/libc.a"
 
 # Sanity check — if this fails the disk image is unusable for the toolchain.
 [ -f "$MNT/usr/include/stdio.h" ] || {
@@ -111,8 +130,7 @@ $S cp "$MUSL/lib/crtn.o"       "$MNT/usr/lib/crtn.o"
 
 # Optional musl extras (pthread/m/dl/rt). Harmless if missing.
 for lib in libm libpthread librt libdl; do
-  src=$MUSL/lib/$lib.a
-  [ -f "$src" ] && $S cp "$src" "$MNT/usr/lib/$lib.a" || true
+  install_static_lib "$MUSL/lib/$lib.a" "$MNT/usr/lib/$lib.a"
 done
 
 # ----- 4. Clang/LLD toolchain (optional, requires `make clang`) -------------
@@ -144,11 +162,11 @@ if [ -n "$CLANG_BIN" ] && [ -f "$CLANG_BIN" ]; then
   fi
   for name in libstdc++.a libstdc++fs.a libsupc++.a; do
     src=$(find "$MUSL_SYSROOT/lib" -maxdepth 3 -name "$name" 2>/dev/null | head -1)
-    [ -n "$src" ] && $S cp "$src" "$MNT/usr/lib/$name" || true
+    install_static_lib "$src" "$MNT/usr/lib/$name"
   done
   for name in libgcc.a libgcc_eh.a; do
     src=$(find "$MUSL_CROSS/lib" -maxdepth 5 -name "$name" 2>/dev/null | head -1)
-    [ -n "$src" ] && $S cp "$src" "$MNT/usr/lib/$name" || true
+    install_static_lib "$src" "$MNT/usr/lib/$name"
   done
   [ -f "$MNT/usr/lib/libgcc.a" ] && $S cp "$MNT/usr/lib/libgcc.a" "$MNT/usr/lib/libgcc_s.a" || true
   for pat in 'crtbegin*.o' 'crtend*.o'; do
@@ -188,8 +206,8 @@ copy_terminfo_entry_from_host()
 if [ -f "$NCURSES/usr/lib/libncurses.a" ]; then
   echo "[disk] ncurses static libs + headers (terminfo from staging or host fallback)"
   $S mkdir -p "$MNT/usr/share/terminfo"
-  $S cp "$NCURSES/usr/lib/libncurses.a" "$MNT/usr/lib/"
-  $S cp "$NCURSES/usr/lib/libtinfo.a" "$MNT/usr/lib/"
+  install_static_lib "$NCURSES/usr/lib/libncurses.a" "$MNT/usr/lib/libncurses.a"
+  install_static_lib "$NCURSES/usr/lib/libtinfo.a"   "$MNT/usr/lib/libtinfo.a"
   if [ -d "$NCURSES/usr/include" ]; then
     $S cp -r "$NCURSES/usr/include/." "$MNT/usr/include/"
   fi

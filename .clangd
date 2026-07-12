@@ -10,7 +10,7 @@ Diagnostics:
     Checks: "-*"
 ---
 # Without per-file entries (e.g. musl/libstdc++ paths missing), clangd can fall
-# back to a kernel command and apply -std=gnu11 to C++ — invalid for C++.
+# back to a kernel command and apply -std=gnu11 to C++ - invalid for C++.
 If:
   PathMatch: (^|.*/)user/.*\.cpp$
 CompileFlags:

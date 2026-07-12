@@ -857,7 +857,7 @@ static void test_gr_dispatch_help_walk_no_arg(void **state)
 /* gr__find_cmd: null name → returns NULL (line 529) */
 static void test_gr_find_cmd_null_name_returns_null(void **state) {
   (void)state;
-  gr_cmd cmds[] = {{"foo", NULL, NULL, NULL}};
+  gr_cmd cmds[] = {{"foo", NULL, NULL, NULL, NULL, 0}};
   const gr_cmd *r = gr__find_cmd(cmds, 1, NULL);
   assert_null(r);
 }
@@ -890,14 +890,14 @@ static void test_gr_parse_flag_null_storage_propagates_error(void **state) {
   assert_int_equal(rc, GR_ERR);
 }
 
-static int help_walk_dummy_run(int argc, char **argv, void *ud) {
+static int help_walk_dummy_run(void *ud, int argc, char **argv) {
   (void)argc; (void)argv; (void)ud; return 0;
 }
 
 /* gr_dispatch: "help" with no further args → "requires a command name" (lines 616-618) */
 static void test_gr_dispatch_help_walk_argc_zero(void **state) {
   (void)state;
-  gr_cmd subcmds[] = {{"sub", "A subcommand", help_walk_dummy_run, NULL}};
+  gr_cmd subcmds[] = {{"sub", "A subcommand", NULL, help_walk_dummy_run, NULL, 0}};
   gr_app app = {
     .program       = "prog",
     .blurb         = "blurb",
@@ -915,6 +915,257 @@ static void test_gr_dispatch_help_walk_argc_zero(void **state) {
   char *argv2[] = {"prog", "help", "sub"};
   rc = gr_dispatch(&app, 3, argv2);
   assert_int_equal(rc, 0);
+}
+
+static void test_gr_needs_value_true_via_usage(void **state) {
+  (void)state;
+  long          n   = 0;
+  double        f   = 0.0;
+  unsigned long u   = 0;
+  const char   *s   = NULL;
+  gr_opt opts[] = {
+      GR_INT  ('n', "num",   &n, "N",   "int opt"),
+      GR_FLOAT('f', "float", &f, "F",   "float opt"),
+      GR_UINT ('u', "uint",  &u, "U",   "uint opt"),
+      GR_STR  ('s', "str",   &s, "STR", "str opt"),
+      GR_END,
+  };
+  gr_spec spec = {"prog", "[opts]", opts, NULL};
+  gr_usage(&spec, stdout);
+}
+
+/* gr__parse_int: null text → GR_ERR (branch !text) */
+static void test_gr_parse_int_null_text(void **state) {
+  (void)state;
+  long n = 0;
+  char buf[64];
+  assert_int_equal(gr__parse_int(NULL, &n, buf, sizeof buf, "-n"), GR_ERR);
+}
+
+/* gr__parse_int: ERANGE (overflow) → GR_ERR */
+static void test_gr_parse_int_overflow(void **state) {
+  (void)state;
+  long n = 0;
+  char buf[64];
+  assert_int_equal(
+      gr__parse_int("99999999999999999999999999", &n, buf, sizeof buf, "-n"),
+      GR_ERR
+  );
+}
+
+/* gr__parse_uint: null text → GR_ERR */
+static void test_gr_parse_uint_null_text(void **state) {
+  (void)state;
+  unsigned long n = 0;
+  char          buf[64];
+  assert_int_equal(gr__parse_uint(NULL, &n, buf, sizeof buf, "-u"), GR_ERR);
+}
+
+/* gr__parse_uint: end == text (no digit consumed) → GR_ERR */
+static void test_gr_parse_uint_no_digit(void **state) {
+  (void)state;
+  unsigned long n = 0;
+  char          buf[64];
+  /* strtoul on "abc" sets end==text (no leading digits) */
+  assert_int_equal(gr__parse_uint("abc", &n, buf, sizeof buf, "-u"), GR_ERR);
+}
+
+/* gr__parse_float: null text → GR_ERR */
+static void test_gr_parse_float_null_text(void **state) {
+  (void)state;
+  double f = 0.0;
+  char   buf[64];
+  assert_int_equal(gr__parse_float(NULL, &f, buf, sizeof buf, "-f"), GR_ERR);
+}
+
+/* gr__parse_float: 'E' uppercase exponent → OK */
+static void test_gr_parse_float_uppercase_exponent(void **state) {
+  (void)state;
+  double f = 0.0;
+  char   buf[64];
+  assert_int_equal(gr__parse_float("2E3", &f, buf, sizeof buf, "-f"), GR_OK);
+  assert_true(f > 1999.0 && f < 2001.0);
+}
+
+/* gr__parse_float: '+' exponent sign → OK */
+static void test_gr_parse_float_explicit_plus_exp(void **state) {
+  (void)state;
+  double f = 0.0;
+  char   buf[64];
+  assert_int_equal(gr__parse_float("1e+2", &f, buf, sizeof buf, "-f"), GR_OK);
+  assert_true(f > 99.0 && f < 101.0);
+}
+
+/* gr_parse: !rest null → GR_ERR (third null-check branch) */
+static void test_gr_parse_null_rest_direct(void **state) {
+  (void)state;
+  gr_opt  opts[] = {GR_END};
+  gr_spec spec   = {"prog", NULL, opts, NULL};
+  char   *argv[] = {"prog"};
+  char    err[64];
+  assert_int_equal(gr_parse(&spec, 1, argv, NULL, err, sizeof err), GR_ERR);
+}
+
+/* gr_parse: single '-' token → positional (tok[1]=='\0' branch) */
+static void test_gr_parse_single_dash_positional(void **state) {
+  (void)state;
+  gr_opt  opts[] = {GR_END};
+  gr_spec spec   = {"prog", NULL, opts, NULL};
+  gr_rest rest   = {0};
+  char   *argv[] = {"prog", "-"};
+  assert_int_equal(gr_parse(&spec, 2, argv, &rest, NULL, 0), GR_OK);
+  assert_int_equal(rest.argc, 1);
+  assert_string_equal(rest.argv[0], "-");
+}
+
+/* gr__path_join: empty prefix → snprintf(dst, cap, "%s", seg) branch */
+static void test_gr_path_join_empty_prefix(void **state) {
+  (void)state;
+  char dst[64] = {0};
+  gr__path_join(dst, sizeof dst, "", "myseg");
+  assert_string_equal(dst, "myseg");
+  char dst2[64] = {0};
+  gr__path_join(dst2, sizeof dst2, NULL, "myseg");
+  assert_string_equal(dst2, "myseg");
+}
+
+/* gr__help_walk: argc==0 → "requires a command name" → returns 2 */
+static void test_gr_help_walk_argc_zero_direct(void **state) {
+  (void)state;
+  gr_cmd cmds[] = {{"sub", "sub", NULL, help_walk_dummy_run, NULL, 0}};
+  gr_app app    = {"prog", NULL, cmds, 1, NULL};
+  /* call gr__help_walk indirectly: gr_dispatch("help") with argc==1 passes
+   * argc-1==0 to gr__help_walk — but gr_dispatch handles "help" alone as
+   * top-level listing. Call directly instead. */
+  char  buf[64];
+  char *argv_empty[] = {};
+  int   r = gr__help_walk("prog", &app, cmds, 1, "", 0, argv_empty);
+  assert_int_equal(r, 2);
+  /* verify the error message was printed to stderr — return code is enough */
+  (void)buf;
+}
+
+/* gr__by_long: option with null long_name → skipped (long_name==NULL branch) */
+static void test_gr_by_long_null_longname(void **state) {
+  (void)state;
+  int    v = 0;
+  gr_opt opts[] = {
+      /* short-only option: long_name is NULL → gr__by_long skips it */
+      GR_FLAG('v', NULL, &v, "v"),
+      GR_END,
+  };
+  gr_spec spec   = {"prog", NULL, opts, NULL};
+  gr_rest rest   = {0};
+  char   *argv[] = {"prog", "--verbose"};
+  char    err[64];
+  /* --verbose not found → GR_ERR (exercises the long_name==NULL branch) */
+  assert_int_equal(gr_parse(&spec, 2, argv, &rest, err, sizeof err), GR_ERR);
+}
+
+/* gr__by_long: long name that shares a prefix but is longer → no match */
+static void test_gr_by_long_prefix_no_match(void **state) {
+  (void)state;
+  int    v = 0;
+  gr_opt opts[] = {GR_FLAG('v', "verb", &v, "v"), GR_END};
+  gr_spec spec  = {"prog", NULL, opts, NULL};
+  gr_rest rest  = {0};
+  char    err[64];
+  /* "verbose" shares prefix "verb" but is longer → opts->long_name[len]!= '\0'
+   * → no match → unknown option → GR_ERR */
+  char *argv[] = {"prog", "--verbose"};
+  assert_int_equal(gr_parse(&spec, 2, argv, &rest, err, sizeof err), GR_ERR);
+}
+
+/* gr_dispatch leaf: inline -h help flag */
+static void test_gr_dispatch_leaf_dash_h(void **state) {
+  (void)state;
+  gr_cmd cmds[] = {{"run", "run it", "details", run_hello, NULL, 0}};
+  gr_app app    = {"prog", NULL, cmds, 1, NULL};
+  char  *argv[] = {"prog", "run", "-h"};
+  assert_int_equal(gr_dispatch(&app, 3, argv), 0);
+}
+
+/* gr_dispatch: argc == 0 → argc > 1 is false → passes 0 / NULL to gr__dispatch */
+static void test_gr_dispatch_argc_zero(void **state) {
+  (void)state;
+  gr_cmd cmds[] = {{"run", "run it", NULL, run_hello, NULL, 0}};
+  gr_app app    = {"prog", NULL, cmds, 1, NULL};
+  /* argc=0 → gr_dispatch receives argc=0; argv may be NULL */
+  assert_int_equal(gr_dispatch(&app, 0, NULL), 2);
+}
+
+/* gr__parse_float: exponent with no sign (not '-', not '+') → else branch */
+static void test_gr_parse_float_no_sign_before_exp_digit(void **state) {
+  (void)state;
+  double f   = 0.0;
+  char   buf[64];
+  /* "2e3" — exponent starts directly with digit, no sign → falls through both
+   * if(*p=='-') and else if(*p=='+'), covering the implicit else path */
+  assert_int_equal(gr__parse_float("2e3", &f, buf, sizeof buf, "-f"), GR_OK);
+  assert_true(f > 1999.0 && f < 2001.0);
+}
+
+/* gr_dispatch: commands != NULL but command_count == 0 → "no commands" */
+static void test_gr_dispatch_commands_not_null_but_count_zero(void **state) {
+  (void)state;
+  gr_cmd cmds[] = {{"run", NULL, NULL, run_hello, NULL, 0}};
+  gr_app app    = {"prog", NULL, cmds, 0, NULL}; /* count=0, commands!=NULL */
+  char  *argv[] = {"prog", "run"};
+  assert_int_equal(gr_dispatch(&app, 2, argv), 2);
+}
+
+/* gr__needs_value: exercise GR_KIND_UINT and GR_KIND_FLOAT true branches via
+ * gr_usage column measure (the only public caller of gr__needs_value) */
+static void test_gr_needs_value_uint_and_float_branches(void **state) {
+  (void)state;
+  unsigned long u = 0;
+  double        f = 0.0;
+  gr_opt opts[] = {
+      GR_UINT (0, "size",  &u, "N", "uint"),
+      GR_FLOAT(0, "ratio", &f, "F", "float"),
+      GR_END,
+  };
+  gr_spec spec = {"prog", NULL, opts, NULL};
+  gr_usage(&spec, stdout);
+}
+
+/* gr_usage: option with no short_name (short_name==0) */
+static void test_gr_usage_no_short_name(void **state) {
+  (void)state;
+  int    v    = 0;
+  gr_opt opts[] = {GR_FLAG(0, "verbose", &v, "verbose"), GR_END};
+  gr_spec spec  = {"prog", NULL, opts, NULL};
+  gr_usage(&spec, stdout);
+}
+
+/* gr_usage: option with no long_name (long_name==NULL) */
+static void test_gr_usage_no_long_name(void **state) {
+  (void)state;
+  int    v    = 0;
+  gr_opt opts[] = {GR_FLAG('v', NULL, &v, "verbose"), GR_END};
+  gr_spec spec  = {"prog", NULL, opts, NULL};
+  gr_usage(&spec, stdout);
+}
+
+/* gr_usage: option with NULL help text → falls back to "" */
+static void test_gr_usage_no_help_text(void **state) {
+  (void)state;
+  int v = 0;
+  gr_opt opts[] = {
+      {.short_name = 'v', .long_name = "verbose", .storage = &v,
+       .value_hint = NULL, .help = NULL, .kind = GR_KIND_FLAG},
+      GR_END,
+  };
+  gr_spec spec = {"prog", NULL, opts, NULL};
+  gr_usage(&spec, stdout);
+}
+
+/* gr_usage: NULL program and NULL usage → fallback to "PROGRAM"/"[options]" */
+static void test_gr_usage_null_program_and_usage(void **state) {
+  (void)state;
+  gr_opt  opts[] = {GR_END};
+  gr_spec spec   = {NULL, NULL, opts, NULL};
+  gr_usage(&spec, stdout);
 }
 
 /* gr__apply_flag: null storage → GR_ERR */
@@ -1034,7 +1285,6 @@ int main(void)
       cmocka_unit_test(test_gr_print_group_null_name_skipped),
       cmocka_unit_test(test_gr_dispatch_parent_help_flag_argc1),
       cmocka_unit_test(test_gr_dispatch_help_walk_no_arg),
-      /* new coverage */
       cmocka_unit_test(test_gr_apply_flag_null_storage),
       cmocka_unit_test(test_gr_apply_count_null_storage),
       cmocka_unit_test(test_gr_apply_val_null_storage),
@@ -1043,6 +1293,29 @@ int main(void)
       cmocka_unit_test(test_gr_path_join_null_seg_noop),
       cmocka_unit_test(test_gr_dispatch_help_walk_argc_zero),
       cmocka_unit_test(test_gr_parse_flag_null_storage_propagates_error),
+      cmocka_unit_test(test_gr_needs_value_true_via_usage),
+      cmocka_unit_test(test_gr_parse_int_null_text),
+      cmocka_unit_test(test_gr_parse_int_overflow),
+      cmocka_unit_test(test_gr_parse_uint_null_text),
+      cmocka_unit_test(test_gr_parse_uint_no_digit),
+      cmocka_unit_test(test_gr_parse_float_null_text),
+      cmocka_unit_test(test_gr_parse_float_uppercase_exponent),
+      cmocka_unit_test(test_gr_parse_float_explicit_plus_exp),
+      cmocka_unit_test(test_gr_parse_null_rest_direct),
+      cmocka_unit_test(test_gr_parse_single_dash_positional),
+      cmocka_unit_test(test_gr_path_join_empty_prefix),
+      cmocka_unit_test(test_gr_help_walk_argc_zero_direct),
+      cmocka_unit_test(test_gr_by_long_null_longname),
+      cmocka_unit_test(test_gr_by_long_prefix_no_match),
+      cmocka_unit_test(test_gr_dispatch_leaf_dash_h),
+      cmocka_unit_test(test_gr_dispatch_argc_zero),
+      cmocka_unit_test(test_gr_parse_float_no_sign_before_exp_digit),
+      cmocka_unit_test(test_gr_dispatch_commands_not_null_but_count_zero),
+      cmocka_unit_test(test_gr_needs_value_uint_and_float_branches),
+      cmocka_unit_test(test_gr_usage_no_short_name),
+      cmocka_unit_test(test_gr_usage_no_long_name),
+      cmocka_unit_test(test_gr_usage_no_help_text),
+      cmocka_unit_test(test_gr_usage_null_program_and_usage),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

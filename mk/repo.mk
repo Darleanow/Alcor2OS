@@ -2,16 +2,17 @@
 
 .PHONY: all help kernel user iso iso-kernel run run-trace debug disk disk-mount disk-umount \
         disk-populate disk-resync disk-quick clean clean-all distclean \
-        format fmt lint check qa
+        format fmt lint check qa compile_commands
 
-all: kernel compile_commands
+all: kernel
 
 help:
-	@echo "Alcor2 $(GIT_VERSION) — useful targets"
+	@echo "Alcor2 $(GIT_VERSION) - useful targets"
 	@echo ""
 	@echo "  Build"
-	@echo "    all (default)   kernel + compile_commands.json (clangd)"
-	@echo "    kernel          link $(BUILD)/$(KERNEL) only"
+	@echo "    all (default)        kernel"
+	@echo "    kernel               link $(BUILD)/$(KERNEL) only"
+	@echo "    compile_commands     refresh compile_commands.json (clangd) via bear"
 	@echo "    iso-kernel      bootable ISO, kernel only — fastest CI check"
 	@echo "    user            userland: crt, init, shell, bin, apps"
 	@echo "    iso             full Limine ISO (kernel + userland)"
@@ -242,11 +243,19 @@ disk-resync: user disk-populate
 # run/run-trace so the build matches the requested mode.
 SYS_TRACE_FORCE := -W $(SRC)/kernel/sys/sys_dispatch.c
 
+ifeq ($(UNAME),Linux)
+RUN_RESYNC := disk-quick
+else
+RUN_RESYNC := disk-populate
+endif
+
 run:
 	@$(MAKE) $(SYS_TRACE_FORCE) iso SYS_TRACE=0
 	@if [ ! -f $(DISK) ]; then \
 		echo "[run] $(DISK) missing — staging first-run disk."; \
 		$(MAKE) disk-populate; \
+	else \
+		$(MAKE) $(RUN_RESYNC); \
 	fi
 	$(QEMU_ENV) $(QEMU) -cdrom $(BUILD)/$(ISO) \
 		-drive file=$(DISK),format=raw,if=ide,cache=writeback \
@@ -291,12 +300,23 @@ ifeq ($(UNAME),Linux)
 		echo "disk-quick: fuse2fs not found — install e2fsprogs or use disk-resync"; exit 1; \
 	fi
 	@test -f $(DISK) || { echo "disk-quick: $(DISK) missing — run disk-populate first"; exit 1; }
+	@# Best-effort cleanup of a stale mnt/ from a previous run that crashed
+	@# (Ctrl-C, OOM, …). fuse2fs refuses to mount on a non-empty dir, so we
+	@# unmount if mounted (lazy -uz in case something still holds it), then
+	@# rmdir the empty leftover.
+	@if mountpoint -q mnt 2>/dev/null; then fusermount -uz mnt 2>/dev/null || true; fi
+	@rmdir mnt 2>/dev/null || true
 	@mkdir -p mnt
 	@fuse2fs $(DISK) mnt
 	@# user/build/bin/*.elf live in the ISO (initfs /init overlay); only sync apps.
 	@cp user/build/apps/*.elf mnt/bin/ 2>/dev/null; \
 	 for f in mnt/bin/*.elf; do [ -f "$$f" ] && mv "$$f" "$${f%.elf}"; done; true
-	@fusermount -u mnt
+	@# Shared headers + static libs the on-disk toolchain links against.
+	@# disk-populate strips libgrendizer.a; we skip the strip here — cost is a
+	@# few extra KB on disk, gained: no duplicated logic with disk-populate.sh.
+	@cp user/build/lib/libgrendizer.a mnt/usr/lib/libgrendizer.a 2>/dev/null || true
+	@cp user/include/grendizer.h      mnt/usr/include/grendizer.h 2>/dev/null || true
+	@fusermount -uz mnt
 	@rmdir mnt 2>/dev/null || true
 	@echo "disk synced (fast)"
 else

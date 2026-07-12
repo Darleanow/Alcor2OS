@@ -310,6 +310,14 @@ static void feed_byte_esc(u8 b)
     fb_ctx.esc_state = 0;
     return;
   }
+  if(b == 'M') {
+    if(fb_ctx.cy <= fb_ctx.scroll_top)
+      scroll_region_down();
+    else
+      fb_ctx.cy--;
+    fb_ctx.esc_state = 0;
+    return;
+  }
   if(b == '(' || b == ')') {
     fb_ctx.esc_state = 3;
     return;

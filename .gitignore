@@ -11,3 +11,4 @@ mnt
 # Doxygen generated output
 docs/doxygen/
 *.profraw
+compile_commands.json

@@ -18,9 +18,9 @@ CFLAGS += \
   -I$(NC_INC) \
   $(if $(NC_SUBD),-I$(NC_SUBD))
 
-SRCS    := spazer.c
+SRCS    := init.c panel.c pad.c bar.c menu.c widgets.c input.c
 OBJS    := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
-HEADERS := $(USER_BASE)/include/spazer/spazer.h
+HEADERS := $(USER_BASE)/include/spazer/spazer.h internal.h
 
 .PHONY: all clean
 

@@ -1,38 +1,32 @@
+/**
+ * @file fleed/src/main.cpp
+ * @brief Fleed - terminal text editor for Alcor2.
+ */
+
+#include <fleed/Editor.hpp>
+
 #include <cstdio>
-#include <fstream>
+#include <grendizer.h>
 #include <iostream>
-#include <string>
 
 int main(int argc, char **argv)
 {
-  if(argc < 2) {
-    std::cout << "Usage: fleed <path/to/file>\n";
+  gr_opt  opts[] = {GR_END};
+  gr_spec spec   = {"fleed", "<file>", opts, nullptr};
+  gr_rest rest;
+  char    errbuf[128];
+
+  int     rc = gr_parse(&spec, argc, argv, &rest, errbuf, sizeof errbuf);
+  if(rc == GR_HELP)
     return 0;
+  if(rc != GR_OK) {
+    std::cerr << errbuf << '\n';
+    return 1;
+  }
+  if(rest.argc < 1) {
+    gr_usage(&spec, stderr);
+    return 1;
   }
 
-  std::fstream f(argv[1], std::fstream::in | std::fstream::out);
-  if(!f.is_open()) {
-    std::cout << "Invalid path: " << argv[1] << '\n';
-    return 0;
-  }
-
-  for(;;) {
-    int c = getchar();
-    if(c == EOF) {
-      break;
-    }
-    if(putchar(c) == EOF) {
-      break;
-    }
-    if(c == '.') {
-      break;
-    }
-  }
-
-  std::string line;
-  while(std::getline(f, line)) {
-    std::cout << line << '\n';
-  }
-
-  return 0;
+  return fleed::Editor(rest.argv[0]).run();
 }

@@ -1,4 +1,4 @@
-# Kernel object tree + unified compile_commands (kernel .c + user/apps .cpp)
+# Kernel object tree
 
 ifeq ($(COV),1)
 CFLAGS += -fprofile-instr-generate -fcoverage-mapping
@@ -11,11 +11,6 @@ KERNEL_SRCS_ASM := $(shell find $(SRC) -name '*.asm')
 OBJS := $(patsubst $(SRC)/%.c,$(BUILD)/%.c.o,$(KERNEL_SRCS_C)) \
         $(patsubst $(SRC)/%.asm,$(BUILD)/%.asm.o,$(KERNEL_SRCS_ASM))
 DEPS := $(OBJS:.o=.d)
-
-# clangd extras (merged into root compile_commands.json)
-USER_APPS_CPPS := $(shell find user/apps \( -path '*/.cache/*' \) -prune -o -name '*.cpp' -print 2>/dev/null | LC_ALL=C sort)
-MUSL_CROSS_SYS := thirdparty/musl-cross/x86_64-linux-musl
-LIBCXX_HDR     := $(firstword $(wildcard $(MUSL_CROSS_SYS)/include/c++/*))
 
 # Each .c is compiled via ccache (when CCACHE=1) so that CI hits the object
 # cache on unchanged files.  CCACHE_PREFIX is set in mk/config.mk.
@@ -31,88 +26,15 @@ $(BUILD)/$(KERNEL): $(OBJS)
 	@mkdir -p $(@D)
 	$(LD) $(LDFLAGS) $^ -o $@
 
-USER_CC_FLAGS := -std=gnu11 -Wall -Wextra -Os -ffreestanding \
-                 -fno-stack-protector -fno-stack-check -fno-lto \
-                 -fno-PIC -fno-PIE -m64 -march=x86-64 -mno-red-zone \
-                 -Ithirdparty/musl/$(MUSL_PREFIX)/include \
-                 -Iuser/include -I$(INCLUDE) \
-                 -Iuser/sdk/spazer/include \
-                 -Iuser/sdk/vega/include \
-                 -Iuser/core/vega/include \
-                 -Iuser/apps/shell/include \
-                 -DALCOR2_VERSION=\"$(GIT_VERSION)\"
-
-compile_commands: $(OBJS)
-	@echo '[' > compile_commands.json
-	@for src in $(KERNEL_SRCS_C); do \
-		echo '  {' >> compile_commands.json; \
-		echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \
-		echo '    "arguments": [' >> compile_commands.json; \
-		echo '      "$(CC)",' >> compile_commands.json; \
-		for flag in $(CFLAGS); do \
-			echo '      "'"$$flag"'",' >> compile_commands.json; \
-		done; \
-		echo '      "-c",' >> compile_commands.json; \
-		echo '      "'"$$src"'",' >> compile_commands.json; \
-		echo '      "-o",' >> compile_commands.json; \
-		obj=$$(echo $$src | sed 's|$(SRC)|$(BUILD)|; s|\.c$$|\.c\.o|'); \
-		echo '      "'"$$obj"'"' >> compile_commands.json; \
-		echo '    ],' >> compile_commands.json; \
-		echo '    "file": "'"$$src"'"' >> compile_commands.json; \
-		echo '  },' >> compile_commands.json; \
-	done
-	@if [ -n "$(strip $(USER_SRCS_C))" ]; then \
-		for src in $(USER_SRCS_C); do \
-			echo '  {' >> compile_commands.json; \
-			echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \
-			echo '    "arguments": [' >> compile_commands.json; \
-			echo '      "$(CC)",' >> compile_commands.json; \
-			for flag in $(USER_CC_FLAGS); do \
-				echo '      "'"$$flag"'",' >> compile_commands.json; \
-			done; \
-			echo '      "-c",' >> compile_commands.json; \
-			echo '      "'"$$src"'"' >> compile_commands.json; \
-			echo '    ],' >> compile_commands.json; \
-			echo '    "file": "'"$$src"'"' >> compile_commands.json; \
-			echo '  },' >> compile_commands.json; \
-		done; \
-	fi
-	@if [ -n "$(strip $(USER_APPS_CPPS))" ]; then \
-		for cpp in $(USER_APPS_CPPS); do \
-			echo '  {' >> compile_commands.json; \
-			echo '    "directory": "$(CURDIR)",' >> compile_commands.json; \
-			echo '    "arguments": [' >> compile_commands.json; \
-			echo '      "clang++",' >> compile_commands.json; \
-			echo '      "-std=gnu++17",' >> compile_commands.json; \
-			echo '      "--target=x86_64-linux-musl",' >> compile_commands.json; \
-			echo '      "-nostdlibinc",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(LIBCXX_HDR)"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(LIBCXX_HDR)/x86_64-linux-musl"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(MUSL_CROSS_SYS)/include"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"thirdparty/musl/$(MUSL_PREFIX)/include"'",' >> compile_commands.json; \
-			echo '      "-isystem",' >> compile_commands.json; \
-			echo '      "'"$(INCLUDE)"'",' >> compile_commands.json; \
-			echo '      "-Wall",' >> compile_commands.json; \
-			echo '      "-Wextra",' >> compile_commands.json; \
-			echo '      "-O2",' >> compile_commands.json; \
-			echo '      "-fno-stack-protector",' >> compile_commands.json; \
-			echo '      "-fno-stack-check",' >> compile_commands.json; \
-			echo '      "-fno-lto",' >> compile_commands.json; \
-			echo '      "-fno-PIC",' >> compile_commands.json; \
-			echo '      "-fno-PIE",' >> compile_commands.json; \
-			echo '      "-m64",' >> compile_commands.json; \
-			echo '      "-march=x86-64",' >> compile_commands.json; \
-			echo '      "-mno-red-zone",' >> compile_commands.json; \
-			echo '      "-c",' >> compile_commands.json; \
-			echo '      "'"$$cpp"'"' >> compile_commands.json; \
-			echo '    ],' >> compile_commands.json; \
-			echo '    "file": "'"$$cpp"'"' >> compile_commands.json; \
-			echo '  },' >> compile_commands.json; \
-		done; \
-	fi
-	@sed -i '$$ s/,$$//' compile_commands.json
-	@echo ']' >> compile_commands.json
+# clangd database: wrap a full build through `bear` so the recorded flags are
+# the exact ones the compilers see (kernel CC, user-space g++, ncurses include
+# path, libstdc++ sysroot, ...). Forces a clean tree so every translation unit
+# is recorded; partial rebuilds would miss the up-to-date .o files. Requires
+# bear >= 3 on the host.
+compile_commands:
+	@command -v bear >/dev/null || { \
+		echo >&2 "make: bear not found; install it (apt: bear) to refresh compile_commands.json"; \
+		exit 1; \
+	}
+	$(MAKE) clean
+	bear --output compile_commands.json -- $(MAKE) kernel user
