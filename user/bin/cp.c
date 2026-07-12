@@ -102,9 +102,8 @@ static int copy_file(const char *src, const char *dst)
  * @param src  Source file path; its basename is appended.
  * @return 0 on success, 1 if the resulting path would exceed @p cap.
  */
-static int build_dest_path(
-    char *out, size_t cap, const char *dir, const char *src
-)
+static int
+    build_dest_path(char *out, size_t cap, const char *dir, const char *src)
 {
   const char *base = gr_basename(src);
   size_t      dlen = strlen(dir);
