@@ -50,14 +50,23 @@ static void
   }
 }
 
-/** @brief Return the filename component of @p path (after the last '/'). */
-static const char *gr__basename(const char *path)
+const char *gr_basename(const char *path)
 {
   const char *slash;
   if(!path || !*path)
-    return "program";
+    return ".";
   slash = strrchr(path, '/');
+  if(slash && slash[1] == '\0')
+    return ".";
   return slash ? slash + 1 : path;
+}
+
+/** @brief Return the filename component of @p path (after the last '/'). */
+static const char *gr__basename(const char *path)
+{
+  if(!path || !*path)
+    return "program";
+  return gr_basename(path);
 }
 
 /** @brief Resolve the display program name from @p spec and @p argv0. */
