@@ -384,6 +384,19 @@ extern "C"
    */
   int gr_dispatch(const gr_app *app, int argc, char **argv);
 
+  /**
+   * @brief Return the filename component of @p path (the part after the last
+   * @c '/' ).
+   *
+   * The returned pointer points into the original @p path string; no memory
+   * is allocated.  When @p path is @c NULL, empty, or ends with @c '/' the
+   * function returns @c "." .
+   *
+   * @param path  Source path string (may be @c NULL).
+   * @return Pointer to the basename within @p path.
+   */
+  const char *gr_basename(const char *path);
+
 #ifdef __cplusplus
 }
 #endif
