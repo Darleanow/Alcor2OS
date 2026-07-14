@@ -8,6 +8,7 @@
 #include <alcor2/arch/io.h>
 #include <alcor2/arch/pic.h>
 #include <alcor2/drivers/keyboard.h>
+#include <alcor2/kbd.h>
 
 #include "keyboard_internal.h"
 
@@ -69,10 +70,20 @@ u32 keyboard_raw_peek(u8 *dst, u32 cap)
   return n;
 }
 
+/**
+ * @brief Top-half PS/2 keyboard interrupt handler.
+ *
+ * Reads the scancode off the data port, pushes it into the raw ring for
+ * lazy translation, then runs @ref kbd_irq_check_intr so a foreground
+ * process not reading stdin (e.g. @c cat @c /dev/zero) still sees
+ * @c SIGINT when the user hits Ctrl+C — the canonical-mode VINTR match
+ * normally only runs from inside @c read(stdin).
+ */
 void keyboard_irq(void)
 {
   u8 scancode = inb(KB_DATA_PORT);
   kb_push(scancode);
+  kbd_irq_check_intr();
 }
 
 static void keyboard_irq_handler(u8 irq)

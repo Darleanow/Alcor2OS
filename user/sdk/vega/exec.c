@@ -10,6 +10,7 @@
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
+#include <alcor2/alcor_tty_user.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -218,6 +219,19 @@ static int resolve_path(const char *name, char *out_path)
   return 0;
 }
 
+/**
+ * @brief Fork-exec a single external command.
+ *
+ * Parent registers the child as TTY foreground for the wait window so
+ * Ctrl+C routes SIGINT to the child; foreground is cleared (not reset to
+ * the shell's PID) after the wait so a subsequent Ctrl+C at the prompt
+ * does not target the shell.
+ *
+ * @param argv    NULL-terminated expanded argv (argv[0] rewritten to the
+ *                resolved path in the child).
+ * @param redirs  Redirection list applied inside the child.
+ * @return Exit status (0-255), or -1 on resolve/fork failure.
+ */
 static int run_external(char **argv, const redir_t *redirs)
 {
   char path[MAX_EXEC_PATH];
@@ -235,8 +249,12 @@ static int run_external(char **argv, const redir_t *redirs)
     execve(path, argv, environ);
     _exit(127);
   }
+  /* Route TTY signals (SIGINT etc.) to the child while we wait on it. */
+  alcor_set_fg_pid(pid);
   int status = 0;
-  if(waitpid(pid, &status, 0) < 0)
+  int wret   = waitpid(pid, &status, 0);
+  alcor_set_fg_pid(0);
+  if(wret < 0)
     return -1;
   return (status >> 8) & 0xff;
 }
@@ -441,71 +459,126 @@ static void exec_stage_in_child(ast_t *stage)
   _exit(127);
 }
 
-static int exec_pipeline(ast_t *n)
+/**
+ * @brief Close the first @p opened pipe pairs in @p pipes.
+ *
+ * Used by both error cleanup (close what we successfully created before
+ * bailing) and the post-fork drain (parent has to close every stage-to-
+ * stage fd so EOF propagates when stages exit).
+ *
+ * @param pipes   Array of pipe pairs.
+ * @param opened  Number of leading pairs that were successfully opened.
+ */
+static void pipeline_close_pipes(int (*pipes)[2], int opened)
 {
-  int     N      = n->u.pipeline.n;
-  ast_t **stages = n->u.pipeline.stages;
-
-  if(N > MAX_PIPE_STAGES) {
-    (void)write(
-        STDOUT_FILENO, ("vega: pipeline too long\n"),
-        strlen(("vega: pipeline too long\n"))
-    );
-    return 1;
+  for(int j = 0; j < opened; j++) {
+    close(pipes[j][0]);
+    close(pipes[j][1]);
   }
+}
 
-  /* Expansion happens inside each child via exec_stage_in_child to avoid
-   * mutating the shared AST (loop bodies re-execute the same nodes). The
-   * last stage inherits fd 1 from the shell, which lands directly in the
-   * kernel fb_console — no host-side capture/relay needed. */
+/**
+ * @brief Print a one-line error and clean up any opened pipes.
+ *
+ * Centralised so the three pipeline error sites (too-long, pipe(),
+ * fork()) share one cleanup contract.
+ *
+ * @param msg     NUL-terminated error message (written verbatim).
+ * @param pipes   Array of pipe pairs to close.
+ * @param opened  Number of leading pairs that were successfully opened.
+ * @return Always 1 — the shell's "pipeline failed" exit status.
+ */
+static int pipeline_die(const char *msg, int (*pipes)[2], int opened)
+{
+  pipeline_close_pipes(pipes, opened);
+  (void)write(STDOUT_FILENO, msg, strlen(msg));
+  return 1;
+}
 
-  int pipes[MAX_PIPE_STAGES - 1][2];
+/**
+ * @brief Open the N-1 internal pipes for an N-stage pipeline.
+ *
+ * Rolls back any already-opened pairs on the first @c pipe() failure so
+ * the caller's @p pipes array contains no half-open descriptors on
+ * error.
+ *
+ * @param pipes  Out-array of pipe pairs (N-1 used).
+ * @param N      Stage count.
+ * @return 0 on success, -1 on any @c pipe() failure.
+ */
+static int pipeline_open_pipes(int (*pipes)[2], int N)
+{
   for(int i = 0; i < N - 1; i++) {
     if(pipe(pipes[i]) < 0) {
-      for(int j = 0; j < i; j++) {
-        close(pipes[j][0]);
-        close(pipes[j][1]);
-      }
-      (void)write(
-          STDOUT_FILENO, ("vega: pipe failed\n"),
-          strlen(("vega: pipe failed\n"))
-      );
-      return 1;
+      pipeline_close_pipes(pipes, i);
+      return -1;
     }
   }
+  return 0;
+}
 
-  int pids[MAX_PIPE_STAGES];
+/**
+ * @brief Child-side entry for one pipeline stage.
+ *
+ * dup2 the right pipe ends onto fds 0/1, close every internal pipe (no
+ * longer needed once dup2'd), and exec the stage — @ref
+ * exec_stage_in_child never returns. Only invoked when fork returned
+ * @c 0 in the caller.
+ *
+ * @param stage  AST node for this stage.
+ * @param pipes  Full pipeline pipes array.
+ * @param i      Zero-based stage index.
+ * @param N      Total stage count.
+ */
+static void pipeline_run_stage(ast_t *stage, int (*pipes)[2], int i, int N)
+{
+  if(i > 0)
+    dup2(pipes[i - 1][0], 0);
+  if(i < N - 1)
+    dup2(pipes[i][1], 1);
+  pipeline_close_pipes(pipes, N - 1);
+  exec_stage_in_child(stage);
+}
+
+/**
+ * @brief Fork the N stages into @p pids.
+ *
+ * On any @c fork() failure the function returns immediately without
+ * killing already-forked children; the caller closes the pipes so the
+ * survivors get EOF and exit on their own.
+ *
+ * @param stages  Stage AST nodes.
+ * @param pipes   Internal pipes for the pipeline (used by the child branch).
+ * @param N       Stage count.
+ * @param pids    Out-array of N child PIDs.
+ * @return 0 on success, -1 if any @c fork failed.
+ */
+static int pipeline_fork_all(ast_t **stages, int (*pipes)[2], int N, int *pids)
+{
   for(int i = 0; i < N; i++) {
     pids[i] = fork();
-    if(pids[i] < 0) {
-      for(int j = 0; j < N - 1; j++) {
-        close(pipes[j][0]);
-        close(pipes[j][1]);
-      }
-      (void)write(
-          STDOUT_FILENO, ("vega: fork failed\n"),
-          strlen(("vega: fork failed\n"))
-      );
-      return 1;
-    }
-    if(pids[i] == 0) {
-      if(i > 0)
-        dup2(pipes[i - 1][0], 0);
-      if(i < N - 1)
-        dup2(pipes[i][1], 1);
-      for(int j = 0; j < N - 1; j++) {
-        close(pipes[j][0]);
-        close(pipes[j][1]);
-      }
-      exec_stage_in_child(stages[i]);
-    }
+    if(pids[i] < 0)
+      return -1;
+    if(pids[i] == 0)
+      pipeline_run_stage(stages[i], pipes, i, N);
   }
+  return 0;
+}
 
-  for(int i = 0; i < N - 1; i++) {
-    close(pipes[i][0]);
-    close(pipes[i][1]);
-  }
-
+/**
+ * @brief Reap the N pipeline stages and return the last stage's status.
+ *
+ * Pipeline exit status is the last stage's status, matching bash. TTY
+ * foreground is registered for the last stage so Ctrl+C targets the
+ * stage whose status the shell is about to surface.
+ *
+ * @param pids  PIDs of the N forked stages.
+ * @param N     Stage count.
+ * @return Last stage's exit status (0-255).
+ */
+static int pipeline_wait_all(int *pids, int N)
+{
+  alcor_set_fg_pid(pids[N - 1]);
   int last_status = 0;
   for(int i = 0; i < N; i++) {
     int status = 0;
@@ -513,9 +586,59 @@ static int exec_pipeline(ast_t *n)
     if(i == N - 1)
       last_status = (status >> 8) & 0xff;
   }
+  alcor_set_fg_pid(0);
   return last_status;
 }
 
+/**
+ * @brief Run an N-stage pipeline.
+ *
+ * Phases: validate → open pipes → fork stages → close pipes in parent →
+ * wait. Each phase is one helper call; error paths funnel through
+ * @ref pipeline_die. Expansion happens inside each child
+ * (@ref exec_stage_in_child) to avoid mutating the shared AST that loop
+ * bodies re-execute.
+ *
+ * @param n  AST node of kind @c AST_PIPE.
+ * @return Last stage's exit status, or 1 on pipeline setup failure.
+ */
+static int exec_pipeline(ast_t *n)
+{
+  int     N      = n->u.pipeline.n;
+  ast_t **stages = n->u.pipeline.stages;
+  int     pipes[MAX_PIPE_STAGES - 1][2];
+
+  if(N > MAX_PIPE_STAGES)
+    return pipeline_die("vega: pipeline too long\n", pipes, 0);
+  if(pipeline_open_pipes(pipes, N) < 0)
+    return pipeline_die("vega: pipe failed\n", pipes, 0);
+
+  int pids[MAX_PIPE_STAGES];
+  if(pipeline_fork_all(stages, pipes, N, pids) < 0)
+    return pipeline_die("vega: fork failed\n", pipes, N - 1);
+
+  pipeline_close_pipes(pipes, N - 1);
+  return pipeline_wait_all(pids, N);
+}
+
+/**
+ * @brief Walk one vega AST node and run it.
+ *
+ * Dispatches by @c node->kind:
+ *  - @c AST_CMD → @ref exec_cmd (single command, function, or builtin)
+ *  - @c AST_AND / @c AST_OR → recursive short-circuit on the binop pair
+ *  - @c AST_SEQ → left then right, return right's status
+ *  - @c AST_PIPE → @ref exec_pipeline
+ *  - @c AST_IF / @c AST_WHILE / @c AST_FOR → control-flow recursion
+ *  - @c AST_FAILFAST → unwraps the trailing `!` modifier
+ *  - @c AST_FN_DEF → register the function and return 0
+ *
+ * The status of each branch is also written to @c expand_set_status so
+ * @c $? sees it on the next expansion.
+ *
+ * @param node  AST node (NULL is allowed and returns 0).
+ * @return Exit status of the executed node (0-255).
+ */
 int vega_exec(ast_t *node)
 {
   if(!node)

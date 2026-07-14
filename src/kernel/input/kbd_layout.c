@@ -18,6 +18,7 @@
 #include <alcor2/kstdlib.h>
 #include <alcor2/ktermios.h>
 #include <alcor2/proc/proc.h>
+#include <alcor2/proc/signal.h>
 
 #define LAT_mu      '\xb5'
 #define LAT_deg     '\xb0'
@@ -81,19 +82,30 @@ static void pend_ss3(char tail)
   out_pend_push((unsigned char)tail);
 }
 
-/* Deliver one codepoint.  ASCII (<0x80) is written to *out directly.
- * Latin-1 (0x80..0xFF, AZERTY accents) is transcoded to 2-byte UTF-8 and
- * pushed to out_pend; kbd_pop_byte drains the queue so the second byte
- * surfaces on the very next read.  dry=true reports readability without
- * touching any state. */
+/**
+ * @brief Deliver one codepoint as ASCII into @p *out or as UTF-8 into
+ *        the pending-bytes queue.
+ *
+ * ASCII (< 0x80) is written to @p *out directly even in dry mode so peek
+ * paths (@ref kbd_irq_check_intr) can inspect the byte they would emit.
+ * Latin-1 (0x80..0xFF — AZERTY accents) is transcoded to 2-byte UTF-8
+ * and pushed to @c out_pend; that step is the global-state mutation that
+ * dry mode skips, returning readability=true without producing a byte.
+ *
+ * @param cp   Codepoint to emit (≤ 0xFF; layout tables hold no higher).
+ * @param out  Single-byte output slot (written for ASCII even when @p dry).
+ * @param dry  When true, no @c out_pend push happens.
+ * @return @c true when the call would deliver a byte (ASCII path always;
+ *         Latin-1 path only when not dry).
+ */
 static bool emit_user_cp(unsigned char cp, unsigned char *out, bool dry)
 {
-  if(dry)
-    return true;
   if(cp < 0x80u) {
     *out = cp;
     return true;
   }
+  if(dry)
+    return true;
   /* Latin-1 → UTF-8: 0xC0|(cp>>6), 0x80|(cp&0x3F).  No need for the 3/4-byte
    * cases — the layout tables only hold codepoints up to 0xff. */
   out_pend_push((unsigned char)(0xc0u | (cp >> 6u)));
@@ -321,8 +333,28 @@ bool kbd_get_release_events(void)
   return release_events;
 }
 
-/* dry=true: report whether the scancode would emit without touching state
- * (used by kbd_raw_pending for select(2) readability). */
+/**
+ * @brief Drive one PS/2 scancode through the keyboard state machine.
+ *
+ * Handles @c 0xE0 prefixes (arrow keys, navigation, extended Alt),
+ * modifier press/release, Function-key dispatch, and layout-aware
+ * printable translation. Multi-byte emits (CSI / SS3 escape sequences,
+ * UTF-8 continuation bytes) go via @c out_pend so the single-byte
+ * @p *out slot stays simple. @p dry runs the dispatch on @p s without
+ * pushing to @c out_pend — used by @ref kbd_raw_pending for select(2)
+ * readability and by @ref kbd_irq_check_intr to peek for VINTR; both
+ * pass a state copy by value so the real translator isn't mutated.
+ *
+ * @note Body intentionally exceeds the 25-LOC soft cap: it is a multi-
+ *       phase scancode dispatcher (e0 path / modifier / release / F1-F12
+ *       table / printable). See #94 for the proposed decomposition.
+ *
+ * @param raw  Raw scancode byte from the keyboard ring.
+ * @param s    Translator state (mutated unless caller passes a copy).
+ * @param out  Single-byte output slot (written for ASCII emits).
+ * @param dry  When true, suppress @c out_pend pushes.
+ * @return @c true when the scancode would (or did) produce a byte.
+ */
 static bool
     process_raw_ctx(u8 raw, kbd_ev_ctx_t *s, unsigned char *out, bool dry)
 {
@@ -539,13 +571,11 @@ static bool
   if(s->mod.ctrl) {
     unsigned char b = pl[key];
     if(b >= 'a' && b <= 'z') {
-      if(!dry)
-        *out = (unsigned char)(b - 'a' + 1);
+      *out = (unsigned char)(b - 'a' + 1);
       return true;
     }
     if(b >= 'A' && b <= 'Z') {
-      if(!dry)
-        *out = (unsigned char)(b - 'A' + 1);
+      *out = (unsigned char)(b - 'A' + 1);
       return true;
     }
     return false;
@@ -577,6 +607,85 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
       return true;
   }
   return false;
+}
+
+/**
+ * @brief Check whether the first byte the translator would emit equals
+ *        @p vintr.
+ *
+ * Walks @p buf through @ref process_raw_ctx using @p st (a state copy
+ * passed by value, so neither @c g_kbd nor @p st leaks out) with
+ * @c dry=true. We only act when @p vintr is the *first* emitted byte —
+ * other emits earlier in the buffer mean the user typed something
+ * legitimate and we should defer to the normal pop path.
+ *
+ * @param buf    Peeked scancodes.
+ * @param n      Number of scancodes in @p buf.
+ * @param vintr  The byte to match.
+ * @param st     Copy of translator state (taken by value at call site).
+ * @return @c true when the first emit equals @p vintr.
+ */
+static bool kbd_peek_first_emit_is(
+    const u8 *buf, u32 n, unsigned char vintr, kbd_ev_ctx_t st
+)
+{
+  for(u32 i = 0; i < n; i++) {
+    unsigned char out;
+    if(process_raw_ctx(buf[i], &st, &out, true))
+      return out == vintr;
+  }
+  return false;
+}
+
+/**
+ * @brief Drain the entire raw scancode ring through the real translator.
+ *
+ * Called only after @ref kbd_peek_first_emit_is matches: by definition
+ * the only "real" byte in the queued sequence is the VINTR we are
+ * intercepting, so dropping everything is correct and keeps
+ * @c g_kbd's modifier flags in sync (Ctrl-up scancodes pending behind
+ * the VINTR would otherwise leave @c mod.ctrl stuck).
+ */
+static void kbd_drain_raw(void)
+{
+  while(keyboard_raw_available()) {
+    u8            raw = keyboard_raw_pop();
+    unsigned char out;
+    process_raw_ctx(raw, &g_kbd, &out, false);
+  }
+}
+
+/**
+ * @brief Eager VINTR (Ctrl+C) detection at keyboard IRQ time.
+ *
+ * Implementation note: every check is a guard that early-returns so the
+ * fast path (no foreground proc / ISIG off / nothing in the ring / first
+ * emit isn't VINTR) is roughly five loads and a comparison. The drain +
+ * @ref proc_signal pair only runs on a confirmed match.
+ */
+void kbd_irq_check_intr(void)
+{
+  u64 fg_pid = proc_get_foreground();
+  if(fg_pid == 0)
+    return;
+  proc_t *p = proc_get(fg_pid);
+  if(!p || !(p->termios.c_lflag & KTERM_ISIG))
+    return;
+
+  unsigned char vintr = p->termios.c_cc[KTERM_VINTR];
+  if(vintr == 0)
+    return;
+
+  u8  peek[KBD_RAW_PEEK_MAX];
+  u32 n = keyboard_raw_peek(peek, (u32)sizeof(peek));
+  if(n == 0)
+    return;
+
+  if(!kbd_peek_first_emit_is(peek, n, vintr, g_kbd))
+    return;
+
+  kbd_drain_raw();
+  proc_signal(fg_pid, SIGINT);
 }
 
 static bool kbd_pop_byte(unsigned char *out, bool block)

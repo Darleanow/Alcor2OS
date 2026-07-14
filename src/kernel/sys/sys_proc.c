@@ -91,6 +91,31 @@ kern_err_t sys_gettid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   return sys_getpid(a1, a2, a3, a4, a5, a6);
 }
 
+/**
+ * @brief Register the TTY foreground PID.
+ *
+ * Caller passes the PID that should receive @c SIGINT etc. from the
+ * canonical-mode keyboard path. Passing 0 clears the registration.
+ *
+ * No process-group or session checks — the kernel trusts the shell to
+ * only register PIDs of its own children. The shell is currently the
+ * only caller; anything else gets the same primitive but earns its own
+ * misbehaviour.
+ *
+ * @param pid  PID to register, or 0 to clear.
+ * @return Always 0.
+ */
+u64 sys_alcor_set_fg_pid(u64 pid, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
+{
+  (void)a2;
+  (void)a3;
+  (void)a4;
+  (void)a5;
+  (void)a6;
+  proc_set_foreground(pid);
+  return 0;
+}
+
 /** @brief Return the calling process's parent PID. */
 kern_err_t sys_getppid(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
 {

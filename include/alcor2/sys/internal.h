@@ -115,6 +115,9 @@ SYSCALL_DECL(sys_exit_group);
 SYSCALL_DECL(sys_alcor_fb_info);
 SYSCALL_DECL(sys_alcor_fb_mmap);
 
+/* TTY foreground PID registration (shell uses this around fork/wait). */
+SYSCALL_DECL(sys_alcor_set_fg_pid);
+
 /* Pipe interface: see <alcor2/fs/pipe.h> (included above). */
 
 #undef SYSCALL_DECL

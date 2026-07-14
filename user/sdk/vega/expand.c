@@ -7,6 +7,7 @@
  * MVP; will be revisited if/when scoping gets richer.
  */
 
+#include <alcor2/alcor_tty_user.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -165,20 +166,89 @@ static int is_name_cont(char c)
   return is_name_start(c) || (c >= '0' && c <= '9');
 }
 
-/* Run @p cmd_str through vega_run in a forked child with stdout redirected
- * to a pipe; capture stdout into a heap-allocated string. Trailing newlines
- * are stripped (matches bash $(...)). Returns NULL on any failure. */
-static char *run_substitution(const char *cmd_str)
+/**
+ * @brief Bytes the substitution read loop pulls per iteration; also the
+ *        grow trigger (next iteration needs room for SUBST_CHUNK + 1).
+ */
+#define SUBST_CHUNK 256
+
+/**
+ * @brief Grow @p *buf if it lacks room for another @ref SUBST_CHUNK + NUL.
+ *
+ * Doubles @p *cap when short; @p *buf is unchanged on @c realloc failure.
+ *
+ * @param buf  In/out heap pointer (replaced on grow).
+ * @param cap  In/out capacity in bytes (doubled on grow).
+ * @param len  Current occupied length.
+ * @return 0 on success, -1 on @c realloc failure.
+ */
+static int subst_grow_if_needed(char **buf, size_t *cap, size_t len)
+{
+  if(len + SUBST_CHUNK + 1 <= *cap)
+    return 0;
+  size_t new_cap = *cap * 2;
+  char  *new_buf = (char *)realloc(*buf, new_cap);
+  if(!new_buf)
+    return -1;
+  *buf = new_buf;
+  *cap = new_cap;
+  return 0;
+}
+
+/**
+ * @brief Drain @p fd into a freshly-allocated, NUL-terminated heap buffer.
+ *
+ * On malloc/realloc failure returns NULL; the caller is still responsible
+ * for reaping the child that's writing to @p fd.
+ *
+ * @param fd       Pipe read fd to drain (read until 0 or error).
+ * @param out_len  Output: bytes captured (excluding the appended NUL).
+ * @return Heap-allocated buffer (caller frees), or NULL on allocation
+ *         failure.
+ */
+static char *capture_pipe_to_buf(int fd, size_t *out_len)
+{
+  size_t cap = SUBST_CHUNK;
+  size_t len = 0;
+  char  *buf = (char *)malloc(cap);
+  if(!buf)
+    return NULL;
+  while(1) {
+    if(subst_grow_if_needed(&buf, &cap, len) < 0) {
+      free(buf);
+      return NULL;
+    }
+    long n = read(fd, buf + len, SUBST_CHUNK);
+    if(n <= 0)
+      break;
+    len += (size_t)n;
+  }
+  buf[len] = '\0';
+  *out_len = len;
+  return buf;
+}
+
+/**
+ * @brief Fork a child that runs @p cmd_str with stdout redirected to a
+ *        fresh pipe.
+ *
+ * The child path never returns (@c _exit). Parent receives the read fd
+ * via the return value and the child PID via @p *out_pid.
+ *
+ * @param cmd_str  Vega source for the child to execute.
+ * @param out_pid  Output: child PID (set only on success).
+ * @return Read fd of the pipe on success, -1 on @c pipe / @c fork failure.
+ */
+static int fork_subst_child(const char *cmd_str, int *out_pid)
 {
   int pipefd[2];
   if(pipe(pipefd) < 0)
-    return NULL;
-
+    return -1;
   int pid = fork();
   if(pid < 0) {
     close(pipefd[0]);
     close(pipefd[1]);
-    return NULL;
+    return -1;
   }
   if(pid == 0) {
     close(pipefd[0]);
@@ -187,39 +257,40 @@ static char *run_substitution(const char *cmd_str)
     int rc = vega_run(cmd_str);
     _exit(rc);
   }
-
   close(pipefd[1]);
+  *out_pid = pid;
+  return pipefd[0];
+}
 
-  size_t cap = 256;
-  size_t len = 0;
-  char  *buf = (char *)malloc(cap);
-  if(!buf) {
-    close(pipefd[0]);
-    waitpid(pid, NULL, 0);
+/**
+ * @brief Implement vega's @c $(...) command substitution.
+ *
+ * Runs @p cmd_str in a forked child with stdout captured via a pipe;
+ * trailing newlines are stripped (matches bash). TTY foreground is set
+ * to the child for the wait window so Ctrl+C kills the substitution
+ * rather than the shell that's draining its pipe.
+ *
+ * @param cmd_str  Vega source to run.
+ * @return Heap-allocated captured output (caller frees), or NULL on any
+ *         setup/alloc failure.
+ */
+static char *run_substitution(const char *cmd_str)
+{
+  int pid;
+  int rfd = fork_subst_child(cmd_str, &pid);
+  if(rfd < 0)
     return NULL;
-  }
 
-  while(1) {
-    if(len + 256 + 1 > cap) {
-      size_t new_cap = cap * 2;
-      char  *new_buf = (char *)realloc(buf, new_cap);
-      if(!new_buf) {
-        free(buf);
-        close(pipefd[0]);
-        waitpid(pid, NULL, 0);
-        return NULL;
-      }
-      buf = new_buf;
-      cap = new_cap;
-    }
-    long n = read(pipefd[0], buf + len, 256);
-    if(n <= 0)
-      break;
-    len += (size_t)n;
-  }
-  close(pipefd[0]);
+  alcor_set_fg_pid(pid);
+  size_t len = 0;
+  char  *buf = capture_pipe_to_buf(rfd, &len);
+
+  close(rfd);
   waitpid(pid, NULL, 0);
+  alcor_set_fg_pid(0);
 
+  if(!buf)
+    return NULL;
   while(len > 0 && buf[len - 1] == '\n')
     len--;
   buf[len] = '\0';

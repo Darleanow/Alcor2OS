@@ -111,4 +111,19 @@ bool kbd_raw_pending(void);
  */
 bool kbd_select_read_ready(const struct proc *p);
 
+/**
+ * @brief Eager VINTR (and friends) detection for the keyboard IRQ.
+ *
+ * Called from @c keyboard_irq right after the new scancode is pushed.
+ * Peeks the raw ring through the translator (state copy, no mutation) and
+ * looks for a byte equal to the foreground proc's @c VINTR. On hit it
+ * drains the ring through the real translator state up to that byte and
+ * delivers @c SIGINT to the foreground PID.
+ *
+ * Bypassed entirely when no foreground PID is registered or its termios
+ * has @c ISIG cleared, so the cost in the common case is two loads + a
+ * compare.
+ */
+void kbd_irq_check_intr(void);
+
 #endif /* ALCOR2_KBD_H */
