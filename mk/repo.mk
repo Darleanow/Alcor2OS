@@ -378,7 +378,7 @@ check:
 qa: lint check check-abi-boundary
 
 # Guard the kernel/user ABI boundary. Userland reaches the kernel only through
-# the forked-musl contract (<sys/...> plus the <alcor2/{fb,input,console,timer,
+# the forked-musl contract (<sys/...> plus the <sys/alcor_{fb,input,console,timer,
 # tty}.h> verbs); it must never re-introduce a shared uapi header tree or
 # hand-code an ioctl encoding (the _IOC direction bit (1 << 30) is the tell).
 ABI_GUARD_DIRS := user/apps user/bin user/sdk user/core user/lib user/init \
@@ -390,6 +390,6 @@ check-abi-boundary:
 	  exit 1; }
 	@if grep -rnE '\(1[uU]? *<< *30\)' $(ABI_GUARD_DIRS) \
 	      --include=*.c --include=*.cpp --include=*.h 2>/dev/null; then \
-	  echo >&2 "ABI guard: hand-coded ioctl encoding in userland — use the <alcor2/*.h> verbs"; \
+	  echo >&2 "ABI guard: hand-coded ioctl encoding in userland — use the <sys/alcor_*.h> verbs"; \
 	  exit 1; \
 	fi

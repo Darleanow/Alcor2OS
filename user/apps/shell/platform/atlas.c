@@ -1,10 +1,10 @@
-#include <alcor2/console.h>
 #include <fcntl.h>
 #include <ft2build.h>
 #include <shell/atlas.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/alcor_console.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>

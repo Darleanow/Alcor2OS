@@ -22,7 +22,7 @@
 
 /*
  * fb_console ioctl ABI (kernel side). Linux-style _IOC encoding, group 'F'.
- * Userland half lives in the musl fork's <alcor2/console.h>.
+ * Userland half lives in the musl fork's <sys/alcor_console.h>.
  */
 
 /** SET_ATLAS: submit a glyph atlas. arg = fb_console_atlas_t*. */
@@ -36,7 +36,7 @@
 /** @brief Atlas descriptor submitted by userspace via FB_CONSOLE_SET_ATLAS.
  *
  * Fixed ABI; mirrored by @c alcor_console_atlas_t in the musl fork's
- * @c <alcor2/console.h> — keep byte-identical. */
+ * @c <sys/alcor_console.h> — keep byte-identical. */
 typedef struct
 {
   uint64_t pixels_user;   /**< Userspace VA of the glyph atlas pixel data. */

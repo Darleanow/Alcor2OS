@@ -12,10 +12,10 @@
 #include "doomgeneric.h"
 #include "doomkeys.h"
 
-#include <alcor2/console.h>
-#include <alcor2/fb.h>
-#include <alcor2/input.h>
-#include <alcor2/timer.h>
+#include <sys/alcor_console.h>
+#include <sys/alcor_fb.h>
+#include <sys/alcor_input.h>
+#include <sys/alcor_timer.h>
 
 #include <fcntl.h>
 #include <poll.h>

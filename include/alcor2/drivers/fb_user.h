@@ -12,7 +12,8 @@
 /** @brief Linear framebuffer description (fixed layout for the syscall ABI).
  *
  * Filled by @ref SYS_ALCOR_FB_INFO. The userland mirror is the private record
- * inside the musl fork's @c <alcor2/fb.h> @c alcor_fb_open() — keep in sync. */
+ * inside the musl fork's @c <sys/alcor_fb.h> @c alcor_fb_open() — keep in sync.
+ */
 typedef struct __attribute__((packed))
 {
   u32 width;

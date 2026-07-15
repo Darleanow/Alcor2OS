@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <alcor2/input.h>
+#include <sys/alcor_input.h>
 
 int main(int argc, char *argv[])
 {

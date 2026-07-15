@@ -10,10 +10,10 @@
  * mutates parent state); builtins in a pipeline run in a forked subshell.
  */
 
-#include <alcor2/tty.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/alcor_tty.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>

@@ -13,7 +13,7 @@
 
 /*
  * Keyboard ioctl ABI (kernel side). Linux _IOW encoding, group 'K'.
- * Userland half lives in the musl fork's <alcor2/input.h>.
+ * Userland half lives in the musl fork's <sys/alcor_input.h>.
  *   bits 31:30 — direction (01 = write, user → kernel)
  *   bits 23:16 — argument size in bytes
  *   bits 15:8  — type character ('K' = keyboard)

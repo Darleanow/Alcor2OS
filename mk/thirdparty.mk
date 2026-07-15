@@ -61,9 +61,13 @@ thirdparty/musl-src/Makefile:
 	git submodule update --init thirdparty/musl-src
 
 # Build the Alcor2 musl fork (carries the userland ABI: SYS_ALCOR_* and the
-# <alcor2/*.h> verb headers). Built out of a copy in the gitignored build dir
-# so the tracked submodule stays pristine (no -dirty gitlink).
-thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile
+# <sys/alcor_*.h> verb headers). Built out of a copy in the gitignored build dir
+# so the tracked submodule stays pristine (no -dirty gitlink). Depends on the
+# ABI files so a submodule bump triggers a rebuild.
+MUSL_ABI_SRCS := thirdparty/musl-src/arch/x86_64/bits/syscall.h.in \
+                 $(wildcard thirdparty/musl-src/include/sys/alcor_*.h)
+
+thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile $(MUSL_ABI_SRCS)
 	@echo "musl $(MUSL_VER) (Alcor2 fork) — build from submodule"
 	@rm -rf thirdparty/musl
 	@mkdir -p thirdparty

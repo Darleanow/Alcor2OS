@@ -25,7 +25,7 @@ typedef struct alcor2_mouse_event
 #define ALCOR2_MOUSE_BTN_MIDDLE 0x04
 
 /* ioctl ABI (kernel side); Linux _IOR/_IOW, group 'M'. Userland half lives in
- * the musl fork's <alcor2/input.h>. */
+ * the musl fork's <sys/alcor_input.h>. */
 #define ALCOR2_MOUSE_IOC_DIR_W 1U
 #define ALCOR2_MOUSE_IOC_DIR_R 2U
 #define ALCOR2_MOUSE_IOC_MAKE(dir, size, nr)                                   \
