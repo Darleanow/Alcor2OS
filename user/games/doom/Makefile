@@ -97,3 +97,5 @@ $(TARGET): $(ALL_OBJS) $(CRT0)
 
 clean:
 	rm -rf $(OUT_DIR) $(TARGET)
+
+-include $(ALL_OBJS:.o=.d)

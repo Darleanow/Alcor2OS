@@ -96,6 +96,11 @@ jobs:
         with:
           fetch-depth: 0   # limine clone inside Makefile needs history
 
+      # The kernel consumes the ABI contract from the AlcorMusl submodule
+      # (staged into build/abi). Fetch only that submodule, not doomgeneric.
+      - name: Checkout ABI contract submodule
+        run: git submodule update --init thirdparty/musl-src
+
       # System packages
       - name: Install build dependencies
         run: |

@@ -57,7 +57,7 @@ thirdparty/limine/limine:
 
 # Ensure the forked-musl submodule is checked out before building.
 thirdparty/musl-src/Makefile:
-	@echo "musl fork — checking out submodule thirdparty/musl-src"
+	@echo "musl fork: checking out submodule thirdparty/musl-src"
 	git submodule update --init thirdparty/musl-src
 
 # Build the Alcor2 musl fork (carries the userland ABI: SYS_ALCOR_* and the
@@ -65,10 +65,12 @@ thirdparty/musl-src/Makefile:
 # so the tracked submodule stays pristine (no -dirty gitlink). Depends on the
 # ABI files so a submodule bump triggers a rebuild.
 MUSL_ABI_SRCS := thirdparty/musl-src/arch/x86_64/bits/syscall.h.in \
+                 thirdparty/musl-src/arch/x86_64/bits/alcor_syscall.h \
+                 $(wildcard thirdparty/musl-src/arch/generic/bits/alcor_*.h) \
                  $(wildcard thirdparty/musl-src/include/sys/alcor_*.h)
 
 thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile $(MUSL_ABI_SRCS)
-	@echo "musl $(MUSL_VER) (Alcor2 fork) — build from submodule"
+	@echo "musl $(MUSL_VER) (Alcor2 fork): build from submodule"
 	@rm -rf thirdparty/musl
 	@mkdir -p thirdparty
 	@cp -a thirdparty/musl-src thirdparty/musl
@@ -77,9 +79,9 @@ thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile $(MUSL_A
 		CFLAGS='-Os -fno-stack-protector' >/dev/null
 	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
-	@grep -qE 'SYS_ALCOR_FB_MMAP[[:space:]]+499' \
-		thirdparty/musl/$(MUSL_PREFIX)/include/bits/syscall.h || \
-		{ echo >&2 "musl fork: Alcor SYS_* numbers missing from sysroot"; exit 1; }
+	@grep -qE '__NR_ALCOR_FB_MMAP[[:space:]]+1026' \
+		thirdparty/musl/$(MUSL_PREFIX)/include/bits/alcor_syscall.h || \
+		{ echo >&2 "musl fork: Alcor ABI headers missing from sysroot"; exit 1; }
 
 
 

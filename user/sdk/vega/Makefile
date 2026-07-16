@@ -40,3 +40,5 @@ $(LIBA): $(OBJS) $(CORE_OBJS) | $(OUT_LIBDIR)
 
 clean:
 	rm -rf $(OUT_DIR) $(LIBA)
+
+-include $(wildcard $(OUT_DIR)/*.d)

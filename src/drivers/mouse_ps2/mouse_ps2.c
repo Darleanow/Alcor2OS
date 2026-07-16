@@ -57,7 +57,7 @@ static u8 s_packet[3];
 static u8 s_phase; /* 0..2 index into s_packet */
 
 /* The i8042 answers within a few microseconds; io_wait() is ~1us per call, so
- * this bounds every poll at ~100ms — long enough to never time out on real
+ * this bounds every poll at ~100ms, long enough to never time out on real
  * hardware, short enough that a missing controller fails init promptly rather
  * than hanging the boot. */
 #define PS2_POLL_TIMEOUT_US 100000
@@ -151,7 +151,7 @@ static void mouse_ps2_irq(u8 irq)
   u8 flags = s_packet[0];
 
   /* Byte 0 bit 3 is always 1 in a valid packet. If it isn't, the stream has
-   * slipped a byte (dx/dy would be misread as flags, swapping axes) — drop the
+   * slipped a byte (dx/dy would be misread as flags, swapping axes), drop the
    * packet and resync rather than warp the cursor sideways/up. */
   if(!(flags & 0x08))
     return;
@@ -171,11 +171,11 @@ static void mouse_ps2_irq(u8 irq)
 
   u8 buttons = 0;
   if(flags & PKT_BTN_LEFT)
-    buttons |= ALCOR2_MOUSE_BTN_LEFT;
+    buttons |= ALCOR_MOUSE_BTN_LEFT;
   if(flags & PKT_BTN_RIGHT)
-    buttons |= ALCOR2_MOUSE_BTN_RIGHT;
+    buttons |= ALCOR_MOUSE_BTN_RIGHT;
   if(flags & PKT_BTN_MIDDLE)
-    buttons |= ALCOR2_MOUSE_BTN_MIDDLE;
+    buttons |= ALCOR_MOUSE_BTN_MIDDLE;
 
   mouse_post_event(dx, dy, 0, buttons);
 }
@@ -201,7 +201,7 @@ bool mouse_ps2_init(void)
 
   /* Initialise the mouse: defaults, raise the report rate, enable reporting. */
   if(mouse_cmd(MOUSE_CMD_SET_DEFAULTS) != MOUSE_ACK) {
-    console_print("[mouse-ps2] no ACK to SET_DEFAULTS — absent?\n");
+    console_print("[mouse-ps2] no ACK to SET_DEFAULTS, absent?\n");
     return false;
   }
   if(mouse_cmd(MOUSE_CMD_SET_SAMPLE) == MOUSE_ACK)

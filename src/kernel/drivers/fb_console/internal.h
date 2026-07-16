@@ -3,7 +3,7 @@
  * @brief Shared state, types, and hot-path primitives for the fb_console
  * module split.
  *
- * Not part of any public/UAPI surface — purely the contract between the
+ * Not part of any public/UAPI surface, purely the contract between the
  * @c fb_console_*.c source files. Public consumers go through
  * @c <alcor2/drivers/fb_console.h> instead. Splitting the original 1.8 KLOC
  * monolith required a single source of truth for the shared @ref fb_ctx
@@ -69,7 +69,7 @@
 #define ATLAS_N_CP_MAX 0x4000u
 
 /** @brief Max byte size of the atlas pixel buffer (16 MiB). Picked so a
- * 64×64 RGBA atlas with 16384 glyphs (= 256 MiB) is rejected — well over the
+ * 64×64 RGBA atlas with 16384 glyphs (= 256 MiB) is rejected, well over the
  * 1 GiB kernel heap we ship with. */
 #define ATLAS_PIXELS_BYTES_MAX (16u * 1024u * 1024u)
 
@@ -83,19 +83,19 @@
  * matters: the grid is one contiguous kmalloc allocation, so bytes saved per
  * cell ripple across the whole heap budget. */
 
-/** @brief SGR 5: blinking text — gated by the global blink phase in tick. */
+/** @brief SGR 5: blinking text, gated by the global blink phase in tick. */
 #define FB_ATTR_BLINK (1u << 0)
 
-/** @brief SGR 1: bold — picks the bold sub-atlas when one is registered. */
+/** @brief SGR 1: bold, picks the bold sub-atlas when one is registered. */
 #define FB_ATTR_BOLD (1u << 1)
 
-/** @brief SGR 3: italic — picks the italic sub-atlas when one is registered. */
+/** @brief SGR 3: italic, picks the italic sub-atlas when one is registered. */
 #define FB_ATTR_ITALIC (1u << 2)
 
-/** @brief SGR 4: underline — drawn as a 2 px bar under the glyph row. */
+/** @brief SGR 4: underline, drawn as a 2 px bar under the glyph row. */
 #define FB_ATTR_UNDERLINE (1u << 3)
 
-/** @brief SGR 7: reverse video — swaps fg/bg at blit time, not in the cell. */
+/** @brief SGR 7: reverse video, swaps fg/bg at blit time, not in the cell. */
 #define FB_ATTR_REVERSE (1u << 4)
 
 /* The SGR_* values below are the wire-format numbers a terminal emits after
@@ -103,37 +103,37 @@
  * sees the same behaviour as it would on a real terminal. Defined here so
  * the parser in @ref ansi.c references named symbols instead of bare ints. */
 
-/** @brief @c CSI @c 0 @c m — reset all SGR state to defaults. */
+/** @brief @c CSI @c 0 @c m, reset all SGR state to defaults. */
 #define SGR_RESET 0
 
-/** @brief @c CSI @c 1 @c m — set bold. */
+/** @brief @c CSI @c 1 @c m, set bold. */
 #define SGR_BOLD 1
 
-/** @brief @c CSI @c 3 @c m — set italic. */
+/** @brief @c CSI @c 3 @c m, set italic. */
 #define SGR_ITALIC 3
 
-/** @brief @c CSI @c 4 @c m — set underline. */
+/** @brief @c CSI @c 4 @c m, set underline. */
 #define SGR_UNDERLINE 4
 
-/** @brief @c CSI @c 5 @c m — set blink. */
+/** @brief @c CSI @c 5 @c m, set blink. */
 #define SGR_BLINK 5
 
-/** @brief @c CSI @c 7 @c m — set reverse video. */
+/** @brief @c CSI @c 7 @c m, set reverse video. */
 #define SGR_REVERSE 7
 
-/** @brief @c CSI @c 22 @c m — clear bold. */
+/** @brief @c CSI @c 22 @c m, clear bold. */
 #define SGR_NO_BOLD 22
 
-/** @brief @c CSI @c 23 @c m — clear italic. */
+/** @brief @c CSI @c 23 @c m, clear italic. */
 #define SGR_NO_ITALIC 23
 
-/** @brief @c CSI @c 24 @c m — clear underline. */
+/** @brief @c CSI @c 24 @c m, clear underline. */
 #define SGR_NO_UNDERLINE 24
 
-/** @brief @c CSI @c 25 @c m — clear blink. */
+/** @brief @c CSI @c 25 @c m, clear blink. */
 #define SGR_NO_BLINK 25
 
-/** @brief @c CSI @c 27 @c m — clear reverse. */
+/** @brief @c CSI @c 27 @c m, clear reverse. */
 #define SGR_NO_REVERSE 27
 
 /** @brief First foreground colour code; @c CSI @c 30..37 @c m index
@@ -143,11 +143,11 @@
 /** @brief Last foreground colour code in the 30..37 range. */
 #define SGR_FG_END 37
 
-/** @brief @c CSI @c 38 @c m — extended foreground (256-colour or truecolour
+/** @brief @c CSI @c 38 @c m, extended foreground (256-colour or truecolour
  * sub-form follows). */
 #define SGR_FG_EXTENDED 38
 
-/** @brief @c CSI @c 39 @c m — reset foreground to the default colour. */
+/** @brief @c CSI @c 39 @c m, reset foreground to the default colour. */
 #define SGR_FG_DEFAULT 39
 
 /** @brief First background colour code; @c CSI @c 40..47 @c m index
@@ -157,11 +157,11 @@
 /** @brief Last background colour code in the 40..47 range. */
 #define SGR_BG_END 47
 
-/** @brief @c CSI @c 48 @c m — extended background (256-colour or truecolour
+/** @brief @c CSI @c 48 @c m, extended background (256-colour or truecolour
  * sub-form follows). */
 #define SGR_BG_EXTENDED 48
 
-/** @brief @c CSI @c 49 @c m — reset background to the default colour. */
+/** @brief @c CSI @c 49 @c m, reset background to the default colour. */
 #define SGR_BG_DEFAULT 49
 
 /** @brief First bright foreground colour code; @c CSI @c 90..97 @c m. */
@@ -184,20 +184,20 @@
  * @c CSI @c 38;5;N @c m. */
 #define SGR_EXT_FORM_256 5
 
-/** @brief DEC private mode 1 (DECCKM) — when set, cursor keys send SS3
+/** @brief DEC private mode 1 (DECCKM), when set, cursor keys send SS3
  * sequences (@c \\EOA) instead of CSI (@c \\E[A). ncurses' keypad() toggles
  * this via the terminfo smkx string. */
 #define DEC_PM_APP_CURSOR_KEYS 1
 
-/** @brief DEC private mode 25 — cursor visibility. */
+/** @brief DEC private mode 25, cursor visibility. */
 #define DEC_PM_CURSOR_VISIBLE 25
 
 /** @brief Alpha byte set to opaque in a 0xAARRGGBB packed pixel. The kernel
- * only emits opaque writes — this masks every result so a downstream
+ * only emits opaque writes, this masks every result so a downstream
  * compositor that respects alpha doesn't see ghosts. */
 #define BGRA_OPAQUE_ALPHA 0xFF000000u
 
-/** @brief 8-bit channel mask — extract one BGRA component. Named because
+/** @brief 8-bit channel mask, extract one BGRA component. Named because
  * @c & 255 reads as a magic number in dense colour code. */
 #define BYTE_MASK 0xFFu
 
@@ -271,13 +271,13 @@
  * boot output matches the userspace theme and there's no jarring re-paint
  * once a userspace atlas takes over. */
 
-/** @brief Catppuccin Mocha "Text" — default foreground colour. */
+/** @brief Catppuccin Mocha "Text", default foreground colour. */
 #define CATPPUCCIN_MOCHA_TEXT 0xcdd6f4u
 
-/** @brief Catppuccin Mocha "Base" — default background colour. */
+/** @brief Catppuccin Mocha "Base", default background colour. */
 #define CATPPUCCIN_MOCHA_BASE 0x1e1e2eu
 
-/** @brief Number of margin sides (left+right or top+bottom) — derived from
+/** @brief Number of margin sides (left+right or top+bottom), derived from
  * how @ref FB_CONSOLE_MARGIN is applied symmetrically on both edges. Named
  * so the reflow arithmetic in @ref fb_console_set_atlas doesn't have a bare
  * 2 doing layout work. */
@@ -305,7 +305,7 @@ typedef struct
  * Was an anonymous static struct in the monolithic @c fb_console.c; lifted
  * to a named typedef + @c extern singleton when the module was split so the
  * sibling source files could share it without poking into a private symbol.
- * Stays a single instance — there is only one framebuffer.
+ * Stays a single instance, there is only one framebuffer.
  */
 typedef struct
 {
@@ -339,10 +339,10 @@ typedef struct
   u8  utf8_rem;
 
   /* ANSI escape-sequence state machine.
-   *   0: NORMAL — bytes feed straight through UTF-8 → cell
-   *   1: ESC    — saw 0x1b, waiting for the next byte
-   *   2: CSI    — inside `ESC [`, accumulating params into esc_buf
-   *   3: G0SET  — inside `ESC (`, waiting for the charset designator */
+   *   0: NORMAL, bytes feed straight through UTF-8 → cell
+   *   1: ESC   , saw 0x1b, waiting for the next byte
+   *   2: CSI   , inside `ESC [`, accumulating params into esc_buf
+   *   3: G0SET , inside `ESC (`, waiting for the charset designator */
   u8   esc_state;
   u8   esc_len;
   char esc_buf[64];
@@ -412,7 +412,7 @@ static inline void fill32(volatile u32 *dst, u32 val, u32 n)
  *
  * @c bypp==1 covers FreeType grayscale (alpha-only) atlases; @c bypp==4
  * covers RGBA atlases. Fast-paths for @c a==0 and @c a==255 skip the multiply
- * for fully-transparent / fully-opaque pixels — that covers the majority of
+ * for fully-transparent / fully-opaque pixels, that covers the majority of
  * a typical glyph coverage map, so the branches pay for themselves.
  *
  * Inlined (not a normal function) because it runs once per row per dirty cell
@@ -497,7 +497,7 @@ u8 bytes_pp_from_bpp(u16 bpp);
  * @brief Write one pixel of @p color at (@p x, @p y) honouring the
  * framebuffer's current @c bytes_pp.
  *
- * Out-of-bounds writes are silently dropped — callers (atlas glyph path,
+ * Out-of-bounds writes are silently dropped, callers (atlas glyph path,
  * mouse cursor halo) tile from coordinates that can lie slightly past the
  * grid edge, and clipping at this single chokepoint is cheaper than guarding
  * every loop.
@@ -520,7 +520,7 @@ u32 atlas_lookup(u32 cp);
 /**
  * @brief Like @ref atlas_lookup, but follow the bold/italic sub-atlas offset
  * when the requested attribute is set. Single chokepoint for SGR-aware glyph
- * resolution — keeps blit paths from each re-implementing the offset
+ * resolution, keeps blit paths from each re-implementing the offset
  * arithmetic.
  *
  * @param cp    Unicode codepoint.
@@ -535,14 +535,14 @@ u32 atlas_lookup_attr(u32 cp, u16 attr);
  * @brief Reject a userspace atlas descriptor whose sizes/bounds would
  * misbehave inside the renderer.
  *
- * Defensive gate against a malformed @c FB_CONSOLE_SET_ATLAS payload — the
- * kernel kmalloc's @c pixels_size and walks @c cp_map_user[0..n_cp-1] based
+ * Defensive gate against a malformed @c ALCOR_IOC_CONSOLE_SET_ATLAS payload;
+ * the kernel kmalloc's @c pixels_size and walks @c cp_map_user[0..n_cp-1] based
  * on these numbers, so they must be bounded before any allocation happens.
  *
  * @param meta  Descriptor copied from userspace.
  * @return @c true if all fields fit the @c ATLAS_*_MAX caps.
  */
-bool atlas_meta_is_sane(const fb_console_atlas_t *meta);
+bool atlas_meta_is_sane(const alcor_console_atlas_t *meta);
 
 /**
  * @brief Render an arbitrary cell value at grid position (col, row).
@@ -558,7 +558,7 @@ bool atlas_meta_is_sane(const fb_console_atlas_t *meta);
 void blit_cell_data(const fb_cell_t *c, int col, int row);
 
 /**
- * @brief Render @c fb_ctx.cells[row * cols + col] — the common case when the
+ * @brief Render @c fb_ctx.cells[row * cols + col], the common case when the
  * caller already owns the grid coordinates and just needs the cell repainted.
  *
  * @param col  Grid column.
@@ -590,7 +590,7 @@ void caret_refresh(void);
  * @brief Drop the @c last-drawn tracker without repainting.
  *
  * Used by paths that overwrite the cell themselves (full repaint, scroll,
- * fb yield/reclaim) — they need the caret machinery to forget the previous
+ * fb yield/reclaim), they need the caret machinery to forget the previous
  * position so the next @ref caret_paint records a fresh one.
  */
 void caret_clear_drawn(void);
@@ -598,7 +598,7 @@ void caret_clear_drawn(void);
 /**
  * @brief Mark the cell currently under the caret dirty for the next
  * @ref flush_batch and forget the tracker. Used by @ref fb_console_write_begin
- * so the batched repaint also wipes the inverted block — without this the
+ * so the batched repaint also wipes the inverted block, without this the
  * post-batch flush would leave the old caret visible until the next refresh.
  */
 void caret_invalidate_in_batch(void);
@@ -642,7 +642,7 @@ void scrollback_alloc_for(int cols);
 /**
  * @brief Forget pending scrolls without flushing them. Used by paths that
  * are about to repaint the entire grid anyway (fb_console_reclaim,
- * fb_console_set_atlas) — flushing first would just waste a VRAM copy.
+ * fb_console_set_atlas), flushing first would just waste a VRAM copy.
  */
 void scrollback_drop_pending(void);
 
@@ -663,7 +663,7 @@ void mouse_cursor_render(void);
 /**
  * @brief Forget the painted-at position without erasing pixels. Used by paths
  * that are about to repaint the whole framebuffer themselves (yield, reclaim,
- * blink-driven re-blit) — the cursor's pixels will be overwritten anyway, so
+ * blink-driven re-blit), the cursor's pixels will be overwritten anyway, so
  * the next @ref mouse_cursor_render must redraw rather than skip-as-unchanged.
  */
 void mouse_cursor_drop(void);
@@ -734,13 +734,13 @@ u32 ansi256_to_rgb(unsigned idx);
 int csi_params(int *pv, int maxn);
 
 /**
- * @brief @c CSI @c m — Select Graphic Rendition. Defined in @c sgr.c; called
+ * @brief @c CSI @c m, Select Graphic Rendition. Defined in @c sgr.c; called
  * from @c csi.c's @ref handle_csi switch.
  */
 void csi_sgr(void);
 
 /**
- * @brief @c CSI dispatcher — final-byte switch for a buffered CSI sequence.
+ * @brief @c CSI dispatcher, final-byte switch for a buffered CSI sequence.
  * Defined in @c csi.c; called from @c ansi.c's state machine when @c esc_buf
  * is complete.
  */

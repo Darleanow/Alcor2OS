@@ -61,3 +61,5 @@ $(TARGET): $(OUT_DIR)/main.o $(CRT0)
 clean:
 	rm -rf $(OUT_DIR) $(TARGET)
 	rm -f $(OUT_DIR)/.fira_code_dl.zip
+
+-include $(wildcard $(OUT_DIR)/*.d)

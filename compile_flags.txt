@@ -1,4 +1,5 @@
 -Iinclude
+-Ibuild/abi
 -Iuser/include
 -std=gnu11
 -ffreestanding

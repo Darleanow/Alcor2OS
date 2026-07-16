@@ -20,3 +20,5 @@ $(LIBA): $(OUT_LIBDIR)/grendizer.o
 
 clean:
 	rm -f $(OUT_LIBDIR)/grendizer.o $(LIBA)
+
+-include $(wildcard $(OUT_LIBDIR)/*.d)

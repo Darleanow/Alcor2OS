@@ -25,3 +25,5 @@ $(TARGET): $(OBJS) $(LIBVEGA) $(CRT0)
 
 clean:
 	rm -rf $(OUT_DIR) $(TARGET)
+
+-include $(wildcard $(OUT_DIR)/*.d)

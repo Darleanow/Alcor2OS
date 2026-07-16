@@ -4,7 +4,7 @@ LIMINE_URL := https://github.com/limine-bootloader/limine.git
 LIMINE_REV := v9.x-binary
 
 # musl is the Alcor2 fork, vendored as the thirdparty/musl-src submodule
-# (carries the userland ABI). Built from source, not downloaded — MUSL_VER is
+# (carries the userland ABI). Built from source, not downloaded; MUSL_VER is
 # informational (banner/log only); the submodule commit pins the real version.
 MUSL_VER := 1.2.6
 

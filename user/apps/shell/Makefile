@@ -84,3 +84,5 @@ clean:
 	rm -rf $(OUT_DIR) $(TARGET)
 
 endif
+
+-include $(wildcard $(OUT_DIR)/*.d)

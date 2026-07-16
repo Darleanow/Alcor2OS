@@ -2,7 +2,7 @@
  * @file include/alcor2/kbd.h
  * @brief Keyboard layouts and tty-line translation (scancode → characters).
  *
- * Layout logic lives outside the PS/2 driver — similar to Linux kbd/console.
+ * Layout logic lives outside the PS/2 driver.
  */
 
 #ifndef ALCOR2_KBD_H
@@ -10,47 +10,21 @@
 
 #include <alcor2/drivers/keyboard.h>
 #include <alcor2/types.h>
-
-/*
- * Keyboard ioctl ABI (kernel side). Linux _IOW encoding, group 'K'.
- * Userland half lives in the musl fork's <sys/alcor_input.h>.
- *   bits 31:30 — direction (01 = write, user → kernel)
- *   bits 23:16 — argument size in bytes
- *   bits 15:8  — type character ('K' = keyboard)
- *   bits  7:0  — command ordinal
- */
-
-/** ioctl(0, ALCOR2_IOC_KBD_SET_LAYOUT, &uint32_t id); id is a ::kbd_layout_t.
- */
-#define ALCOR2_IOC_KBD_SET_LAYOUT                                              \
-  ((1U << 30) | (0x4BU << 8) | 1U | (sizeof(uint32_t) << 16))
-
-/** ioctl(0, ALCOR2_IOC_KBD_RELEASE_EVENTS, &uint32_t on); \x00<char> on key-up.
- */
-#define ALCOR2_IOC_KBD_RELEASE_EVENTS                                          \
-  ((1U << 30) | (0x4BU << 8) | 2U | (sizeof(uint32_t) << 16))
-
-/** @brief Selectable keyboard layouts (argument for the SET_LAYOUT ioctl). */
-typedef enum
-{
-  KBD_LAYOUT_US = 0, /**< US QWERTY. */
-  KBD_LAYOUT_FR = 1, /**< AZERTY lettering on a US scan map; US-ASCII digits. */
-  KBD_LAYOUT_COUNT
-} kbd_layout_t;
+#include <bits/alcor_input.h>
 
 struct proc;
 
 /**
  * @brief Select the active layout.
- * @param layout One of ::kbd_layout_t; out-of-range falls back to US.
+ * @param layout One of ::alcor_kbd_layout_t; out-of-range falls back to US.
  */
-void kbd_set_layout(kbd_layout_t layout);
+void kbd_set_layout(alcor_kbd_layout_t layout);
 
 /**
  * @brief Query the active layout.
- * @return The current ::kbd_layout_t.
+ * @return The current ::alcor_kbd_layout_t.
  */
-kbd_layout_t kbd_get_layout(void);
+alcor_kbd_layout_t kbd_get_layout(void);
 
 /**
  * @brief Toggle \x00<char> key-release sentinels.
