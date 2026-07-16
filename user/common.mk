@@ -20,8 +20,7 @@ MUSL_INSTALL := $(USER_BASE)/../thirdparty/musl/$(MUSL_PREFIX)
 MUSL_INC     := $(MUSL_INSTALL)/include
 MUSL_LIB     := $(MUSL_INSTALL)/lib
 
-# The sysroot must carry the Alcor ABI headers; a vanilla musl install means
-# the fork was not built. Fail early with the fix instead of a header error.
+# A vanilla musl sysroot means the fork was not built; fail with the fix.
 ifneq ($(wildcard $(MUSL_INC)),)
   ifeq ($(wildcard $(MUSL_INC)/bits/alcor_syscall.h),)
     $(error musl sysroot has no Alcor ABI headers; run: make musl)

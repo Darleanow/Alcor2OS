@@ -13,11 +13,8 @@
 #include <alcor2/arch/cpu.h>
 #include <alcor2/types.h>
 
-/*
- * Syscall numbers come from the AlcorMusl contract, staged by make into
- * build/abi: <bits/syscall.h> carries the full table (POSIX numbers plus the
- * Alcor2 band from <bits/alcor_syscall.h>). The kernel defines none itself.
- */
+/* Every syscall number comes from the AlcorMusl contract staged into
+ * build/abi; the kernel defines none itself. */
 #include <bits/syscall.h>
 
 /**

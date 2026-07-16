@@ -1,11 +1,4 @@
-# ci.yml: runs on every push and pull-request (all branches).
-#
-# Jobs:
-#   lint       clang-format diff check + cppcheck
-#   build      kernel compiled with clang-18 + ccache into a bootable ISO
-#   user-apps  musl + musl-cross + full user/ (C and C++ apps)
-#
-# The build ISO is kernel-only (fast); the full disk image is in release.yml.
+# The ISO built here is kernel-only; the full disk image is in release.yml.
 
 name: CI
 
@@ -16,18 +9,16 @@ on:
     branches: ["**"]
   workflow_dispatch:
 
-# Cancel in-progress runs for the same branch/PR when a new push arrives.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  MUSL_VER:    "1.2.5"
-  LIMINE_REV:  "v8.x-binary"
+  MUSL_VER:    "1.2.6"
+  LIMINE_REV:  "v9.x-binary"
   LLVM_VER:    "18"
 
 jobs:
-  # Lint & QA
   lint:
     name: Lint, format check & QA
     runs-on: ubuntu-24.04
@@ -85,7 +76,6 @@ jobs:
       - name: make qa (clang-tidy + cppcheck)
         run: make qa
 
-  # Build kernel ISO
   build:
     name: Build kernel ISO (clang-18, ccache)
     runs-on: ubuntu-24.04
@@ -96,12 +86,9 @@ jobs:
         with:
           fetch-depth: 0   # limine clone inside Makefile needs history
 
-      # The kernel consumes the ABI contract from the AlcorMusl submodule
-      # (staged into build/abi). Fetch only that submodule, not doomgeneric.
       - name: Checkout ABI contract submodule
         run: git submodule update --init thirdparty/musl-src
 
-      # System packages
       - name: Install build dependencies
         run: |
           sudo apt-get update -qq
@@ -118,11 +105,9 @@ jobs:
             ccache \
             ca-certificates
 
-          # Expose clang-18 as plain `clang` / `ld.lld` for the Makefile
           sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-18   100
           sudo update-alternatives --install /usr/bin/ld.lld  ld.lld  /usr/bin/ld.lld-18  100
 
-      # ccache: key hashes all sources; restore-key falls back to the last cache.
       - name: Restore ccache
         id: ccache-restore
         uses: actions/cache/restore@v5
@@ -138,8 +123,6 @@ jobs:
           ccache --zero-stats
           echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
 
-      # Third-party: Limine
-      # Key: version string + versions.mk hash (changes when LIMINE_REV changes)
       - name: Restore Limine cache
         id: cache-limine
         uses: actions/cache@v5
@@ -149,7 +132,6 @@ jobs:
           restore-keys: |
             limine-${{ env.LIMINE_REV }}-
 
-      # Third-party: musl
       - name: Restore musl cache
         id: cache-musl
         uses: actions/cache@v5
@@ -159,7 +141,6 @@ jobs:
           restore-keys: |
             musl-${{ env.MUSL_VER }}-
 
-      # Build
       - name: Build kernel + ISO (kernel-only, fast)
         run: |
           make iso-kernel \
@@ -181,7 +162,6 @@ jobs:
           path: ~/.ccache
           key: ccache-clang18-${{ hashFiles('src/**/*.c', 'src/**/*.h', 'include/**/*.h') }}
 
-      # Artifact
       - name: Prepare artifact metadata
         run: |
           mkdir -p release
@@ -206,7 +186,6 @@ jobs:
           retention-days: 14
           compression-level: 0   # ISO is already compressed
 
-  # Userland + apps (needs musl-cross for C++ targets)
   user-apps:
     name: Build userland + apps (musl-cross)
     runs-on: ubuntu-24.04

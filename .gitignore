@@ -1,6 +1,5 @@
 build/
 thirdparty/*
-# Tracked submodule: forked musl carrying the Alcor userland ABI
 !thirdparty/musl-src
 *.o
 *.d

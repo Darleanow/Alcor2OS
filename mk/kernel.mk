@@ -12,10 +12,9 @@ USER_APPS_CPPS := $(shell find user/apps \( -path '*/.cache/*' \) -prune -o -nam
 MUSL_CROSS_SYS := thirdparty/musl-cross/x86_64-linux-musl
 LIBCXX_HDR     := $(firstword $(wildcard $(MUSL_CROSS_SYS)/include/c++/*))
 
-# The kernel/userland ABI contract is owned by the AlcorMusl fork and staged
-# into $(BUILD)/abi so kernel code can only reach the contract files, never
-# the rest of the musl tree. cp -u keeps stage mtimes fresh when the fork
-# changes, so the -MMD depfiles retrigger exactly the affected objects.
+# Staging keeps kernel includes quarantined: only the contract files are
+# reachable, never the rest of the musl tree. cp -u refreshes stage mtimes so
+# the -MMD depfiles retrigger exactly the affected objects.
 ABI_BITS_GENERIC := alcor_fb.h alcor_input.h alcor_console.h alcor_timer.h
 .PHONY: abi-stage
 abi-stage:
