@@ -223,7 +223,7 @@ void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons)
  *
  * @param me  Process that may currently own the waiter slot.
  */
-static void mouse_clear_waiter_if(proc_t *me)
+static void mouse_clear_waiter_if(const proc_t *me)
 {
   cpu_disable_interrupts();
   if(g.waiter == me)
