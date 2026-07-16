@@ -15,6 +15,7 @@
 
 /* Every syscall number comes from the AlcorMusl contract staged into
  * build/abi; the kernel defines none itself. */
+#include <bits/alcor_syscall.h>
 #include <bits/syscall.h>
 
 /**

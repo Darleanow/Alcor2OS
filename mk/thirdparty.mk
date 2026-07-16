@@ -59,7 +59,6 @@ thirdparty/musl-src/Makefile:
 	git submodule update --init thirdparty/musl-src
 
 MUSL_ABI_SRCS := thirdparty/musl-src/arch/x86_64/bits/syscall.h.in \
-                 thirdparty/musl-src/arch/x86_64/bits/alcor_syscall.h \
                  $(wildcard thirdparty/musl-src/arch/generic/bits/alcor_*.h) \
                  $(wildcard thirdparty/musl-src/include/sys/alcor_*.h)
 
