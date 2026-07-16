@@ -79,7 +79,7 @@ thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile $(MUSL_A
 		CFLAGS='-Os -fno-stack-protector' >/dev/null
 	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
-	@grep -qE '__NR_ALCOR_FB_MMAP[[:space:]]+1026' \
+	@grep -qF 'ALCOR_SYSCALL_BIT | 3' \
 		thirdparty/musl/$(MUSL_PREFIX)/include/bits/alcor_syscall.h || \
 		{ echo >&2 "musl fork: Alcor ABI headers missing from sysroot"; exit 1; }
 

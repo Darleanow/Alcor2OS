@@ -404,7 +404,12 @@ check-abi-boundary: abi-stage
 	    echo >&2 "ABI guard: $$h is not freestanding-pure"; exit 1; }; \
 	done
 	@dups=$$(grep -hoE '__NR_[a-zA-Z0-9_]+[[:space:]]+[0-9]+' \
-	    $(BUILD)/abi/bits/syscall.h $(BUILD)/abi/bits/alcor_syscall.h \
+	    $(BUILD)/abi/bits/syscall.h \
 	  | awk '{print $$2}' | sort -n | uniq -d); \
 	test -z "$$dups" || { \
-	  echo >&2 "ABI guard: duplicate syscall numbers: $$dups"; exit 1; }
+	  echo >&2 "ABI guard: duplicate upstream syscall numbers: $$dups"; exit 1; }
+	@dups=$$(grep -hoE 'ALCOR_SYSCALL_BIT \| [0-9]+' \
+	    $(BUILD)/abi/bits/alcor_syscall.h \
+	  | awk '{print $$3}' | sort -n | uniq -d); \
+	test -z "$$dups" || { \
+	  echo >&2 "ABI guard: duplicate Alcor syscall ordinals: $$dups"; exit 1; }
