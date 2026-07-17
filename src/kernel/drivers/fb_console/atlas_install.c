@@ -16,7 +16,8 @@
 #include <alcor2/types.h>
 #include <kernel/drivers/fb_console/internal.h>
 
-/** @brief Linux SIGWINCH number. Forward-declared so we don't pull in
+/** @brief SIGWINCH number (POSIX x86_64 value). Forward-declared so we don't
+ * pull in
  * @c <proc/signal.h> for a single broadcast call. */
 #define SIGWINCH 28
 
@@ -36,7 +37,8 @@ void proc_signal_broadcast(int signum);
  *                  step to reuse.
  * @return @c true if the descriptor is safe to copy; @c false otherwise.
  */
-static bool validate_atlas_meta(const fb_console_atlas_t *meta, u64 *cp_bytes)
+static bool
+    validate_atlas_meta(const alcor_console_atlas_t *meta, u64 *cp_bytes)
 {
   if(!meta || !atlas_meta_is_sane(meta))
     return false;
@@ -53,7 +55,7 @@ static bool validate_atlas_meta(const fb_console_atlas_t *meta, u64 *cp_bytes)
  *        every field of @p meta into @c fb_ctx.atlas_*.
  *
  * The copy is what lets the kernel keep rendering after the submitting
- * process @c munmap's its source — without it, every cell blit would race
+ * process @c munmap's its source, without it, every cell blit would race
  * the unmap. Previous atlas storage is kfree'd here so a reload doesn't
  * leak memory across submissions.
  *
@@ -62,7 +64,8 @@ static bool validate_atlas_meta(const fb_console_atlas_t *meta, u64 *cp_bytes)
  * @return 0 on success, -1 if either copy buffer kmalloc failed (state
  *         unchanged in that case).
  */
-static int install_atlas_payload(const fb_console_atlas_t *meta, u64 cp_bytes)
+static int
+    install_atlas_payload(const alcor_console_atlas_t *meta, u64 cp_bytes)
 {
   u8  *new_pixels = kmalloc(meta->pixels_size);
   u32 *new_cp_map = kmalloc(cp_bytes);
@@ -126,7 +129,7 @@ static void compute_grid_dims(
  * @brief Allocate a fresh empty grid sized @p cols x @p rows and replace
  *        @c fb_ctx.cells with it.
  *
- * Pre-existing cells are dropped — cell coordinates have no meaning across a
+ * Pre-existing cells are dropped, cell coordinates have no meaning across a
  * column reflow. On kmalloc failure the existing grid stays in place; the
  * caller (still inside the atlas install path) keeps rendering with the old
  * geometry rather than crashing.
@@ -158,7 +161,7 @@ static bool swap_grid_for_dims(int cols, int rows)
  *        default bg colour.
  *
  * Used by @ref reflow_grid_for_atlas after a cell-size change so margin
- * pixels that fell outside the new grid get cleared — without it, residue
+ * pixels that fell outside the new grid get cleared, without it, residue
  * from the previous geometry would survive at the edges.
  */
 static void clear_framebuffer_to_default_bg(void)
@@ -173,14 +176,14 @@ static void clear_framebuffer_to_default_bg(void)
  *        the live one.
  *
  * No-op when the cell geometry matches what's already on screen (atlas reload
- * with same metrics). On grid resize, the previous cell content is discarded —
+ * with same metrics). On grid resize, the previous cell content is discarded;
  * cell coordinates don't survive a cols/rows change in any well-defined way.
  * On kmalloc failure the existing grid is left in place and the atlas blit
  * clips to the old @c cell_w/cell_h instead.
  *
  * @param meta  Validated descriptor.
  */
-static void reflow_grid_for_atlas(const fb_console_atlas_t *meta)
+static void reflow_grid_for_atlas(const alcor_console_atlas_t *meta)
 {
   int new_cell_w = (int)meta->cell_w;
   int new_cell_h = (int)meta->cell_h;
@@ -241,7 +244,7 @@ static void repaint_and_notify_winsize(int old_cols, int old_rows)
  * @param meta  Atlas descriptor.
  * @return 0 on success, -1 on any validation or installation failure.
  */
-int fb_console_set_atlas(const fb_console_atlas_t *meta)
+int fb_console_set_atlas(const alcor_console_atlas_t *meta)
 {
   u64 cp_bytes;
   if(!validate_atlas_meta(meta, &cp_bytes))

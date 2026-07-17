@@ -1,3 +1,6 @@
 [submodule "user/games/doom/doomgeneric"]
 	path = user/games/doom/doomgeneric
 	url = https://github.com/ozkl/doomgeneric
+[submodule "thirdparty/musl-src"]
+	path = thirdparty/musl-src
+	url = https://github.com/Darleanow/AlcorMusl.git

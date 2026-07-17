@@ -1,9 +1,11 @@
 /**
  * @file include/alcor2/types.h
- * @brief Common type definitions and macros.
+ * @brief Fixed-width integer typedefs and kernel-side attribute macros.
  *
- * Provides fixed-width integer types, boolean, size types,
- * and compiler attribute macros.
+ * The @c u8…@c u64 / @c i8…@c i64 / @c usize shorthand plus compiler
+ * attribute macros (@c PACKED, @c ALIGNED, @c NORETURN, @c SECTION,
+ * @c USED). Userland uses the standard @c <stdint.h> names via the musl fork
+ * instead of this header.
  */
 
 #ifndef ALCOR2_TYPES_H

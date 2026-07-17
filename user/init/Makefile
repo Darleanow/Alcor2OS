@@ -20,3 +20,5 @@ $(TARGET): $(OBJS) $(CRT0)
 
 clean:
 	rm -rf $(OUT_DIR)
+
+-include $(wildcard $(OUT_DIR)/*.d)

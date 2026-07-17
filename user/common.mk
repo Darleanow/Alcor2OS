@@ -19,6 +19,13 @@ BUILD_DIR    := $(USER_BASE)/build
 MUSL_INSTALL := $(USER_BASE)/../thirdparty/musl/$(MUSL_PREFIX)
 MUSL_INC     := $(MUSL_INSTALL)/include
 MUSL_LIB     := $(MUSL_INSTALL)/lib
+
+# A vanilla musl sysroot means the fork was not built; fail with the fix.
+ifneq ($(wildcard $(MUSL_INC)),)
+  ifeq ($(wildcard $(MUSL_INC)/bits/alcor_syscall.h),)
+    $(error musl sysroot has no Alcor ABI headers; run: make musl)
+  endif
+endif
 USER_LD      := $(USER_BASE)/user.ld
 AS  := nasm
 
@@ -27,13 +34,12 @@ ASFLAGS := -f elf64
 GIT_VERSION  := $(shell git -C $(USER_BASE)/.. describe --tags --always --dirty 2>/dev/null || echo dev)
 DEBUG        ?= 0
 
-CFLAGS := -std=gnu11 -Wall -Wextra -Os \
+CFLAGS := -std=gnu11 -Wall -Wextra -Os -MMD -MP \
           -ffreestanding -fno-stack-protector -fno-stack-check \
           -fno-lto -fno-PIC -fno-PIE -m64 -march=x86-64 \
           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
           -DALCOR2_VERSION=\"$(GIT_VERSION)\" \
           -I$(MUSL_INC) \
-          -I$(USER_BASE)/../include \
           -I$(USER_BASE)/include
 ifeq ($(DEBUG),1)
   CFLAGS += -g -fsanitize=undefined
@@ -52,12 +58,11 @@ else
 CXX := $(MUSL_CROSS_GXX)
 endif
 
-CXXFLAGS := -std=gnu++17 -Wall -Wextra -Os \
+CXXFLAGS := -std=gnu++17 -Wall -Wextra -Os -MMD -MP \
             -fno-stack-protector -fno-stack-check \
             -fno-lto -fno-PIC -fno-PIE -m64 -march=x86-64 \
             -mno-red-zone \
             -I$(MUSL_INC) \
-            -I$(USER_BASE)/../include \
             -I$(USER_BASE)/include
 
 # libgcc_eh before libc (unwind / dl_iterate_phdr from libc.a)

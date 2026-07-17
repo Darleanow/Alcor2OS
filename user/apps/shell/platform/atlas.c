@@ -1,10 +1,10 @@
-#include <alcor2/fb_console_ioctl.h>
 #include <fcntl.h>
 #include <ft2build.h>
 #include <shell/atlas.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/alcor_console.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -481,7 +481,7 @@ int atlas_submit(const char *font_path)
   FT_Done_FreeType(lib);
   free(font_data);
 
-  fb_console_atlas_t meta = {
+  alcor_console_atlas_t meta = {
       .pixels_user   = (uint64_t)(uintptr_t)pixels,
       .pixels_size   = (uint32_t)atlas_size,
       .cell_w        = CELL_W,
@@ -496,7 +496,7 @@ int atlas_submit(const char *font_path)
       .italic_offset = italic_base,
   };
 
-  int rc = ioctl(STDOUT_FILENO, FB_CONSOLE_SET_ATLAS, &meta);
+  int rc = alcor_console_set_atlas(&meta);
   /* The kernel copies pixels + cp_map into its own buffers; we can free
    * the userspace originals now. */
   free(pixels);

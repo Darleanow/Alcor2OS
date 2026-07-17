@@ -23,16 +23,16 @@
 
 static struct
 {
-  alcor2_mouse_event_t ring[RING_CAP];
-  u16                  head; /* producer (IRQ) */
-  u16                  tail; /* consumer (syscall) */
-  bool                 relative;
-  bool                 moved; /* set on first real motion; gates the cursor */
-  i32                  cursor_x;
-  i32                  cursor_y;
-  u32                  screen_w;
-  u32                  screen_h;
-  proc_t              *waiter;
+  alcor_mouse_event_t ring[RING_CAP];
+  u16                 head; /* producer (IRQ) */
+  u16                 tail; /* consumer (syscall) */
+  bool                relative;
+  bool                moved; /* set on first real motion; gates the cursor */
+  i32                 cursor_x;
+  i32                 cursor_y;
+  u32                 screen_w;
+  u32                 screen_h;
+  proc_t             *waiter;
 } g;
 
 static inline u16 ring_count(void)
@@ -54,9 +54,9 @@ static i64 mouse_dev_read(void *ctx, void *buf, u64 count, u64 offset)
 {
   (void)ctx;
   (void)offset;
-  if(count < sizeof(alcor2_mouse_event_t))
+  if(count < sizeof(alcor_mouse_event_t))
     return -EINVAL;
-  if(!vmm_is_user_range(buf, sizeof(alcor2_mouse_event_t)))
+  if(!vmm_is_user_range(buf, sizeof(alcor_mouse_event_t)))
     return -EFAULT;
 
   /* Non-blocking: return EAGAIN immediately if the ring is empty.
@@ -66,8 +66,8 @@ static i64 mouse_dev_read(void *ctx, void *buf, u64 count, u64 offset)
     cpu_enable_interrupts();
     return -EAGAIN;
   }
-  alcor2_mouse_event_t ev = g.ring[g.tail & (RING_CAP - 1)];
-  g.tail                  = (u16)(g.tail + 1);
+  alcor_mouse_event_t ev = g.ring[g.tail & (RING_CAP - 1)];
+  g.tail                 = (u16)(g.tail + 1);
   cpu_enable_interrupts();
 
   kmemcpy(buf, &ev, sizeof(ev));
@@ -93,7 +93,7 @@ static i64 mouse_dev_ioctl(void *ctx, u64 request, u64 arg)
 {
   (void)ctx;
   switch(request) {
-  case ALCOR2_IOC_MOUSE_SET_RELATIVE: {
+  case ALCOR_IOC_MOUSE_SET_RELATIVE: {
     if(!vmm_is_user_range((const void *)arg, sizeof(u32)))
       return -EFAULT;
     u32 v;
@@ -101,14 +101,14 @@ static i64 mouse_dev_ioctl(void *ctx, u64 request, u64 arg)
     mouse_set_relative(v != 0);
     return 0;
   }
-  case ALCOR2_IOC_MOUSE_GET_RELATIVE: {
+  case ALCOR_IOC_MOUSE_GET_RELATIVE: {
     if(!vmm_is_user_range((void *)arg, sizeof(u32)))
       return -EFAULT;
     u32 v = mouse_is_relative() ? 1u : 0u;
     kmemcpy((void *)arg, &v, sizeof(v));
     return 0;
   }
-  case ALCOR2_IOC_MOUSE_GET_POS: {
+  case ALCOR_IOC_MOUSE_GET_POS: {
     if(!vmm_is_user_range((void *)arg, sizeof(mouse_pos_t)))
       return -EFAULT;
     mouse_pos_t p;
@@ -197,13 +197,13 @@ void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons)
   }
 
   if(!ring_full()) {
-    alcor2_mouse_event_t *e = &g.ring[g.head & (RING_CAP - 1)];
-    e->dx                   = dx;
-    e->dy                   = dy;
-    e->dwheel               = dwheel;
-    e->buttons              = buttons;
-    e->flags                = 0;
-    g.head                  = (u16)(g.head + 1);
+    alcor_mouse_event_t *e = &g.ring[g.head & (RING_CAP - 1)];
+    e->dx                  = dx;
+    e->dy                  = dy;
+    e->dwheel              = dwheel;
+    e->buttons             = buttons;
+    e->flags               = 0;
+    g.head                 = (u16)(g.head + 1);
   }
 
   if(g.waiter) {
@@ -218,12 +218,12 @@ void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons)
  *
  * Pulled out so the signal-bail path in @ref mouse_read_block is a single
  * call instead of an inline cpu_disable/enable bracket repeating the lock
- * structure. Only clears the slot when it still belongs to @p me — a
+ * structure. Only clears the slot when it still belongs to @p me, a
  * concurrent IRQ may have already woken us and handed it off.
  *
  * @param me  Process that may currently own the waiter slot.
  */
-static void mouse_clear_waiter_if(proc_t *me)
+static void mouse_clear_waiter_if(const proc_t *me)
 {
   cpu_disable_interrupts();
   if(g.waiter == me)
@@ -243,7 +243,7 @@ static void mouse_clear_waiter_if(proc_t *me)
  * @param out  Output event slot.
  * @return 0 on success, @c -EAGAIN with no proc context, @c -EINTR on signal.
  */
-i64 mouse_read_block(alcor2_mouse_event_t *out)
+i64 mouse_read_block(alcor_mouse_event_t *out)
 {
   while(1) {
     cpu_disable_interrupts();

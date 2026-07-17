@@ -17,3 +17,5 @@ $(CRT_BUILD):
 
 clean:
 	rm -rf $(CRT_BUILD)
+
+-include $(wildcard $(CRT_BUILD)/*.d)

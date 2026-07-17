@@ -12,9 +12,29 @@ USER_APPS_CPPS := $(shell find user/apps \( -path '*/.cache/*' \) -prune -o -nam
 MUSL_CROSS_SYS := thirdparty/musl-cross/x86_64-linux-musl
 LIBCXX_HDR     := $(firstword $(wildcard $(MUSL_CROSS_SYS)/include/c++/*))
 
+# Staging keeps kernel includes quarantined: only the contract files are
+# reachable, never the rest of the musl tree. cp -u refreshes stage mtimes so
+# the -MMD depfiles retrigger exactly the affected objects.
+ABI_BITS_GENERIC := alcor_syscall.h alcor_fb.h alcor_input.h alcor_console.h \
+                    alcor_timer.h
+.PHONY: abi-stage
+abi-stage:
+	@test -f thirdparty/musl-src/Makefile || \
+	  git submodule update --init thirdparty/musl-src
+	@case "$$(git submodule status thirdparty/musl-src 2>/dev/null)" in \
+	  "+"*) echo >&2 "WARNING: thirdparty/musl-src checkout differs from the" \
+	    "committed pin (run: git submodule update thirdparty/musl-src)";; \
+	esac
+	@mkdir -p $(BUILD)/abi/bits
+	@for h in $(ABI_BITS_GENERIC); do \
+	  cp -u thirdparty/musl-src/arch/generic/bits/$$h $(BUILD)/abi/bits/$$h; \
+	done
+	@cp -u thirdparty/musl-src/arch/x86_64/bits/syscall.h.in \
+	  $(BUILD)/abi/bits/syscall.h
+
 # Each .c is compiled via ccache (when CCACHE=1) so that CI hits the object
 # cache on unchanged files.  CCACHE_PREFIX is set in mk/config.mk.
-$(BUILD)/%.c.o: $(SRC)/%.c
+$(BUILD)/%.c.o: $(SRC)/%.c | abi-stage
 	@mkdir -p $(@D)
 	$(CCACHE_PREFIX) $(CC) $(CFLAGS) -c $< -o $@
 

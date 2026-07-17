@@ -338,12 +338,13 @@ format fmt:
 	  ! -path '*/doomgeneric/*' \
 	  -print0 | xargs -0 clang-format-21 -i
 
-lint:
+lint: abi-stage
 	clang-tidy \
 	  --header-filter='^(src|include|user)/(?!games/doom/doomgeneric/).*' \
 	  $(KERNEL_SRCS_C) $(USER_SRCS_C) \
 	  -- -I$(INCLUDE) \
 	     -I$(SRC) \
+	     -I$(BUILD)/abi \
 	     -Iuser/sdk/vega/include \
 	     -Iuser/core/vega/include \
 	     -Iuser/apps/shell/include \
@@ -356,7 +357,7 @@ lint:
 	     -DSYS_TRACE=0 \
 	     -std=gnu11
 
-check:
+check: abi-stage
 	cppcheck \
 	  --enable=all \
 	  --suppress=missingIncludeSystem \
@@ -368,6 +369,7 @@ check:
 	  -DVEGA_VERSION=\"qa\" \
 	  -i user/games/doom/doomgeneric \
 	  -I$(INCLUDE) \
+	  -I$(BUILD)/abi \
 	  -Iuser/include \
 	  -Iuser/sdk/vega/include \
 	  -Iuser/core/vega/include \
@@ -375,4 +377,39 @@ check:
 	  -Iuser/games/doom/doomgeneric/doomgeneric \
 	  $(SRC) user
 
-qa: lint check
+qa: lint check check-abi-boundary
+
+# ABI boundary checks, in the order they would break things:
+#   1. no resurrected include/uapi tree (the contract lives in AlcorMusl)
+#   2. no hand-coded ioctl encoding in app code (bit 30 is the tell)
+#   3. every contract header compiles freestanding with no libc includes,
+#      so the contract stays portable to any future libc
+#   4. no duplicate syscall number in the contract table
+ABI_GUARD_DIRS := user/apps user/bin user/sdk user/core user/lib user/init \
+                  user/crt user/games/doom/src
+.PHONY: check-abi-boundary
+check-abi-boundary: abi-stage
+	@test ! -d include/uapi || { \
+	  echo >&2 "ABI guard: include/uapi/ is back; the ABI lives in AlcorMusl"; \
+	  exit 1; }
+	@if grep -rnE '\(1[uU]? *<< *30\)' $(ABI_GUARD_DIRS) \
+	      --include=*.c --include=*.cpp --include=*.h 2>/dev/null; then \
+	  echo >&2 "ABI guard: hand-coded ioctl encoding; use the <sys/alcor_*.h> verbs"; \
+	  exit 1; \
+	fi
+	@for h in $(BUILD)/abi/bits/alcor_*.h; do \
+	  $(CC) -std=gnu11 -ffreestanding -nostdinc \
+	    -isystem $$($(CC) -print-file-name=include) \
+	    -fsyntax-only "$$h" || { \
+	    echo >&2 "ABI guard: $$h is not freestanding-pure"; exit 1; }; \
+	done
+	@dups=$$(grep -hoE '__NR_[a-zA-Z0-9_]+[[:space:]]+[0-9]+' \
+	    $(BUILD)/abi/bits/syscall.h \
+	  | awk '{print $$2}' | sort -n | uniq -d); \
+	test -z "$$dups" || { \
+	  echo >&2 "ABI guard: duplicate upstream syscall numbers: $$dups"; exit 1; }
+	@dups=$$(grep -hoE 'ALCOR_SYSCALL_BIT \| [0-9]+' \
+	    $(BUILD)/abi/bits/alcor_syscall.h \
+	  | awk '{print $$3}' | sort -n | uniq -d); \
+	test -z "$$dups" || { \
+	  echo >&2 "ABI guard: duplicate Alcor syscall ordinals: $$dups"; exit 1; }

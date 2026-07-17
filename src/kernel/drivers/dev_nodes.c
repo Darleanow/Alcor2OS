@@ -9,13 +9,11 @@
  *             to fb_console, ioctls handle termios and FB_CONSOLE controls.
  */
 
-#include <alcor2/alcor_fb.h>
 #include <alcor2/arch/pit.h>
 #include <alcor2/drivers/console.h>
 #include <alcor2/drivers/fb_console.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
-#include <alcor2/fb_console_ioctl.h>
 #include <alcor2/fs/ramfs.h>
 #include <alcor2/fs/vfs.h>
 #include <alcor2/kbd.h>
@@ -26,7 +24,7 @@
 #include <alcor2/types.h>
 
 /**
- * @brief Read from /dev/null — always returns 0 (EOF).
+ * @brief Read from /dev/null, always returns 0 (EOF).
  *
  * @param ctx     Unused.
  * @param buf     Destination buffer (untouched).
@@ -44,7 +42,7 @@ static i64 null_read(void *ctx, void *buf, u64 count, u64 offset)
 }
 
 /**
- * @brief Write to /dev/null — silently discards all data.
+ * @brief Write to /dev/null, silently discards all data.
  *
  * @param ctx     Unused.
  * @param buf     Source buffer (ignored).
@@ -61,7 +59,7 @@ static i64 null_write(void *ctx, const void *buf, u64 count, u64 offset)
 }
 
 /**
- * @brief Read from /dev/zero — fills the buffer with zero bytes.
+ * @brief Read from /dev/zero, fills the buffer with zero bytes.
  *
  * @param ctx     Unused.
  * @param buf     Destination buffer; filled with 0x00.
@@ -78,7 +76,7 @@ static i64 zero_read(void *ctx, void *buf, u64 count, u64 offset)
 }
 
 /**
- * @brief Read from /dev/tty — delegates to the keyboard line discipline.
+ * @brief Read from /dev/tty, delegates to the keyboard line discipline.
  *
  * @param ctx     Unused.
  * @param buf     Destination buffer.
@@ -97,7 +95,7 @@ static i64 tty_read(void *ctx, void *buf, u64 count, u64 offset)
 }
 
 /**
- * @brief Write to /dev/tty — delegates to fb_console.
+ * @brief Write to /dev/tty, delegates to fb_console.
  *
  * @param ctx     Unused.
  * @param buf     Source buffer.
@@ -148,29 +146,30 @@ static i64 copy_from_user(void *dst, u64 uptr, u64 n)
 /**
  * @brief Forward an ioctl request to fb_console.
  *
- * Handles @c FB_CONSOLE_SET_ATLAS, @c FB_CONSOLE_YIELD, @c FB_CONSOLE_RECLAIM.
- * Used by both @c tty_ioctl and @c fb_ioctl to keep the two surfaces in sync.
+ * Handles @c ALCOR_IOC_CONSOLE_SET_ATLAS, @c ALCOR_IOC_CONSOLE_YIELD, @c
+ * ALCOR_IOC_CONSOLE_RECLAIM. Used by both @c tty_ioctl and @c fb_ioctl to keep
+ * the two surfaces in sync.
  *
  * @param request  ioctl request code.
  * @param arg      User-space pointer to the ioctl argument (only used for
- *                 @c FB_CONSOLE_SET_ATLAS).
+ *                 @c ALCOR_IOC_CONSOLE_SET_ATLAS).
  * @return 0 on success, @c -ENOTTY if @p request is not an fb_console control,
  *         negative @c -errno on validation failure.
  */
 static i64 fb_console_ioctl_forward(u64 request, u64 arg)
 {
-  if(request == FB_CONSOLE_SET_ATLAS) {
-    if(!vmm_is_user_range((void *)arg, sizeof(fb_console_atlas_t)))
+  if(request == ALCOR_IOC_CONSOLE_SET_ATLAS) {
+    if(!vmm_is_user_range((void *)arg, sizeof(alcor_console_atlas_t)))
       return -EFAULT;
-    fb_console_atlas_t meta;
+    alcor_console_atlas_t meta;
     kmemcpy(&meta, (void *)arg, sizeof(meta));
     return fb_console_set_atlas(&meta) == 0 ? 0 : -EINVAL;
   }
-  if(request == FB_CONSOLE_YIELD) {
+  if(request == ALCOR_IOC_CONSOLE_YIELD) {
     fb_console_yield();
     return 0;
   }
-  if(request == FB_CONSOLE_RECLAIM) {
+  if(request == ALCOR_IOC_CONSOLE_RECLAIM) {
     fb_console_reclaim();
     return 0;
   }
@@ -178,7 +177,7 @@ static i64 fb_console_ioctl_forward(u64 request, u64 arg)
 }
 
 /**
- * @brief ioctl on /dev/tty — handles termios, winsize, keyboard layout, and
+ * @brief ioctl on /dev/tty, handles termios, winsize, keyboard layout, and
  * fb_console controls.
  *
  * @param ctx      Unused.
@@ -210,23 +209,23 @@ static i64 tty_ioctl(void *ctx, u64 request, u64 arg)
   case KTERM_TCSETSF:
     return copy_from_user(&p->termios, arg, sizeof(p->termios));
 
-  case ALCOR2_IOC_KBD_SET_LAYOUT: {
+  case ALCOR_IOC_KBD_SET_LAYOUT: {
     u32 lid;
     if(copy_from_user(&lid, arg, sizeof(lid)) < 0)
       return -EFAULT;
-    if(lid >= KBD_LAYOUT_COUNT)
+    if(lid >= ALCOR_KBD_COUNT)
       return -EINVAL;
-    kbd_set_layout((kbd_layout_t)lid);
+    kbd_set_layout((alcor_kbd_layout_t)lid);
     return 0;
   }
-  case ALCOR2_IOC_KBD_RELEASE_EVENTS: {
+  case ALCOR_IOC_KBD_RELEASE_EVENTS: {
     u32 on;
     if(copy_from_user(&on, arg, sizeof(on)) < 0)
       return -EFAULT;
     kbd_set_release_events(on != 0);
     return 0;
   }
-  case ALCOR2_IOC_TIMER_FAST: {
+  case ALCOR_IOC_TIMER_FAST: {
     u32 on;
     if(copy_from_user(&on, arg, sizeof(on)) < 0)
       return -EFAULT;
@@ -245,7 +244,7 @@ static i64 tty_ioctl(void *ctx, u64 request, u64 arg)
 }
 
 /**
- * @brief Read from /dev/fb — returns an alcor_fb_info_t with the framebuffer
+ * @brief Read from /dev/fb, returns an alcor_fb_info_t with the framebuffer
  * geometry.
  *
  * The first @c sizeof(alcor_fb_info_t) bytes yield the geometry struct.
@@ -273,8 +272,8 @@ static i64 fb_read(void *ctx, void *buf, u64 count, u64 offset)
 }
 
 /**
- * @brief ioctl on /dev/fb — forwards FB_CONSOLE_YIELD, FB_CONSOLE_RECLAIM,
- * and FB_CONSOLE_SET_ATLAS.
+ * @brief ioctl on /dev/fb, forwards ALCOR_IOC_CONSOLE_YIELD,
+ * ALCOR_IOC_CONSOLE_RECLAIM, and ALCOR_IOC_CONSOLE_SET_ATLAS.
  *
  * @param ctx      Unused.
  * @param request  ioctl request code.
@@ -302,7 +301,7 @@ static const ramfs_chardev_ops_t zero_ops = {
  *
  * POLL_IN consults the keyboard line discipline against the calling process's
  * termios (canonical mode reports ready only once a full line is buffered).
- * POLL_OUT is always available — fb_console writes never block.
+ * POLL_OUT is always available, fb_console writes never block.
  *
  * @param ctx     Unused.
  * @param events  Requested events.

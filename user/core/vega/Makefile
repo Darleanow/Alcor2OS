@@ -25,3 +25,5 @@ $(OUT_DIR)/%.o: %.c $(HEADERS) | $(OUT_DIR)
 
 clean:
 	rm -rf $(OUT_DIR)
+
+-include $(wildcard $(OUT_DIR)/*.d)

@@ -14,7 +14,7 @@
  *      sig_ucontext_t is pushed below the red zone on the user stack and
  *      the syscall frame is redirected to the handler.
  *   4. The handler runs, then calls sa_restorer which executes
- *      syscall(SYS_RT_SIGRETURN).
+ *      syscall(__NR_rt_sigreturn).
  *   5. sys_rt_sigreturn restores all registers from sig_ucontext_t and
  *      resumes the interrupted code.
  */
@@ -202,7 +202,7 @@ u64 sys_rt_sigreturn(u64 a1, u64 a2, u64 a3, u64 a4, u64 a5, u64 a6)
   if(p)
     p->sig_mask = ctx->sig_mask;
 
-  /* Return ctx->rax — syscall_dispatch stores it back into frame->rax */
+  /* Return ctx->rax, syscall_dispatch stores it back into frame->rax */
   return ctx->rax;
 }
 
@@ -241,20 +241,20 @@ u64 sys_kill(u64 pid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
   return 0;
 }
 
-/* tkill(tid, sig) — single-threaded kernel: tid maps to pid. */
+/* tkill(tid, sig), single-threaded kernel: tid maps to pid. */
 u64 sys_tkill(u64 tid, u64 sig, u64 a3, u64 a4, u64 a5, u64 a6)
 {
   return sys_kill(tid, sig, a3, a4, a5, a6);
 }
 
-/* tgkill(tgid, tid, sig) — same: route to sys_kill on the tgid. */
+/* tgkill(tgid, tid, sig), same: route to sys_kill on the tgid. */
 u64 sys_tgkill(u64 tgid, u64 tid, u64 sig, u64 a4, u64 a5, u64 a6)
 {
   (void)tid;
   return sys_kill(tgid, sig, 0, a4, a5, a6);
 }
 
-/* sigaltstack(const stack_t *ss, stack_t *old_ss) — alternate signal stack.
+/* sigaltstack(const stack_t *ss, stack_t *old_ss), alternate signal stack.
  * No real altstack support: zero out old_ss if requested, ignore ss. */
 u64 sys_sigaltstack(u64 ss, u64 old_ss, u64 a3, u64 a4, u64 a5, u64 a6)
 {

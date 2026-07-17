@@ -55,16 +55,27 @@ thirdparty/limine/limine:
 	  $(MAKE) -C thirdparty/limine >/dev/null; \
 	fi
 
-thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a:
-	@echo "musl $(MUSL_VER) — download & build"
+thirdparty/musl-src/Makefile:
+	git submodule update --init thirdparty/musl-src
+
+MUSL_ABI_SRCS := thirdparty/musl-src/arch/x86_64/bits/syscall.h.in \
+                 $(wildcard thirdparty/musl-src/arch/generic/bits/alcor_*.h) \
+                 $(wildcard thirdparty/musl-src/include/sys/alcor_*.h)
+
+# Built from a copy so build artifacts never dirty the submodule checkout.
+thirdparty/musl/$(MUSL_PREFIX)/lib/libc.a: thirdparty/musl-src/Makefile $(MUSL_ABI_SRCS)
+	@echo "musl $(MUSL_VER) (Alcor2 fork): build from submodule"
+	@rm -rf thirdparty/musl
 	@mkdir -p thirdparty
-	@curl -sL $(MUSL_URL) | tar xz -C thirdparty
-	@mv thirdparty/musl-$(MUSL_VER) thirdparty/musl
+	@cp -a thirdparty/musl-src thirdparty/musl
 	@cd thirdparty/musl && ./configure --prefix=$$(pwd)/$(MUSL_PREFIX) \
 		--disable-shared $(MUSL_CONFIGURE_EXTRA) \
 		CFLAGS='-Os -fno-stack-protector' >/dev/null
 	@$(MAKE) -C thirdparty/musl -j$(JOBS) >/dev/null
 	@$(MAKE) -C thirdparty/musl install >/dev/null
+	@grep -qF 'ALCOR_SYSCALL_BIT | 3' \
+		thirdparty/musl/$(MUSL_PREFIX)/include/bits/alcor_syscall.h || \
+		{ echo >&2 "musl fork: Alcor ABI headers missing from sysroot"; exit 1; }
 
 
 

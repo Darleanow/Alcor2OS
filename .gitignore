@@ -1,5 +1,6 @@
 build/
-thirdparty/
+thirdparty/*
+!thirdparty/musl-src
 *.o
 *.d
 *.elf

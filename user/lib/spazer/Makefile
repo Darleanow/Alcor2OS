@@ -43,3 +43,5 @@ clean:
 	rm -rf $(OUT_DIR) $(LIBA)
 
 endif
+
+-include $(wildcard $(OUT_DIR)/*.d)

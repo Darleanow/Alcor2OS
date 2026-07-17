@@ -63,7 +63,7 @@ static void pend_csi(char tail)
   out_pend_push((unsigned char)tail);
 }
 
-/* ESC [ N ~ — Home/End/Ins/PgUp/PgDn/F5-F12 (each has a distinct N). */
+/* ESC [ N ~, Home/End/Ins/PgUp/PgDn/F5-F12 (each has a distinct N). */
 static void pend_csi_tilde(unsigned n)
 {
   out_pend_push(0x1b);
@@ -74,7 +74,7 @@ static void pend_csi_tilde(unsigned n)
   out_pend_push('~');
 }
 
-/* ESC O X — F1..F4 in xterm convention. */
+/* ESC O X, F1..F4 in xterm convention. */
 static void pend_ss3(char tail)
 {
   out_pend_push(0x1b);
@@ -88,7 +88,7 @@ static void pend_ss3(char tail)
  *
  * ASCII (< 0x80) is written to @p *out directly even in dry mode so peek
  * paths (@ref kbd_irq_check_intr) can inspect the byte they would emit.
- * Latin-1 (0x80..0xFF — AZERTY accents) is transcoded to 2-byte UTF-8
+ * Latin-1 (0x80..0xFF, AZERTY accents) is transcoded to 2-byte UTF-8
  * and pushed to @c out_pend; that step is the global-state mutation that
  * dry mode skips, returning readability=true without producing a byte.
  *
@@ -107,7 +107,7 @@ static bool emit_user_cp(unsigned char cp, unsigned char *out, bool dry)
   if(dry)
     return true;
   /* Latin-1 → UTF-8: 0xC0|(cp>>6), 0x80|(cp&0x3F).  No need for the 3/4-byte
-   * cases — the layout tables only hold codepoints up to 0xff. */
+   * cases, the layout tables only hold codepoints up to 0xff. */
   out_pend_push((unsigned char)(0xc0u | (cp >> 6u)));
   out_pend_push((unsigned char)(0x80u | (cp & 0x3fu)));
   return false;
@@ -261,18 +261,18 @@ static void fr_tables_init(void)
   fr_ready = true;
 }
 
-static const unsigned char *pick_pl(kbd_layout_t id)
+static const unsigned char *pick_pl(alcor_kbd_layout_t id)
 {
-  if(id == KBD_LAYOUT_FR)
+  if(id == ALCOR_KBD_FR)
     fr_tables_init();
-  return id == KBD_LAYOUT_FR ? fr_pl : us_pl;
+  return id == ALCOR_KBD_FR ? fr_pl : us_pl;
 }
 
-static const unsigned char *pick_sh(kbd_layout_t id)
+static const unsigned char *pick_sh(alcor_kbd_layout_t id)
 {
-  if(id == KBD_LAYOUT_FR)
+  if(id == ALCOR_KBD_FR)
     fr_tables_init();
-  return id == KBD_LAYOUT_FR ? fr_sh : us_sh;
+  return id == ALCOR_KBD_FR ? fr_sh : us_sh;
 }
 
 static bool fr_caps_scan(u8 key)
@@ -291,7 +291,7 @@ static bool us_caps_scan(u8 key)
 
 #define KBD_RAW_PEEK_MAX 256
 
-static kbd_layout_t g_layout = KBD_LAYOUT_US;
+static alcor_kbd_layout_t g_layout = ALCOR_KBD_US;
 
 /* When set, a printable key-up emits a \x00<char> sentinel so apps can track
  * releases precisely (typematic only repeats the last key, breaking Z+D). */
@@ -307,10 +307,10 @@ typedef struct
 
 static kbd_ev_ctx_t g_kbd = {0};
 
-void                kbd_set_layout(kbd_layout_t layout)
+void                kbd_set_layout(alcor_kbd_layout_t layout)
 {
-  if((unsigned)layout >= KBD_LAYOUT_COUNT)
-    layout = KBD_LAYOUT_US;
+  if((unsigned)layout >= ALCOR_KBD_COUNT)
+    layout = ALCOR_KBD_US;
   g_layout   = layout;
   out_pend_w = out_pend_r = 0;
   g_kbd.pend_e0           = false;
@@ -318,7 +318,7 @@ void                kbd_set_layout(kbd_layout_t layout)
   g_kbd.ralt_dn           = false;
 }
 
-kbd_layout_t kbd_get_layout(void)
+alcor_kbd_layout_t kbd_get_layout(void)
 {
   return g_layout;
 }
@@ -341,7 +341,7 @@ bool kbd_get_release_events(void)
  * printable translation. Multi-byte emits (CSI / SS3 escape sequences,
  * UTF-8 continuation bytes) go via @c out_pend so the single-byte
  * @p *out slot stays simple. @p dry runs the dispatch on @p s without
- * pushing to @c out_pend — used by @ref kbd_raw_pending for select(2)
+ * pushing to @c out_pend, used by @ref kbd_raw_pending for select(2)
  * readability and by @ref kbd_irq_check_intr to peek for VINTR; both
  * pass a state copy by value so the real translator isn't mutated.
  *
@@ -581,12 +581,12 @@ static bool
     return false;
   }
 
-  if(g_layout == KBD_LAYOUT_FR && (s->lalt_dn || s->ralt_dn) && fr_alt[key]) {
+  if(g_layout == ALCOR_KBD_FR && (s->lalt_dn || s->ralt_dn) && fr_alt[key]) {
     return emit_user_cp(fr_alt[key], out, dry);
   }
 
   bool eff_shift = s->mod.shift;
-  if(g_layout == KBD_LAYOUT_FR) {
+  if(g_layout == ALCOR_KBD_FR) {
     if(fr_caps_scan(key))
       eff_shift ^= s->mod.capslock;
   } else if(us_caps_scan(key)) {
@@ -615,7 +615,7 @@ static bool kbd_peek_would_emit(const u8 *buf, u32 n, kbd_ev_ctx_t st)
  *
  * Walks @p buf through @ref process_raw_ctx using @p st (a state copy
  * passed by value, so neither @c g_kbd nor @p st leaks out) with
- * @c dry=true. We only act when @p vintr is the *first* emitted byte —
+ * @c dry=true. We only act when @p vintr is the *first* emitted byte;
  * other emits earlier in the buffer mean the user typed something
  * legitimate and we should defer to the normal pop path.
  *

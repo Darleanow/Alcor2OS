@@ -3,7 +3,6 @@
  * @brief Syscalls: framebuffer info + mmap (userspace drawing / font stacks).
  */
 
-#include <alcor2/alcor_fb.h>
 #include <alcor2/drivers/fb_user.h>
 #include <alcor2/errno.h>
 #include <alcor2/kstdlib.h>

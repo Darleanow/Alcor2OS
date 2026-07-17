@@ -10,7 +10,7 @@ CORE_OBJS  := $(CORE_DIR)/ast.o $(CORE_DIR)/lexer.o $(CORE_DIR)/parse.o
 CFLAGS  += -I$(USER_BASE)/sdk/vega/include \
            -I$(USER_BASE)/core/vega/include
 
-SRCS := vega.c exec.c expand.c fntab.c alcor_tty.c
+SRCS := vega.c exec.c expand.c fntab.c
 OBJS := $(patsubst %.c,$(OUT_DIR)/%.o,$(SRCS))
 
 HEADERS := \
@@ -40,3 +40,5 @@ $(LIBA): $(OBJS) $(CORE_OBJS) | $(OUT_LIBDIR)
 
 clean:
 	rm -rf $(OUT_DIR) $(LIBA)
+
+-include $(wildcard $(OUT_DIR)/*.d)

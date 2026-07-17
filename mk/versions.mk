@@ -3,8 +3,8 @@
 LIMINE_URL := https://github.com/limine-bootloader/limine.git
 LIMINE_REV := v9.x-binary
 
-MUSL_URL := https://git.musl-libc.org/cgit/musl/snapshot/musl-1.2.5.tar.gz
-MUSL_VER := 1.2.5
+# Informational only; the thirdparty/musl-src submodule commit is the real pin.
+MUSL_VER := 1.2.6
 
 MUSL_CROSS_URL := https://github.com/richfelker/musl-cross-make/archive/refs/heads/master.tar.gz
 

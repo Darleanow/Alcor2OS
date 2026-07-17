@@ -74,14 +74,14 @@ u32 atlas_lookup_attr(u32 cp, u16 attr)
  * The @c kmalloc and per-codepoint walks in @ref fb_console_set_atlas trust
  * every field of @p meta verbatim once this returns @c true, so this is the
  * one and only place where an attacker-controlled value gets bounded. Caps
- * are generous (no real font needs anything near them) — the goal is to
+ * are generous (no real font needs anything near them), the goal is to
  * stop a runaway allocation, not enforce font policy.
  *
  * @param meta  Descriptor copied from userspace.
  * @return @c true if every field fits the @c ATLAS_*_MAX caps and stride is
  *         within @c cell_w * max-bytes-per-pixel.
  */
-bool atlas_meta_is_sane(const fb_console_atlas_t *meta)
+bool atlas_meta_is_sane(const alcor_console_atlas_t *meta)
 {
   if(meta->cell_w == 0u || meta->cell_h == 0u ||
      meta->cell_w > ATLAS_CELL_DIM_MAX || meta->cell_h > ATLAS_CELL_DIM_MAX)

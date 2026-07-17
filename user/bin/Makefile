@@ -18,3 +18,5 @@ $(OUT_DIR)/%.elf: %.c $(CRT0) | $(OUT_DIR)
 
 clean:
 	rm -rf $(OUT_DIR)
+
+-include $(wildcard $(OUT_DIR)/*.d)

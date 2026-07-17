@@ -7,8 +7,8 @@
 #ifndef ALCOR2_DRIVERS_MOUSE_H
 #define ALCOR2_DRIVERS_MOUSE_H
 
-#include <alcor2/mouse.h>
 #include <alcor2/types.h>
+#include <bits/alcor_input.h>
 
 /** @brief Initialise the broker: clear the ring, cursor, and waiter slot. */
 void mouse_init(void);
@@ -31,7 +31,7 @@ bool mouse_ps2_init(void);
  * @param dx      X delta (right positive).
  * @param dy      Y delta (down positive).
  * @param dwheel  Wheel delta (up positive).
- * @param buttons Button bitmask (see ALCOR2_MOUSE_BTN_*).
+ * @param buttons Button bitmask (see ALCOR_MOUSE_BTN_*).
  */
 void mouse_post_event(i32 dx, i32 dy, i16 dwheel, u8 buttons);
 
@@ -47,7 +47,7 @@ void mouse_set_screen(u32 width, u32 height);
  * @param out Destination event.
  * @return 0 on success, or a negative errno.
  */
-i64 mouse_read_block(alcor2_mouse_event_t *out);
+i64 mouse_read_block(alcor_mouse_event_t *out);
 
 /**
  * @brief Enable or disable relative mode (cursor pinned to centre, raw deltas

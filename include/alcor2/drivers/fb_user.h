@@ -6,9 +6,9 @@
 #ifndef ALCOR2_FB_USER_H
 #define ALCOR2_FB_USER_H
 
-#include <alcor2/alcor_fb.h>
 #include <alcor2/limine.h>
 #include <alcor2/types.h>
+#include <bits/alcor_fb.h>
 
 /**
  * @brief Capture framebuffer geometry and physical span from Limine.
@@ -23,7 +23,7 @@ void fb_user_boot_init(
 
 bool fb_user_ready(void);
 
-/** @brief Fill @p out for @ref SYS_ALCOR_FB_INFO. */
+/** @brief Fill @p out for @ref __NR_ALCOR_FB_INFO. */
 void fb_user_fill_info(alcor_fb_info_t *out);
 
 /**
